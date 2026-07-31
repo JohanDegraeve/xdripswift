@@ -1,6 +1,95 @@
 /// constants for home view, ie first view
 
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
+
+enum LoopStatusState {
+    case recent
+    case aging
+    case notLooping
+    case noData
+
+    init(deviceStatusCreatedAt: Date?, lastLoopDate: Date?, referenceDate: Date = .now) {
+        let latestAllowedDate = referenceDate.addingTimeInterval(60)
+        let warningDate = referenceDate.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes)
+        let noDataDate = referenceDate.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes)
+
+        guard let deviceStatusCreatedAt, deviceStatusCreatedAt != .distantPast, deviceStatusCreatedAt <= latestAllowedDate, deviceStatusCreatedAt > noDataDate else {
+            self = .noData
+            return
+        }
+
+        if let lastLoopDate, lastLoopDate != .distantPast, lastLoopDate <= latestAllowedDate {
+            if lastLoopDate > warningDate {
+                self = .recent
+                return
+            } else if lastLoopDate > noDataDate {
+                self = .aging
+                return
+            }
+        }
+
+        self = .notLooping
+    }
+
+    var color: Color {
+        switch self {
+        case .recent:
+            return .green
+        case .aging:
+            return .yellow
+        case .notLooping:
+            return .red
+        case .noData:
+            return .gray
+        }
+    }
+
+    #if os(iOS)
+    var uiColor: UIColor {
+        switch self {
+        case .recent:
+            return .systemGreen
+        case .aging:
+            return .systemYellow
+        case .notLooping:
+            return .systemRed
+        case .noData:
+            return .systemGray
+        }
+    }
+    #endif
+
+    var title: String {
+        switch self {
+        case .recent, .aging:
+            return "Looping"
+        case .notLooping:
+            return "Not looping"
+        case .noData:
+            return "No data"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .recent:
+            return ConstantsHomeView.loopStatusRecentSystemImage
+        case .aging:
+            return ConstantsHomeView.loopStatusAcceptableSystemImage
+        case .notLooping:
+            return ConstantsHomeView.loopStatusNotLoopingSystemImage
+        case .noData:
+            return ConstantsHomeView.loopStatusNoDataSystemImage
+        }
+    }
+
+    var showsLoopAge: Bool {
+        self != .noData
+    }
+}
 
 enum ConstantsHomeView {
 
@@ -90,7 +179,7 @@ enum ConstantsHomeView {
     // MARK: - For loop/AID status
     
     /// after how many seconds should the loop status be shown as a warning
-    static let loopShowWarningAfterMinutes: TimeInterval = 60 * 9
+    static let loopShowWarningAfterMinutes: TimeInterval = 60 * 12
     
     /// after how many seconds should the loop status be shown as having no current data to show
     static let loopShowNoDataAfterMinutes: TimeInterval = 60 * 17

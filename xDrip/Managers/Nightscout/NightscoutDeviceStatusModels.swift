@@ -224,52 +224,20 @@ struct NightscoutDeviceStatus: Codable, Sendable {
         return nil
     }
     
-    func deviceStatusColor() -> Color {
-        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return .green
-        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return .yellow
-        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return .yellow
-        } else {
-            return .red
-        }
+    func deviceStatusColor(referenceDate: Date = .now) -> Color {
+        loopStatusState(referenceDate: referenceDate).color
     }
     
-    func deviceStatusBannerBackgroundColor() -> Color {
-        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return Color(red: 0, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
-        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return Color(red: 1, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
-        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return Color(red: 1, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
-        } else {
-            return Color(red: 1, green: 0, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
-        }
+    func deviceStatusBannerBackgroundColor(referenceDate: Date = .now) -> Color {
+        loopStatusState(referenceDate: referenceDate).color.opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
     }
     
-    func deviceStatusUIColor() -> UIColor {
-        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return .systemGreen
-        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return .systemYellow
-        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return .systemYellow
-        } else {
-            return .systemRed
-        }
+    func deviceStatusUIColor(referenceDate: Date = .now) -> UIColor {
+        loopStatusState(referenceDate: referenceDate).uiColor
     }
     
-    func deviceStatusTitle() -> String {
-        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return "Looping"
-        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return "Looping"
-        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return "Not looping"
-        } else {
-            return "Error/No data"
-        }
+    func deviceStatusTitle(referenceDate: Date = .now) -> String {
+        loopStatusState(referenceDate: referenceDate).title
     }
 
     func deviceStatusIconImage() -> Image {
@@ -280,16 +248,12 @@ struct NightscoutDeviceStatus: Codable, Sendable {
         UIImage(systemName: deviceStatusIconSystemName()) ?? UIImage()
     }
 
-    func deviceStatusIconSystemName() -> String {
-        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return ConstantsHomeView.loopStatusRecentSystemImage
-        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return ConstantsHomeView.loopStatusAcceptableSystemImage
-        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return ConstantsHomeView.loopStatusNotLoopingSystemImage
-        } else {
-            return ConstantsHomeView.loopStatusNoDataSystemImage
-        }
+    func deviceStatusIconSystemName(referenceDate: Date = .now) -> String {
+        loopStatusState(referenceDate: referenceDate).systemImage
+    }
+
+    private func loopStatusState(referenceDate: Date = .now) -> LoopStatusState {
+        LoopStatusState(deviceStatusCreatedAt: createdAt, lastLoopDate: lastLoopDate, referenceDate: referenceDate)
     }
     
     func pumpReservoirColor() -> Color? {

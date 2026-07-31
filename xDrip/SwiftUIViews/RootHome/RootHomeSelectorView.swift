@@ -105,7 +105,7 @@ struct RootHomeSelectorButton: View {
     let action: () -> Void
 
     private enum Layout {
-        static let fontSize: CGFloat = 13
+        static let fontSize: CGFloat = 14
         static let indicatorOutwardOffset: CGFloat = 2
     }
 

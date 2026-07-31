@@ -51,12 +51,13 @@ struct RootHomePumpState {
     var reservoir = RootHomeMetricState(title: Texts_HomeView.pumpReservoir, value: "-")
     var battery = RootHomeMetricState(title: Texts_HomeView.pumpBattery, value: "-")
     var cage = RootHomeMetricState(title: "CAGE", value: "-")
+    var isHistorical = false
 }
 
 /// Loop status and optional uploader-battery presentation.
 struct RootHomeLoopState {
-    var iob = RootHomeMetricState(title: "IOB", value: "-")
-    var cob = RootHomeMetricState(title: "COB", value: "-")
+    var iob = RootHomeMetricState(title: "IOB", value: "- U")
+    var cob = RootHomeMetricState(title: "COB", value: "- g")
     var statusTitle = "-"
     var statusSystemImage: String?
     var statusColor = ConstantsAppColors.secondaryText
@@ -66,6 +67,7 @@ struct RootHomeLoopState {
     var showsUploaderBattery = false
     var uploaderBatterySystemImage = "battery.75"
     var uploaderBatteryColor = ConstantsAppColors.primaryText
+    var isHistorical = false
 }
 
 /// Calculated statistics and their loading state for the selected period.
@@ -211,10 +213,7 @@ final class RootHomeStateModel: ObservableObject {
         }
 
         let latestReadings = bgReadingsAccessor?.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4) ?? []
-        let latestSiteChangeDate = treatmentEntryAccessor?
-            .getLatestTreatments(howOld: TimeInterval(days: 90))
-            .first { !$0.treatmentdeleted && $0.treatmentType == .SiteChange }?
-            .date
+        let latestSiteChangeDate = treatmentEntryAccessor?.latestSiteChangeDate()
         let deviceStatus = nightscoutSyncManager?.deviceStatus as? NightscoutDeviceStatus
         let cgmTransmitter = bluetoothPeripheralManager?.getCGMTransmitter()
 
@@ -387,8 +386,16 @@ final class RootHomeStateModel: ObservableObject {
 
     // MARK: - Pump and Loop
 
-    private func pumpState(deviceStatus: NightscoutDeviceStatus?, latestSiteChangeDate: Date?) -> RootHomePumpState {
-        let hasRecentData = deviceStatus?.lastCheckedDate != .distantPast && (deviceStatus?.createdAt ?? .distantPast) > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes)
+    func pumpState(
+        deviceStatus: NightscoutDeviceStatus?,
+        latestSiteChangeDate: Date?,
+        referenceDate: Date = .now,
+        usesRelativeCageTime: Bool = true,
+        defaultTextColor: Color = ConstantsAppColors.primaryText
+    ) -> RootHomePumpState {
+        let hasRecentData = deviceStatus?.lastCheckedDate != .distantPast
+            && (deviceStatus?.createdAt ?? .distantPast) <= referenceDate.addingTimeInterval(60)
+            && (deviceStatus?.createdAt ?? .distantPast) > referenceDate.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes)
         let basal = hasRecentData ? deviceStatus?.rate?.round(toDecimalPlaces: 1) : nil
         let reservoirText: String
 
@@ -403,42 +410,66 @@ final class RootHomeStateModel: ObservableObject {
         let batteryText = hasRecentData ? deviceStatus?.pumpBatteryPercent.map { "\($0) %" } ?? "- %" : "- %"
 
         return RootHomePumpState(
-            basal: RootHomeMetricState(title: "Basal", value: basal.map { "\($0) U/hr" } ?? "? U/hr"),
-            reservoir: RootHomeMetricState(title: Texts_HomeView.pumpReservoir, value: reservoirText, valueColor: hasRecentData ? deviceStatus?.pumpReservoirColor() ?? ConstantsAppColors.primaryText : ConstantsAppColors.primaryText),
-            battery: RootHomeMetricState(title: Texts_HomeView.pumpBattery, value: batteryText, valueColor: hasRecentData ? deviceStatus?.pumpBatteryPercentColor() ?? ConstantsAppColors.primaryText : ConstantsAppColors.primaryText),
-            cage: RootHomeMetricState(title: "CAGE", value: latestSiteChangeDate?.daysAndHoursAgo() ?? "-", valueColor: cageColor(latestSiteChangeDate))
+            basal: RootHomeMetricState(title: "Basal", value: basal.map { "\($0) U/hr" } ?? "? U/hr", valueColor: defaultTextColor),
+            reservoir: RootHomeMetricState(title: Texts_HomeView.pumpReservoir, value: reservoirText, valueColor: hasRecentData ? deviceStatus?.pumpReservoirColor() ?? defaultTextColor : defaultTextColor),
+            battery: RootHomeMetricState(title: Texts_HomeView.pumpBattery, value: batteryText, valueColor: hasRecentData ? deviceStatus?.pumpBatteryPercentColor() ?? defaultTextColor : defaultTextColor),
+            cage: RootHomeMetricState(
+                title: "CAGE",
+                value: cageText(latestSiteChangeDate, referenceDate: referenceDate, usesRelativeCageTime: usesRelativeCageTime),
+                valueColor: cageColor(latestSiteChangeDate, referenceDate: referenceDate, defaultColor: defaultTextColor)
+            )
         )
     }
 
-    private func loopState(deviceStatus: NightscoutDeviceStatus?) -> RootHomeLoopState {
+    func loopState(
+        deviceStatus: NightscoutDeviceStatus?,
+        referenceDate: Date = .now,
+        usesRelativeStatusTime: Bool = true,
+        defaultTextColor: Color = ConstantsAppColors.primaryText
+    ) -> RootHomeLoopState {
         guard let deviceStatus else { return RootHomeLoopState() }
 
         let hasBeenChecked = deviceStatus.lastCheckedDate != .distantPast
-        let hasRecentData = hasBeenChecked && deviceStatus.createdAt > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes)
+        let hasRecentData = hasBeenChecked
+            && deviceStatus.createdAt <= referenceDate.addingTimeInterval(60)
+            && deviceStatus.createdAt > referenceDate.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes)
         let uploaderBattery = hasRecentData && !UserDefaults.standard.isMaster ? deviceStatus.uploaderBatteryStatusStyle() : nil
+        let loopStatusState = LoopStatusState(deviceStatusCreatedAt: deviceStatus.createdAt, lastLoopDate: deviceStatus.lastLoopDate, referenceDate: referenceDate)
+        let statusTimeText = usesRelativeStatusTime
+            ? deviceStatus.lastLoopDate.daysAndHoursAgo()
+            : deviceStatus.lastLoopDate.formatted(date: .omitted, time: .shortened)
+        let hasLoopDate = deviceStatus.lastLoopDate != .distantPast
+        let statusTimeAgo = loopStatusState.showsLoopAge ? (hasLoopDate ? statusTimeText : "-m") : ""
 
         let iobText = hasRecentData ? deviceStatus.iob.map { "\($0.round(toDecimalPlaces: 2)) U" } ?? "- U" : "- U"
 
         return RootHomeLoopState(
-            iob: RootHomeMetricState(title: "IOB", value: iobText),
-            cob: RootHomeMetricState(title: "COB", value: hasRecentData ? "\(deviceStatus.cob?.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes ?? "-") g" : "- g"),
-            statusTitle: hasBeenChecked ? deviceStatus.deviceStatusTitle() : Texts_Common.checking,
-            statusSystemImage: hasBeenChecked ? deviceStatus.deviceStatusIconSystemName() : nil,
-            statusColor: hasBeenChecked ? deviceStatus.deviceStatusColor() : ConstantsAppColors.secondaryText,
-            statusTimeAgo: hasRecentData && deviceStatus.lastLoopDate != .distantPast ? deviceStatus.lastLoopDate.daysAndHoursAgo() : "",
-            showsStatusTimeAgo: hasRecentData,
+            iob: RootHomeMetricState(title: "IOB", value: iobText, valueColor: defaultTextColor),
+            cob: RootHomeMetricState(title: "COB", value: hasRecentData ? "\(deviceStatus.cob?.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes ?? "-") g" : "- g", valueColor: defaultTextColor),
+            statusTitle: hasBeenChecked ? loopStatusState.title : Texts_Common.checking,
+            statusSystemImage: hasBeenChecked ? loopStatusState.systemImage : nil,
+            statusColor: hasBeenChecked ? loopStatusState.color : ConstantsAppColors.secondaryText,
+            statusTimeAgo: statusTimeAgo,
+            showsStatusTimeAgo: !statusTimeAgo.isEmpty,
             showsActivityIndicator: !hasBeenChecked,
             showsUploaderBattery: uploaderBattery != nil,
             uploaderBatterySystemImage: uploaderBattery?.systemImage ?? "battery.75",
-            uploaderBatteryColor: uploaderBattery?.color ?? ConstantsAppColors.primaryText
+            uploaderBatteryColor: uploaderBattery?.color ?? defaultTextColor
         )
     }
 
-    private func cageColor(_ siteChangeDate: Date?) -> Color {
-        guard let siteChangeDate else { return ConstantsAppColors.primaryText }
+    private func cageText(_ siteChangeDate: Date?, referenceDate: Date, usesRelativeCageTime: Bool) -> String {
+        guard let siteChangeDate else { return "-" }
+        guard !usesRelativeCageTime else { return siteChangeDate.daysAndHoursAgo() }
+
+        return max(0, referenceDate.timeIntervalSince(siteChangeDate).minutes).minutesToDaysAndHours()
+    }
+
+    private func cageColor(_ siteChangeDate: Date?, referenceDate: Date = .now, defaultColor: Color = ConstantsAppColors.primaryText) -> Color {
+        guard let siteChangeDate else { return defaultColor }
 
         let maximumAge = TimeInterval(UserDefaults.standard.CAGEMaxHours * 60 * 60)
-        let currentAge = -siteChangeDate.timeIntervalSinceNow
+        let currentAge = referenceDate.timeIntervalSince(siteChangeDate)
 
         if currentAge > maximumAge {
             return ConstantsAppColors.urgent
@@ -448,7 +479,7 @@ final class RootHomeStateModel: ObservableObject {
             return ConstantsAppColors.warning
         }
 
-        return ConstantsAppColors.primaryText
+        return defaultColor
     }
 
     // MARK: - Sensor and Data Source

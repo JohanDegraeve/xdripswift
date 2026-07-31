@@ -252,35 +252,19 @@ struct XDripWidgetAttributes: ActivityAttributes {
         }
                 
         func deviceStatusColor() -> Color? {
-            if let lastLoopDate = deviceStatusLastLoopDate, let createdAt = deviceStatusCreatedAt {
-                if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-                    return .green
-                } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                    return .green
-                } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                    return .yellow
-                } else {
-                    return .red
-                }
-            } else {
-                return nil
-            }
+            guard deviceStatusCreatedAt != nil else { return nil }
+
+            return loopStatusState().color
         }
         
         func deviceStatusIconImage() -> Image? {
-            if let lastLoopDate = deviceStatusLastLoopDate, let createdAt = deviceStatusCreatedAt {
-                if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-                    return Image(systemName: ConstantsHomeView.loopStatusRecentSystemImage)
-                } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                    return Image(systemName: ConstantsHomeView.loopStatusAcceptableSystemImage)
-                } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                    return Image(systemName: ConstantsHomeView.loopStatusNotLoopingSystemImage)
-                } else {
-                    return Image(systemName: ConstantsHomeView.loopStatusNoDataSystemImage)
-                }
-            } else {
-                return nil
-            }
+            guard deviceStatusCreatedAt != nil else { return nil }
+
+            return Image(systemName: loopStatusState().systemImage)
+        }
+
+        private func loopStatusState() -> LoopStatusState {
+            LoopStatusState(deviceStatusCreatedAt: deviceStatusCreatedAt, lastLoopDate: deviceStatusLastLoopDate)
         }
     }
 }

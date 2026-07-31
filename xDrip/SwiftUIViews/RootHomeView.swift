@@ -41,6 +41,7 @@ struct RootHomeView: View {
     @StateObject private var glucoseChartStateManager: GlucoseChartStateManager
     @StateObject private var miniChartStateManager: GlucoseChartStateManager
     @StateObject private var scrollCoordinator: GlucoseChartScrollCoordinator
+    @StateObject private var historicalDataCache: RootHomeHistoricalDataCache
 
     private let nightscoutSyncManager: NightscoutSyncManager
     @State private var selectedRange: RootHomeChartRange
@@ -79,6 +80,7 @@ struct RootHomeView: View {
         _glucoseChartStateManager = StateObject(wrappedValue: GlucoseChartStateManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager, showsSensorNoiseBands: true))
         _miniChartStateManager = StateObject(wrappedValue: GlucoseChartStateManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager))
         _scrollCoordinator = StateObject(wrappedValue: GlucoseChartScrollCoordinator(visibleTimeInterval: initialRange.timeInterval))
+        _historicalDataCache = StateObject(wrappedValue: RootHomeHistoricalDataCache(coreDataManager: coreDataManager))
         _selectedRange = State(initialValue: initialRange)
     }
 
@@ -102,6 +104,7 @@ struct RootHomeView: View {
             scrollCoordinator.stopDeceleration()
             glucoseChartStateManager.cleanUpMemory()
             miniChartStateManager.cleanUpMemory()
+            historicalDataCache.cleanUpMemory()
         }
         .onReceive(chartRefreshTimer) { _ in
             refreshCurrentTimeRangeIfNeeded(showsLoading: false)
@@ -112,16 +115,21 @@ struct RootHomeView: View {
                 stateModel.updateClock()
             }
         }
-        .onReceive(scrollCoordinator.$endDate.throttle(for: .milliseconds(120), scheduler: RunLoop.main, latest: true)) { _ in
+        .onReceive(scrollCoordinator.$endDate.throttle(for: .milliseconds(120), scheduler: RunLoop.main, latest: true)) { endDate in
             requestChartStateIfNeeded()
+            prepareHistoricalDataIfNeeded(at: endDate)
         }
         .onReceive(nightscoutSyncManager.$deviceStatus.receive(on: RunLoop.main)) { _ in
+            if scrollCoordinator.isShowingCurrentTimeRange {
+                historicalDataCache.reset()
+            }
             actions.refreshPumpAndLoopStatus()
         }
         .onChange(of: selectedRange) { newRange in
             chartWidthInHours = newRange.rawValue
             scrollCoordinator.setVisibleTimeInterval(newRange.timeInterval)
             requestChartState(forceReset: true)
+            prepareHistoricalDataIfNeeded(at: endDate)
         }
         .onChange(of: chartWidthInHours) { _ in
             refreshChartRangeFromStoredSettings()
@@ -157,7 +165,7 @@ struct RootHomeView: View {
             VStack(spacing: Layout.rowSpacing) {
                 HStack(spacing: 0) {
                     if state.visibility.showsPump {
-                        RootHomePumpView(state: state.pump)
+                        RootHomePumpView(state: pumpDisplayState)
                             .frame(maxHeight: .infinity)
                     }
 
@@ -167,7 +175,7 @@ struct RootHomeView: View {
                 .frame(height: Layout.glucoseStatusRowHeight)
 
                 if state.visibility.showsLoop {
-                    RootHomeLoopView(state: state.loop, actions: actions)
+                    RootHomeLoopView(state: loopDisplayState, actions: actions)
                 }
 
                 if state.sensorNoise.showsWarning {
@@ -295,6 +303,66 @@ struct RootHomeView: View {
         )
     }
 
+    private var pumpDisplayState: RootHomePumpState {
+        guard !scrollCoordinator.isShowingCurrentTimeRange else {
+            return state.pump
+        }
+
+        let referenceDate = endDate
+        let historicalData = historicalDataCache.selection(at: referenceDate)
+
+        return historicalPumpState(
+            stateModel.pumpState(
+                deviceStatus: historicalData.deviceStatus?.deviceStatus(),
+                latestSiteChangeDate: historicalData.siteChangeDate,
+                referenceDate: referenceDate,
+                usesRelativeCageTime: false,
+                defaultTextColor: ConstantsAppColors.secondaryText
+            )
+        )
+    }
+
+    private var loopDisplayState: RootHomeLoopState {
+        guard !scrollCoordinator.isShowingCurrentTimeRange else {
+            return state.loop
+        }
+
+        let referenceDate = endDate
+        guard let snapshot = historicalDataCache.selection(at: referenceDate).deviceStatus else {
+            let loopStatusState = LoopStatusState(deviceStatusCreatedAt: nil, lastLoopDate: nil, referenceDate: referenceDate)
+            return historicalLoopState(RootHomeLoopState(
+                iob: RootHomeMetricState(title: "IOB", value: "- U", valueColor: ConstantsAppColors.secondaryText),
+                cob: RootHomeMetricState(title: "COB", value: "- g", valueColor: ConstantsAppColors.secondaryText),
+                statusTitle: loopStatusState.title,
+                statusSystemImage: loopStatusState.systemImage,
+                statusColor: ConstantsAppColors.secondaryText
+            ))
+        }
+
+        return historicalLoopState(
+            stateModel.loopState(
+                deviceStatus: snapshot.deviceStatus(),
+                referenceDate: referenceDate,
+                usesRelativeStatusTime: false,
+                defaultTextColor: ConstantsAppColors.secondaryText
+            )
+        )
+    }
+
+    private func historicalPumpState(_ pumpState: RootHomePumpState) -> RootHomePumpState {
+        var pumpState = pumpState
+        pumpState.isHistorical = true
+
+        return pumpState
+    }
+
+    private func historicalLoopState(_ loopState: RootHomeLoopState) -> RootHomeLoopState {
+        var loopState = loopState
+        loopState.isHistorical = true
+
+        return loopState
+    }
+
     private var miniChartState: GlucoseChartState {
         let state = miniChartStateManager.state
 
@@ -382,6 +450,15 @@ struct RootHomeView: View {
         requestChartState(forceReset: false, showsLoading: false)
     }
 
+    private func prepareHistoricalDataIfNeeded(at referenceDate: Date) {
+        guard !scrollCoordinator.isShowingCurrentTimeRange else { return }
+
+        historicalDataCache.prepare(
+            around: referenceDate,
+            visibleTimeInterval: selectedRange.timeInterval
+        )
+    }
+
     private func requestChartState(forceReset: Bool, showsLoading: Bool = true, refreshCachedData: Bool = false) {
         if showsLoading {
             isLoadingChart = true
@@ -456,5 +533,215 @@ struct RootHomeView: View {
 
         showOriginalBGReadingsOnly = false
         requestChartState(forceReset: false, showsLoading: false)
+    }
+}
+
+// MARK: - Historical Pump and Loop Cache
+
+/// Keeps the historical values used by the pump and loop strips away from SwiftUI's render path.
+///
+/// Dragging publishes a new chart end date for almost every point moved. Core Data work in a derived
+/// view property would therefore run repeatedly while SwiftUI evaluates the same body. This cache
+/// loads a buffered range on a serial background queue, then resolves each timestamp from immutable
+/// value snapshots already held in memory.
+private final class RootHomeHistoricalDataCache: ObservableObject {
+
+    struct Selection {
+        let deviceStatus: NightscoutDeviceStatusSnapshot?
+        let siteChangeDate: Date?
+    }
+
+    private struct Load {
+        let startDate: Date
+        let endDate: Date
+        let siteChangeStartDate: Date?
+        let loadsSiteChanges: Bool
+        let resetsCache: Bool
+        let generation: Int
+    }
+
+    @Published private(set) var revision = 0
+
+    private let deviceStatusAccessor: NightscoutDeviceStatusAccessor
+    private let treatmentEntryAccessor: TreatmentEntryAccessor
+    private let operationQueue = OperationQueue()
+
+    private var deviceStatuses = [NightscoutDeviceStatusSnapshot]()
+    private var siteChangeDates = [Date]()
+    private var cacheStartDate: Date?
+    private var cacheEndDate: Date?
+    private var requestedDate: Date?
+    private var requestedVisibleTimeInterval: TimeInterval = 0
+    private var isLoading = false
+    private var generation = 0
+
+    private static let minimumBufferTimeInterval: TimeInterval = .hours(1)
+    private static let maximumBufferTimeInterval: TimeInterval = .hours(6)
+
+    init(coreDataManager: CoreDataManager) {
+        deviceStatusAccessor = NightscoutDeviceStatusAccessor(coreDataManager: coreDataManager)
+        treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
+        operationQueue.maxConcurrentOperationCount = 1
+        operationQueue.name = "RootHomeHistoricalDataCache"
+    }
+
+    /// Extends the cache only when the requested timestamp approaches an unloaded edge.
+    ///
+    /// Site changes are initially loaded through the requested range because CAGE may depend on an
+    /// entry many days earlier. Later forward extensions fetch only newly possible site changes.
+    func prepare(around date: Date, visibleTimeInterval: TimeInterval) {
+        requestedDate = date
+        requestedVisibleTimeInterval = abs(visibleTimeInterval)
+
+        guard !isLoading else { return }
+
+        let buffer = min(
+            max(requestedVisibleTimeInterval * 0.5, Self.minimumBufferTimeInterval),
+            Self.maximumBufferTimeInterval
+        )
+        let desiredStartDate = date.addingTimeInterval(-buffer)
+        let desiredEndDate = min(date.addingTimeInterval(buffer), Date())
+
+        let load: Load?
+
+        if let cacheStartDate, let cacheEndDate {
+            if desiredEndDate < cacheStartDate || desiredStartDate > cacheEndDate {
+                load = Load(startDate: desiredStartDate, endDate: desiredEndDate, siteChangeStartDate: nil, loadsSiteChanges: true, resetsCache: true, generation: generation)
+            } else if desiredStartDate < cacheStartDate {
+                // The initial site-change fetch already includes every older retained entry.
+                load = Load(startDate: desiredStartDate, endDate: cacheStartDate, siteChangeStartDate: nil, loadsSiteChanges: false, resetsCache: false, generation: generation)
+            } else if desiredEndDate > cacheEndDate {
+                load = Load(startDate: cacheEndDate, endDate: desiredEndDate, siteChangeStartDate: cacheEndDate, loadsSiteChanges: true, resetsCache: false, generation: generation)
+            } else {
+                load = nil
+            }
+        } else {
+            load = Load(startDate: desiredStartDate, endDate: desiredEndDate, siteChangeStartDate: nil, loadsSiteChanges: true, resetsCache: true, generation: generation)
+        }
+
+        guard let load, load.startDate < load.endDate else { return }
+
+        isLoading = true
+        let statusStartDate = load.startDate.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes)
+
+        operationQueue.addOperation { [weak self] in
+            guard let self else { return }
+
+            let statuses = self.deviceStatusAccessor.fetch(fromDate: statusStartDate, toDate: load.endDate)
+            let siteChanges = load.loadsSiteChanges
+                ? self.treatmentEntryAccessor.siteChangeDates(
+                    fromDate: load.siteChangeStartDate,
+                    toDate: load.endDate
+                )
+                : []
+
+            DispatchQueue.main.async {
+                guard self.generation == load.generation else { return }
+
+                if load.resetsCache {
+                    self.deviceStatuses = statuses
+                    self.siteChangeDates = siteChanges
+                    self.cacheStartDate = load.startDate
+                    self.cacheEndDate = load.endDate
+                } else {
+                    self.merge(statuses)
+                    self.siteChangeDates = Array(Set(self.siteChangeDates).union(siteChanges)).sorted()
+                    self.cacheStartDate = min(self.cacheStartDate ?? load.startDate, load.startDate)
+                    self.cacheEndDate = max(self.cacheEndDate ?? load.endDate, load.endDate)
+                }
+
+                self.isLoading = false
+                self.revision &+= 1
+
+                if let requestedDate = self.requestedDate {
+                    self.prepare(
+                        around: requestedDate,
+                        visibleTimeInterval: self.requestedVisibleTimeInterval
+                    )
+                }
+            }
+        }
+    }
+
+    /// Resolves both strips from the same cached status snapshot for one selected timestamp.
+    func selection(at date: Date) -> Selection {
+        let statusIndex = deviceStatuses.lastIndexAtOrBefore(date, date: \.createdAt)
+        let status = statusIndex.map { deviceStatuses[$0] }.flatMap {
+            $0.createdAt >= date.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) ? $0 : nil
+        }
+        let siteChangeIndex = siteChangeDates.lastIndexBefore(date)
+
+        return Selection(
+            deviceStatus: status,
+            siteChangeDate: siteChangeIndex.map { siteChangeDates[$0] }
+        )
+    }
+
+    func reset() {
+        generation &+= 1
+        operationQueue.cancelAllOperations()
+        deviceStatuses.removeAll()
+        siteChangeDates.removeAll()
+        cacheStartDate = nil
+        cacheEndDate = nil
+        requestedDate = nil
+        requestedVisibleTimeInterval = 0
+        isLoading = false
+        revision &+= 1
+    }
+
+    func cleanUpMemory() {
+        reset()
+    }
+
+    private func merge(_ snapshots: [NightscoutDeviceStatusSnapshot]) {
+        var snapshotsByID = [String: NightscoutDeviceStatusSnapshot]()
+
+        for snapshot in deviceStatuses + snapshots {
+            snapshotsByID[snapshot.id] = snapshot
+        }
+
+        deviceStatuses = snapshotsByID.values.sorted { $0.createdAt < $1.createdAt }
+    }
+}
+
+private extension Array {
+    /// Binary-searches an ascending value-snapshot array without rebuilding filtered copies per frame.
+    func lastIndexAtOrBefore(_ targetDate: Date, date: (Element) -> Date) -> Index? {
+        var lowerBound = startIndex
+        var upperBound = endIndex
+
+        while lowerBound < upperBound {
+            let distance = self.distance(from: lowerBound, to: upperBound)
+            let middle = index(lowerBound, offsetBy: distance / 2)
+
+            if date(self[middle]) <= targetDate {
+                lowerBound = index(after: middle)
+            } else {
+                upperBound = middle
+            }
+        }
+
+        return lowerBound == startIndex ? nil : index(before: lowerBound)
+    }
+}
+
+private extension Array where Element == Date {
+    func lastIndexBefore(_ targetDate: Date) -> Index? {
+        var lowerBound = startIndex
+        var upperBound = endIndex
+
+        while lowerBound < upperBound {
+            let distance = self.distance(from: lowerBound, to: upperBound)
+            let middle = index(lowerBound, offsetBy: distance / 2)
+
+            if self[middle] < targetDate {
+                lowerBound = index(after: middle)
+            } else {
+                upperBound = middle
+            }
+        }
+
+        return lowerBound == startIndex ? nil : index(before: lowerBound)
     }
 }

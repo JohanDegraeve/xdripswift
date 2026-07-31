@@ -129,6 +129,75 @@ class TreatmentEntryAccessor {
         }
     }
 
+    /// Returns persisted, non-deleted site-change dates as value types for safe background caching.
+    ///
+    /// Historical CAGE presentation only needs timestamps. Materialising that small value array here
+    /// prevents the Home view from retaining managed objects or querying Core Data during scrolling.
+    func siteChangeDates(fromDate: Date? = nil, toDate: Date) -> [Date] {
+        let fetchRequest: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
+        var predicates = [
+            NSPredicate(format: "date <= %@", toDate as NSDate),
+            NSPredicate(format: "treatmentType == %@", NSNumber(value: TreatmentType.SiteChange.rawValue)),
+            NSCompoundPredicate(orPredicateWithSubpredicates: [
+                NSPredicate(format: "treatmentdeleted == NO"),
+                NSPredicate(format: "treatmentdeleted == nil")
+            ]),
+        ]
+
+        if let fromDate {
+            predicates.append(NSPredicate(format: "date >= %@", fromDate as NSDate))
+        }
+
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(TreatmentEntry.date), ascending: true)]
+        fetchRequest.returnsObjectsAsFaults = false
+        fetchRequest.includesPropertyValues = true
+
+        var siteChangeDates = [Date]()
+        let context = coreDataManager.privateManagedObjectContext
+        context.performAndWait {
+            do {
+                siteChangeDates = try context.fetch(fetchRequest).map(\.date)
+            } catch {
+                let fetchError = error as NSError
+                trace("in siteChangeDates, unable to execute fetch request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, fetchError.localizedDescription)
+            }
+        }
+
+        return siteChangeDates
+    }
+
+    /// Returns only the newest active site change before a reference timestamp.
+    ///
+    /// Live CAGE refreshes need one date, not every treatment from the retention period. Keeping
+    /// this as a fetch-limit-one query avoids repeatedly materialising months of treatment objects.
+    func latestSiteChangeDate(atOrBefore date: Date = .now) -> Date? {
+        let fetchRequest: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
+        fetchRequest.fetchLimit = 1
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "date <= %@", date as NSDate),
+            NSPredicate(format: "treatmentType == %@", NSNumber(value: TreatmentType.SiteChange.rawValue)),
+            NSCompoundPredicate(orPredicateWithSubpredicates: [
+                NSPredicate(format: "treatmentdeleted == NO"),
+                NSPredicate(format: "treatmentdeleted == nil")
+            ]),
+        ])
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(TreatmentEntry.date), ascending: false)]
+        fetchRequest.returnsObjectsAsFaults = false
+
+        let context = coreDataManager.privateManagedObjectContext
+        var date: Date?
+        context.performAndWait {
+            do {
+                date = try context.fetch(fetchRequest).first?.date
+            } catch {
+                trace("in latestSiteChangeDate, unable to execute fetch request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, error.localizedDescription)
+            }
+        }
+
+        return date
+    }
+
     /// deletes treatmentEntry, synchronously, in the managedObjectContext's thread
     /// - parameters:
     ///     - treatmentEntry : treatmentEntry to delete

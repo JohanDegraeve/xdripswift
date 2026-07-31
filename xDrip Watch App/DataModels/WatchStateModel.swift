@@ -435,41 +435,24 @@ final class WatchStateModel: NSObject, ObservableObject {
     }
 
     func deviceStatusColor() -> Color? {
-        if deviceStatusLastLoopDate != .distantPast {
-            if deviceStatusLastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-                return .green
-            } else if deviceStatusLastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                return .green
-            } else if deviceStatusCreatedAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                return .yellow
-            } else {
-                return .red
-            }
-        } else {
-            return nil
-        }
+        guard deviceStatusCreatedAt != .distantPast else { return nil }
+
+        return loopStatusState().color
     }
 
     func deviceStatusIconImage() -> Image? {
-        if deviceStatusLastLoopDate != .distantPast {
-            if deviceStatusLastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-                return Image(systemName: ConstantsHomeView.loopStatusRecentSystemImage)
-            } else if deviceStatusLastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                return Image(systemName: ConstantsHomeView.loopStatusAcceptableSystemImage)
-            } else if deviceStatusCreatedAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                return Image(systemName: ConstantsHomeView.loopStatusNotLoopingSystemImage)
-            } else {
-                return Image(systemName: ConstantsHomeView.loopStatusNoDataSystemImage)
-            }
-        } else {
-            return nil
-        }
+        guard deviceStatusCreatedAt != .distantPast else { return nil }
+
+        return Image(systemName: loopStatusState().systemImage)
     }
 
     /// returns the minutes ago string of the last loop time
     /// check if more than 1 hour has passed. If so, then the amount of text to show would be too much so return the shorter version
     /// - Returns: string representation of last loop time as "(xm)"
     func deviceStatusLastLoopMinsAgoString() -> String {
+        guard loopStatusState().showsLoopAge else { return "" }
+        guard deviceStatusLastLoopDate != .distantPast else { return "-m" }
+
         let diffComponents = Calendar.current.dateComponents([.hour], from: deviceStatusLastLoopDate, to: Date())
 
         if let hours = diffComponents.hour, hours < 1 {
@@ -477,6 +460,10 @@ final class WatchStateModel: NSObject, ObservableObject {
         } else {
             return "-m"
         }
+    }
+
+    private func loopStatusState() -> LoopStatusState {
+        LoopStatusState(deviceStatusCreatedAt: deviceStatusCreatedAt, lastLoopDate: deviceStatusLastLoopDate)
     }
 
     // MARK: - helper functions not related with the class structure

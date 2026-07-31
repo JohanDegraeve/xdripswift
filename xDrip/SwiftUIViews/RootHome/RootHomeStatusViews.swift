@@ -8,6 +8,16 @@
 
 import SwiftUI
 
+private enum RootHomeDisplayStyle {
+    static let historicalValueOpacity = 0.7
+}
+
+private extension Bool {
+    var rootHomeHistoricalValueOpacity: Double {
+        self ? RootHomeDisplayStyle.historicalValueOpacity : 1
+    }
+}
+
 /// Compact pump status displayed beside the current glucose reading.
 struct RootHomePumpView: View {
     let state: RootHomePumpState
@@ -18,16 +28,16 @@ struct RootHomePumpView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            RootHomeHorizontalMetricView(metric: state.basal)
-            RootHomeHorizontalMetricView(metric: state.reservoir)
-            RootHomeHorizontalMetricView(metric: state.battery)
-            RootHomeHorizontalMetricView(metric: state.cage)
+            RootHomeHorizontalMetricView(metric: state.basal, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
+            RootHomeHorizontalMetricView(metric: state.reservoir, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
+            RootHomeHorizontalMetricView(metric: state.battery, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
+            RootHomeHorizontalMetricView(metric: state.cage, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
         .frame(width: Layout.width)
         .frame(maxHeight: .infinity)
-        .background(ConstantsAppColors.homePanelBackground)
+        .background(panelBackground(isHistorical: state.isHistorical))
         .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
     }
 }
@@ -39,56 +49,27 @@ struct RootHomeLoopView: View {
 
     private enum Layout {
         static let statusSymbolSize: CGFloat = 18
+        static let inlineMetricWidth: CGFloat = 78
+        static let height: CGFloat = 34
     }
 
     var body: some View {
         Button(action: actions.showAIDStatus) {
             HStack(spacing: 0) {
-                RootHomeInlineMetricView(metric: state.iob)
-                Spacer(minLength: 16)
-                RootHomeInlineMetricView(metric: state.cob)
-                Spacer(minLength: 16)
+                RootHomeInlineMetricView(metric: state.iob, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                HStack(spacing: 6) {
-                    if state.showsUploaderBattery {
-                        Image(systemName: state.uploaderBatterySystemImage)
-                            .font(.system(size: 14))
-                            .foregroundStyle(state.uploaderBatteryColor)
-                    }
+                RootHomeInlineMetricView(metric: state.cob, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
+                    .frame(width: Layout.inlineMetricWidth, alignment: .leading)
 
-                    if state.showsActivityIndicator {
-                        ProgressView()
-                            .scaleEffect(0.75)
-                            .tint(ConstantsAppColors.primaryText)
-                    }
-
-                    if let statusSystemImage = state.statusSystemImage {
-                        Image(systemName: statusSystemImage)
-                            .font(.system(size: Layout.statusSymbolSize, weight: .black))
-                            .symbolRenderingMode(.monochrome)
-                            .foregroundStyle(state.statusColor)
-                    }
-
-                    Text(state.statusTitle)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(state.statusColor)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.65)
-
-                    if state.showsStatusTimeAgo {
-                        Text(state.statusTimeAgo)
-                            .font(.system(size: 16))
-                            .foregroundStyle(ConstantsAppColors.primaryText)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.65)
-                    }
-                }
+                loopStatusView
+                    .frame(maxWidth: .infinity, alignment: .trailing)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
             .frame(maxWidth: .infinity)
-            .background(ConstantsAppColors.homePanelBackground)
+            .frame(height: Layout.height)
+            .background(panelBackground(isHistorical: state.isHistorical))
             .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
         }
         .buttonStyle(.plain)
@@ -98,11 +79,52 @@ struct RootHomeLoopView: View {
         }
         .frame(maxHeight: .infinity)
     }
+
+    private var loopStatusView: some View {
+        HStack(spacing: 6) {
+            if state.showsUploaderBattery {
+                Image(systemName: state.uploaderBatterySystemImage)
+                    .font(.system(size: 14))
+                    .foregroundStyle(state.uploaderBatteryColor)
+                    .opacity(state.isHistorical.rootHomeHistoricalValueOpacity)
+            }
+
+            if state.showsStatusTimeAgo {
+                Text(state.statusTimeAgo)
+                    .font(.system(size: 16))
+                    .foregroundStyle(state.isHistorical ? ConstantsAppColors.secondaryText : ConstantsAppColors.primaryText)
+                    .opacity(state.isHistorical.rootHomeHistoricalValueOpacity)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+            }
+
+            if state.showsActivityIndicator {
+                ProgressView()
+                    .scaleEffect(0.75)
+                    .tint(state.isHistorical ? ConstantsAppColors.secondaryText : ConstantsAppColors.primaryText)
+                    .opacity(state.isHistorical.rootHomeHistoricalValueOpacity)
+            }
+
+            if let statusSystemImage = state.statusSystemImage {
+                Image(systemName: statusSystemImage)
+                    .font(.system(size: Layout.statusSymbolSize, weight: .black))
+                    .symbolRenderingMode(.monochrome)
+                    .foregroundStyle(state.statusColor)
+                    .opacity(state.isHistorical.rootHomeHistoricalValueOpacity)
+            }
+        }
+    }
+}
+
+private func panelBackground(isHistorical: Bool) -> Color {
+    ConstantsAppColors.homePanelBackground.opacity(isHistorical ? 0.3 : 1)
 }
 
 /// One compact title and value pair used inside the pump panel.
 struct RootHomeInlineMetricView: View {
     let metric: RootHomeMetricState
+    var valueOpacity = 1.0
 
     var body: some View {
         HStack(spacing: 6) {
@@ -115,6 +137,7 @@ struct RootHomeInlineMetricView: View {
             Text(metric.value)
                 .font(.system(size: 16, weight: .medium))
                 .foregroundStyle(metric.valueColor)
+                .opacity(valueOpacity)
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.65)
@@ -125,6 +148,7 @@ struct RootHomeInlineMetricView: View {
 /// One horizontal title and value pair used by the loop row.
 struct RootHomeHorizontalMetricView: View {
     let metric: RootHomeMetricState
+    var valueOpacity = 1.0
 
     var body: some View {
         HStack(spacing: 4) {
@@ -138,6 +162,7 @@ struct RootHomeHorizontalMetricView: View {
             Text(metric.value)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(metric.valueColor)
+                .opacity(valueOpacity)
                 .monospacedDigit()
                 .lineLimit(1)
         }

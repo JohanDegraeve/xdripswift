@@ -33,15 +33,15 @@ struct MainViewAIDStatusView: View {
             Spacer()
             
             HStack(alignment: .center, spacing: 5) {
-                watchState.deviceStatusIconImage()
-                    .font(.system(size: textSize))
-                    .fontWeight(.bold)
-                    .foregroundStyle(watchState.deviceStatusColor() ?? .colorSecondary)
-                
                 Text(watchState.deviceStatusLastLoopDateTimeAgoString)
                     .font(.system(size: textSize))
                     .fontWeight(.semibold)
                     .foregroundStyle(.colorPrimary)
+
+                watchState.deviceStatusIconImage()
+                    .font(.system(size: textSize))
+                    .fontWeight(.bold)
+                    .foregroundStyle(watchState.deviceStatusColor() ?? .colorSecondary)
             }
         }
         //        .padding(.leading, isSmallScreen ? 6 : 8)
