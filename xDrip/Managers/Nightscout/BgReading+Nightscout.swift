@@ -16,7 +16,7 @@ extension BgReading {
             "filtered": (ageAdjustedRawValue > 0.0 ? round(ageAdjustedRawValue * 1000) : Int(finalValue.round(toDecimalPlaces: 0))*1000),
             "unfiltered": (ageAdjustedRawValue > 0.0 ? round(ageAdjustedRawValue * 1000) : Int(finalValue.round(toDecimalPlaces: 0))*1000),
             "noise": 1,
-            "sysTime": timeStamp.ISOStringFromDate()
+            "sysTime": timeStamp.ISOStringFromDate(reuseDateFormatter: reuseDateFormatter)
         ]
         
     }

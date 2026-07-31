@@ -413,8 +413,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         // into several Nightscout requests. Keeping managed objects alive across
         // that whole delayed path caused crashes when the dictionary payload was
         // rebuilt later on.
+        let dateFormatter = Date.ISODateFormatter()
         let bgReadingsToReplace = bgReadings.sorted(by: { $0.timeStamp < $1.timeStamp }).map {
-            BgReadingReplacementPayload(timeStamp: $0.timeStamp, dictionaryRepresentationForNightscoutUpload: $0.dictionaryRepresentationForNightscoutUpload())
+            BgReadingReplacementPayload(timeStamp: $0.timeStamp, dictionaryRepresentationForNightscoutUpload: $0.dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: dateFormatter))
         }
         guard bgReadingsToReplace.count > 0 else { return }
 
@@ -1439,7 +1440,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             bgReadingsToUpload = Array(bgReadingsToUpload.prefix(ConstantsNightscout.maxReadingsToUpload))
             
             // map readings to dictionaryRepresentation
-            let bgReadingsDictionaryRepresentation = bgReadingsToUpload.map { $0.dictionaryRepresentationForNightscoutUpload() }
+            let dateFormatter = Date.ISODateFormatter()
+            let bgReadingsDictionaryRepresentation = bgReadingsToUpload.map { $0.dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: dateFormatter) }
             
             // store the timestamp of the newest reading in this uploaded batch
             // the array is sorted oldest first at this point
@@ -1689,7 +1691,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         trace("in uploadTreatmentsToNightscout, number of treatments to upload : %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, treatmentsToUpload.count.description)
         
         // map treatments to dictionaryRepresentation
-        let treatmentsDictionaryRepresentation = treatmentsToUpload.map { $0.dictionaryRepresentationForNightscoutUpload() }
+        let dateFormatter = Date.ISODateFormatter()
+        let treatmentsDictionaryRepresentation = treatmentsToUpload.map { $0.dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: dateFormatter) }
         
         // The responsedata will contain, in serialized json, the treatments ids assigned by the server.
         uploadDataAndGetResponse(dataToUpload: treatmentsDictionaryRepresentation, httpMethod: nil, path: nightscoutTreatmentPath) { (responseData: Data?, result: NightscoutResult) in
