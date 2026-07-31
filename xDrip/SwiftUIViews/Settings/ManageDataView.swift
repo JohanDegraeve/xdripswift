@@ -100,6 +100,7 @@ struct StorageInfoView: View {
         Section {
             LabeledContent(Texts_SettingsView.cleanDataBgReadings, value: inventory.bgReadings.count.formatted())
             LabeledContent(Texts_SettingsView.cleanDataTreatments, value: inventory.treatments.count.formatted())
+            LabeledContent(Texts_SettingsView.cleanDataDeviceStatus, value: inventory.deviceStatus.count.formatted())
             LabeledContent(Texts_SettingsView.cleanDataCalibrations, value: inventory.calibrations.count.formatted())
             LabeledContent(Texts_SettingsView.storageInfoSensors, value: inventory.sensors.formatted())
             LabeledContent(Texts_SettingsView.storageInfoDevices, value: inventory.devices.formatted())
@@ -153,6 +154,7 @@ final class StorageInfoViewModel: ObservableObject {
         guard let inventory else { return 0 }
         return inventory.bgReadings.count
             + inventory.treatments.count
+            + inventory.deviceStatus.count
             + inventory.calibrations.count
             + inventory.sensors
             + inventory.devices
@@ -193,7 +195,7 @@ final class StorageInfoViewModel: ObservableObject {
 
     private var inventoryDates: [CleanDataCategoryInventory] {
         guard let inventory else { return [] }
-        return [inventory.bgReadings, inventory.treatments, inventory.calibrations]
+        return [inventory.bgReadings, inventory.treatments, inventory.deviceStatus, inventory.calibrations]
     }
 }
 

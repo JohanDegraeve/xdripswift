@@ -540,7 +540,6 @@
 "settingsviews_storageInfoEarliestRecord" = "Najstarejši zapis";
 "settingsviews_storageInfoLatestRecord" = "Najnovejši zapis";
 "settingsviews_storageInfoCheckingStatus" = "Preverjanje shrambe…";
-"settingsviews_nightscoutImportRetentionFooter" = "Uvoz je omejen na obdobje hrambe %d dni. Starejši podatki se odstranijo med čiščenjem.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Samodejno čiščenje";
 "settingsviews_cleanDataKeepHistoricalData" = "Ohrani zgodovino";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Nazadnje končano";

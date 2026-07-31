@@ -40,6 +40,9 @@ struct NightscoutImportView: View {
                     if viewModel.includesTreatments {
                         treatmentResultSection(result)
                     }
+                    if viewModel.includesDeviceStatus {
+                        deviceStatusResultSection(result)
+                    }
                 } else if let checkpoint = viewModel.savedCheckpoint {
                     // A saved import is an exclusive workflow state: the user should either resume it
                     // or discard it before configuring a separate historical import.
@@ -47,7 +50,7 @@ struct NightscoutImportView: View {
                 } else {
                     selectionSection
                     periodSection
-                    startSection
+                    startAction
                 }
             }
         }
@@ -129,6 +132,8 @@ struct NightscoutImportView: View {
                 .tint(.green)
             Toggle(Texts_SettingsView.cleanDataTreatments, isOn: $viewModel.includesTreatments)
                 .tint(.green)
+            Toggle(Texts_SettingsView.nightscoutImportDeviceStatus, isOn: $viewModel.includesDeviceStatus)
+                .tint(.green)
         }
     }
 
@@ -144,15 +149,13 @@ struct NightscoutImportView: View {
         } header: {
             Text(Texts_SettingsView.cleanDataDateRange)
         } footer: {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(Texts_SettingsView.nightscoutImportExistingDataFooter)
-                Text(Texts_SettingsView.nightscoutImportRetentionFooter(viewModel.retentionDays))
-            }
+            Text(Texts_SettingsView.nightscoutImportExistingDataFooter)
         }
     }
 
-    private var startSection: some View {
-        Section {
+    /// Keeps the primary action visually independent from the grouped settings sections above it.
+    private var startAction: some View {
+        VStack(alignment: .leading, spacing: 10) {
             Button {
                 showsStartConfirmation = true
             } label: {
@@ -162,10 +165,14 @@ struct NightscoutImportView: View {
             .buttonStyle(.borderedProminent)
             .tint(Self.actionColor)
             .disabled(!viewModel.canStartImport)
-            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-        } footer: {
+
             Text(Texts_SettingsView.nightscoutImportKeepOpenFooter)
+                .font(.footnote)
+                .foregroundStyle(Color(.secondaryLabel))
         }
+        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
     }
 
     // MARK: Resume
@@ -176,6 +183,7 @@ struct NightscoutImportView: View {
             LabeledContent(Texts_SettingsView.nightscoutImportCompletedBatches, value: Texts_SettingsView.nightscoutImportBatchCount(checkpoint.completedChunks, checkpoint.totalChunks))
             LabeledContent(Texts_SettingsView.backupBgReadingsAdded, value: checkpoint.counts.bgReadingsAdded.formatted())
             LabeledContent(Texts_SettingsView.backupTreatmentsAdded, value: checkpoint.counts.treatmentsAdded.formatted())
+            LabeledContent(Texts_SettingsView.nightscoutImportDeviceStatusAdded, value: checkpoint.counts.deviceStatusAdded.formatted())
 
             Button {
                 viewModel.resumeImport()
@@ -210,11 +218,6 @@ struct NightscoutImportView: View {
         ZStack {
             Color.black.opacity(0.78).ignoresSafeArea()
             VStack(spacing: 16) {
-                ProgressView(value: viewModel.progressFraction)
-                    .progressViewStyle(.linear)
-                    .tint(.green)
-                    .frame(maxWidth: 280)
-
                 Text(viewModel.progressTitle)
                     .font(.headline)
                     .foregroundStyle(.white)
@@ -225,14 +228,30 @@ struct NightscoutImportView: View {
                     .foregroundStyle(Color.white.opacity(0.8))
                     .multilineTextAlignment(.center)
 
-                if viewModel.progressCounts.bgReadingsAdded + viewModel.progressCounts.treatmentsAdded > 0 {
-                    VStack(spacing: 4) {
-                        Text(Texts_SettingsView.nightscoutImportBgAddedProgress(viewModel.progressCounts.bgReadingsAdded))
-                        Text(Texts_SettingsView.nightscoutImportTreatmentsAddedProgress(viewModel.progressCounts.treatmentsAdded))
-                    }
-                    .font(.caption)
-                    .foregroundStyle(Color.white.opacity(0.8))
+                ProgressView(value: viewModel.progressFraction)
+                    .progressViewStyle(.linear)
+                    .tint(.green)
+                    .frame(maxWidth: 280)
+
+                // A fixed-width two-column layout prevents changing digit counts from shifting
+                // either the labels or values while batches are being processed.
+                VStack(spacing: 4) {
+                    progressCountRow(
+                        title: Texts_SettingsView.backupBgReadingsAdded,
+                        value: viewModel.progressCounts.bgReadingsAdded
+                    )
+                    progressCountRow(
+                        title: Texts_SettingsView.backupTreatmentsAdded,
+                        value: viewModel.progressCounts.treatmentsAdded
+                    )
+                    progressCountRow(
+                        title: Texts_SettingsView.nightscoutImportDeviceStatusAdded,
+                        value: viewModel.progressCounts.deviceStatusAdded
+                    )
                 }
+                .frame(width: 260)
+                .font(.caption)
+                .foregroundStyle(Color.white.opacity(0.8))
 
                 Button(Texts_SettingsView.nightscoutImportPause) {
                     viewModel.pauseImport()
@@ -242,6 +261,17 @@ struct NightscoutImportView: View {
                 .padding(.top, 4)
             }
             .padding(28)
+        }
+    }
+
+    /// Forms one row of the progress table with stable leading and trailing column alignment.
+    private func progressCountRow(title: String, value: Int) -> some View {
+        HStack(spacing: 16) {
+            Text(title)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text(value.formatted())
+                .monospacedDigit()
+                .frame(minWidth: 52, alignment: .trailing)
         }
     }
 
@@ -296,6 +326,17 @@ struct NightscoutImportView: View {
         }
     }
 
+    private func deviceStatusResultSection(_ result: NightscoutImportResult) -> some View {
+        Section {
+            LabeledContent(Texts_SettingsView.nightscoutImportDownloaded, value: result.counts.deviceStatusDocumentsDownloaded.formatted())
+            LabeledContent(Texts_SettingsView.nightscoutImportAdded, value: result.counts.deviceStatusAdded.formatted())
+            LabeledContent(Texts_SettingsView.nightscoutImportSkipped, value: result.counts.deviceStatusSkipped.formatted())
+            LabeledContent(Texts_SettingsView.nightscoutImportInvalid, value: result.counts.deviceStatusDocumentsInvalid.formatted())
+        } header: {
+            Text(Texts_SettingsView.nightscoutImportDeviceStatus)
+        }
+    }
+
     private var errorIsPresented: Binding<Bool> {
         Binding {
             viewModel.errorMessage != nil
@@ -313,6 +354,7 @@ final class NightscoutImportViewModel: ObservableObject {
     @Published var period: NightscoutImportPeriod = .sevenDays
     @Published var includesBgReadings = true
     @Published var includesTreatments = true
+    @Published var includesDeviceStatus = true
     @Published private(set) var retentionDays = UserDefaults.standard.retentionPeriodInDays
     @Published private(set) var configuredSiteURL: String?
     @Published private(set) var savedCheckpoint: NightscoutImportCheckpoint?
@@ -348,7 +390,7 @@ final class NightscoutImportViewModel: ObservableObject {
     var canStartImport: Bool {
         hasConfiguredSite
             && savedCheckpoint == nil
-            && (includesBgReadings || includesTreatments)
+            && (includesBgReadings || includesTreatments || includesDeviceStatus)
             && !isWorking
     }
 
@@ -366,14 +408,7 @@ final class NightscoutImportViewModel: ObservableObject {
     }
 
     var startConfirmationMessage: String {
-        let selectedData: String
-        if includesBgReadings && includesTreatments {
-            selectedData = Texts_SettingsView.nightscoutImportBgAndTreatments
-        } else if includesBgReadings {
-            selectedData = Texts_SettingsView.nightscoutImportBgOnly
-        } else {
-            selectedData = Texts_SettingsView.nightscoutImportTreatmentsOnly
-        }
+        let selectedData = selectedDataDescription
         return Texts_SettingsView.nightscoutImportConfirmation(period.rawValue, selectedData)
     }
 
@@ -408,7 +443,8 @@ final class NightscoutImportViewModel: ObservableObject {
         let options = NightscoutImportOptions(
             period: period,
             includesBgReadings: includesBgReadings,
-            includesTreatments: includesTreatments
+            includesTreatments: includesTreatments,
+            includesDeviceStatus: includesDeviceStatus
         )
         runImport { [service] progress in
             try await service.start(options: options, progress: progress)
@@ -420,6 +456,7 @@ final class NightscoutImportViewModel: ObservableObject {
             period = checkpoint.options.period
             includesBgReadings = checkpoint.options.includesBgReadings
             includesTreatments = checkpoint.options.includesTreatments
+            includesDeviceStatus = checkpoint.options.includesDeviceStatus
             progressCounts = checkpoint.counts
         }
         runImport { [service] progress in
@@ -497,5 +534,23 @@ final class NightscoutImportViewModel: ObservableObject {
             components.port = port
         }
         return NightscoutImportService.normalizedSiteIdentity(from: components)
+    }
+
+    private var selectedDataDescription: String {
+        var selections = [String]()
+        if includesBgReadings { selections.append(Texts_SettingsView.nightscoutImportBgOnly) }
+        if includesTreatments { selections.append(Texts_SettingsView.nightscoutImportTreatmentsOnly) }
+        if includesDeviceStatus { selections.append(Texts_SettingsView.nightscoutImportDeviceStatus.lowercased()) }
+
+        switch selections.count {
+        case 0:
+            return ""
+        case 1:
+            return selections[0]
+        case 2:
+            return selections.joined(separator: " and ")
+        default:
+            return selections.dropLast().joined(separator: ", ") + " and " + (selections.last ?? "")
+        }
     }
 }

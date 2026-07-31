@@ -509,7 +509,6 @@
 "settingsviews_storageInfoEarliestRecord" = "Ältester Datensatz";
 "settingsviews_storageInfoLatestRecord" = "Neuester Datensatz";
 "settingsviews_storageInfoCheckingStatus" = "Speicher wird geprüft…";
-"settingsviews_nightscoutImportRetentionFooter" = "Der Import ist auf den Aufbewahrungszeitraum von %d Tagen begrenzt. Ältere Daten werden bei der Bereinigung entfernt.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Automatische Bereinigung";
 "settingsviews_cleanDataKeepHistoricalData" = "Historische Daten behalten";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Zuletzt abgeschlossen";

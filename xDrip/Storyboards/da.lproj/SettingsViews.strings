@@ -283,7 +283,6 @@
 "settingsviews_storageInfoEarliestRecord" = "Ældste post";
 "settingsviews_storageInfoLatestRecord" = "Nyeste post";
 "settingsviews_storageInfoCheckingStatus" = "Kontrollerer lager…";
-"settingsviews_nightscoutImportRetentionFooter" = "Importen er begrænset til din opbevaringsperiode på %d dage. Ældre data fjernes af oprydningen.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Automatisk oprydning";
 "settingsviews_cleanDataKeepHistoricalData" = "Behold historiske data";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Senest fuldført";

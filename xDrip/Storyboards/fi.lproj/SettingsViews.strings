@@ -325,7 +325,6 @@
 "settingsviews_storageInfoEarliestRecord" = "Vanhin tietue";
 "settingsviews_storageInfoLatestRecord" = "Uusin tietue";
 "settingsviews_storageInfoCheckingStatus" = "Tarkistetaan tallennustilaa…";
-"settingsviews_nightscoutImportRetentionFooter" = "Tuonti rajoittuu %d päivän säilytysaikaan. Siivous poistaa vanhemmat tiedot.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Automaattinen siivous";
 "settingsviews_cleanDataKeepHistoricalData" = "Säilytä historiatiedot";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Viimeksi valmis";

@@ -259,7 +259,6 @@
 "settingsviews_storageInfoEarliestRecord" = "Παλαιότερη εγγραφή";
 "settingsviews_storageInfoLatestRecord" = "Νεότερη εγγραφή";
 "settingsviews_storageInfoCheckingStatus" = "Έλεγχος αποθήκευσης…";
-"settingsviews_nightscoutImportRetentionFooter" = "Η εισαγωγή περιορίζεται στην περίοδο διατήρησης των %d ημερών. Τα παλαιότερα δεδομένα αφαιρούνται κατά την εκκαθάριση.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Αυτόματη εκκαθάριση";
 "settingsviews_cleanDataKeepHistoricalData" = "Διατήρηση ιστορικού";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Τελευταία ολοκλήρωση";

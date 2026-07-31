@@ -299,7 +299,6 @@
 "settingsviews_storageInfoEarliestRecord" = "Registo mais antigo";
 "settingsviews_storageInfoLatestRecord" = "Registo mais recente";
 "settingsviews_storageInfoCheckingStatus" = "A verificar armazenamento…";
-"settingsviews_nightscoutImportRetentionFooter" = "A importação está limitada ao período de retenção de %d dias. Os dados mais antigos são removidos pela limpeza.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Limpeza automática";
 "settingsviews_cleanDataKeepHistoricalData" = "Manter histórico";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Última execução";

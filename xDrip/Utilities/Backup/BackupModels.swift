@@ -129,9 +129,13 @@ struct BackupManifest: Codable, Sendable {
     let appBuild: String
     let bgReadingCount: Int
     let treatmentCount: Int
+    let deviceStatusCount: Int?
+    let profileCount: Int?
     let firstBgReadingDate: Date?
     let lastBgReadingDate: Date?
     let firstTreatmentDate: Date?
+    let firstDeviceStatusDate: Date?
+    let firstProfileDate: Date?
     let includesSettings: Bool
     let includesAccounts: Bool
     let isPasswordProtected: Bool
@@ -149,6 +153,8 @@ struct BackupPayload: Codable, Sendable {
     let alertTypes: [BackupAlertType]
     let bgReadings: [BackupBgReading]
     let treatments: [BackupTreatment]
+    let deviceStatuses: [BackupNightscoutDeviceStatus]?
+    let profiles: [BackupNightscoutProfile]?
 }
 
 // MARK: - Settings and Alerts
@@ -234,6 +240,66 @@ struct BackupTreatment: Codable, Sendable {
     let valueSecondary: Double
 }
 
+struct BackupNightscoutDeviceStatus: Codable, Sendable {
+    let id: String
+    let createdAt: Date
+    let updatedDate: Date
+    let lastCheckedDate: Date
+    let lastLoopDate: Date
+    let timestamp: Date?
+    let device: String?
+    let appVersion: String?
+    let activeProfile: String?
+    let iob: Double?
+    let cob: Double?
+    let eventualBG: Double?
+    let currentTarget: Double?
+    let isf: Double?
+    let insulinReq: Double?
+    let bolusVolume: Double?
+    let rate: Double?
+    let duration: Int?
+    let reason: String?
+    let sensitivityRatio: Double?
+    let tdd: Double?
+    let error: String?
+    let overrideActive: Bool?
+    let overrideName: String?
+    let overrideMinValue: Double?
+    let overrideMaxValue: Double?
+    let overrideMultiplier: Double?
+    let pumpBatteryPercent: Int?
+    let pumpReservoir: Double?
+    let pumpIsBolusing: Bool?
+    let pumpIsSuspended: Bool?
+    let pumpStatus: String?
+    let pumpStatusTimestamp: Date?
+    let pumpManufacturer: String?
+    let pumpModel: String?
+    let uploaderBatteryPercent: Int?
+    let uploaderIsCharging: Bool?
+}
+
+struct BackupNightscoutProfile: Codable, Sendable {
+    let id: String
+    let startDate: Date
+    let createdAt: Date
+    let updatedDate: Date
+    let lastCheckedDate: Date
+    let profileName: String?
+    let enteredBy: String?
+    let timezone: String?
+    let dia: Double?
+    let isMgDl: Bool?
+    let schedules: [BackupNightscoutProfileSchedule]
+}
+
+struct BackupNightscoutProfileSchedule: Codable, Sendable {
+    let kind: Int16
+    let timeAsSecondsFromMidnight: Int32
+    let value: Double
+}
+
 struct BackupInspection: Sendable {
     let payload: BackupPayload
 }
@@ -252,6 +318,10 @@ struct BackupRestoreResult: Sendable {
     let firstBgReadingAppliedAt: Date?
     let treatmentsAdded: Int
     let treatmentsSkipped: Int
+    let deviceStatusesAdded: Int
+    let deviceStatusesSkipped: Int
+    let profilesAdded: Int
+    let profilesSkipped: Int
     let settingsRestored: Int
     let accountsRestored: Int
     let accountStatuses: [BackupAccountCategory: BackupAccountRestoreStatus]

@@ -217,7 +217,6 @@
 "settingsviews_storageInfoEarliestRecord" = "Earliest Record";
 "settingsviews_storageInfoLatestRecord" = "Latest Record";
 "settingsviews_storageInfoCheckingStatus" = "Checking storage…";
-"settingsviews_nightscoutImportRetentionFooter" = "Limited to your %d-day retention period. Older data is removed by housekeeping.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Automatic Housekeeping";
 "settingsviews_cleanDataKeepHistoricalData" = "Keep Historical Data";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Last Completed";
@@ -231,6 +230,7 @@
 "settingsviews_cleanDataStoredData" = "Stored Data";
 "settingsviews_cleanDataBgReadings" = "BG Readings";
 "settingsviews_cleanDataTreatments" = "Treatments";
+"settingsviews_cleanDataDeviceStatus" = "Device Status";
 "settingsviews_cleanDataCalibrations" = "Calibrations";
 "settingsviews_cleanDataSelectData" = "Data to Delete";
 "settingsviews_cleanDataCleanupMethod" = "Cleanup Method";
@@ -257,6 +257,7 @@
 "settingsviews_cleanDataCompleted" = "Completed";
 "settingsviews_cleanDataBgReadingsDeleted" = "BG Readings Deleted";
 "settingsviews_cleanDataTreatmentsDeleted" = "Treatments Deleted";
+"settingsviews_cleanDataDeviceStatusDeleted" = "Device Status Deleted";
 "settingsviews_cleanDataStorageBefore" = "Storage Before";
 "settingsviews_cleanDataStorageAfter" = "Storage After";
 "settingsviews_cleanDataCleanupSummary" = "Cleanup Summary";
@@ -278,6 +279,8 @@
 "settingsviews_nightscoutImportAdded" = "Added";
 "settingsviews_nightscoutImportSkipped" = "Skipped";
 "settingsviews_nightscoutImportInvalid" = "Invalid";
+"settingsviews_nightscoutImportDeviceStatus" = "Device Status";
+"settingsviews_nightscoutImportDeviceStatusAdded" = "Device Status Added";
 "settingsviews_nightscoutImportSummaryFooter" = "Records already stored locally were skipped. Invalid Nightscout documents were not imported.";
 "settingsviews_nightscoutImportingData" = "Importing Data";
 "settingsviews_cleanDataConfirmationCode" = "Confirmation code %@";
@@ -364,7 +367,7 @@
 "settingsviews_nightscoutImportTreatmentsOnly" = "treatments";
 "settingsviews_nightscoutImportKeepAppOpen" = "Keep the app open.";
 "settingsviews_nightscoutImportPaused" = "Import paused";
-"settingsviews_nightscoutImportErrorNoSelection" = "Select BG readings, treatments or both.";
+"settingsviews_nightscoutImportErrorNoSelection" = "Select BG readings, treatments, Device Status or any combination.";
 "settingsviews_nightscoutImportErrorUnsupportedPeriod" = "The saved import uses a period that is no longer supported. Discard it and start again.";
 "settingsviews_nightscoutImportErrorRetention" = "The selected import period exceeds the current data retention setting.";
 "settingsviews_nightscoutImportErrorMissingURL" = "Enter a Nightscout URL in Nightscout Settings before starting an import.";

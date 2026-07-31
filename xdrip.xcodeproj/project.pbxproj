@@ -288,6 +288,14 @@
 		4E6100012FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100112FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift */; };
 		4E6100022FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100122FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift */; };
 		4E6100032FF3000100000001 /* SensorNoiseHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */; };
+		4F2400013001000100000001 /* NightscoutDeviceStatusEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400113001000100000001 /* NightscoutDeviceStatusEntry+CoreDataClass.swift */; };
+		4F2400023001000100000001 /* NightscoutDeviceStatusEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400123001000100000001 /* NightscoutDeviceStatusEntry+CoreDataProperties.swift */; };
+		4F2400033001000100000001 /* NightscoutProfileEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400133001000100000001 /* NightscoutProfileEntry+CoreDataClass.swift */; };
+		4F2400043001000100000001 /* NightscoutProfileEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400143001000100000001 /* NightscoutProfileEntry+CoreDataProperties.swift */; };
+		4F2400053001000100000001 /* NightscoutProfileScheduleEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400153001000100000001 /* NightscoutProfileScheduleEntry+CoreDataClass.swift */; };
+		4F2400063001000100000001 /* NightscoutProfileScheduleEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400163001000100000001 /* NightscoutProfileScheduleEntry+CoreDataProperties.swift */; };
+		4F2400073001000100000001 /* NightscoutDeviceStatusAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400173001000100000001 /* NightscoutDeviceStatusAccessor.swift */; };
+		4F2400083001000100000001 /* NightscoutProfileAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400183001000100000001 /* NightscoutProfileAccessor.swift */; };
 		745981A52E1F1B0F85780B06 /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
 		7DDD89BD4ECFCE7BDA8D3AE2 /* SettingsSharedUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */; };
 		BA0000010000000000000001 /* BackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000011 /* BackupModels.swift */; };
@@ -1109,6 +1117,15 @@
 		4E6100122FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SensorNoiseSample+CoreDataProperties.swift"; path = "xDrip/Core Data/Extensions/SensorNoiseSample+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorNoiseHistoryView.swift; sourceTree = "<group>"; };
 		4E6100312FF3000100000001 /* xdrip v23.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v23.xcdatamodel"; sourceTree = "<group>"; };
+		4F2400113001000100000001 /* NightscoutDeviceStatusEntry+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NightscoutDeviceStatusEntry+CoreDataClass.swift"; sourceTree = "<group>"; };
+		4F2400123001000100000001 /* NightscoutDeviceStatusEntry+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NightscoutDeviceStatusEntry+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		4F2400133001000100000001 /* NightscoutProfileEntry+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NightscoutProfileEntry+CoreDataClass.swift"; sourceTree = "<group>"; };
+		4F2400143001000100000001 /* NightscoutProfileEntry+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NightscoutProfileEntry+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		4F2400153001000100000001 /* NightscoutProfileScheduleEntry+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NightscoutProfileScheduleEntry+CoreDataClass.swift"; sourceTree = "<group>"; };
+		4F2400163001000100000001 /* NightscoutProfileScheduleEntry+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NightscoutProfileScheduleEntry+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		4F2400173001000100000001 /* NightscoutDeviceStatusAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutDeviceStatusAccessor.swift; sourceTree = "<group>"; };
+		4F2400183001000100000001 /* NightscoutProfileAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutProfileAccessor.swift; sourceTree = "<group>"; };
+		4F2400313001000100000001 /* xdrip v24.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v24.xcdatamodel"; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xDrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xDrip/Version.xcconfig; sourceTree = "<group>"; };
 		685B5F8D633F5492574F0567 /* GlucoseChartStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartStateManager.swift; sourceTree = "<group>"; };
@@ -2996,6 +3013,8 @@
 				F8B3A818227DEC92004BA588 /* BgReadingsAccessor.swift */,
 				F8DF766323E781C100063910 /* BLEPeripheralAccessor.swift */,
 				F8B3A817227DEC91004BA588 /* CalibrationsAccessor.swift */,
+				4F2400173001000100000001 /* NightscoutDeviceStatusAccessor.swift */,
+				4F2400183001000100000001 /* NightscoutProfileAccessor.swift */,
 				F8B3A815227DEC91004BA588 /* SensorsAccessor.swift */,
 				F85FF3D6252FB1C0004E6FF1 /* SnoozeParametersAccessor.swift */,
 				D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */,
@@ -3187,6 +3206,12 @@
 				4D71800A2FE8000100000001 /* MedtrumTouchCareNano+CoreDataProperties.swift */,
 				F8C97851242AA70C00A09483 /* MiaoMiao+CoreDataClass.swift */,
 				F8C97852242AA70C00A09483 /* MiaoMiao+CoreDataProperties.swift */,
+				4F2400113001000100000001 /* NightscoutDeviceStatusEntry+CoreDataClass.swift */,
+				4F2400123001000100000001 /* NightscoutDeviceStatusEntry+CoreDataProperties.swift */,
+				4F2400133001000100000001 /* NightscoutProfileEntry+CoreDataClass.swift */,
+				4F2400143001000100000001 /* NightscoutProfileEntry+CoreDataProperties.swift */,
+				4F2400153001000100000001 /* NightscoutProfileScheduleEntry+CoreDataClass.swift */,
+				4F2400163001000100000001 /* NightscoutProfileScheduleEntry+CoreDataProperties.swift */,
 				F85542312B7573D20058CE09 /* OmniPodHeartBeat+CoreDataClass.swift */,
 				F85542332B7574330058CE09 /* OmniPodHeartBeat+CoreDataProperties.swift */,
 				F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */,
@@ -4168,6 +4193,9 @@
 				F51B9F7D24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift in Sources */,
 				F8E51D612448E695001C9E5A /* Bundle.swift in Sources */,
 				F821CF61229BF4A2005C1E43 /* NightscoutSyncManager.swift in Sources */,
+				4F2400013001000100000001 /* NightscoutDeviceStatusEntry+CoreDataClass.swift in Sources */,
+				4F2400023001000100000001 /* NightscoutDeviceStatusEntry+CoreDataProperties.swift in Sources */,
+				4F2400073001000100000001 /* NightscoutDeviceStatusAccessor.swift in Sources */,
 				4A9B10052F0A000100000001 /* BgPostProcessingManager.swift in Sources */,
 				4A9B10082F0A000100000001 /* BgSmoothingAlgorithmPlugin.swift in Sources */,
 				4A9B100A2F0A000100000001 /* ExponentialBgSmoothing.swift in Sources */,
@@ -4185,6 +4213,11 @@
 				47A0E6442D4E263800B31C21 /* LiveActivityIntent.swift in Sources */,
 				F8EE3EAC2B6834FD00B27B96 /* Libre2HeartBeat+CoreDataClass.swift in Sources */,
 				D4FD899727772F9100689788 /* TreatmentEntryAccessor.swift in Sources */,
+				4F2400033001000100000001 /* NightscoutProfileEntry+CoreDataClass.swift in Sources */,
+				4F2400043001000100000001 /* NightscoutProfileEntry+CoreDataProperties.swift in Sources */,
+				4F2400053001000100000001 /* NightscoutProfileScheduleEntry+CoreDataClass.swift in Sources */,
+				4F2400063001000100000001 /* NightscoutProfileScheduleEntry+CoreDataProperties.swift in Sources */,
+				4F2400083001000100000001 /* NightscoutProfileAccessor.swift in Sources */,
 				F8F971B623A5914D00C3F17D /* M5Stack+BluetoothPeripheral.swift in Sources */,
 				F821CF57229BF43A005C1E43 /* SnoozeParameters.swift in Sources */,
 				47DE41AD2B863D370041DA19 /* WatchState.swift in Sources */,
@@ -5621,6 +5654,7 @@
 		F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				4F2400313001000100000001 /* xdrip v24.xcdatamodel */,
 				4E6100312FF3000100000001 /* xdrip v23.xcdatamodel */,
 				4E6000312FF2000100000001 /* xdrip v22.xcdatamodel */,
 				4D71800D2FE8000100000001 /* xdrip v21.xcdatamodel */,
@@ -5634,7 +5668,7 @@
 				F85FF3CB252F9C9A004E6FF1 /* xdrip v13.xcdatamodel */,
 				F85FF3C3252D0C32004E6FF1 /* xdrip v12.xcdatamodel */,
 			);
-			currentVersion = 4E6100312FF3000100000001 /* xdrip v23.xcdatamodel */;
+			currentVersion = 4F2400313001000100000001 /* xdrip v24.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

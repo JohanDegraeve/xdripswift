@@ -540,7 +540,6 @@
 "settingsviews_storageInfoEarliestRecord" = "Najstarszy rekord";
 "settingsviews_storageInfoLatestRecord" = "Najnowszy rekord";
 "settingsviews_storageInfoCheckingStatus" = "Sprawdzanie pamięci…";
-"settingsviews_nightscoutImportRetentionFooter" = "Import jest ograniczony do okresu przechowywania wynoszącego %d dni. Starsze dane są usuwane podczas czyszczenia.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Automatyczne czyszczenie";
 "settingsviews_cleanDataKeepHistoricalData" = "Zachowaj historię";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Ostatnio ukończono";

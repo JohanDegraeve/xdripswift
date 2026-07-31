@@ -295,7 +295,6 @@
 "settingsviews_storageInfoEarliestRecord" = "أقدم سجل";
 "settingsviews_storageInfoLatestRecord" = "أحدث سجل";
 "settingsviews_storageInfoCheckingStatus" = "جارٍ فحص التخزين…";
-"settingsviews_nightscoutImportRetentionFooter" = "يقتصر الاستيراد على فترة الاحتفاظ البالغة %d يومًا. يحذف التنظيف البيانات الأقدم.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "تنظيف تلقائي";
 "settingsviews_cleanDataKeepHistoricalData" = "الاحتفاظ بالبيانات السابقة";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "آخر اكتمال";

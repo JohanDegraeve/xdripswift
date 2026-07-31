@@ -287,7 +287,6 @@
 "settingsviews_storageInfoEarliestRecord" = "En eski kayıt";
 "settingsviews_storageInfoLatestRecord" = "En yeni kayıt";
 "settingsviews_storageInfoCheckingStatus" = "Depolama kontrol ediliyor…";
-"settingsviews_nightscoutImportRetentionFooter" = "İçe aktarma %d günlük saklama süresiyle sınırlıdır. Daha eski veriler temizlik sırasında silinir.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Otomatik temizleme";
 "settingsviews_cleanDataKeepHistoricalData" = "Geçmiş verileri koru";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Son tamamlanma";

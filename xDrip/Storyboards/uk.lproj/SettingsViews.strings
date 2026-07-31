@@ -495,7 +495,6 @@
 "settingsviews_storageInfoEarliestRecord" = "Найраніший запис";
 "settingsviews_storageInfoLatestRecord" = "Найновіший запис";
 "settingsviews_storageInfoCheckingStatus" = "Перевірка сховища…";
-"settingsviews_nightscoutImportRetentionFooter" = "Імпорт обмежено періодом зберігання у %d днів. Старіші дані видаляються під час очищення.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Автоматичне очищення";
 "settingsviews_cleanDataKeepHistoricalData" = "Зберігати історію";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Останнє виконання";

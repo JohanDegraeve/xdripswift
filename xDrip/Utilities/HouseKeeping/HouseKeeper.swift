@@ -51,7 +51,8 @@ final class HouseKeeper {
                     let plan = try await service.deletionPlan(
                         selection: CleanDataSelection(
                             includesBgReadings: true,
-                            includesTreatments: true
+                            includesTreatments: true,
+                            includesDeviceStatus: false
                         ),
                         rangeMode: .keepRecent,
                         fromDate: nil,
@@ -66,6 +67,7 @@ final class HouseKeeper {
                 } catch CleanDataError.noMatchingData {
                     counts = (0, 0, 0)
                 }
+                let loopCounts = try await service.deleteNightscoutLoopData(throughDate: throughDate)
 
                 storeCompletion(
                     at: Date(),
@@ -74,14 +76,16 @@ final class HouseKeeper {
                     defaults: defaults
                 )
                 trace(
-                    "in doAppStartUpHouseKeeping, completed. duration = %{public}@ ms, BG readings = %{public}@, treatments = %{public}@, unused calibrations = %{public}@",
+                    "in doAppStartUpHouseKeeping, completed. duration = %{public}@ ms, BG readings = %{public}@, treatments = %{public}@, unused calibrations = %{public}@, Nightscout devicestatus = %{public}@, Nightscout profiles = %{public}@",
                     log: log,
                     category: ConstantsLog.categoryHouseKeeper,
                     type: .info,
                     Int(Date().timeIntervalSince(startedAt) * 1000).description,
                     counts.bgReadings.description,
                     counts.treatments.description,
-                    counts.calibrations.description
+                    counts.calibrations.description,
+                    loopCounts.deviceStatusCount.description,
+                    loopCounts.profileCount.description
                 )
             } catch {
                 trace(

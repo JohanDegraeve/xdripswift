@@ -355,7 +355,6 @@
 "settingsviews_storageInfoEarliestRecord" = "Premier enregistrement";
 "settingsviews_storageInfoLatestRecord" = "Dernier enregistrement";
 "settingsviews_storageInfoCheckingStatus" = "Vérification du stockage…";
-"settingsviews_nightscoutImportRetentionFooter" = "L’importation est limitée à votre période de conservation de %d jours. Les données antérieures sont supprimées par le nettoyage.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Nettoyage automatique";
 "settingsviews_cleanDataKeepHistoricalData" = "Conserver l’historique";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Dernière exécution";

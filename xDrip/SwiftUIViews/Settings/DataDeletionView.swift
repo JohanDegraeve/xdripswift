@@ -87,6 +87,13 @@ struct DataDeletionView: View {
             .tint(.green)
             .disabled(inventory.treatments.count == 0)
             .onChange(of: viewModel.includesTreatments) { _ in viewModel.selectionChanged() }
+
+            Toggle(isOn: $viewModel.includesDeviceStatus) {
+                selectionLabel(title: Texts_SettingsView.cleanDataDeviceStatus, count: inventory.deviceStatus.count)
+            }
+            .tint(.green)
+            .disabled(inventory.deviceStatus.count == 0)
+            .onChange(of: viewModel.includesDeviceStatus) { _ in viewModel.selectionChanged() }
         } header: {
             Text(Texts_SettingsView.cleanDataSelectData)
         }
@@ -185,6 +192,9 @@ struct DataDeletionView: View {
             }
             if deletionPlan.selection.includesTreatments {
                 LabeledContent(Texts_SettingsView.cleanDataTreatments, value: deletionPlan.treatmentCount.formatted())
+            }
+            if deletionPlan.selection.includesDeviceStatus {
+                LabeledContent(Texts_SettingsView.cleanDataDeviceStatus, value: deletionPlan.deviceStatusCount.formatted())
             }
             if deletionPlan.calibrationCount > 0 {
                 LabeledContent(Texts_SettingsView.cleanDataUnusedCalibrations, value: deletionPlan.calibrationCount.formatted())
@@ -286,6 +296,7 @@ struct DataDeletionView: View {
             LabeledContent(Texts_SettingsView.cleanDataCompleted, value: formattedDate(result.completedAt))
             LabeledContent(Texts_SettingsView.cleanDataBgReadingsDeleted, value: result.bgReadingCount.formatted())
             LabeledContent(Texts_SettingsView.cleanDataTreatmentsDeleted, value: result.treatmentCount.formatted())
+            LabeledContent(Texts_SettingsView.cleanDataDeviceStatusDeleted, value: result.deviceStatusCount.formatted())
             LabeledContent(Texts_SettingsView.cleanDataStorageBefore, value: formattedByteCount(result.storeSizeBeforeInBytes))
             LabeledContent(Texts_SettingsView.cleanDataStorageAfter, value: formattedByteCount(result.storeSizeAfterInBytes))
         } header: {
@@ -332,6 +343,7 @@ final class DataDeletionViewModel: ObservableObject {
     @Published var inventory: CleanDataInventory?
     @Published var includesBgReadings = false
     @Published var includesTreatments = false
+    @Published var includesDeviceStatus = false
     @Published var rangeMode = CleanDataRangeMode.keepRecent
     @Published var recentDataDays = 90
     @Published var customFromDate = Date()
@@ -354,7 +366,7 @@ final class DataDeletionViewModel: ObservableObject {
     }
 
     var canPrepareDeletionPlan: Bool {
-        let hasSelection = includesBgReadings || includesTreatments
+        let hasSelection = includesBgReadings || includesTreatments || includesDeviceStatus
         return hasSelection && (rangeMode != .custom || customFromDate <= customThroughDate)
     }
 
@@ -378,12 +390,13 @@ final class DataDeletionViewModel: ObservableObject {
 
     func selectionChanged() {
         trace(
-            "in cleanDataSelectionChanged, BG readings selected = %{public}@, treatments selected = %{public}@",
+            "in cleanDataSelectionChanged, BG readings selected = %{public}@, treatments selected = %{public}@, Nightscout devicestatus selected = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
             includesBgReadings.description,
-            includesTreatments.description
+            includesTreatments.description,
+            includesDeviceStatus.description
         )
     }
 
@@ -403,7 +416,8 @@ final class DataDeletionViewModel: ObservableObject {
         let dates = deletionDates()
         let selection = CleanDataSelection(
             includesBgReadings: includesBgReadings,
-            includesTreatments: includesTreatments
+            includesTreatments: includesTreatments,
+            includesDeviceStatus: includesDeviceStatus
         )
         start(status: Texts_SettingsView.cleanDataCountingStatus)
         Task {
@@ -445,13 +459,14 @@ final class DataDeletionViewModel: ObservableObject {
         guard let deletionPlan else { return }
         let confirmationDate = Date()
         trace(
-            "in cleanDataUserConfirmedSummary, direct user confirmation of deletion summary received. confirmation timestamp = %{public}@, BG readings = %{public}@, treatments = %{public}@, unused calibrations = %{public}@, from = %{public}@, through = %{public}@",
+            "in cleanDataUserConfirmedSummary, direct user confirmation of deletion summary received. confirmation timestamp = %{public}@, BG readings = %{public}@, treatments = %{public}@, Nightscout devicestatus = %{public}@, unused calibrations = %{public}@, from = %{public}@, through = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
             confirmationDate.description(with: .current),
             deletionPlan.bgReadingCount.description,
             deletionPlan.treatmentCount.description,
+            deletionPlan.deviceStatusCount.description,
             deletionPlan.calibrationCount.description,
             deletionPlan.fromDate?.description(with: .current) ?? "earliest stored data",
             deletionPlan.throughDate.description(with: .current)
@@ -464,7 +479,7 @@ final class DataDeletionViewModel: ObservableObject {
         guard confirmationCodeMatches, let deletionPlan else { return }
         let confirmationDate = Date()
         trace(
-            "in cleanDataUserConfirmedDeletion, final DELETE confirmation received. confirmation timestamp = %{public}@, displayed code = %{public}@, entered attempt = %{public}@, captcha matched = true, BG readings = %{public}@, treatments = %{public}@, unused calibrations = %{public}@, from = %{public}@, through = %{public}@",
+            "in cleanDataUserConfirmedDeletion, final DELETE confirmation received. confirmation timestamp = %{public}@, displayed code = %{public}@, entered attempt = %{public}@, captcha matched = true, BG readings = %{public}@, treatments = %{public}@, Nightscout devicestatus = %{public}@, unused calibrations = %{public}@, from = %{public}@, through = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
@@ -473,6 +488,7 @@ final class DataDeletionViewModel: ObservableObject {
             enteredConfirmationCode,
             deletionPlan.bgReadingCount.description,
             deletionPlan.treatmentCount.description,
+            deletionPlan.deviceStatusCount.description,
             deletionPlan.calibrationCount.description,
             deletionPlan.fromDate?.description(with: .current) ?? "earliest stored data",
             deletionPlan.throughDate.description(with: .current)
@@ -496,19 +512,20 @@ final class DataDeletionViewModel: ObservableObject {
         var dates = [Date]()
         if includesBgReadings, let date = inventory.bgReadings.firstDate { dates.append(date) }
         if includesTreatments, let date = inventory.treatments.firstDate { dates.append(date) }
+        if includesDeviceStatus, let date = inventory.deviceStatus.firstDate { dates.append(date) }
         return dates.min()
     }
 
     private var firstStoredDate: Date? {
         guard let inventory else { return nil }
-        return [inventory.bgReadings.firstDate, inventory.treatments.firstDate]
+        return [inventory.bgReadings.firstDate, inventory.treatments.firstDate, inventory.deviceStatus.firstDate]
             .compactMap { $0 }
             .min()
     }
 
     private var lastStoredDate: Date? {
         guard let inventory else { return nil }
-        return [inventory.bgReadings.lastDate, inventory.treatments.lastDate]
+        return [inventory.bgReadings.lastDate, inventory.treatments.lastDate, inventory.deviceStatus.lastDate]
             .compactMap { $0 }
             .max()
     }
@@ -518,6 +535,7 @@ final class DataDeletionViewModel: ObservableObject {
         var dates = [Date]()
         if includesBgReadings, let date = inventory.bgReadings.lastDate { dates.append(date) }
         if includesTreatments, let date = inventory.treatments.lastDate { dates.append(date) }
+        if includesDeviceStatus, let date = inventory.deviceStatus.lastDate { dates.append(date) }
         return dates.max()
     }
 

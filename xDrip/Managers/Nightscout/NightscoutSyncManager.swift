@@ -66,6 +66,12 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     /// TreatmentEntryAccessor
     private let treatmentEntryAccessor: TreatmentEntryAccessor
+
+    /// NightscoutDeviceStatusAccessor
+    private let nightscoutDeviceStatusAccessor: NightscoutDeviceStatusAccessor
+
+    /// NightscoutProfileAccessor
+    private let nightscoutProfileAccessor: NightscoutProfileAccessor
     
     /// reference to coreDataManager
     private let coreDataManager: CoreDataManager
@@ -157,6 +163,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         self.messageHandler = messageHandler
         self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
         self.treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
+        self.nightscoutDeviceStatusAccessor = NightscoutDeviceStatusAccessor(coreDataManager: coreDataManager)
+        self.nightscoutProfileAccessor = NightscoutProfileAccessor(coreDataManager: coreDataManager)
         
         super.init()
 
@@ -904,6 +912,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             trace("in updateProfile, found a newer Nightscout profile online with date = %{public}@, old profile date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, newProfile.startDate.formatted(date: .abbreviated, time: .shortened), profile.startDate.formatted(date: .abbreviated, time: .shortened))
                         }
                         self.profile = newProfile
+                        self.nightscoutProfileAccessor.upsert(newProfile)
                         // Store in userdefaults for quick access
                         if let profileData = try? JSONEncoder().encode(newProfile) {
                             UserDefaults.standard.nightscoutProfile = profileData
@@ -1026,13 +1035,16 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 // advanced on a heartbeat/status-only update.
                 let mostRecentLoopDate = unifiedResponses
                     .flatMap { loopDates(from: $0) }
+                    .filter { $0 <= Date().addingTimeInterval(20) }
                     .max() ?? .distantPast
                 deviceStatus.lastLoopDate = max(deviceStatus.lastLoopDate, mostRecentLoopDate)
+                deviceStatus.sanitizingFutureDates()
 
                 let downloadedDeviceStatus = deviceStatus
                 await MainActor.run {
                     var mergedDeviceStatus = downloadedDeviceStatus
-                    let storedDeviceStatus = self.deviceStatus
+                    var storedDeviceStatus = self.deviceStatus
+                    storedDeviceStatus.sanitizingFutureDates()
                     
                     // Merge against the currently published value at publish time, not the value
                     // captured before the async request started. This keeps overlapping Nightscout
@@ -1041,8 +1053,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         mergedDeviceStatus.fillMissingDisplayValues(from: storedDeviceStatus)
                     }
                     mergedDeviceStatus.lastLoopDate = max(mergedDeviceStatus.lastLoopDate, storedDeviceStatus.lastLoopDate)
+                    mergedDeviceStatus.sanitizingFutureDates()
                     
-                    let signatureChanged = mergedDeviceStatus.createdAt != storedDeviceStatus.createdAt || mergedDeviceStatus.lastLoopDate != storedDeviceStatus.lastLoopDate || mergedDeviceStatus.id != storedDeviceStatus.id || mergedDeviceStatus.iob != storedDeviceStatus.iob || mergedDeviceStatus.cob != storedDeviceStatus.cob
+                    let signatureChanged = mergedDeviceStatus.hasPersistedChanges(comparedTo: storedDeviceStatus)
                     
                     mergedDeviceStatus.lastCheckedDate = .now
                     mergedDeviceStatus.updatedDate = .now
@@ -1051,6 +1064,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     trace("in updateDeviceStatus, deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, String(describing: mergedDeviceStatus))
                     
                     self.deviceStatus = mergedDeviceStatus
+                    if signatureChanged {
+                        self.nightscoutDeviceStatusAccessor.upsert(mergedDeviceStatus)
+                    }
                     self.didUpdateDeviceStatusDuringLastSync = signatureChanged
                 }
             } catch {
@@ -1064,13 +1080,26 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         }
 
         func loopDates(from response: NightscoutDeviceStatusResponse) -> [Date] {
-            [
+            var dates = [
                 response.openAPS?.enacted?.timestamp,
-                response.openAPS?.suggested?.timestamp,
                 response.loop?.enacted?.timestamp,
                 response.loop?.timestamp
             ]
-            .compactMap { date(from: $0) }
+
+            if let suggested = response.openAPS?.suggested, shouldUseSuggestedAsLoopDate(response: response, suggested: suggested) {
+                dates.append(suggested.timestamp)
+            }
+
+            return dates.compactMap { date(from: $0) }
+        }
+
+        func shouldUseSuggestedAsLoopDate(response: NightscoutDeviceStatusResponse, suggested: NightscoutDeviceStatusResponse.OpenAPS.APSuggestion) -> Bool {
+            switch response.device {
+            case "Trio", "iAPS":
+                return suggested.wasReceived
+            default:
+                return true
+            }
         }
 
         func date(from string: String?) -> Date? {

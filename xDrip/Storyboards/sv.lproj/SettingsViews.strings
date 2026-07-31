@@ -313,7 +313,6 @@
 "settingsviews_storageInfoEarliestRecord" = "Äldsta post";
 "settingsviews_storageInfoLatestRecord" = "Senaste post";
 "settingsviews_storageInfoCheckingStatus" = "Kontrollerar lagring…";
-"settingsviews_nightscoutImportRetentionFooter" = "Importen begränsas till lagringsperioden på %d dagar. Äldre data tas bort vid rensning.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Automatisk rensning";
 "settingsviews_cleanDataKeepHistoricalData" = "Behåll historik";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Senast slutförd";

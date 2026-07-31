@@ -23,6 +23,7 @@ struct CleanDataCategoryInventory: Sendable {
 struct CleanDataInventory: Sendable {
     let bgReadings: CleanDataCategoryInventory
     let treatments: CleanDataCategoryInventory
+    let deviceStatus: CleanDataCategoryInventory
     let calibrations: CleanDataCategoryInventory
     let devices: Int
     let sensors: Int
@@ -49,9 +50,10 @@ enum CleanDataRangeMode: String, CaseIterable, Identifiable, Sendable {
 struct CleanDataSelection: Sendable {
     let includesBgReadings: Bool
     let includesTreatments: Bool
+    let includesDeviceStatus: Bool
 
     var hasSelection: Bool {
-        includesBgReadings || includesTreatments
+        includesBgReadings || includesTreatments || includesDeviceStatus
     }
 }
 
@@ -63,11 +65,12 @@ struct CleanDataDeletionPlan: Sendable {
     let throughDate: Date
     let bgReadingCount: Int
     let treatmentCount: Int
+    let deviceStatusCount: Int
     let calibrationCount: Int
     let createdAt: Date
 
     var totalSelectedRecordCount: Int {
-        bgReadingCount + treatmentCount + calibrationCount
+        bgReadingCount + treatmentCount + deviceStatusCount + calibrationCount
     }
 }
 
@@ -75,6 +78,7 @@ struct CleanDataDeletionPlan: Sendable {
 struct CleanDataDeletionResult: Sendable {
     let bgReadingCount: Int
     let treatmentCount: Int
+    let deviceStatusCount: Int
     let calibrationCount: Int
     let completedAt: Date
     let storeSizeBeforeInBytes: Int64
@@ -136,10 +140,12 @@ final class DataManagementService: @unchecked Sendable {
         let inventory = try await context.perform {
             let bgReadings = try self.bgReadingInventory(on: context)
             let treatments = try self.treatmentInventory(on: context)
+            let deviceStatus = try self.deviceStatusInventory(on: context)
             let calibrations = try self.calibrationInventory(on: context)
             return CleanDataInventory(
                 bgReadings: bgReadings,
                 treatments: treatments,
+                deviceStatus: deviceStatus,
                 calibrations: calibrations,
                 devices: try context.count(for: BLEPeripheral.fetchRequest()),
                 sensors: try context.count(for: Sensor.fetchRequest()),
@@ -147,7 +153,7 @@ final class DataManagementService: @unchecked Sendable {
             )
         }
         trace(
-            "in cleanDataInventory, completed. duration = %{public}@ ms, store bytes = %{public}@, BG readings = %{public}@, treatments = %{public}@, calibrations = %{public}@, devices = %{public}@, sensors = %{public}@",
+            "in cleanDataInventory, completed. duration = %{public}@ ms, store bytes = %{public}@, BG readings = %{public}@, treatments = %{public}@, Nightscout devicestatus = %{public}@, calibrations = %{public}@, devices = %{public}@, sensors = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
@@ -155,6 +161,7 @@ final class DataManagementService: @unchecked Sendable {
             inventory.storeSizeInBytes.description,
             inventory.bgReadings.count.description,
             inventory.treatments.count.description,
+            inventory.deviceStatus.count.description,
             inventory.calibrations.count.description,
             inventory.devices.description,
             inventory.sensors.description
@@ -191,9 +198,12 @@ final class DataManagementService: @unchecked Sendable {
                     afterDeletingSelectedBgReadings: true
                 ))
                 : 0
-            return (bgReadingCount, treatmentCount, calibrationCount)
+            let deviceStatusCount = selection.includesDeviceStatus
+                ? try context.count(for: self.nightscoutDeviceStatusFetchRequest(fromDate: fromDate, throughDate: throughDate))
+                : 0
+            return (bgReadingCount, treatmentCount, deviceStatusCount, calibrationCount)
         }
-        guard counts.0 + counts.1 + counts.2 > 0 else { throw CleanDataError.noMatchingData }
+        guard counts.0 + counts.1 + counts.2 + counts.3 > 0 else { throw CleanDataError.noMatchingData }
 
         let plan = CleanDataDeletionPlan(
             selection: selection,
@@ -202,11 +212,12 @@ final class DataManagementService: @unchecked Sendable {
             throughDate: throughDate,
             bgReadingCount: counts.0,
             treatmentCount: counts.1,
-            calibrationCount: counts.2,
+            deviceStatusCount: counts.2,
+            calibrationCount: counts.3,
             createdAt: Date()
         )
         trace(
-            "in cleanDataDeletionPlan, preview created. mode = %{public}@, from = %{public}@, through = %{public}@, BG readings = %{public}@, treatments = %{public}@, unused calibrations = %{public}@",
+            "in cleanDataDeletionPlan, preview created. mode = %{public}@, from = %{public}@, through = %{public}@, BG readings = %{public}@, treatments = %{public}@, Nightscout devicestatus = %{public}@, unused calibrations = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
@@ -215,6 +226,7 @@ final class DataManagementService: @unchecked Sendable {
             throughDate.description(with: .current),
             plan.bgReadingCount.description,
             plan.treatmentCount.description,
+            plan.deviceStatusCount.description,
             plan.calibrationCount.description
         )
         return plan
@@ -248,8 +260,12 @@ final class DataManagementService: @unchecked Sendable {
                     afterDeletingSelectedBgReadings: true
                 ))
                 : 0
+            let currentDeviceStatusCount = plan.selection.includesDeviceStatus
+                ? try context.count(for: self.nightscoutDeviceStatusFetchRequest(fromDate: plan.fromDate, throughDate: plan.throughDate))
+                : 0
             guard currentBgReadingCount == plan.bgReadingCount,
                   currentTreatmentCount == plan.treatmentCount,
+                  currentDeviceStatusCount == plan.deviceStatusCount,
                   currentCalibrationCount == plan.calibrationCount
             else {
                 throw CleanDataError.storedDataChanged
@@ -283,6 +299,21 @@ final class DataManagementService: @unchecked Sendable {
                 treatmentCount = 0
             }
 
+            let deviceStatusCount: Int
+            if plan.selection.includesDeviceStatus {
+                let result = try self.executeBatchDelete(
+                    fetchRequest: self.nightscoutDeviceStatusFetchRequest(
+                        fromDate: plan.fromDate,
+                        throughDate: plan.throughDate
+                    ),
+                    on: context
+                )
+                deviceStatusCount = result.count
+                deletedObjectIDURLs.append(contentsOf: result.objectIDURLs)
+            } else {
+                deviceStatusCount = 0
+            }
+
             let calibrationCount: Int
             if plan.selection.includesBgReadings {
                 let result = try self.executeBatchDelete(
@@ -304,6 +335,7 @@ final class DataManagementService: @unchecked Sendable {
             return (
                 bgReadingCount,
                 treatmentCount,
+                deviceStatusCount,
                 calibrationCount,
                 deletedObjectIDURLs,
                 storeSizeBeforeInBytes,
@@ -313,30 +345,62 @@ final class DataManagementService: @unchecked Sendable {
             )
         }
 
-        mergeDeletedObjects(with: execution.3)
+        mergeDeletedObjects(with: execution.4)
         let result = CleanDataDeletionResult(
             bgReadingCount: execution.0,
             treatmentCount: execution.1,
-            calibrationCount: execution.2,
+            deviceStatusCount: execution.2,
+            calibrationCount: execution.3,
             completedAt: Date(),
-            storeSizeBeforeInBytes: execution.4,
-            storeSizeAfterInBytes: execution.5,
-            oldestRemainingBgReadingDate: execution.6,
-            oldestRemainingTreatmentDate: execution.7
+            storeSizeBeforeInBytes: execution.5,
+            storeSizeAfterInBytes: execution.6,
+            oldestRemainingBgReadingDate: execution.7,
+            oldestRemainingTreatmentDate: execution.8
         )
         trace(
-            "in cleanDataDelete, completed. duration = %{public}@ ms, BG readings = %{public}@, treatments = %{public}@, unused calibrations = %{public}@, store bytes before = %{public}@, store bytes after = %{public}@",
+            "in cleanDataDelete, completed. duration = %{public}@ ms, BG readings = %{public}@, treatments = %{public}@, Nightscout devicestatus = %{public}@, unused calibrations = %{public}@, store bytes before = %{public}@, store bytes after = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
             elapsedMilliseconds(since: startedAt),
             result.bgReadingCount.description,
             result.treatmentCount.description,
+            result.deviceStatusCount.description,
             result.calibrationCount.description,
             result.storeSizeBeforeInBytes.description,
             result.storeSizeAfterInBytes.description
         )
         return result
+    }
+
+    func deleteNightscoutLoopData(throughDate: Date) async throws -> (deviceStatusCount: Int, profileCount: Int) {
+        try savePendingChanges()
+        let context = coreDataManager.privateManagedObjectContext
+        let execution = try await context.perform {
+            var deletedObjectIDURLs = [URL]()
+
+            let deviceStatusResult = try self.executeBatchDelete(
+                fetchRequest: self.nightscoutDeviceStatusFetchRequest(throughDate: throughDate),
+                on: context
+            )
+            deletedObjectIDURLs.append(contentsOf: deviceStatusResult.objectIDURLs)
+
+            let profileRequest: NSFetchRequest<NightscoutProfileEntry> = NightscoutProfileEntry.fetchRequest()
+            profileRequest.predicate = NSPredicate(format: "startDate < %@", throughDate as NSDate)
+            profileRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(NightscoutProfileEntry.startDate), ascending: false)]
+
+            // A profile continues to apply after its start date. Preserve the newest
+            // pre-cutoff profile so reports retain the schedule active at the boundary.
+            let profiles = Array(try context.fetch(profileRequest).dropFirst())
+            profiles.forEach { context.delete($0) }
+            try context.save()
+            deletedObjectIDURLs.append(contentsOf: profiles.map { $0.objectID.uriRepresentation() })
+
+            return (deviceStatusResult.count, profiles.count, deletedObjectIDURLs)
+        }
+
+        mergeDeletedObjects(with: execution.2)
+        return (execution.0, execution.1)
     }
 
     // MARK: - Fetch Requests
@@ -387,6 +451,16 @@ final class DataManagementService: @unchecked Sendable {
         return request
     }
 
+    private func nightscoutDeviceStatusFetchRequest(throughDate: Date) -> NSFetchRequest<NSFetchRequestResult> {
+        nightscoutDeviceStatusFetchRequest(fromDate: nil, throughDate: throughDate)
+    }
+
+    private func nightscoutDeviceStatusFetchRequest(fromDate: Date?, throughDate: Date) -> NSFetchRequest<NSFetchRequestResult> {
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "NightscoutDeviceStatusEntry")
+        request.predicate = datePredicate(key: #keyPath(NightscoutDeviceStatusEntry.createdAt), fromDate: fromDate, throughDate: throughDate)
+        return request
+    }
+
     private func datePredicate(key: String, fromDate: Date?, throughDate: Date) -> NSPredicate {
         if let fromDate {
             return NSPredicate(
@@ -420,6 +494,15 @@ final class DataManagementService: @unchecked Sendable {
         )
     }
 
+    private func deviceStatusInventory(on context: NSManagedObjectContext) throws -> CleanDataCategoryInventory {
+        let count = try context.count(for: NightscoutDeviceStatusEntry.fetchRequest())
+        return try CleanDataCategoryInventory(
+            count: count,
+            firstDate: firstDeviceStatus(on: context, ascending: true)?.createdAt,
+            lastDate: firstDeviceStatus(on: context, ascending: false)?.createdAt
+        )
+    }
+
     private func calibrationInventory(on context: NSManagedObjectContext) throws -> CleanDataCategoryInventory {
         let count = try context.count(for: Calibration.fetchRequest())
         return try CleanDataCategoryInventory(
@@ -441,6 +524,13 @@ final class DataManagementService: @unchecked Sendable {
         request.fetchLimit = 1
         request.predicate = NSPredicate(format: "date != nil")
         request.sortDescriptors = [NSSortDescriptor(key: #keyPath(TreatmentEntry.date), ascending: ascending)]
+        return try context.fetch(request).first
+    }
+
+    private func firstDeviceStatus(on context: NSManagedObjectContext, ascending: Bool) throws -> NightscoutDeviceStatusEntry? {
+        let request: NSFetchRequest<NightscoutDeviceStatusEntry> = NightscoutDeviceStatusEntry.fetchRequest()
+        request.fetchLimit = 1
+        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(NightscoutDeviceStatusEntry.createdAt), ascending: ascending)]
         return try context.fetch(request).first
     }
 

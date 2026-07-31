@@ -176,11 +176,14 @@ final class BackupService: @unchecked Sendable {
         let accounts = storedAccounts?.isEmpty == false ? storedAccounts : nil
 
         let context = coreDataManager.privateChildManagedObjectContext()
+        let includesLoopData = options.includesBgReadings || options.includesTreatments
         let snapshot = try await context.perform {
             let alertTypes = options.includesSettings ? try self.exportAlertTypes(context: context) : []
             let bgReadings = options.includesBgReadings ? try self.exportBgReadings(context: context) : []
             let treatments = options.includesTreatments ? try self.exportTreatments(context: context) : []
-            return (alertTypes, bgReadings, treatments)
+            let deviceStatuses = includesLoopData ? try self.exportDeviceStatuses(context: context) : []
+            let profiles = includesLoopData ? try self.exportProfiles(context: context) : []
+            return (alertTypes, bgReadings, treatments, deviceStatuses, profiles)
         }
 
         let info = Bundle.main.infoDictionary
@@ -192,9 +195,13 @@ final class BackupService: @unchecked Sendable {
             appBuild: info?["CFBundleVersion"] as? String ?? "unknown",
             bgReadingCount: snapshot.1.count,
             treatmentCount: snapshot.2.count,
+            deviceStatusCount: snapshot.3.count,
+            profileCount: snapshot.4.count,
             firstBgReadingDate: snapshot.1.map(\.timeStamp).min(),
             lastBgReadingDate: snapshot.1.map(\.timeStamp).max(),
             firstTreatmentDate: snapshot.2.map(\.date).min(),
+            firstDeviceStatusDate: snapshot.3.map(\.createdAt).min(),
+            firstProfileDate: snapshot.4.map(\.startDate).min(),
             includesSettings: options.includesSettings,
             includesAccounts: accounts?.isEmpty == false,
             isPasswordProtected: options.passphrase?.isEmpty == false
@@ -205,7 +212,9 @@ final class BackupService: @unchecked Sendable {
             accounts: accounts,
             alertTypes: snapshot.0,
             bgReadings: snapshot.1,
-            treatments: snapshot.2
+            treatments: snapshot.2,
+            deviceStatuses: snapshot.3,
+            profiles: snapshot.4
         )
         let json = try encoder.encode(payload)
         let compressed = try (json as NSData).compressed(using: .lzfse) as Data
@@ -223,7 +232,7 @@ final class BackupService: @unchecked Sendable {
             )
         try archive.write(to: outputURL, options: .atomic)
         trace(
-            "in createBackup, completed. duration = %{public}@ ms, archive bytes = %{public}@, BG readings = %{public}@, treatments = %{public}@, settings = %{public}@, accounts = %{public}@, encrypted = %{public}@",
+            "in createBackup, completed. duration = %{public}@ ms, archive bytes = %{public}@, BG readings = %{public}@, treatments = %{public}@, device status = %{public}@, profiles = %{public}@, settings = %{public}@, accounts = %{public}@, encrypted = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
@@ -231,6 +240,8 @@ final class BackupService: @unchecked Sendable {
             archive.count.description,
             manifest.bgReadingCount.description,
             manifest.treatmentCount.description,
+            (manifest.deviceStatusCount ?? 0).description,
+            (manifest.profileCount ?? 0).description,
             manifest.includesSettings.description,
             manifest.includesAccounts.description,
             manifest.isPasswordProtected.description
@@ -273,7 +284,7 @@ final class BackupService: @unchecked Sendable {
         }
         try validate(payload)
         trace(
-            "in inspectBackup, completed. duration = %{public}@ ms, format version = %{public}@, archive bytes = %{public}@, encrypted = %{public}@, BG readings = %{public}@, treatments = %{public}@, settings = %{public}@, accounts = %{public}@",
+            "in inspectBackup, completed. duration = %{public}@ ms, format version = %{public}@, archive bytes = %{public}@, encrypted = %{public}@, BG readings = %{public}@, treatments = %{public}@, device status = %{public}@, profiles = %{public}@, settings = %{public}@, accounts = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
@@ -283,6 +294,8 @@ final class BackupService: @unchecked Sendable {
             protected.description,
             payload.manifest.bgReadingCount.description,
             payload.manifest.treatmentCount.description,
+            (payload.manifest.deviceStatusCount ?? payload.deviceStatuses?.count ?? 0).description,
+            (payload.manifest.profileCount ?? payload.profiles?.count ?? 0).description,
             payload.manifest.includesSettings.description,
             payload.manifest.includesAccounts.description
         )
@@ -317,7 +330,7 @@ final class BackupService: @unchecked Sendable {
         let startedAt = Date()
         let payload = inspection.payload
         trace(
-            "in restore, starting. mode = %{public}@, settings = %{public}@, account categories = %{public}@, BG readings = %{public}@, treatments = %{public}@",
+            "in restore, starting. mode = %{public}@, settings = %{public}@, account categories = %{public}@, BG readings = %{public}@, treatments = %{public}@, device status = %{public}@, profiles = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
@@ -325,7 +338,9 @@ final class BackupService: @unchecked Sendable {
             restoresSettings.description,
             restoredAccountCategories.count.description,
             payload.manifest.bgReadingCount.description,
-            payload.manifest.treatmentCount.description
+            payload.manifest.treatmentCount.description,
+            (payload.manifest.deviceStatusCount ?? payload.deviceStatuses?.count ?? 0).description,
+            (payload.manifest.profileCount ?? payload.profiles?.count ?? 0).description
         )
         let restoredAccountKeys = restoredAccountCategories.reduce(into: Set<String>()) {
             $0.formUnion($1.keys)
@@ -339,18 +354,24 @@ final class BackupService: @unchecked Sendable {
             }
             let bgCounts: (added: Int, skipped: Int, firstAddedAt: Date?)
             let treatmentCounts: (added: Int, skipped: Int)
+            let deviceStatusCounts: (added: Int, skipped: Int)
+            let profileCounts: (added: Int, skipped: Int)
             if mode == .ignore {
                 bgCounts = (0, payload.bgReadings.count, nil)
                 treatmentCounts = (0, payload.treatments.count)
+                deviceStatusCounts = (0, payload.deviceStatuses?.count ?? 0)
+                profileCounts = (0, payload.profiles?.count ?? 0)
             } else {
                 bgCounts = try self.restoreBgReadings(payload.bgReadings, mode: mode, context: context)
                 treatmentCounts = try self.restoreTreatments(payload.treatments, context: context)
+                deviceStatusCounts = try self.restoreDeviceStatuses(payload.deviceStatuses ?? [], context: context)
+                profileCounts = try self.restoreProfiles(payload.profiles ?? [], context: context)
             }
             if restoresSettings {
                 try self.replaceAlertTypes(payload.alertTypes, context: context)
             }
             try context.save()
-            return (bgCounts, treatmentCounts)
+            return (bgCounts, treatmentCounts, deviceStatusCounts, profileCounts)
         }
         coreDataManager.saveChanges()
 
@@ -377,12 +398,16 @@ final class BackupService: @unchecked Sendable {
             firstBgReadingAppliedAt: counts.0.firstAddedAt,
             treatmentsAdded: counts.1.added,
             treatmentsSkipped: counts.1.skipped,
+            deviceStatusesAdded: counts.2.added,
+            deviceStatusesSkipped: counts.2.skipped,
+            profilesAdded: counts.3.added,
+            profilesSkipped: counts.3.skipped,
             settingsRestored: restoredValueCounts.0,
             accountsRestored: restoredValueCounts.1,
             accountStatuses: accountStatuses
         )
         trace(
-            "in restore, completed. duration = %{public}@ ms, BG readings added = %{public}@, BG readings skipped = %{public}@, treatments added = %{public}@, treatments skipped = %{public}@, settings restored = %{public}@, account values restored = %{public}@",
+            "in restore, completed. duration = %{public}@ ms, BG readings added = %{public}@, BG readings skipped = %{public}@, treatments added = %{public}@, treatments skipped = %{public}@, device status added = %{public}@, device status skipped = %{public}@, profiles added = %{public}@, profiles skipped = %{public}@, settings restored = %{public}@, account values restored = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
@@ -391,6 +416,10 @@ final class BackupService: @unchecked Sendable {
             result.bgReadingsSkipped.description,
             result.treatmentsAdded.description,
             result.treatmentsSkipped.description,
+            result.deviceStatusesAdded.description,
+            result.deviceStatusesSkipped.description,
+            result.profilesAdded.description,
+            result.profilesSkipped.description,
             result.settingsRestored.description,
             result.accountsRestored.description
         )
@@ -445,6 +474,90 @@ final class BackupService: @unchecked Sendable {
                 uploaded: $0.uploaded,
                 value: $0.value,
                 valueSecondary: $0.valueSecondary
+            )
+        }
+    }
+
+    private func exportDeviceStatuses(context: NSManagedObjectContext) throws -> [BackupNightscoutDeviceStatus] {
+        let request: NSFetchRequest<NightscoutDeviceStatusEntry> = NightscoutDeviceStatusEntry.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(NightscoutDeviceStatusEntry.createdAt), ascending: true)]
+        request.fetchBatchSize = 500
+        return try context.fetch(request).map {
+            BackupNightscoutDeviceStatus(
+                id: $0.id,
+                createdAt: $0.createdAt,
+                updatedDate: $0.updatedDate,
+                lastCheckedDate: $0.lastCheckedDate,
+                lastLoopDate: $0.lastLoopDate,
+                timestamp: $0.timestamp,
+                device: $0.device,
+                appVersion: $0.appVersion,
+                activeProfile: $0.activeProfile,
+                iob: $0.iob?.doubleValue,
+                cob: $0.cob?.doubleValue,
+                eventualBG: $0.eventualBG?.doubleValue,
+                currentTarget: $0.currentTarget?.doubleValue,
+                isf: $0.isf?.doubleValue,
+                insulinReq: $0.insulinReq?.doubleValue,
+                bolusVolume: $0.bolusVolume?.doubleValue,
+                rate: $0.rate?.doubleValue,
+                duration: $0.duration?.intValue,
+                reason: $0.reason,
+                sensitivityRatio: $0.sensitivityRatio?.doubleValue,
+                tdd: $0.tdd?.doubleValue,
+                error: $0.error,
+                overrideActive: $0.overrideActive?.boolValue,
+                overrideName: $0.overrideName,
+                overrideMinValue: $0.overrideMinValue?.doubleValue,
+                overrideMaxValue: $0.overrideMaxValue?.doubleValue,
+                overrideMultiplier: $0.overrideMultiplier?.doubleValue,
+                pumpBatteryPercent: $0.pumpBatteryPercent?.intValue,
+                pumpReservoir: $0.pumpReservoir?.doubleValue,
+                pumpIsBolusing: $0.pumpIsBolusing?.boolValue,
+                pumpIsSuspended: $0.pumpIsSuspended?.boolValue,
+                pumpStatus: $0.pumpStatus,
+                pumpStatusTimestamp: $0.pumpStatusTimestamp,
+                pumpManufacturer: $0.pumpManufacturer,
+                pumpModel: $0.pumpModel,
+                uploaderBatteryPercent: $0.uploaderBatteryPercent?.intValue,
+                uploaderIsCharging: $0.uploaderIsCharging?.boolValue
+            )
+        }
+    }
+
+    private func exportProfiles(context: NSManagedObjectContext) throws -> [BackupNightscoutProfile] {
+        let request: NSFetchRequest<NightscoutProfileEntry> = NightscoutProfileEntry.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(NightscoutProfileEntry.startDate), ascending: true)]
+        request.relationshipKeyPathsForPrefetching = ["schedules"]
+        request.returnsObjectsAsFaults = false
+        request.includesPropertyValues = true
+        return try context.fetch(request).map { profile in
+            let schedules = (profile.schedules as? Set<NightscoutProfileScheduleEntry> ?? [])
+                .sorted {
+                    if $0.kind == $1.kind {
+                        return $0.timeAsSecondsFromMidnight < $1.timeAsSecondsFromMidnight
+                    }
+                    return $0.kind < $1.kind
+                }
+                .map {
+                    BackupNightscoutProfileSchedule(
+                        kind: $0.kind,
+                        timeAsSecondsFromMidnight: $0.timeAsSecondsFromMidnight,
+                        value: $0.value
+                    )
+                }
+            return BackupNightscoutProfile(
+                id: profile.id,
+                startDate: profile.startDate,
+                createdAt: profile.createdAt,
+                updatedDate: profile.updatedDate,
+                lastCheckedDate: profile.lastCheckedDate,
+                profileName: profile.profileName,
+                enteredBy: profile.enteredBy,
+                timezone: profile.timezone,
+                dia: profile.dia?.doubleValue,
+                isMgDl: profile.isMgDl?.boolValue,
+                schedules: schedules
             )
         }
     }
@@ -578,6 +691,115 @@ final class BackupService: @unchecked Sendable {
         return (added, skipped)
     }
 
+    private func restoreDeviceStatuses(
+        _ deviceStatuses: [BackupNightscoutDeviceStatus],
+        context: NSManagedObjectContext
+    ) throws -> (added: Int, skipped: Int) {
+        let request: NSFetchRequest<NightscoutDeviceStatusEntry> = NightscoutDeviceStatusEntry.fetchRequest()
+        let existing = try context.fetch(request)
+        var ids = Set(existing.map(\.id).filter { !$0.isEmpty })
+        var createdDates = Set(existing.map(\.createdAt))
+        var added = 0
+        var skipped = 0
+
+        for record in deviceStatuses {
+            guard !ids.contains(record.id), !createdDates.contains(record.createdAt) else {
+                skipped += 1
+                continue
+            }
+
+            let entry = NightscoutDeviceStatusEntry(context: context)
+            entry.id = record.id
+            entry.createdAt = record.createdAt
+            entry.updatedDate = record.updatedDate
+            entry.lastCheckedDate = record.lastCheckedDate
+            entry.lastLoopDate = record.lastLoopDate
+            entry.timestamp = record.timestamp
+            entry.device = record.device
+            entry.appVersion = record.appVersion
+            entry.activeProfile = record.activeProfile
+            entry.iob = record.iob.nsNumber
+            entry.cob = record.cob.nsNumber
+            entry.eventualBG = record.eventualBG.nsNumber
+            entry.currentTarget = record.currentTarget.nsNumber
+            entry.isf = record.isf.nsNumber
+            entry.insulinReq = record.insulinReq.nsNumber
+            entry.bolusVolume = record.bolusVolume.nsNumber
+            entry.rate = record.rate.nsNumber
+            entry.duration = record.duration.nsNumber
+            entry.reason = record.reason
+            entry.sensitivityRatio = record.sensitivityRatio.nsNumber
+            entry.tdd = record.tdd.nsNumber
+            entry.error = record.error
+            entry.overrideActive = record.overrideActive.nsNumber
+            entry.overrideName = record.overrideName
+            entry.overrideMinValue = record.overrideMinValue.nsNumber
+            entry.overrideMaxValue = record.overrideMaxValue.nsNumber
+            entry.overrideMultiplier = record.overrideMultiplier.nsNumber
+            entry.pumpBatteryPercent = record.pumpBatteryPercent.nsNumber
+            entry.pumpReservoir = record.pumpReservoir.nsNumber
+            entry.pumpIsBolusing = record.pumpIsBolusing.nsNumber
+            entry.pumpIsSuspended = record.pumpIsSuspended.nsNumber
+            entry.pumpStatus = record.pumpStatus
+            entry.pumpStatusTimestamp = record.pumpStatusTimestamp
+            entry.pumpManufacturer = record.pumpManufacturer
+            entry.pumpModel = record.pumpModel
+            entry.uploaderBatteryPercent = record.uploaderBatteryPercent.nsNumber
+            entry.uploaderIsCharging = record.uploaderIsCharging.nsNumber
+
+            ids.insert(record.id)
+            createdDates.insert(record.createdAt)
+            added += 1
+        }
+
+        return (added, skipped)
+    }
+
+    private func restoreProfiles(
+        _ profiles: [BackupNightscoutProfile],
+        context: NSManagedObjectContext
+    ) throws -> (added: Int, skipped: Int) {
+        let request: NSFetchRequest<NightscoutProfileEntry> = NightscoutProfileEntry.fetchRequest()
+        let existing = try context.fetch(request)
+        var ids = Set(existing.map(\.id).filter { !$0.isEmpty })
+        var startDates = Set(existing.map(\.startDate))
+        var added = 0
+        var skipped = 0
+
+        for record in profiles {
+            guard !ids.contains(record.id), !startDates.contains(record.startDate) else {
+                skipped += 1
+                continue
+            }
+
+            let entry = NightscoutProfileEntry(context: context)
+            entry.id = record.id
+            entry.startDate = record.startDate
+            entry.createdAt = record.createdAt
+            entry.updatedDate = record.updatedDate
+            entry.lastCheckedDate = record.lastCheckedDate
+            entry.profileName = record.profileName
+            entry.enteredBy = record.enteredBy
+            entry.timezone = record.timezone
+            entry.dia = record.dia.nsNumber
+            entry.isMgDl = record.isMgDl.nsNumber
+
+            for schedule in record.schedules {
+                let scheduleEntry = NightscoutProfileScheduleEntry(context: context)
+                scheduleEntry.kind = schedule.kind
+                scheduleEntry.timeAsSecondsFromMidnight = schedule.timeAsSecondsFromMidnight
+                scheduleEntry.value = schedule.value
+                scheduleEntry.profile = entry
+            }
+
+            ids.insert(record.id)
+            startDates.insert(record.startDate)
+            added += 1
+        }
+
+        return (added, skipped)
+    }
+
     private func replaceAlertTypes(_ alertTypes: [BackupAlertType], context: NSManagedObjectContext) throws {
         try context.fetch(NSFetchRequest<AlertEntry>(entityName: "AlertEntry")).forEach(context.delete)
         try context.fetch(NSFetchRequest<AlertType>(entityName: "AlertType")).forEach(context.delete)
@@ -614,10 +836,23 @@ final class BackupService: @unchecked Sendable {
             request.predicate = NSPredicate(format: "timeStamp >= %@ AND timeStamp <= %@", first as NSDate, last as NSDate)
             try context.fetch(request).forEach(context.delete)
         }
-        guard let first = payload.treatments.map(\.date).min(), let last = payload.treatments.map(\.date).max() else { return }
-        let request: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
-        request.predicate = NSPredicate(format: "date >= %@ AND date <= %@", first as NSDate, last as NSDate)
-        try context.fetch(request).forEach(context.delete)
+        if let first = payload.treatments.map(\.date).min(), let last = payload.treatments.map(\.date).max() {
+            let request: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
+            request.predicate = NSPredicate(format: "date >= %@ AND date <= %@", first as NSDate, last as NSDate)
+            try context.fetch(request).forEach(context.delete)
+        }
+
+        if let first = payload.deviceStatuses?.map(\.createdAt).min(), let last = payload.deviceStatuses?.map(\.createdAt).max() {
+            let request: NSFetchRequest<NightscoutDeviceStatusEntry> = NightscoutDeviceStatusEntry.fetchRequest()
+            request.predicate = NSPredicate(format: "createdAt >= %@ AND createdAt <= %@", first as NSDate, last as NSDate)
+            try context.fetch(request).forEach(context.delete)
+        }
+
+        if let first = payload.profiles?.map(\.startDate).min(), let last = payload.profiles?.map(\.startDate).max() {
+            let request: NSFetchRequest<NightscoutProfileEntry> = NightscoutProfileEntry.fetchRequest()
+            request.predicate = NSPredicate(format: "startDate >= %@ AND startDate <= %@", first as NSDate, last as NSDate)
+            try context.fetch(request).forEach(context.delete)
+        }
     }
 
     // MARK: - Validation and Matching
@@ -635,15 +870,26 @@ final class BackupService: @unchecked Sendable {
         let firstBgReadingDate = payload.bgReadings.map(\.timeStamp).min()
         let lastBgReadingDate = payload.bgReadings.map(\.timeStamp).max()
         let firstTreatmentDate = payload.treatments.map(\.date).min()
+        let deviceStatuses = payload.deviceStatuses ?? []
+        let profiles = payload.profiles ?? []
+        let firstDeviceStatusDate = deviceStatuses.map(\.createdAt).min()
+        let firstProfileDate = profiles.map(\.startDate).min()
         guard manifest.bgReadingCount == payload.bgReadings.count,
               manifest.treatmentCount == payload.treatments.count,
+              (manifest.deviceStatusCount ?? deviceStatuses.count) == deviceStatuses.count,
+              (manifest.profileCount ?? profiles.count) == profiles.count,
               manifest.firstBgReadingDate == firstBgReadingDate,
               manifest.lastBgReadingDate == lastBgReadingDate,
               manifest.firstTreatmentDate == firstTreatmentDate,
+              (manifest.firstDeviceStatusDate ?? firstDeviceStatusDate) == firstDeviceStatusDate,
+              (manifest.firstProfileDate ?? firstProfileDate) == firstProfileDate,
               manifest.includesSettings == (payload.settings != nil),
               manifest.includesAccounts == (payload.accounts?.isEmpty == false),
               manifest.includesSettings || payload.alertTypes.isEmpty,
-              payload.treatments.allSatisfy({ TreatmentType(rawValue: $0.treatmentType) != nil })
+              payload.treatments.allSatisfy({ TreatmentType(rawValue: $0.treatmentType) != nil }),
+              profiles.allSatisfy({ profile in
+                  profile.schedules.allSatisfy { NightscoutProfileScheduleKind(rawValue: $0.kind) != nil }
+              })
         else {
             throw BackupError.invalidFile
         }
@@ -723,5 +969,23 @@ final class BackupService: @unchecked Sendable {
 
     private func elapsedMilliseconds(since startDate: Date) -> String {
         Int(Date().timeIntervalSince(startDate) * 1000).description
+    }
+}
+
+private extension Optional where Wrapped == Double {
+    var nsNumber: NSNumber? {
+        map { NSNumber(value: $0) }
+    }
+}
+
+private extension Optional where Wrapped == Int {
+    var nsNumber: NSNumber? {
+        map { NSNumber(value: $0) }
+    }
+}
+
+private extension Optional where Wrapped == Bool {
+    var nsNumber: NSNumber? {
+        map { NSNumber(value: $0) }
     }
 }

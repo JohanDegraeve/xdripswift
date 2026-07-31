@@ -259,7 +259,6 @@
 "settingsviews_storageInfoEarliestRecord" = "Самая ранняя запись";
 "settingsviews_storageInfoLatestRecord" = "Самая новая запись";
 "settingsviews_storageInfoCheckingStatus" = "Проверка хранилища…";
-"settingsviews_nightscoutImportRetentionFooter" = "Импорт ограничен периодом хранения в %d дней. Более старые данные удаляются при очистке.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Автоматическая очистка";
 "settingsviews_cleanDataKeepHistoricalData" = "Хранить историю";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Последнее выполнение";

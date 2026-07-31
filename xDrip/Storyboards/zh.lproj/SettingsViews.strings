@@ -465,7 +465,6 @@
 "settingsviews_storageInfoEarliestRecord" = "最早记录";
 "settingsviews_storageInfoLatestRecord" = "最新记录";
 "settingsviews_storageInfoCheckingStatus" = "正在检查存储…";
-"settingsviews_nightscoutImportRetentionFooter" = "导入范围受 %d 天保留期限制。清理功能会删除更早的数据。";
 "settingsviews_cleanDataAutomaticHousekeeping" = "自动清理";
 "settingsviews_cleanDataKeepHistoricalData" = "保留历史数据";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "上次完成";

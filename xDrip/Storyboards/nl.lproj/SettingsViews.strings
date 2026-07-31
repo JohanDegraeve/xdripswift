@@ -339,7 +339,6 @@
 "settingsviews_storageInfoEarliestRecord" = "Oudste record";
 "settingsviews_storageInfoLatestRecord" = "Nieuwste record";
 "settingsviews_storageInfoCheckingStatus" = "Opslag controleren…";
-"settingsviews_nightscoutImportRetentionFooter" = "De import is beperkt tot de bewaartermijn van %d dagen. Oudere gegevens worden door de opschoning verwijderd.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Automatisch opschonen";
 "settingsviews_cleanDataKeepHistoricalData" = "Historische gegevens bewaren";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Laatst voltooid";

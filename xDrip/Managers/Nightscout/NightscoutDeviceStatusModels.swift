@@ -12,7 +12,7 @@ import SwiftUI
 
 /// Struct to hold internal DeviceStatus
 /// Initialize from a NightscoutDeviceStatusResponse
-struct NightscoutDeviceStatus: Codable {
+struct NightscoutDeviceStatus: Codable, Sendable {
     var updatedDate: Date = .distantPast
     var lastCheckedDate: Date = .distantPast
     
@@ -340,6 +340,94 @@ struct NightscoutDeviceStatus: Codable {
 // MARK: Internal NightscoutDeviceStatus initializer
 
 extension NightscoutDeviceStatus {
+    private struct PersistenceSignature: Equatable {
+        let id: String
+        let createdAt: Date
+        let lastLoopDate: Date
+        let timestamp: Date?
+        let device: String?
+        let appVersion: String?
+        let activeProfile: String?
+        let iob: Double?
+        let cob: Double?
+        let eventualBG: Double?
+        let currentTarget: Double?
+        let isf: Double?
+        let insulinReq: Double?
+        let bolusVolume: Double?
+        let rate: Double?
+        let duration: Int?
+        let reason: String?
+        let sensitivityRatio: Double?
+        let tdd: Double?
+        let error: String?
+        let overrideActive: Bool?
+        let overrideName: String?
+        let overrideMinValue: Double?
+        let overrideMaxValue: Double?
+        let overrideMultiplier: Double?
+        let pumpBatteryPercent: Int?
+        let pumpReservoir: Double?
+        let pumpIsBolusing: Bool?
+        let pumpIsSuspended: Bool?
+        let pumpStatus: String?
+        let pumpStatusTimestamp: Date?
+        let pumpManufacturer: String?
+        let pumpModel: String?
+        let uploaderBatteryPercent: Int?
+        let uploaderIsCharging: Bool?
+    }
+
+    /// Returns whether any normalized field stored for history differs from another status.
+    ///
+    /// Poll timestamps are deliberately excluded: they change on every request and would create a
+    /// write every cycle even when Nightscout returned the same status. Raw compatibility fields
+    /// such as `mills`, pump clocks and pump IDs are also excluded because they are not part of the
+    /// persisted reporting model.
+    func hasPersistedChanges(comparedTo other: NightscoutDeviceStatus) -> Bool {
+        persistenceSignature != other.persistenceSignature
+    }
+
+    private var persistenceSignature: PersistenceSignature {
+        PersistenceSignature(
+            id: id,
+            createdAt: createdAt,
+            lastLoopDate: lastLoopDate,
+            timestamp: timestamp,
+            device: device,
+            appVersion: appVersion,
+            activeProfile: activeProfile,
+            iob: iob,
+            cob: cob,
+            eventualBG: eventualBG,
+            currentTarget: currentTarget,
+            isf: isf,
+            insulinReq: insulinReq,
+            bolusVolume: bolusVolume,
+            rate: rate,
+            duration: duration,
+            reason: reason,
+            sensitivityRatio: sensitivityRatio,
+            tdd: tdd,
+            error: error,
+            overrideActive: overrideActive,
+            overrideName: overrideName,
+            overrideMinValue: overrideMinValue,
+            overrideMaxValue: overrideMaxValue,
+            overrideMultiplier: overrideMultiplier,
+            pumpBatteryPercent: pumpBatteryPercent,
+            pumpReservoir: pumpReservoir,
+            pumpIsBolusing: pumpIsBolusing,
+            pumpIsSuspended: pumpIsSuspended,
+            pumpStatus: pumpStatus,
+            pumpStatusTimestamp: pumpStatusTimestamp,
+            pumpManufacturer: pumpManufacturer,
+            pumpModel: pumpModel,
+            uploaderBatteryPercent: uploaderBatteryPercent,
+            uploaderIsCharging: uploaderIsCharging
+        )
+    }
+
     /// Fill missing display values from another device status response.
     ///
     /// Nightscout can return a newest devicestatus document that is more like a heartbeat than a
@@ -391,6 +479,15 @@ extension NightscoutDeviceStatus {
             lastLoopDate = fallback.lastLoopDate
         }
     }
+
+    mutating func sanitizingFutureDates(referenceDate: Date = Date(), futureTolerance: TimeInterval = 20) {
+        let maximumAllowedDate = referenceDate.addingTimeInterval(futureTolerance)
+        if createdAt > maximumAllowedDate { createdAt = .distantPast }
+        if updatedDate > maximumAllowedDate { updatedDate = .distantPast }
+        if lastCheckedDate > maximumAllowedDate { lastCheckedDate = .distantPast }
+        if lastLoopDate > maximumAllowedDate { lastLoopDate = .distantPast }
+        if let timestamp, timestamp > maximumAllowedDate { self.timestamp = nil }
+    }
     
     /// Initialize from a unified NightscoutDeviceStatusResponse
     init(from unified: NightscoutDeviceStatusResponse) {
@@ -435,7 +532,6 @@ extension NightscoutDeviceStatus {
                 self.tdd = aps.tdd
                 let apsTimestampDate: Date? = aps.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter().date(from: $0) }
                 self.timestamp = apsTimestampDate
-                if let apsTimestampDate = apsTimestampDate { lastLoopDates.append(apsTimestampDate) }
                 if let cobValue = aps.cob { cobCandidates.append((cobValue, apsTimestampDate)) }
                 if let iobValue = aps.iob { iobCandidates.append((iobValue, apsTimestampDate)) }
             }
@@ -446,7 +542,7 @@ extension NightscoutDeviceStatus {
                 if let cobValue = enacted?.cob { cobCandidates.append((cobValue, enactedTimestampDate)) }
                 if let iobValue = enacted?.iob { iobCandidates.append((iobValue, enactedTimestampDate)) }
             }
-            if let suggestedTimestampString = suggested?.timestamp {
+            if let suggestedTimestampString = suggested?.timestamp, useSuggestedAsEnacted() || suggested?.wasReceived == true {
                 let suggestedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: suggestedTimestampString) ?? ISO8601DateFormatter().date(from: suggestedTimestampString)
                 if let suggestedTimestampDate = suggestedTimestampDate { lastLoopDates.append(suggestedTimestampDate) }
                 if let cobValue = suggested?.cob { cobCandidates.append((cobValue, suggestedTimestampDate)) }
@@ -653,6 +749,10 @@ struct NightscoutDeviceStatusResponse: Codable {
             let timestamp: String?
             let units: Double?
             let variableSens: Double?
+
+            var wasReceived: Bool {
+                received ?? recieved ?? false
+            }
 
             private enum CodingKeys: String, CodingKey {
                 case cob = "COB"

@@ -62,9 +62,37 @@ struct NightscoutImportOptions: Codable, Sendable {
     let period: NightscoutImportPeriod
     let includesBgReadings: Bool
     let includesTreatments: Bool
+    let includesDeviceStatus: Bool
 
     var hasSelection: Bool {
-        includesBgReadings || includesTreatments
+        includesBgReadings || includesTreatments || includesDeviceStatus
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case period
+        case includesBgReadings
+        case includesTreatments
+        case includesDeviceStatus
+    }
+
+    init(
+        period: NightscoutImportPeriod,
+        includesBgReadings: Bool,
+        includesTreatments: Bool,
+        includesDeviceStatus: Bool
+    ) {
+        self.period = period
+        self.includesBgReadings = includesBgReadings
+        self.includesTreatments = includesTreatments
+        self.includesDeviceStatus = includesDeviceStatus
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        period = try container.decode(NightscoutImportPeriod.self, forKey: .period)
+        includesBgReadings = try container.decode(Bool.self, forKey: .includesBgReadings)
+        includesTreatments = try container.decode(Bool.self, forKey: .includesTreatments)
+        includesDeviceStatus = try container.decodeIfPresent(Bool.self, forKey: .includesDeviceStatus) ?? false
     }
 }
 
@@ -78,6 +106,43 @@ struct NightscoutImportCounts: Codable, Sendable {
     var treatmentsAdded = 0
     var treatmentsSkipped = 0
     var treatmentDocumentsUnsupported = 0
+    var deviceStatusDocumentsDownloaded = 0
+    var deviceStatusAdded = 0
+    var deviceStatusSkipped = 0
+    var deviceStatusDocumentsInvalid = 0
+
+    private enum CodingKeys: String, CodingKey {
+        case bgDocumentsDownloaded
+        case bgReadingsAdded
+        case bgReadingsSkipped
+        case bgDocumentsInvalid
+        case treatmentDocumentsDownloaded
+        case treatmentsAdded
+        case treatmentsSkipped
+        case treatmentDocumentsUnsupported
+        case deviceStatusDocumentsDownloaded
+        case deviceStatusAdded
+        case deviceStatusSkipped
+        case deviceStatusDocumentsInvalid
+    }
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        bgDocumentsDownloaded = try container.decodeIfPresent(Int.self, forKey: .bgDocumentsDownloaded) ?? 0
+        bgReadingsAdded = try container.decodeIfPresent(Int.self, forKey: .bgReadingsAdded) ?? 0
+        bgReadingsSkipped = try container.decodeIfPresent(Int.self, forKey: .bgReadingsSkipped) ?? 0
+        bgDocumentsInvalid = try container.decodeIfPresent(Int.self, forKey: .bgDocumentsInvalid) ?? 0
+        treatmentDocumentsDownloaded = try container.decodeIfPresent(Int.self, forKey: .treatmentDocumentsDownloaded) ?? 0
+        treatmentsAdded = try container.decodeIfPresent(Int.self, forKey: .treatmentsAdded) ?? 0
+        treatmentsSkipped = try container.decodeIfPresent(Int.self, forKey: .treatmentsSkipped) ?? 0
+        treatmentDocumentsUnsupported = try container.decodeIfPresent(Int.self, forKey: .treatmentDocumentsUnsupported) ?? 0
+        deviceStatusDocumentsDownloaded = try container.decodeIfPresent(Int.self, forKey: .deviceStatusDocumentsDownloaded) ?? 0
+        deviceStatusAdded = try container.decodeIfPresent(Int.self, forKey: .deviceStatusAdded) ?? 0
+        deviceStatusSkipped = try container.decodeIfPresent(Int.self, forKey: .deviceStatusSkipped) ?? 0
+        deviceStatusDocumentsInvalid = try container.decodeIfPresent(Int.self, forKey: .deviceStatusDocumentsInvalid) ?? 0
+    }
 }
 
 /// Final, user-facing summary returned only after every selected phase has completed.
@@ -109,6 +174,7 @@ struct NightscoutImportProgress: Sendable {
 private enum NightscoutImportCheckpointPhase: String, Codable, Sendable {
     case bgReadings
     case treatments
+    case deviceStatus
 }
 
 /// Everything required to safely continue after navigation, suspension, termination or a failure.
@@ -370,6 +436,7 @@ final class NightscoutImportService: @unchecked Sendable {
     private static let minimumSubdivisionDuration: TimeInterval = 5 * 60
     private static let bgResponseLimit = 2_000
     private static let treatmentResponseLimit = 1_000
+    private static let deviceStatusResponseLimit = 1_000
     private static let maximumRequestAttempts = 4
     private static let duplicateBgWindow: TimeInterval = 30
 
@@ -435,13 +502,14 @@ final class NightscoutImportService: @unchecked Sendable {
         progress: @escaping @Sendable (NightscoutImportProgress) -> Void
     ) async throws -> NightscoutImportResult {
         trace(
-            "in Nightscout historical import, user requested a new import. days = %{public}@, BG = %{public}@, treatments = %{public}@",
+            "in Nightscout historical import, user requested a new import. days = %{public}@, BG = %{public}@, treatments = %{public}@, device status = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
             options.period.rawValue.description,
             options.includesBgReadings.description,
-            options.includesTreatments.description
+            options.includesTreatments.description,
+            options.includesDeviceStatus.description
         )
         do {
             guard options.hasSelection else { throw NightscoutImportError.noDataSelected }
@@ -451,7 +519,9 @@ final class NightscoutImportService: @unchecked Sendable {
             }
             let configuration = try currentConfiguration()
             let requestedFrom = now.addingTimeInterval(-TimeInterval(options.period.rawValue) * Self.outerChunkDuration)
-            let initialPhase: NightscoutImportCheckpointPhase = options.includesBgReadings ? .bgReadings : .treatments
+            guard let initialPhase = selectedPhases(for: options).first else {
+                throw NightscoutImportError.noDataSelected
+            }
             let checkpoint = NightscoutImportCheckpoint(
                 id: UUID(),
                 createdAt: now,
@@ -489,7 +559,7 @@ final class NightscoutImportService: @unchecked Sendable {
             }
             try validate(checkpoint: checkpoint)
             trace(
-                "in Nightscout historical import, resume settings. days = %{public}@, next batch = %{public}@/%{public}@, phase = %{public}@, BG = %{public}@, treatments = %{public}@",
+                "in Nightscout historical import, resume settings. days = %{public}@, next batch = %{public}@/%{public}@, phase = %{public}@, BG = %{public}@, treatments = %{public}@, device status = %{public}@",
                 log: log,
                 category: ConstantsLog.categoryDataManagement,
                 type: .info,
@@ -498,7 +568,8 @@ final class NightscoutImportService: @unchecked Sendable {
                 checkpoint.totalChunks.description,
                 checkpoint.nextPhase.rawValue,
                 checkpoint.options.includesBgReadings.description,
-                checkpoint.options.includesTreatments.description
+                checkpoint.options.includesTreatments.description,
+                checkpoint.options.includesDeviceStatus.description
             )
             let configuration = try currentConfiguration()
             guard configuration.normalizedSiteURL == checkpoint.siteURL else {
@@ -517,7 +588,9 @@ final class NightscoutImportService: @unchecked Sendable {
 
     /// Rejects damaged, legacy or policy-incompatible checkpoints before they can allocate chunks.
     private func validate(checkpoint: NightscoutImportCheckpoint) throws {
+        let phases = selectedPhases(for: checkpoint.options)
         guard checkpoint.options.hasSelection,
+              phases.contains(checkpoint.nextPhase),
               checkpoint.options.period.isSupported,
               checkpoint.options.period.rawValue <= UserDefaults.standard.retentionPeriodInDays,
               checkpoint.requestedFrom < checkpoint.requestedTo,
@@ -551,11 +624,16 @@ final class NightscoutImportService: @unchecked Sendable {
             checkpointStore.clear()
             throw NightscoutImportError.checkpointUnavailable
         }
+        let phases = selectedPhases(for: checkpoint.options)
+        guard !phases.isEmpty else {
+            checkpointStore.clear()
+            throw NightscoutImportError.noDataSelected
+        }
 
         // Make pending local work durable before child contexts begin their merge/deduplication passes.
         try await persistManagedObjectContexts()
         trace(
-            "in Nightscout historical import, starting or resuming. days = %{public}@, chunk = %{public}@/%{public}@, BG = %{public}@, treatments = %{public}@",
+            "in Nightscout historical import, starting or resuming. days = %{public}@, chunk = %{public}@/%{public}@, BG = %{public}@, treatments = %{public}@, device status = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
@@ -563,15 +641,17 @@ final class NightscoutImportService: @unchecked Sendable {
             min(checkpoint.nextChunkIndex + 1, chunks.count).description,
             chunks.count.description,
             checkpoint.options.includesBgReadings.description,
-            checkpoint.options.includesTreatments.description
+            checkpoint.options.includesTreatments.description,
+            checkpoint.options.includesDeviceStatus.description
         )
 
         while checkpoint.nextChunkIndex < chunks.count {
             try Task.checkCancellation()
             let interval = chunks[checkpoint.nextChunkIndex]
 
-            if checkpoint.options.includesBgReadings && checkpoint.nextPhase == .bgReadings {
-                reportProgress(checkpoint: checkpoint, chunks: chunks, progress: progress)
+            reportProgress(checkpoint: checkpoint, chunks: chunks, phases: phases, progress: progress)
+            switch checkpoint.nextPhase {
+            case .bgReadings:
                 let documents = try await downloadEntries(in: interval, configuration: configuration)
                 let prepared = prepareBgReadings(documents, in: interval)
                 let applied = try await applyBgReadings(prepared.records, in: interval)
@@ -579,30 +659,26 @@ final class NightscoutImportService: @unchecked Sendable {
                 checkpoint.counts.bgDocumentsInvalid += prepared.invalidCount
                 checkpoint.counts.bgReadingsAdded += applied.added
                 checkpoint.counts.bgReadingsSkipped += applied.skipped
-                checkpoint.nextPhase = checkpoint.options.includesTreatments ? .treatments : .bgReadings
-                if !checkpoint.options.includesTreatments {
-                    checkpoint.nextChunkIndex += 1
-                }
-                try checkpointStore.save(checkpoint)
-                reportProgress(checkpoint: checkpoint, chunks: chunks, progress: progress)
-            }
-
-            if checkpoint.options.includesTreatments && checkpoint.nextChunkIndex < chunks.count && checkpoint.nextPhase == .treatments {
-                try Task.checkCancellation()
-                reportProgress(checkpoint: checkpoint, chunks: chunks, progress: progress)
-                let treatmentInterval = chunks[checkpoint.nextChunkIndex]
-                let documents = try await downloadTreatments(in: treatmentInterval, configuration: configuration)
-                let prepared = prepareTreatments(documents, in: treatmentInterval)
-                let applied = try await applyTreatments(prepared.records, in: treatmentInterval)
+            case .treatments:
+                let documents = try await downloadTreatments(in: interval, configuration: configuration)
+                let prepared = prepareTreatments(documents, in: interval)
+                let applied = try await applyTreatments(prepared.records, in: interval)
                 checkpoint.counts.treatmentDocumentsDownloaded += documents.count
                 checkpoint.counts.treatmentDocumentsUnsupported += prepared.unsupportedCount
                 checkpoint.counts.treatmentsAdded += applied.added
                 checkpoint.counts.treatmentsSkipped += applied.skipped
-                checkpoint.nextChunkIndex += 1
-                checkpoint.nextPhase = checkpoint.options.includesBgReadings ? .bgReadings : .treatments
-                try checkpointStore.save(checkpoint)
-                reportProgress(checkpoint: checkpoint, chunks: chunks, progress: progress)
+            case .deviceStatus:
+                let documents = try await downloadDeviceStatus(in: interval, configuration: configuration)
+                let prepared = prepareDeviceStatus(documents, in: interval)
+                let applied = try await applyDeviceStatus(prepared.records, in: interval)
+                checkpoint.counts.deviceStatusDocumentsDownloaded += documents.count
+                checkpoint.counts.deviceStatusDocumentsInvalid += prepared.invalidCount
+                checkpoint.counts.deviceStatusAdded += applied.added
+                checkpoint.counts.deviceStatusSkipped += applied.skipped
             }
+            advance(&checkpoint, phases: phases)
+            try checkpointStore.save(checkpoint)
+            reportProgress(checkpoint: checkpoint, chunks: chunks, phases: phases, progress: progress)
         }
 
         checkpointStore.clear()
@@ -614,7 +690,7 @@ final class NightscoutImportService: @unchecked Sendable {
             counts: checkpoint.counts
         )
         trace(
-            "in Nightscout historical import, completed. duration = %{public}@ ms, BG downloaded = %{public}@, BG added = %{public}@, BG skipped = %{public}@, BG invalid = %{public}@, treatment documents downloaded = %{public}@, treatments added = %{public}@, treatments skipped = %{public}@, treatment documents unsupported = %{public}@",
+            "in Nightscout historical import, completed. duration = %{public}@ ms, BG downloaded = %{public}@, BG added = %{public}@, BG skipped = %{public}@, BG invalid = %{public}@, treatment documents downloaded = %{public}@, treatments added = %{public}@, treatments skipped = %{public}@, treatment documents unsupported = %{public}@, device status documents downloaded = %{public}@, device status added = %{public}@, device status skipped = %{public}@, device status invalid = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
@@ -626,7 +702,11 @@ final class NightscoutImportService: @unchecked Sendable {
             result.counts.treatmentDocumentsDownloaded.description,
             result.counts.treatmentsAdded.description,
             result.counts.treatmentsSkipped.description,
-            result.counts.treatmentDocumentsUnsupported.description
+            result.counts.treatmentDocumentsUnsupported.description,
+            result.counts.deviceStatusDocumentsDownloaded.description,
+            result.counts.deviceStatusAdded.description,
+            result.counts.deviceStatusSkipped.description,
+            result.counts.deviceStatusDocumentsInvalid.description
         )
         return result
     }
@@ -650,20 +730,13 @@ final class NightscoutImportService: @unchecked Sendable {
     private func reportProgress(
         checkpoint: NightscoutImportCheckpoint,
         chunks: [DateInterval],
+        phases: [NightscoutImportCheckpointPhase],
         progress: @escaping @Sendable (NightscoutImportProgress) -> Void
     ) {
-        let resourcesPerChunk = (checkpoint.options.includesBgReadings ? 1 : 0)
-            + (checkpoint.options.includesTreatments ? 1 : 0)
-        let completedInCurrentChunk: Int
-        if checkpoint.nextChunkIndex >= chunks.count {
-            completedInCurrentChunk = 0
-        } else if checkpoint.options.includesBgReadings,
-                  checkpoint.options.includesTreatments,
-                  checkpoint.nextPhase == .treatments {
-            completedInCurrentChunk = 1
-        } else {
-            completedInCurrentChunk = 0
-        }
+        let resourcesPerChunk = phases.count
+        let completedInCurrentChunk = checkpoint.nextChunkIndex >= chunks.count
+            ? 0
+            : phases.firstIndex(of: checkpoint.nextPhase) ?? 0
         let completedUnits = min(
             checkpoint.nextChunkIndex * resourcesPerChunk + completedInCurrentChunk,
             chunks.count * resourcesPerChunk
@@ -675,6 +748,26 @@ final class NightscoutImportService: @unchecked Sendable {
             totalChunks: chunks.count,
             counts: checkpoint.counts
         ))
+    }
+
+    private func selectedPhases(for options: NightscoutImportOptions) -> [NightscoutImportCheckpointPhase] {
+        var phases = [NightscoutImportCheckpointPhase]()
+        if options.includesBgReadings { phases.append(.bgReadings) }
+        if options.includesTreatments { phases.append(.treatments) }
+        if options.includesDeviceStatus { phases.append(.deviceStatus) }
+        return phases
+    }
+
+    private func advance(_ checkpoint: inout NightscoutImportCheckpoint, phases: [NightscoutImportCheckpointPhase]) {
+        guard let currentIndex = phases.firstIndex(of: checkpoint.nextPhase),
+              currentIndex + 1 < phases.count
+        else {
+            checkpoint.nextChunkIndex += 1
+            checkpoint.nextPhase = phases[0]
+            return
+        }
+
+        checkpoint.nextPhase = phases[currentIndex + 1]
     }
 
     // MARK: Network Configuration and Requests
@@ -785,8 +878,27 @@ final class NightscoutImportService: @unchecked Sendable {
         )
     }
 
+    private func downloadDeviceStatus(
+        in interval: DateInterval,
+        configuration: NightscoutImportConfiguration
+    ) async throws -> [NightscoutDeviceStatusResponse] {
+        try await downloadCollection(
+            path: "/api/v1/devicestatus.json",
+            interval: interval,
+            responseLimit: Self.deviceStatusResponseLimit,
+            configuration: configuration,
+            rangeQuery: { interval in
+                [
+                    URLQueryItem(name: "find[created_at][$gte]", value: Self.iso8601String(from: interval.start)),
+                    URLQueryItem(name: "find[created_at][$lt]", value: Self.iso8601String(from: interval.end)),
+                ]
+            },
+            type: NightscoutDeviceStatusResponse.self
+        )
+    }
+
     /// A full response is treated as possibly truncated and split by time until both halves are below the cap.
-    private func downloadCollection<Document: Decodable & Sendable>(
+    private func downloadCollection<Document: Decodable>(
         path: String,
         interval: DateInterval,
         responseLimit: Int,
@@ -1021,6 +1133,40 @@ final class NightscoutImportService: @unchecked Sendable {
         return (records.sorted { $0.date < $1.date }, unsupportedCount)
     }
 
+    private func prepareDeviceStatus(
+        _ documents: [NightscoutDeviceStatusResponse],
+        in interval: DateInterval
+    ) -> (records: [NightscoutDeviceStatus], invalidCount: Int) {
+        var records = [NightscoutDeviceStatus]()
+        var invalidCount = 0
+        var identities = Set<String>()
+
+        for document in documents {
+            var status = NightscoutDeviceStatus(from: document)
+            guard status.createdAt > .distantPast,
+                  interval.containsHalfOpen(status.createdAt)
+            else {
+                invalidCount += 1
+                continue
+            }
+
+            let identity = status.id.isEmpty
+                ? "createdAt-\(Int(status.createdAt.timeIntervalSince1970 * 1_000))"
+                : status.id
+            guard identities.insert(identity).inserted else {
+                invalidCount += 1
+                continue
+            }
+
+            status.id = identity
+            status.lastCheckedDate = status.createdAt
+            status.updatedDate = status.createdAt
+            records.append(status)
+        }
+
+        return (records.sorted { $0.createdAt < $1.createdAt }, invalidCount)
+    }
+
     private func expandTreatment(
         _ document: NightscoutTreatmentDocument,
         remoteID: String,
@@ -1183,6 +1329,49 @@ final class NightscoutImportService: @unchecked Sendable {
         return result
     }
 
+    private func applyDeviceStatus(
+        _ records: [NightscoutDeviceStatus],
+        in interval: DateInterval
+    ) async throws -> (added: Int, skipped: Int) {
+        guard !records.isEmpty else { return (0, 0) }
+        let context = coreDataManager.privateChildManagedObjectContext()
+        let result = try await context.perform {
+            let request: NSFetchRequest<NightscoutDeviceStatusEntry> = NightscoutDeviceStatusEntry.fetchRequest()
+            request.predicate = NSPredicate(
+                format: "createdAt >= %@ AND createdAt < %@",
+                interval.start as NSDate,
+                interval.end as NSDate
+            )
+            request.includesPropertyValues = true
+            let existing = try context.fetch(request)
+            var existingIDs = Set(existing.map(\.id).filter { !$0.isEmpty })
+            var existingCreatedAtMilliseconds = Set(existing.map { Int64($0.createdAt.timeIntervalSince1970 * 1_000) })
+            var added = 0
+            var skipped = 0
+
+            for status in records {
+                try Task.checkCancellation()
+                let createdAtMilliseconds = Int64(status.createdAt.timeIntervalSince1970 * 1_000)
+                guard !existingIDs.contains(status.id),
+                      !existingCreatedAtMilliseconds.contains(createdAtMilliseconds)
+                else {
+                    skipped += 1
+                    continue
+                }
+
+                let entry = NightscoutDeviceStatusEntry(context: context)
+                Self.apply(status, to: entry)
+                existingIDs.insert(entry.id)
+                existingCreatedAtMilliseconds.insert(createdAtMilliseconds)
+                added += 1
+            }
+            try context.save()
+            return (added, skipped)
+        }
+        try await persistManagedObjectContexts()
+        return result
+    }
+
     /// Saves child changes through both parents before advancing the durable import checkpoint.
     private func persistManagedObjectContexts() async throws {
         let mainContext = coreDataManager.mainManagedObjectContext
@@ -1228,6 +1417,46 @@ final class NightscoutImportService: @unchecked Sendable {
         notes: String?
     ) -> String {
         "\(Int64(date.timeIntervalSince1970 * 1_000))|\(type.rawValue)|\(value.bitPattern)|\(secondary.bitPattern)|\(notes ?? "")"
+    }
+
+    private static func apply(_ status: NightscoutDeviceStatus, to entry: NightscoutDeviceStatusEntry) {
+        entry.id = status.id.isEmpty ? "createdAt-\(Int(status.createdAt.timeIntervalSince1970 * 1_000))" : status.id
+        entry.createdAt = status.createdAt
+        entry.updatedDate = status.updatedDate
+        entry.lastCheckedDate = status.lastCheckedDate
+        entry.lastLoopDate = status.lastLoopDate
+        entry.timestamp = status.timestamp
+        entry.device = status.device
+        entry.appVersion = status.appVersion
+        entry.activeProfile = status.activeProfile
+        entry.iob = status.iob.map { NSNumber(value: $0) }
+        entry.cob = status.cob.map { NSNumber(value: $0) }
+        entry.eventualBG = status.eventualBG.map { NSNumber(value: $0) }
+        entry.currentTarget = status.currentTarget.map { NSNumber(value: $0) }
+        entry.isf = status.isf.map { NSNumber(value: $0) }
+        entry.insulinReq = status.insulinReq.map { NSNumber(value: $0) }
+        entry.bolusVolume = status.bolusVolume.map { NSNumber(value: $0) }
+        entry.rate = status.rate.map { NSNumber(value: $0) }
+        entry.duration = status.duration.map { NSNumber(value: $0) }
+        entry.reason = status.reason
+        entry.sensitivityRatio = status.sensitivityRatio.map { NSNumber(value: $0) }
+        entry.tdd = status.tdd.map { NSNumber(value: $0) }
+        entry.error = status.error
+        entry.overrideActive = status.overrideActive.map { NSNumber(value: $0) }
+        entry.overrideName = status.overrideName
+        entry.overrideMinValue = status.overrideMinValue.map { NSNumber(value: $0) }
+        entry.overrideMaxValue = status.overrideMaxValue.map { NSNumber(value: $0) }
+        entry.overrideMultiplier = status.overrideMultiplier.map { NSNumber(value: $0) }
+        entry.pumpBatteryPercent = status.pumpBatteryPercent.map { NSNumber(value: $0) }
+        entry.pumpReservoir = status.pumpReservoir.map { NSNumber(value: $0) }
+        entry.pumpIsBolusing = status.pumpIsBolusing.map { NSNumber(value: $0) }
+        entry.pumpIsSuspended = status.pumpIsSuspended.map { NSNumber(value: $0) }
+        entry.pumpStatus = status.pumpStatus
+        entry.pumpStatusTimestamp = status.pumpStatusTimestamp
+        entry.pumpManufacturer = status.pumpManufacturer
+        entry.pumpModel = status.pumpModel
+        entry.uploaderBatteryPercent = status.uploaderBatteryPercent.map { NSNumber(value: $0) }
+        entry.uploaderIsCharging = status.uploaderIsCharging.map { NSNumber(value: $0) }
     }
 
     // MARK: Date and Direction Helpers

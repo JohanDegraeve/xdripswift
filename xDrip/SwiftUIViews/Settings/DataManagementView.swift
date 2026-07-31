@@ -287,6 +287,8 @@ struct DataManagementView: View {
             LabeledContent(Texts_SettingsView.backupEarliestData, value: earliestDataDescription(manifest))
             LabeledContent(Texts_SettingsView.cleanDataBgReadings, value: manifest.bgReadingCount.formatted())
             LabeledContent(Texts_SettingsView.cleanDataTreatments, value: manifest.treatmentCount.formatted())
+            LabeledContent(Texts_SettingsView.cleanDataDeviceStatus, value: (manifest.deviceStatusCount ?? 0).formatted())
+            LabeledContent(Texts_SettingsView.backupProfiles, value: (manifest.profileCount ?? 0).formatted())
             LabeledContent(Texts_SettingsView.backupSettingsAndAlerts, value: manifest.includesSettings ? Texts_SettingsView.backupIncluded : Texts_SettingsView.backupNotIncluded)
             LabeledContent(Texts_SettingsView.backupAccountDetails, value: manifest.includesAccounts ? Texts_SettingsView.backupIncluded : Texts_SettingsView.backupNotIncluded)
             LabeledContent(Texts_SettingsView.backupPasswordProtection, value: manifest.isPasswordProtected ? Texts_Common.enabled : Texts_SettingsView.backupNotEnabled)
@@ -361,6 +363,8 @@ struct DataManagementView: View {
             LabeledContent(Texts_SettingsView.backupEarliestData, value: earliestDataDescription(payload))
             LabeledContent(Texts_SettingsView.cleanDataBgReadings, value: manifest.bgReadingCount.formatted())
             LabeledContent(Texts_SettingsView.cleanDataTreatments, value: manifest.treatmentCount.formatted())
+            LabeledContent(Texts_SettingsView.cleanDataDeviceStatus, value: (manifest.deviceStatusCount ?? payload.deviceStatuses?.count ?? 0).formatted())
+            LabeledContent(Texts_SettingsView.backupProfiles, value: (manifest.profileCount ?? payload.profiles?.count ?? 0).formatted())
             LabeledContent(Texts_SettingsView.backupSettings, value: manifest.includesSettings ? Texts_SettingsView.backupIncluded : Texts_SettingsView.backupNotIncluded)
             LabeledContent(Texts_SettingsView.backupAccountDetails) {
                 HStack(spacing: 5) {
@@ -443,6 +447,10 @@ struct DataManagementView: View {
             LabeledContent(Texts_SettingsView.backupBgReadingsSkipped, value: result.bgReadingsSkipped.formatted())
             LabeledContent(Texts_SettingsView.backupTreatmentsAdded, value: result.treatmentsAdded.formatted())
             LabeledContent(Texts_SettingsView.backupTreatmentsSkipped, value: result.treatmentsSkipped.formatted())
+            LabeledContent(Texts_SettingsView.backupDeviceStatusAdded, value: result.deviceStatusesAdded.formatted())
+            LabeledContent(Texts_SettingsView.backupDeviceStatusSkipped, value: result.deviceStatusesSkipped.formatted())
+            LabeledContent(Texts_SettingsView.backupProfilesAdded, value: result.profilesAdded.formatted())
+            LabeledContent(Texts_SettingsView.backupProfilesSkipped, value: result.profilesSkipped.formatted())
             LabeledContent(Texts_SettingsView.backupSettingsRestored, value: result.settingsRestored.formatted())
         }
     }
@@ -450,17 +458,23 @@ struct DataManagementView: View {
     private func earliestDataDescription(_ payload: BackupPayload) -> String {
         earliestDataDescription(
             payload.manifest,
-            fallbackFirstTreatmentDate: payload.treatments.map(\.date).min()
+            fallbackFirstTreatmentDate: payload.treatments.map(\.date).min(),
+            fallbackFirstDeviceStatusDate: payload.deviceStatuses?.map(\.createdAt).min(),
+            fallbackFirstProfileDate: payload.profiles?.map(\.startDate).min()
         )
     }
 
     private func earliestDataDescription(
         _ manifest: BackupManifest,
-        fallbackFirstTreatmentDate: Date? = nil
+        fallbackFirstTreatmentDate: Date? = nil,
+        fallbackFirstDeviceStatusDate: Date? = nil,
+        fallbackFirstProfileDate: Date? = nil
     ) -> String {
         let earliestDate = [
             manifest.firstBgReadingDate,
             manifest.firstTreatmentDate ?? fallbackFirstTreatmentDate,
+            manifest.firstDeviceStatusDate ?? fallbackFirstDeviceStatusDate,
+            manifest.firstProfileDate ?? fallbackFirstProfileDate,
         ]
         .compactMap { $0 }
         .min()
