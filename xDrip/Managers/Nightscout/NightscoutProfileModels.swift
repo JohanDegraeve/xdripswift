@@ -54,7 +54,7 @@ extension NightscoutProfile {
         
         // Parse startDate
         let startDateString = response.startDate
-        self.startDate = ISO8601DateFormatter.withFractionalSeconds.date(from: startDateString) ?? ISO8601DateFormatter().date(from: startDateString) ?? .distantPast
+        self.startDate = ISO8601DateFormatter.withFractionalSeconds.date(from: startDateString) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: startDateString) ?? .distantPast
         self.createdAt = self.startDate
         self.id = response.id
         self.profileName = response.defaultProfile

@@ -971,28 +971,28 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     // Trio: use openAPS.enacted only (not suggested)
                     if resp.device == "Trio", let enacted = resp.openAPS?.enacted,
                        let rate = enacted.rate, let duration = enacted.duration, let ts = enacted.timestamp,
-                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter().date(from: ts)
+                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: ts)
                     {
                         return (rate, duration, date)
                     }
                     // iAPS: use openAPS.suggested or enacted
                     if resp.device == "iAPS", let aps = resp.openAPS?.suggested ?? resp.openAPS?.enacted,
                        let rate = aps.rate, let duration = aps.duration, let ts = aps.timestamp,
-                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter().date(from: ts)
+                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: ts)
                     {
                         return (rate, duration, date)
                     }
                     // OpenAPS/AAPS: use openAPS.suggested or enacted
                     if let device = resp.device, device.starts(with: "openaps://") || device == "AAPS", let aps = resp.openAPS?.suggested ?? resp.openAPS?.enacted,
                        let rate = aps.rate, let duration = aps.duration, let ts = aps.timestamp,
-                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter().date(from: ts)
+                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: ts)
                     {
                         return (rate, duration, date)
                     }
                     // Loop: use loop.enacted
                     if let enacted = resp.loop?.enacted,
                        let rate = enacted.rate, let duration = enacted.duration, let ts = enacted.timestamp,
-                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter().date(from: ts)
+                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: ts)
                     {
                         return (rate, duration, date)
                     }
@@ -1006,7 +1006,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 // 2. Uploader battery (always from uploader.battery)
                 let uploaderBatteryCandidates = unifiedResponses.compactMap { resp -> (percent: Int, date: Date)? in
                     if let percent = resp.uploader?.battery, let ts = resp.uploader?.timestamp,
-                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter().date(from: ts)
+                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: ts)
                     {
                         return (percent, date)
                     }
@@ -1019,7 +1019,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 // 3. Pump battery (always from pump.battery.percent)
                 let pumpBatteryCandidates = unifiedResponses.compactMap { resp -> (percent: Int, date: Date)? in
                     if let percent = resp.pump?.battery?.percent, let clock = resp.pump?.clock,
-                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: clock) ?? ISO8601DateFormatter().date(from: clock)
+                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: clock) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: clock)
                     {
                         return (percent, date)
                     }
@@ -1105,7 +1105,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         func date(from string: String?) -> Date? {
             guard let string = string else { return nil }
 
-            return ISO8601DateFormatter.withFractionalSeconds.date(from: string) ?? ISO8601DateFormatter().date(from: string)
+            return ISO8601DateFormatter.withFractionalSeconds.date(from: string) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: string)
         }
     }
     

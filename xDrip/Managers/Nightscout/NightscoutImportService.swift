@@ -1466,19 +1466,12 @@ final class NightscoutImportService: @unchecked Sendable {
             return Date(timeIntervalSince1970: milliseconds / 1_000)
         }
         guard let iso8601 else { return nil }
-        let fractionalFormatter = ISO8601DateFormatter()
-        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = fractionalFormatter.date(from: iso8601) { return date }
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter.date(from: iso8601)
+        return ISO8601DateFormatter.withFractionalSeconds.date(from: iso8601)
+            ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: iso8601)
     }
 
     private static func iso8601String(from date: Date) -> String {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        return formatter.string(from: date)
+        return ISO8601DateFormatter.withFractionalSeconds.string(from: date)
     }
 
     private static func slope(forNightscoutDirection direction: String?) -> (value: Double, hidden: Bool) {

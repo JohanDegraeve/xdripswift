@@ -460,7 +460,7 @@ extension NightscoutDeviceStatus {
         // Parse createdAt
         if let createdAtStr = unified.createdAt {
             self.createdAt = ISO8601DateFormatter.withFractionalSeconds.date(from: createdAtStr)
-                ?? ISO8601DateFormatter().date(from: createdAtStr)
+                ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: createdAtStr)
                 ?? .distantPast
         }
         
@@ -494,20 +494,20 @@ extension NightscoutDeviceStatus {
                 self.reason = aps.reason
                 self.sensitivityRatio = aps.sensitivityRatio
                 self.tdd = aps.tdd
-                let apsTimestampDate: Date? = aps.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter().date(from: $0) }
+                let apsTimestampDate: Date? = aps.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: $0) }
                 self.timestamp = apsTimestampDate
                 if let cobValue = aps.cob { cobCandidates.append((cobValue, apsTimestampDate)) }
                 if let iobValue = aps.iob { iobCandidates.append((iobValue, apsTimestampDate)) }
             }
             // Also consider enacted/suggested timestamps for lastLoopDate
             if let enactedTimestampString = enacted?.timestamp {
-                let enactedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: enactedTimestampString) ?? ISO8601DateFormatter().date(from: enactedTimestampString)
+                let enactedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: enactedTimestampString) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: enactedTimestampString)
                 if let enactedTimestampDate = enactedTimestampDate { lastLoopDates.append(enactedTimestampDate) }
                 if let cobValue = enacted?.cob { cobCandidates.append((cobValue, enactedTimestampDate)) }
                 if let iobValue = enacted?.iob { iobCandidates.append((iobValue, enactedTimestampDate)) }
             }
             if let suggestedTimestampString = suggested?.timestamp, useSuggestedAsEnacted() || suggested?.wasReceived == true {
-                let suggestedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: suggestedTimestampString) ?? ISO8601DateFormatter().date(from: suggestedTimestampString)
+                let suggestedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: suggestedTimestampString) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: suggestedTimestampString)
                 if let suggestedTimestampDate = suggestedTimestampDate { lastLoopDates.append(suggestedTimestampDate) }
                 if let cobValue = suggested?.cob { cobCandidates.append((cobValue, suggestedTimestampDate)) }
                 if let iobValue = suggested?.iob { iobCandidates.append((iobValue, suggestedTimestampDate)) }
@@ -520,11 +520,11 @@ extension NightscoutDeviceStatus {
             self.insulinReq = loop.recommendedBolus ?? insulinReq
             self.eventualBG = loop.predicted?.values?.last ?? eventualBG
             if let cobValue = loop.cob?.cob {
-                let cobTimestampDate = loop.cob?.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter().date(from: $0) }
+                let cobTimestampDate = loop.cob?.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: $0) }
                 cobCandidates.append((cobValue, cobTimestampDate))
             }
             if let iobValue = loop.iob?.iob {
-                let iobTimestampDate = loop.iob?.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter().date(from: $0) }
+                let iobTimestampDate = loop.iob?.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: $0) }
                 iobCandidates.append((iobValue, iobTimestampDate))
             }
             if let enacted = loop.enacted {
@@ -532,12 +532,12 @@ extension NightscoutDeviceStatus {
                 self.duration = enacted.duration ?? duration
                 self.rate = enacted.rate ?? rate
                 if let enactedTimestampString = enacted.timestamp {
-                    let enactedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: enactedTimestampString) ?? ISO8601DateFormatter().date(from: enactedTimestampString)
+                    let enactedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: enactedTimestampString) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: enactedTimestampString)
                     if let enactedTimestampDate = enactedTimestampDate { lastLoopDates.append(enactedTimestampDate) }
                 }
             }
             if let loopTimestampString = loop.timestamp {
-                let loopTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: loopTimestampString) ?? ISO8601DateFormatter().date(from: loopTimestampString)
+                let loopTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: loopTimestampString) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: loopTimestampString)
                 if let loopTimestampDate = loopTimestampDate { lastLoopDates.append(loopTimestampDate) }
             }
         }
@@ -607,14 +607,14 @@ extension NightscoutDeviceStatus {
             // Pump battery: always from pump.battery.percent (never from uploader.battery)
             self.pumpBatteryPercent = pump.battery?.percent ?? pumpBatteryPercent
             if let clock = pump.clock {
-                self.pumpClock = ISO8601DateFormatter.withFractionalSeconds.date(from: clock) ?? ISO8601DateFormatter().date(from: clock)
+                self.pumpClock = ISO8601DateFormatter.withFractionalSeconds.date(from: clock) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: clock)
             }
             self.pumpID = pump.pumpID ?? pumpID
             self.pumpIsBolusing = pump.bolusing ?? pump.status?.bolusing ?? pumpIsBolusing
             self.pumpIsSuspended = pump.suspended ?? pump.status?.suspended ?? pumpIsSuspended
             self.pumpStatus = pump.reservoir_display_override ?? pump.status?.status ?? pumpStatus
             if let ts = pump.status?.timestamp {
-                self.pumpStatusTimestamp = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter().date(from: ts)
+                self.pumpStatusTimestamp = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: ts)
             }
             // For Omnipod/Dash, if reservoir value being returned is nil,
             // set to omniPodReservoirFlagNumber so that the UI will display "50+"
@@ -850,12 +850,20 @@ struct NightscoutDeviceStatusResponse: Codable {
     }
 }
 
-// MARK: - ISO8601DateFormatter with fractional seconds
+// MARK: - ISO8601 date formatters
 
 extension ISO8601DateFormatter {
     static let withFractionalSeconds: ISO8601DateFormatter = {
         let dateFormatter = ISO8601DateFormatter()
         dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        return dateFormatter
+    }()
+
+    static let withoutFractionalSeconds: ISO8601DateFormatter = {
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime]
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         return dateFormatter
     }()
 }
