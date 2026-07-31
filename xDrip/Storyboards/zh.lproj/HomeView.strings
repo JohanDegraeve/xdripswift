@@ -145,7 +145,7 @@
 "sensorNoiseHistoryCurrentTitle" = "当前测量";
 "sensorNoiseHistoryChartTitle" = "噪声变化";
 "sensorNoiseHistoryRangeTitle" = "时间范围";
-"sensorNoiseHistoryDayRange" = "24 小时";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3 天";
 "sensorNoiseHistoryWeekRange" = "7 天";
 "sensorNoiseHistoryAllRange" = "全部";

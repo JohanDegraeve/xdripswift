@@ -130,7 +130,7 @@
 "sensorNoiseHistoryCurrentTitle" = "Current Measurements";
 "sensorNoiseHistoryChartTitle" = "Noise Over Time";
 "sensorNoiseHistoryRangeTitle" = "Time Range";
-"sensorNoiseHistoryDayRange" = "24h";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3d";
 "sensorNoiseHistoryWeekRange" = "7d";
 "sensorNoiseHistoryAllRange" = "All";

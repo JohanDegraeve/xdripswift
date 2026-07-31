@@ -94,7 +94,7 @@
 "sensorNoiseHistoryCurrentTitle" = "القياسات الحالية";
 "sensorNoiseHistoryChartTitle" = "الضوضاء بمرور الوقت";
 "sensorNoiseHistoryRangeTitle" = "النطاق الزمني";
-"sensorNoiseHistoryDayRange" = "24 س";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3 أ";
 "sensorNoiseHistoryWeekRange" = "7 أ";
 "sensorNoiseHistoryAllRange" = "الكل";

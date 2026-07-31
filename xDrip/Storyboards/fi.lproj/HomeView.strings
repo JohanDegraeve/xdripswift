@@ -108,7 +108,7 @@
 "sensorNoiseHistoryCurrentTitle" = "Nykyiset mittaukset";
 "sensorNoiseHistoryChartTitle" = "Kohina ajan kuluessa";
 "sensorNoiseHistoryRangeTitle" = "Aikaväli";
-"sensorNoiseHistoryDayRange" = "24 t";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3 pv";
 "sensorNoiseHistoryWeekRange" = "7 pv";
 "sensorNoiseHistoryAllRange" = "Kaikki";

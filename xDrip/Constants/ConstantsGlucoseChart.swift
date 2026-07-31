@@ -28,10 +28,10 @@ enum ConstantsGlucoseChart {
     static let glucoseNotUrgentRangeColor = Color.yellow
     
     /// glucose colors - for original values when post processing is enabled
-    static let glucoseOriginalColor = Color.gray.opacity(0.55)
+    static let glucoseOriginalColor = Color(white: 0.3).opacity(0.3)
 
     /// glucose colors - for original values when peek mode is active
-    static let glucoseOriginalPeekColor = Color(white: 0.67)
+    static let glucoseOriginalPeekColor = Color(white: 0.5)
 
     // bolus treatment marker color/sizes
     

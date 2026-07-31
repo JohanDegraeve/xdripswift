@@ -92,7 +92,7 @@
 "sensorNoiseHistoryCurrentTitle" = "Aktuelle målinger";
 "sensorNoiseHistoryChartTitle" = "Støj over tid";
 "sensorNoiseHistoryRangeTitle" = "Tidsinterval";
-"sensorNoiseHistoryDayRange" = "24 t";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3d";
 "sensorNoiseHistoryWeekRange" = "7d";
 "sensorNoiseHistoryAllRange" = "Alle";

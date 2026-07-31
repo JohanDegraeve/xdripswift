@@ -92,7 +92,7 @@
 "sensorNoiseHistoryCurrentTitle" = "Текущие измерения";
 "sensorNoiseHistoryChartTitle" = "Шум во времени";
 "sensorNoiseHistoryRangeTitle" = "Период";
-"sensorNoiseHistoryDayRange" = "24 ч";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3 дн.";
 "sensorNoiseHistoryWeekRange" = "7 дн.";
 "sensorNoiseHistoryAllRange" = "Всё";

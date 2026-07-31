@@ -188,7 +188,7 @@
 "sensorNoiseHistoryCurrentTitle" = "Bieżące pomiary";
 "sensorNoiseHistoryChartTitle" = "Szum w czasie";
 "sensorNoiseHistoryRangeTitle" = "Zakres czasu";
-"sensorNoiseHistoryDayRange" = "24 godz.";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3 dni";
 "sensorNoiseHistoryWeekRange" = "7 dni";
 "sensorNoiseHistoryAllRange" = "Wszystko";

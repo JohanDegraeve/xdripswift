@@ -176,7 +176,7 @@
 "sensorNoiseHistoryCurrentTitle" = "Поточні вимірювання";
 "sensorNoiseHistoryChartTitle" = "Шум у часі";
 "sensorNoiseHistoryRangeTitle" = "Період";
-"sensorNoiseHistoryDayRange" = "24 год";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3 дн.";
 "sensorNoiseHistoryWeekRange" = "7 дн.";
 "sensorNoiseHistoryAllRange" = "Усе";

@@ -190,8 +190,8 @@ struct SensorNoiseHistoryView: View {
     private func noiseHistoryChart(snapshot: SensorNoiseHistorySnapshot, chartHeight: CGFloat) -> some View {
         let availableRanges = SensorNoiseHistoryRange.availableRanges(sensorStartDate: snapshot.sensorStartDate, sensorEndDate: snapshot.sensorEndDate)
         // The picker hides ranges that are not useful for the current sensor age. If the old state
-        // points at a hidden range, use the shortest visible range until the user picks another one.
-        let effectiveRange = availableRanges.contains(selectedRange) ? selectedRange : .day
+        // points at a hidden range, use the widest currently available range until the user picks another one.
+        let effectiveRange = availableRanges.contains(selectedRange) ? selectedRange : (availableRanges.last ?? .day)
         let chartData = SensorNoiseChartData(
             snapshot: snapshot,
             range: effectiveRange,
@@ -678,6 +678,9 @@ private enum SensorNoiseHistoryRange: String, CaseIterable, Identifiable {
     case week
     case all
 
+    private static let minimumFullSessionChartDuration: TimeInterval = 6 * 60 * 60
+    private static let minimumDistinctRangeDifference: TimeInterval = 60 * 60
+
     var id: String { rawValue }
 
     var chartOrder: Int {
@@ -708,12 +711,17 @@ private enum SensorNoiseHistoryRange: String, CaseIterable, Identifiable {
 
     /// Only shows chart widths that add useful information for the current sensor age.
     ///
-    /// `24h` and the full-session option are always available. Wider fixed ranges are only shown
-    /// once the sensor has enough elapsed time to make them visually different from the full range.
+    /// The full-session option is always available for new sensors and replaces `1d` until the
+    /// sensor has at least one extra hour of data. Fixed ranges are then added only when they are
+    /// meaningfully smaller than the current full session.
     static func availableRanges(sensorStartDate: Date, sensorEndDate: Date?) -> [SensorNoiseHistoryRange] {
         let endDate = sensorEndDate ?? Date()
         let elapsed = max(endDate.timeIntervalSince(sensorStartDate), 0)
-        var ranges: [SensorNoiseHistoryRange] = [.day]
+        var ranges = [SensorNoiseHistoryRange]()
+
+        if elapsed >= ((SensorNoiseHistoryRange.day.duration ?? 0) + Self.minimumDistinctRangeDifference) {
+            ranges.append(.day)
+        }
 
         if elapsed >= (SensorNoiseHistoryRange.threeDays.duration ?? 0) {
             ranges.append(.threeDays)
@@ -723,9 +731,21 @@ private enum SensorNoiseHistoryRange: String, CaseIterable, Identifiable {
             ranges.append(.week)
         }
 
-        ranges.append(.all)
+        let widestFixedDuration = ranges.last?.duration ?? 0
+        if ranges.isEmpty || elapsed >= widestFixedDuration + Self.minimumDistinctRangeDifference {
+            ranges.append(.all)
+        }
 
         return ranges
+    }
+
+    func chartDuration(sensorStartDate: Date, sensorEndDate: Date?) -> TimeInterval {
+        if let duration { return duration }
+
+        let endDate = sensorEndDate ?? Date()
+        let elapsed = max(endDate.timeIntervalSince(sensorStartDate), 0)
+
+        return max(elapsed, Self.minimumFullSessionChartDuration)
     }
 
     func localizedTitle(sensorStartDate: Date, sensorEndDate: Date?) -> String {
@@ -806,8 +826,8 @@ private struct SensorNoiseChartData {
         let latestPointDate = snapshot.points.last?.timeStamp ?? snapshot.sensorStartDate
         let proposedEndDate = snapshot.sensorEndDate ?? max(Date(), latestPointDate)
         let endDate = max(proposedEndDate, snapshot.sensorStartDate.addingTimeInterval(60))
-        let proposedStartDate = range.duration.map { endDate.addingTimeInterval(-$0) } ?? snapshot.sensorStartDate
-        let startDate = max(snapshot.sensorStartDate, proposedStartDate)
+        let proposedStartDate = endDate.addingTimeInterval(-range.chartDuration(sensorStartDate: snapshot.sensorStartDate, sensorEndDate: snapshot.sensorEndDate))
+        let startDate = range == .all ? proposedStartDate : max(snapshot.sensorStartDate, proposedStartDate)
         domain = startDate ... endDate
         switch range {
         case .day:

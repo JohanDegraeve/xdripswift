@@ -706,7 +706,10 @@ struct BgAdjustmentsView: View {
     }
 
     private func sourceCanUseFiveMinuteReadings() -> Bool {
-        return bgPostProcessingManager.sourceCanUseFiveMinuteReadings(readingDates: bgReadings.map { $0.timeStamp })
+        // The preview chart can optionally show older sensor or follower data.
+        // Cadence detection must use the current source only so old 5 minute data
+        // does not hide this option for a current faster source.
+        return bgPostProcessingManager.currentSourceCanUseFiveMinuteReadings()
     }
 
     private func sourceDataNotUpdatedWarningText() -> String? {

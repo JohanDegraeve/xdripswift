@@ -188,7 +188,7 @@
 "sensorNoiseHistoryCurrentTitle" = "Misurazioni attuali";
 "sensorNoiseHistoryChartTitle" = "Rumore nel tempo";
 "sensorNoiseHistoryRangeTitle" = "Intervallo di tempo";
-"sensorNoiseHistoryDayRange" = "24h";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3 g";
 "sensorNoiseHistoryWeekRange" = "7 g";
 "sensorNoiseHistoryAllRange" = "Tutto";

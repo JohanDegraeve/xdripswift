@@ -171,7 +171,7 @@
 "sensorNoiseHistoryCurrentTitle" = "Aktuelle Messungen";
 "sensorNoiseHistoryChartTitle" = "Rauschen im Zeitverlauf";
 "sensorNoiseHistoryRangeTitle" = "Zeitraum";
-"sensorNoiseHistoryDayRange" = "24 Std.";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3 T.";
 "sensorNoiseHistoryWeekRange" = "7 T.";
 "sensorNoiseHistoryAllRange" = "Alles";

@@ -995,9 +995,12 @@ class BgPostProcessingManager {
         return abs(latestBgAdjustment.intercept) > 0.0001 || abs(latestBgAdjustment.slope - 1.0) > 0.0001
     }
 
-    private func currentSourceCanUseFiveMinuteReadings() -> Bool {
+    func currentSourceCanUseFiveMinuteReadings() -> Bool {
         let currentSensor = UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
-        let currentSourceReadingDates = bgReadingsAccessor.getLatestBgReadings(limit: 288, fromDate: Date(timeIntervalSinceNow: -24 * 60 * 60), forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).map { $0.timeStamp }
+
+        // getLatestBgReadings returns newest first. Sort oldest first before
+        // calculating gaps or every interval is negative and cadence detection fails.
+        let currentSourceReadingDates = bgReadingsAccessor.getLatestBgReadings(limit: 288, fromDate: Date(timeIntervalSinceNow: -24 * 60 * 60), forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).map { $0.timeStamp }.sorted()
 
         return sourceCanUseFiveMinuteReadings(readingDates: currentSourceReadingDates)
     }

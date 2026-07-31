@@ -105,7 +105,7 @@
 "sensorNoiseHistoryCurrentTitle" = "Medições atuais";
 "sensorNoiseHistoryChartTitle" = "Ruído ao longo do tempo";
 "sensorNoiseHistoryRangeTitle" = "Intervalo de tempo";
-"sensorNoiseHistoryDayRange" = "24h";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3d";
 "sensorNoiseHistoryWeekRange" = "7d";
 "sensorNoiseHistoryAllRange" = "Tudo";

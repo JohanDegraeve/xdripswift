@@ -107,7 +107,7 @@
 "sensorNoiseHistoryCurrentTitle" = "Huidige metingen";
 "sensorNoiseHistoryChartTitle" = "Ruis in de tijd";
 "sensorNoiseHistoryRangeTitle" = "Tijdsbereik";
-"sensorNoiseHistoryDayRange" = "24 u";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3d";
 "sensorNoiseHistoryWeekRange" = "7d";
 "sensorNoiseHistoryAllRange" = "Alles";

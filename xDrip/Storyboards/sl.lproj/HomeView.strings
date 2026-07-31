@@ -188,7 +188,7 @@
 "sensorNoiseHistoryCurrentTitle" = "Trenutne meritve";
 "sensorNoiseHistoryChartTitle" = "Šum skozi čas";
 "sensorNoiseHistoryRangeTitle" = "Časovni obseg";
-"sensorNoiseHistoryDayRange" = "24h";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3d";
 "sensorNoiseHistoryWeekRange" = "7d";
 "sensorNoiseHistoryAllRange" = "Vse";

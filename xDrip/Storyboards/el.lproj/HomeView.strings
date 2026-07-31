@@ -92,7 +92,7 @@
 "sensorNoiseHistoryCurrentTitle" = "Τρέχουσες μετρήσεις";
 "sensorNoiseHistoryChartTitle" = "Θόρυβος με την πάροδο του χρόνου";
 "sensorNoiseHistoryRangeTitle" = "Χρονικό εύρος";
-"sensorNoiseHistoryDayRange" = "24 ώρ.";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3 ημ.";
 "sensorNoiseHistoryWeekRange" = "7 ημ.";
 "sensorNoiseHistoryAllRange" = "Όλα";

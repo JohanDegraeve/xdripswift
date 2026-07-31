@@ -101,7 +101,7 @@ enum Texts_HomeView {
     }()
 
     static let sensorNoiseHistoryDayRange:String = {
-        return NSLocalizedString("sensorNoiseHistoryDayRange", tableName: filename, bundle: Bundle.main, value: "24h", comment: "one day sensor noise chart range")
+        return NSLocalizedString("sensorNoiseHistoryDayRange", tableName: filename, bundle: Bundle.main, value: "1d", comment: "one day sensor noise chart range")
     }()
 
     static let sensorNoiseHistoryThreeDayRange:String = {

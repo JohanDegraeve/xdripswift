@@ -92,7 +92,7 @@
 "sensorNoiseHistoryCurrentTitle" = "Mevcut ölçümler";
 "sensorNoiseHistoryChartTitle" = "Zaman içinde gürültü";
 "sensorNoiseHistoryRangeTitle" = "Zaman aralığı";
-"sensorNoiseHistoryDayRange" = "24 sa";
+"sensorNoiseHistoryDayRange" = "1d";
 "sensorNoiseHistoryThreeDayRange" = "3 gün";
 "sensorNoiseHistoryWeekRange" = "7 gün";
 "sensorNoiseHistoryAllRange" = "Tümü";
