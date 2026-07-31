@@ -264,7 +264,8 @@ class SettingsViewNightscoutSettingsViewModel {
                 
                 if let httpResponse = response as? HTTPURLResponse, let data = data {
                     
-                    let errorMessage = String(data: data, encoding: String.Encoding.utf8)!
+                    let errorMessage = String(data: data, encoding: .utf8)
+                        ?? HTTPURLResponse.localizedString(forStatusCode: httpResponse.statusCode)
                     
                     switch httpResponse.statusCode {
                         
