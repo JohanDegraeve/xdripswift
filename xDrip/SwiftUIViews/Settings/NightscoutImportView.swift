@@ -77,9 +77,9 @@ struct NightscoutImportView: View {
         } message: {
             Text(viewModel.errorMessage ?? "")
         }
-        // Apply the destination tint outside the alert presenters. Otherwise the alerts inherit
-        // the Settings navigation stack's yellow tint even though the form itself is system blue.
-        .tint(Color(.systemBlue))
+        // Apply the destination tint outside the alert presenters so alert actions stay on the
+        // navigation tint instead of inheriting command colours.
+        .tint(ConstantsAppColors.navigationTint)
         .onAppear {
             viewModel.refreshConfigurationAndCheckpoint()
         }

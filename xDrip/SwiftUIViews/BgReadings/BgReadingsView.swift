@@ -176,9 +176,11 @@ struct BgReadingsView: View {
                     Button(Texts_Common.Cancel, action: {
                         self.presentationMode.wrappedValue.dismiss()
                     })
+                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     EditButton()
+                        .tint(ConstantsAppColors.toolbarAction)
 
                     if !selectedBgReadings.isEmpty {
                         Button(role: .destructive) {
@@ -186,6 +188,7 @@ struct BgReadingsView: View {
                         } label: {
                             Label("\(Texts_Common.delete) (\(selectedBgReadings.count))", systemImage: "trash")
                         }
+                        .tint(ConstantsAppColors.toolbarDestructiveAction)
                         .accessibilityIdentifier("deleteSelectedBgReadingsButton")
                     }
                 }

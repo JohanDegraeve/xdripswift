@@ -38,7 +38,7 @@ struct BluetoothPeripheralsNavigationView: View {
             BluetoothPeripheralsView(viewModel: viewModel, router: router)
                 .navigationDestination(for: BluetoothPeripheralsRoute.self, destination: destination)
         }
-        .tint(.yellow)
+        .tint(ConstantsAppColors.navigationTint)
         .colorScheme(.dark)
     }
 
@@ -152,7 +152,7 @@ struct BluetoothPeripheralsView: View {
                 Button(action: showAddFlow) {
                     Image(systemName: "plus")
                 }
-                .tint(.yellow)
+                .tint(ConstantsAppColors.toolbarAction)
             }
         }
         .alert(item: $viewModel.pendingAlert) { alert in

@@ -47,7 +47,7 @@ struct ImportDataView: View {
                 }
             }
         }
-        .tint(Color(.systemBlue))
+        .tint(ConstantsAppColors.navigationTint)
     }
 
     @ViewBuilder

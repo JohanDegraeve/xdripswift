@@ -364,6 +364,7 @@ struct AIDStatusView: View {
                     Button(Texts_Common.Cancel, action: {
                         self.presentationMode.wrappedValue.dismiss()
                     })
+                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
             }
             .onReceive(timer, perform: { _ in

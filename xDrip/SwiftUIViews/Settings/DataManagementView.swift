@@ -217,8 +217,8 @@ struct DataManagementView: View {
         } message: {
             Text(viewModel.errorMessage ?? "")
         }
-        // Keep the system alert actions blue instead of inheriting the Settings stack's yellow tint.
-        .tint(Color(.systemBlue))
+        // Keep system alert actions on the navigation tint instead of inheriting command colours.
+        .tint(ConstantsAppColors.navigationTint)
         .onAppear(perform: openInitialBackupIfNeeded)
     }
 
@@ -306,7 +306,7 @@ struct DataManagementView: View {
             Button(Texts_SettingsView.backupChooseFile) {
                 isImporting = true
             }
-            .tint(Color(.systemBlue))
+            .tint(ConstantsAppColors.navigationTint)
         } header: {
             Text(Texts_SettingsView.backupFile)
         } footer: {
@@ -337,7 +337,7 @@ struct DataManagementView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-            .tint(Color(.systemBlue))
+            .tint(ConstantsAppColors.navigationTint)
             .disabled(viewModel.restorePassphrase.isEmpty)
         }
     }

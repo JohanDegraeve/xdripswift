@@ -85,7 +85,7 @@ struct BluetoothPeripheralDetailView: View {
                     Button(action: state.deleteButtonTapped) {
                         Image(systemName: "trash")
                     }
-                    .tint(.red)
+                    .tint(ConstantsAppColors.toolbarDestructiveAction)
                 }
             }
         }
@@ -293,10 +293,12 @@ struct BluetoothPeripheralTextEntryView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button(textEntry.cancelTitle, action: close)
+                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
             }
 
             ToolbarItem(placement: .confirmationAction) {
                 Button(textEntry.actionTitle, action: submit)
+                    .tint(ConstantsAppColors.toolbarAction)
                     .disabled(!actionIsEnabled)
             }
         }
@@ -357,6 +359,7 @@ struct BluetoothPeripheralSelectionListView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button(Texts_Common.Cancel, action: close)
+                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
             }
         }
         .colorScheme(.dark)

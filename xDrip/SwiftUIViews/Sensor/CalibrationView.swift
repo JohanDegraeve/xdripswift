@@ -43,13 +43,16 @@ struct CalibrationView: View {
                     Button(Texts_Common.Cancel) {
                         dismiss()
                     }
+                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button(action: openCalibrationHelp) {
                         Image(systemName: "questionmark.circle")
                     }
+                    .tint(ConstantsAppColors.toolbarAction)
 
                     Button(Texts_HomeView.calibrationButton, action: submitCalibration)
+                        .tint(ConstantsAppColors.toolbarAction)
                         .disabled(!canCalibrate || !isCalibrationValueInRange)
                 }
             }

@@ -329,7 +329,7 @@ struct RootTabView: View {
                         NavigationStack {
                             TreatmentsView(coreDataManager: dependencies.coreDataManager)
                         }
-                        .tint(.yellow)
+                        .tint(ConstantsAppColors.navigationTint)
                     }
                     .tag(Tab.treatments)
                     .tabItem {
@@ -381,6 +381,7 @@ struct RootTabView: View {
                         tabLabel(title: tabTitles.settings, systemImage: "gearshape.fill")
                     }
                 }
+                .tint(ConstantsAppColors.selectedTab)
 
                 if let dependencies = stateModel.dependencies {
                     RootScreenLockOverlay(
@@ -531,7 +532,7 @@ private struct RootStatisticsTabView: View {
         NavigationStack {
             StatisticsView(statisticsManager: dependencies.statisticsManager)
         }
-        .tint(.yellow)
+        .tint(ConstantsAppColors.navigationTint)
         .padding(.bottom, RootTabLayout.contentBottomPadding)
     }
 }

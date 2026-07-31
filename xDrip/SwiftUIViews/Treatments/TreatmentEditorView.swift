@@ -65,6 +65,7 @@ struct TreatmentEditorContainerView: View {
                     Button(Texts_Common.Cancel) {
                         onCancel()
                     }
+                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -73,6 +74,8 @@ struct TreatmentEditorContainerView: View {
                             onSave()
                         }
                     }
+                    .tint(ConstantsAppColors.toolbarAction)
+                    .disabled(!viewModel.canSaveTreatment)
                 }
             }
         }

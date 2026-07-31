@@ -35,7 +35,7 @@ struct GenerateReportView: View {
                             Button(Texts_Common.Cancel) {
                                 dismiss()
                             }
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                             .disabled(viewModel.isGenerating)
                         }
                     }
@@ -175,7 +175,7 @@ struct GenerateReportView: View {
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.borderedProminent)
-        .tint(Color(.systemBlue))
+        .tint(ConstantsAppColors.navigationTint)
         .disabled(!viewModel.isPeriodAvailable(viewModel.selectedPeriod) || viewModel.isLoadingAvailability)
     }
 
@@ -275,6 +275,7 @@ private struct ReportPasswordEditView: View {
                     password = passwordEntry.trimmingCharacters(in: .whitespacesAndNewlines)
                     dismiss()
                 }
+                .tint(ConstantsAppColors.toolbarAction)
                 .disabled(!passwordIsValid)
             }
         }

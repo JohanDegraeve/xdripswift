@@ -29,12 +29,14 @@ struct SensorStartDateView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(Texts_Common.Cancel, action: onCancel)
+                        .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(Texts_Common.Ok) {
                         UserDefaults.standard.startSensorTimeInfoGiven = true
                         onStart(selectedStartDate)
                     }
+                    .tint(ConstantsAppColors.toolbarAction)
                 }
             }
         }
@@ -65,11 +67,13 @@ struct SensorStartCodeView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(Texts_Common.Cancel, action: onCancel)
+                        .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(Texts_Common.Ok) {
                         onSubmit(sensorCode.trimmingCharacters(in: .whitespacesAndNewlines))
                     }
+                    .tint(ConstantsAppColors.toolbarAction)
                     .disabled(!isSensorCodeValid)
                 }
             }

@@ -39,7 +39,7 @@ struct ManageDataView: View {
                 }
             }
         }
-        .tint(Color(.systemBlue))
+        .tint(ConstantsAppColors.navigationTint)
     }
 }
 
@@ -75,7 +75,7 @@ struct StorageInfoView: View {
         } message: {
             Text(viewModel.errorMessage ?? "")
         }
-        .tint(Color(.systemBlue))
+        .tint(ConstantsAppColors.navigationTint)
         .task {
             await viewModel.loadInventoryIfNeeded()
         }
@@ -245,7 +245,7 @@ struct DataRetentionView: View {
                 }
             }
         }
-        .tint(Color(.systemBlue))
+        .tint(ConstantsAppColors.navigationTint)
         .onAppear(perform: viewModel.refresh)
     }
 }

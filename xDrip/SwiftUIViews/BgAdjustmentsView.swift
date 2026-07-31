@@ -104,6 +104,7 @@ struct BgAdjustmentsView: View {
                     Button(Texts_Common.Cancel, action: {
                         self.presentationMode.wrappedValue.dismiss()
                     })
+                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
 
             }
@@ -1120,10 +1121,12 @@ private struct BasicAdjustmentInputView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(Texts_Common.Cancel, action: onCancel)
+                        .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(Texts_Common.Ok, action: onConfirm)
+                        .tint(ConstantsAppColors.toolbarAction)
                         .disabled(!enteredGlucoseValueIsValid())
                 }
             }

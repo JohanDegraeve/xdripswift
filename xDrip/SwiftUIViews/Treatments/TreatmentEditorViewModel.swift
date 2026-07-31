@@ -27,12 +27,22 @@ import CoreData
 
     private let coreDataManager: CoreDataManager?
     private let treatmentToEditObjectID: NSManagedObjectID?
+    private let initialTreatmentState: TreatmentEditorInitialState?
 
     // MARK: - initialization
 
     init(coreDataManager: CoreDataManager?, treatmentToEdit: TreatmentEntry?) {
         self.coreDataManager = coreDataManager
         self.treatmentToEditObjectID = treatmentToEdit?.objectID
+        self.initialTreatmentState = treatmentToEdit.map {
+            TreatmentEditorInitialState(
+                selectedType: $0.treatmentType,
+                selectedDate: $0.date,
+                storedValue: $0.value,
+                enteredBy: $0.enteredBy,
+                notes: $0.notes
+            )
+        }
         self.selectedType = treatmentToEdit?.treatmentType ?? .Carbs
         self.selectedDate = treatmentToEdit?.date ?? Date()
         self.enteredByValue = treatmentToEdit?.enteredBy ?? ConstantsHomeView.applicationName
@@ -98,6 +108,18 @@ import CoreData
         }
 
         return Texts_TreatmentsView.invalidValueMessage
+    }
+
+    var canSaveTreatment: Bool {
+        guard currentInputIsValid else {
+            return false
+        }
+
+        if isAddMode {
+            return true
+        }
+
+        return treatmentHasChanges
     }
 
     // MARK: - public functions
@@ -246,6 +268,49 @@ import CoreData
         return value
     }
 
+    private var currentInputIsValid: Bool {
+        if selectedType == .Note {
+            return normalizedNotesValue() != nil
+        }
+
+        guard let value = normalizedValue() else {
+            return false
+        }
+
+        return value > 0
+    }
+
+    private var treatmentHasChanges: Bool {
+        guard let initialTreatmentState else {
+            return true
+        }
+
+        return currentStoredState() != initialTreatmentState
+    }
+
+    private func currentStoredState() -> TreatmentEditorInitialState? {
+        let storedNotesValue = selectedType == .Note ? normalizedNotesValue() : nil
+        let storedValue: Double
+
+        if selectedType == .Note {
+            storedValue = 0
+        } else {
+            guard let value = normalizedValue(), value > 0 else {
+                return nil
+            }
+
+            storedValue = storedValueForCurrentType(value)
+        }
+
+        return TreatmentEditorInitialState(
+            selectedType: selectedType,
+            selectedDate: selectedDate,
+            storedValue: storedValue,
+            enteredBy: normalizedEnteredByValue(),
+            notes: storedNotesValue
+        )
+    }
+
     private func treatmentToEdit(in coreDataManager: CoreDataManager) -> TreatmentEntry? {
         guard let treatmentToEditObjectID = treatmentToEditObjectID else {
             return nil
@@ -264,6 +329,14 @@ import CoreData
             UserDefaults.standard.nightscoutSyncRequired = true
         }
     }
+}
+
+private struct TreatmentEditorInitialState: Equatable {
+    let selectedType: TreatmentType
+    let selectedDate: Date
+    let storedValue: Double
+    let enteredBy: String?
+    let notes: String?
 }
 
 struct TreatmentEditorAlertMessage: Identifiable {

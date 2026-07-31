@@ -143,7 +143,7 @@ struct TreatmentsListView: View {
                     Button(action: onAddTreatment) {
                         Image(systemName: "plus")
                     }
-                    .tint(.yellow)
+                    .tint(ConstantsAppColors.toolbarAction)
                 }
             }
             .onAppear {

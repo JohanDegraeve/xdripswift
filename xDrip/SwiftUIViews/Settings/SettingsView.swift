@@ -85,7 +85,7 @@ struct SettingsNavigationView: View {
                 presenter.showMessage(title: Texts_Common.warning, message: Texts_SettingsView.failedToSendEmail)
             }
         }
-        .tint(.yellow)
+        .tint(ConstantsAppColors.navigationTint)
         .colorScheme(.dark)
         .onAppear {
             UserDefaults.standard.showDeveloperSettings = false
@@ -354,7 +354,7 @@ struct SettingsView: View {
                 } label: {
                     Image(systemName: "questionmark.circle")
                 }
-                .tint(.yellow)
+                .tint(ConstantsAppColors.toolbarAction)
                 .accessibilityLabel(Texts_SettingsView.showOnlineHelp)
             }
         }

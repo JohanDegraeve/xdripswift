@@ -42,7 +42,7 @@ struct GlucoseReportPreviewView: View {
                     } label: {
                         shareButtonIcon
                     }
-                    .tint(.yellow)
+                    .tint(ConstantsAppColors.toolbarAction)
                     .disabled(isPreparingProtectedShare)
                 }
             }

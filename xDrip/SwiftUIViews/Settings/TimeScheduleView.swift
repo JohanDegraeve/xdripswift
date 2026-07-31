@@ -147,6 +147,7 @@ struct TimeScheduleView: View {
                 Button(action: viewModel.addScheduleEntry) {
                     Image(systemName: "plus")
                 }
+                .tint(ConstantsAppColors.toolbarAction)
             }
         }
         .settingsPushPresentation(datePicker: $viewModel.datePicker)
@@ -207,6 +208,7 @@ struct SettingsDatePickerView: View {
                         datePicker.cancel?()
                         close()
                     }
+                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
             }
 
@@ -216,6 +218,7 @@ struct SettingsDatePickerView: View {
                     datePicker.ok(selectedDate)
                     close()
                 }
+                .tint(ConstantsAppColors.toolbarAction)
                 .disabled(selectedDate == initialDate)
             }
         }

@@ -33,6 +33,11 @@ enum ConstantsAppColors {
     static let homePanelBackground = Color(white: 0.15)
     static let toolbarIcon = Color.white
     static let toolbarLockedIcon = urgent
+    static let toolbarAction = warning
+    static let toolbarDestructiveAction = urgent
+    static let toolbarNeutralAction = primaryText
+    static let navigationTint = accent
+    static let selectedTab = navigationTint
     static let clockText = Color.gray
     static let dataSourceText = secondaryText
 

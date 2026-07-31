@@ -41,7 +41,7 @@ struct DataDeletionView: View {
             }
         }
         .padding(.top, viewModel.deletionPlan != nil && viewModel.deletionResult == nil ? 4 : 0)
-        .tint(Color(.systemBlue))
+        .tint(ConstantsAppColors.navigationTint)
         .disabled(viewModel.isWorking)
         .overlay {
             if viewModel.isWorking {

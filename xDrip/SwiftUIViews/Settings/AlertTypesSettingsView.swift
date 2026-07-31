@@ -64,6 +64,7 @@ struct AlertTypesSettingsView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
+                .tint(ConstantsAppColors.toolbarAction)
             }
         }
     }
@@ -411,11 +412,13 @@ struct AlertTypeEditorView: View {
                 Button(role: .destructive, action: viewModel.requestDelete) {
                     Image(systemName: "trash")
                 }
+                .tint(ConstantsAppColors.toolbarDestructiveAction)
                 .disabled(!viewModel.canDelete)
             }
 
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(Texts_Common.Ok, action: viewModel.save)
+                    .tint(ConstantsAppColors.toolbarAction)
             }
         }
         .alert(item: $viewModel.alert) { alert in

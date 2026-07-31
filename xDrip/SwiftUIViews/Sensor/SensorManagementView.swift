@@ -178,6 +178,7 @@ struct SensorManagementView: View {
                     Button(Texts_Common.Cancel, action: {
                         self.presentationMode.wrappedValue.dismiss()
                     })
+                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
             }
         }

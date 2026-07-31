@@ -37,6 +37,7 @@ struct LoopDelayScheduleView: View {
                 Button(action: openNewEditor) {
                     Image(systemName: "plus")
                 }
+                .tint(ConstantsAppColors.toolbarAction)
             }
         }
         .onAppear() {
@@ -284,6 +285,7 @@ private struct LoopDelayEditorView: View {
                         duplicateLoopDelayAlertIsPresented = true
                     }
                 }
+                .tint(ConstantsAppColors.toolbarAction)
             }
         }
         .onDisappear {

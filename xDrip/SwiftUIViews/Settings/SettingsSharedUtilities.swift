@@ -1343,6 +1343,7 @@ struct SettingsTextEntryView: View {
                 Button(textEntry.actionTitle) {
                     submit()
                 }
+                .tint(ConstantsAppColors.toolbarAction)
                 .disabled(!hasModifiedValue)
             }
         }
@@ -1421,6 +1422,7 @@ struct SettingsSelectionListView: View {
                     selectionList.action(selectedRow)
                     close()
                 }
+                .tint(ConstantsAppColors.toolbarAction)
                 .disabled(selectedRow == initialSelectedRow)
             }
         }

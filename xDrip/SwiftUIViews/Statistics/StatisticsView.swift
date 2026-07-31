@@ -39,7 +39,7 @@ struct StatisticsView: View {
                         Text(Texts_Common.reportGenerateTitle)
                     }
                 }
-                .tint(.yellow)
+                .tint(ConstantsAppColors.toolbarAction)
             }
         }
         .sheet(isPresented: $isShowingReportGenerator) {

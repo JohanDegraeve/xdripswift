@@ -38,6 +38,7 @@ struct SnoozeView: View {
                     Button(Texts_Common.Cancel) {
                         presentationMode.wrappedValue.dismiss()
                     }
+                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
             }
             .listStyle(.insetGrouped)
@@ -64,7 +65,7 @@ struct SnoozeView: View {
                         viewModel.handleSnoozeAllToggleChanged(isOn: isOn)
                     }
                 ))
-                .tint(.red)
+                .tint(ConstantsAppColors.toolbarDestructiveAction)
                 .foregroundStyle(Color(.colorPrimary))
                 
                 snoozeAllStatusRow()
