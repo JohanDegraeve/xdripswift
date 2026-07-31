@@ -811,10 +811,13 @@ final class WatchStateModel: NSObject, ObservableObject {
 
 extension WatchStateModel: WCSessionDelegate {
     func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error _: Error?) {
-        if activationState == .activated {
-            requestWatchStateUpdate()
+        // keep Watch state changes on the main queue because WCSession delivers delegate callbacks on a non-main queue
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self, activationState == .activated else { return }
+
+            self.requestWatchStateUpdate()
             // if the AGP tab requested data while activation was pending, send it now
-            sendPendingAGPRequestIfPossible()
+            self.sendPendingAGPRequestIfPossible()
         }
     }
 
