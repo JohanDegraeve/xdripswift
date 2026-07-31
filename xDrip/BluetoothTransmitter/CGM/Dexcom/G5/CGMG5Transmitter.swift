@@ -1267,7 +1267,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             trace("in processBatteryStatusRxMessage, voltageA = %{public}@, voltageB = %{public}@, resist = %{public}@, runtime = %{public}@, temperature = %{public}@, status = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, batteryStatusRxMessage.voltageA.description, batteryStatusRxMessage.voltageB.description, batteryStatusRxMessage.resist.description, batteryStatusRxMessage.runtime.description, batteryStatusRxMessage.temperature.description, batteryStatusRxMessage.status.description)
 
             // possibly other app is running in parallel and also requested battery info, in that case don't store it again
-            if Date() > Date(timeInterval: ConstantsDexcomG5.batteryReadPeriod, since: UserDefaults.standard.timeStampOfLastBatteryReading != nil ? UserDefaults.standard.timeStampOfLastBatteryReading! : Date(timeIntervalSince1970: 0)) {
+            let timeStampOfLastBatteryReading = UserDefaults.standard.timeStampOfLastBatteryReading ?? Date(timeIntervalSince1970: 0)
+            if Date() > Date(timeInterval: ConstantsDexcomG5.batteryReadPeriod, since: timeStampOfLastBatteryReading) {
 
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
@@ -1679,7 +1680,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// - returns:
     ///     - true if batter status requested, otherwise false
     private func batteryStatusRequested() -> Bool {
-        if Date() > Date(timeInterval: ConstantsDexcomG5.batteryReadPeriod, since: UserDefaults.standard.timeStampOfLastBatteryReading != nil ? UserDefaults.standard.timeStampOfLastBatteryReading! : Date(timeIntervalSince1970: 0)) {
+        let timeStampOfLastBatteryReading = UserDefaults.standard.timeStampOfLastBatteryReading ?? Date(timeIntervalSince1970: 0)
+        if Date() > Date(timeInterval: ConstantsDexcomG5.batteryReadPeriod, since: timeStampOfLastBatteryReading) {
             trace("in batteryStatusRequested, last battery reading was long time ago, requesting now", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
             
             if let writeControlCharacteristic = writeControlCharacteristic {
