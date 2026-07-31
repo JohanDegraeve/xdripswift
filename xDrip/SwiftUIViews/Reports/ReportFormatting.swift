@@ -49,6 +49,14 @@ enum GlucoseReportFormatting {
         "\(value.round(toDecimalPlaces: decimals).stringWithoutTrailingZeroes)%"
     }
 
+    static func number(_ value: Double, decimalPlaces: Int, locale: Locale = .current) -> String {
+        value.formatted(
+            .number
+                .locale(locale)
+                .precision(.fractionLength(decimalPlaces))
+        )
+    }
+
     static func hoursPerDay(from percentage: Double) -> String {
         hoursPerDay(from: percentage, language: .english)
     }

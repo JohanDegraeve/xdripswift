@@ -40,6 +40,13 @@ enum GlucoseReportPeriod: Int, CaseIterable, Identifiable {
     }
 }
 
+enum GlucoseReportAIDPeriod: Int, CaseIterable, Identifiable {
+    case notIncluded = 0
+    case three = 3
+
+    var id: Int { rawValue }
+}
+
 enum GlucoseReportLanguage: String, CaseIterable, Identifiable {
     case english = "en"
     case spanish = "es"
@@ -135,6 +142,7 @@ struct GlucoseReportConfiguration {
     var patientName: String
     var patientID: String
     var period: GlucoseReportPeriod
+    var aidPeriod: GlucoseReportAIDPeriod
     var paperSize: GlucoseReportPaperSize
     var language: GlucoseReportLanguage
 
@@ -180,12 +188,13 @@ struct GlucoseReportAnalytics {
     let rangeDistribution: GlucoseReportRangeDistribution
     let tightRangeDistribution: GlucoseReportRangeDistribution
     let agpPoints: [GlucoseReportAGPPoint]
+    let dailyGlucoseProfiles: [GlucoseReportDailyGlucoseProfile]
     let dailySummaries: [GlucoseReportDailySummary]
     let trendPoints: [GlucoseReportTrendPoint]
-    let deviceNames: [String]
     let sensorCount: Int
     let averageSensorDuration: TimeInterval?
     let calibrationCount: Int
+    let aidAnalytics: GlucoseReportAIDAnalytics?
     let lowEventCount: Int
     let veryLowEventCount: Int
     let highEventCount: Int
@@ -194,6 +203,102 @@ struct GlucoseReportAnalytics {
     var hasData: Bool {
         sampleCount > 0
     }
+}
+
+struct GlucoseReportAIDAnalytics {
+    let systemName: String?
+    let systemVersion: String?
+    let pumpManufacturer: String?
+    let pumpModel: String?
+    let calculationDays: Int
+    let periodDays: Int
+    let loopalyzerStartDate: Date
+    let loopalyzerEndDate: Date
+    let loopingTimePercentage: Double
+    let averageTDD: Double?
+    let averageCarbsPerDay: Double?
+    let pumpSuspensionTime: TimeInterval?
+    let latestReservoir: Double?
+    let latestPumpBatteryPercentage: Int?
+    let loopalyzerPoints: [GlucoseReportLoopalyzerPoint]
+    let insulinTreatmentMarkers: [GlucoseReportLoopalyzerTreatmentMarker]
+    let carbTreatmentMarkers: [GlucoseReportLoopalyzerTreatmentMarker]
+    let profileSchedules: [GlucoseReportAIDProfileSchedule]
+
+    var hasChartData: Bool {
+        loopalyzerPoints.contains { point in
+            point.glucoseMgDl != nil || point.scheduledBasalRate != nil || point.basalDeltaRate != nil || point.iob != nil || point.cob != nil
+        }
+    }
+
+    var systemDescription: String {
+        let name = systemName ?? "AID"
+        guard let systemVersion, !systemVersion.isEmpty else { return name }
+        return "\(name) (\(systemVersion))"
+    }
+
+    var pumpDescription: String? {
+        let description = [pumpManufacturer, pumpModel]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+        return description.isEmpty ? nil : description
+    }
+}
+
+struct GlucoseReportLoopalyzerPoint: Identifiable {
+    /// Looping analytics are calculated in quarter-hour buckets. `minuteOfDay` is the
+    /// inclusive start of that bucket, not the timestamp of a point sample.
+    static let bucketDurationMinutes = 15
+
+    let id = UUID()
+    let minuteOfDay: Int
+    let glucoseMgDl: Double?
+    let scheduledBasalRate: Double?
+    let basalDeltaRate: Double?
+    let iob: Double?
+    let cob: Double?
+
+    var bucketStartMinute: Double {
+        Double(minuteOfDay)
+    }
+
+    var bucketMidpointMinute: Double {
+        min(bucketStartMinute + Double(Self.bucketDurationMinutes) / 2, 1440)
+    }
+
+    var bucketEndMinute: Double {
+        min(bucketStartMinute + Double(Self.bucketDurationMinutes), 1440)
+    }
+
+    var bucketBarStartMinute: Double {
+        min(bucketStartMinute + 1.5, 1440)
+    }
+
+    var bucketBarEndMinute: Double {
+        max(bucketEndMinute - 1.5, bucketBarStartMinute)
+    }
+}
+
+struct GlucoseReportLoopalyzerTreatmentMarker: Identifiable {
+    let id = UUID()
+    let minuteOfDay: Int
+    let amount: Double
+}
+
+struct GlucoseReportAIDProfileSchedule: Identifiable {
+    struct ScheduleValue: Identifiable {
+        let id = UUID()
+        let secondsFromMidnight: Int
+        let value: Double
+    }
+
+    let id = UUID()
+    let name: String
+    let startDate: Date
+    let basal: [ScheduleValue]
+    let carbRatio: [ScheduleValue]
+    let sensitivity: [ScheduleValue]
 }
 
 struct GlucoseReportRangeDistribution {
@@ -278,6 +383,18 @@ struct GlucoseReportAGPPoint: Identifiable {
     let p95MgDl: Double
 }
 
+struct GlucoseReportDailyGlucoseProfile: Identifiable {
+    let id = UUID()
+    let date: Date
+    let points: [GlucoseReportDailyGlucosePoint]
+}
+
+struct GlucoseReportDailyGlucosePoint: Identifiable {
+    let id = UUID()
+    let minuteOfDay: Int
+    let valueMgDl: Double
+}
+
 struct GlucoseReportDailySummary: Identifiable {
     let id = UUID()
     let date: Date
@@ -298,6 +415,8 @@ struct GlucoseReportTrendPoint: Identifiable {
     let interval: GlucoseReportTrendInterval
     let averageMgDl: Double
     let coefficientOfVariation: Double
+    let averageTDDPerDay: Double?
+    let averageCarbsPerDay: Double?
     let sampleCount: Int
 
     var gmiPercentage: Double {
@@ -306,6 +425,9 @@ struct GlucoseReportTrendPoint: Identifiable {
 }
 
 enum GlucoseReportClinicalConstants {
+    static let dayStartMinute = 6 * 60
+    static let nightStartMinute = 22 * 60
+
     // International Consensus on Time in Range: Diabetes Care 2019, 42(8), 1593-1603.
     // Source: https://doi.org/10.2337/dci19-0028
     static let veryLowMgDl = 54.0
@@ -438,13 +560,32 @@ enum GlucoseReportText {
     case cgmSystemAndReportQuality
     case cgmSource
     case storedCGMReadings
-    case currentSensor
     case sensorsInPeriod
     case averageSensorDurationFormat
     case calibrations
     case firstReading
     case lastReading
     case dataCapture
+    case automatedInsulinDelivery
+    case aidSystem
+    case pump
+    case loopingTime
+    case averageTDD
+    case averageCarbs
+    case pumpSuspension
+    case reservoir
+    case battery
+    case loopingOverview
+    case scheduledBasalProfile
+    case basalProfile
+    case tempBasalDelta
+    case scheduledBasal
+    case deliveredBasal
+    case profile
+    case carbRatio
+    case sensitivity
+    case loopalyzerPeriodFormat
+    case loopalyzerFootnote
     case reportInterpretationNote
     case footerGeneratedFormat
     case pageFormat
@@ -480,7 +621,7 @@ enum GlucoseReportText {
         case .bestTIR: return "Best TIR"
         case .lowestAverage: return "Lowest Avg"
         case .highestAverage: return "Highest Avg"
-        case .estimatedA1cAndVariabilityTrend: return "Estimated A1c and Variability Trend"
+        case .estimatedA1cAndVariabilityTrend: return "Trend Analysis"
         case .estimatedA1cGMI: return "Estimated A1c / GMI"
         case .lowerIsGenerallyBetter: return "Lower is generally better"
         case .cv: return "CV"
@@ -488,15 +629,34 @@ enum GlucoseReportText {
         case .insufficientData: return "Insufficient data"
         case .gmiFootnote: return "GMI is CGM-derived and should be interpreted as an estimate, not a laboratory HbA1c result."
         case .cgmSystemAndReportQuality: return "CGM System and Report Quality"
-        case .cgmSource: return "CGM Source"
+        case .cgmSource: return "Data Source"
         case .storedCGMReadings: return "Stored CGM readings"
-        case .currentSensor: return "Current Sensor"
         case .sensorsInPeriod: return "Sensors in Period"
         case .averageSensorDurationFormat: return "average %@ per sensor"
         case .calibrations: return "Calibrations"
         case .firstReading: return "First Reading"
         case .lastReading: return "Last Reading"
         case .dataCapture: return "Data Capture"
+        case .automatedInsulinDelivery: return "OS-AID/Looping Data"
+        case .aidSystem: return "System"
+        case .pump: return "Pump"
+        case .loopingTime: return "Looping Success"
+        case .averageTDD: return "Average TDD"
+        case .averageCarbs: return "Average Carbs"
+        case .pumpSuspension: return "Pump Suspension"
+        case .reservoir: return "Reservoir"
+        case .battery: return "Battery"
+        case .loopingOverview: return "Looping Overview"
+        case .scheduledBasalProfile: return "Scheduled Basal Profile"
+        case .basalProfile: return "Basal Profile"
+        case .tempBasalDelta: return "Temp Basal Delta"
+        case .scheduledBasal: return "Scheduled Basal"
+        case .deliveredBasal: return "Delivered Basal"
+        case .profile: return "Profile"
+        case .carbRatio: return "Carb ratio"
+        case .sensitivity: return "Sensitivity"
+        case .loopalyzerPeriodFormat: return "Last %d Days"
+        case .loopalyzerFootnote: return "Loopalyzer-style view inspired by Nightscout reports. Multi-day averages can flatten meal and correction responses, so the selected analysis period is limited to 3 days. For more in-depth analysis, use the Loopalyzer function in Nightscout."
         case .reportInterpretationNote: return "This report summarizes stored CGM readings for clinical review. It is not a real-time treatment display and should be interpreted with the user's care team."
         case .footerGeneratedFormat: return "Generated by %@ (%@) from locally stored CGM data."
         case .pageFormat: return "Page %d of %d"
@@ -534,7 +694,7 @@ enum GlucoseReportText {
         case .bestTIR: return "Mejor TIR"
         case .lowestAverage: return "Media Mínima"
         case .highestAverage: return "Media Máxima"
-        case .estimatedA1cAndVariabilityTrend: return "Tendencia de A1c Estimada y Variabilidad"
+        case .estimatedA1cAndVariabilityTrend: return "Análisis de Tendencias"
         case .estimatedA1cGMI: return "A1c Estimada / GMI"
         case .lowerIsGenerallyBetter: return "Más bajo suele ser mejor"
         case .cv: return "CV"
@@ -542,15 +702,34 @@ enum GlucoseReportText {
         case .insufficientData: return "Datos insuficientes"
         case .gmiFootnote: return "El GMI se deriva de la MCG y debe interpretarse como una estimación, no como un resultado de HbA1c de laboratorio."
         case .cgmSystemAndReportQuality: return "Sistema MCG y Calidad del Informe"
-        case .cgmSource: return "Fuente MCG"
+        case .cgmSource: return "Fuente de Datos"
         case .storedCGMReadings: return "Lecturas MCG almacenadas"
-        case .currentSensor: return "Sensor Actual"
         case .sensorsInPeriod: return "Sensores en el Periodo"
         case .averageSensorDurationFormat: return "media %@ por sensor"
         case .calibrations: return "Calibraciones"
         case .firstReading: return "Primera Lectura"
         case .lastReading: return "Última Lectura"
         case .dataCapture: return "Captura de Datos"
+        case .automatedInsulinDelivery: return "OS-AID/Looping Data"
+        case .aidSystem: return "Sistema"
+        case .pump: return "Bomba"
+        case .loopingTime: return "Éxito de bucle"
+        case .averageTDD: return "TDD Media"
+        case .averageCarbs: return "Carbohidratos Medios"
+        case .pumpSuspension: return "Suspensión de Bomba"
+        case .reservoir: return "Reservorio"
+        case .battery: return "Batería"
+        case .loopingOverview: return "Resumen del bucle"
+        case .scheduledBasalProfile: return "Perfil Basal Programado"
+        case .basalProfile: return "Perfil Basal"
+        case .tempBasalDelta: return "Delta Basal Temporal"
+        case .scheduledBasal: return "Basal Programada"
+        case .deliveredBasal: return "Basal Administrada"
+        case .profile: return "Perfil"
+        case .carbRatio: return "Ratio de carbohidratos"
+        case .sensitivity: return "Sensibilidad"
+        case .loopalyzerPeriodFormat: return "Últimos %d días"
+        case .loopalyzerFootnote: return "Vista tipo Loopalyzer inspirada en los informes de Nightscout. Las medias de varios días pueden aplanar las respuestas a comidas y correcciones, por lo que el periodo de análisis seleccionado se limita a 3 días. Para un análisis más detallado, usa la función Loopalyzer de Nightscout."
         case .reportInterpretationNote: return "Este informe resume lecturas MCG almacenadas para revisión clínica. No es una pantalla de tratamiento en tiempo real y debe interpretarse con el equipo médico del usuario."
         case .footerGeneratedFormat: return "Generado por %@ (%@) a partir de datos MCG almacenados localmente."
         case .pageFormat: return "Página %d de %d"
@@ -588,7 +767,7 @@ enum GlucoseReportText {
         case .bestTIR: return "Meilleur TIR"
         case .lowestAverage: return "Moy. la plus basse"
         case .highestAverage: return "Moy. la plus haute"
-        case .estimatedA1cAndVariabilityTrend: return "Tendance A1c Estimée et Variabilité"
+        case .estimatedA1cAndVariabilityTrend: return "Analyse des Tendances"
         case .estimatedA1cGMI: return "A1c Estimée / GMI"
         case .lowerIsGenerallyBetter: return "Plus bas est généralement meilleur"
         case .cv: return "CV"
@@ -596,15 +775,34 @@ enum GlucoseReportText {
         case .insufficientData: return "Données insuffisantes"
         case .gmiFootnote: return "Le GMI est dérivé de la MCG et doit être interprété comme une estimation, pas comme un résultat d'HbA1c de laboratoire."
         case .cgmSystemAndReportQuality: return "Système MCG et Qualité du Rapport"
-        case .cgmSource: return "Source MCG"
+        case .cgmSource: return "Source des Données"
         case .storedCGMReadings: return "Lectures MCG stockées"
-        case .currentSensor: return "Capteur Actuel"
         case .sensorsInPeriod: return "Capteurs sur la Période"
         case .averageSensorDurationFormat: return "moyenne %@ par capteur"
         case .calibrations: return "Étalonnages"
         case .firstReading: return "Première Lecture"
         case .lastReading: return "Dernière Lecture"
         case .dataCapture: return "Capture des Données"
+        case .automatedInsulinDelivery: return "OS-AID/Looping Data"
+        case .aidSystem: return "Système"
+        case .pump: return "Pompe"
+        case .loopingTime: return "Succès de boucle"
+        case .averageTDD: return "TDD Moyenne"
+        case .averageCarbs: return "Glucides Moyens"
+        case .pumpSuspension: return "Suspension Pompe"
+        case .reservoir: return "Réservoir"
+        case .battery: return "Batterie"
+        case .loopingOverview: return "Vue d’ensemble du bouclage"
+        case .scheduledBasalProfile: return "Profil basal programmé"
+        case .basalProfile: return "Profil basal"
+        case .tempBasalDelta: return "Delta basal temporaire"
+        case .scheduledBasal: return "Basal Programmé"
+        case .deliveredBasal: return "Basal Administré"
+        case .profile: return "Profil"
+        case .carbRatio: return "Ratio glucides"
+        case .sensitivity: return "Sensibilité"
+        case .loopalyzerPeriodFormat: return "Derniers %d jours"
+        case .loopalyzerFootnote: return "Vue de type Loopalyzer inspirée des rapports Nightscout. Les moyennes sur plusieurs jours peuvent lisser les réponses aux repas et corrections, la période d’analyse sélectionnée est donc limitée à 3 jours. Pour une analyse plus approfondie, utilisez la fonction Loopalyzer de Nightscout."
         case .reportInterpretationNote: return "Ce rapport résume les lectures MCG stockées pour examen clinique. Il ne s'agit pas d'un affichage de traitement en temps réel et il doit être interprété avec l'équipe soignante de l'utilisateur."
         case .footerGeneratedFormat: return "Généré par %@ (%@) à partir de données MCG stockées localement."
         case .pageFormat: return "Page %d sur %d"
@@ -642,7 +840,7 @@ enum GlucoseReportText {
         case .bestTIR: return "Beste TIR"
         case .lowestAverage: return "Laagste Gem."
         case .highestAverage: return "Hoogste Gem."
-        case .estimatedA1cAndVariabilityTrend: return "Trend Geschatte A1c en Variabiliteit"
+        case .estimatedA1cAndVariabilityTrend: return "Trendanalyse"
         case .estimatedA1cGMI: return "Geschatte A1c / GMI"
         case .lowerIsGenerallyBetter: return "Lager is meestal beter"
         case .cv: return "CV"
@@ -650,15 +848,34 @@ enum GlucoseReportText {
         case .insufficientData: return "Onvoldoende gegevens"
         case .gmiFootnote: return "GMI is afgeleid van CGM en moet worden geïnterpreteerd als een schatting, niet als een laboratorium-HbA1c-resultaat."
         case .cgmSystemAndReportQuality: return "CGM-systeem en Rapportkwaliteit"
-        case .cgmSource: return "CGM-bron"
+        case .cgmSource: return "Gegevensbron"
         case .storedCGMReadings: return "Opgeslagen CGM-metingen"
-        case .currentSensor: return "Huidige Sensor"
         case .sensorsInPeriod: return "Sensoren in Periode"
         case .averageSensorDurationFormat: return "gemiddeld %@ per sensor"
         case .calibrations: return "Kalibraties"
         case .firstReading: return "Eerste Meting"
         case .lastReading: return "Laatste Meting"
         case .dataCapture: return "Gegevensdekking"
+        case .automatedInsulinDelivery: return "OS-AID/Looping Data"
+        case .aidSystem: return "Systeem"
+        case .pump: return "Pomp"
+        case .loopingTime: return "Loop-succes"
+        case .averageTDD: return "Gem. TDD"
+        case .averageCarbs: return "Gem. Koolhydraten"
+        case .pumpSuspension: return "Pompstop"
+        case .reservoir: return "Reservoir"
+        case .battery: return "Batterij"
+        case .loopingOverview: return "Loop-overzicht"
+        case .scheduledBasalProfile: return "Gepland basaalprofiel"
+        case .basalProfile: return "Basaalprofiel"
+        case .tempBasalDelta: return "Tijdelijke basaal-delta"
+        case .scheduledBasal: return "Geplande Basaal"
+        case .deliveredBasal: return "Toegediende Basaal"
+        case .profile: return "Profiel"
+        case .carbRatio: return "Koolhydraatratio"
+        case .sensitivity: return "Gevoeligheid"
+        case .loopalyzerPeriodFormat: return "Laatste %d dagen"
+        case .loopalyzerFootnote: return "Loopalyzer-achtige weergave geïnspireerd op Nightscout-rapporten. Meerdaagse gemiddelden kunnen reacties op maaltijden en correcties afvlakken, daarom is de geselecteerde analyseperiode beperkt tot 3 dagen. Gebruik voor een uitgebreidere analyse de Loopalyzer-functie in Nightscout."
         case .reportInterpretationNote: return "Dit rapport vat opgeslagen CGM-metingen samen voor klinische beoordeling. Het is geen realtime behandelweergave en moet samen met het zorgteam van de gebruiker worden geïnterpreteerd."
         case .footerGeneratedFormat: return "Gegenereerd door %@ (%@) op basis van lokaal opgeslagen CGM-gegevens."
         case .pageFormat: return "Pagina %d van %d"
@@ -696,7 +913,7 @@ enum GlucoseReportText {
         case .bestTIR: return "Beste TIR"
         case .lowestAverage: return "Niedrigster Ø"
         case .highestAverage: return "Höchster Ø"
-        case .estimatedA1cAndVariabilityTrend: return "Trend Geschätzte A1c und Variabilität"
+        case .estimatedA1cAndVariabilityTrend: return "Trendanalyse"
         case .estimatedA1cGMI: return "Geschätzte A1c / GMI"
         case .lowerIsGenerallyBetter: return "Niedriger ist im Allgemeinen besser"
         case .cv: return "CV"
@@ -704,15 +921,34 @@ enum GlucoseReportText {
         case .insufficientData: return "Nicht genügend Daten"
         case .gmiFootnote: return "GMI wird aus CGM-Daten abgeleitet und sollte als Schätzung interpretiert werden, nicht als Labor-HbA1c-Ergebnis."
         case .cgmSystemAndReportQuality: return "CGM-System und Berichtsqualität"
-        case .cgmSource: return "CGM-Quelle"
+        case .cgmSource: return "Datenquelle"
         case .storedCGMReadings: return "Gespeicherte CGM-Messwerte"
-        case .currentSensor: return "Aktueller Sensor"
         case .sensorsInPeriod: return "Sensoren im Zeitraum"
         case .averageSensorDurationFormat: return "durchschnittlich %@ pro Sensor"
         case .calibrations: return "Kalibrierungen"
         case .firstReading: return "Erster Messwert"
         case .lastReading: return "Letzter Messwert"
         case .dataCapture: return "Datenerfassung"
+        case .automatedInsulinDelivery: return "OS-AID/Looping Data"
+        case .aidSystem: return "System"
+        case .pump: return "Pumpe"
+        case .loopingTime: return "Loop-Erfolg"
+        case .averageTDD: return "Durchschn. TDD"
+        case .averageCarbs: return "Durchschn. Kohlenhydrate"
+        case .pumpSuspension: return "Pumpenstopp"
+        case .reservoir: return "Reservoir"
+        case .battery: return "Batterie"
+        case .loopingOverview: return "Loop-Übersicht"
+        case .scheduledBasalProfile: return "Geplantes Basalprofil"
+        case .basalProfile: return "Basalprofil"
+        case .tempBasalDelta: return "Temporäre Basal-Differenz"
+        case .scheduledBasal: return "Geplante Basalrate"
+        case .deliveredBasal: return "Abgegebene Basalrate"
+        case .profile: return "Profil"
+        case .carbRatio: return "Kohlenhydratfaktor"
+        case .sensitivity: return "Insulinsensitivität"
+        case .loopalyzerPeriodFormat: return "Letzte %d Tage"
+        case .loopalyzerFootnote: return "Loopalyzer-ähnliche Ansicht, inspiriert von Nightscout-Berichten. Mehrtagesmittel können Mahlzeiten- und Korrekturreaktionen abflachen, daher ist der gewählte Analysezeitraum auf 3 Tage begrenzt. Verwenden Sie für eine ausführlichere Analyse die Loopalyzer-Funktion in Nightscout."
         case .reportInterpretationNote: return "Dieser Bericht fasst gespeicherte CGM-Messwerte zur klinischen Beurteilung zusammen. Er ist keine Echtzeit-Behandlungsanzeige und sollte mit dem Behandlungsteam des Benutzers interpretiert werden."
         case .footerGeneratedFormat: return "Erstellt von %@ (%@) aus lokal gespeicherten CGM-Daten."
         case .pageFormat: return "Seite %d von %d"
@@ -750,7 +986,7 @@ enum GlucoseReportText {
         case .bestTIR: return "Miglior TIR"
         case .lowestAverage: return "Media Minima"
         case .highestAverage: return "Media Massima"
-        case .estimatedA1cAndVariabilityTrend: return "Tendenza A1c Stimata e Variabilità"
+        case .estimatedA1cAndVariabilityTrend: return "Analisi delle Tendenze"
         case .estimatedA1cGMI: return "A1c Stimata / GMI"
         case .lowerIsGenerallyBetter: return "Più basso è generalmente meglio"
         case .cv: return "CV"
@@ -758,15 +994,34 @@ enum GlucoseReportText {
         case .insufficientData: return "Dati insufficienti"
         case .gmiFootnote: return "Il GMI deriva dal CGM e deve essere interpretato come una stima, non come un risultato HbA1c di laboratorio."
         case .cgmSystemAndReportQuality: return "Sistema CGM e Qualità del Report"
-        case .cgmSource: return "Fonte CGM"
+        case .cgmSource: return "Fonte Dati"
         case .storedCGMReadings: return "Letture CGM memorizzate"
-        case .currentSensor: return "Sensore Attuale"
         case .sensorsInPeriod: return "Sensori nel Periodo"
         case .averageSensorDurationFormat: return "media %@ per sensore"
         case .calibrations: return "Calibrazioni"
         case .firstReading: return "Prima Lettura"
         case .lastReading: return "Ultima Lettura"
         case .dataCapture: return "Acquisizione Dati"
+        case .automatedInsulinDelivery: return "OS-AID/Looping Data"
+        case .aidSystem: return "Sistema"
+        case .pump: return "Microinfusore"
+        case .loopingTime: return "Successo loop"
+        case .averageTDD: return "TDD Media"
+        case .averageCarbs: return "Carboidrati Medi"
+        case .pumpSuspension: return "Sospensione Pompa"
+        case .reservoir: return "Serbatoio"
+        case .battery: return "Batteria"
+        case .loopingOverview: return "Panoramica del loop"
+        case .scheduledBasalProfile: return "Profilo basale programmato"
+        case .basalProfile: return "Profilo basale"
+        case .tempBasalDelta: return "Delta basale temporanea"
+        case .scheduledBasal: return "Basale Programmata"
+        case .deliveredBasal: return "Basale Erogata"
+        case .profile: return "Profilo"
+        case .carbRatio: return "Rapporto carboidrati"
+        case .sensitivity: return "Sensibilità"
+        case .loopalyzerPeriodFormat: return "Ultimi %d giorni"
+        case .loopalyzerFootnote: return "Vista in stile Loopalyzer ispirata ai report Nightscout. Le medie su più giorni possono appiattire le risposte a pasti e correzioni, quindi il periodo di analisi selezionato è limitato a 3 giorni. Per un'analisi più approfondita, usa la funzione Loopalyzer di Nightscout."
         case .reportInterpretationNote: return "Questo report riassume le letture CGM memorizzate per revisione clinica. Non è una visualizzazione terapeutica in tempo reale e deve essere interpretato con il team sanitario dell'utente."
         case .footerGeneratedFormat: return "Generato da %@ (%@) da dati CGM memorizzati localmente."
         case .pageFormat: return "Pagina %d di %d"
@@ -804,7 +1059,7 @@ enum GlucoseReportText {
         case .bestTIR: return "Melhor TIR"
         case .lowestAverage: return "Média Mínima"
         case .highestAverage: return "Média Máxima"
-        case .estimatedA1cAndVariabilityTrend: return "Tendência de A1c Estimada e Variabilidade"
+        case .estimatedA1cAndVariabilityTrend: return "Análise de Tendências"
         case .estimatedA1cGMI: return "A1c Estimada / GMI"
         case .lowerIsGenerallyBetter: return "Mais baixo é geralmente melhor"
         case .cv: return "CV"
@@ -812,15 +1067,34 @@ enum GlucoseReportText {
         case .insufficientData: return "Dados insuficientes"
         case .gmiFootnote: return "O GMI é derivado da MCG e deve ser interpretado como uma estimativa, não como um resultado laboratorial de HbA1c."
         case .cgmSystemAndReportQuality: return "Sistema MCG e Qualidade do Relatório"
-        case .cgmSource: return "Fonte MCG"
+        case .cgmSource: return "Fonte de Dados"
         case .storedCGMReadings: return "Leituras MCG armazenadas"
-        case .currentSensor: return "Sensor Atual"
         case .sensorsInPeriod: return "Sensores no Período"
         case .averageSensorDurationFormat: return "média %@ por sensor"
         case .calibrations: return "Calibrações"
         case .firstReading: return "Primeira Leitura"
         case .lastReading: return "Última Leitura"
         case .dataCapture: return "Captura de Dados"
+        case .automatedInsulinDelivery: return "OS-AID/Looping Data"
+        case .aidSystem: return "Sistema"
+        case .pump: return "Bomba"
+        case .loopingTime: return "Sucesso do loop"
+        case .averageTDD: return "TDD Média"
+        case .averageCarbs: return "Hidratos Médios"
+        case .pumpSuspension: return "Suspensão da Bomba"
+        case .reservoir: return "Reservatório"
+        case .battery: return "Bateria"
+        case .loopingOverview: return "Visão geral do loop"
+        case .scheduledBasalProfile: return "Perfil basal programado"
+        case .basalProfile: return "Perfil basal"
+        case .tempBasalDelta: return "Delta basal temporária"
+        case .scheduledBasal: return "Basal Programada"
+        case .deliveredBasal: return "Basal Administrada"
+        case .profile: return "Perfil"
+        case .carbRatio: return "Rácio hidratos"
+        case .sensitivity: return "Sensibilidade"
+        case .loopalyzerPeriodFormat: return "Últimos %d dias"
+        case .loopalyzerFootnote: return "Vista ao estilo Loopalyzer inspirada nos relatórios Nightscout. Médias de vários dias podem atenuar respostas a refeições e correções, por isso o período de análise selecionado está limitado a 3 dias. Para uma análise mais aprofundada, utilize a função Loopalyzer do Nightscout."
         case .reportInterpretationNote: return "Este relatório resume leituras MCG armazenadas para revisão clínica. Não é uma visualização de tratamento em tempo real e deve ser interpretado com a equipa clínica do utilizador."
         case .footerGeneratedFormat: return "Gerado por %@ (%@) a partir de dados MCG armazenados localmente."
         case .pageFormat: return "Página %d de %d"
@@ -847,4 +1121,18 @@ enum GlucoseReportColors {
     static let agpInnerBand = Color(red: 0.25, green: 0.50, blue: 0.74).opacity(0.42)
     static let agpOuterLine = Color(red: 0.50, green: 0.57, blue: 0.66)
     static let agpInnerLine = Color(red: 0.20, green: 0.41, blue: 0.62)
+    static let aidBasal = GlucoseChartTreatmentStyle.basalLineColor
+    static let aidScheduledBasal = aidBasal
+    static let aidScheduledBasalFill = GlucoseChartTreatmentStyle.basalFillColor
+    static let aidScheduledBasalFillOpacity = 0.65
+    static let aidScheduledBasalLineWidth = GlucoseChartTreatmentStyle.scheduledBasalLineWidth
+    static let aidScheduledBasalDash: [CGFloat] = [1.0, 1.0]
+    static let aidDeliveredBasal = aidBasal
+    static let aidDeliveredBasalOpacity = 0.85
+    static let aidIOB = GlucoseChartTreatmentStyle.bolusColor
+    static let aidIOBOpacity = 0.85
+    static let aidCOB = GlucoseChartTreatmentStyle.carbsColor
+    static let aidCOBOpacity = 0.85
+    static let aidTreatmentMarker = Color(red: 0.22, green: 0.24, blue: 0.27).opacity(0.6)
+    static let nighttimeBackground = Color.gray.opacity(0.075)
 }

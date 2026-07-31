@@ -56,3 +56,5 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+"common_statistics_loopalyzerAttribution" = "Εμπνευσμένο από το Loopalyzer και τις αναφορές Nightscout.";
+"common_statistics_loopingOverview" = "Επισκόπηση βρόχου";

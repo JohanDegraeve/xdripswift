@@ -62,9 +62,11 @@
 "common_statistics_trends" = "Tendências";
 "common_statistics_daily" = "Diário";
 "common_statistics_report" = "Relatório";
+"common_statistics_section" = "Secção";
+"common_statistics_looping" = "Loop";
 "common_statistics_timeInRange" = "Tempo no Intervalo";
 "common_statistics_timeInTightRange" = "Tempo no Intervalo Estrito";
-"common_statistics_meanGlucose" = "Glicose média";
+"common_statistics_averageGlucose" = "Glicose média";
 "common_statistics_gmi" = "GMI";
 "common_statistics_cgmEstimate" = "Estimativa CGM";
 "common_statistics_dataCapture" = "Captura de Dados";
@@ -112,3 +114,13 @@
 "common_report_patientPeriodTitleFormat" = "%@ - %@";
 "common_report_passwordProtectionOpenError" = "Não foi possível abrir o PDF do relatório para proteção por palavra-passe.";
 "common_report_passwordProtectionWriteError" = "Não foi possível criar o PDF do relatório protegido por palavra-passe.";
+"common_statistics_loopingTime" = "Tempo em Loop";
+"common_statistics_targetGreaterThan" = "Objetivo >%@";
+"common_statistics_calculatedUsingDaysFormat" = "Calculado com %d dias de dados.";
+"common_statistics_averageTDD" = "TDD Média";
+"common_statistics_averageCarbs" = "Hidratos médios";
+"common_statistics_loopingOverview" = "Visão geral do loop";
+"common_statistics_scheduledBasalProfile" = "Perfil basal programado";
+"common_statistics_averagePeriodFormat" = "Últimos %d dias";
+"common_statistics_tempBasalDelta" = "Delta basal temporária";
+"common_statistics_loopalyzerAttribution" = "Inspirado no Loopalyzer e nos relatórios Nightscout. Para uma análise mais aprofundada, utilize a função Loopalyzer do Nightscout.";

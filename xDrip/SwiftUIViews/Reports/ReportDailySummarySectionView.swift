@@ -52,7 +52,7 @@ struct GlucoseReportDailySummarySectionView: View {
         color: Color,
         value: @escaping (GlucoseReportDailySummary) -> Double
     ) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
+        VStack(alignment: .leading, spacing: 5) {
             HStack {
                 HStack(spacing: 3) {
                     Circle()
@@ -79,6 +79,7 @@ struct GlucoseReportDailySummarySectionView: View {
                         y: .value(title, value(summary))
                     )
                     .foregroundStyle(summary.sampleCount > 0 ? color : GlucoseReportColors.rule)
+                    .cornerRadius(1.2)
                 }
             }
             .chartXScale(domain: xDomain)
@@ -173,18 +174,24 @@ struct GlucoseReportMetricTrendSectionView: View {
                     title: language.text(.estimatedA1cGMI),
                     targetLabel: language.text(.lowerIsGenerallyBetter),
                     yDomain: gmiDomain,
+                    decimalPlaces: 1,
                     target: nil,
-                    value: \.gmiPercentage
+                    value: { $0.gmiPercentage },
+                    labelText: { "\(GlucoseReportFormatting.number($0, decimalPlaces: 1, locale: language.locale))%" }
                 )
 
                 trendChart(
                     title: language.text(.cv),
                     targetLabel: language.text(.targetLessThanOrEqual, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.coefficientOfVariationTargetPercentage)),
                     yDomain: 0 ... 60,
+                    decimalPlaces: 0,
                     target: GlucoseReportClinicalConstants.coefficientOfVariationTargetPercentage,
-                    value: \.coefficientOfVariation
+                    value: { $0.coefficientOfVariation },
+                    labelText: { "\(GlucoseReportFormatting.number($0, decimalPlaces: 0, locale: language.locale))%" }
                 )
             }
+
+            treatmentTrendCharts
 
             Text(language.text(.gmiFootnote))
                 .font(.system(size: 7.5))
@@ -202,10 +209,12 @@ struct GlucoseReportMetricTrendSectionView: View {
         title: String,
         targetLabel: String,
         yDomain: ClosedRange<Double>,
+        decimalPlaces: Int,
         target: Double?,
-        value: KeyPath<GlucoseReportTrendPoint, Double>
+        value: @escaping (GlucoseReportTrendPoint) -> Double?,
+        labelText: @escaping (Double) -> String
     ) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
+        VStack(alignment: .leading, spacing: 5) {
             HStack {
                 Text(title.uppercased())
                     .font(.system(size: 7.5, weight: .semibold))
@@ -214,6 +223,7 @@ struct GlucoseReportMetricTrendSectionView: View {
                 Text(targetLabel)
                     .font(.system(size: 7))
                     .foregroundStyle(GlucoseReportColors.tertiaryText)
+                    .opacity(targetLabel.isEmpty ? 0 : 1)
             }
 
             Chart {
@@ -224,20 +234,28 @@ struct GlucoseReportMetricTrendSectionView: View {
                 }
 
                 ForEach(trendPoints) { point in
-                    if point.interval == .weekly {
+                    if point.interval == .weekly, let pointValue = value(point) {
                         LineMark(
                             x: .value("Date", point.date),
-                            y: .value(title, point[keyPath: value])
+                            y: .value(title, pointValue)
                         )
                         .lineStyle(StrokeStyle(lineWidth: 1.4))
                         .foregroundStyle(by: .value("Interval", point.interval.rawValue))
 
                         PointMark(
                             x: .value("Date", point.date),
-                            y: .value(title, point[keyPath: value])
+                            y: .value(title, pointValue)
                         )
                         .symbolSize(10)
                         .foregroundStyle(by: .value("Interval", point.interval.rawValue))
+                        .annotation(position: .top, alignment: annotationAlignment(for: point, value: value)) {
+                            if isTerminalWeeklyPoint(point, value: value) {
+                                Text(labelText(pointValue))
+                                    .font(.system(size: 6.5, weight: .semibold))
+                                    .foregroundStyle(GlucoseReportColors.secondaryText)
+                                    .monospacedDigit()
+                            }
+                        }
                     }
                 }
             }
@@ -253,7 +271,7 @@ struct GlucoseReportMetricTrendSectionView: View {
                         .foregroundStyle(GlucoseReportColors.rule)
                     AxisValueLabel {
                         if let axisValue = axisValue.as(Double.self) {
-                            Text(axisValue.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes)
+                            Text(GlucoseReportFormatting.number(axisValue, decimalPlaces: decimalPlaces, locale: language.locale))
                                 .font(.system(size: 6.5))
                                 .foregroundStyle(GlucoseReportColors.secondaryText)
                         }
@@ -275,7 +293,7 @@ struct GlucoseReportMetricTrendSectionView: View {
             }
             .frame(height: 78)
             .overlay {
-                if trendPoints.isEmpty {
+                if metricTrendPoints(value: value).isEmpty {
                     Text(language.text(.insufficientData))
                         .font(.system(size: 9, weight: .semibold))
                         .foregroundStyle(GlucoseReportColors.secondaryText)
@@ -294,6 +312,49 @@ struct GlucoseReportMetricTrendSectionView: View {
         let lower = max(4, floor((minimum - 0.2) * 2) / 2)
         let upper = min(14, ceil((maximum + 0.2) * 2) / 2)
         return lower ... max(lower + 1, upper)
+    }
+
+    @ViewBuilder private var treatmentTrendCharts: some View {
+        if hasTDDTrendData || hasCarbTrendData {
+            HStack(spacing: 10) {
+                if hasTDDTrendData {
+                    trendChart(
+                        title: language.text(.averageTDD),
+                        targetLabel: "",
+                        yDomain: upperDomain(values: trendPoints.compactMap(\.averageTDDPerDay), minimum: 20),
+                        decimalPlaces: 1,
+                        target: nil,
+                        value: { $0.averageTDDPerDay },
+                        labelText: { "\(GlucoseReportFormatting.number($0, decimalPlaces: 1, locale: language.locale)) U" }
+                    )
+                }
+
+                if hasCarbTrendData {
+                    trendChart(
+                        title: language.text(.averageCarbs),
+                        targetLabel: "",
+                        yDomain: upperDomain(values: trendPoints.compactMap(\.averageCarbsPerDay), minimum: 100),
+                        decimalPlaces: 0,
+                        target: nil,
+                        value: { $0.averageCarbsPerDay },
+                        labelText: { "\(GlucoseReportFormatting.number($0, decimalPlaces: 0, locale: language.locale)) g" }
+                    )
+                }
+            }
+        }
+    }
+
+    private var hasTDDTrendData: Bool {
+        trendPoints.contains { $0.averageTDDPerDay != nil }
+    }
+
+    private var hasCarbTrendData: Bool {
+        trendPoints.contains { $0.averageCarbsPerDay != nil }
+    }
+
+    private func upperDomain(values: [Double], minimum: Double) -> ClosedRange<Double> {
+        guard let maximum = values.max(), maximum > 0 else { return 0 ... minimum }
+        return 0 ... max(minimum, ceil(maximum * 1.15 / 10) * 10)
     }
 
     private var xDomain: ClosedRange<Date> {
@@ -328,6 +389,42 @@ struct GlucoseReportMetricTrendSectionView: View {
         }
 
         return ticks
+    }
+
+    private var weeklyTrendPoints: [GlucoseReportTrendPoint] {
+        trendPoints
+            .filter { $0.interval == .weekly }
+            .sorted { $0.date < $1.date }
+    }
+
+    private func metricTrendPoints(
+        value: (GlucoseReportTrendPoint) -> Double?
+    ) -> [GlucoseReportTrendPoint] {
+        weeklyTrendPoints.filter { value($0) != nil }
+    }
+
+    private func isTerminalWeeklyPoint(
+        _ point: GlucoseReportTrendPoint,
+        value: (GlucoseReportTrendPoint) -> Double?
+    ) -> Bool {
+        let points = metricTrendPoints(value: value)
+        return point.date == points.first?.date || point.date == points.last?.date
+    }
+
+    private func annotationAlignment(
+        for point: GlucoseReportTrendPoint,
+        value: (GlucoseReportTrendPoint) -> Double?
+    ) -> Alignment {
+        let points = metricTrendPoints(value: value)
+        if point.date == points.first?.date {
+            return .leading
+        }
+
+        if point.date == points.last?.date {
+            return .trailing
+        }
+
+        return .center
     }
 
     private func yAxisValues(for domain: ClosedRange<Double>) -> [Double] {

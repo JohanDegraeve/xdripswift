@@ -12,7 +12,7 @@ import UIKit
 @MainActor
 final class GlucoseReportPDFGenerator {
     func generatePDF(configuration: GlucoseReportConfiguration, analytics: GlucoseReportAnalytics, generatedAt: Date) async throws -> URL {
-        let pageCount = 2
+        let pageCount = analytics.aidAnalytics == nil ? 3 : 4
         let pageSize = configuration.paperSize.pageSize
         let reportsDirectory = try reportsDirectory()
         let fileURL = reportsDirectory

@@ -2319,9 +2319,9 @@
 		4D30C0002FF5000100000001 /* Reports */ = {
 			isa = PBXGroup;
 			children = (
+				4D30C00E2FF5000100000001 /* AGPChartView.swift */,
 				4D30C0012FF5000100000001 /* GenerateReportView.swift */,
 				4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */,
-				4D30C00E2FF5000100000001 /* AGPChartView.swift */,
 				4D30C0032FF5000100000001 /* ReportAGPChartView.swift */,
 				4D30C0052FF5000100000001 /* ReportClinicalPageView.swift */,
 				4D30C0062FF5000100000001 /* ReportDailySummarySectionView.swift */,

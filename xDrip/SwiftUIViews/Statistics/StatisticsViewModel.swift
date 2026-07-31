@@ -21,6 +21,7 @@ final class StatisticsViewModel: ObservableObject {
     @Published private(set) var isLoading = true
 
     private let statisticsManager: StatisticsManager
+    private var analyticsTask: Task<Void, Never>?
 
     init(statisticsManager: StatisticsManager) {
         self.statisticsManager = statisticsManager
@@ -48,17 +49,22 @@ final class StatisticsViewModel: ObservableObject {
     }
 
     private func loadAnalytics() {
+        analyticsTask?.cancel()
+        let requestedPeriod = selectedPeriod
         let configuration = GlucoseReportConfiguration(
             patientName: UserDefaults.standard.reportPatientName,
             patientID: UserDefaults.standard.reportPatientID,
             period: selectedPeriod,
+            aidPeriod: .three,
             paperSize: UserDefaults.standard.reportPaperSize,
             language: UserDefaults.standard.reportLanguage
         )
 
-        Task {
+        analyticsTask = Task {
             isLoading = true
-            analytics = await statisticsManager.reportAnalytics(for: configuration)
+            let requestedAnalytics = await statisticsManager.reportAnalytics(for: configuration)
+            guard !Task.isCancelled, selectedPeriod == requestedPeriod else { return }
+            analytics = requestedAnalytics
             isLoading = false
         }
     }

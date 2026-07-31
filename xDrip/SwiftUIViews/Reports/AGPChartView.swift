@@ -51,6 +51,7 @@ struct AGPChartView: View {
 
     var body: some View {
         Chart {
+            nighttimeBackground
             targetRange
             outerBand
             innerBand
@@ -63,6 +64,10 @@ struct AGPChartView: View {
         .chartYScale(domain: converted(40) ... converted(dynamicUpperYMgDl))
         .chartXAxis {
             AxisMarks(values: [0, 360, 720, 1080, 1440]) { value in
+                if presentation == .statistics {
+                    AxisTick()
+                        .foregroundStyle(axisLabelColor)
+                }
                 AxisGridLine()
                     .foregroundStyle(xAxisGridLineColor)
                 AxisValueLabel {
@@ -118,15 +123,32 @@ struct AGPChartView: View {
         )
         .foregroundStyle(targetFillColor)
 
-        // Statistics already emphasises these values through its objective gridlines.
-        if presentation != .statistics {
-            RuleMark(y: .value("Low target", converted(GlucoseReportClinicalConstants.timeInRangeLowMgDl)))
-                .lineStyle(StrokeStyle(lineWidth: targetRuleLineWidth))
-                .foregroundStyle(targetRuleColor)
+        RuleMark(y: .value("Low target", converted(GlucoseReportClinicalConstants.timeInRangeLowMgDl)))
+            .lineStyle(StrokeStyle(lineWidth: targetRuleLineWidth))
+            .foregroundStyle(agpLowGridLineColor)
 
-            RuleMark(y: .value("High target", converted(GlucoseReportClinicalConstants.timeInRangeHighMgDl)))
-                .lineStyle(StrokeStyle(lineWidth: targetRuleLineWidth))
-                .foregroundStyle(targetRuleColor)
+        RuleMark(y: .value("High target", converted(GlucoseReportClinicalConstants.timeInRangeHighMgDl)))
+            .lineStyle(StrokeStyle(lineWidth: targetRuleLineWidth))
+            .foregroundStyle(agpHighGridLineColor)
+    }
+
+    @ChartContentBuilder private var nighttimeBackground: some ChartContent {
+        if presentation == .printableReport {
+            RectangleMark(
+                xStart: .value("Start", 0),
+                xEnd: .value("End", GlucoseReportClinicalConstants.dayStartMinute),
+                yStart: .value("Low", converted(40)),
+                yEnd: .value("High", converted(dynamicUpperYMgDl))
+            )
+            .foregroundStyle(GlucoseReportColors.nighttimeBackground)
+
+            RectangleMark(
+                xStart: .value("Start", GlucoseReportClinicalConstants.nightStartMinute),
+                xEnd: .value("End", 1440),
+                yStart: .value("Low", converted(40)),
+                yEnd: .value("High", converted(dynamicUpperYMgDl))
+            )
+            .foregroundStyle(GlucoseReportColors.nighttimeBackground)
         }
     }
 
@@ -300,7 +322,7 @@ struct AGPChartView: View {
     private var xAxisLabelFont: Font {
         switch presentation {
         case .statistics:
-            return .system(size: ConstantsStatistics.chartAxisLabelFontSize)
+            return .system(size: ConstantsStatistics.chartAxisLabelFontSize + 1)
         case .landscapeComparison:
             return .system(size: 14, weight: .semibold)
         case .printableReport:
@@ -311,7 +333,7 @@ struct AGPChartView: View {
     private var axisLabelColor: Color {
         switch presentation {
         case .statistics:
-            return Color(.colorTertiary)
+            return Color(.colorSecondary)
         case .landscapeComparison:
             return ConstantsAppColors.tertiaryText
         case .printableReport:
@@ -326,8 +348,8 @@ struct AGPChartView: View {
 
         switch presentation {
         case .statistics:
-            font = .system(size: ConstantsStatistics.chartAxisLabelFontSize, weight: isObjective ? .bold : .regular)
-            color = isObjective ? ConstantsGlucoseChartSwiftUI.yAxisMainChartObjectiveLabelColor : ConstantsGlucoseChartSwiftUI.yAxisMainChartDimmedLabelColor
+            font = .system(size: ConstantsStatistics.chartAxisLabelFontSize + 1, weight: isObjective ? .bold : .regular)
+            color = isObjective ? ConstantsGlucoseChartSwiftUI.yAxisMainChartObjectiveLabelColor : Color(.colorSecondary)
         case .landscapeComparison:
             font = .system(size: 14, weight: isObjective ? .bold : .semibold)
             color = isObjective ? ConstantsGlucoseChartSwiftUI.yAxisMainChartObjectiveLabelColor : ConstantsAppColors.tertiaryText
@@ -343,15 +365,23 @@ struct AGPChartView: View {
     }
 
     private func yAxisGridLineColor(for convertedValue: Double?) -> Color {
-        if presentation == .printableReport {
-            return GlucoseReportColors.rule
+        guard let convertedValue else {
+            return presentation == .printableReport ? GlucoseReportColors.rule : ConstantsAppColors.agpYAxisGridLine
         }
 
-        guard let convertedValue, presentation == .statistics, objectiveAxisValues.contains(convertedValue) else {
-            return ConstantsAppColors.agpYAxisGridLine
+        if isAxisValue(convertedValue, equalTo: converted(GlucoseReportClinicalConstants.timeInRangeLowMgDl)) {
+            return agpLowGridLineColor
         }
 
-        return ConstantsAppColors.agpObjectiveGridLine
+        if isAxisValue(convertedValue, equalTo: converted(GlucoseReportClinicalConstants.timeInRangeHighMgDl)) {
+            return agpHighGridLineColor
+        }
+
+        return presentation == .printableReport ? GlucoseReportColors.rule : ConstantsAppColors.agpYAxisGridLine
+    }
+
+    private func isAxisValue(_ value: Double, equalTo comparison: Double) -> Bool {
+        abs(value - comparison) < 0.01
     }
 
     private var xAxisGridLineColor: Color {
@@ -362,8 +392,22 @@ struct AGPChartView: View {
         presentation == .printableReport ? GlucoseReportColors.target.opacity(0.12) : ConstantsAppColors.agpTargetFill
     }
 
-    private var targetRuleColor: Color {
-        presentation == .printableReport ? GlucoseReportColors.target.opacity(0.75) : ConstantsAppColors.agpTargetRule
+    private var agpLowGridLineColor: Color {
+        switch presentation {
+        case .printableReport:
+            return GlucoseReportColors.low.opacity(0.75)
+        case .statistics, .landscapeComparison:
+            return ConstantsAppColors.statisticsLow.opacity(0.5)
+        }
+    }
+
+    private var agpHighGridLineColor: Color {
+        switch presentation {
+        case .printableReport:
+            return GlucoseReportColors.high.opacity(0.75)
+        case .statistics, .landscapeComparison:
+            return ConstantsAppColors.statisticsHigh.opacity(0.5)
+        }
     }
 
     private var targetRuleLineWidth: CGFloat {

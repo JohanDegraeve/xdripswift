@@ -48,7 +48,8 @@ struct GenerateReportView: View {
     private var reportForm: some View {
         Form {
             patientSection
-            optionsSection
+            reportDataSection
+            outputOptionsSection
         }
         .disabled(viewModel.isGenerating)
         .overlay {
@@ -116,7 +117,7 @@ struct GenerateReportView: View {
         }
     }
 
-    private var optionsSection: some View {
+    private var reportDataSection: some View {
         Section {
             NavigationLink {
                 ReportPeriodPickerView(
@@ -128,6 +129,13 @@ struct GenerateReportView: View {
             }
             .disabled(viewModel.isLoadingAvailability)
 
+        } header: {
+            Text(Texts_Common.reportOptions)
+        }
+    }
+
+    private var outputOptionsSection: some View {
+        Section {
             NavigationLink {
                 ReportPaperSizePickerView(paperSize: $viewModel.paperSize)
             } label: {
@@ -145,10 +153,8 @@ struct GenerateReportView: View {
             } label: {
                 ReportSettingRow(title: Texts_Common.reportPasswordToOpen, value: viewModel.passwordToOpen, placeholder: Texts_Common.reportNone, isPassword: true)
             }
-        } header: {
-            Text(Texts_Common.reportOptions)
         } footer: {
-            VStack(alignment: .leading, spacing: 15) {
+            VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 6) {
                     passwordStatusIcon
                     Text(viewModel.hasPasswordToOpen ? Texts_Common.reportWillBePasswordProtected : Texts_Common.reportWillNotBePasswordProtected)
@@ -156,7 +162,7 @@ struct GenerateReportView: View {
 
                 generateButton
             }
-            .padding(.top, 0)
+            .padding(.top, 6)
         }
     }
 
@@ -293,45 +299,49 @@ private struct ReportPeriodPickerView: View {
 
     var body: some View {
         List {
-            ForEach(GlucoseReportPeriod.allCases) { period in
-                Button {
-                    selectedPeriod = period
-                } label: {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                                Text(period.optionTitle)
-                                    .foregroundStyle(Color(.colorPrimary))
+            Section {
+                ForEach(GlucoseReportPeriod.allCases) { period in
+                    Button {
+                        selectedPeriod = period
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                                    Text(period.optionTitle)
+                                        .foregroundStyle(Color(.colorPrimary))
 
-                                if isPeriodAvailable(period) {
-                                    Text("(\(dateRangeText(for: period)))")
-                                        .font(.system(size: 15))
-                                        .foregroundStyle(Color(.colorSecondary))
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.7)
-                                } else {
-                                    Text("(\(Texts_Common.reportNotEnoughData))")
-                                        .font(.system(size: 15))
-                                        .foregroundStyle(Color(.colorSecondary))
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.7)
+                                    if isPeriodAvailable(period) {
+                                        Text("(\(dateRangeText(for: period)))")
+                                            .font(.system(size: 15))
+                                            .foregroundStyle(Color(.colorSecondary))
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.7)
+                                    } else {
+                                        Text("(\(Texts_Common.reportNotEnoughData))")
+                                            .font(.system(size: 15))
+                                            .foregroundStyle(Color(.colorSecondary))
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.7)
+                                    }
                                 }
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.75)
                             }
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.75)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
 
-                        if selectedPeriod == period {
-                            Image(systemName: "checkmark")
-                                .foregroundStyle(.green)
+                            if selectedPeriod == period {
+                                Image(systemName: "checkmark")
+                                    .foregroundStyle(.green)
+                            }
                         }
+                        .contentShape(Rectangle())
+                        .opacity(isPeriodAvailable(period) ? 1 : 0.45)
                     }
-                    .contentShape(Rectangle())
-                    .opacity(isPeriodAvailable(period) ? 1 : 0.45)
+                    .disabled(!isPeriodAvailable(period))
+                    .buttonStyle(.plain)
                 }
-                .disabled(!isPeriodAvailable(period))
-                .buttonStyle(.plain)
+            } footer: {
+                Text(Texts_Common.reportPeriodFooter)
             }
         }
         .navigationTitle(Texts_Common.reportPeriod)

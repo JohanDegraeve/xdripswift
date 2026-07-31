@@ -77,6 +77,7 @@ final class GenerateReportViewModel: ObservableObject {
                 patientName: patientName.trimmingCharacters(in: .whitespacesAndNewlines),
                 patientID: patientID.trimmingCharacters(in: .whitespacesAndNewlines),
                 period: selectedPeriod,
+                aidPeriod: aidReportIsAvailable ? .three : .notIncluded,
                 paperSize: paperSize,
                 language: language
             )
@@ -113,6 +114,11 @@ final class GenerateReportViewModel: ObservableObject {
 
     var hasPasswordToOpen: Bool {
         trimmedPasswordToOpen != nil
+    }
+
+    var aidReportIsAvailable: Bool {
+        UserDefaults.standard.nightscoutEnabled
+            && UserDefaults.standard.nightscoutFollowType != .none
     }
 
     private var trimmedPasswordToOpen: String? {
