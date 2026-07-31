@@ -176,7 +176,10 @@ class NightscoutFollowManager: NSObject {
         let count = Int(ceil(backfillTimeInterval / minimumTimeBetweenTwoReadingsInSeconds)) + 1
         
         // ceate endpoint to get latest entries
-        let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightscoutUrl, count: count, minimumTimeStamp: timeStampOfFirstBgReadingToDowload, token: UserDefaults.standard.nightscoutToken)
+        guard let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightscoutUrl, count: count, minimumTimeStamp: timeStampOfFirstBgReadingToDowload, token: UserDefaults.standard.nightscoutToken) else {
+            trace("    Nightscout URL does not use a supported scheme, no download will be started", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error)
+            return
+        }
         
         // create downloadTask and start download
         if let url = latestEntriesEndpoint.url {
