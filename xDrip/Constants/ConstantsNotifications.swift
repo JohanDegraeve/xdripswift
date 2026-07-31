@@ -20,6 +20,8 @@ enum ConstantsNotifications {
         static let fastRiseAlert = "fastRiseAlert"
         /// phone battery low
         static let phoneBatteryLow = "phoneBatteryLow"
+        /// not looping
+        static let notLoopingAlert = "notLoopingAlert"
     }
     
     /// identifiers for calibration requests

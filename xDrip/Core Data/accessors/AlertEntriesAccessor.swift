@@ -111,7 +111,7 @@ class AlertEntriesAccessor {
                     }
                     if !entryFound {
                         // there's no entry found for alertKindInCases, create one and save it in coredata
-                        let newAlertEntry = AlertEntry(isDisabled: false, value: alertKindInCases.defaultAlertValue(), triggerValue: alertKindInCases.defaultAlertTriggerValue(), alertKind: alertKindInCases, start: 0, alertType: alertTypesAccessor.getDefaultAlertType(), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                        let newAlertEntry = AlertEntry(isDisabled: alertKindInCases.defaultIsDisabled(), value: alertKindInCases.defaultAlertValue(), triggerValue: alertKindInCases.defaultAlertTriggerValue(), alertKind: alertKindInCases, start: 0, alertType: alertTypesAccessor.getDefaultAlertType(), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                         
                         // insert it at location 0, because it has a start 0, to keep it sorted correctly, at least per alertkind
                         alertEntries.insert(newAlertEntry, at: 0)

@@ -24,6 +24,10 @@ class Texts_Alerts {
     static let missedReadingAlertTitle: String = {
         return NSLocalizedString("alerts_missedreadingalerttitle", tableName: filename, bundle: Bundle.main, value: "Missed Readings", comment: "When Missed reading alert happens, this is the title of the alert notification, also in alert settings list, for the name of the alert")
     }()
+
+    static let notLoopingAlertTitle: String = {
+        return NSLocalizedString("alerts_notloopingalerttitle", tableName: filename, bundle: Bundle.main, value: "Not Looping", comment: "When the OS-AID loop has not completed a recent cycle, this is the title of the alert notification and the alert settings list title")
+    }()
     
     static let calibrationNeededAlertTitle: String = {
         return NSLocalizedString("alerts_calibrationneeded", tableName: filename, bundle: Bundle.main, value: "Calibration Reminder", comment: "when calibration is needed, this is the title of the alert notification, also in alert settings list, for the name of the alert")

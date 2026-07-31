@@ -65,7 +65,7 @@ import AppIntents
     
     /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
     private let keyValueObserverTimeKeeper: KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
-    
+
     /// Calibrator to be used for calibration, value will depend on transmitter type
     private var calibrator: Calibrator?
     
@@ -738,6 +738,11 @@ import AppIntents
         // initialize watchManager
         watchManager = WatchManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager!)
         
+    }
+
+    private func checkNotLoopingAlertWithLatestDeviceStatus() {
+        guard let deviceStatus = nightscoutSyncManager?.deviceStatus else { return }
+        _ = alertManager?.checkNotLoopingAlert(deviceStatus: NotLoopingDeviceStatus(deviceStatus: deviceStatus))
     }
 
     /// TEMPORARY MIGRATION: remove this function and its UserDefaults flag after the reduced
@@ -1741,9 +1746,16 @@ import AppIntents
         // unwrap alerts and check alerts
         if let alertManager = alertManager {
             createNotificationImages()
-            
+
             // check if an immediate alert went off that shows the current reading
-            if alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds) {
+            let immediateGlucoseNotificationCreated = alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds)
+
+            // The shared alert pass removes old pending requests before rebuilding them. Check the
+            // independent loop alert afterwards so its immediate notification cannot be removed by
+            // that cleanup while UNUserNotificationCenter is still processing the request.
+            checkNotLoopingAlertWithLatestDeviceStatus()
+
+            if immediateGlucoseNotificationCreated {
                 // an immediate alert went off that shows the current reading
                 
                 // possibly the app is in the foreground now

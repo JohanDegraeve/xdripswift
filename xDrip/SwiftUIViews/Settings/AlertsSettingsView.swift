@@ -328,6 +328,8 @@ final class AlertEntryEditorViewModel: ObservableObject {
 
             if alertEntry.alertkind == AlertKind.missedreading.rawValue {
                 UserDefaults.standard.missedReadingAlertChanged = true
+            } else if alertEntry.alertkind == AlertKind.notlooping.rawValue {
+                UserDefaults.standard.notLoopingAlertChanged = true
             }
 
         case .new:
@@ -341,6 +343,10 @@ final class AlertEntryEditorViewModel: ObservableObject {
                 nsManagedObjectContext: coreDataManager.mainManagedObjectContext
             )
             coreDataManager.saveChanges()
+
+            if alertKindValue == .notlooping {
+                UserDefaults.standard.notLoopingAlertChanged = true
+            }
         }
 
         close()
@@ -359,8 +365,12 @@ final class AlertEntryEditorViewModel: ObservableObject {
             action: { [weak self] in
                 guard let self else { return }
 
+                let deletedAlertKind = alertEntry.alertkind
                 self.coreDataManager.mainManagedObjectContext.delete(alertEntry)
                 self.coreDataManager.saveChanges()
+                if deletedAlertKind == AlertKind.notlooping.rawValue {
+                    UserDefaults.standard.notLoopingAlertChanged = true
+                }
                 self.close()
             },
             cancel: nil

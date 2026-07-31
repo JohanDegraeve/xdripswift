@@ -2,6 +2,35 @@ import Foundation
 
 // MARK: - AlertKind
 
+struct NotLoopingDeviceStatus: Sendable {
+    let createdAt: Date
+    let lastCheckedDate: Date
+    let lastLoopDate: Date
+
+    init(createdAt: Date, lastCheckedDate: Date, lastLoopDate: Date) {
+        self.createdAt = createdAt
+        self.lastCheckedDate = lastCheckedDate
+        self.lastLoopDate = lastLoopDate
+    }
+
+    init(deviceStatus: NightscoutDeviceStatus) {
+        self.init(createdAt: deviceStatus.createdAt, lastCheckedDate: deviceStatus.lastCheckedDate, lastLoopDate: deviceStatus.lastLoopDate)
+    }
+
+    init(snapshot: NightscoutDeviceStatusSnapshot) {
+        self.init(createdAt: snapshot.createdAt, lastCheckedDate: snapshot.lastCheckedDate, lastLoopDate: snapshot.lastLoopDate)
+    }
+
+    func sanitizingFutureDates(referenceDate: Date = Date(), futureTolerance: TimeInterval = 20) -> NotLoopingDeviceStatus {
+        let maximumAllowedDate = referenceDate.addingTimeInterval(futureTolerance)
+        return NotLoopingDeviceStatus(
+            createdAt: createdAt > maximumAllowedDate ? .distantPast : createdAt,
+            lastCheckedDate: lastCheckedDate > maximumAllowedDate ? .distantPast : lastCheckedDate,
+            lastLoopDate: lastLoopDate > maximumAllowedDate ? .distantPast : lastLoopDate
+        )
+    }
+}
+
 /// low, high, very low, very high, ...
 public enum AlertKind: Int, CaseIterable {
     // when adding alertkinds, add new cases at the end (ie 9, ...)
@@ -18,6 +47,7 @@ public enum AlertKind: Int, CaseIterable {
     case fastdrop = 7
     case fastrise = 8
     case phonebatterylow = 9
+    case notlooping = 10
 
     /// this is used for presentation in UI table view. It allows to order the alert kinds in the view, different than they case ordering, and so allows to add new cases
     init?(forSection section: Int) {
@@ -37,10 +67,12 @@ public enum AlertKind: Int, CaseIterable {
         case 6:
             self = .missedreading
         case 7:
-            self = .calibration
+            self = .notlooping
         case 8:
-            self = .batterylow
+            self = .calibration
         case 9:
+            self = .batterylow
+        case 10:
             self = .phonebatterylow
         default:
             fatalError("in AlertKind initializer init(forRowAt row: Int), there's no case for the rownumber")
@@ -64,11 +96,13 @@ public enum AlertKind: Int, CaseIterable {
             return 8
         case 6: // missed reading
             return 4
-        case 7: // calibration
+        case 7: // not looping
+            return 10
+        case 8: // calibration
             return 5
-        case 8: // battery low
+        case 9: // battery low
             return 6
-        case 9: // phone battery low
+        case 10: // phone battery low
             return 9
         default:
             fatalError("in alertKindRawValue, unknown case")
@@ -153,6 +187,18 @@ public enum AlertKind: Int, CaseIterable {
             return ConstantsDefaultAlertLevels.fastrise
         case .phonebatterylow:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelPhone
+        case .notlooping:
+            return ConstantsDefaultAlertLevels.notLooping
+        }
+    }
+
+    /// default enabled state for newly introduced alert kinds.
+    func defaultIsDisabled() -> Bool {
+        switch self {
+        case .notlooping:
+            return true
+        default:
+            return false
         }
     }
     
@@ -191,6 +237,8 @@ public enum AlertKind: Int, CaseIterable {
             return "fastrise"
         case .phonebatterylow:
             return "phonebatterylow"
+        case .notlooping:
+            return "notlooping"
         }
     }
     
@@ -212,7 +260,7 @@ public enum AlertKind: Int, CaseIterable {
     ///     - alertbody : AlertBody, AlertTitle and delay are used if an alert needs to be raised for the notification.
     ///     - alerttitle : AlertBody, AlertTitle and delay are used if an alert needs to be raised for the notification.
     ///     - delayInSeconds : If delayInSeconds not nil and > 0 or if delayInSeconds is nil, then the alert will be a future planned Alert. This will only be applicable to missed reading alerts.
-    func alertNeeded(currentAlertEntry: AlertEntry, nextAlertEntry: AlertEntry?, lastBgReading: BgReading?, _ lastButOneBgReading: BgReading?, lastCalibration: Calibration?, transmitterBatteryInfo: TransmitterBatteryInfo?) -> (alertNeeded: Bool, alertBody: String?, alertTitle: String?, delayInSeconds: Int?) {
+    func alertNeeded(currentAlertEntry: AlertEntry, nextAlertEntry: AlertEntry?, lastBgReading: BgReading?, _ lastButOneBgReading: BgReading?, lastCalibration: Calibration?, transmitterBatteryInfo: TransmitterBatteryInfo?, deviceStatus: NotLoopingDeviceStatus? = nil) -> (alertNeeded: Bool, alertBody: String?, alertTitle: String?, delayInSeconds: Int?) {
         // Not all input parameters in the closure are needed for every type of alert. - this is to make it generic
         
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
@@ -412,6 +460,27 @@ public enum AlertKind: Int, CaseIterable {
             }
             
             return (false, nil, nil, nil)
+
+        case .notlooping:
+            guard currentAlertEntry.alertType.enabled, let deviceStatus else { return (false, nil, nil, nil) }
+
+            let alertValue = Int(currentAlertEntry.value)
+            let threshold = TimeInterval(Double(alertValue) * 60.0)
+            let now = Date()
+            let freshnessBoundary = now.addingTimeInterval(-threshold)
+            guard deviceStatus.lastCheckedDate > freshnessBoundary,
+                  deviceStatus.createdAt > freshnessBoundary else {
+                return (false, nil, nil, nil)
+            }
+
+            if deviceStatus.lastLoopDate == .distantPast {
+                return (true, "", Texts_Alerts.notLoopingAlertTitle, nil)
+            } else {
+                let secondsSinceLastLoop = now.timeIntervalSince(deviceStatus.lastLoopDate)
+                guard secondsSinceLastLoop >= threshold else { return (false, nil, nil, nil) }
+            }
+
+            return (true, "", Texts_Alerts.notLoopingAlertTitle, nil)
         }
     }
     
@@ -438,6 +507,8 @@ public enum AlertKind: Int, CaseIterable {
             return ConstantsNotifications.NotificationIdentifiersForAlerts.fastRiseAlert
         case .phonebatterylow:
             return ConstantsNotifications.NotificationIdentifiersForAlerts.phoneBatteryLow
+        case .notlooping:
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.notLoopingAlert
         }
     }
     
@@ -464,6 +535,8 @@ public enum AlertKind: Int, CaseIterable {
             return Texts_Alerts.fastRiseTitle
         case .phonebatterylow:
             return Texts_Alerts.phoneBatteryLowAlertTitle
+        case .notlooping:
+            return Texts_Alerts.notLoopingAlertTitle
         }
     }
     
@@ -473,7 +546,7 @@ public enum AlertKind: Int, CaseIterable {
         switch self {
         case .verylow, .low, .high, .veryhigh, .fastdrop, .fastrise:
             return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol
-        case .missedreading:
+        case .missedreading, .notlooping:
             return Texts_Common.minutes
         case .calibration:
             return Texts_Common.hours
@@ -494,7 +567,7 @@ public enum AlertKind: Int, CaseIterable {
         switch self {
         case .verylow, .veryhigh, .fastdrop:
             return .urgent
-        case .low, .high, .fastrise:
+        case .low, .high, .fastrise, .notlooping:
             return .warning
         default:
             return .normal
@@ -518,7 +591,7 @@ private func createAlertTitleForBgReadingAlerts(alertKind: AlertKind) -> String 
         return Texts_Alerts.fastDropTitle
     case .fastrise:
         return Texts_Alerts.fastRiseTitle
-    case .missedreading, .calibration, .batterylow, .phonebatterylow:
+    case .missedreading, .calibration, .batterylow, .phonebatterylow, .notlooping:
         return ""
     }
 }

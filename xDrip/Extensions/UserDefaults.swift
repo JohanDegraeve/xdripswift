@@ -440,6 +440,9 @@ extension UserDefaults {
         /// - in case missed reading alert settings are changed by user, this value will be set to true
         /// - alertmanager will observe that value and when changed, verify if missed reading alert needs to be changed
         case missedReadingAlertChanged = "missedReadingAlertChanged"
+        /// - in case Not Looping alert settings are changed by user, this value will be set to true
+        /// - alertmanager will observe that value and recheck or clear the Not Looping alert
+        case notLoopingAlertChanged = "notLoopingAlertChanged"
         /// when was the app launched, used in trace info that is sent via email. Just to be able to see afterwards if the app ever crashed. Because sometimes users say it crashed, but maybe it just stopped receiving readings and restarted by opening the app, but didn't really crash
         case timeStampAppLaunch = "timeStampAppLaunch"
 
@@ -2498,6 +2501,15 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.missedReadingAlertChanged.rawValue)
+        }
+    }
+
+    @objc dynamic var notLoopingAlertChanged: Bool {
+        get {
+            return bool(forKey: Key.notLoopingAlertChanged.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.notLoopingAlertChanged.rawValue)
         }
     }
 

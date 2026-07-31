@@ -44,6 +44,10 @@ public class AlertManager: NSObject {
     
     /// permanent reference to notificationcenter
     private let uNUserNotificationCenter: UNUserNotificationCenter
+
+    /// Last immediate Not Looping notification created during this app run.
+    /// This throttles repeats without marking the alert as user-snoozed.
+    private var notLoopingLastNotificationDate: Date?
     
     // coredataManager instance
     private var coreDataManager: CoreDataManager
@@ -167,6 +171,68 @@ public class AlertManager: NSObject {
         }
         
         return immediateNotificationCreated
+    }
+
+    /// Check the OS-AID loop-cycle alarm using the latest Nightscout device-status snapshot.
+    /// The alarm is only allowed to fire when device-status data itself is fresh.
+    func checkNotLoopingAlert(deviceStatus: NotLoopingDeviceStatus?) -> Bool {
+        let deviceStatus = deviceStatus?.sanitizingFutureDates()
+
+        guard UserDefaults.standard.nightscoutEnabled,
+              UserDefaults.standard.nightscoutFollowType != .none,
+              let deviceStatus
+        else {
+            trace("in checkNotLoopingAlert, skipping because Nightscout is disabled, follow type is disabled, or device status is unavailable", log: log, category: ConstantsLog.categoryAlertManager, type: .info)
+            clearNotLoopingNotifications()
+            resetNotLoopingNotificationThrottle()
+            return false
+        }
+
+        if let snoozeAllAlertsUntilDate = UserDefaults.standard.snoozeAllAlertsUntilDate, snoozeAllAlertsUntilDate > Date() {
+            trace("in checkNotLoopingAlert, skipping because Snooze All is enabled for the next %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .info, snoozeAllAlertsUntilDate.daysAndHoursRemaining())
+            clearNotLoopingNotifications()
+            return false
+        }
+
+        let (currentAlertEntry, _) = alertEntriesAccessor.getCurrentAndNextAlertEntry(forAlertKind: .notlooping, forWhen: Date(), alertTypesAccessor: alertTypesAccessor)
+        let alertValue = Int(currentAlertEntry.value)
+        let threshold = TimeInterval(Double(alertValue) * 60.0)
+
+        trace("in checkNotLoopingAlert, threshold = %{public}@ minutes, last device status check = %{public}@, last loop date = %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .info, alertValue.description, deviceStatus.lastCheckedDate.description, deviceStatus.lastLoopDate.description)
+
+        guard !currentAlertEntry.isDisabled,
+              currentAlertEntry.alertType.enabled,
+              deviceStatus.lastCheckedDate > Date().addingTimeInterval(-threshold),
+              deviceStatus.createdAt > Date().addingTimeInterval(-threshold)
+        else {
+            trace("in checkNotLoopingAlert, skipping because alert is disabled, alert type is disabled, or the downloaded device status is stale", log: log, category: ConstantsLog.categoryAlertManager, type: .info)
+            clearNotLoopingNotifications()
+            resetNotLoopingNotificationThrottle()
+            return false
+        }
+
+        let loopIsStale = deviceStatus.lastLoopDate == .distantPast || Date().timeIntervalSince(deviceStatus.lastLoopDate) >= threshold
+        guard loopIsStale else {
+            trace("in checkNotLoopingAlert, skipping because the latest loop date is still inside the threshold", log: log, category: ConstantsLog.categoryAlertManager, type: .info)
+            clearNotLoopingNotifications()
+            resetNotLoopingNotificationThrottle()
+            return false
+        }
+
+        guard notLoopingNotificationThrottleHasExpired() else {
+            trace("in checkNotLoopingAlert, skipping because the in-memory repeat throttle has not expired", log: log, category: ConstantsLog.categoryAlertManager, type: .info)
+            return false
+        }
+
+        clearNotLoopingNotifications()
+        let notificationCreated = checkAlertAndFire(alertKind: .notlooping, lastBgReading: nil, lastButOneBgReading: nil, lastCalibration: nil, transmitterBatteryInfo: nil, deviceStatus: deviceStatus)
+        if notificationCreated {
+            notLoopingLastNotificationDate = Date()
+        } else {
+            trace("in checkNotLoopingAlert, shared alert path did not create a notification", log: log, category: ConstantsLog.categoryAlertManager, type: .info)
+        }
+
+        return notificationCreated
     }
     
     /// Function to be called that receives the notification actions. Will handle the response. - called when user clicks a notification
@@ -432,6 +498,18 @@ public class AlertManager: NSObject {
                     }
                     
                     UserDefaults.standard.missedReadingAlertChanged = false
+
+                case UserDefaults.Key.notLoopingAlertChanged:
+                    guard UserDefaults.standard.notLoopingAlertChanged else { return }
+
+                    clearNotLoopingNotifications()
+                    resetNotLoopingNotificationThrottle()
+
+                    UserDefaults.standard.notLoopingAlertChanged = false
+
+                case UserDefaults.Key.nightscoutEnabled, UserDefaults.Key.nightscoutFollowType:
+                    clearNotLoopingNotifications()
+                    resetNotLoopingNotificationThrottle()
                     
                 default:
                     break
@@ -489,7 +567,7 @@ public class AlertManager: NSObject {
     }
     
     /// will check if the alert of type alertKind needs to be fired and also fires it, plays the sound, and if yes returns true, otherwise false
-    private func checkAlertAndFire(alertKind: AlertKind, lastBgReading: BgReading?, lastButOneBgReading: BgReading?, lastCalibration: Calibration?, transmitterBatteryInfo: TransmitterBatteryInfo?) -> Bool {
+    private func checkAlertAndFire(alertKind: AlertKind, lastBgReading: BgReading?, lastButOneBgReading: BgReading?, lastCalibration: Calibration?, transmitterBatteryInfo: TransmitterBatteryInfo?, deviceStatus: NotLoopingDeviceStatus? = nil) -> Bool {
         /// This is only for missed reading alert. How many minutes between now and the moment the snooze expires (meaning when is it not snoozed anymore)
         ///
         /// will be initialized later
@@ -528,7 +606,7 @@ public class AlertManager: NSObject {
         }
         
         // check if alert is required
-        let (alertNeeded, alertBody, alertTitle, delayInSeconds) = alertKind.alertNeeded(currentAlertEntry: currentAlertEntry, nextAlertEntry: nextAlertEntry, lastBgReading: lastBgReading, lastButOneBgReading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo)
+        let (alertNeeded, alertBody, alertTitle, delayInSeconds) = alertKind.alertNeeded(currentAlertEntry: currentAlertEntry, nextAlertEntry: nextAlertEntry, lastBgReading: lastBgReading, lastButOneBgReading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo, deviceStatus: deviceStatus)
         
         // create a new property for delayInSeconds, if it's nil then set to 0 - because returnvalue might either be nil or 0, to be treated in the same way
         var delayInSecondsToUse = delayInSeconds == nil ? 0 : delayInSeconds!
@@ -542,7 +620,8 @@ public class AlertManager: NSObject {
             }
         }
         
-        if alertNeeded && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
+        let alertMayFire = UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)
+        if alertNeeded && alertMayFire {
             // alert needs to be raised
             
             // the applicable alertentry
@@ -565,11 +644,13 @@ public class AlertManager: NSObject {
             // create the content for the alert notification, set body and text, category and also attachments and userInfo dict if available
             let content = UNMutableNotificationContent()
             
-            // set body, title for the standard notification (this will only be used for the short view in both iOS and WatchOS)
-            // after testing, the notification seems much clearer if we just use a single title line and include both title + body
-            // we'll put an emoji prefix just to give the notification a bit more character
+            // keep not looping minimal; other alerts keep the shared prefix + title + value format
             if let alertTitle = alertTitle, let alertBody = alertBody {
-                content.title = alertKind.alertUrgencyType().alertTitlePrefix + " " + alertTitle.uppercased() + " " + alertBody
+                if alertKind == .notlooping {
+                    content.title = alertTitle
+                } else {
+                    content.title = alertKind.alertUrgencyType().alertTitlePrefix + " " + alertTitle.uppercased() + " " + alertBody
+                }
             }
             
             // now let's start creating the custom content
@@ -630,13 +711,16 @@ public class AlertManager: NSObject {
                 content.userInfo = userInfo
             }
             
-            // Add the chart thumbnail when available, but do not let a missing
-            // or invalid image crash the reading pipeline before downstream sync.
-            do {
-                let thumbnailAttachment = try UNNotificationAttachment(identifier: "thumbnail", url: URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationThumbnailImage).png"), options: [UNNotificationAttachmentOptionsThumbnailHiddenKey: false])
-                content.attachments = [thumbnailAttachment]
-            } catch {
-                trace("in checkAlerts, failed to attach notification thumbnail: %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
+            // Add the chart thumbnail only when the rendered file is already
+            // available. Some alerts can fire outside the BG reading pipeline.
+            let thumbnailURL = URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationThumbnailImage).png")
+            if FileManager.default.fileExists(atPath: thumbnailURL.path) {
+                do {
+                    let thumbnailAttachment = try UNNotificationAttachment(identifier: "thumbnail", url: thumbnailURL, options: [UNNotificationAttachmentOptionsThumbnailHiddenKey: false])
+                    content.attachments = [thumbnailAttachment]
+                } catch {
+                    trace("in checkAlerts, failed to attach notification thumbnail: %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
+                }
             }
             
             // if snooze from notification in homescreen is needed then set the categoryIdentifier
@@ -727,11 +811,24 @@ public class AlertManager: NSObject {
             uNUserNotificationCenter.add(notificationRequest) { error in
                 if let error = error {
                     trace("Unable to Add Notification Request %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
+                    if !content.attachments.isEmpty {
+                        content.attachments = []
+                        let fallbackNotificationRequest = UNNotificationRequest(identifier: alertKind.notificationIdentifier(), content: content, trigger: trigger)
+                        self.uNUserNotificationCenter.add(fallbackNotificationRequest) { fallbackError in
+                            if let fallbackError = fallbackError {
+                                trace("Unable to Add Notification Request without attachment %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .error, fallbackError.localizedDescription)
+                            } else {
+                                trace("in checkAlert, added notification request without attachment for alert '%{public}@'", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+                            }
+                        }
+                    }
+                } else {
+                    trace("in checkAlert, added notification request for alert '%{public}@'", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
                 }
             }
             
             // snooze default period, to avoid that alert goes off every minute for Libre 2, except if it's a delayed alert (for delayed alerts it looks a bit risky to me)
-            if delayInSecondsToUse == 0 {
+            if delayInSecondsToUse == 0, alertKind != .notlooping {
                 trace("in checkAlert, snoozing alert '%{public}@' for %{public}@ minutes", log: log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes.description)
                 
                 getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes)
@@ -781,6 +878,7 @@ public class AlertManager: NSObject {
     // helper method used during intialization of AlertManager
     private func initAlertNotificationIdentiferArray() {
         for alertKind in AlertKind.allCases {
+            guard alertKind != .notlooping else { continue }
             alertNotificationIdentifers.append(alertKind.notificationIdentifier())
         }
     }
@@ -808,5 +906,30 @@ public class AlertManager: NSObject {
     /// when user changes M5Stack related settings, then the transmitter need to get that info, add observers
     private func addObservers() {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.missedReadingAlertChanged.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.notLoopingAlertChanged.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutEnabled.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue, options: .new, context: nil)
+    }
+
+    private func clearNotLoopingNotifications() {
+        uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: [AlertKind.notlooping.notificationIdentifier()])
+        uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: [AlertKind.notlooping.notificationIdentifier()])
+    }
+
+    private func notLoopingNotificationThrottleHasExpired() -> Bool {
+        guard let notLoopingLastNotificationDate else { return true }
+
+        return Date().timeIntervalSince(notLoopingLastNotificationDate) >= TimeInterval(ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes * 60)
+    }
+
+    private func resetNotLoopingNotificationThrottle() {
+        notLoopingLastNotificationDate = nil
+    }
+
+    deinit {
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.missedReadingAlertChanged.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.notLoopingAlertChanged.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutEnabled.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue)
     }
 }
