@@ -6,7 +6,7 @@ public final class CoreDataManager {
     
     // MARK: - Type Aliases
     
-    public typealias CoreDataManagerCompletion = () -> ()
+    public typealias CoreDataManagerCompletion = (CoreDataManager) -> Void
     
     // MARK: - Properties
     
@@ -115,7 +115,7 @@ public final class CoreDataManager {
             self.addPersistentStore(to: persistentStoreCoordinator)
             
             // Invoke Completion On Main Queue
-            DispatchQueue.main.async { self.completion() }
+            DispatchQueue.main.async { self.completion(self) }
         }
         
         // when app terminates, call saveChangesAtTermination, just in case that somewhere in the code saveChanges is not called when needed

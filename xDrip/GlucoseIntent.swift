@@ -86,12 +86,11 @@ struct GlucoseIntent: AppIntent {
 extension CoreDataManager {
     static func create(for modelName: String) async -> CoreDataManager {
         await withCheckedContinuation { continuation in
-            let sem = DispatchSemaphore(value: 0)
-            let manager = CoreDataManager(modelName: modelName) {
-                sem.signal()
+            // Suspend the intent until the store is ready without blocking the main actor that
+            // receives CoreDataManager's completion callback.
+            _ = CoreDataManager(modelName: modelName) { manager in
+                continuation.resume(returning: manager)
             }
-            sem.wait()
-            continuation.resume(returning: manager)
         }
     }
 }
