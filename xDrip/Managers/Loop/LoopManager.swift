@@ -523,7 +523,11 @@ public class LoopManager: NSObject {
     private func parseTimestamp(_ timestamp: String) throws -> Date? {
         let regex = try NSRegularExpression(pattern: "\\((.*)\\)")
         if let match = regex.firstMatch(in: timestamp, range: NSMakeRange(0, timestamp.count)) {
-            let epoch = Double((timestamp as NSString).substring(with: match.range(at: 1)))! / 1000
+            guard let milliseconds = Double((timestamp as NSString).substring(with: match.range(at: 1))) else {
+                return nil
+            }
+
+            let epoch = milliseconds / 1000
             return Date(timeIntervalSince1970: epoch)
         }
         return nil
