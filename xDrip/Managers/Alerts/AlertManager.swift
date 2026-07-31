@@ -859,7 +859,7 @@ public class AlertManager: NSObject {
                 case .provisional:
                     trace("   notificationSettings.authorizationStatus = provisional", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
                 @unknown default:
-                    fatalError("unsupported authorizationStatus in AlertManager")
+                    trace("   notificationSettings.authorizationStatus is not recognised by this app version", log: self.log, category: ConstantsLog.categoryAlertManager, type: .error)
                 }
             }
             
