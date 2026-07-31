@@ -224,6 +224,7 @@ enum SettingsAccessory {
 enum SettingsControl {
     case toggle(isOn: () -> Bool, setIsOn: (Bool) -> Void, confirmation: ((Bool) -> SettingsToggleConfirmationContent?)? = nil)
     case warningBanner(message: String, severity: SettingsWarningBannerSeverity = .warning)
+    case custom(content: () -> AnyView)
 }
 
 enum SettingsWarningBannerSeverity {
@@ -782,6 +783,10 @@ private struct SettingsNativeRowView: View {
             SettingsWarningBannerView(title: row.title, message: message, indicatorColor: severity.indicatorColor)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                 .listRowBackground(severity.backgroundColor)
+
+        case let .some(.custom(content)):
+            content()
+                .disabled(!row.isEnabled)
 
         case let .some(.toggle(isOn, setIsOn, confirmation)):
             Toggle(isOn: Binding(

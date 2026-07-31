@@ -1,6 +1,7 @@
 import Foundation
 import Contacts
 import os
+import SwiftUI
 
 fileprivate enum Setting: Int, CaseIterable {
     /// enable contact image yes or no
@@ -28,7 +29,14 @@ class SettingsViewContactImageSettingsViewModel: NSObject, SettingsViewModelProt
         return [
             nativeSettingsRow(id: "contactImage.enableContactImage", index: Setting.enableContactImage.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "contactImage.displayTrend", index: Setting.displayTrend.rawValue, sectionID: sectionID, isVisible: contactImageRowsVisible),
-            nativeSettingsRow(id: "contactImage.useHighContrastContactImage", index: Setting.useHighContrastContactImage.rawValue, sectionID: sectionID, isVisible: contactImageRowsVisible)
+            nativeSettingsRow(id: "contactImage.useHighContrastContactImage", index: Setting.useHighContrastContactImage.rawValue, sectionID: sectionID, isVisible: contactImageRowsVisible),
+            SettingsRow(
+                id: "contactImage.preview",
+                title: Texts_SettingsView.contactImageSectionTitle,
+                accessory: .none,
+                control: .custom(content: { AnyView(ContactImageSettingsPreview()) }),
+                isVisible: contactImageRowsVisible
+            )
         ]
     }
 
@@ -280,5 +288,47 @@ class SettingsViewContactImageSettingsViewModel: NSObject, SettingsViewModelProt
         default:
             break
         }
+    }
+}
+
+private struct ContactImageSettingsPreview: View {
+    @AppStorage(UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue) private var bloodGlucoseUnitIsMmol = false
+    @AppStorage(UserDefaults.Key.displayTrendInContactImage.rawValue) private var displayTrend = false
+    @AppStorage(UserDefaults.Key.useHighContrastContactImage.rawValue) private var useHighContrast = false
+
+    private let previewSize: CGFloat = 132
+
+    var body: some View {
+        VStack(spacing: 10) {
+            ZStack {
+                Circle()
+                    .fill(.black)
+
+                ContactImageRenderer(
+                    bgValue: 123,
+                    isMgDl: !bloodGlucoseUnitIsMmol,
+                    slopeArrow: displayTrend ? "→" : "",
+                    bgRangeDescription: .inRange,
+                    valueIsUpToDate: true,
+                    useHighContrastContactImage: useHighContrast,
+                    disableContactImage: false
+                )
+                .clipShape(Circle())
+                .scaleEffect(previewSize / 256)
+            }
+            .frame(width: previewSize, height: previewSize)
+            .clipShape(Circle())
+            .overlay {
+                Circle()
+                    .stroke(.secondary.opacity(0.25), lineWidth: 1)
+            }
+
+            Text(ConstantsHomeView.applicationName)
+                .font(.headline)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Texts_SettingsView.contactImageSectionTitle)
     }
 }
