@@ -46,31 +46,16 @@ public struct TreatmentNSResponse {
         var nightscoutDate: Date?
         
         if let createdAt = dictionary["created_at"] as? String {
-            
-            let dateFormatter = DateFormatter()
-            
-            // add the locale and timeZone properties as per dateFromISOString()
-            dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-            dateFormatter.timeZone = TimeZone(abbreviation: "GMT")
-            
             // let's check which date format is return by Nightscout and deal with it accordingly
             // if the date string contains a decimal point, then it must contain milliseconds
             // if we don't take this into account, .date(from: string) will be returned as nil if the milliseconds (.SSS) are missing
             if createdAt.contains(".") {
-                
                 // this is the way Loop, FreeAPS (Loop), OpenAPS and FreeAPS X store the created_at date/time
-                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-                
+                nightscoutDate = ISO8601DateFormatter.withFractionalSeconds.date(from: createdAt)
             } else {
-                
                 // and AndroidAPS stores it without milliseconds
-                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
-                
+                nightscoutDate = ISO8601DateFormatter.withoutFractionalSeconds.date(from: createdAt)
             }
-            
-            // assign the date to the optional nightscoutDate
-            nightscoutDate = dateFormatter.date(from: createdAt)
-            
         }
         
         // first check that _id exists and that created_at was successfully converted into a Date
