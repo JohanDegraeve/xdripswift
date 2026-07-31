@@ -508,8 +508,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     // Reset deviceStatus and profile to empty when Nightscout connection settings change
                     DispatchQueue.main.async {
                         self.deviceStatus = NightscoutDeviceStatus()
+                        self.profile = NightscoutProfile()
                     }
-                    profile = NightscoutProfile()
                     // apikey or nightscout api key change is triggered by user, should not be done within 200 ms
                     if keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
                         // if master is set (or if we're in follower mode other than Nightscout and we want to upload to Nightscout), siteURL exists and either API_SECRET or a token is entered, then test credentials
@@ -905,20 +905,26 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 let profileResponses: [NightscoutProfileResponse]? = try await nightscoutRequest(path: nightscoutProfilePath, responseType: [NightscoutProfileResponse].self)
                 if let profileResponse = profileResponses?.first {
                     let newProfile = NightscoutProfile(from: profileResponse)
-                    if newProfile.startDate > profile.startDate {
-                        if profile.startDate == .distantPast {
-                            trace("in updateProfile, no profile is stored yet. Importing Nightscout profile with date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, profile.startDate.formatted(date: .abbreviated, time: .shortened))
+                    let shouldPersistProfile = await MainActor.run { () -> Bool in
+                        guard newProfile.startDate > self.profile.startDate else { return false }
+
+                        if self.profile.startDate == .distantPast {
+                            trace("in updateProfile, no profile is stored yet. Importing Nightscout profile with date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, self.profile.startDate.formatted(date: .abbreviated, time: .shortened))
                         } else {
-                            trace("in updateProfile, found a newer Nightscout profile online with date = %{public}@, old profile date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, newProfile.startDate.formatted(date: .abbreviated, time: .shortened), profile.startDate.formatted(date: .abbreviated, time: .shortened))
+                            trace("in updateProfile, found a newer Nightscout profile online with date = %{public}@, old profile date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, newProfile.startDate.formatted(date: .abbreviated, time: .shortened), self.profile.startDate.formatted(date: .abbreviated, time: .shortened))
                         }
+
                         self.profile = newProfile
+                        self.didUpdateProfileDuringLastSync = true
+
+                        return true
+                    }
+
+                    if shouldPersistProfile {
                         self.nightscoutProfileAccessor.upsert(newProfile)
                         // Store in userdefaults for quick access
                         if let profileData = try? JSONEncoder().encode(newProfile) {
                             UserDefaults.standard.nightscoutProfile = profileData
-                        }
-                        await MainActor.run {
-                            self.didUpdateProfileDuringLastSync = true
                         }
                     }
                 }
