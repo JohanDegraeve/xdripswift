@@ -582,6 +582,14 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     /// synchronize all treatments and other information with Nightscout
     private func syncWithNightscout(overrideAppState: Bool = false) {
+        // Keep UIKit state checks and sync bookkeeping on the main thread.
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { [weak self] in
+                self?.syncWithNightscout(overrideAppState: overrideAppState)
+            }
+            return
+        }
+
         if UIApplication.shared.applicationState == .background && !overrideAppState {
             trace("in syncWithNightscout, aborted because app is backgrounded and not overriden", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
             performBackgroundFollowerRefreshIfNeeded()
@@ -599,13 +607,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         // Only update lastActualSyncTime after a real sync is about to start
         lastActualSyncTime = Date()
 
-        // Ensure Core Data main-context objects are always accessed on the main thread
-        if !Thread.isMainThread {
-            DispatchQueue.main.async { [weak self] in
-                self?.syncWithNightscout()
-            }
-            return
-        }
         // check that Nightscout is enabled
         // and nightscoutURL exists
         guard UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil else { return }
