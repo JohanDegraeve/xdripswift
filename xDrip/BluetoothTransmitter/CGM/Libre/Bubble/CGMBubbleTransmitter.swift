@@ -345,7 +345,7 @@ class CGMBubbleTransmitter: BluetoothTransmitter, CGMTransmitter {
                         
                         
                     case .patchInfo:
-                        if value.count >= 10 {
+                        if value.count >= 11 {
                             
                             patchInfo = value.subdata(in: 5 ..< 11).hexEncodedString().uppercased()
 
