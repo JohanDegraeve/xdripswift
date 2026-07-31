@@ -121,8 +121,9 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
                 // NFC session creation must be on main thread
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
-                    self.libreNFC = LibreNFC(libreNFCDelegate: self)
-                    (self.libreNFC as! LibreNFC).startSession()
+                    let libreNFC = LibreNFC(libreNFCDelegate: self)
+                    self.libreNFC = libreNFC
+                    libreNFC.startSession()
                 }
             }
             
