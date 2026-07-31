@@ -281,7 +281,8 @@ class Trace {
         
         if let path = Bundle.main.path(forResource: "Info", ofType: "plist") {
             
-            if let createdDate = try! FileManager.default.attributesOfItem(atPath: path)[.creationDate] as? Date {
+            if let attributes = try? FileManager.default.attributesOfItem(atPath: path),
+               let createdDate = attributes[.creationDate] as? Date {
                 
                 return createdDate
                 
@@ -289,7 +290,7 @@ class Trace {
             
         }
         
-        return Date() // Should never execute
+        return Date() // file metadata may be unavailable
         
     }
     
@@ -297,7 +298,8 @@ class Trace {
         
         if let documentsFolder = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last {
             
-            if let installDate = try! FileManager.default.attributesOfItem(atPath: documentsFolder.path)[.creationDate] as? Date {
+            if let attributes = try? FileManager.default.attributesOfItem(atPath: documentsFolder.path),
+               let installDate = attributes[.creationDate] as? Date {
                 
                 return installDate
                 
@@ -305,7 +307,7 @@ class Trace {
             
         }
         
-        return Date() // Should never execute
+        return Date() // file metadata may be unavailable
         
     }
     
