@@ -194,22 +194,10 @@ private struct BluetoothPeripheralStatusBannerView: View {
                 .foregroundStyle(state.connectionStatus.tintColor)
                 .frame(width: 24)
 
-            Text(state.displayTitle)
-                .font(.headline)
-                .fontWeight(.semibold)
-                .foregroundStyle(Color(.colorPrimary))
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-                .layoutPriority(1)
-
-            Spacer(minLength: 8)
-
             Text(state.connectButtonStatusText)
-                .font(.body)
-                .foregroundStyle(Color(.colorSecondary))
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-                .fixedSize(horizontal: true, vertical: false)
+                .foregroundStyle(Color(.colorPrimary))
+
+            Spacer()
         }
         .padding(.vertical, 3)
     }

@@ -1442,7 +1442,7 @@ private extension BluetoothPeripheralDetailState {
                 id: "dexcom-g5",
                 title: "Dexcom",
                 headerDetail: dexcomG5.isAnubis ? "Anubis" : nil,
-                headerSymbol: dexcomG5.isAnubis ? BluetoothPeripheralDetailSymbol(systemName: "checkmark.circle.fill", color: .mint) : nil,
+                headerSymbol: dexcomG5.isAnubis ? BluetoothPeripheralDetailSymbol(systemName: "checkmark.circle.fill", color: .green) : nil,
                 rows: makeDexcomG5CommonRows(dexcomG5: dexcomG5)
             ),
             BluetoothPeripheralDetailSection(
