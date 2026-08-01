@@ -654,7 +654,6 @@
 		F8DF766223E390D100063910 /* BLEPeripheral+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF766123E390D100063910 /* BLEPeripheral+CoreDataProperties.swift */; };
 		F8DF766423E781C100063910 /* BLEPeripheralAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF766323E781C100063910 /* BLEPeripheralAccessor.swift */; };
 		F8E0475E28CC8E330049D8C9 /* GlucoseData+LoopShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */; };
-		F8E3A2A323D4E7E200E5E98A /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */; };
 		F8E3A2A923D906C200E5E98A /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2A823D906C200E5E98A /* CalendarManager.swift */; };
 		F8E3A2AB23DA520B00E5E98A /* ConstantsCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2AA23DA520B00E5E98A /* ConstantsCalendar.swift */; };
 		F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */; };
@@ -1747,7 +1746,6 @@
 		F8DF766123E390D100063910 /* BLEPeripheral+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BLEPeripheral+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F8DF766323E781C100063910 /* BLEPeripheralAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEPeripheralAccessor.swift; sourceTree = "<group>"; };
 		F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GlucoseData+LoopShare.swift"; sourceTree = "<group>"; };
-		F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		F8E3A2A823D906C200E5E98A /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
 		F8E3A2AA23DA520B00E5E98A /* ConstantsCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsCalendar.swift; sourceTree = "<group>"; };
 		F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringProtocol.swift; sourceTree = "<group>"; };
@@ -2793,7 +2791,6 @@
 			children = (
 				471C9C022B933461005E1326 /* xDrip Widget Extension.entitlements */,
 				471C9C012B9333D5005E1326 /* xDrip Watch Complication Extension.entitlements */,
-				F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */,
 				666E283926F7E54C00ACE4DF /* Version.xcconfig */,
 				666E283826F7E54C00ACE4DF /* xDrip.xcconfig */,
 				F8AC425C21ADEBD60078C348 /* xDrip */,
@@ -3779,7 +3776,6 @@
 				F824378124CB7A9800BED341 /* Cartoon_Uh_Oh.caf in Resources */,
 				F64039B2281E90CF0051EFFE /* QuickActions.strings in Resources */,
 				F824377F24CB7A9800BED341 /* Sci-Fi_Alarm.caf in Resources */,
-				F8E3A2A323D4E7E200E5E98A /* Default-568h@2x.png in Resources */,
 				F82437C324CB7A9900BED341 /* Metallic.caf in Resources */,
 				F82437C224CB7A9900BED341 /* Alert_Tone_Ringtone_2.caf in Resources */,
 				F824377E24CB7A9800BED341 /* Sci-Fi_Warning.caf in Resources */,
