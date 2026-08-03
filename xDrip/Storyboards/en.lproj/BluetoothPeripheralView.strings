@@ -15,6 +15,7 @@
 "scan" = "Scan";
 "readyToScan" = "Ready to Scan";
 "scanning" = "Scanning";
+"scanningSinceFormat" = "since %@ (%d min)";
 "disconnect" = "Disconnect";
 "tryingToConnect" = "Scanning";
 "notTryingToConnect" = "Not Scanning";

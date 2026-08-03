@@ -68,6 +68,14 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("scanning", tableName: filename, bundle: Bundle.main, value: "Scanning", comment: "text in status row, if scanning ongoing")
     }()
     
+    /// Format string appended to the Status row detail while scanning is ongoing.
+    /// Example result after formatting: "since 2:34 PM (3 min)".
+    /// First placeholder is the clock time when scanning started; second is elapsed whole minutes.
+    /// Kept as a short suffix so it stays on the existing Status row instead of adding a separate table row.
+    static let scanningSinceFormat: String = {
+        return NSLocalizedString("scanningSinceFormat", tableName: filename, bundle: Bundle.main, value: "since %@ (%d min)", comment: "appended to Scanning status: since <time> (<minutes> min). Shown while waiting for a sensor/transmitter that may only advertise once per multi-minute cycle.")
+    }()
+    
     static let disconnect: String = {
         return NSLocalizedString("disconnect", tableName: filename, bundle: Bundle.main, value: "Disconnect", comment: "button text, to disconnect")
     }()

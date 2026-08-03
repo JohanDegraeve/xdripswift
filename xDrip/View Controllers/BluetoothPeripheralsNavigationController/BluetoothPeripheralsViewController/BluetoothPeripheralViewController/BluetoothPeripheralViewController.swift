@@ -139,6 +139,17 @@ class BluetoothPeripheralViewController: UIViewController {
     /// Periodic refresher for Transmitter Read Success while the view is visible
     private var transmitterReadSuccessTimer: Timer?
     
+    /// Timestamp when the current "Scanning" / trying-to-connect status began on this screen.
+    /// Used only to render a subtle elapsed wait on the Status row (for example "since 2:34 PM (3 min)").
+    /// Sensors/transmitters can take up to roughly a multi-minute advertising cycle before they are
+    /// discoverable again, so this helps the user judge how long they have already been waiting.
+    /// Cleared whenever scanning stops or a connection succeeds.
+    private var scanningStartedAt: Date?
+    
+    /// Timer that periodically reloads the Status row while scanning, so the elapsed-minute text stays up to date.
+    /// Invalidated when scanning ends or when the view disappears.
+    private var scanningElapsedTimer: Timer?
+    
     // MARK: - public functions
     
     /// configure the viewController
@@ -191,6 +202,7 @@ class BluetoothPeripheralViewController: UIViewController {
                 } else {
                     connectButtonOutlet?.setTitle(Texts_BluetoothPeripheralView.donotconnect, for: .normal)
                     
+                    // Status detail may also append "since <time> (N min)" on the Status row while this wait continues.
                     return Texts_BluetoothPeripheralView.tryingToConnect
                 }
             }
@@ -243,6 +255,7 @@ class BluetoothPeripheralViewController: UIViewController {
                 
                 connectButtonOutlet?.setTitle(Texts_BluetoothPeripheralView.scanning, for: .normal)
                 
+                // Status detail may also append "since <time> (N min)" on the Status row while this wait continues.
                 return Texts_BluetoothPeripheralView.scanning
             }
             
@@ -444,6 +457,9 @@ class BluetoothPeripheralViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         stopTransmitterReadSuccessTimer()
+        // Stop the scanning-elapsed refresher while this screen is not visible; it will be started again
+        // from the Status row configuration if scanning is still active when the user returns.
+        stopScanningElapsedTimer()
         // we need to remove all observers from the view controller before removing it from the navigation stack
         // otherwise the app crashes when one of the userdefault values changes and the observer tries to
         // update the UI (which isn't available any more)
@@ -791,6 +807,11 @@ class BluetoothPeripheralViewController: UIViewController {
         
         // call configure in the model, as we have a new transmitter here
         bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: tableView, bluetoothPeripheralViewController: self)
+        
+        // Reload the general section so the Status row immediately reflects connect / scan / stop-scanning
+        // and so scanningStartedAt can be set (or cleared) for the elapsed "since ... (N min)" suffix.
+        // Without this reload, the button title can update while the Status detail stays stale.
+        tableView.reloadSections(IndexSet(integer: 0), with: .none)
     }
     
     /// checks if bluetoothPeripheral is not nil, etc.
@@ -975,6 +996,92 @@ class BluetoothPeripheralViewController: UIViewController {
     private func stopTransmitterReadSuccessTimer() {
         transmitterReadSuccessTimer?.invalidate()
         transmitterReadSuccessTimer = nil
+    }
+    
+    /// Returns whether the Status detail text means the app is actively scanning or trying to connect.
+    /// Both `scanning` (new device discovery) and `tryingToConnect` (known device reconnect) are treated
+    /// as active waits, because both show "Scanning" to the user and both can take several minutes.
+    /// - parameters:
+    ///     - statusText: the base status string produced by setConnectButtonLabelTextAndGetStatusDetailedText
+    /// - returns: true when elapsed scanning time should be shown on the Status row
+    private func isActivelyScanningStatus(_ statusText: String) -> Bool {
+        // Compare against both localized keys: for English they are both "Scanning", but other languages may differ.
+        return statusText == Texts_BluetoothPeripheralView.scanning || statusText == Texts_BluetoothPeripheralView.tryingToConnect
+    }
+    
+    /// Starts or clears tracking of when the current scanning wait began.
+    /// Only records the start time on the transition into scanning (when scanningStartedAt is still nil),
+    /// so the elapsed minutes keep counting across Status row reloads instead of resetting every refresh.
+    /// - parameters:
+    ///     - isActivelyScanning: true while Status is Scanning / trying to connect; false otherwise
+    private func updateScanningStartedAtTracking(isActivelyScanning: Bool) {
+        if isActivelyScanning {
+            // First moment we enter an active scanning state on this screen: remember "now" as the start.
+            if scanningStartedAt == nil {
+                scanningStartedAt = Date()
+            }
+            // Keep the Status row minute counter refreshing while the wait continues.
+            startScanningElapsedTimer()
+        } else {
+            // Not scanning anymore (Connected, Not Scanning, Ready to Scan, NFC needed, etc.): drop the start time.
+            scanningStartedAt = nil
+            stopScanningElapsedTimer()
+        }
+    }
+    
+    /// Builds the Status row detail text, appending a short "since <time> (N min)" suffix while scanning.
+    /// The suffix stays on the same Status row (above Connected At / Disconnected At) so the wait is visible
+    /// without adding a dedicated table row. Connected / Not Scanning / other states are unchanged.
+    /// - parameters:
+    ///     - baseStatusText: status string from setConnectButtonLabelTextAndGetStatusDetailedText (for example "Scanning")
+    /// - returns: baseStatusText, or baseStatusText plus the localized since/elapsed suffix when actively scanning
+    private func statusDetailTextAppendingScanningElapsed(baseStatusText: String) -> String {
+        // Decide from the base status whether this is an active wait the user should track.
+        let activelyScanning = isActivelyScanningStatus(baseStatusText)
+        // Update start timestamp / refresh timer before formatting, so a fresh scan gets a start time immediately.
+        updateScanningStartedAtTracking(isActivelyScanning: activelyScanning)
+        
+        // Non-scanning statuses, or scanning without a start time yet: show the plain status only.
+        guard activelyScanning, let scanningStartedAt = scanningStartedAt else {
+            return baseStatusText
+        }
+        
+        // Clock time when this scanning wait started, in the user's locale (time only; date is not needed here).
+        let timeString = scanningStartedAt.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+        // Whole minutes since scanningStartedAt. Flooring via Int is intentional: show 0 min until a full minute passes.
+        let minutes = max(0, Int(Date().timeIntervalSince(scanningStartedAt) / 60))
+        // Localized suffix such as "since 2:34 PM (3 min)".
+        let sinceSuffix = String(format: Texts_BluetoothPeripheralView.scanningSinceFormat, timeString, minutes)
+        // Keep base status first so the row still reads clearly as "Scanning ..." rather than only the elapsed part.
+        return "\(baseStatusText) \(sinceSuffix)"
+    }
+    
+    /// Starts a repeating timer that reloads only the Status row so elapsed minutes update while the user waits.
+    /// Interval is 15 seconds: fine enough to advance the minute display promptly, without reloading the whole section often.
+    /// Uses RunLoop common mode so the timer still fires while the user is scrolling or interacting with the table.
+    private func startScanningElapsedTimer() {
+        // Avoid stacking multiple timers if Status is rebuilt repeatedly during an ongoing scan.
+        guard scanningElapsedTimer == nil else { return }
+        scanningElapsedTimer = Timer.scheduledTimer(withTimeInterval: 15.0, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            // Only the connectionStatus row needs refreshing for the elapsed text.
+            let indexPath = IndexPath(row: Setting.connectionStatus.rawValue, section: 0)
+            // Guard against reloading while the table structure is temporarily inconsistent.
+            guard self.tableView.numberOfSections > 0,
+                  self.tableView.numberOfRows(inSection: 0) > indexPath.row else { return }
+            self.tableView.reloadRows(at: [indexPath], with: .none)
+        }
+        // Match the Transmitter Read Success timer pattern: also fire during tracking RunLoop modes.
+        if let scanningElapsedTimer = scanningElapsedTimer {
+            RunLoop.main.add(scanningElapsedTimer, forMode: .common)
+        }
+    }
+    
+    /// Invalidates and clears the scanning elapsed refresh timer.
+    /// Safe to call when the timer was never started.
+    private func stopScanningElapsedTimer() {
+        scanningElapsedTimer?.invalidate()
+        scanningElapsedTimer = nil
     }
 
     /// When a setting change can alter which general sections are visible (e.g., algorithm toggles),
@@ -1307,7 +1414,10 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             case .connectionStatus:
                 
                 cell.textLabel?.text = Texts_BluetoothPeripheralView.status
-                cell.detailTextLabel?.text = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: isScanning, nfcScanNeeded: nfcScanNeeded, nfcScanSuccessful: nfcScanSuccessful, connectButtonOutlet: connectButtonOutlet, expectedBluetoothPeripheralType: expectedBluetoothPeripheralType, transmitterId: transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
+                // Base status also updates the connect/scan button title (Scanning, Connected, Not Scanning, ...).
+                let baseStatusText = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: isScanning, nfcScanNeeded: nfcScanNeeded, nfcScanSuccessful: nfcScanSuccessful, connectButtonOutlet: connectButtonOutlet, expectedBluetoothPeripheralType: expectedBluetoothPeripheralType, transmitterId: transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
+                // While scanning, append elapsed wait on this same Status row (not a new row under Disconnected At).
+                cell.detailTextLabel?.text = statusDetailTextAppendingScanningElapsed(baseStatusText: baseStatusText)
                 cell.accessoryType = .none
                 
             case .alias:
@@ -1743,6 +1853,9 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
         // handled in BluetoothPeripheralManager
         bluetoothPeripheralManager?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
         
+        // Connection succeeded: clear scanning start time and stop the elapsed-minute refresher before the Status reload.
+        updateScanningStartedAtTracking(isActivelyScanning: false)
+        
         updateTransmitterReadSuccess()
         
         startTransmitterReadSuccessTimer()
@@ -1813,6 +1926,7 @@ extension BluetoothPeripheralViewController {
  - button = "start scanning"
  - if  scanning :
  - status = "scanning"
+ - status detail may also append "since <time> (N min)" while the wait continues (same Status row; helps because a sensor/transmitter may only advertise on a multi-minute cycle)
  - button = "scanning" but button disabled
  - if the transmitter type needs a valid NFC scan before trying to connect by bluetooth
  - status = "NFC scan needed"
@@ -1824,6 +1938,7 @@ extension BluetoothPeripheralViewController {
  - button = "disconnect"
  - if not connected, but shouldconnect = true
  - status = "trying to connect" (renamed to scanning)
+ - status detail may also append "since <time> (N min)" while the wait continues (same Status row; same reason as new-device scanning above)
  - button = "do no try to connect"
  - if not connected, but shouldconnect = false
  - status = "not trying to connect" (not scanning)
