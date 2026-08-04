@@ -480,11 +480,11 @@ struct AGPChartView: View {
     }
 
     private func converted(_ valueMgDl: Double) -> Double {
-        usesMgDl ? valueMgDl : valueMgDl * ConstantsBloodGlucose.mgDlToMmoll
+        valueMgDl.mgDlToMmol(mgDl: usesMgDl)
     }
 
     private func axisLabelText(for convertedValue: Double) -> String {
-        usesMgDl ? "\(Int(convertedValue.rounded()))" : convertedValue.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes
+        convertedValue.bgValueToString(mgDl: usesMgDl)
     }
 
     private func timeLabel(minute: Int) -> String {

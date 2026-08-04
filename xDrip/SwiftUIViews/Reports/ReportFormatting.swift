@@ -30,19 +30,11 @@ enum GlucoseReportFormatting {
     }()
 
     static func glucose(_ mgDlValue: Double, usesMgDl: Bool) -> String {
-        if usesMgDl {
-            return "\(Int(mgDlValue.rounded())) mg/dL"
-        }
-
-        return "\((mgDlValue * ConstantsBloodGlucose.mgDlToMmoll).round(toDecimalPlaces: 1).stringWithoutTrailingZeroes) mmol/L"
+        mgDlValue.mgDlToMmolAndToString(mgDl: usesMgDl) + " " + (usesMgDl ? "mg/dL" : "mmol/L")
     }
 
     static func axisGlucose(_ mgDlValue: Double, usesMgDl: Bool) -> String {
-        if usesMgDl {
-            return "\(Int(mgDlValue.rounded()))"
-        }
-
-        return "\((mgDlValue * ConstantsBloodGlucose.mgDlToMmoll).round(toDecimalPlaces: 1).stringWithoutTrailingZeroes)"
+        mgDlValue.mgDlToMmolAndToString(mgDl: usesMgDl)
     }
 
     static func percentage(_ value: Double, decimals: Int = 0) -> String {

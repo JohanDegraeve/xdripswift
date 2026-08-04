@@ -234,7 +234,7 @@ struct BgReadingsView: View {
         // get the timestamp so that we can match it to the main (unfiltered) array
         let timestampOfBgReadingToDelete = bgReadingToDelete.timeStamp
         
-        trace("deleting BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .info, bgReadingToDelete.calculatedValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).stringWithoutTrailingZeroes, String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol), timestampOfBgReadingToDelete.description)
+        trace("deleting BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .info, bgReadingToDelete.calculatedValue.mgDlToMmolAndToString(mgDl: isMgDl), String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol), timestampOfBgReadingToDelete.description)
         
         // delete from the filtered BgReading array which will also force a refresh of the view
         filteredBgReadings.remove(atOffsets: offsets)
@@ -263,7 +263,7 @@ struct BgReadingsView: View {
         for bgReadingToDelete in bgReadingsToDelete {
             let timestampOfBgReadingToDelete = bgReadingToDelete.timeStamp
 
-            trace("multi-delete BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .info, bgReadingToDelete.calculatedValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).stringWithoutTrailingZeroes, String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol), timestampOfBgReadingToDelete.description)
+            trace("multi-delete BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .info, bgReadingToDelete.calculatedValue.mgDlToMmolAndToString(mgDl: isMgDl), String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol), timestampOfBgReadingToDelete.description)
 
             // remove from filtered array (if present)
             if let indexInFiltered = filteredBgReadings.firstIndex(where: { $0.timeStamp == timestampOfBgReadingToDelete }) {

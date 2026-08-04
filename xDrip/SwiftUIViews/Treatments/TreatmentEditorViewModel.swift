@@ -52,10 +52,9 @@ import CoreData
             if treatmentToEdit.treatmentType == .Note {
                 self.enteredValue = ""
             } else if treatmentToEdit.treatmentType == .BgCheck {
-                self.enteredValue = treatmentToEdit.value
-                    .mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                    .bgValueRounded(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                    .stringWithoutTrailingZeroes
+                self.enteredValue = treatmentToEdit.value.mgDlToMmolAndToString(
+                    mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl
+                )
             } else {
                 self.enteredValue = treatmentToEdit.value.stringWithoutTrailingZeroes
             }

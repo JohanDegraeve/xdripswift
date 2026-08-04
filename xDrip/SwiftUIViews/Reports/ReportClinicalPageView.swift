@@ -487,15 +487,11 @@ private struct GlucoseReportDailyGlucoseProfilesPageView: View {
     }
 
     private func axisLabel(for convertedValue: Double) -> String {
-        if analytics.usesMgDl {
-            return convertedValue.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes
-        }
-
-        return convertedValue.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes
+        convertedValue.bgValueToString(mgDl: analytics.usesMgDl)
     }
 
     private func converted(_ valueMgDl: Double) -> Double {
-        analytics.usesMgDl ? valueMgDl : valueMgDl * ConstantsBloodGlucose.mgDlToMmoll
+        valueMgDl.mgDlToMmol(mgDl: analytics.usesMgDl)
     }
 
     private func timeLabel(_ minute: Int) -> String {
@@ -852,7 +848,10 @@ private struct GlucoseReportLoopalyzerChart: View {
             return 40 ... max(250, upperBound(values: points.compactMap(\.glucoseMgDl), minimum: 250))
         }
 
-        return (40 * ConstantsBloodGlucose.mgDlToMmoll) ... max(13.9, upperBound(values: points.compactMap { $0.glucoseMgDl.map(convertedGlucose) }, minimum: 13.9))
+        return 40.0.mgDlToMmol() ... max(
+            13.9,
+            upperBound(values: points.compactMap { $0.glucoseMgDl.map(convertedGlucose) }, minimum: 13.9)
+        )
     }
 
     private var iobUpperBound: Double {
@@ -864,7 +863,7 @@ private struct GlucoseReportLoopalyzerChart: View {
     }
 
     private func convertedGlucose(_ valueMgDl: Double) -> Double {
-        usesMgDl ? valueMgDl : valueMgDl * ConstantsBloodGlucose.mgDlToMmoll
+        valueMgDl.mgDlToMmol(mgDl: usesMgDl)
     }
 
     private func upperBound(values: [Double], minimum: Double) -> Double {
@@ -928,7 +927,7 @@ private struct GlucoseReportAIDProfileTables: View {
                 unit: usesMgDl ? "mg/dL / U" : "mmol/L / U",
                 values: schedule.sensitivity,
                 decimalPlaces: 1,
-                valueTransform: { usesMgDl ? $0 : $0 * ConstantsBloodGlucose.mgDlToMmoll }
+                valueTransform: { $0.mgDlToMmol(mgDl: usesMgDl) }
             )
         }
     }

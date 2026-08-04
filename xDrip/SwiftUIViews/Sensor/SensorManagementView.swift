@@ -395,7 +395,7 @@ struct SensorManagementView: View {
     }
 
     private func displayEditableBgValue(_ valueInMgDl: Double) -> String {
-        valueInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).stringWithoutTrailingZeroes
+        valueInMgDl.mgDlToMmolAndToString(mgDl: isMgDl)
     }
 
     private func sensorDetailsMessage(

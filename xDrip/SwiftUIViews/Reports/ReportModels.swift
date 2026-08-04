@@ -351,13 +351,7 @@ struct GlucoseReportRangeDistribution {
     }
 
     private func formattedGlucoseLimit(_ valueMgDl: Double, usesMgDl: Bool) -> String {
-        if usesMgDl {
-            return "\(Int(valueMgDl.rounded()))"
-        }
-
-        return (valueMgDl * ConstantsBloodGlucose.mgDlToMmoll)
-            .round(toDecimalPlaces: 1)
-            .stringWithoutTrailingZeroes
+        valueMgDl.mgDlToMmolAndToString(mgDl: usesMgDl)
     }
 }
 

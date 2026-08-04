@@ -327,9 +327,7 @@ struct TreatmentSnapshot: Hashable {
     var valueText: String? {
         switch treatmentType {
         case .BgCheck:
-            return rawValue.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                .bgValueRounded(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                .stringWithoutTrailingZeroes
+            return rawValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         case .SiteChange, .SensorStart, .PumpBatteryChange, .Note:
             return nil
         default:

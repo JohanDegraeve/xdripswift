@@ -244,10 +244,9 @@ final class RootHomeStateModel: ObservableObject {
     func updateStatistics(_ statistics: StatisticsManager.Statistics, days: Int) {
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         let hasData = statistics.averageStatisticValue.value > 0
+        let glucoseUnit = isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
         let averageValue = hasData
-            ? (isMgDl
-               ? "\(Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0))) mg/dl"
-               : "\(statistics.averageStatisticValue.round(toDecimalPlaces: 1)) mmol/l")
+            ? statistics.averageStatisticValue.bgValueToString(mgDl: isMgDl) + " " + glucoseUnit
             : "-"
         let a1cValue: String
 
@@ -785,7 +784,7 @@ final class RootHomeStateModel: ObservableObject {
     }
 
     private func formattedLimit(_ value: Double, isMgDl: Bool) -> String {
-        isMgDl ? String(Int(value)) : String(value.round(toDecimalPlaces: 1))
+        value.bgValueToString(mgDl: isMgDl)
     }
 
 }
