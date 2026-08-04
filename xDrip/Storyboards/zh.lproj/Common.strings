@@ -135,5 +135,3 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
-"common_statistics_loopalyzerAttribution" = "灵感来自 Loopalyzer 和 Nightscout 报告。";
-"common_statistics_loopingOverview" = "闭环概览";

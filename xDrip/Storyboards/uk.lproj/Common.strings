@@ -157,5 +157,3 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
-"common_statistics_loopalyzerAttribution" = "Натхнено Loopalyzer і звітами Nightscout.";
-"common_statistics_loopingOverview" = "Огляд замкненого циклу";

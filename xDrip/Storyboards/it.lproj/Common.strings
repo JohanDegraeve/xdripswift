@@ -176,7 +176,6 @@
 "common_statistics_daily" = "Giornaliero";
 "common_statistics_report" = "Report";
 "common_statistics_section" = "Sezione";
-"common_statistics_looping" = "Loop";
 "common_statistics_timeInRange" = "Tempo nell'Intervallo";
 "common_statistics_timeInTightRange" = "Tempo nell'Intervallo Stretto";
 "common_statistics_averageGlucose" = "Glicemia media";
@@ -227,13 +226,6 @@
 "common_report_patientPeriodTitleFormat" = "%@ - %@";
 "common_report_passwordProtectionOpenError" = "Impossibile aprire il PDF del report per la protezione con password.";
 "common_report_passwordProtectionWriteError" = "Impossibile creare il PDF del report protetto da password.";
-"common_statistics_loopingTime" = "Tempo in Loop";
-"common_statistics_targetGreaterThan" = "Obiettivo >%@";
-"common_statistics_calculatedUsingDaysFormat" = "Calcolato utilizzando %d giorni di dati.";
 "common_statistics_averageTDD" = "TDD Media";
 "common_statistics_averageCarbs" = "Carboidrati medi";
-"common_statistics_loopingOverview" = "Panoramica del loop";
-"common_statistics_scheduledBasalProfile" = "Profilo basale programmato";
-"common_statistics_averagePeriodFormat" = "Ultimi %d giorni";
 "common_statistics_tempBasalDelta" = "Delta basale temporanea";
-"common_statistics_loopalyzerAttribution" = "Ispirato a Loopalyzer e ai report Nightscout. Per un'analisi più approfondita, usa la funzione Loopalyzer di Nightscout.";

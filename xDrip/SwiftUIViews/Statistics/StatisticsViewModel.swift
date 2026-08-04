@@ -55,7 +55,7 @@ final class StatisticsViewModel: ObservableObject {
             patientName: UserDefaults.standard.reportPatientName,
             patientID: UserDefaults.standard.reportPatientID,
             period: selectedPeriod,
-            aidPeriod: .three,
+            aidPeriod: .notIncluded,
             paperSize: UserDefaults.standard.reportPaperSize,
             language: UserDefaults.standard.reportLanguage
         )

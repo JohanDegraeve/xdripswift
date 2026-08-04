@@ -225,12 +225,6 @@ struct GlucoseReportAIDAnalytics {
     let carbTreatmentMarkers: [GlucoseReportLoopalyzerTreatmentMarker]
     let profileSchedules: [GlucoseReportAIDProfileSchedule]
 
-    var hasChartData: Bool {
-        loopalyzerPoints.contains { point in
-            point.glucoseMgDl != nil || point.scheduledBasalRate != nil || point.basalDeltaRate != nil || point.iob != nil || point.cob != nil
-        }
-    }
-
     var systemDescription: String {
         let name = systemName ?? "AID"
         guard let systemVersion, !systemVersion.isEmpty else { return name }

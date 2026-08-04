@@ -169,5 +169,3 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
-"common_statistics_loopalyzerAttribution" = "Navdihnjeno z orodjem Loopalyzer in poročili Nightscout.";
-"common_statistics_loopingOverview" = "Pregled zanke";

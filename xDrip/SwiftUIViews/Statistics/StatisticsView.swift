@@ -48,11 +48,6 @@ struct StatisticsView: View {
         .task {
             viewModel.load()
         }
-        .onChange(of: availablePages) { pages in
-            if !pages.contains(selectedPage) {
-                selectedPage = pages.first ?? .cgmData
-            }
-        }
     }
 
     @ViewBuilder private var contentArea: some View {
@@ -62,7 +57,7 @@ struct StatisticsView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let analytics = viewModel.analytics, analytics.hasData {
             TabView(selection: $selectedPage) {
-                ForEach(availablePages) { page in
+                ForEach(StatisticsPage.allCases) { page in
                     StatisticsPageScrollView {
                         pagePicker
                         pageContent(page, analytics: analytics)
@@ -88,24 +83,12 @@ struct StatisticsView: View {
             StatisticsCGMDataPage(analytics: analytics)
         case .cgmStatistics:
             StatisticsCGMStatisticsPage(analytics: analytics, period: viewModel.selectedPeriod)
-        case .looping:
-            if let aidAnalytics = analytics.aidAnalytics {
-                StatisticsLoopingPage(aidAnalytics: aidAnalytics, usesMgDl: analytics.usesMgDl)
-            }
         }
-    }
-
-    private var availablePages: [StatisticsPage] {
-        guard viewModel.analytics?.aidAnalytics != nil else {
-            return [.cgmData, .cgmStatistics]
-        }
-
-        return [.cgmData, .cgmStatistics, .looping]
     }
 
     private var pagePicker: some View {
         Picker(Texts_Common.statisticsSection, selection: $selectedPage) {
-            ForEach(availablePages) { page in
+            ForEach(StatisticsPage.allCases) { page in
                 Text(page.title)
                     .tag(page)
             }
@@ -142,7 +125,6 @@ struct StatisticsView: View {
 private enum StatisticsPage: String, CaseIterable, Identifiable {
     case cgmData
     case cgmStatistics
-    case looping
 
     var id: Self { self }
 
@@ -152,8 +134,6 @@ private enum StatisticsPage: String, CaseIterable, Identifiable {
             return Texts_Common.statisticsSummary
         case .cgmStatistics:
             return Texts_Common.statisticsTrends
-        case .looping:
-            return Texts_Common.statisticsLooping
         }
     }
 }
@@ -201,19 +181,6 @@ private struct StatisticsCGMStatisticsPage: View {
         StatisticsAGPCard(analytics: analytics)
         StatisticsTrendCard(trendPoints: analytics.trendPoints)
         StatisticsDailyPatternCard(analytics: analytics, period: period)
-    }
-}
-
-private struct StatisticsLoopingPage: View {
-    let aidAnalytics: GlucoseReportAIDAnalytics
-    let usesMgDl: Bool
-
-    var body: some View {
-        StatisticsAIDSummaryCard(aidAnalytics: aidAnalytics)
-
-        if aidAnalytics.hasChartData {
-            StatisticsLoopalyzerCard(aidAnalytics: aidAnalytics, usesMgDl: usesMgDl)
-        }
     }
 }
 
@@ -420,420 +387,25 @@ private struct StatisticsAGPCard: View {
     }
 }
 
-private struct StatisticsAIDSummaryCard: View {
-    let aidAnalytics: GlucoseReportAIDAnalytics
-
-    private let tileSpacing: CGFloat = 10
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            VStack(spacing: tileSpacing) {
-                HStack(spacing: tileSpacing) {
-                    summaryTile(title: Texts_Common.statisticsAverageTDD, value: aidAnalytics.averageTDD.map { "\($0.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes) U/day" } ?? "-")
-                    summaryTile(title: Texts_Common.statisticsAverageCarbs, value: aidAnalytics.averageCarbsPerDay.map { "\($0.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes) g/day" } ?? "-")
-                }
-
-                summaryTile(
-                    title: Texts_Common.statisticsLoopingTime,
-                    value: GlucoseReportFormatting.percentage(aidAnalytics.loopingTimePercentage),
-                    detail: String(format: Texts_Common.statisticsTargetGreaterThan, GlucoseReportFormatting.percentage(70)),
-                    gauge: StatisticsGauge(
-                        value: aidAnalytics.loopingTimePercentage,
-                        target: 70,
-                        upperBound: 100,
-                        isLowerBetter: false
-                    )
-                )
-            }
-
-            Text(String(format: Texts_Common.statisticsCalculatedUsingDaysFormat, aidAnalytics.calculationDays))
-                .font(.caption2)
-                .foregroundStyle(Color(.colorSecondary))
-                .padding(.horizontal, 12)
-        }
-    }
-
-    private func summaryTile(title: String, value: String, detail: String? = nil, gauge: StatisticsGauge? = nil) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title.uppercased())
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(Color(.colorSecondary))
-            Text(value)
-                .font(.callout.weight(.bold))
-                .foregroundStyle(Color(.colorPrimary))
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-            if let detail {
-                Text(detail)
-                    .font(.caption2)
-                    .foregroundStyle(Color(.colorTertiary))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.65)
-            }
-            if let gauge {
-                StatisticsTargetGauge(gauge: gauge)
-            }
-        }
-        .padding(10)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
-    }
-}
-
-private struct StatisticsLoopalyzerCard: View {
-    let aidAnalytics: GlucoseReportAIDAnalytics
-    let usesMgDl: Bool
-
-    var body: some View {
-        let displayPeriodDays = min(aidAnalytics.periodDays, GlucoseReportAIDPeriod.three.rawValue)
-
-        VStack(alignment: .leading, spacing: 4) {
-            StatisticsSection(
-                title: Texts_Common.statisticsLoopingOverview,
-                detail: String(format: Texts_Common.statisticsAveragePeriodFormat, displayPeriodDays)
-            ) {
-                StatisticsCard {
-                    StatisticsLoopalyzerChart(
-                        points: aidAnalytics.loopalyzerPoints,
-                        insulinTreatmentMarkers: aidAnalytics.insulinTreatmentMarkers,
-                        carbTreatmentMarkers: aidAnalytics.carbTreatmentMarkers,
-                        usesMgDl: usesMgDl
-                    )
-                }
-            }
-
-            // Keep the in-app attribution concise. The generated clinical report provides
-            // the fuller explanation of how the multi-day Loopalyzer-style trace is derived.
-            Text(Texts_Common.statisticsLoopalyzerAttribution)
-                .font(.caption2)
-                .foregroundStyle(Color(.colorSecondary))
-                .padding(.horizontal, 12)
-        }
-    }
-}
-
-private struct StatisticsLoopalyzerChart: View {
-    let points: [GlucoseReportLoopalyzerPoint]
-    let insulinTreatmentMarkers: [GlucoseReportLoopalyzerTreatmentMarker]
-    let carbTreatmentMarkers: [GlucoseReportLoopalyzerTreatmentMarker]
-    let usesMgDl: Bool
-
-    private enum Layout {
-        static let plotHeight: CGFloat = 60
-        static let xAxisHeight: CGFloat = 18
-        static let chartHeight = plotHeight + xAxisHeight
-        static let yAxisLabelWidth: CGFloat = 24
-        static let axisLabelFontSize = ConstantsStatistics.chartAxisLabelFontSize + 1
-        static let treatmentBarWidthMinutes = 5.0
-    }
-
-    var body: some View {
-        VStack(spacing: 12) {
-            loopChart(title: Texts_Common.statisticsScheduledBasalProfile, yDomain: 0 ... basalUpperBound, showsXAxisLabels: true, basalProfile: true)
-            loopChart(title: Texts_Common.statisticsAverageGlucose, yDomain: glucoseDomain, glucose: true)
-            loopChart(title: Texts_Common.statisticsTempBasalDelta, yDomain: basalDeltaDomain, basalDelta: true)
-            loopChart(title: "IOB", yDomain: -1 ... iobUpperBound, iob: true)
-            loopChart(title: "COB", yDomain: 0 ... cobUpperBound, showsXAxisLabels: true, cob: true)
-        }
-    }
-
-    private func loopChart(
-        title: String,
-        yDomain: ClosedRange<Double>,
-        showsXAxisLabels: Bool = false,
-        basalProfile: Bool = false,
-        basalDelta: Bool = false,
-        glucose: Bool = false,
-        iob: Bool = false,
-        cob: Bool = false
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            chartTitle(title)
-
-            HStack(alignment: .top, spacing: 4) {
-                Chart {
-                    if glucose {
-                        RectangleMark(
-                            xStart: .value("Start", 0.0),
-                            xEnd: .value("End", 1440.0),
-                            yStart: .value("Low", convertedGlucose(GlucoseReportClinicalConstants.timeInRangeLowMgDl)),
-                            yEnd: .value("High", convertedGlucose(GlucoseReportClinicalConstants.timeInRangeHighMgDl))
-                        )
-                        .foregroundStyle(ConstantsAppColors.statisticsInRange.opacity(0.12))
-
-                        RuleMark(y: .value("Low", convertedGlucose(GlucoseReportClinicalConstants.timeInRangeLowMgDl)))
-                            .lineStyle(StrokeStyle(lineWidth: 0.5))
-                            .foregroundStyle(ConstantsAppColors.statisticsLow.opacity(0.5))
-
-                        RuleMark(y: .value("High", convertedGlucose(GlucoseReportClinicalConstants.timeInRangeHighMgDl)))
-                            .lineStyle(StrokeStyle(lineWidth: 0.5))
-                            .foregroundStyle(ConstantsAppColors.statisticsHigh.opacity(0.5))
-                    }
-
-                    ForEach(points) { point in
-                        if basalProfile, let value = point.scheduledBasalRate {
-                            RectangleMark(
-                                xStart: .value("Start", point.bucketStartMinute),
-                                xEnd: .value("End", point.bucketEndMinute),
-                                yStart: .value("Zero", 0),
-                                yEnd: .value("Basal", value)
-                            )
-                            .foregroundStyle(GlucoseReportColors.aidScheduledBasalFill.opacity(GlucoseReportColors.aidScheduledBasalFillOpacity))
-                        }
-                        if basalProfile, let value = point.scheduledBasalRate {
-                            // Draw the scheduled rate over the exact same quarter-hour interval
-                            // as its filled block so the dashed edge cannot drift within the bar.
-                            RuleMark(
-                                xStart: .value("Start", point.bucketStartMinute),
-                                xEnd: .value("End", point.bucketEndMinute),
-                                y: .value("Basal", value)
-                            )
-                            .lineStyle(StrokeStyle(
-                                lineWidth: GlucoseReportColors.aidScheduledBasalLineWidth,
-                                dash: [3.0, 2.0]
-                            ))
-                            .foregroundStyle(GlucoseReportColors.aidScheduledBasal)
-                        }
-                        if glucose, let value = point.glucoseMgDl {
-                            // Glucose is the mean of a 15-minute bucket, so its true plotting
-                            // position is the bucket midpoint rather than the bucket start.
-                            LineMark(x: .value("Time", point.bucketMidpointMinute), y: .value("Glucose", convertedGlucose(value)))
-                                .foregroundStyle(ConstantsAppColors.statisticsInRange)
-                                .lineStyle(StrokeStyle(lineWidth: 2.0))
-                                .interpolationMethod(.catmullRom)
-                        }
-                        if basalDelta, let value = point.basalDeltaRate {
-                            RectangleMark(
-                                xStart: .value("Start", point.bucketBarStartMinute),
-                                xEnd: .value("End", point.bucketBarEndMinute),
-                                yStart: .value("Zero", 0),
-                                yEnd: .value("Delta", value)
-                            )
-                            .foregroundStyle(GlucoseReportColors.aidDeliveredBasal.opacity(GlucoseReportColors.aidDeliveredBasalOpacity))
-                        }
-                        if iob, let value = point.iob {
-                            RectangleMark(
-                                xStart: .value("Start", point.bucketBarStartMinute),
-                                xEnd: .value("End", point.bucketBarEndMinute),
-                                yStart: .value("Zero", 0),
-                                yEnd: .value("IOB", value)
-                            )
-                            .foregroundStyle(
-                                value < 0
-                                    ? ConstantsAppColors.statisticsLow
-                                    : GlucoseReportColors.aidIOB.opacity(GlucoseReportColors.aidIOBOpacity)
-                            )
-                        }
-                        if cob, let value = point.cob {
-                            RectangleMark(
-                                xStart: .value("Start", point.bucketBarStartMinute),
-                                xEnd: .value("End", point.bucketBarEndMinute),
-                                yStart: .value("Zero", 0),
-                                yEnd: .value("COB", value)
-                            )
-                            .foregroundStyle(GlucoseReportColors.aidCOB.opacity(GlucoseReportColors.aidCOBOpacity))
-                        }
-                    }
-
-                    if basalProfile {
-                        ForEach(scheduledBasalTransitions) { transition in
-                            RuleMark(
-                                x: .value("Time", transition.minuteOfDay),
-                                yStart: .value("From", transition.fromRate),
-                                yEnd: .value("To", transition.toRate)
-                            )
-                            .lineStyle(StrokeStyle(
-                                lineWidth: GlucoseReportColors.aidScheduledBasalLineWidth,
-                                dash: [3.0, 2.0]
-                            ))
-                            .foregroundStyle(GlucoseReportColors.aidScheduledBasal)
-                        }
-                    }
-
-                    // Axis gridlines render behind marks, where the full-width bar series obscure
-                    // them. Internal rules remain visible without outlining the plot area.
-                    ForEach([360.0, 720.0, 1080.0], id: \.self) { minute in
-                        RuleMark(x: .value("Grid Time", minute))
-                            .lineStyle(StrokeStyle(lineWidth: 0.5))
-                            .foregroundStyle(Color(.colorSecondary).opacity(0.45))
-                    }
-                    RuleMark(y: .value("Grid Value", (yDomain.lowerBound + yDomain.upperBound) / 2))
-                        .lineStyle(StrokeStyle(lineWidth: 0.5))
-                        .foregroundStyle(Color(.colorSecondary).opacity(0.45))
-
-                    if iob {
-                        ForEach(insulinTreatmentMarkers) { marker in
-                            treatmentMarker(marker, yDomain: yDomain)
-                        }
-                    }
-
-                    if cob {
-                        ForEach(carbTreatmentMarkers) { marker in
-                            treatmentMarker(marker, yDomain: yDomain)
-                        }
-                    }
-                }
-                .chartLegend(.hidden)
-                .chartXScale(
-                    domain: 0.0 ... 1440.0,
-                    range: .plotDimension(startPadding: 0, endPadding: 0)
-                )
-                .chartYScale(domain: yDomain)
-                .chartYAxis {
-                    AxisMarks(position: .trailing, values: [yDomain.lowerBound, yDomain.upperBound]) { _ in
-                        AxisGridLine()
-                            .foregroundStyle(Color(.colorSecondary).opacity(0.55))
-                    }
-                }
-                .chartXAxis {
-                    AxisMarks(values: [0.0, 360.0, 720.0, 1080.0, 1440.0]) { value in
-                        if showsXAxisLabels {
-                            AxisTick(length: 5, stroke: StrokeStyle(lineWidth: 0.5))
-                                .foregroundStyle(Color(.colorSecondary).opacity(0.45))
-                            AxisValueLabel {
-                                if let minute = value.as(Double.self) {
-                                    Text(timeLabel(for: Int(minute)))
-                                        .font(.system(size: Layout.axisLabelFontSize))
-                                        .foregroundStyle(Color(.colorSecondary))
-                                }
-                            }
-                        }
-                    }
-                }
-                .chartPlotStyle { plotArea in
-                    plotArea.frame(height: Layout.plotHeight)
-                }
-                .frame(height: showsXAxisLabels ? Layout.chartHeight : Layout.plotHeight, alignment: .top)
-
-                yAxisLabels(for: yDomain)
-            }
-        }
-    }
-
-    private func chartTitle(_ title: String) -> some View {
-        Text(title)
-            .font(.system(size: ConstantsStatistics.chartAxisLabelFontSize + 3, weight: .semibold))
-            .foregroundStyle(Color(.colorPrimary))
-            .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private func yAxisLabels(for yDomain: ClosedRange<Double>) -> some View {
-        VStack(alignment: .leading) {
-            axisLabel(yDomain.upperBound)
-            Spacer()
-            axisLabel(yDomain.lowerBound)
-        }
-        // The x-axis labels consume part of the Chart's total height. Match only the explicit
-        // plot-area height so the lower value sits on the real y-axis baseline.
-        .frame(width: Layout.yAxisLabelWidth, height: Layout.plotHeight, alignment: .leading)
-    }
-
-    private func axisLabel(_ value: Double) -> some View {
-        Text(value.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes)
-            .font(.system(size: Layout.axisLabelFontSize))
-            .foregroundStyle(Color(.colorSecondary))
-            .lineLimit(1)
-    }
-
-    /// Nightscout Loopalyzer represents treatments as vertical black bars on the IOB/COB
-    /// charts. Keep them narrow, but tall enough to represent their treatment amount clearly.
-    private func treatmentMarker(
-        _ marker: GlucoseReportLoopalyzerTreatmentMarker,
-        yDomain: ClosedRange<Double>
-    ) -> some ChartContent {
-        let halfWidth = Layout.treatmentBarWidthMinutes / 2
-        return RectangleMark(
-            xStart: .value("Start", max(Double(marker.minuteOfDay) - halfWidth, 0)),
-            xEnd: .value("End", min(Double(marker.minuteOfDay) + halfWidth, 1440)),
-            yStart: .value("Zero", 0),
-            yEnd: .value("Treatment", min(marker.amount, yDomain.upperBound))
-        )
-        .foregroundStyle(Color(.lightGray).opacity(0.6))
-    }
-
-    private var basalUpperBound: Double {
-        upperBound(values: points.compactMap(\.scheduledBasalRate), minimum: 2)
-    }
-
-    private var basalDeltaDomain: ClosedRange<Double> {
-        let maximum = max(points.compactMap(\.basalDeltaRate).map(abs).max() ?? 0, 1)
-        let bound = ceil(maximum * 1.15 * 10) / 10
-        return -bound ... bound
-    }
-
-    private var glucoseDomain: ClosedRange<Double> {
-        if usesMgDl {
-            return 40 ... max(250, upperBound(values: points.compactMap(\.glucoseMgDl), minimum: 250))
-        }
-
-        return (40 * ConstantsBloodGlucose.mgDlToMmoll) ... max(13.9, upperBound(values: points.compactMap { $0.glucoseMgDl.map(convertedGlucose) }, minimum: 13.9))
-    }
-
-    private var iobUpperBound: Double {
-        upperBound(values: points.compactMap(\.iob) + insulinTreatmentMarkers.map(\.amount), minimum: 5)
-    }
-
-    private var cobUpperBound: Double {
-        upperBound(values: points.compactMap(\.cob) + carbTreatmentMarkers.map(\.amount), minimum: 30)
-    }
-
-    private func upperBound(values: [Double], minimum: Double) -> Double {
-        guard let maximum = values.max(), maximum > 0 else { return minimum }
-        return max(minimum, ceil(maximum * 1.15))
-    }
-
-    private func convertedGlucose(_ valueMgDl: Double) -> Double {
-        usesMgDl ? valueMgDl : valueMgDl * ConstantsBloodGlucose.mgDlToMmoll
-    }
-
-    private func timeLabel(for minute: Int) -> String {
-        String(format: "%02d:00", min(minute / 60, 24))
-    }
-
-    private var scheduledBasalTransitions: [ScheduledBasalTransition] {
-        let scheduledPoints = points
-            .compactMap { point -> (minute: Double, rate: Double)? in
-                guard let rate = point.scheduledBasalRate else { return nil }
-                return (point.bucketStartMinute, rate)
-            }
-            .sorted { $0.minute < $1.minute }
-
-        return scheduledPoints.indices.compactMap { index in
-            guard index > scheduledPoints.startIndex else { return nil }
-            let previous = scheduledPoints[scheduledPoints.index(before: index)]
-            let current = scheduledPoints[index]
-            guard previous.rate != current.rate else { return nil }
-            return ScheduledBasalTransition(
-                minuteOfDay: current.minute,
-                fromRate: previous.rate,
-                toRate: current.rate
-            )
-        }
-    }
-
-    private struct ScheduledBasalTransition: Identifiable {
-        let minuteOfDay: Double
-        let fromRate: Double
-        let toRate: Double
-
-        var id: String {
-            "\(minuteOfDay)-\(fromRate)-\(toRate)"
-        }
-    }
-}
-
 private struct StatisticsAGPChart: View {
     let points: [GlucoseReportAGPPoint]
     let usesMgDl: Bool
 
     var body: some View {
-        AGPChartView(
-            points: points,
-            usesMgDl: usesMgDl,
-            presentation: .statistics,
-            emptyMessage: Texts_Common.statisticsInsufficientAGPData
-        )
+        GeometryReader { geometry in
+            AGPChartView(
+                points: points,
+                usesMgDl: usesMgDl,
+                presentation: .statistics,
+                emptyMessage: Texts_Common.statisticsInsufficientAGPData,
+                fixedPlotWidth: plotWidth(for: geometry.size.width)
+            )
+        }
         .frame(height: 165)
+    }
+
+    private func plotWidth(for availableWidth: CGFloat) -> CGFloat {
+        max(0, availableWidth - ConstantsStatistics.chartTrailingAxisWidth)
     }
 }
 

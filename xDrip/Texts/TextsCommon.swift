@@ -264,10 +264,6 @@ class Texts_Common {
         return NSLocalizedString("common_statistics_section", tableName: filename, bundle: Bundle.main, value: "Section", comment: "statistics content section picker title")
     }()
 
-    static let statisticsLooping = {
-        return NSLocalizedString("common_statistics_looping", tableName: filename, bundle: Bundle.main, value: "Looping", comment: "statistics looping page title")
-    }()
-
     static let statisticsTimeInRange = {
         return NSLocalizedString("common_statistics_timeInRange", tableName: filename, bundle: Bundle.main, value: "Time in Range", comment: "statistics time in range title")
     }()
@@ -332,22 +328,6 @@ class Texts_Common {
         return NSLocalizedString("common_statistics_dailyPatternFooter", tableName: filename, bundle: Bundle.main, value: "Bars show daily percentage in 70-180 mg/dL range. The dashed line marks the 70% clinical target.", comment: "statistics daily pattern chart footer")
     }()
 
-    static let statisticsLoopingTime = {
-        return NSLocalizedString("common_statistics_loopingTime", tableName: filename, bundle: Bundle.main, value: "Looping Success", comment: "statistics AID looping success title")
-    }()
-
-    static let statisticsTargetGreaterThan = {
-        return NSLocalizedString("common_statistics_targetGreaterThan", tableName: filename, bundle: Bundle.main, value: "Target >%@", comment: "statistics target greater than value format")
-    }()
-
-    static let statisticsCalculatedUsingDaysFormat = {
-        return NSLocalizedString("common_statistics_calculatedUsingDaysFormat", tableName: filename, bundle: Bundle.main, value: "Calculated using %d days of data.", comment: "statistics AID data coverage footer")
-    }()
-
-    static let statisticsSystem = {
-        return NSLocalizedString("common_statistics_system", tableName: filename, bundle: Bundle.main, value: "System", comment: "statistics AID system title")
-    }()
-
     static let statisticsAverageTDD = {
         return NSLocalizedString("common_statistics_averageTDD", tableName: filename, bundle: Bundle.main, value: "Average TDD", comment: "statistics AID average total daily dose title")
     }()
@@ -356,28 +336,8 @@ class Texts_Common {
         return NSLocalizedString("common_statistics_averageCarbs", tableName: filename, bundle: Bundle.main, value: "Average Carbs", comment: "statistics AID average carbohydrates title")
     }()
 
-    static let statisticsLoopingOverview = {
-        return NSLocalizedString("common_statistics_loopingOverview", tableName: filename, bundle: Bundle.main, value: "Looping Overview", comment: "statistics AID looping chart title")
-    }()
-
-    static let statisticsLoopalyzerPeriodFormat = {
-        return NSLocalizedString("common_statistics_loopalyzerPeriodFormat", tableName: filename, bundle: Bundle.main, value: "%d days", comment: "statistics AID loopalyzer period label")
-    }()
-
-    static let statisticsLoopalyzerAttribution = {
-        return NSLocalizedString("common_statistics_loopalyzerAttribution", tableName: filename, bundle: Bundle.main, value: "Inspired by Loopalyzer and Nightscout reports. For more in-depth analysis, use the Loopalyzer function in Nightscout.", comment: "statistics AID loop chart attribution footer")
-    }()
-
     static let reportPeriodFooter = {
         return NSLocalizedString("common_report_periodFooter", tableName: filename, bundle: Bundle.main, value: "90 days is recommended for a clinical CGM report.", comment: "report settings period recommendation footer")
-    }()
-
-    static let statisticsScheduledBasalProfile = {
-        return NSLocalizedString("common_statistics_scheduledBasalProfile", tableName: filename, bundle: Bundle.main, value: "Scheduled Basal Profile", comment: "statistics scheduled basal profile chart label")
-    }()
-
-    static let statisticsAveragePeriodFormat = {
-        return NSLocalizedString("common_statistics_averagePeriodFormat", tableName: filename, bundle: Bundle.main, value: "Last %d Days", comment: "statistics recent Loopalyzer period")
     }()
 
     static let statisticsTempBasalDelta = {
