@@ -13,7 +13,7 @@ import SwiftUI
 import UIKit
 
 /// manager class to handle the live activity events
-public final class LiveActivityManager {
+public final class LiveActivityManager: ObservableObject {
     // MARK: - Private variables
     
     private var eventAttributes: XDripWidgetAttributes
@@ -29,7 +29,21 @@ public final class LiveActivityManager {
     
     // initialize an "empty" contentState and use this to hold the current context state of the live activity after each start/update
     // this makes it much easier to restart from an App Intent without needing to generate a new context to send
-    private var persistentContentState = XDripWidgetAttributes.ContentState(bgReadingValues: [0], bgReadingDates: [.now], isMgDl: true, slopeOrdinal: 0, deltaValueInUserUnit: 0, urgentLowLimitInMgDl: 0, lowLimitInMgDl: 0, highLimitInMgDl: 0, urgentHighLimitInMgDl: 0, liveActivityType: .normal, dataSourceDescription: "", deviceStatusCreatedAt: .now, deviceStatusLastLoopDate: .now)
+    @Published private var persistentContentState = XDripWidgetAttributes.ContentState(
+        bgReadingValues: [0],
+        bgReadingDates: [.now],
+        isMgDl: true,
+        slopeOrdinal: 0,
+        deltaValueInUserUnit: 0,
+        urgentLowLimitInMgDl: 0,
+        lowLimitInMgDl: 0,
+        highLimitInMgDl: 0,
+        urgentHighLimitInMgDl: 0,
+        liveActivityType: .normal,
+        dataSourceDescription: "",
+        deviceStatusCreatedAt: .now,
+        deviceStatusLastLoopDate: .now
+    )
     
     // the start date of the event so when know track when to proactively end/restart the activity
     private var eventStartDate: Date
@@ -57,6 +71,11 @@ public final class LiveActivityManager {
 // MARK: - Helper Extension
 
 extension LiveActivityManager {
+    /// Uses the most recent real state for the Settings preview once glucose limits are available.
+    var contentStateForPreview: XDripWidgetAttributes.ContentState? {
+        persistentContentState.urgentLowLimitInMgDl > 0 ? persistentContentState : nil
+    }
+
     /// Public API: serialized update entry point
     @MainActor
     func update(contentState: XDripWidgetAttributes.ContentState, forceRestart: Bool = false) {

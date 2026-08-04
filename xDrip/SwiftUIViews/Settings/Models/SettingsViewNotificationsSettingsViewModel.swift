@@ -1,6 +1,7 @@
 import Foundation
 import OSLog
 import ActivityKit
+import SwiftUI
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -96,13 +97,46 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
                 )
             ]
         case .liveActivities:
+            var liveActivityTypeRow = nativeSettingsRow(
+                id: "notifications.liveActivityType",
+                index: Setting.liveActivityType.rawValue,
+                sectionID: sectionID,
+                isVisible: liveActivitiesAvailable
+            )
+            if UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
+                let liveActivityTypes = LiveActivityType.allCasesForList
+                liveActivityTypeRow.accessory = .none
+                liveActivityTypeRow.control = .menu(
+                    options: {
+                        liveActivityTypes.map {
+                            SettingsMenuOption(title: $0.description, isSelected: $0 == UserDefaults.standard.liveActivityType)
+                        }
+                    },
+                    selectOption: { index in
+                        guard liveActivityTypes.indices.contains(index) else { return }
+                        let oldLiveActivityType = UserDefaults.standard.liveActivityType
+                        let newLiveActivityType = liveActivityTypes[index]
+                        guard newLiveActivityType != oldLiveActivityType else { return }
+                        UserDefaults.standard.liveActivityType = newLiveActivityType
+                        trace(
+                            "Live activity type was changed from '%{public}@' to '%{public}@'",
+                            log: self.log,
+                            category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel,
+                            type: .info,
+                            oldLiveActivityType.description,
+                            newLiveActivityType.description
+                        )
+                    }
+                )
+            }
             return [
+                liveActivityTypeRow,
                 SettingsRow(
-                    id: "notifications.liveActivityType",
+                    id: "notifications.liveActivityPreview",
                     title: Texts_SettingsView.labelLiveActivityType,
-                    detail: UserDefaults.standard.liveActivityType.description,
-                    isVisible: liveActivitiesAvailable,
-                    action: .selectionList(liveActivitySelectionList)
+                    accessory: .none,
+                    control: .custom(content: { AnyView(LiveActivitySettingsPreview()) }),
+                    isVisible: liveActivitiesAvailable && UserDefaults.standard.liveActivityType != .disabled
                 )
             ]
         }
@@ -350,46 +384,6 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
         )
     }
 
-    private func liveActivitySelectionList() -> SettingsSelectionListContent {
-        var data = [String]()
-        var selectedRow: Int?
-        var index = 0
-        let currentLiveActivityType = UserDefaults.standard.liveActivityType
-
-        for liveActivityType in LiveActivityType.allCasesForList {
-            data.append(liveActivityType.description)
-
-            if liveActivityType == currentLiveActivityType {
-                selectedRow = index
-            }
-
-            index += 1
-        }
-
-        return SettingsSelectionListContent(
-            title: Texts_SettingsView.labelLiveActivityType,
-            data: data,
-            selectedRow: selectedRow,
-            actionTitle: Texts_Common.Ok,
-            cancelTitle: Texts_Common.Cancel,
-            action: { index in
-                let oldLiveActivityType = UserDefaults.standard.liveActivityType
-
-                if index != selectedRow {
-                    UserDefaults.standard.liveActivityType = LiveActivityType(forRowAt: index) ?? .disabled
-
-                    let newLiveActivityType = UserDefaults.standard.liveActivityType
-
-                    trace("Live activity type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, oldLiveActivityType.description, newLiveActivityType.description)
-
-                    self.sectionReloadClosure?()
-                }
-            },
-            cancel: nil,
-            didSelectRow: nil
-        )
-    }
-    
     // MARK: - observe functions
     
     private func addObservers() {

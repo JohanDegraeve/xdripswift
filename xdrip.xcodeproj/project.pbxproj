@@ -167,12 +167,14 @@
 		47A6AC452B7D43100047A4BA /* Common.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD444221C9D0D006EAB84 /* Common.strings */; };
 		47A6AC462B7D43110047A4BA /* Common.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD444221C9D0D006EAB84 /* Common.strings */; };
 		47A8B8872E392BFE00081CBD /* LiveActivityViewContentActivityFamilies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A8B8862E392BF700081CBD /* LiveActivityViewContentActivityFamilies.swift */; };
+		47A8B8882F4A00000081CBD /* LiveActivityViewContentActivityFamilies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A8B8862E392BF700081CBD /* LiveActivityViewContentActivityFamilies.swift */; };
 		47AECB9E2CD2B62B005F1814 /* NightscoutDeviceStatusModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47AECB9D2CD2B618005F1814 /* NightscoutDeviceStatusModels.swift */; };
 		47B136DB2BC9BB55001E7ED3 /* ContactImageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B136DA2BC9BB55001E7ED3 /* ContactImageRenderer.swift */; };
 		47B136DD2BCA9151001E7ED3 /* ConstantsContactImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B136DC2BCA9151001E7ED3 /* ConstantsContactImage.swift */; };
 		47B60F3726F389E2003198D3 /* LandscapeChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B60F3626F389E2003198D3 /* LandscapeChartView.swift */; };
 		47B65D412E3A31B100C3140B /* LiveActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B65D402E3A319D00C3140B /* LiveActivityView.swift */; };
 		47B65D452E3A756300C3140B /* LiveActivityViewContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B65D442E3A755900C3140B /* LiveActivityViewContent.swift */; };
+		47B65D462F4A000000C3140B /* LiveActivityViewContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B65D442E3A755900C3140B /* LiveActivityViewContent.swift */; };
 		47B731412B83DD3C00B0A450 /* ConstantsLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7313F2B83DC0200B0A450 /* ConstantsLiveActivity.swift */; };
 		47B7FC722B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
 		47CA61E42B965E7100C2A597 /* AccessoryCircularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */; };
@@ -300,6 +302,7 @@
 		4F2500143002000100000001 /* SensorHealthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2500133002000100000001 /* SensorHealthModels.swift */; };
 		4F2600013002000200000001 /* SensorNoisePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2600113002000200000001 /* SensorNoisePersistenceTests.swift */; };
 		4F2600023002000200000001 /* SensorHealthIssueManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2600123002000200000001 /* SensorHealthIssueManagerTests.swift */; };
+		4F2700123003000100000001 /* LiveActivitySettingsPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2700113003000100000001 /* LiveActivitySettingsPreview.swift */; };
 		745981A52E1F1B0F85780B06 /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
 		7DDD89BD4ECFCE7BDA8D3AE2 /* SettingsSharedUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */; };
 		BA0000010000000000000001 /* BackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000011 /* BackupModels.swift */; };
@@ -1141,6 +1144,7 @@
 		4F2600113002000200000001 /* SensorNoisePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorNoisePersistenceTests.swift; sourceTree = "<group>"; };
 		4F2600123002000200000001 /* SensorHealthIssueManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorHealthIssueManagerTests.swift; sourceTree = "<group>"; };
 		4F2600133002000200000001 /* xdripTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = xdripTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4F2700113003000100000001 /* LiveActivitySettingsPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivitySettingsPreview.swift; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xDrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xDrip/Version.xcconfig; sourceTree = "<group>"; };
 		685B5F8D633F5492574F0567 /* GlucoseChartStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartStateManager.swift; sourceTree = "<group>"; };
@@ -2801,6 +2805,7 @@
 				BA0000010000000000000016 /* DataDeletionView.swift */,
 				BA0000010000000000000014 /* DataManagementView.swift */,
 				BA000001000000000000001A /* ImportDataView.swift */,
+				4F2700113003000100000001 /* LiveActivitySettingsPreview.swift */,
 				F866974F2867AA4A00025441 /* LoopDelayScheduleView.swift */,
 				BA0000010000000000000019 /* ManageDataView.swift */,
 				BA0000010000000000000018 /* NightscoutImportView.swift */,
@@ -4174,6 +4179,9 @@
 				F8F71D802B7EAA2E005076E8 /* DexcomG7+CoreDataClass.swift in Sources */,
 				F81FA006228E09D40028C70F /* TextsCalibration.swift in Sources */,
 				F8B3A84A227F090E004BA588 /* SettingsViewNotificationsSettingsViewModel.swift in Sources */,
+				4F2700123003000100000001 /* LiveActivitySettingsPreview.swift in Sources */,
+				47B65D462F4A000000C3140B /* LiveActivityViewContent.swift in Sources */,
+				47A8B8882F4A00000081CBD /* LiveActivityViewContentActivityFamilies.swift in Sources */,
 				F80D916D24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift in Sources */,
 				F8B955EB2591355200C06016 /* CGMLibre2Transmitter+TestData.swift in Sources */,
 				F8F9722E23A5915900C3F17D /* M5StackTransmitterOpCode.swift in Sources */,

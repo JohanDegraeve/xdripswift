@@ -109,14 +109,10 @@ struct XDripWidgetAttributes: ActivityAttributes {
                 let encodedByteCount = (try? JSONEncoder().encode(limitedState).count) ?? Int.max
                 guard encodedByteCount > maximumEncodedBytes else { break }
 
-                let sourceCount = limitedState.bgReadingFloats.count
-                let targetCount = max(2, sourceCount * 3 / 4)
-                let indexes = (0 ..< targetCount).map { index in
-                    index * (sourceCount - 1) / (targetCount - 1)
-                }
-
-                limitedState.bgReadingFloats = indexes.map { limitedState.bgReadingFloats[$0] }
-                limitedState.secondsSinceFirstDate = indexes.map { limitedState.secondsSinceFirstDate[$0] }
+                // remove only the oldest chart point so payload limiting cannot alter the cadence
+                // of the remaining history or remove the current reading.
+                limitedState.bgReadingFloats.removeLast()
+                limitedState.secondsSinceFirstDate.removeLast()
             }
 
             return limitedState

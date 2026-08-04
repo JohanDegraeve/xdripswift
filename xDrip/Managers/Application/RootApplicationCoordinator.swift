@@ -2098,26 +2098,29 @@ import AppIntents
             let hoursOfBgReadingsToSend: Double = 12
             
             let allBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+
+            // reduce faster reading cadences to the same approximate 5 minute spacing used by
+            // post processing. Sources that already provide 5 minute readings remain unchanged.
+            let bgReadings = allBgReadings.filter(
+                minimumTimeBetweenTwoReadingsInMinutes: ConstantsBgSmoothing.fiveMinuteCadenceMinimumTimeBetweenReadingsInMinutes,
+                lastConnectionStatusChangeTimeStamp: nil,
+                timeStampLastProcessedBgReading: nil
+            )
+
+            // calculate the current value, slope and delta from the same readings used by Home.
+            // Chart payload reduction must never change these values.
+            let latestBgReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4)
             
-            // Live Activities have maximum payload size of 4kB.
-            // This value is selected by testing how much we can send before getting the "Payload maximum size exceeded" error.
-            let maxNumberOfReadings = 260
-            
-            // If there are more readings than we can send to the Live Activity, downsample the values to fit.
-            let bgReadings = allBgReadings.count > maxNumberOfReadings
-            ? (0 ..< maxNumberOfReadings).map { allBgReadings[$0 * allBgReadings.count / maxNumberOfReadings] }
-            : allBgReadings
-            
-            if bgReadings.count > 0 {
-                var slopeOrdinal: Int = 0
+            if bgReadings.count > 0, let latestBgReading = latestBgReadings.first {
+                let slopeOrdinal = latestBgReading.slopeOrdinal()
                 var deltaValueInUserUnit: Double = 0
                 var bgReadingValues: [Double] = []
                 var bgReadingDates: [Date] = []
                 
                 // add delta if available
-                if bgReadings.count > 1 {
-                    var previousValueInUserUnit: Double = bgReadings[1].finalValue.mgDlToMmol(mgDl: isMgDl)
-                    var actualValueInUserUnit: Double = bgReadings[0].finalValue.mgDlToMmol(mgDl: isMgDl)
+                if latestBgReadings.count > 1 {
+                    var previousValueInUserUnit: Double = latestBgReadings[1].finalValue.mgDlToMmol(mgDl: isMgDl)
+                    var actualValueInUserUnit: Double = latestBgReading.finalValue.mgDlToMmol(mgDl: isMgDl)
                     
                     // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation
                     if !isMgDl {
@@ -2126,7 +2129,6 @@ import AppIntents
                     }
                     
                     deltaValueInUserUnit = actualValueInUserUnit - previousValueInUserUnit
-                    slopeOrdinal = bgReadings[0].slopeOrdinal()
                 }
                 
                 for bgReading in bgReadings {
