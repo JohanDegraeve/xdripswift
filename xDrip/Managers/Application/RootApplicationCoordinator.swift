@@ -125,6 +125,10 @@ import AppIntents
 
     /// SensorNoiseManager instance
     private var sensorNoiseManager: SensorNoiseManager?
+
+    /// Owns sensor-health episodes, Home banner state and one-off notification deduplication.
+    /// Only confirmed terminal failures cross from this manager into `AlertManager`.
+    private let sensorHealthIssueManager = SensorHealthIssueManager()
     
     /// reference to activeSensor
     private(set) var activeSensor:Sensor?
@@ -297,6 +301,7 @@ import AppIntents
                     alertManager: alertManager,
                     bgPostProcessingManager: bgPostProcessingManager,
                     sensorNoiseManager: sensorNoiseManager,
+                    sensorHealthIssueManager: self.sensorHealthIssueManager,
                     bluetoothPeripheralManager: bluetoothPeripheralManager,
                     soundPlayer: soundPlayer,
                     nightscoutSyncManager: nightscoutSyncManager,
@@ -633,7 +638,11 @@ import AppIntents
         bgPostProcessingManager = BgPostProcessingManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager, healthKitManager: healthKitManager)
 
         // setup sensor noise manager and refresh persisted values for the current algorithm version
-        sensorNoiseManager = SensorNoiseManager(coreDataManager: coreDataManager, bgReadingsAccessor: bgReadingsAccessor)
+        sensorNoiseManager = SensorNoiseManager(
+            coreDataManager: coreDataManager,
+            bgReadingsAccessor: bgReadingsAccessor,
+            sensorHealthIssueManager: sensorHealthIssueManager
+        )
         sensorNoiseManager?.update(activeSensor: activeSensor)
         
         // setup bgReadingSpeaker
@@ -725,6 +734,9 @@ import AppIntents
         
         // setup alertmanager
         alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
+        if let alertManager {
+            sensorHealthIssueManager.configure(oneOffAlarmRaiser: alertManager)
+        }
         
         // setup calendarManager
         calendarManager = CalendarManager(coreDataManager: coreDataManager)
@@ -921,6 +933,9 @@ import AppIntents
                         if let backfilledAt = glucose.backfilledAt ?? (isHistoricalGapFill ? Date() : nil),
                            backfilledAt.timeIntervalSince(glucose.timeStamp) > ConstantsBloodGlucose.minimumSecondsToConsiderAsBackfillDelay {
                             newReading.backfilledAt = backfilledAt
+                            // Rebuild noise history when delayed readings fill a period that was
+                            // previously calculated without them.
+                            activeSensor.noiseHistoryIsComplete = false
                         }
                         
                         if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
@@ -2344,6 +2359,16 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
             createNotification(title: Texts_Common.warning, body: xDripError.errorDescription, identifier: ConstantsNotifications.notificationIdentifierForxCGMTransmitterDelegatexDripError, sound: nil)
         }
     }
+
+    func sensorHealthEventOccurred(_ event: CGMSensorHealthEvent) {
+        guard UserDefaults.standard.isMaster else { return }
+
+        sensorHealthIssueManager.report(
+            event,
+            sensorID: activeSensor?.id,
+            sensorStartDate: activeSensor?.startDate
+        )
+    }
 }
 
 // MARK: - conform to UNUserNotificationCenterDelegate protocol
@@ -2371,6 +2396,13 @@ extension RootApplicationCoordinator: @preconcurrency UNUserNotificationCenterDe
             // so actually the app was in the foreground, at the  moment the Transmitter Class called the cgmTransmitterNeedsPairing function, there's no need to show the notification, we can immediately call back the cgmTransmitter initiatePairing function
             completionHandler([])
             bluetoothPeripheralManager?.initiatePairing()
+        } else if notification.request.identifier.hasPrefix(SensorHealthIssueManager.notificationIdentifierPrefix) {
+            let isTerminal = notification.request.content.userInfo[SensorHealthIssueManager.notificationIsTerminalUserInfoKey] as? Bool == true
+
+            // Home owns the foreground visual for sensor-health episodes. Suppressing the system
+            // banner avoids showing the same title and message twice. A terminal failure remains
+            // a real alarm, so it may still make its one-off sound and remain in Notification Center.
+            completionHandler(isTerminal ? [.sound, .list] : [])
             // this will verify if it concerns an alert notification, if not pickerviewData will be nil
         } else if let pickerViewData = alertManager?.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler) {
             presentPicker(pickerViewData)
@@ -2399,6 +2431,23 @@ extension RootApplicationCoordinator: @preconcurrency UNUserNotificationCenterDe
             presentAlert(title: Texts_Common.warning, message: Texts_HomeView.sensorNotDetected)
         } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
             // nothing required, the pairing function will be called as it's been added to ApplicationManager in function cgmTransmitterNeedsPairing
+        } else if response.notification.request.identifier.hasPrefix(SensorHealthIssueManager.notificationIdentifierPrefix) {
+            let notificationIdentifier = response.notification.request.identifier
+            let isTerminal = response.notification.request.content.userInfo[SensorHealthIssueManager.notificationIsTerminalUserInfoKey] as? Bool == true
+
+            if isTerminal, let alertManager {
+                // This branch deliberately bypasses the conventional snooze response. Clear the
+                // one-off alarm explicitly so an Override Mute sound cannot continue after Home opens.
+                alertManager.clearOneOffSensorFailureAlarm(notificationIdentifier: notificationIdentifier)
+            } else {
+                center.removePendingNotificationRequests(withIdentifiers: [notificationIdentifier])
+                center.removeDeliveredNotifications(withIdentifiers: [notificationIdentifier])
+            }
+
+            // Notification taps only return to Home. Direct detail navigation would leave the
+            // active banner behind and make the notification and banner behave like separate
+            // alerts. The in-app banner remains the single route to the relevant detail view.
+            rootTabStateModel?.showHomeForSensorHealthNotification()
         } else {
             // it's not an initial calibration request notification that the user clicked, by calling alertManager?.userNotificationCenter, we check if it was an alert notification that was clicked and if yes pickerViewData will have the list of alert snooze values
             if let pickerViewData = alertManager?.userNotificationCenter(center, didReceive: response) {

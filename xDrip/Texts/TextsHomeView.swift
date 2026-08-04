@@ -80,10 +80,6 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorManagementNoiseFlatline", tableName: filename, bundle: Bundle.main, value: "The sensor has likely failed.", comment: "warning that repeated identical sensor readings probably indicate sensor failure")
     }()
 
-    static let sensorManagementNoiseFooter:String = {
-        return NSLocalizedString("sensorManagementNoiseFooter", tableName: filename, bundle: Bundle.main, value: "Sensitivity selected: %@", comment: "sensor management noise section footer, parameter is the selected sensitivity level")
-    }()
-
     static let sensorNoiseHistoryTitle:String = {
         return NSLocalizedString("sensorNoiseHistoryTitle", tableName: filename, bundle: Bundle.main, value: "Noise History", comment: "navigation title for sensor noise history")
     }()
@@ -124,6 +120,26 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorNoiseHistoryLongCompact", tableName: filename, bundle: Bundle.main, value: "4 h", comment: "compact label for long-term sensor noise")
     }()
 
+    static let sensorNoiseHistoryPersistentCompact: String = {
+        return NSLocalizedString(
+            "sensorNoiseHistoryPersistentCompact",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "12 h",
+            comment: "compact label for the rolling twelve-hour sensor noise median"
+        )
+    }()
+
+    static let sensorManagementNoisePersistent: String = {
+        return NSLocalizedString(
+            "sensorManagementNoisePersistent",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Last 12 Hours",
+            comment: "sensor noise history row title for the rolling twelve-hour median"
+        )
+    }()
+
     static let sensorNoiseHistoryLoading:String = {
         return NSLocalizedString("sensorNoiseHistoryLoading", tableName: filename, bundle: Bundle.main, value: "Building sensor history", comment: "message while historic sensor noise is calculated")
     }()
@@ -137,7 +153,14 @@ enum Texts_HomeView {
     }()
 
     static let sensorNoiseHistoryFooter:String = {
-        return NSLocalizedString("sensorNoiseHistoryFooter", tableName: filename, bundle: Bundle.main, value: "The chart shows residual sensor jitter across this sensor session. Lower values are smoother. It does not measure glucose accuracy.", comment: "explanation below the sensor noise history chart")
+        return NSLocalizedString(
+            "sensorNoiseHistoryFooter",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "The chart shows 30-minute jitter, the rolling 4-hour value and the 12-hour median "
+                + "used for persistent-noise warnings. Lower values are smoother. It does not measure glucose accuracy.",
+            comment: "explanation below the sensor noise history chart"
+        )
     }()
 
     static let sensorNoiseHistoryChartAccessibility:String = {
@@ -154,6 +177,156 @@ enum Texts_HomeView {
 
     static let sensorNoiseWarningFlatlineTitle:String = {
         return NSLocalizedString("sensorNoiseWarningFlatlineTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Signal Is Flat", comment: "home screen warning title for repeated identical sensor values")
+    }()
+
+    static let sensorHealthPersistentNoiseTitle: String = {
+        return NSLocalizedString(
+            "sensorHealthPersistentNoiseTitle",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Very High Sensor Noise",
+            comment: "sensor health banner title after twelve hours of sustained very high noise"
+        )
+    }()
+
+    static let sensorHealthPersistentNoiseGuidance: String = {
+        return NSLocalizedString(
+            "sensorHealthPersistentNoiseGuidance",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Very high noise for 12 hours. Consider replacing the sensor if it continues.",
+            comment: "compact sensor health guidance for sustained calculated sensor noise"
+        )
+    }()
+
+    static let sensorHealthFlatlineTitle: String = {
+        return NSLocalizedString(
+            "sensorHealthFlatlineTitle",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Sensor Signal Is Flat",
+            comment: "sensor health banner title for repeated identical sensor values"
+        )
+    }()
+
+    static let sensorHealthFlatlineGuidance: String = {
+        return NSLocalizedString(
+            "sensorHealthFlatlineGuidance",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Readings unchanged for 30 minutes. This usually indicates that the sensor has failed/expired.",
+            comment: "compact sensor health guidance for suspected flatline readings"
+        )
+    }()
+
+    static let sensorHealthTemporaryIssueTitle: String = {
+        return NSLocalizedString(
+            "sensorHealthTemporaryIssueTitle",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Temporary Sensor Issue",
+            comment: "sensor health banner title for a transmitter temporary issue lasting three hours"
+        )
+    }()
+
+    static let sensorHealthTemporaryIssueGuidance: String = {
+        return NSLocalizedString(
+            "sensorHealthTemporaryIssueGuidance",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Temporary sensor issue for 3 hours. Check with a meter and follow manufacturer guidance.",
+            comment: "compact sensor health guidance for a temporary transmitter status"
+        )
+    }()
+
+    static let sensorHealthSensorFailedTitle: String = {
+        return NSLocalizedString(
+            "sensorHealthSensorFailedTitle",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Sensor Failed",
+            comment: "sensor health banner title for a transmitter-confirmed sensor failure"
+        )
+    }()
+
+    static let sensorHealthSensorFailedGuidance: String = {
+        return NSLocalizedString(
+            "sensorHealthSensorFailedGuidance",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Sensor failure reported. Replace the sensor.",
+            comment: "compact sensor health guidance for a transmitter-confirmed sensor failure"
+        )
+    }()
+
+    static let sensorHealthTransmitterFailedTitle: String = {
+        return NSLocalizedString(
+            "sensorHealthTransmitterFailedTitle",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Transmitter Failure",
+            comment: "sensor health banner title for a terminal transmitter failure"
+        )
+    }()
+
+    static let sensorHealthTransmitterFailedGuidance: String = {
+        return NSLocalizedString(
+            "sensorHealthTransmitterFailedGuidance",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Transmitter failure reported. Check or replace it.",
+            comment: "compact sensor health guidance for a terminal transmitter failure"
+        )
+    }()
+
+    static let sensorHealthTestPersistentNoise: String = {
+        return NSLocalizedString(
+            "sensorHealthTestPersistentNoise",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Test Persistent Noise in 5 Seconds",
+            comment: "hidden Home context-menu action that queues a persistent sensor noise test warning"
+        )
+    }()
+
+    static let sensorHealthTestFlatline: String = {
+        return NSLocalizedString(
+            "sensorHealthTestFlatline",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Test Flat Signal in 5 Seconds",
+            comment: "hidden Home context-menu action that queues a flat sensor signal test warning"
+        )
+    }()
+
+    static let sensorHealthTestTemporaryIssue: String = {
+        return NSLocalizedString(
+            "sensorHealthTestTemporaryIssue",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Test Temporary Issue in 5 Seconds",
+            comment: "hidden Home context-menu action that queues a temporary sensor issue warning"
+        )
+    }()
+
+    static let sensorHealthTestSensorFailure: String = {
+        return NSLocalizedString(
+            "sensorHealthTestSensorFailure",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Test Sensor Failure in 5 Seconds",
+            comment: "hidden Home context-menu action that queues a sensor failure alarm"
+        )
+    }()
+
+    static let sensorHealthTestTransmitterFailure: String = {
+        return NSLocalizedString(
+            "sensorHealthTestTransmitterFailure",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Test Transmitter Failure in 5 Seconds",
+            comment: "hidden Home context-menu action that queues a transmitter failure alarm"
+        )
     }()
 
     static let sensorManagementActionsTitle:String = {
@@ -204,7 +377,7 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorManagementNoSensor", tableName: filename, bundle: Bundle.main, value: "No Sensor", comment: "banner title when no sensor session is active")
     }()
 
-    static let sensorManagementCGMType:String = {
+    static let sensorManagementCGMType: String = {
         return NSLocalizedString("sensorManagementCGMType", tableName: filename, bundle: Bundle.main, value: "CGM Type", comment: "sensor management row title for CGM type")
     }()
 
@@ -216,27 +389,27 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorManagementRemaining", tableName: filename, bundle: Bundle.main, value: "Remaining", comment: "sensor management row title")
     }()
 
-    static let sensorManagementSessionLifetime:String = {
+    static let sensorManagementSessionLifetime: String = {
         return NSLocalizedString("sensorManagementSessionLifetime", tableName: filename, bundle: Bundle.main, value: "Elapsed / Remaining", comment: "sensor management row title for compact elapsed and remaining lifetime")
     }()
 
-    static let sensorManagementSessionDetails:String = {
+    static let sensorManagementSessionDetails: String = {
         return NSLocalizedString("sensorManagementSessionDetails", tableName: filename, bundle: Bundle.main, value: "Session Details", comment: "sensor management button and alert title for full sensor session dates")
     }()
 
-    static let sensorManagementStarted:String = {
+    static let sensorManagementStarted: String = {
         return NSLocalizedString("sensorManagementStarted", tableName: filename, bundle: Bundle.main, value: "Started", comment: "sensor management session details label for sensor start date")
     }()
 
-    static let sensorManagementEnds:String = {
+    static let sensorManagementEnds: String = {
         return NSLocalizedString("sensorManagementEnds", tableName: filename, bundle: Bundle.main, value: "Ends", comment: "sensor management session details label for sensor end date")
     }()
 
-    static let sensorManagementCalibrationOpenTitle:String = {
+    static let sensorManagementCalibrationOpenTitle: String = {
         return NSLocalizedString("sensorManagementCalibrationOpenTitle", tableName: filename, bundle: Bundle.main, value: "Calibration Details", comment: "sensor management row title that opens calibration details")
     }()
 
-    static let sensorManagementLastCalibration:String = {
+    static let sensorManagementLastCalibration: String = {
         return NSLocalizedString("sensorManagementLastCalibration", tableName: filename, bundle: Bundle.main, value: "Last", comment: "sensor management row title for the latest calibration date")
     }()
 
@@ -252,11 +425,11 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorManagementHistoricCalibration", tableName: filename, bundle: Bundle.main, value: "Historic", comment: "label for a historic or unused calibration")
     }()
 
-    static let pumpBattery:String = {
+    static let pumpBattery: String = {
         return NSLocalizedString("pumpBattery", tableName: filename, bundle: Bundle.main, value: "Battery", comment: "pump status view, insulin pump battery level label")
     }()
 
-    static let pumpReservoir:String = {
+    static let pumpReservoir: String = {
         return NSLocalizedString("pumpReservoir", tableName: filename, bundle: Bundle.main, value: "Reservoir", comment: "pump status view, insulin pump reservoir amount label")
     }()
 
@@ -264,87 +437,87 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorManagementCalibrationSafetyFooter", tableName: filename, bundle: Bundle.main, value: "Only calibrate if you understand how to do it safely.", comment: "safety text shown in the calibration entry screen")
     }()
 
-    static let sensorManagementCalibrationInRange:String = {
+    static let sensorManagementCalibrationInRange: String = {
         return NSLocalizedString("sensorManagementCalibrationInRange", tableName: filename, bundle: Bundle.main, value: "In range", comment: "calibration readiness row checking whether glucose is in a suitable range")
     }()
 
-    static let sensorManagementCalibrationStableTrend:String = {
+    static let sensorManagementCalibrationStableTrend: String = {
         return NSLocalizedString("sensorManagementCalibrationStableTrend", tableName: filename, bundle: Bundle.main, value: "Stable trend", comment: "calibration readiness row checking whether glucose has been stable")
     }()
 
-    static let sensorManagementCalibrationSlightlyLow:String = {
+    static let sensorManagementCalibrationSlightlyLow: String = {
         return NSLocalizedString("sensorManagementCalibrationSlightlyLow", tableName: filename, bundle: Bundle.main, value: "Slightly Low", comment: "calibration readiness detail when glucose is slightly below the preferred calibration range")
     }()
 
-    static let sensorManagementCalibrationSlightlyHigh:String = {
+    static let sensorManagementCalibrationSlightlyHigh: String = {
         return NSLocalizedString("sensorManagementCalibrationSlightlyHigh", tableName: filename, bundle: Bundle.main, value: "Slightly High", comment: "calibration readiness detail when glucose is slightly above the preferred calibration range")
     }()
 
-    static let sensorManagementCalibrationNoReading:String = {
+    static let sensorManagementCalibrationNoReading: String = {
         return NSLocalizedString("sensorManagementCalibrationNoReading", tableName: filename, bundle: Bundle.main, value: "No Reading", comment: "calibration readiness detail when no current glucose reading is available")
     }()
 
-    static let sensorManagementCalibrationGood:String = {
+    static let sensorManagementCalibrationGood: String = {
         return NSLocalizedString("sensorManagementCalibrationGood", tableName: filename, bundle: Bundle.main, value: "Good", comment: "calibration readiness detail when the glucose level is suitable")
     }()
 
-    static let sensorManagementCalibrationNoTrend:String = {
+    static let sensorManagementCalibrationNoTrend: String = {
         return NSLocalizedString("sensorManagementCalibrationNoTrend", tableName: filename, bundle: Bundle.main, value: "No Trend", comment: "calibration readiness detail when no glucose trend is available")
     }()
 
-    static let sensorManagementCalibrationStale:String = {
+    static let sensorManagementCalibrationStale: String = {
         return NSLocalizedString("sensorManagementCalibrationStale", tableName: filename, bundle: Bundle.main, value: "Stale", comment: "calibration readiness detail when the latest glucose reading is too old")
     }()
 
-    static let sensorManagementCalibrationStable:String = {
+    static let sensorManagementCalibrationStable: String = {
         return NSLocalizedString("sensorManagementCalibrationStable", tableName: filename, bundle: Bundle.main, value: "Stable", comment: "calibration readiness detail when glucose has been stable")
     }()
 
-    static let sensorManagementCalibrationFallingFast:String = {
+    static let sensorManagementCalibrationFallingFast: String = {
         return NSLocalizedString("sensorManagementCalibrationFallingFast", tableName: filename, bundle: Bundle.main, value: "Falling Fast", comment: "calibration readiness detail when glucose is falling quickly")
     }()
 
-    static let sensorManagementCalibrationFalling:String = {
+    static let sensorManagementCalibrationFalling: String = {
         return NSLocalizedString("sensorManagementCalibrationFalling", tableName: filename, bundle: Bundle.main, value: "Falling", comment: "calibration readiness detail when glucose is falling")
     }()
 
-    static let sensorManagementCalibrationRisingFast:String = {
+    static let sensorManagementCalibrationRisingFast: String = {
         return NSLocalizedString("sensorManagementCalibrationRisingFast", tableName: filename, bundle: Bundle.main, value: "Rising Fast", comment: "calibration readiness detail when glucose is rising quickly")
     }()
 
-    static let sensorManagementCalibrationRising:String = {
+    static let sensorManagementCalibrationRising: String = {
         return NSLocalizedString("sensorManagementCalibrationRising", tableName: filename, bundle: Bundle.main, value: "Rising", comment: "calibration readiness detail when glucose is rising")
     }()
 
-    static let sensorManagementCalibrationFlatline:String = {
+    static let sensorManagementCalibrationFlatline: String = {
         return NSLocalizedString("sensorManagementCalibrationFlatline", tableName: filename, bundle: Bundle.main, value: "Flatline", comment: "calibration readiness detail when identical sensor readings suggest a flatline")
     }()
 
-    static let sensorManagementCalibrationBG:String = {
+    static let sensorManagementCalibrationBG: String = {
         return NSLocalizedString("sensorManagementCalibrationBG", tableName: filename, bundle: Bundle.main, value: "BG", comment: "calibration history row title for the calibrated blood glucose value")
     }()
 
-    static let sensorManagementCalibrationRaw:String = {
+    static let sensorManagementCalibrationRaw: String = {
         return NSLocalizedString("sensorManagementCalibrationRaw", tableName: filename, bundle: Bundle.main, value: "Raw", comment: "calibration history row title for the raw sensor value")
     }()
 
-    static let sensorManagementCalibrationSlope:String = {
+    static let sensorManagementCalibrationSlope: String = {
         return NSLocalizedString("sensorManagementCalibrationSlope", tableName: filename, bundle: Bundle.main, value: "Slope", comment: "calibration history row title for the calibration slope")
     }()
 
-    static let sensorManagementCalibrationIntercept:String = {
+    static let sensorManagementCalibrationIntercept: String = {
         return NSLocalizedString("sensorManagementCalibrationIntercept", tableName: filename, bundle: Bundle.main, value: "Intercept", comment: "calibration history row title for the calibration intercept")
     }()
 
-    static let sensorManagementCalibrationReadinessBad:String = {
+    static let sensorManagementCalibrationReadinessBad: String = {
         return NSLocalizedString("sensorManagementCalibrationReadinessBad", tableName: filename, bundle: Bundle.main, value: "Calibration is unlikely to be accurate at this time. Please wait.", comment: "calibration readiness footer when conditions are unsuitable")
     }()
 
-    static let sensorManagementCalibrationReadinessCaution:String = {
+    static let sensorManagementCalibrationReadinessCaution: String = {
         return NSLocalizedString("sensorManagementCalibrationReadinessCaution", tableName: filename, bundle: Bundle.main, value: "Calibration may be less reliable. Waiting may be better.", comment: "calibration readiness footer when conditions are not ideal")
     }()
 
-    static let sensorManagementCalibrationReadinessGood:String = {
+    static let sensorManagementCalibrationReadinessGood: String = {
         return NSLocalizedString("sensorManagementCalibrationReadinessGood", tableName: filename, bundle: Bundle.main, value: "Now is a good time to calibrate.", comment: "calibration readiness footer when conditions are suitable")
     }()
 
@@ -353,7 +526,13 @@ enum Texts_HomeView {
     }()
 
     static let sensorManagementLargeCalibrationDifferenceWarningFormat:String = {
-        return NSLocalizedString("sensorManagementLargeCalibrationDifferenceWarningFormat", tableName: filename, bundle: Bundle.main, value: "It is possible that this calibration will not work. Try to limit each calibration change to maximum %@ at a time.", comment: "warning shown when the entered calibration differs too much from the current glucose value; placeholder is a localized glucose amount with unit")
+        return NSLocalizedString(
+            "sensorManagementLargeCalibrationDifferenceWarningFormat",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "It is possible that this calibration will not work. Try to limit each calibration change to maximum %@ at a time.",
+            comment: "warning shown when the entered calibration differs too much from the current glucose value. Placeholder is a localized glucose amount with unit"
+        )
     }()
     
     static let lockButton:String = {
@@ -522,7 +701,19 @@ enum Texts_HomeView {
     }()
 
     static let noSensorCodeSelectedMessage: String = {
-        return String(format: NSLocalizedString("noSensorCodeSelectedMessage", tableName: filename, bundle: Bundle.main, value: "Starting a Dexcom G6 sensor with 0000 means no sensor code will be sent to the transmitter.\n\nThe Dexcom transmitter will require calibrations for this sensor session: two calibrations after warm-up, another 12 hours later, another 12 hours after that, then once every 24 hours until the sensor ends.\n\nThese calibration requests come from the Dexcom transmitter/no-code workflow. They are not caused by the %@ calibration reminder setting, and disabling that reminder will not stop required transmitter calibrations.", comment: "Alert message shown before starting a Dexcom G6 sensor with no code/0000; placeholder is the app display name"), ConstantsHomeView.applicationName)
+        let message = "Starting a Dexcom G6 sensor with 0000 means no sensor code will be sent to the transmitter.\n\n"
+            + "The Dexcom transmitter will require calibrations for this sensor session: two calibrations after warm-up, "
+            + "another 12 hours later, another 12 hours after that, then once every 24 hours until the sensor ends.\n\n"
+            + "These calibration requests come from the Dexcom transmitter/no-code workflow. They are not caused by the "
+            + "%@ calibration reminder setting, and disabling that reminder will not stop required transmitter calibrations."
+        let localizedMessage = NSLocalizedString(
+            "noSensorCodeSelectedMessage",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: message,
+            comment: "Alert message shown before starting a Dexcom G6 sensor with no code/0000. Placeholder is the app display name"
+        )
+        return String(format: localizedMessage, ConstantsHomeView.applicationName)
     }()
 
     static let startSensorAnyway: String = {

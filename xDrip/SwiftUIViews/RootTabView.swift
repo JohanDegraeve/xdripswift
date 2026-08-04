@@ -60,6 +60,7 @@ struct RootTabDependencies {
     let alertManager: AlertManager
     let bgPostProcessingManager: BgPostProcessingManager
     let sensorNoiseManager: SensorNoiseManager
+    let sensorHealthIssueManager: SensorHealthIssueManager
     let bluetoothPeripheralManager: BluetoothPeripheralManaging
     let soundPlayer: SoundPlayer
     let nightscoutSyncManager: NightscoutSyncManager
@@ -85,6 +86,7 @@ struct RootTabDependencies {
     @Published private(set) var incomingBackupRequest: IncomingBackupRequest?
     @Published private(set) var isPreparingIncomingBackup = false
     @Published private(set) var alertRequest: RootAlertRequest?
+    @Published private(set) var sensorHealthHomeRequest = 0
     @Published var textInputRequest: RootTextInputRequest?
     @Published var textInput = ""
     @Published var pickerData: SnoozePickerData?
@@ -172,6 +174,12 @@ struct RootTabDependencies {
         pickerData = SnoozePickerData(pickerViewData)
     }
 
+    /// Returns a notification tap to Home without bypassing the active in-app banner.
+    /// The banner owns navigation to Sensor Management or Bluetooth detail.
+    func showHomeForSensorHealthNotification() {
+        sensorHealthHomeRequest += 1
+    }
+
     /// Copies a document supplied by iOS before handing it to the restore workflow.
     func receiveIncomingBackup(_ sourceURL: URL) {
         // The Live Activity uses xdripswift://open only to bring the app to the foreground.
@@ -234,6 +242,7 @@ struct RootTabDependencies {
         alertManager: AlertManager,
         bgPostProcessingManager: BgPostProcessingManager,
         sensorNoiseManager: SensorNoiseManager,
+        sensorHealthIssueManager: SensorHealthIssueManager,
         bluetoothPeripheralManager: BluetoothPeripheralManaging,
         soundPlayer: SoundPlayer,
         nightscoutSyncManager: NightscoutSyncManager,
@@ -257,6 +266,7 @@ struct RootTabDependencies {
             alertManager: alertManager,
             bgPostProcessingManager: bgPostProcessingManager,
             sensorNoiseManager: sensorNoiseManager,
+            sensorHealthIssueManager: sensorHealthIssueManager,
             bluetoothPeripheralManager: bluetoothPeripheralManager,
             soundPlayer: soundPlayer,
             nightscoutSyncManager: nightscoutSyncManager,
@@ -287,6 +297,7 @@ struct RootTabView: View {
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var stateModel: RootTabStateModel
     @State private var selectedTab = Tab.home
+    @State private var bluetoothDetailNavigationRequest = 0
 
     private let applicationCoordinator: RootApplicationCoordinator
     private let tabTitles: RootTabTitles
@@ -318,7 +329,11 @@ struct RootTabView: View {
                         applicationCoordinator: applicationCoordinator,
                         dependencies: stateModel.dependencies,
                         snoozeDismissalRequest: stateModel.snoozeDismissalRequest,
-                        isLandscape: isLandscape
+                        isLandscape: isLandscape,
+                        showBluetooth: {
+                            bluetoothDetailNavigationRequest += 1
+                            selectedTab = .bluetooth
+                        }
                     )
                     .tag(Tab.home)
                     .tabItem {
@@ -357,7 +372,8 @@ struct RootTabView: View {
                         BluetoothPeripheralsNavigationView(
                             coreDataManager: dependencies.coreDataManager,
                             bluetoothPeripheralManager: dependencies.bluetoothPeripheralManager,
-                            sensorProvider: stateModel.sensorProvider
+                            sensorProvider: stateModel.sensorProvider,
+                            sensorHealthDetailRequest: bluetoothDetailNavigationRequest
                         )
                     }
                     .tag(Tab.bluetooth)
@@ -423,6 +439,9 @@ struct RootTabView: View {
             if requestID != nil {
                 selectedTab = .settings
             }
+        }
+        .onChange(of: stateModel.sensorHealthHomeRequest) { _ in
+            selectedTab = .home
         }
         .alert(
             item: Binding(
@@ -561,6 +580,7 @@ private struct RootHomeTabView: View {
     let dependencies: RootTabDependencies?
     let snoozeDismissalRequest: Int
     let isLandscape: Bool
+    let showBluetooth: () -> Void
 
     // MARK: - View
 
@@ -568,15 +588,21 @@ private struct RootHomeTabView: View {
         ZStack {
             if let dependencies {
                 if isLandscape {
-                    RootHomeLandscapeView(dependencies: dependencies)
+                    RootHomeLandscapeView(
+                        dependencies: dependencies,
+                        showSensorManagement: { presentedView = .sensorManagement },
+                        showBluetooth: showBluetooth
+                    )
                 } else {
                     RootHomeView(
                         stateModel: dependencies.rootHomeStateModel,
+                        sensorHealthIssueManager: dependencies.sensorHealthIssueManager,
                         coreDataManager: dependencies.coreDataManager,
                         nightscoutSyncManager: dependencies.nightscoutSyncManager,
                         actions: rootHomeActions(from: dependencies)
                     )
                 }
+
             }
         }
         .padding(
@@ -626,12 +652,14 @@ private struct RootHomeTabView: View {
     private func rootHomeActions(from dependencies: RootTabDependencies) -> RootHomeActions {
         var actions = dependencies.rootHomeActions
         actions.showSnooze = { presentedView = .snooze }
+        actions.queueSensorHealthTest = { dependencies.sensorHealthIssueManager.queueTestIssue($0) }
         actions.showBgReadings = { presentedView = .bgReadings }
         actions.showSensorManagement = { presentedView = .sensorManagement }
         actions.showCalibration = { presentedView = .sensorCalibration }
         actions.showBgAdjustments = { presentedView = .bgAdjustments }
         actions.showHideItems = { presentedView = .showHideItems }
         actions.showAIDStatus = { presentedView = .aidStatus }
+        actions.showBluetooth = showBluetooth
         actions.toggleScreenLock = { updateScreenLock(using: dependencies, overrideCurrentState: false, nightMode: true) }
         actions.keepScreenAwake = { updateScreenLock(using: dependencies, overrideCurrentState: true, nightMode: false) }
         return actions
@@ -745,24 +773,50 @@ private struct RootScreenLockOverlay: View {
 /// Observes Home state so locking and unlocking switch landscape content immediately.
 private struct RootHomeLandscapeView: View {
     @ObservedObject private var rootHomeStateModel: RootHomeStateModel
+    @ObservedObject private var sensorHealthIssueManager: SensorHealthIssueManager
     private let coreDataManager: CoreDataManager
     private let nightscoutSyncManager: NightscoutSyncManager
+    private let showSensorManagement: () -> Void
+    private let showBluetooth: () -> Void
 
-    init(dependencies: RootTabDependencies) {
+    init(dependencies: RootTabDependencies, showSensorManagement: @escaping () -> Void, showBluetooth: @escaping () -> Void) {
         rootHomeStateModel = dependencies.rootHomeStateModel
+        sensorHealthIssueManager = dependencies.sensorHealthIssueManager
         coreDataManager = dependencies.coreDataManager
         nightscoutSyncManager = dependencies.nightscoutSyncManager
+        self.showSensorManagement = showSensorManagement
+        self.showBluetooth = showBluetooth
     }
 
     var body: some View {
-        if rootHomeStateModel.state.isScreenLocked {
-            RootHomeLandscapeValueView(stateModel: rootHomeStateModel)
-        } else {
-            RootHomeLandscapeChartView(
-                coreDataManager: coreDataManager,
-                nightscoutSyncManager: nightscoutSyncManager
-            )
+        VStack(spacing: 8) {
+            if let issue = sensorHealthIssueManager.visibleIssue {
+                SensorHealthBannerView(
+                    issue: issue,
+                    action: {
+                        switch issue.destination {
+                        case .sensorManagement:
+                            showSensorManagement()
+                        case .bluetoothPeripheral:
+                            showBluetooth()
+                        }
+                    },
+                    dismiss: sensorHealthIssueManager.dismissVisibleIssue
+                )
+                .padding(.horizontal, 12)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+
+            if rootHomeStateModel.state.isScreenLocked {
+                RootHomeLandscapeValueView(stateModel: rootHomeStateModel)
+            } else {
+                RootHomeLandscapeChartView(
+                    coreDataManager: coreDataManager,
+                    nightscoutSyncManager: nightscoutSyncManager
+                )
+            }
         }
+        .animation(.easeOut(duration: 0.22), value: sensorHealthIssueManager.visibleIssue?.id)
     }
 }
 

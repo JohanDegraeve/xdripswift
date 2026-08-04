@@ -94,4 +94,29 @@ enum DexcomAlgorithmState: UInt8, CustomStringConvertible, CaseIterable {
     static func indicatorColor(forDescription description: String) -> DexcomSensorStatusIndicatorColor? {
         allCases.first { $0.description == description }?.indicatorColor
     }
+
+    /// Typed health event used by the shared episode manager.
+    var sensorHealthEvent: CGMSensorHealthEvent {
+        switch self {
+        case .excessNoise:
+            return .temporary(source: .dexcom, reason: .dexcomExcessNoise)
+        case .TemporarySensorIssue:
+            return .temporary(source: .dexcom, reason: .dexcomTemporarySensorIssue)
+        case .questionMarks:
+            return .temporary(source: .dexcom, reason: .dexcomQuestionMarks)
+        case .SessionFailedDueToTransmitterError:
+            return .terminal(source: .dexcom, reason: .dexcomTransmitterFailure)
+        case .SensorFailedDuetoCountsAberration,
+             .SensorFailedDuetoResidualAberration,
+             .SessionFailedDueToUnrecoverableError,
+             .SensorFailedDueToProgressiveSensorDecline,
+             .SensorFailedDueToHighCountsAberration,
+             .SensorFailedDueToLowCountsAberration,
+             .SensorFailedDueToRestart,
+             .sensorFailed:
+            return .terminal(source: .dexcom, reason: .dexcomSensorFailure)
+        default:
+            return .recovered(source: .dexcom)
+        }
+    }
 }

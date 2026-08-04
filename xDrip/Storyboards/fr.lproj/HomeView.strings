@@ -97,7 +97,6 @@
 "sensorManagementNoiseVeryHigh" = "Très élevé";
 "sensorManagementNoiseExtreme" = "Extrême";
 "sensorManagementNoiseFlatline" = "Le capteur est probablement défaillant.";
-"sensorManagementNoiseFooter" = "Sensibilité sélectionnée : %@";
 "sensorNoiseWarningExtremeTitle" = "Bruit extrême du capteur";
 "sensorNoiseWarningPersistentTitle" = "Bruit persistant du capteur";
 "sensorNoiseWarningFlatlineTitle" = "Le signal du capteur est plat";
@@ -114,7 +113,6 @@
 "sensorNoiseHistoryLoading" = "Création de l’historique du capteur";
 "sensorNoiseHistoryNoDataTitle" = "Pas encore assez de données de bruit";
 "sensorNoiseHistoryNoDataMessage" = "Le graphique apparaîtra après la collecte d’un nombre suffisant de mesures du capteur.";
-"sensorNoiseHistoryFooter" = "Le graphique montre l’instabilité résiduelle du capteur pendant cette session. Les valeurs basses indiquent un signal plus régulier. Il ne mesure pas la précision du glucose.";
 "sensorNoiseHistoryChartAccessibility" = "Graphique de l’historique du bruit du capteur";
 "pumpBattery" = "Batterie";
 "pumpReservoir" = "Réservoir";
@@ -149,3 +147,13 @@
 "sensorManagementCalibrationReadinessGood" = "C’est le bon moment pour calibrer.";
 "sensorManagementCalibrationSafetyFooter" = "Ne calibrez que si vous savez le faire en toute sécurité.";
 "sensorManagementLargeCalibrationDifferenceWarningFormat" = "Cette calibration risque de ne pas fonctionner. Essayez de limiter chaque modification de calibration à %@ maximum à la fois.";
+"sensorHealthPersistentNoiseTitle" = "Bruit du capteur très élevé";
+"sensorHealthPersistentNoiseGuidance" = "Bruit très élevé depuis 12 heures. Envisagez de remplacer le capteur si cela continue.";
+"sensorHealthFlatlineTitle" = "Le signal du capteur est plat";
+"sensorHealthFlatlineGuidance" = "Mesures inchangées depuis 30 minutes. Cela indique généralement que le capteur est défaillant/expiré.";
+"sensorHealthTemporaryIssueTitle" = "Problème temporaire du capteur";
+"sensorHealthTemporaryIssueGuidance" = "Problème temporaire du capteur depuis 3 heures. Vérifiez avec un lecteur et suivez les recommandations du fabricant.";
+"sensorHealthSensorFailedTitle" = "Capteur défaillant";
+"sensorHealthSensorFailedGuidance" = "Défaillance du capteur signalée. Remplacez le capteur.";
+"sensorHealthTransmitterFailedTitle" = "Défaillance du transmetteur";
+"sensorHealthTransmitterFailedGuidance" = "Défaillance du transmetteur signalée. Vérifiez-le ou remplacez-le.";

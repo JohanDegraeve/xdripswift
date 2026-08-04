@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// Collects the start time for sensor types that do not require a sensor code.
 struct SensorStartDateView: View {
     let onCancel: () -> Void
     let onStart: (Date) -> Void
@@ -52,6 +53,7 @@ struct SensorStartDateView: View {
     }
 }
 
+/// Collects and validates a Dexcom G6 sensor code before starting the session.
 struct SensorStartCodeView: View {
     let onCancel: () -> Void
     let onSubmit: (String) -> Void

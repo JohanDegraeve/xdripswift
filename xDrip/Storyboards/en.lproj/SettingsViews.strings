@@ -61,6 +61,8 @@
 "settingsviews_allowMainChartAutoReset" = "Auto Reset Chart";
 "settingsviews_showOriginalBGReadings" = "Original Values";
 "settingsviews_showSensorNoise" = "Show Sensor Noise";
+"settingsviews_sensorHealthNotifications" = "Sensor Health Warnings";
+"settingsviews_sensorHealthNotificationsFooter" = "Controls optional system notifications for prolonged sensor noise, a flat signal and temporary sensor issues. Sensor/Transmitter Failure is configured with the other alarms. The dismissible Home banner remains available.";
 "settingsviews_urgentHighValue" = "Urgent High Value";
 "settingsviews_urgentHighValueMessage" = "Enter the glucose value for the urgent high threshold.";
 "settingsviews_highValue" = "High Value";

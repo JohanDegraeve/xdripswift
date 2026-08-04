@@ -12,6 +12,16 @@ class Texts_Common {
     static let Cancel = {
         return NSLocalizedString("common_cancel", tableName: filename, bundle: Bundle.main, value: "Cancel", comment: "literally 'Cancel'")
     }()
+
+    static let dismiss = {
+        return NSLocalizedString(
+            "common_dismiss",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Dismiss",
+            comment: "accessibility label for a dismiss button"
+        )
+    }()
     
     static let mgdl: String = {
         return NSLocalizedString("common_mgdl", tableName: filename, bundle: Bundle.main, value: "mg/dL", comment: "mg/dL")

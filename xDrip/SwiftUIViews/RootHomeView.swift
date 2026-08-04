@@ -38,6 +38,7 @@ struct RootHomeView: View {
 
     @Environment(\.scenePhase) private var scenePhase
     @ObservedObject private var stateModel: RootHomeStateModel
+    @ObservedObject private var sensorHealthIssueManager: SensorHealthIssueManager
     @StateObject private var glucoseChartStateManager: GlucoseChartStateManager
     @StateObject private var miniChartStateManager: GlucoseChartStateManager
     @StateObject private var scrollCoordinator: GlucoseChartScrollCoordinator
@@ -69,10 +70,17 @@ struct RootHomeView: View {
 
     // MARK: - Initialisation
 
-    init(stateModel: RootHomeStateModel, coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager, actions: RootHomeActions) {
+    init(
+        stateModel: RootHomeStateModel,
+        sensorHealthIssueManager: SensorHealthIssueManager,
+        coreDataManager: CoreDataManager,
+        nightscoutSyncManager: NightscoutSyncManager,
+        actions: RootHomeActions
+    ) {
         let initialRange = RootHomeChartRange.closest(to: UserDefaults.standard.chartWidthInHours)
 
         self.stateModel = stateModel
+        self.sensorHealthIssueManager = sensorHealthIssueManager
         self.actions = actions
         self.nightscoutSyncManager = nightscoutSyncManager
         // only the main chart can show sensor noise background bands. The mini-chart keeps the
@@ -162,6 +170,25 @@ struct RootHomeView: View {
                 endOriginalGlucosePeek: endOriginalGlucosePeek
             )
 
+            // Home owns the visible explanation for every active sensor-health episode. Keeping the
+            // banner inside this layout makes it dismissible and removes all reserved space when it
+            // is absent. The user chooses when to open the relevant detail view from here.
+            if let issue = sensorHealthIssueManager.visibleIssue {
+                SensorHealthBannerView(
+                    issue: issue,
+                    action: {
+                        switch issue.destination {
+                        case .sensorManagement:
+                            actions.showSensorManagement()
+                        case .bluetoothPeripheral:
+                            actions.showBluetooth()
+                        }
+                    },
+                    dismiss: sensorHealthIssueManager.dismissVisibleIssue
+                )
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+
             VStack(spacing: Layout.rowSpacing) {
                 HStack(spacing: 0) {
                     if state.visibility.showsPump {
@@ -176,10 +203,6 @@ struct RootHomeView: View {
 
                 if state.visibility.showsLoop {
                     RootHomeLoopView(state: loopDisplayState, actions: actions)
-                }
-
-                if state.sensorNoise.showsWarning {
-                    RootHomeSensorNoiseWarningView(state: state.sensorNoise, action: actions.showSensorManagement)
                 }
 
                 RootHomeMainChartView(
@@ -214,6 +237,7 @@ struct RootHomeView: View {
         }
         .padding(.horizontal, Layout.screenHorizontalMargin)
         .frame(maxHeight: .infinity, alignment: .top)
+        .animation(.easeOut(duration: 0.22), value: sensorHealthIssueManager.visibleIssue?.id)
     }
 
     @ViewBuilder private func lowerStatusContent() -> some View {

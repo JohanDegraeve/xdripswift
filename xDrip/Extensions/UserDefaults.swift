@@ -134,6 +134,8 @@ extension UserDefaults {
         case showSensorNoise = "showSensorNoise"
         /// how strictly should stored sensor noise values be interpreted?
         case sensorNoiseSensitivity = "sensorNoiseSensitivity"
+        /// should actionable sensor health episodes create system notifications?
+        case sensorHealthNotificationsEnabled = "sensorHealthNotificationsEnabled"
         /// show the objective lines in color or grey?
         case urgentHighMarkValue = "urgentHighMarkValue"
         /// high value
@@ -1414,6 +1416,17 @@ extension UserDefaults {
         }
         set {
             set(newValue.rawValue, forKey: Key.sensorNoiseSensitivity.rawValue)
+        }
+    }
+
+    /// Should actionable sensor health episodes create system notifications?
+    @objc dynamic var sensorHealthNotificationsEnabled: Bool {
+        get {
+            guard object(forKey: Key.sensorHealthNotificationsEnabled.rawValue) != nil else { return true }
+            return bool(forKey: Key.sensorHealthNotificationsEnabled.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.sensorHealthNotificationsEnabled.rawValue)
         }
     }
 

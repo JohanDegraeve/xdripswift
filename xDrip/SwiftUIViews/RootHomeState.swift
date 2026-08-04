@@ -102,15 +102,11 @@ struct RootHomeSensorState {
     var countsDown = false
 }
 
-/// Current sensor-noise indicator and actionable warning for fresh master-mode readings.
+/// Current sensor-noise indicator for fresh master-mode readings.
 struct RootHomeSensorNoiseState {
     var showsIndicator = false
     var indicatorColor = ConstantsAppColors.secondaryText
     var indicatorAccessibilityLabel = ""
-    var showsWarning = false
-    var title = ""
-    var detail = ""
-    var color = ConstantsAppColors.urgent
 }
 
 /// Current data-source description and connection indicators.
@@ -665,52 +661,11 @@ final class RootHomeStateModel: ObservableObject {
             longTermNoise: activeSensor.longTermNoise?.doubleValue,
             sensitivity: sensitivity
         )
-        var state = RootHomeSensorNoiseState(
+        return RootHomeSensorNoiseState(
             showsIndicator: true,
             indicatorColor: persistedState.displayColor,
             indicatorAccessibilityLabel: Texts_HomeView.sensorManagementNoiseTitle + ": " + persistedState.localizedTitle
         )
-
-        if rawState == .flatlineSuspected {
-            state.showsWarning = true
-            state.title = Texts_HomeView.sensorNoiseWarningFlatlineTitle
-            state.detail = Texts_HomeView.sensorManagementNoiseFlatline
-            state.color = ConstantsAppColors.urgent
-            return state
-        }
-
-        if let shortTermNoise = activeSensor.shortTermNoise?.doubleValue,
-           ConstantsSensorNoise.state(for: shortTermNoise, sensitivity: sensitivity) == .extreme {
-            state.showsWarning = true
-            state.title = Texts_HomeView.sensorNoiseWarningExtremeTitle
-            state.detail = formattedNoise(shortTermNoise, windowTitle: Texts_HomeView.sensorManagementNoiseShortTerm)
-            state.color = ConstantsAppColors.urgent
-            return state
-        }
-
-        if let longTermNoise = activeSensor.longTermNoise?.doubleValue {
-            let longTermState = ConstantsSensorNoise.state(for: longTermNoise, sensitivity: sensitivity)
-            guard longTermState.rawValue >= SensorNoiseState.veryHigh.rawValue else { return state }
-
-            state.showsWarning = true
-            state.title = Texts_HomeView.sensorNoiseWarningPersistentTitle
-            state.detail = formattedNoise(longTermNoise, windowTitle: Texts_HomeView.sensorManagementNoiseLongTerm)
-            state.color = longTermState == .extreme
-                ? ConstantsAppColors.urgent
-                : ConstantsAppColors.caution
-            return state
-        }
-
-        return state
-    }
-
-    private func formattedNoise(_ noiseInMgDl: Double, windowTitle: String) -> String {
-        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-        let displayNoise = noiseInMgDl.mgDlToMmol(mgDl: isMgDl)
-        let value = isMgDl
-            ? displayNoise.formatted(.number.precision(.fractionLength(1)))
-            : displayNoise.formatted(.number.precision(.fractionLength(2)))
-        return windowTitle + ": " + value + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
     }
 
     private var followerConnectionIsRecent: Bool {
@@ -843,6 +798,7 @@ final class RootHomeStateModel: ObservableObject {
 /// supplied by RootApplicationCoordinator while its presentation responsibilities are extracted.
 struct RootHomeActions {
     var showSnooze: () -> Void = {}
+    var queueSensorHealthTest: (SensorHealthTestKind) -> Void = { _ in }
     var showBgReadings: () -> Void = {}
     var showSensorManagement: () -> Void = {}
     var showCalibration: () -> Void = {}
@@ -857,4 +813,5 @@ struct RootHomeActions {
     var cycleStatisticsType: () -> Void = {}
     var hideFollowerUrl: () -> Void = {}
     var showAIDStatus: () -> Void = {}
+    var showBluetooth: () -> Void = {}
 }

@@ -84,7 +84,6 @@
 "sensorManagementNoiseVeryHigh" = "Πολύ υψηλός";
 "sensorManagementNoiseExtreme" = "Ακραίος";
 "sensorManagementNoiseFlatline" = "Ο αισθητήρας πιθανότατα απέτυχε.";
-"sensorManagementNoiseFooter" = "Επιλεγμένη ευαισθησία: %@";
 "sensorNoiseWarningExtremeTitle" = "Ακραίος θόρυβος αισθητήρα";
 "sensorNoiseWarningPersistentTitle" = "Επίμονος θόρυβος αισθητήρα";
 "sensorNoiseWarningFlatlineTitle" = "Το σήμα του αισθητήρα είναι επίπεδο";
@@ -101,7 +100,6 @@
 "sensorNoiseHistoryLoading" = "Δημιουργία ιστορικού αισθητήρα";
 "sensorNoiseHistoryNoDataTitle" = "Δεν υπάρχουν ακόμη αρκετά δεδομένα θορύβου";
 "sensorNoiseHistoryNoDataMessage" = "Το γράφημα θα εμφανιστεί αφού συλλεχθούν αρκετές ενδείξεις αισθητήρα.";
-"sensorNoiseHistoryFooter" = "Το γράφημα δείχνει την υπολειπόμενη διακύμανση του αισθητήρα σε αυτή τη συνεδρία. Οι χαμηλότερες τιμές σημαίνουν ομαλότερο σήμα. Δεν μετρά την ακρίβεια της γλυκόζης.";
 "sensorNoiseHistoryChartAccessibility" = "Γράφημα ιστορικού θορύβου αισθητήρα";
 "pumpBattery" = "Μπαταρία";
 "pumpReservoir" = "Δεξαμενή";
@@ -113,3 +111,13 @@
 "sensorManagementStatusActive" = "Sensor Active";
 "sensorManagementStarted" = "Started";
 "sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Πολύ υψηλός θόρυβος αισθητήρα";
+"sensorHealthPersistentNoiseGuidance" = "Πολύ υψηλός θόρυβος για 12 ώρες. Εξετάστε την αντικατάσταση του αισθητήρα αν συνεχιστεί.";
+"sensorHealthFlatlineTitle" = "Το σήμα του αισθητήρα είναι επίπεδο";
+"sensorHealthFlatlineGuidance" = "Οι μετρήσεις δεν άλλαξαν για 30 λεπτά. Αυτό συνήθως σημαίνει ότι ο αισθητήρας απέτυχε/έληξε.";
+"sensorHealthTemporaryIssueTitle" = "Προσωρινό πρόβλημα αισθητήρα";
+"sensorHealthTemporaryIssueGuidance" = "Προσωρινό πρόβλημα αισθητήρα για 3 ώρες. Ελέγξτε με μετρητή και ακολουθήστε τις οδηγίες του κατασκευαστή.";
+"sensorHealthSensorFailedTitle" = "Αποτυχία αισθητήρα";
+"sensorHealthSensorFailedGuidance" = "Αναφέρθηκε αποτυχία αισθητήρα. Αντικαταστήστε τον αισθητήρα.";
+"sensorHealthTransmitterFailedTitle" = "Αποτυχία πομπού";
+"sensorHealthTransmitterFailedGuidance" = "Αναφέρθηκε αποτυχία πομπού. Ελέγξτε ή αντικαταστήστε τον.";

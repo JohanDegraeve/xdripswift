@@ -28,6 +28,16 @@ class Texts_Alerts {
     static let notLoopingAlertTitle: String = {
         return NSLocalizedString("alerts_notloopingalerttitle", tableName: filename, bundle: Bundle.main, value: "Not Looping", comment: "When the OS-AID loop has not completed a recent cycle, this is the title of the alert notification and the alert settings list title")
     }()
+
+    static let sensorTransmitterFailureAlertTitle: String = {
+        return NSLocalizedString(
+            "alerts_sensortransmitterfailure",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Sensor/Transmitter Failure",
+            comment: "Alarm settings title for a terminal failure reported by the active sensor or transmitter"
+        )
+    }()
     
     static let calibrationNeededAlertTitle: String = {
         return NSLocalizedString("alerts_calibrationneeded", tableName: filename, bundle: Bundle.main, value: "Calibration Reminder", comment: "when calibration is needed, this is the title of the alert notification, also in alert settings list, for the name of the alert")

@@ -24,7 +24,13 @@ protocol CGMTransmitterDelegate:AnyObject {
     
     /// to pass some text error message, delegate can decide to show to user, log, ...
     func errorOccurred(xDripError: XdripError)
+
+    /// Reports a decoded sensor/transmitter health state without promoting generic BLE errors.
+    func sensorHealthEventOccurred(_ event: CGMSensorHealthEvent)
     
 }
 
+extension CGMTransmitterDelegate {
+    func sensorHealthEventOccurred(_ event: CGMSensorHealthEvent) {}
+}
 

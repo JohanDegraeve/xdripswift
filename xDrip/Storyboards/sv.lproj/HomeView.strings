@@ -97,7 +97,6 @@
 "sensorManagementNoiseVeryHigh" = "Mycket högt";
 "sensorManagementNoiseExtreme" = "Extremt";
 "sensorManagementNoiseFlatline" = "Sensorn har troligen slutat fungera.";
-"sensorManagementNoiseFooter" = "Vald känslighet: %@";
 "sensorNoiseWarningExtremeTitle" = "Extremt sensorbrus";
 "sensorNoiseWarningPersistentTitle" = "Ihållande sensorbrus";
 "sensorNoiseWarningFlatlineTitle" = "Sensorsignalen är platt";
@@ -114,7 +113,6 @@
 "sensorNoiseHistoryLoading" = "Bygger sensorhistorik";
 "sensorNoiseHistoryNoDataTitle" = "Inte tillräckligt med brusdata än";
 "sensorNoiseHistoryNoDataMessage" = "Diagrammet visas när tillräckligt många sensorvärden har samlats in.";
-"sensorNoiseHistoryFooter" = "Diagrammet visar kvarvarande sensorvariation under den här sensorsessionen. Lägre värden innebär en jämnare signal. Det mäter inte glukosnoggrannhet.";
 "sensorNoiseHistoryChartAccessibility" = "Diagram över sensorbrusets historik";
 "pumpBattery" = "Batteri";
 "pumpReservoir" = "Reservoar";
@@ -126,3 +124,13 @@
 "sensorManagementStatusActive" = "Sensor Active";
 "sensorManagementStarted" = "Started";
 "sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Mycket högt sensorbrus";
+"sensorHealthPersistentNoiseGuidance" = "Mycket högt brus i 12 timmar. Överväg att byta sensorn om det fortsätter.";
+"sensorHealthFlatlineTitle" = "Sensorsignalen är platt";
+"sensorHealthFlatlineGuidance" = "Värdena har varit oförändrade i 30 minuter. Det betyder oftast att sensorn har slutat fungera/gått ut.";
+"sensorHealthTemporaryIssueTitle" = "Tillfälligt sensorproblem";
+"sensorHealthTemporaryIssueGuidance" = "Tillfälligt sensorproblem i 3 timmar. Kontrollera med en blodsockermätare och följ tillverkarens anvisningar.";
+"sensorHealthSensorFailedTitle" = "Sensorfel";
+"sensorHealthSensorFailedGuidance" = "Sensorfel rapporterat. Byt sensorn.";
+"sensorHealthTransmitterFailedTitle" = "Sändarfel";
+"sensorHealthTransmitterFailedGuidance" = "Sändarfel rapporterat. Kontrollera eller byt sändaren.";

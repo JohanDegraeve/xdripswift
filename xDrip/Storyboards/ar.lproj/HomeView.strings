@@ -86,7 +86,6 @@
 "sensorManagementNoiseVeryHigh" = "مرتفعة جدًا";
 "sensorManagementNoiseExtreme" = "شديدة";
 "sensorManagementNoiseFlatline" = "من المحتمل أن المستشعر قد فشل.";
-"sensorManagementNoiseFooter" = "الحساسية المحددة: %@";
 "sensorNoiseWarningExtremeTitle" = "ضوضاء شديدة في المستشعر";
 "sensorNoiseWarningPersistentTitle" = "ضوضاء مستمرة في المستشعر";
 "sensorNoiseWarningFlatlineTitle" = "إشارة المستشعر ثابتة";
@@ -103,7 +102,6 @@
 "sensorNoiseHistoryLoading" = "جارٍ إنشاء سجل المستشعر";
 "sensorNoiseHistoryNoDataTitle" = "لا توجد بيانات ضوضاء كافية بعد";
 "sensorNoiseHistoryNoDataMessage" = "سيظهر المخطط بعد جمع عدد كافٍ من قراءات المستشعر.";
-"sensorNoiseHistoryFooter" = "يعرض المخطط اهتزاز المستشعر المتبقي خلال هذه الجلسة. القيم الأقل تعني إشارة أكثر سلاسة. وهو لا يقيس دقة الجلوكوز.";
 "sensorNoiseHistoryChartAccessibility" = "مخطط سجل ضوضاء المستشعر";
 "pumpBattery" = "البطارية";
 "pumpReservoir" = "الخزان";
@@ -115,3 +113,13 @@
 "sensorManagementStatusActive" = "Sensor Active";
 "sensorManagementStarted" = "Started";
 "sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "تشويش المستشعر مرتفع جدًا";
+"sensorHealthPersistentNoiseGuidance" = "تشويش مرتفع جدًا لمدة 12 ساعة. فكّر في استبدال المستشعر إذا استمر.";
+"sensorHealthFlatlineTitle" = "إشارة المستشعر ثابتة";
+"sensorHealthFlatlineGuidance" = "لم تتغير القراءات منذ 30 دقيقة. يشير هذا عادةً إلى تعطل/انتهاء صلاحية المستشعر.";
+"sensorHealthTemporaryIssueTitle" = "مشكلة مؤقتة في المستشعر";
+"sensorHealthTemporaryIssueGuidance" = "مشكلة مؤقتة في المستشعر منذ 3 ساعات. تحقق بجهاز قياس السكر واتبع إرشادات الشركة المصنّعة.";
+"sensorHealthSensorFailedTitle" = "فشل المستشعر";
+"sensorHealthSensorFailedGuidance" = "تم الإبلاغ عن فشل المستشعر. استبدل المستشعر.";
+"sensorHealthTransmitterFailedTitle" = "فشل جهاز الإرسال";
+"sensorHealthTransmitterFailedGuidance" = "تم الإبلاغ عن فشل جهاز الإرسال. تحقّق منه أو استبدله.";

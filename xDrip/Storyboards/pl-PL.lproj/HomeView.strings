@@ -180,7 +180,6 @@
 "sensorManagementNoiseVeryHigh" = "Bardzo wysoki";
 "sensorManagementNoiseExtreme" = "Ekstremalny";
 "sensorManagementNoiseFlatline" = "Sensor prawdopodobnie uległ awarii.";
-"sensorManagementNoiseFooter" = "Wybrana czułość: %@";
 "sensorNoiseWarningExtremeTitle" = "Ekstremalny szum sensora";
 "sensorNoiseWarningPersistentTitle" = "Utrzymujący się szum sensora";
 "sensorNoiseWarningFlatlineTitle" = "Sygnał sensora jest płaski";
@@ -197,7 +196,6 @@
 "sensorNoiseHistoryLoading" = "Tworzenie historii sensora";
 "sensorNoiseHistoryNoDataTitle" = "Za mało danych o szumie";
 "sensorNoiseHistoryNoDataMessage" = "Wykres pojawi się po zebraniu wystarczającej liczby odczytów sensora.";
-"sensorNoiseHistoryFooter" = "Wykres przedstawia resztkowe wahania sensora w trakcie tej sesji. Niższe wartości oznaczają stabilniejszy sygnał. Nie mierzy dokładności glukozy.";
 "sensorNoiseHistoryChartAccessibility" = "Wykres historii szumu sensora";
 "pumpBattery" = "Bateria";
 "pumpReservoir" = "Zbiornik";
@@ -209,3 +207,13 @@
 "sensorManagementStatusActive" = "Sensor Active";
 "sensorManagementStarted" = "Started";
 "sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Bardzo wysoki szum sensora";
+"sensorHealthPersistentNoiseGuidance" = "Bardzo wysoki szum od 12 godzin. Rozważ wymianę sensora, jeśli problem nie ustąpi.";
+"sensorHealthFlatlineTitle" = "Sygnał sensora jest płaski";
+"sensorHealthFlatlineGuidance" = "Odczyty nie zmieniły się od 30 minut. Zwykle oznacza to awarię/wygaśnięcie sensora.";
+"sensorHealthTemporaryIssueTitle" = "Tymczasowy problem z sensorem";
+"sensorHealthTemporaryIssueGuidance" = "Tymczasowy problem z sensorem od 3 godzin. Sprawdź glukometrem i postępuj zgodnie z zaleceniami producenta.";
+"sensorHealthSensorFailedTitle" = "Awaria sensora";
+"sensorHealthSensorFailedGuidance" = "Zgłoszono awarię sensora. Wymień sensor.";
+"sensorHealthTransmitterFailedTitle" = "Awaria nadajnika";
+"sensorHealthTransmitterFailedGuidance" = "Zgłoszono awarię nadajnika. Sprawdź go lub wymień.";

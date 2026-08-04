@@ -28,6 +28,13 @@ struct RootHomeToolbarView: View {
     var body: some View {
         HStack(spacing: 0) {
             toolbarButton(systemImage: state.controls.snoozeSystemImage, label: Texts_HomeView.snoozeButton, action: actions.showSnooze)
+                .contextMenu {
+                    ForEach(Array(SensorHealthTestKind.allCases.enumerated()), id: \.offset) { _, testKind in
+                        Button(testKind.testMenuTitle) {
+                            actions.queueSensorHealthTest(testKind)
+                        }
+                    }
+                }
             toolbarButton(systemImage: "drop", label: "BgReadings", action: actions.showBgReadings)
             sensorToolbarButton()
             postProcessingToolbarButton()

@@ -97,7 +97,6 @@
 "sensorManagementNoiseVeryHigh" = "Muito elevado";
 "sensorManagementNoiseExtreme" = "Extremo";
 "sensorManagementNoiseFlatline" = "O sensor provavelmente falhou.";
-"sensorManagementNoiseFooter" = "Sensibilidade selecionada: %@";
 "sensorNoiseWarningExtremeTitle" = "Ruído extremo do sensor";
 "sensorNoiseWarningPersistentTitle" = "Ruído persistente do sensor";
 "sensorNoiseWarningFlatlineTitle" = "O sinal do sensor está plano";
@@ -114,7 +113,6 @@
 "sensorNoiseHistoryLoading" = "A criar o histórico do sensor";
 "sensorNoiseHistoryNoDataTitle" = "Ainda não existem dados de ruído suficientes";
 "sensorNoiseHistoryNoDataMessage" = "O gráfico aparecerá depois de serem recolhidas leituras suficientes do sensor.";
-"sensorNoiseHistoryFooter" = "O gráfico mostra a oscilação residual do sensor durante esta sessão. Valores mais baixos indicam um sinal mais estável. Não mede a precisão da glicose.";
 "sensorNoiseHistoryChartAccessibility" = "Gráfico do histórico de ruído do sensor";
 "pumpBattery" = "Bateria";
 "pumpReservoir" = "Reservatório";
@@ -149,3 +147,13 @@
 "sensorManagementCalibrationReadinessGood" = "Agora é uma boa altura para calibrar.";
 "sensorManagementCalibrationSafetyFooter" = "Calibre apenas se souber como fazê-lo em segurança.";
 "sensorManagementLargeCalibrationDifferenceWarningFormat" = "É possível que esta calibração não funcione. Tente limitar cada alteração de calibração a um máximo de %@ de cada vez.";
+"sensorHealthPersistentNoiseTitle" = "Ruído do sensor muito elevado";
+"sensorHealthPersistentNoiseGuidance" = "Ruído muito elevado há 12 horas. Considere substituir o sensor se continuar.";
+"sensorHealthFlatlineTitle" = "O sinal do sensor está plano";
+"sensorHealthFlatlineGuidance" = "Leituras sem alteração há 30 minutos. Geralmente indica que o sensor falhou/expirou.";
+"sensorHealthTemporaryIssueTitle" = "Problema temporário do sensor";
+"sensorHealthTemporaryIssueGuidance" = "Problema temporário do sensor há 3 horas. Confirme com um medidor e siga as orientações do fabricante.";
+"sensorHealthSensorFailedTitle" = "Falha do sensor";
+"sensorHealthSensorFailedGuidance" = "Falha do sensor comunicada. Substitua o sensor.";
+"sensorHealthTransmitterFailedTitle" = "Falha do transmissor";
+"sensorHealthTransmitterFailedGuidance" = "Falha do transmissor comunicada. Verifique-o ou substitua-o.";

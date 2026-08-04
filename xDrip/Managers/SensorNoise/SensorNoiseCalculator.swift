@@ -80,15 +80,23 @@ enum ConstantsSensorNoise {
     static let shortTermWindow: TimeInterval = 30 * 60
     static let longTermWindow: TimeInterval = 4 * 60 * 60
     static let longTermContextWindow: TimeInterval = longTermWindow + shortTermWindow
+    static let persistentNoiseWindow: TimeInterval = 12 * 60 * 60
+    static let persistentNoiseContextWindow: TimeInterval = persistentNoiseWindow + shortTermWindow
     static let minimumShortTermSpan: TimeInterval = 20 * 60
     static let minimumLongTermSpan: TimeInterval = 3.5 * 60 * 60
     static let maximumGap: TimeInterval = 12 * 60
+    static let minimumPersistentNoiseCoverage = 0.70
+    /// Each stored estimate summarizes the preceding thirty minutes. This allows normal scheduling
+    /// delays without treating a genuinely longer break as covered history.
+    static let maximumPersistentEstimateGap = shortTermWindow
 
     static let minimumReadingsForQuadraticFit = 6
     static let minimumReadingsForNeighbourJitter = 6
     static let minimumLongTermEstimates = 12
     static let minimumLongTermCoverage = 0.70
-    static let historyMinimumInterval: TimeInterval = ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes * 60
+    /// Live calculations and stored history use the same cadence so faster sensors do not repeat
+    /// the four-hour rolling calculation for every incoming value.
+    static let measurementInterval: TimeInterval = 10 * 60
 
     /// Allows history to survive small internal sensor-session start date changes.
     ///
@@ -129,7 +137,9 @@ enum ConstantsSensorNoise {
     static let flatlineMinimumSpan: TimeInterval = 25 * 60
     static let flatlineMinimumReadings = 6
     static let flatlineRangeToleranceInMgDl = 0.1
-    static let rootWarningFreshness: TimeInterval = 15 * 60
+    /// Keep the most recent measurement visible across the ten-minute calculation interval,
+    /// including normal delivery and scheduling delays.
+    static let rootWarningFreshness: TimeInterval = 20 * 60
 
     /// Maps a standard-deviation value to the matching display and warning state.
     static func state(for noise: Double) -> SensorNoiseState {
@@ -188,6 +198,12 @@ struct SensorNoiseMeasurement: Equatable {
     let longTermCoverage: Double
     let state: SensorNoiseState
     let latestReadingAt: Date?
+}
+
+/// Twelve-hour sensor noise result used by history display and persistent-noise warnings.
+struct SensorNoisePersistenceAssessment: Equatable {
+    let value: Double?
+    let coverage: Double
 }
 
 /// One historic sensor noise measurement anchored to a reading timestamp.
@@ -295,6 +311,66 @@ struct SensorNoiseCalculator {
         )
     }
 
+    /// Calculates the twelve-hour median from rolling thirty-minute jitter estimates.
+    func calculatePersistence(readings: [SensorNoiseReading]) -> SensorNoisePersistenceAssessment {
+        let usableReadings = usableReadings(from: readings)
+
+        guard let latestReading = usableReadings.last else {
+            return SensorNoisePersistenceAssessment(value: nil, coverage: 0)
+        }
+
+        let windowStart = latestReading.timeStamp.addingTimeInterval(-ConstantsSensorNoise.persistentNoiseWindow)
+        let contextStart = windowStart.addingTimeInterval(-ConstantsSensorNoise.shortTermWindow)
+        let contextualReadings = usableReadings.filter {
+            $0.timeStamp >= contextStart && $0.timeStamp <= latestReading.timeStamp
+        }
+        var estimates = [(timeStamp: Date, noise: Double)]()
+        var lastEndpointDate: Date?
+
+        for endpoint in contextualReadings where endpoint.timeStamp >= windowStart {
+            if let lastEndpointDate,
+               endpoint.timeStamp.timeIntervalSince(lastEndpointDate) < ConstantsSensorNoise.measurementInterval {
+                continue
+            }
+
+            lastEndpointDate = endpoint.timeStamp
+            let segment = contiguousTail(
+                readings: contextualReadings,
+                endingAt: endpoint.timeStamp,
+                window: ConstantsSensorNoise.shortTermWindow
+            )
+
+            if let noise = jitterAwareNoiseStandardDeviation(readings: segment) {
+                estimates.append((endpoint.timeStamp, noise))
+            }
+        }
+
+        return calculatePersistence(estimates: estimates, endingAt: latestReading.timeStamp)
+    }
+
+    /// Calculates persistence at one timestamp from chronological thirty-minute estimates.
+    func calculatePersistence(
+        estimates: [(timeStamp: Date, noise: Double)],
+        endingAt endDate: Date
+    ) -> SensorNoisePersistenceAssessment {
+        let windowStart = endDate.addingTimeInterval(-ConstantsSensorNoise.persistentNoiseWindow)
+        let windowEstimates = estimates.filter {
+            $0.timeStamp >= windowStart && $0.timeStamp <= endDate
+        }
+        let coveredDuration = zip(windowEstimates, windowEstimates.dropFirst()).reduce(0.0) { result, pair in
+            let gap = pair.1.timeStamp.timeIntervalSince(pair.0.timeStamp)
+            return result + (gap <= ConstantsSensorNoise.maximumPersistentEstimateGap ? max(gap, 0) : 0)
+        }
+        let coverage = min(max(coveredDuration / ConstantsSensorNoise.persistentNoiseWindow, 0), 1)
+
+        return SensorNoisePersistenceAssessment(
+            value: coverage >= ConstantsSensorNoise.minimumPersistentNoiseCoverage
+                ? percentile(windowEstimates.map(\.noise), percentile: 0.5)
+                : nil,
+            coverage: coverage
+        )
+    }
+
     /// Calculates measurements across the full supplied sensor session at the stored history cadence.
     ///
     /// Each endpoint is calculated with the same rolling context as a live update, so rebuilding
@@ -311,7 +387,7 @@ struct SensorNoiseCalculator {
             let endpoint = usableReadings[endpointIndex]
 
             if let lastEndpointDate,
-               endpoint.timeStamp.timeIntervalSince(lastEndpointDate) < ConstantsSensorNoise.historyMinimumInterval {
+               endpoint.timeStamp.timeIntervalSince(lastEndpointDate) < ConstantsSensorNoise.measurementInterval {
                 continue
             }
 

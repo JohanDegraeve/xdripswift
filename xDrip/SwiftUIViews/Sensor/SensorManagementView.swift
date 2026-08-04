@@ -33,6 +33,8 @@ struct SensorManagementView: View {
     @State private var showingSensorDetails = false
     @State private var showingNoSensorCodeConfirmation = false
     @State private var sensorNoiseSensitivity = UserDefaults.standard.sensorNoiseSensitivity
+    @State private var persistentNoise: Double?
+    @State private var persistentNoiseSensorID: String?
     @State private var pendingStartSensorCode: String?
 
     private let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
@@ -93,66 +95,66 @@ struct SensorManagementView: View {
 
                 List {
                     if state.hasTransmitter {
-                    Section(header: Text(Texts_HomeView.sensorManagementSummaryTitle), footer: summaryFooter(for: state)) {
-                        statusRow(state: state)
-                            .id(refreshView)
-                        row(title: Texts_HomeView.sensorManagementCGMType, data: state.bannerTitle)
+                        Section(header: Text(Texts_HomeView.sensorManagementSummaryTitle), footer: summaryFooter(for: state)) {
+                            statusRow(state: state)
+                                .id(refreshView)
+                            row(title: Texts_HomeView.sensorManagementCGMType, data: state.bannerTitle)
 
-                        Button {
-                            showingSensorDetails = true
-                        } label: {
-                            HStack {
-                                Text(Texts_HomeView.sensorManagementElapsed)
-                                    .foregroundStyle(Color(.colorPrimary))
-                                Spacer()
-                                Text(state.sessionLifetimeString)
-                                    .foregroundStyle(Color(.colorSecondary))
-                                    .multilineTextAlignment(.trailing)
-                                Image(systemName: "chevron.right")
-                                    .font(.footnote.weight(.semibold))
-                                    .foregroundStyle(Color(.tertiaryLabel))
-                            }
-                        }
-                    }
-
-                    if state.showsNoise {
-                        Section(
-                            header: Text(Texts_HomeView.sensorManagementNoiseTitle),
-                            footer: Text(String(format: Texts_HomeView.sensorManagementNoiseFooter, sensorNoiseSensitivity.description))
-                        ) {
-                            if let sensorID = state.sensorID, let sensorStartDate = state.sensorStartDate {
-                                NavigationLink {
-                                    SensorNoiseHistoryView(
-                                        sensorID: sensorID,
-                                        sensorStartDate: sensorStartDate,
-                                        sensorNoiseManager: sensorNoiseManager,
-                                        isMgDl: isMgDl,
-                                        currentMeasurementsDetail: state.noiseMeasurementsDetail
-                                    )
-                                } label: {
-                                    SensorNoiseSummaryRow(
-                                        shortTermNoise: state.shortTermNoise,
-                                        longTermNoise: state.longTermNoise,
-                                        state: state.noiseState,
-                                        isMgDl: isMgDl
-                                    )
+                            Button {
+                                showingSensorDetails = true
+                            } label: {
+                                HStack {
+                                    Text(Texts_HomeView.sensorManagementElapsed)
+                                        .foregroundStyle(Color(.colorPrimary))
+                                    Spacer()
+                                    Text(state.sessionLifetimeString)
+                                        .foregroundStyle(Color(.colorSecondary))
+                                        .multilineTextAlignment(.trailing)
+                                    Image(systemName: "chevron.right")
+                                        .font(.footnote.weight(.semibold))
+                                        .foregroundStyle(Color(.tertiaryLabel))
                                 }
                             }
                         }
-                    }
 
-                    Section(header: Text(Texts_HomeView.sensorManagementHistoryTitle), footer: calibrationFooter(for: state)) {
-                        NavigationLink {
-                            CalibrationHistoryView(
-                                currentCalibration: state.currentCalibration,
-                                calibrationHistory: state.calibrationHistory,
-                                isMgDl: isMgDl
-                            )
-                        } label: {
-                            row(title: Texts_HomeView.sensorManagementLastCalibration, data: state.calibrationSummary)
+                        if state.showsNoise {
+                            Section(header: Text(Texts_HomeView.sensorManagementNoiseTitle)) {
+                                if let sensorID = state.sensorID, let sensorStartDate = state.sensorStartDate {
+                                    NavigationLink {
+                                        SensorNoiseHistoryView(
+                                            sensorID: sensorID,
+                                            sensorStartDate: sensorStartDate,
+                                            sensorNoiseManager: sensorNoiseManager,
+                                            isMgDl: isMgDl,
+                                            currentMeasurementsDetail: state.noiseMeasurementsDetail
+                                        )
+                                    } label: {
+                                        SensorNoiseSummaryRow(
+                                            shortTermNoise: state.shortTermNoise,
+                                            longTermNoise: state.longTermNoise,
+                                            persistentNoise: state.persistentNoise,
+                                            state: state.noiseState,
+                                            isMgDl: isMgDl
+                                        )
+                                    }
+                                }
+
+                                sensorNoiseSensitivityRow()
+                            }
                         }
-                        .disabled(!state.hasCalibrationHistory)
-                    }
+
+                        Section(header: Text(Texts_HomeView.sensorManagementHistoryTitle), footer: calibrationFooter(for: state)) {
+                            NavigationLink {
+                                CalibrationHistoryView(
+                                    currentCalibration: state.currentCalibration,
+                                    calibrationHistory: state.calibrationHistory,
+                                    isMgDl: isMgDl
+                                )
+                            } label: {
+                                row(title: Texts_HomeView.sensorManagementLastCalibration, data: state.calibrationSummary)
+                            }
+                            .disabled(!state.hasCalibrationHistory)
+                        }
                     } else {
                         Section {
                             VStack(spacing: 10) {
@@ -185,9 +187,15 @@ struct SensorManagementView: View {
         .colorScheme(.dark)
         .onAppear {
             refreshSensorNoiseSensitivity()
+            refreshPersistentNoise()
         }
         .onReceive(timer) { _ in
             refreshView.toggle()
+            refreshPersistentNoiseIfSensorChanged()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .sensorNoiseHistoryDidChange)) { notification in
+            guard notification.object as? String == activeSensorProvider()?.id else { return }
+            refreshPersistentNoise(rebuildIfNeeded: false)
         }
         .alert(Texts_HomeView.sensorManagementSessionDetails, isPresented: $showingSensorDetails) {
             Button(Texts_Common.Ok, role: .cancel) {}
@@ -248,9 +256,60 @@ struct SensorManagementView: View {
         }
     }
 
-    /// Keeps the parent Sensor Noise footer aligned with the selected sensitivity.
+    private func sensorNoiseSensitivityRow() -> some View {
+        NavigationLink {
+            SensorNoiseSensitivitySelectionView(
+                selectedSensitivity: sensorNoiseSensitivity,
+                onSelect: updateSensorNoiseSensitivity
+            )
+        } label: {
+            HStack {
+                Text(Texts_SettingsView.sensorNoiseSensitivity)
+
+                Spacer()
+
+                Text(sensorNoiseSensitivity.description)
+                    .foregroundStyle(Color(.colorSecondary))
+            }
+        }
+    }
+
+    /// Keeps the parent Sensor Noise row aligned with the persisted sensitivity.
     private func refreshSensorNoiseSensitivity() {
         sensorNoiseSensitivity = UserDefaults.standard.sensorNoiseSensitivity
+    }
+
+    /// Stores the app-wide sensitivity and updates the parent row immediately.
+    private func updateSensorNoiseSensitivity(_ sensitivity: SensorNoiseSensitivity) {
+        UserDefaults.standard.sensorNoiseSensitivity = sensitivity
+        sensorNoiseSensitivity = sensitivity
+    }
+
+    /// Keeps the compact 12-hour value aligned with the same persisted history used by Noise History.
+    private func refreshPersistentNoise(rebuildIfNeeded: Bool = true) {
+        guard let sensor = activeSensorProvider() else {
+            persistentNoiseSensorID = nil
+            persistentNoise = nil
+            return
+        }
+
+        persistentNoiseSensorID = sensor.id
+        persistentNoise = sensorNoiseManager.historySnapshot(
+            sensorID: sensor.id,
+            sessionStartDate: sensor.startDate
+        )?.persistentNoise
+
+        guard rebuildIfNeeded else { return }
+
+        sensorNoiseManager.rebuildHistoryIfNeeded(sensorID: sensor.id, sessionStartDate: sensor.startDate) {
+            guard activeSensorProvider()?.id == sensor.id else { return }
+            refreshPersistentNoise(rebuildIfNeeded: false)
+        }
+    }
+
+    private func refreshPersistentNoiseIfSensorChanged() {
+        guard activeSensorProvider()?.id != persistentNoiseSensorID else { return }
+        refreshPersistentNoise()
     }
 
     private func handleStartTap() {
@@ -610,6 +669,7 @@ struct SensorManagementView: View {
             hasCalibrationHistory: hasCalibrationHistory,
             shortTermNoise: activeSensor?.shortTermNoise?.doubleValue,
             longTermNoise: activeSensor?.longTermNoise?.doubleValue,
+            persistentNoise: activeSensor?.id == persistentNoiseSensorID ? persistentNoise : nil,
             noiseState: noiseState,
             currentBgDisplay: activeSensor.flatMap { bgReadingsAccessor.last(forSensor: $0) }.map {
                 SensorManagementEnteredBgValue(rawValue: displayEditableBgValue($0.finalValue), valueInMgDl: $0.finalValue)
@@ -620,6 +680,45 @@ struct SensorManagementView: View {
         )
     }
 
+}
+
+// MARK: - sensitivity picker
+
+private struct SensorNoiseSensitivitySelectionView: View {
+    let selectedSensitivity: SensorNoiseSensitivity
+    let onSelect: (SensorNoiseSensitivity) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        List {
+            Section {
+                ForEach(SensorNoiseSensitivity.allCases, id: \.self) { sensitivity in
+                    Button {
+                        onSelect(sensitivity)
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Text(sensitivity.description)
+                                .foregroundStyle(Color(.colorPrimary))
+
+                            Spacer()
+
+                            if selectedSensitivity == sensitivity {
+                                Image(systemName: "checkmark")
+                                    .foregroundStyle(.green)
+                            }
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+            } footer: {
+                Text(Texts_SettingsView.sensorNoiseSensitivityFooter)
+            }
+        }
+        .navigationTitle(Texts_SettingsView.sensorNoiseSensitivity)
+        .navigationBarTitleDisplayMode(.inline)
+    }
 }
 
 /// Complete value presentation derived from the current sensor and transmitter.
@@ -657,6 +756,7 @@ private struct SensorManagementState {
     let hasCalibrationHistory: Bool
     let shortTermNoise: Double?
     let longTermNoise: Double?
+    let persistentNoise: Double?
     let noiseState: SensorNoiseState
     let currentBgDisplay: SensorManagementEnteredBgValue?
     let calibrationReadiness: CalibrationReadiness

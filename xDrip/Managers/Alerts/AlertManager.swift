@@ -173,6 +173,120 @@ public class AlertManager: NSObject {
         return immediateNotificationCreated
     }
 
+    /// Raises the only sensor-health event that belongs in the alarm system.
+    ///
+    /// A transmitter-reported terminal sensor or transmitter failure needs the user's normal Alerts
+    /// screen controls and assigned Alert Type. Calculated noise, flatline and temporary transmitter
+    /// issues do not enter this class. They remain sensor-health episodes presented by Home.
+    ///
+    /// This method creates one notification and applies the configured sound and vibration. It does
+    /// not create an alarm cycle, repeat schedule, snooze action or Snooze All state.
+    func raiseOneOffSensorFailureAlarm(_ issue: SensorHealthIssue) {
+        let alertKind = AlertKind.sensorTransmitterFailure
+        let (alertEntry, _) = alertEntriesAccessor.getCurrentAndNextAlertEntry(
+            forAlertKind: alertKind,
+            forWhen: Date(),
+            alertTypesAccessor: alertTypesAccessor
+        )
+
+        guard !alertEntry.isDisabled, alertEntry.alertType.enabled else {
+            trace(
+                "sensor/transmitter failure alarm is disabled",
+                log: log,
+                category: ConstantsLog.categoryAlertManager,
+                type: .info
+            )
+            return
+        }
+
+        let content = UNMutableNotificationContent()
+        content.title = issue.title
+        content.body = issue.guidance
+        content.interruptionLevel = .active
+        content.threadIdentifier = "sensorHealth"
+        content.userInfo = [
+            SensorHealthIssueManager.notificationIsTerminalUserInfoKey: true
+        ]
+
+        applyImmediatePresentation(from: alertEntry.alertType, to: content)
+
+        let request = UNNotificationRequest(
+            identifier: SensorHealthIssueManager.notificationIdentifierPrefix + issue.id,
+            content: content,
+            trigger: nil
+        )
+
+        uNUserNotificationCenter.add(request) { [weak self] error in
+            guard let error else {
+                if let self {
+                    trace(
+                        "raised one-off sensor failure alarm",
+                        log: self.log,
+                        category: ConstantsLog.categoryAlertManager,
+                        type: .info
+                    )
+                }
+                return
+            }
+
+            guard let self else { return }
+            trace(
+                "unable to raise one-off sensor failure alarm: %{public}@",
+                log: self.log,
+                category: ConstantsLog.categoryAlertManager,
+                type: .error,
+                error.localizedDescription
+            )
+        }
+
+        if alertEntry.alertType.vibrate {
+            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
+        }
+    }
+
+    /// Stops and clears a one-off terminal failure alarm when its notification is opened.
+    ///
+    /// This performs the same immediate sound cleanup as a conventional alarm response without
+    /// creating a snooze picker. Removing both notification states also prevents a delivered or
+    /// not-yet-delivered copy from remaining after the app opens.
+    func clearOneOffSensorFailureAlarm(notificationIdentifier: String) {
+        soundPlayer?.stopPlaying()
+        uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: [notificationIdentifier])
+        uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: [notificationIdentifier])
+    }
+
+    /// Applies sound behavior from an Alert Type without adding a snooze notification category.
+    /// Terminal failures are episode-deduplicated and never repeat or join Snooze All.
+    private func applyImmediatePresentation(from alertType: AlertType, to content: UNMutableNotificationContent) {
+        let soundFileName = resolvedSoundFileName(for: alertType)
+
+        if alertType.overridemute {
+            guard soundFileName != "" else { return }
+            soundPlayer?.playSound(soundFileName: soundFileName ?? "xdripalert.aif")
+        } else if let soundFileName {
+            guard !soundFileName.isEmpty else { return }
+            content.sound = UNNotificationSound(named: UNNotificationSoundName(soundFileName))
+        } else {
+            content.sound = .default
+        }
+    }
+
+    /// Resolves the user-facing Alarm Type sound name to its bundled sound file.
+    /// Nil means the default iOS sound and an empty string means no sound.
+    private func resolvedSoundFileName(for alertType: AlertType) -> String? {
+        guard let configuredName = alertType.soundname else { return nil }
+        guard !configuredName.isEmpty else { return "" }
+
+        for sound in ConstantsSounds.allCases {
+            let components = sound.rawValue.split(separator: "/", maxSplits: 1).map(String.init)
+            if components.count == 2, components[0] == configuredName {
+                return components[1]
+            }
+        }
+
+        return "xdripalert.aif"
+    }
+
     /// Check the OS-AID loop-cycle alarm using the latest Nightscout device-status snapshot.
     /// The alarm is only allowed to fire when device-status data itself is fresh.
     func checkNotLoopingAlert(deviceStatus: NotLoopingDeviceStatus?) -> Bool {
@@ -465,7 +579,12 @@ public class AlertManager: NSObject {
         for section in 0..<sectionCount {
             // First find the AlertKind index in allCases,
             // ensure there are entries for it, and check if the first entry is enabled (not disabled).
-            if let alertKind = AlertKind(forSection: section), let index = AlertKind.allCases.firstIndex(of: alertKind), index < alertEntriesPerAlertKind.count, let firstEntry = alertEntriesPerAlertKind[index].first, !firstEntry.isDisabled {
+            if let alertKind = AlertKind(forSection: section),
+               alertKind.supportsSnooze(),
+               let index = AlertKind.allCases.firstIndex(of: alertKind),
+               index < alertEntriesPerAlertKind.count,
+               let firstEntry = alertEntriesPerAlertKind[index].first,
+               !firstEntry.isDisabled {
                 orderedEnabledKinds.append(alertKind)
             }
         }
@@ -644,7 +763,7 @@ public class AlertManager: NSObject {
             // create the content for the alert notification, set body and text, category and also attachments and userInfo dict if available
             let content = UNMutableNotificationContent()
             
-            // keep not looping minimal; other alerts keep the shared prefix + title + value format
+            // keep not looping minimal. Other alerts keep the shared prefix, title and value format
             if let alertTitle = alertTitle, let alertBody = alertBody {
                 if alertKind == .notlooping {
                     content.title = alertTitle
@@ -933,3 +1052,5 @@ public class AlertManager: NSObject {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue)
     }
 }
+
+extension AlertManager: SensorHealthOneOffAlarmRaising {}

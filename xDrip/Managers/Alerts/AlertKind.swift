@@ -21,6 +21,7 @@ struct NotLoopingDeviceStatus: Sendable {
         self.init(createdAt: snapshot.createdAt, lastCheckedDate: snapshot.lastCheckedDate, lastLoopDate: snapshot.lastLoopDate)
     }
 
+    /// Rejects server dates that are too far ahead to be valid for an alert decision.
     func sanitizingFutureDates(referenceDate: Date = Date(), futureTolerance: TimeInterval = 20) -> NotLoopingDeviceStatus {
         let maximumAllowedDate = referenceDate.addingTimeInterval(futureTolerance)
         return NotLoopingDeviceStatus(
@@ -48,6 +49,10 @@ public enum AlertKind: Int, CaseIterable {
     case fastrise = 8
     case phonebatterylow = 9
     case notlooping = 10
+    /// Configuration for a transmitter-reported terminal sensor or transmitter failure.
+    /// The event arrives from the active BLE peripheral and fires once through AlertManager.
+    /// Recoverable sensor-health episodes never use this AlertKind.
+    case sensorTransmitterFailure = 11
 
     /// this is used for presentation in UI table view. It allows to order the alert kinds in the view, different than they case ordering, and so allows to add new cases
     init?(forSection section: Int) {
@@ -74,6 +79,8 @@ public enum AlertKind: Int, CaseIterable {
             self = .batterylow
         case 10:
             self = .phonebatterylow
+        case 11:
+            self = .sensorTransmitterFailure
         default:
             fatalError("in AlertKind initializer init(forRowAt row: Int), there's no case for the rownumber")
         }
@@ -104,6 +111,8 @@ public enum AlertKind: Int, CaseIterable {
             return 6
         case 10: // phone battery low
             return 9
+        case 11: // sensor/transmitter failure
+            return 11
         default:
             fatalError("in alertKindRawValue, unknown case")
         }
@@ -123,7 +132,18 @@ public enum AlertKind: Int, CaseIterable {
     ///
     /// probably only useful in UI - named AlertKind and not AlertType because there's already an AlertType which has a different goal
     func needsAlertValue() -> Bool {
-        return true
+        return self != .sensorTransmitterFailure
+    }
+
+    /// A terminal failure is event-driven and has one all-day configuration.
+    /// It cannot be divided into schedules because there is no value or time window to evaluate.
+    func supportsAlertSchedules() -> Bool {
+        return self != .sensorTransmitterFailure
+    }
+
+    /// A terminal failure is reported once by the active BLE peripheral and is never snoozable.
+    func supportsSnooze() -> Bool {
+        return self != .sensorTransmitterFailure
     }
     
     /// a trigger value used for some alert types that:
@@ -189,6 +209,8 @@ public enum AlertKind: Int, CaseIterable {
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelPhone
         case .notlooping:
             return ConstantsDefaultAlertLevels.notLooping
+        case .sensorTransmitterFailure:
+            return 0
         }
     }
 
@@ -239,6 +261,8 @@ public enum AlertKind: Int, CaseIterable {
             return "phonebatterylow"
         case .notlooping:
             return "notlooping"
+        case .sensorTransmitterFailure:
+            return "sensorTransmitterFailure"
         }
     }
     
@@ -481,6 +505,12 @@ public enum AlertKind: Int, CaseIterable {
             }
 
             return (true, "", Texts_Alerts.notLoopingAlertTitle, nil)
+
+        case .sensorTransmitterFailure:
+            // Terminal failures are pushed by the active CGM peripheral. They are not found by the
+            // normal value and schedule checks. AlertManager reads this kind's enabled state and
+            // assigned Alert Type only when SensorHealthIssueManager passes the event across.
+            return (false, nil, nil, nil)
         }
     }
     
@@ -509,6 +539,8 @@ public enum AlertKind: Int, CaseIterable {
             return ConstantsNotifications.NotificationIdentifiersForAlerts.phoneBatteryLow
         case .notlooping:
             return ConstantsNotifications.NotificationIdentifiersForAlerts.notLoopingAlert
+        case .sensorTransmitterFailure:
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.sensorTransmitterFailure
         }
     }
     
@@ -537,6 +569,8 @@ public enum AlertKind: Int, CaseIterable {
             return Texts_Alerts.phoneBatteryLowAlertTitle
         case .notlooping:
             return Texts_Alerts.notLoopingAlertTitle
+        case .sensorTransmitterFailure:
+            return Texts_Alerts.sensorTransmitterFailureAlertTitle
         }
     }
     
@@ -558,6 +592,8 @@ public enum AlertKind: Int, CaseIterable {
             }
         case .phonebatterylow:
             return "%"
+        case .sensorTransmitterFailure:
+            return ""
         }
     }
     
@@ -591,7 +627,7 @@ private func createAlertTitleForBgReadingAlerts(alertKind: AlertKind) -> String 
         return Texts_Alerts.fastDropTitle
     case .fastrise:
         return Texts_Alerts.fastRiseTitle
-    case .missedreading, .calibration, .batterylow, .phonebatterylow, .notlooping:
+    case .missedreading, .calibration, .batterylow, .phonebatterylow, .notlooping, .sensorTransmitterFailure:
         return ""
     }
 }

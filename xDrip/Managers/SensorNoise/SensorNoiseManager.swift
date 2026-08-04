@@ -16,6 +16,8 @@ struct SensorNoiseHistoryPoint: Equatable, Identifiable {
     let timeStamp: Date
     let shortTermNoise: Double?
     let longTermNoise: Double?
+    let persistentNoise: Double?
+    let persistentCoverage: Double
     let state: SensorNoiseState
 }
 
@@ -27,6 +29,8 @@ struct SensorNoiseHistorySnapshot {
     let longTermNoise: Double?
     let shortTermCoverage: Double
     let longTermCoverage: Double
+    let persistentNoise: Double?
+    let persistentCoverage: Double
     let state: SensorNoiseState
     let points: [SensorNoiseHistoryPoint]
 }
@@ -38,9 +42,9 @@ extension Notification.Name {
 
 /// Calculates and stores rolling noise measurements on the active sensor.
 ///
-/// Current values remain on `Sensor`, while chart points are stored separately as
-/// `SensorNoiseSample` records. Existing sessions are rebuilt lazily when their history is first
-/// opened, after which normal sensor updates append new samples at the standard reading cadence.
+/// Current thirty-minute and four-hour values remain on `Sensor`. Chart points are stored as
+/// `SensorNoiseSample` records, and their twelve-hour median is derived when history is loaded.
+/// Existing sessions are rebuilt lazily, then normal updates append at the ten-minute cadence.
 final class SensorNoiseManager {
 
     // MARK: - private properties
@@ -54,6 +58,9 @@ final class SensorNoiseManager {
     /// SensorNoiseCalculator instance
     private let calculator = SensorNoiseCalculator()
 
+    /// Shared sensor-health episode manager
+    private let sensorHealthIssueManager: SensorHealthIssueManager
+
     /// completion handlers waiting for the same sensor history build
     private var historyBuildCompletions = [String: [() -> Void]]()
 
@@ -62,9 +69,14 @@ final class SensorNoiseManager {
 
     // MARK: - initializer
 
-    init(coreDataManager: CoreDataManager, bgReadingsAccessor: BgReadingsAccessor) {
+    init(
+        coreDataManager: CoreDataManager,
+        bgReadingsAccessor: BgReadingsAccessor,
+        sensorHealthIssueManager: SensorHealthIssueManager
+    ) {
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = bgReadingsAccessor
+        self.sensorHealthIssueManager = sensorHealthIssueManager
     }
 
     // MARK: - public functions
@@ -73,20 +85,47 @@ final class SensorNoiseManager {
     func update(activeSensor: Sensor?, now: Date = Date()) {
         guard UserDefaults.standard.isMaster, let activeSensor else { return }
 
+        var shouldCalculate = false
+        var sensorID: String?
+        var sessionStartDate: Date?
+
+        coreDataManager.mainManagedObjectContext.performAndWait {
+            guard !activeSensor.isDeleted, activeSensor.managedObjectContext != nil else { return }
+
+            sensorID = activeSensor.id
+            sessionStartDate = activeSensor.startDate
+
+            if activeSensor.noiseAlgorithmVersion != ConstantsSensorNoise.algorithmVersion {
+                shouldCalculate = true
+            } else if let latestReadingAt = activeSensor.noiseLatestReadingAt {
+                shouldCalculate = now.timeIntervalSince(latestReadingAt) >= ConstantsSensorNoise.measurementInterval
+            } else {
+                shouldCalculate = true
+            }
+        }
+
+        guard shouldCalculate, let sensorID, let sessionStartDate else { return }
+
+        let readingStartDate = max(
+            now.addingTimeInterval(
+                -(ConstantsSensorNoise.persistentNoiseContextWindow + ConstantsSensorNoise.rootWarningFreshness)
+            ),
+            sessionStartDate.addingTimeInterval(-ConstantsSensorNoise.sessionStartDateReachBackTolerance)
+        )
         let snapshots = bgReadingsAccessor.getLatestBgReadingSnapshots(
             limit: nil,
-            // Include a freshness allowance so an app launch between sensor readings still
-            // provides the full 30-minute context for every four-hour rolling estimate.
-            fromDate: now.addingTimeInterval(
-                -(ConstantsSensorNoise.longTermContextWindow + ConstantsSensorNoise.rootWarningFreshness)
-            ),
-            forSensor: activeSensor,
+            // Match history rebuilds by anchoring to the physical session start date rather than
+            // only the current Sensor ID. This keeps 12-hour persistence working after harmless
+            // internal Sensor object churn, while still refusing readings before the session start.
+            fromDate: readingStartDate,
+            forSensor: nil,
             ignoreRawData: true,
             ignoreCalculatedValue: false,
             includingSuppressed: true
         )
         let readings = snapshots.map(Self.noiseReading)
         let measurement = calculator.calculate(readings: readings)
+        let persistence = calculator.calculatePersistence(readings: readings)
         var didStoreHistorySample = false
 
         coreDataManager.mainManagedObjectContext.performAndWait {
@@ -112,8 +151,17 @@ final class SensorNoiseManager {
 
         coreDataManager.saveChanges()
 
+        sensorHealthIssueManager.reportCalculatedState(
+            sensorID: sensorID,
+            sensorStartDate: sessionStartDate,
+            measurement: measurement,
+            persistence: persistence,
+            sensitivity: UserDefaults.standard.sensorNoiseSensitivity,
+            now: now
+        )
+
         if didStoreHistorySample {
-            NotificationCenter.default.post(name: .sensorNoiseHistoryDidChange, object: activeSensor.id)
+            NotificationCenter.default.post(name: .sensorNoiseHistoryDidChange, object: sensorID)
         }
 
         trace(
@@ -151,7 +199,7 @@ final class SensorNoiseManager {
             request.fetchBatchSize = 512
 
             do {
-                let points = self.currentSessionPoints(
+                let storedPoints = self.currentSessionPoints(
                     from: try request.execute(),
                     currentSensorID: sensorID
                 ).map { sample in
@@ -160,9 +208,13 @@ final class SensorNoiseManager {
                         timeStamp: sample.timeStamp,
                         shortTermNoise: sample.shortTermNoise?.doubleValue,
                         longTermNoise: sample.longTermNoise?.doubleValue,
+                        persistentNoise: nil,
+                        persistentCoverage: 0,
                         state: SensorNoiseState(rawValue: sample.stateRaw) ?? .collecting
                     )
                 }
+                let points = self.addingPersistentNoise(to: storedPoints)
+                let latestPoint = points.last
 
                 snapshot = SensorNoiseHistorySnapshot(
                     sensorStartDate: sensor.startDate,
@@ -171,6 +223,8 @@ final class SensorNoiseManager {
                     longTermNoise: sensor.longTermNoise?.doubleValue,
                     shortTermCoverage: sensor.shortTermNoiseCoverage,
                     longTermCoverage: sensor.longTermNoiseCoverage,
+                    persistentNoise: latestPoint?.persistentNoise,
+                    persistentCoverage: latestPoint?.persistentCoverage ?? 0,
                     state: SensorNoiseState(rawValue: sensor.noiseStateRaw) ?? .collecting,
                     points: points
                 )
@@ -286,7 +340,33 @@ final class SensorNoiseManager {
         return pointsByTimestamp.values.sorted { $0.timeStamp < $1.timeStamp }
     }
 
-    /// stores no more than one history point per normal sensor reading interval
+    /// Adds the rolling twelve-hour median to each stored chart point.
+    private func addingPersistentNoise(to points: [SensorNoiseHistoryPoint]) -> [SensorNoiseHistoryPoint] {
+        var estimates = [(timeStamp: Date, noise: Double)]()
+
+        return points.map { point in
+            if let shortTermNoise = point.shortTermNoise {
+                estimates.append((point.timeStamp, shortTermNoise))
+            }
+
+            let assessment = calculator.calculatePersistence(
+                estimates: estimates,
+                endingAt: point.timeStamp
+            )
+
+            return SensorNoiseHistoryPoint(
+                id: point.id,
+                timeStamp: point.timeStamp,
+                shortTermNoise: point.shortTermNoise,
+                longTermNoise: point.longTermNoise,
+                persistentNoise: assessment.value,
+                persistentCoverage: assessment.coverage,
+                state: point.state
+            )
+        }
+    }
+
+    /// stores no more than one history point per sensor-noise measurement interval
     private func storeHistorySample(timeStamp: Date, measurement: SensorNoiseMeasurement, sensor: Sensor) -> Bool {
         guard measurement.shortTermNoise != nil
                 || measurement.longTermNoise != nil
@@ -313,7 +393,7 @@ final class SensorNoiseManager {
                     return true
                 }
 
-                guard interval >= ConstantsSensorNoise.historyMinimumInterval else { return false }
+                guard interval >= ConstantsSensorNoise.measurementInterval else { return false }
             }
 
             _ = SensorNoiseSample(

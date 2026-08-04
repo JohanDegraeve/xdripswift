@@ -22,6 +22,8 @@ enum ConstantsNotifications {
         static let phoneBatteryLow = "phoneBatteryLow"
         /// not looping
         static let notLoopingAlert = "notLoopingAlert"
+        /// manufacturer-reported terminal sensor or transmitter failure
+        static let sensorTransmitterFailure = "sensorTransmitterFailure"
     }
     
     /// identifiers for calibration requests

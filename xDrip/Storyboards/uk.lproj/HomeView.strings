@@ -168,7 +168,6 @@
 "sensorManagementNoiseVeryHigh" = "Дуже високий";
 "sensorManagementNoiseExtreme" = "Екстремальний";
 "sensorManagementNoiseFlatline" = "Сенсор, імовірно, вийшов з ладу.";
-"sensorManagementNoiseFooter" = "Вибрана чутливість: %@";
 "sensorNoiseWarningExtremeTitle" = "Екстремальний шум сенсора";
 "sensorNoiseWarningPersistentTitle" = "Постійний шум сенсора";
 "sensorNoiseWarningFlatlineTitle" = "Сигнал сенсора плаский";
@@ -185,7 +184,6 @@
 "sensorNoiseHistoryLoading" = "Створення історії сенсора";
 "sensorNoiseHistoryNoDataTitle" = "Поки недостатньо даних про шум";
 "sensorNoiseHistoryNoDataMessage" = "Графік з’явиться після накопичення достатньої кількості показань сенсора.";
-"sensorNoiseHistoryFooter" = "Графік показує залишкові коливання сенсора протягом цієї сесії. Нижчі значення означають рівніший сигнал. Він не вимірює точність глюкози.";
 "sensorNoiseHistoryChartAccessibility" = "Графік історії шуму сенсора";
 "pumpBattery" = "Батарея";
 "pumpReservoir" = "Резервуар";
@@ -197,3 +195,13 @@
 "sensorManagementStatusActive" = "Sensor Active";
 "sensorManagementStarted" = "Started";
 "sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Дуже високий шум сенсора";
+"sensorHealthPersistentNoiseGuidance" = "Дуже високий шум протягом 12 годин. Якщо він триває, розгляньте заміну сенсора.";
+"sensorHealthFlatlineTitle" = "Сигнал сенсора не змінюється";
+"sensorHealthFlatlineGuidance" = "Показники не змінювалися 30 хвилин. Зазвичай це означає, що сенсор несправний/прострочений.";
+"sensorHealthTemporaryIssueTitle" = "Тимчасова проблема із сенсором";
+"sensorHealthTemporaryIssueGuidance" = "Тимчасова проблема із сенсором протягом 3 годин. Перевірте глюкометром і дотримуйтеся рекомендацій виробника.";
+"sensorHealthSensorFailedTitle" = "Відмова сенсора";
+"sensorHealthSensorFailedGuidance" = "Повідомлено про відмову сенсора. Замініть сенсор.";
+"sensorHealthTransmitterFailedTitle" = "Відмова передавача";
+"sensorHealthTransmitterFailedGuidance" = "Повідомлено про відмову передавача. Перевірте або замініть його.";

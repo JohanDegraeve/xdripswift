@@ -643,7 +643,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                         trace("in didUpdateValueFor characteristic, sensorDataRx, received unfiltered value 2096896.0, which is caused by low battery. Creating error message", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                                         
                                         DispatchQueue.main.async { [weak self] in
-                                            self?.cgmTransmitterDelegate?.errorOccurred(xDripError: DexcomError.receivedEnfilteredValue2096896)
+                                            self?.cgmTransmitterDelegate?.sensorHealthEventOccurred(
+                                                .terminal(source: .dexcom, reason: .dexcomTransmitterBatteryFailure)
+                                            )
                                         }
                                     } else {
                                         timeStampOfLastG5Reading = Date()
@@ -1400,6 +1402,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.cGMG5TransmitterDelegate?.received(sensorStatus: algorithmStatus.description, cGMG5Transmitter: self)
+            self.cgmTransmitterDelegate?.sensorHealthEventOccurred(algorithmStatus.sensorHealthEvent)
         }
 
         switch algorithmStatus {

@@ -419,7 +419,7 @@ final class GlucoseChartStateManager: ObservableObject {
 
             let nextDate = index + 1 < visibleNoiseSamples.count
                 ? visibleNoiseSamples[index + 1].date
-                : sample.date.addingTimeInterval(ConstantsSensorNoise.historyMinimumInterval)
+                : sample.date.addingTimeInterval(ConstantsSensorNoise.measurementInterval)
             // shift each stored noise sample back by the short-term window so the band follows the
             // glucose values being assessed instead of lagging behind them on the chart.
             let offsetStartDate = sample.date.addingTimeInterval(-Self.sensorNoiseChartBandTimeOffset)

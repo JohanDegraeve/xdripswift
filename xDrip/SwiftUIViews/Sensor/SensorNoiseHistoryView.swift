@@ -62,8 +62,6 @@ struct SensorNoiseHistoryView: View {
                     Section {
                         currentStateRow(snapshot: snapshot)
 
-                        sensorNoiseSensitivityRow()
-
                         SensorNoiseGaugeRow(
                             title: Texts_HomeView.sensorManagementNoiseShortTerm,
                             noiseInMgDl: snapshot.shortTermNoise,
@@ -79,6 +77,14 @@ struct SensorNoiseHistoryView: View {
                             isMgDl: isMgDl,
                             sensitivity: sensorNoiseSensitivity
                         )
+
+                        SensorNoiseGaugeRow(
+                            title: Texts_HomeView.sensorManagementNoisePersistent,
+                            noiseInMgDl: snapshot.persistentNoise,
+                            coverage: snapshot.persistentCoverage,
+                            isMgDl: isMgDl,
+                            sensitivity: sensorNoiseSensitivity
+                        )
                     } header: {
                         Text(Texts_HomeView.sensorNoiseHistoryCurrentTitle)
                     }
@@ -86,7 +92,7 @@ struct SensorNoiseHistoryView: View {
                     Section {
                         noiseHistoryChart(
                             snapshot: snapshot,
-                            chartHeight: max(110, (geometry.size.height - 430) * 0.62)
+                            chartHeight: max(110, (geometry.size.height - 430) * 0.55)
                         )
                         .listRowInsets(EdgeInsets(top: 14, leading: 12, bottom: 16, trailing: 12))
                     } header: {
@@ -141,38 +147,16 @@ struct SensorNoiseHistoryView: View {
             if let currentMeasurementsDetail {
                 Text(currentMeasurementsDetail)
                     .foregroundStyle(Color(.colorSecondary))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
             }
         }
         .padding(.vertical, 2)
     }
 
-    private func sensorNoiseSensitivityRow() -> some View {
-        NavigationLink {
-            SensorNoiseSensitivitySelectionView(
-                selectedSensitivity: sensorNoiseSensitivity,
-                onSelect: updateSensorNoiseSensitivity
-            )
-        } label: {
-            HStack {
-                Text(Texts_SettingsView.sensorNoiseSensitivity)
-
-                Spacer()
-
-                Text(sensorNoiseSensitivity.description)
-                    .foregroundStyle(Color(.colorSecondary))
-            }
-        }
-    }
-
     /// Keeps the local display state aligned with the persisted app-wide setting.
     private func refreshSensorNoiseSensitivity() {
         sensorNoiseSensitivity = UserDefaults.standard.sensorNoiseSensitivity
-    }
-
-    /// Stores the new sensitivity and refreshes this view immediately.
-    private func updateSensorNoiseSensitivity(_ sensitivity: SensorNoiseSensitivity) {
-        UserDefaults.standard.sensorNoiseSensitivity = sensitivity
-        sensorNoiseSensitivity = sensitivity
     }
 
     private func displayState(snapshot: SensorNoiseHistorySnapshot) -> SensorNoiseState {
@@ -201,15 +185,12 @@ struct SensorNoiseHistoryView: View {
 
         return VStack(alignment: .leading, spacing: 14) {
             if let displayedPoint {
-                HStack(spacing: 8) {
-                    Text(displayedPoint.timeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .short))
-                        .font(.footnote.monospacedDigit())
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.75)
-                        .allowsTightening(true)
+                Text(displayedPoint.timeStamp.formatted(date: .abbreviated, time: .shortened))
+                    .font(.subheadline.monospacedDigit())
+                    .foregroundStyle(Color(.colorSecondary))
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Spacer()
-
+                HStack(spacing: 6) {
                     noiseValuePill(
                         label: Texts_HomeView.sensorNoiseHistoryShortCompact,
                         value: displayedPoint.shortTermNoise
@@ -217,6 +198,10 @@ struct SensorNoiseHistoryView: View {
                     noiseValuePill(
                         label: Texts_HomeView.sensorNoiseHistoryLongCompact,
                         value: displayedPoint.longTermNoise
+                    )
+                    noiseValuePill(
+                        label: Texts_HomeView.sensorNoiseHistoryPersistentCompact,
+                        value: displayedPoint.persistentNoise
                     )
                 }
             }
@@ -285,6 +270,7 @@ struct SensorNoiseHistoryView: View {
         .padding(.horizontal, 7)
         .padding(.vertical, 4)
         .background(Color(.systemGray6), in: Capsule())
+        .frame(maxWidth: .infinity)
         .accessibilityLabel(label + " " + (value.map(displayNoiseValue) ?? Texts_Common.notAvailable))
     }
 
@@ -369,6 +355,24 @@ struct SensorNoiseHistoryView: View {
                 .foregroundStyle(segment.color.opacity(chartData.longLineOpacity))
             }
 
+            ForEach(chartData.persistentSegments) { segment in
+                LineMark(
+                    x: .value("Time", segment.startDate),
+                    y: .value("Noise", segment.startValue),
+                    series: .value("Segment", segment.id)
+                )
+                .lineStyle(StrokeStyle(lineWidth: 3.25, lineCap: .round, lineJoin: .round, dash: [2, 4]))
+                .foregroundStyle(segment.color.opacity(0.9))
+
+                LineMark(
+                    x: .value("Time", segment.endDate),
+                    y: .value("Noise", segment.endValue),
+                    series: .value("Segment", segment.id)
+                )
+                .lineStyle(StrokeStyle(lineWidth: 3.25, lineCap: .round, lineJoin: .round, dash: [2, 4]))
+                .foregroundStyle(segment.color.opacity(0.9))
+            }
+
             ForEach(chartData.trendPoints) { point in
                 LineMark(
                     x: .value("Time", point.date),
@@ -399,6 +403,15 @@ struct SensorNoiseHistoryView: View {
                     )
                     .symbolSize(35)
                     .foregroundStyle(ConstantsSensorNoise.state(for: longTermNoise, sensitivity: sensorNoiseSensitivity).displayColor)
+                }
+
+                if let persistentNoise = displayedPoint.persistentNoise {
+                    PointMark(
+                        x: .value("Selected time", displayedPoint.timeStamp),
+                        y: .value("Persistent noise", chartData.displayValue(persistentNoise))
+                    )
+                    .symbolSize(58)
+                    .foregroundStyle(ConstantsSensorNoise.state(for: persistentNoise, sensitivity: sensorNoiseSensitivity).displayColor)
                 }
             }
         }
@@ -481,45 +494,6 @@ struct SensorNoiseHistoryView: View {
     }
 }
 
-// MARK: - sensitivity picker
-
-private struct SensorNoiseSensitivitySelectionView: View {
-    let selectedSensitivity: SensorNoiseSensitivity
-    let onSelect: (SensorNoiseSensitivity) -> Void
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        List {
-            Section {
-                ForEach(SensorNoiseSensitivity.allCases, id: \.self) { sensitivity in
-                    Button {
-                        onSelect(sensitivity)
-                        dismiss()
-                    } label: {
-                        HStack {
-                            Text(sensitivity.description)
-                                .foregroundStyle(Color(.colorPrimary))
-
-                            Spacer()
-
-                            if selectedSensitivity == sensitivity {
-                                Image(systemName: "checkmark")
-                                    .foregroundStyle(.green)
-                            }
-                        }
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                }
-            } footer: {
-                Text(Texts_SettingsView.sensorNoiseSensitivityFooter)
-            }
-        }
-        .navigationTitle(Texts_SettingsView.sensorNoiseSensitivity)
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
 // MARK: - view model
 
 @MainActor private final class SensorNoiseHistoryViewModel: ObservableObject {
@@ -561,6 +535,7 @@ private struct SensorNoiseSensitivitySelectionView: View {
 struct SensorNoiseSummaryRow: View {
     let shortTermNoise: Double?
     let longTermNoise: Double?
+    let persistentNoise: Double?
     let state: SensorNoiseState
     let isMgDl: Bool
 
@@ -597,6 +572,13 @@ struct SensorNoiseSummaryRow: View {
             Text(displayValue(longTermNoise))
                 .foregroundStyle(
                     longTermNoise.map { ConstantsSensorNoise.state(for: $0, sensitivity: UserDefaults.standard.sensorNoiseSensitivity).displayColor }
+                        ?? Color(.colorSecondary)
+                )
+            Text("/")
+                .foregroundStyle(Color(.colorSecondary))
+            Text(displayValue(persistentNoise))
+                .foregroundStyle(
+                    persistentNoise.map { ConstantsSensorNoise.state(for: $0, sensitivity: UserDefaults.standard.sensorNoiseSensitivity).displayColor }
                         ?? Color(.colorSecondary)
                 )
         }
@@ -815,6 +797,7 @@ private struct SensorNoiseChartData {
     let isMgDl: Bool
     let shortSegments: [SensorNoiseChartSegment]
     let longSegments: [SensorNoiseChartSegment]
+    let persistentSegments: [SensorNoiseChartSegment]
     let xAxisDates: [Date]?
     let trendPoints: [SensorNoiseChartTrendPoint]
 
@@ -849,12 +832,13 @@ private struct SensorNoiseChartData {
         veryHighThreshold = ConstantsSensorNoise.threshold(ConstantsSensorNoise.veryHighNoiseStandardDeviation, sensitivity: sensitivity).mgDlToMmol(mgDl: isMgDl)
         extremeThreshold = ConstantsSensorNoise.threshold(ConstantsSensorNoise.extremeNoiseStandardDeviation, sensitivity: sensitivity).mgDlToMmol(mgDl: isMgDl)
 
-        shortSegments = Self.segments(pointGroups: displayGroups, isLongTerm: false, isMgDl: isMgDl, sensitivity: sensitivity)
-        longSegments = Self.segments(pointGroups: displayGroups, isLongTerm: true, isMgDl: isMgDl, sensitivity: sensitivity)
+        shortSegments = Self.segments(pointGroups: displayGroups, metric: .short, isMgDl: isMgDl, sensitivity: sensitivity)
+        longSegments = Self.segments(pointGroups: displayGroups, metric: .long, isMgDl: isMgDl, sensitivity: sensitivity)
+        persistentSegments = Self.segments(pointGroups: displayGroups, metric: .persistent, isMgDl: isMgDl, sensitivity: sensitivity)
         trendPoints = Self.trendPoints(points: visiblePoints, range: range, isMgDl: isMgDl)
 
         let largestObservedValue = points.flatMap { point in
-            [point.shortTermNoise, point.longTermNoise].compactMap { $0 }
+            [point.shortTermNoise, point.longTermNoise, point.persistentNoise].compactMap { $0 }
         }
         .max()?
         .mgDlToMmol(mgDl: isMgDl) ?? 0
@@ -964,9 +948,15 @@ private struct SensorNoiseChartData {
     }
 
     /// Builds independently colored line segments for one measurement window.
+    private enum Metric {
+        case short
+        case long
+        case persistent
+    }
+
     private static func segments(
         pointGroups: [[SensorNoiseHistoryPoint]],
-        isLongTerm: Bool,
+        metric: Metric,
         isMgDl: Bool,
         sensitivity: SensorNoiseSensitivity
     ) -> [SensorNoiseChartSegment] {
@@ -977,8 +967,20 @@ private struct SensorNoiseChartData {
             for pair in zip(points, points.dropFirst()) {
                 defer { segmentIndex += 1 }
 
-                let startNoise = isLongTerm ? pair.0.longTermNoise : pair.0.shortTermNoise
-                let endNoise = isLongTerm ? pair.1.longTermNoise : pair.1.shortTermNoise
+                let startNoise: Double?
+                let endNoise: Double?
+
+                switch metric {
+                case .short:
+                    startNoise = pair.0.shortTermNoise
+                    endNoise = pair.1.shortTermNoise
+                case .long:
+                    startNoise = pair.0.longTermNoise
+                    endNoise = pair.1.longTermNoise
+                case .persistent:
+                    startNoise = pair.0.persistentNoise
+                    endNoise = pair.1.persistentNoise
+                }
                 guard let startNoise, let endNoise else { continue }
 
                 let state: SensorNoiseState
@@ -990,7 +992,7 @@ private struct SensorNoiseChartData {
 
                 result.append(
                     SensorNoiseChartSegment(
-                        id: (isLongTerm ? "long-" : "short-") + String(segmentIndex),
+                        id: String(describing: metric) + "-" + String(segmentIndex),
                         startDate: pair.0.timeStamp,
                         endDate: pair.1.timeStamp,
                         startValue: startNoise.mgDlToMmol(mgDl: isMgDl),
@@ -1040,7 +1042,7 @@ private struct SensorNoiseChartData {
         }
 
         guard let coefficients = quadraticCoefficients(samples: samples) else { return [] }
-        let pointCount = max(2, min(Self.trendRenderPointCount, Int(duration / ConstantsSensorNoise.historyMinimumInterval)))
+        let pointCount = max(2, min(Self.trendRenderPointCount, Int(duration / ConstantsSensorNoise.measurementInterval)))
 
         return (0 ..< pointCount).map { index in
             let ratio = Double(index) / Double(pointCount - 1)
@@ -1133,7 +1135,7 @@ private struct SensorNoiseChartData {
         return groups
     }
 
-    /// Reduces rendering cost while preserving endpoints and the largest values in each bucket.
+    /// Reduces rendering cost while preserving endpoints and the largest value for each plotted metric.
     private static func downsample(
         _ points: [SensorNoiseHistoryPoint],
         maximumBuckets: Int
@@ -1142,7 +1144,7 @@ private struct SensorNoiseChartData {
 
         let bucketSize = Int(ceil(Double(points.count) / Double(maximumBuckets)))
         var reduced = [SensorNoiseHistoryPoint]()
-        reduced.reserveCapacity(maximumBuckets * 4)
+        reduced.reserveCapacity(maximumBuckets * 5)
 
         for bucketStart in stride(from: 0, to: points.count, by: bucketSize) {
             let bucketEnd = min(bucketStart + bucketSize, points.count)
@@ -1150,6 +1152,7 @@ private struct SensorNoiseChartData {
             var candidates = [bucket.first, bucket.last]
             candidates.append(bucket.max { ($0.shortTermNoise ?? -1) < ($1.shortTermNoise ?? -1) })
             candidates.append(bucket.max { ($0.longTermNoise ?? -1) < ($1.longTermNoise ?? -1) })
+            candidates.append(bucket.max { ($0.persistentNoise ?? -1) < ($1.persistentNoise ?? -1) })
 
             let uniqueCandidates = candidates.compactMap { $0 }.reduce(into: [String: SensorNoiseHistoryPoint]()) {
                 $0[$1.id] = $1

@@ -296,6 +296,10 @@
 		4F2400063001000100000001 /* NightscoutProfileScheduleEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400163001000100000001 /* NightscoutProfileScheduleEntry+CoreDataProperties.swift */; };
 		4F2400073001000100000001 /* NightscoutDeviceStatusAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400173001000100000001 /* NightscoutDeviceStatusAccessor.swift */; };
 		4F2400083001000100000001 /* NightscoutProfileAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400183001000100000001 /* NightscoutProfileAccessor.swift */; };
+		4F2500013002000100000001 /* SensorHealthIssueManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2500113002000100000001 /* SensorHealthIssueManager.swift */; };
+		4F2500143002000100000001 /* SensorHealthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2500133002000100000001 /* SensorHealthModels.swift */; };
+		4F2600013002000200000001 /* SensorNoisePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2600113002000200000001 /* SensorNoisePersistenceTests.swift */; };
+		4F2600023002000200000001 /* SensorHealthIssueManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2600123002000200000001 /* SensorHealthIssueManagerTests.swift */; };
 		745981A52E1F1B0F85780B06 /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
 		7DDD89BD4ECFCE7BDA8D3AE2 /* SettingsSharedUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */; };
 		BA0000010000000000000001 /* BackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000011 /* BackupModels.swift */; };
@@ -774,6 +778,13 @@
 			remoteGlobalIDString = 47A6ABDE2B790CC60047A4BA;
 			remoteInfo = "xDrip Watch App";
 		};
+		4F2600513002000200000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F8AC425221ADEBD60078C348 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F8AC425921ADEBD60078C348;
+			remoteInfo = xdrip;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1125,6 +1136,11 @@
 		4F2400173001000100000001 /* NightscoutDeviceStatusAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutDeviceStatusAccessor.swift; sourceTree = "<group>"; };
 		4F2400183001000100000001 /* NightscoutProfileAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutProfileAccessor.swift; sourceTree = "<group>"; };
 		4F2400313001000100000001 /* xdrip v24.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v24.xcdatamodel"; sourceTree = "<group>"; };
+		4F2500113002000100000001 /* SensorHealthIssueManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorHealthIssueManager.swift; sourceTree = "<group>"; };
+		4F2500133002000100000001 /* SensorHealthModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorHealthModels.swift; sourceTree = "<group>"; };
+		4F2600113002000200000001 /* SensorNoisePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorNoisePersistenceTests.swift; sourceTree = "<group>"; };
+		4F2600123002000200000001 /* SensorHealthIssueManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorHealthIssueManagerTests.swift; sourceTree = "<group>"; };
+		4F2600133002000200000001 /* xdripTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = xdripTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xDrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xDrip/Version.xcconfig; sourceTree = "<group>"; };
 		685B5F8D633F5492574F0567 /* GlucoseChartStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartStateManager.swift; sourceTree = "<group>"; };
@@ -1897,6 +1913,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4F2600323002000200000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8AC425721ADEBD60078C348 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2384,6 +2407,24 @@
 			path = SensorNoise;
 			sourceTree = "<group>";
 		};
+		4F2500213002000100000001 /* SensorHealth */ = {
+			isa = PBXGroup;
+			children = (
+				4F2500113002000100000001 /* SensorHealthIssueManager.swift */,
+				4F2500133002000100000001 /* SensorHealthModels.swift */,
+			);
+			path = SensorHealth;
+			sourceTree = "<group>";
+		};
+		4F2600213002000200000001 /* xDrip Tests */ = {
+			isa = PBXGroup;
+			children = (
+				4F2600123002000200000001 /* SensorHealthIssueManagerTests.swift */,
+				4F2600113002000200000001 /* SensorNoisePersistenceTests.swift */,
+			);
+			path = "xDrip Tests";
+			sourceTree = "<group>";
+		};
 		6E033988052CBCF93DBE169B /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -2668,6 +2709,7 @@
 				F821CF4F229BF43A005C1E43 /* Nightscout */,
 				4A9B10212F0A000100000001 /* PostProcessing */,
 				F64039AE281C3F8D0051EFFE /* QuickActions */,
+				4F2500213002000100000001 /* SensorHealth */,
 				4E6000212FF2000100000001 /* SensorNoise */,
 				F821CF9922AEF2DF005C1E43 /* Speak */,
 				47FB28052636AFE700042FFB /* Statistics */,
@@ -2798,6 +2840,7 @@
 				47A6ABE02B790CC60047A4BA /* xDrip Watch App */,
 				479359882B88B95A007D3CEE /* xDrip Watch Complication */,
 				47CD64172BE9506C002BDA68 /* xDrip Notification Context Extension */,
+				4F2600213002000200000001 /* xDrip Tests */,
 				48C0E851274A3BB6D42C6F20 /* Frameworks */,
 				F8AC425B21ADEBD60078C348 /* Products */,
 				F85DC29B21CFCEB800B9F74A /* Recovered References */,
@@ -2813,6 +2856,7 @@
 				47A6ABDF2B790CC60047A4BA /* xDrip Watch App.app */,
 				479359852B88B95A007D3CEE /* xDrip Watch Complication Extension.appex */,
 				47CD64122BE9506C002BDA68 /* xDrip Notification Context Extension.appex */,
+				4F2600133002000200000001 /* xdripTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3605,6 +3649,24 @@
 			productReference = 47CD64122BE9506C002BDA68 /* xDrip Notification Context Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		4F2600413002000200000001 /* xdripTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4F2600633002000200000001 /* Build configuration list for PBXNativeTarget "xdripTests" */;
+			buildPhases = (
+				4F2600313002000200000001 /* Sources */,
+				4F2600323002000200000001 /* Frameworks */,
+				4F2600333002000200000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4F2600523002000200000001 /* PBXTargetDependency */,
+			);
+			name = xdripTests;
+			productName = xdripTests;
+			productReference = 4F2600133002000200000001 /* xdripTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		F8AC425921ADEBD60078C348 /* xdrip */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F8AC426E21ADEBD70078C348 /* Build configuration list for PBXNativeTarget "xdrip" */;
@@ -3653,6 +3715,10 @@
 					};
 					47CD64112BE9506C002BDA68 = {
 						CreatedOnToolsVersion = 15.3;
+					};
+					4F2600413002000200000001 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = F8AC425921ADEBD60078C348;
 					};
 					F8AC425921ADEBD60078C348 = {
 						CreatedOnToolsVersion = 10.1;
@@ -3705,6 +3771,7 @@
 				47A6ABDE2B790CC60047A4BA /* xDrip Watch App */,
 				479359842B88B95A007D3CEE /* xDrip Watch Complication Extension */,
 				47CD64112BE9506C002BDA68 /* xDrip Notification Context Extension */,
+				4F2600413002000200000001 /* xdripTests */,
 			);
 		};
 /* End PBXProject section */
@@ -3750,6 +3817,13 @@
 			files = (
 				4737758D2C14DDC900525B90 /* Assets.xcassets in Resources */,
 				47CD641C2BE9506C002BDA68 /* Base in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4F2600333002000200000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4062,6 +4136,15 @@
 				473775892C14DD3100525B90 /* ConstantsLibreLinkUp.swift in Sources */,
 				473775842C14DCA900525B90 /* ConstantsGlucoseChartSwiftUI.swift in Sources */,
 				473775872C14DCFB00525B90 /* TextsSettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4F2600313002000200000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F2600023002000200000001 /* SensorHealthIssueManagerTests.swift in Sources */,
+				4F2600013002000200000001 /* SensorNoisePersistenceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4467,6 +4550,8 @@
 				F8297F5A238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift in Sources */,
 				4E6000012FF2000100000001 /* SensorNoiseCalculator.swift in Sources */,
 				4E6000022FF2000100000001 /* SensorNoiseManager.swift in Sources */,
+				4F2500013002000100000001 /* SensorHealthIssueManager.swift in Sources */,
+				4F2500143002000100000001 /* SensorHealthModels.swift in Sources */,
 				4E6100012FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift in Sources */,
 				4E6100022FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift in Sources */,
 				47D2DB3B2B14F6D000C8EE6B /* ScreenLockDimmingType.swift in Sources */,
@@ -4528,6 +4613,11 @@
 			isa = PBXTargetDependency;
 			target = 47A6ABDE2B790CC60047A4BA /* xDrip Watch App */;
 			targetProxy = 47DE41B02B864EE50041DA19 /* PBXContainerItemProxy */;
+		};
+		4F2600523002000200000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F8AC425921ADEBD60078C348 /* xdrip */;
+			targetProxy = 4F2600513002000200000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -5399,6 +5489,49 @@
 			};
 			name = Release;
 		};
+		4F2600613002000200000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/xdrip.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/xdrip";
+			};
+			name = Debug;
+		};
+		4F2600623002000200000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/xdrip.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/xdrip";
+			};
+			name = Release;
+		};
 		F8AC426C21ADEBD70078C348 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 666E283826F7E54C00ACE4DF /* xDrip.xcconfig */;
@@ -5622,6 +5755,15 @@
 			buildConfigurations = (
 				47CD64212BE9506C002BDA68 /* Debug */,
 				47CD64222BE9506C002BDA68 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4F2600633002000200000001 /* Build configuration list for PBXNativeTarget "xdripTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4F2600613002000200000001 /* Debug */,
+				4F2600623002000200000001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

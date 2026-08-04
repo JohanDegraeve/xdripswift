@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// Shows the current calibration and previous calibrations for the active sensor.
 struct CalibrationHistoryView: View {
     let currentCalibration: SensorManagementCalibrationDisplay?
     let calibrationHistory: [SensorManagementCalibrationDisplay]

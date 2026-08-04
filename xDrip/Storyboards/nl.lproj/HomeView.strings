@@ -99,7 +99,6 @@
 "sensorManagementNoiseVeryHigh" = "Zeer hoog";
 "sensorManagementNoiseExtreme" = "Extreem";
 "sensorManagementNoiseFlatline" = "De sensor is waarschijnlijk defect.";
-"sensorManagementNoiseFooter" = "Geselecteerde gevoeligheid: %@";
 "sensorNoiseWarningExtremeTitle" = "Extreme sensorruis";
 "sensorNoiseWarningPersistentTitle" = "Aanhoudende sensorruis";
 "sensorNoiseWarningFlatlineTitle" = "Het sensorsignaal is vlak";
@@ -116,7 +115,6 @@
 "sensorNoiseHistoryLoading" = "Sensorgeschiedenis wordt opgebouwd";
 "sensorNoiseHistoryNoDataTitle" = "Nog niet genoeg ruisgegevens";
 "sensorNoiseHistoryNoDataMessage" = "De grafiek verschijnt nadat voldoende sensormetingen zijn verzameld.";
-"sensorNoiseHistoryFooter" = "De grafiek toont resterende sensorfluctuatie tijdens deze sensorsessie. Lagere waarden betekenen een rustiger signaal. De grafiek meet niet de nauwkeurigheid van glucosewaarden.";
 "sensorNoiseHistoryChartAccessibility" = "Grafiek met de sensorruisgeschiedenis";
 "pumpBattery" = "Batterij";
 "pumpReservoir" = "Reservoir";
@@ -151,3 +149,13 @@
 "sensorManagementCalibrationReadinessGood" = "Dit is een goed moment om te kalibreren.";
 "sensorManagementCalibrationSafetyFooter" = "Kalibreer alleen als u weet hoe u dit veilig doet.";
 "sensorManagementLargeCalibrationDifferenceWarningFormat" = "Mogelijk werkt deze kalibratie niet. Probeer elke kalibratiewijziging te beperken tot maximaal %@ per keer.";
+"sensorHealthPersistentNoiseTitle" = "Zeer hoge sensorruis";
+"sensorHealthPersistentNoiseGuidance" = "Zeer hoge ruis gedurende 12 uur. Overweeg de sensor te vervangen als dit aanhoudt.";
+"sensorHealthFlatlineTitle" = "Het sensorsignaal is vlak";
+"sensorHealthFlatlineGuidance" = "Metingen 30 minuten onveranderd. Dit wijst meestal op een defecte/verlopen sensor.";
+"sensorHealthTemporaryIssueTitle" = "Tijdelijk sensorprobleem";
+"sensorHealthTemporaryIssueGuidance" = "Tijdelijk sensorprobleem sinds 3 uur. Controleer met een bloedglucosemeter en volg de aanwijzingen van de fabrikant.";
+"sensorHealthSensorFailedTitle" = "Sensor defect";
+"sensorHealthSensorFailedGuidance" = "Sensorfout gemeld. Vervang de sensor.";
+"sensorHealthTransmitterFailedTitle" = "Zender defect";
+"sensorHealthTransmitterFailedGuidance" = "Zenderfout gemeld. Controleer of vervang de zender.";

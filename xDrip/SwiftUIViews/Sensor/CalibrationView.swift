@@ -9,6 +9,7 @@
 import SwiftUI
 import os
 
+/// Collects a calibration value and shows the checks that affect calibration quality.
 struct CalibrationView: View {
     @Environment(\.dismiss) private var dismiss
 

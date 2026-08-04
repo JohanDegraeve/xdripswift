@@ -84,7 +84,6 @@
 "sensorManagementNoiseVeryHigh" = "Çok yüksek";
 "sensorManagementNoiseExtreme" = "Aşırı";
 "sensorManagementNoiseFlatline" = "Sensör büyük olasılıkla arızalandı.";
-"sensorManagementNoiseFooter" = "Seçilen hassasiyet: %@";
 "sensorNoiseWarningExtremeTitle" = "Aşırı sensör gürültüsü";
 "sensorNoiseWarningPersistentTitle" = "Kalıcı sensör gürültüsü";
 "sensorNoiseWarningFlatlineTitle" = "Sensör sinyali düz";
@@ -101,7 +100,6 @@
 "sensorNoiseHistoryLoading" = "Sensör geçmişi oluşturuluyor";
 "sensorNoiseHistoryNoDataTitle" = "Henüz yeterli gürültü verisi yok";
 "sensorNoiseHistoryNoDataMessage" = "Yeterli sensör okuması toplandıktan sonra grafik görünecektir.";
-"sensorNoiseHistoryFooter" = "Grafik, bu sensör oturumu boyunca kalan sensör dalgalanmasını gösterir. Daha düşük değerler daha düzgün bir sinyal anlamına gelir. Glikoz doğruluğunu ölçmez.";
 "sensorNoiseHistoryChartAccessibility" = "Sensör gürültüsü geçmişi grafiği";
 "pumpBattery" = "Pil";
 "pumpReservoir" = "Rezervuar";
@@ -113,3 +111,13 @@
 "sensorManagementStatusActive" = "Sensor Active";
 "sensorManagementStarted" = "Started";
 "sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Çok Yüksek Sensör Gürültüsü";
+"sensorHealthPersistentNoiseGuidance" = "12 saattir çok yüksek gürültü. Devam ederse sensörü değiştirmeyi düşünün.";
+"sensorHealthFlatlineTitle" = "Sensör Sinyali Sabit";
+"sensorHealthFlatlineGuidance" = "Okumalar 30 dakikadır değişmedi. Bu genellikle sensörün arızalandığını/süresinin dolduğunu gösterir.";
+"sensorHealthTemporaryIssueTitle" = "Geçici Sensör Sorunu";
+"sensorHealthTemporaryIssueGuidance" = "3 saattir geçici sensör sorunu. Ölçüm cihazıyla kontrol edin ve üreticinin talimatlarını izleyin.";
+"sensorHealthSensorFailedTitle" = "Sensör Arızası";
+"sensorHealthSensorFailedGuidance" = "Sensör arızası bildirildi. Sensörü değiştirin.";
+"sensorHealthTransmitterFailedTitle" = "Verici Arızası";
+"sensorHealthTransmitterFailedGuidance" = "Verici arızası bildirildi. Kontrol edin veya değiştirin.";

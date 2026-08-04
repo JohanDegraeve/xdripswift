@@ -8,46 +8,65 @@
 
 import SwiftUI
 
-/// Tappable home warning that opens the persisted sensor-noise details.
-struct RootHomeSensorNoiseWarningView: View {
-    let state: RootHomeSensorNoiseState
+/// Home presentation for one active sensor-health episode.
+///
+/// This is intentionally an in-layout SwiftUI banner rather than an `AlertManager` alarm. Sensor
+/// health warnings need a visible, dismissible explanation and a route to detail. They do not need
+/// alarm values, schedules, repeats or snooze controls. The banner disappears completely when no
+/// episode is visible and does not reserve a permanent warning row.
+struct SensorHealthBannerView: View {
+    let issue: SensorHealthIssue
     let action: () -> Void
+    let dismiss: () -> Void
+
+    private var color: Color {
+        issue.severity == .terminal ? ConstantsAppColors.urgent : ConstantsAppColors.caution
+    }
 
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: 8) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(ConstantsAppColors.warning)
+        HStack(spacing: 12) {
+            Button(action: action) {
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(issue.title)
+                            .font(.headline.weight(.bold))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.85)
+                        Text(issue.guidance)
+                            .font(.subheadline)
+                            .foregroundStyle(.white)
+                            .lineLimit(3)
+                            .minimumScaleFactor(0.9)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(state.title)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(ConstantsAppColors.primaryText)
-                    Text(state.detail)
-                        .font(.system(size: 11))
-                        .foregroundStyle(ConstantsAppColors.secondaryText)
+                    Spacer(minLength: 4)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.9))
                 }
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-
-                Spacer(minLength: 4)
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(ConstantsAppColors.secondaryText)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .frame(maxWidth: .infinity)
-            .background(state.color.opacity(0.14))
-            .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous)
-                    .stroke(state.color.opacity(0.7), lineWidth: 1)
+            .buttonStyle(.plain)
+            .accessibilityLabel(issue.title + ". " + issue.guidance)
+
+            Button(action: dismiss) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 36, height: 36)
+                    .background(.black.opacity(0.18), in: Circle())
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Texts_Common.dismiss)
         }
-        .buttonStyle(.plain)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity)
+        .background(color.opacity(0.8))
+        .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
+        .accessibilityElement(children: .contain)
     }
 }
 
@@ -227,7 +246,7 @@ struct RootHomeDataSourceView: View {
                         .fill(state.connectionColor)
                         .frame(width: 8, height: 8)
                 }
-                
+
                 if state.showsKeepAliveIcon {
                     Image(systemName: state.keepAliveSystemImage)
                         .font(.system(size: 15))

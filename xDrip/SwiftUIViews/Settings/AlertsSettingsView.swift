@@ -141,8 +141,12 @@ private struct AlertEntrySummaryRow: View {
         }
 
         let separator = " \u{00B7} "
-        var text = Int(alertEntry.start).convertMinutesToTimeAsString()
-        text += separator
+        var text = ""
+
+        if alertKind.supportsAlertSchedules() {
+            text = Int(alertEntry.start).convertMinutesToTimeAsString()
+            text += separator
+        }
 
         if alertEntry.alertType.enabled && alertKind.needsAlertValue() {
             text += alertKind.valueIsABgValue()
@@ -263,6 +267,10 @@ final class AlertEntryEditorViewModel: ObservableObject {
             return [.isDisabled]
         }
 
+        if !alertKindValue.supportsAlertSchedules() {
+            return [.isDisabled, .alertType]
+        }
+
         if alertKindValue.needsAlertValue() || alertType.enabled {
             if alertKindValue.needsAlertTriggerValue() {
                 return AlertEntryEditorSetting.allCases
@@ -300,6 +308,8 @@ final class AlertEntryEditorViewModel: ObservableObject {
     var canDelete: Bool {
         guard case .edit = mode else { return false }
 
+        guard alertKindValue.supportsAlertSchedules() else { return false }
+
         return start != 0 && !hasChanges
     }
 
@@ -308,7 +318,14 @@ final class AlertEntryEditorViewModel: ObservableObject {
     var canAdd: Bool {
         guard case .edit = mode else { return false }
 
+        guard alertKindValue.supportsAlertSchedules() else { return false }
+
         return !hasChanges
+    }
+
+    /// Event-driven alarms always have one all-day entry, so schedule add/delete controls are hidden.
+    var showsScheduleActions: Bool {
+        return alertKindValue.supportsAlertSchedules()
     }
 
     /// Writes the editor values back to Core Data or creates a new AlertEntry.
@@ -657,15 +674,17 @@ struct AlertEntryEditorView: View {
         .settingsListStyle(title: viewModel.title, titleDisplayMode: .inline)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button {
-                    if let mode = viewModel.newAlertMode() {
-                        openNewAlert(mode)
+                if viewModel.showsScheduleActions {
+                    Button {
+                        if let mode = viewModel.newAlertMode() {
+                            openNewAlert(mode)
+                        }
+                    } label: {
+                        Image(systemName: "plus")
                     }
-                } label: {
-                    Image(systemName: "plus")
+                    .tint(ConstantsAppColors.toolbarAction)
+                    .disabled(!viewModel.canAdd)
                 }
-                .tint(ConstantsAppColors.toolbarAction)
-                .disabled(!viewModel.canAdd)
 
                 Button(Texts_Common.Ok, action: viewModel.save)
                     .tint(ConstantsAppColors.toolbarAction)
@@ -673,11 +692,13 @@ struct AlertEntryEditorView: View {
             }
 
             ToolbarItem(placement: .navigationBarLeading) {
-                Button(role: .destructive, action: viewModel.requestDelete) {
-                    Image(systemName: "trash")
+                if viewModel.showsScheduleActions {
+                    Button(role: .destructive, action: viewModel.requestDelete) {
+                        Image(systemName: "trash")
+                    }
+                    .tint(ConstantsAppColors.toolbarDestructiveAction)
+                    .disabled(!viewModel.canDelete)
                 }
-                .tint(ConstantsAppColors.toolbarDestructiveAction)
-                .disabled(!viewModel.canDelete)
             }
         }
         .settingsPushPresentation(

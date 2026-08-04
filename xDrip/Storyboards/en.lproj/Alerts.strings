@@ -8,6 +8,7 @@
 "alerts_select_snooze_time" = "Select Snooze Time";
 "alerts_missedreadingalerttitle" = "Missed Readings";
 "alerts_notloopingalerttitle" = "Not Looping";
+"alerts_sensortransmitterfailure" = "Sensor/Transmitter Failure";
 "alerts_calibrationneeded" = "Calibration Reminder";
 "alerts_batterylow" = "Transmitter Battery Low";
 "alertstart" = "Apply from";

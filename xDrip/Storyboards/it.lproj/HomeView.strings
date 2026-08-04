@@ -180,7 +180,6 @@
 "sensorManagementNoiseVeryHigh" = "Molto alto";
 "sensorManagementNoiseExtreme" = "Estremo";
 "sensorManagementNoiseFlatline" = "Il sensore probabilmente ha smesso di funzionare.";
-"sensorManagementNoiseFooter" = "Sensibilità selezionata: %@";
 "sensorNoiseWarningExtremeTitle" = "Rumore estremo del sensore";
 "sensorNoiseWarningPersistentTitle" = "Rumore persistente del sensore";
 "sensorNoiseWarningFlatlineTitle" = "Il segnale del sensore è piatto";
@@ -197,7 +196,6 @@
 "sensorNoiseHistoryLoading" = "Creazione della cronologia del sensore";
 "sensorNoiseHistoryNoDataTitle" = "Dati sul rumore ancora insufficienti";
 "sensorNoiseHistoryNoDataMessage" = "Il grafico apparirà dopo la raccolta di un numero sufficiente di letture del sensore.";
-"sensorNoiseHistoryFooter" = "Il grafico mostra l’oscillazione residua del sensore durante questa sessione. I valori più bassi indicano un segnale più regolare. Non misura la precisione del glucosio.";
 "sensorNoiseHistoryChartAccessibility" = "Grafico della cronologia del rumore del sensore";
 "pumpBattery" = "Batteria";
 "pumpReservoir" = "Serbatoio";
@@ -232,3 +230,13 @@
 "sensorManagementCalibrationReadinessGood" = "Ora è un buon momento per calibrare.";
 "sensorManagementCalibrationSafetyFooter" = "Calibra solo se sai come farlo in sicurezza.";
 "sensorManagementLargeCalibrationDifferenceWarningFormat" = "È possibile che questa calibrazione non funzioni. Cerca di limitare ogni variazione della calibrazione a un massimo di %@ alla volta.";
+"sensorHealthPersistentNoiseTitle" = "Rumore del sensore molto alto";
+"sensorHealthPersistentNoiseGuidance" = "Rumore molto alto da 12 ore. Valuta di sostituire il sensore se continua.";
+"sensorHealthFlatlineTitle" = "Il segnale del sensore è piatto";
+"sensorHealthFlatlineGuidance" = "Letture invariate da 30 minuti. Di solito indica che il sensore è guasto/scaduto.";
+"sensorHealthTemporaryIssueTitle" = "Problema temporaneo del sensore";
+"sensorHealthTemporaryIssueGuidance" = "Problema temporaneo del sensore da 3 ore. Controlla con un glucometro e segui le indicazioni del produttore.";
+"sensorHealthSensorFailedTitle" = "Sensore guasto";
+"sensorHealthSensorFailedGuidance" = "Guasto del sensore segnalato. Sostituisci il sensore.";
+"sensorHealthTransmitterFailedTitle" = "Guasto del trasmettitore";
+"sensorHealthTransmitterFailedGuidance" = "Guasto del trasmettitore segnalato. Controllalo o sostituiscilo.";

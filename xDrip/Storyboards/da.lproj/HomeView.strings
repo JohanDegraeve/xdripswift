@@ -84,7 +84,6 @@
 "sensorManagementNoiseVeryHigh" = "Meget høj";
 "sensorManagementNoiseExtreme" = "Ekstrem";
 "sensorManagementNoiseFlatline" = "Sensoren er sandsynligvis svigtet.";
-"sensorManagementNoiseFooter" = "Valgt følsomhed: %@";
 "sensorNoiseWarningExtremeTitle" = "Ekstrem sensorstøj";
 "sensorNoiseWarningPersistentTitle" = "Vedvarende sensorstøj";
 "sensorNoiseWarningFlatlineTitle" = "Sensorsignalet er fladt";
@@ -101,7 +100,6 @@
 "sensorNoiseHistoryLoading" = "Opbygger sensorhistorik";
 "sensorNoiseHistoryNoDataTitle" = "Endnu ikke nok støjdata";
 "sensorNoiseHistoryNoDataMessage" = "Diagrammet vises, når der er indsamlet nok sensormålinger.";
-"sensorNoiseHistoryFooter" = "Diagrammet viser resterende sensorudsving gennem denne sensorsession. Lavere værdier betyder et mere stabilt signal. Det måler ikke glukosenøjagtighed.";
 "sensorNoiseHistoryChartAccessibility" = "Diagram over sensorens støjhistorik";
 "pumpBattery" = "Batteri";
 "pumpReservoir" = "Reservoir";
@@ -113,3 +111,13 @@
 "sensorManagementStatusActive" = "Sensor Active";
 "sensorManagementStarted" = "Started";
 "sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Meget høj sensorstøj";
+"sensorHealthPersistentNoiseGuidance" = "Meget høj støj i 12 timer. Overvej at udskifte sensoren, hvis det fortsætter.";
+"sensorHealthFlatlineTitle" = "Sensorsignalet er fladt";
+"sensorHealthFlatlineGuidance" = "Målingerne har været uændrede i 30 minutter. Det betyder normalt, at sensoren er defekt/udløbet.";
+"sensorHealthTemporaryIssueTitle" = "Midlertidigt sensorproblem";
+"sensorHealthTemporaryIssueGuidance" = "Midlertidigt sensorproblem i 3 timer. Kontrollér med et blodsukkerapparat, og følg producentens vejledning.";
+"sensorHealthSensorFailedTitle" = "Sensorfejl";
+"sensorHealthSensorFailedGuidance" = "Sensorfejl rapporteret. Udskift sensoren.";
+"sensorHealthTransmitterFailedTitle" = "Senderfejl";
+"sensorHealthTransmitterFailedGuidance" = "Senderfejl rapporteret. Kontrollér eller udskift senderen.";

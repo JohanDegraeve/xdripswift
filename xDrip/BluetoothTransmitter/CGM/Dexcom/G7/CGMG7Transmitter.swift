@@ -357,6 +357,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     guard let self = self else { return }
 
                     self.cGMG7TransmitterDelegate?.received(sensorStatus: g7GlucoseMessage.algorithmStatus.description, cGMG7Transmitter: self)
+                    self.cgmTransmitterDelegate?.sensorHealthEventOccurred(g7GlucoseMessage.algorithmStatus.sensorHealthEvent)
 
                     // send sensorStartDate to cGMG7TransmitterDelegate
                     self.cGMG7TransmitterDelegate?.received(sensorStartDate: Date(timeIntervalSinceNow: -g7GlucoseMessage.sensorAge), cGMG7Transmitter: self)

@@ -329,6 +329,27 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_showSensorNoise", tableName: filename, bundle: Bundle.main, value: "Show Sensor Noise", comment: "home screen settings, should visible sensor noise UI be shown")
     }()
 
+    static let sensorHealthNotifications: String = {
+        return NSLocalizedString(
+            "settingsviews_sensorHealthNotifications",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Sensor Health Warnings",
+            comment: "alert settings toggle for nonterminal sensor health system notifications"
+        )
+    }()
+
+    static let sensorHealthNotificationsFooter: String = {
+        return NSLocalizedString(
+            "settingsviews_sensorHealthNotificationsFooter",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Controls optional system notifications for prolonged sensor noise, a flat signal and temporary sensor issues. "
+                + "Sensor/Transmitter Failure is configured with the other alarms. The dismissible Home banner remains available.",
+            comment: "footer distinguishing nonterminal sensor health warnings from the configured terminal failure alarm"
+        )
+    }()
+
     static let labelUrgentHighValue: String = {
         return NSLocalizedString("settingsviews_urgentHighValue", tableName: filename, bundle: Bundle.main, value: "Urgent High Value", comment: "home screen settings, urgent high value")
     }()

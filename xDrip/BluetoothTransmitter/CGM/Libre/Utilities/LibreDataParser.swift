@@ -292,24 +292,37 @@ class LibreDataParser {
         // trace the sensor state
         if let sensorState = result.sensorState {
             trace("in handleGlucoseData, sensor state = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, sensorState.description)
-            
-            if sensorState != .ready && sensorState != .expired {
-                
-                trace("    not processing data as sensor does not have the state ready or expired", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
-                
-                // initialize xDripError, to be used in calls to cgmTransmitterDelegate.errorOccurred and completionHandler
-                let xDripError = LibreError.sensorNotReady
-                
-                // call cgmTransmitterDelegate (this is actually the RootViewController passed in via the BluetoothTransmitter
-                cgmTransmitterDelegate?.errorOccurred(xDripError: xDripError)
-                
-                // call completionHandler, to inform caller about sensorState and xDripError
-                completionHandler(sensorState, xDripError)
-                
-                return
-                
+
+            if let sensorHealthEvent = sensorState.sensorHealthEvent {
+                cgmTransmitterDelegate?.sensorHealthEventOccurred(sensorHealthEvent)
             }
-            
+
+            switch sensorState {
+            case .ready:
+                break
+
+            case .failure:
+                completionHandler(sensorState, LibreError.sensorNotReady)
+                return
+
+            case .notYetStarted, .starting, .shutdown:
+                // These are expected lifecycle states. They suppress readings but are not failures.
+                completionHandler(sensorState, LibreError.sensorNotReady)
+                return
+
+            case .expired:
+                // Libre can continue supplying readings briefly after its nominal expiry.
+                break
+
+            case .unknown:
+                trace("    not processing data because the sensor state is unknown", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+
+                let xDripError = LibreError.sensorNotReady
+                cgmTransmitterDelegate?.errorOccurred(xDripError: xDripError)
+                completionHandler(sensorState, xDripError)
+                return
+            }
+
         } else {
             trace("in handleGlucoseData, sensor state is unknown", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
         }

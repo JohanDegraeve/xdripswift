@@ -180,7 +180,6 @@
 "sensorManagementNoiseVeryHigh" = "Zelo visok";
 "sensorManagementNoiseExtreme" = "Ekstremen";
 "sensorManagementNoiseFlatline" = "Senzor je verjetno odpovedal.";
-"sensorManagementNoiseFooter" = "Izbrana občutljivost: %@";
 "sensorNoiseWarningExtremeTitle" = "Ekstremen šum senzorja";
 "sensorNoiseWarningPersistentTitle" = "Vztrajen šum senzorja";
 "sensorNoiseWarningFlatlineTitle" = "Signal senzorja je raven";
@@ -197,7 +196,6 @@
 "sensorNoiseHistoryLoading" = "Ustvarjanje zgodovine senzorja";
 "sensorNoiseHistoryNoDataTitle" = "Podatkov o šumu še ni dovolj";
 "sensorNoiseHistoryNoDataMessage" = "Graf se bo prikazal, ko bo zbranih dovolj odčitkov senzorja.";
-"sensorNoiseHistoryFooter" = "Graf prikazuje preostalo nihanje senzorja v tej seji. Nižje vrednosti pomenijo bolj gladek signal. Ne meri natančnosti glukoze.";
 "sensorNoiseHistoryChartAccessibility" = "Graf zgodovine šuma senzorja";
 "pumpBattery" = "Baterija";
 "pumpReservoir" = "Rezervoar";
@@ -209,3 +207,13 @@
 "sensorManagementStatusActive" = "Sensor Active";
 "sensorManagementStarted" = "Started";
 "sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Zelo visok šum senzorja";
+"sensorHealthPersistentNoiseGuidance" = "Zelo visok šum že 12 ur. Če se nadaljuje, razmislite o zamenjavi senzorja.";
+"sensorHealthFlatlineTitle" = "Signal senzorja je raven";
+"sensorHealthFlatlineGuidance" = "Odčitki se 30 minut niso spremenili. To običajno pomeni, da je senzor odpovedal/potekel.";
+"sensorHealthTemporaryIssueTitle" = "Začasna težava s senzorjem";
+"sensorHealthTemporaryIssueGuidance" = "Začasna težava s senzorjem že 3 ure. Preverite z merilnikom in upoštevajte navodila proizvajalca.";
+"sensorHealthSensorFailedTitle" = "Senzor je odpovedal";
+"sensorHealthSensorFailedGuidance" = "Sporočena je odpoved senzorja. Zamenjajte senzor.";
+"sensorHealthTransmitterFailedTitle" = "Odpoved oddajnika";
+"sensorHealthTransmitterFailedGuidance" = "Sporočena je odpoved oddajnika. Preverite ga ali ga zamenjajte.";

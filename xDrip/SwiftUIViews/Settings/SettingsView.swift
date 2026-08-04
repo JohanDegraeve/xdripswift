@@ -561,6 +561,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                                 [
                                     SettingsViewAlertSettingsViewModel(rowGroup: .alertTypes),
                                     SettingsViewAlertSettingsViewModel(rowGroup: .alerts),
+                                    SettingsViewAlertSettingsViewModel(rowGroup: .sensorHealth),
                                     SettingsViewAlertSettingsViewModel(rowGroup: .volumeTests)
                                 ]
                             }

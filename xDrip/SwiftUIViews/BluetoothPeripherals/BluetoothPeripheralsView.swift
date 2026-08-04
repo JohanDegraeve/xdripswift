@@ -14,19 +14,23 @@ import SwiftUI
 struct BluetoothPeripheralsNavigationView: View {
     @StateObject private var router: BluetoothPeripheralsRouter
     @StateObject private var viewModel: BluetoothPeripheralsViewModel
+    @State private var lastSensorHealthDetailRequest = 0
 
     private let coreDataManager: CoreDataManager
     private let bluetoothPeripheralManager: BluetoothPeripheralManaging
     private let sensorProvider: ActiveSensorProviding?
+    private let sensorHealthDetailRequest: Int
 
     init(
         coreDataManager: CoreDataManager,
         bluetoothPeripheralManager: BluetoothPeripheralManaging,
-        sensorProvider: ActiveSensorProviding?
+        sensorProvider: ActiveSensorProviding?,
+        sensorHealthDetailRequest: Int = 0
     ) {
         self.coreDataManager = coreDataManager
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
         self.sensorProvider = sensorProvider
+        self.sensorHealthDetailRequest = sensorHealthDetailRequest
         _router = StateObject(wrappedValue: BluetoothPeripheralsRouter())
         _viewModel = StateObject(wrappedValue: BluetoothPeripheralsViewModel(
             bluetoothPeripheralManager: bluetoothPeripheralManager
@@ -40,6 +44,8 @@ struct BluetoothPeripheralsNavigationView: View {
         }
         .tint(ConstantsAppColors.navigationTint)
         .colorScheme(.dark)
+        .onAppear(perform: handleSensorHealthDetailRequest)
+        .onChange(of: sensorHealthDetailRequest) { _ in handleSensorHealthDetailRequest() }
     }
 
     @ViewBuilder private func destination(for route: BluetoothPeripheralsRoute) -> some View {
@@ -70,6 +76,18 @@ struct BluetoothPeripheralsNavigationView: View {
         case let .readSuccess(display, type):
             TransmitterReadSuccessView(display: display, bluetoothPeripheralType: type)
         }
+    }
+
+    /// Opens the current transmitter detail only after the user taps its in-app banner.
+    private func handleSensorHealthDetailRequest() {
+        guard sensorHealthDetailRequest > 0,
+              sensorHealthDetailRequest != lastSensorHealthDetailRequest,
+              let transmitter = bluetoothPeripheralManager.getCGMTransmitter() as? BluetoothTransmitter,
+              let peripheral = bluetoothPeripheralManager.getBluetoothPeripheral(for: transmitter) else { return }
+
+        lastSensorHealthDetailRequest = sensorHealthDetailRequest
+        router.path.removeAll()
+        router.openPeripheral(peripheral, type: peripheral.bluetoothPeripheralType())
     }
 }
 

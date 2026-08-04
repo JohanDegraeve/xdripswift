@@ -163,7 +163,6 @@
 "sensorManagementNoiseVeryHigh" = "Sehr hoch";
 "sensorManagementNoiseExtreme" = "Extrem";
 "sensorManagementNoiseFlatline" = "Der Sensor ist wahrscheinlich ausgefallen.";
-"sensorManagementNoiseFooter" = "Ausgewählte Empfindlichkeit: %@";
 "sensorNoiseWarningExtremeTitle" = "Extremes Sensorrauschen";
 "sensorNoiseWarningPersistentTitle" = "Anhaltendes Sensorrauschen";
 "sensorNoiseWarningFlatlineTitle" = "Das Sensorsignal ist flach";
@@ -180,7 +179,6 @@
 "sensorNoiseHistoryLoading" = "Sensorverlauf wird erstellt";
 "sensorNoiseHistoryNoDataTitle" = "Noch nicht genug Rauschdaten";
 "sensorNoiseHistoryNoDataMessage" = "Das Diagramm erscheint, sobald genügend Sensorwerte erfasst wurden.";
-"sensorNoiseHistoryFooter" = "Das Diagramm zeigt die verbleibende Sensorunruhe während dieser Sensorsitzung. Niedrigere Werte bedeuten ein ruhigeres Signal. Es misst nicht die Glukosegenauigkeit.";
 "sensorNoiseHistoryChartAccessibility" = "Diagramm des Sensorrauschverlaufs";
 "pumpBattery" = "Batterie";
 "pumpReservoir" = "Reservoir";
@@ -215,3 +213,13 @@
 "sensorManagementCalibrationReadinessGood" = "Jetzt ist ein guter Zeitpunkt zum Kalibrieren.";
 "sensorManagementCalibrationSafetyFooter" = "Kalibrieren Sie nur, wenn Sie wissen, wie es sicher durchgeführt wird.";
 "sensorManagementLargeCalibrationDifferenceWarningFormat" = "Diese Kalibrierung funktioniert möglicherweise nicht. Versuchen Sie, jede Kalibrierungsänderung auf maximal %@ zu begrenzen.";
+"sensorHealthPersistentNoiseTitle" = "Sehr starkes Sensorrauschen";
+"sensorHealthPersistentNoiseGuidance" = "Seit 12 Stunden sehr starkes Rauschen. Bei Fortbestehen Sensorwechsel erwägen.";
+"sensorHealthFlatlineTitle" = "Sensorsignal ist unverändert";
+"sensorHealthFlatlineGuidance" = "Messwerte seit 30 Minuten unverändert. Dies deutet meist auf einen ausgefallenen/abgelaufenen Sensor hin.";
+"sensorHealthTemporaryIssueTitle" = "Vorübergehendes Sensorproblem";
+"sensorHealthTemporaryIssueGuidance" = "Vorübergehendes Sensorproblem seit 3 Stunden. Mit Blutzuckermessgerät prüfen und Herstellerhinweise beachten.";
+"sensorHealthSensorFailedTitle" = "Sensor ausgefallen";
+"sensorHealthSensorFailedGuidance" = "Sensorausfall gemeldet. Sensor ersetzen.";
+"sensorHealthTransmitterFailedTitle" = "Transmitter ausgefallen";
+"sensorHealthTransmitterFailedGuidance" = "Transmitterausfall gemeldet. Transmitter prüfen oder ersetzen.";

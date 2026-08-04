@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// Shows transmitter reliability totals and the hourly reading timeline.
 struct TransmitterReadSuccessView: View {
     let display: TransmitterReadSuccessDisplay
     let bluetoothPeripheralType: BluetoothPeripheralType

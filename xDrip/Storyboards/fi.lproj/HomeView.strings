@@ -100,7 +100,6 @@
 "sensorManagementNoiseVeryHigh" = "Erittäin korkea";
 "sensorManagementNoiseExtreme" = "Äärimmäinen";
 "sensorManagementNoiseFlatline" = "Sensori on todennäköisesti vikaantunut.";
-"sensorManagementNoiseFooter" = "Valittu herkkyys: %@";
 "sensorNoiseWarningExtremeTitle" = "Äärimmäinen sensorin kohina";
 "sensorNoiseWarningPersistentTitle" = "Jatkuva sensorin kohina";
 "sensorNoiseWarningFlatlineTitle" = "Sensorin signaali on tasainen";
@@ -117,7 +116,6 @@
 "sensorNoiseHistoryLoading" = "Luodaan sensorihistoriaa";
 "sensorNoiseHistoryNoDataTitle" = "Kohinatietoja ei ole vielä riittävästi";
 "sensorNoiseHistoryNoDataMessage" = "Kaavio tulee näkyviin, kun sensorilukemia on kerätty riittävästi.";
-"sensorNoiseHistoryFooter" = "Kaavio näyttää sensorin jäännösvaihtelun tämän sensorijakson aikana. Pienemmät arvot tarkoittavat tasaisempaa signaalia. Se ei mittaa glukoosin tarkkuutta.";
 "sensorNoiseHistoryChartAccessibility" = "Sensorin kohinahistorian kaavio";
 "pumpBattery" = "Akku";
 "pumpReservoir" = "Säiliö";
@@ -129,3 +127,13 @@
 "sensorManagementStatusActive" = "Sensor Active";
 "sensorManagementStarted" = "Started";
 "sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Erittäin voimakas anturikohina";
+"sensorHealthPersistentNoiseGuidance" = "Erittäin voimakasta kohinaa 12 tunnin ajan. Harkitse anturin vaihtamista, jos se jatkuu.";
+"sensorHealthFlatlineTitle" = "Anturin signaali on tasainen";
+"sensorHealthFlatlineGuidance" = "Lukemat eivät ole muuttuneet 30 minuuttiin. Tämä tarkoittaa yleensä, että anturi on vioittunut/vanhentunut.";
+"sensorHealthTemporaryIssueTitle" = "Tilapäinen anturiongelma";
+"sensorHealthTemporaryIssueGuidance" = "Tilapäinen anturiongelma 3 tunnin ajan. Tarkista verensokerimittarilla ja noudata valmistajan ohjeita.";
+"sensorHealthSensorFailedTitle" = "Anturi vioittunut";
+"sensorHealthSensorFailedGuidance" = "Anturivika ilmoitettu. Vaihda anturi.";
+"sensorHealthTransmitterFailedTitle" = "Lähetinvika";
+"sensorHealthTransmitterFailedGuidance" = "Lähetinvika ilmoitettu. Tarkista tai vaihda lähetin.";

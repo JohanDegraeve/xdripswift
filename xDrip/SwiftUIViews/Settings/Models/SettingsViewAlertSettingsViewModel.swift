@@ -14,12 +14,17 @@ fileprivate enum Setting:Int, CaseIterable {
     
     /// volume test for sound play in iOS notification
     case volumeTestiOSSound = 3
+
+    /// Controls iOS notifications for flatline and temporary sensor issues.
+    /// Home banners remain available. Terminal failures use the main Alerts screen setting.
+    case sensorHealthNotifications = 4
     
 }
 
 enum AlertSettingsRowGroup {
     case alertTypes
     case alerts
+    case sensorHealth
     case volumeTests
 }
 
@@ -38,6 +43,8 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
         switch rowGroup {
         case .alertTypes, .alerts:
             return nil
+        case .sensorHealth:
+            return nil
         case .volumeTests:
             return Texts_SettingsView.volumeTestsSectionTitle
         }
@@ -49,6 +56,8 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
             return Texts_SettingsView.alertTypesSectionFooter
         case .alerts:
             return Texts_SettingsView.alertsSectionFooter
+        case .sensorHealth:
+            return Texts_SettingsView.sensorHealthNotificationsFooter
         case .volumeTests:
             return nil
         }
@@ -63,6 +72,14 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
         case .alerts:
             return [
                 nativeSettingsRow(id: "alerts.alerts", index: Setting.alerts.rawValue, sectionID: sectionID)
+            ]
+        case .sensorHealth:
+            return [
+                nativeSettingsRow(
+                    id: "alerts.sensorHealthNotifications",
+                    index: Setting.sensorHealthNotifications.rawValue,
+                    sectionID: sectionID
+                )
             ]
         case .volumeTests:
             return [
@@ -94,6 +111,15 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
     func isEnabled(index: Int) -> Bool {
         return true
     }
+
+    func settingsToggle(index: Int) -> SettingsToggleControl? {
+        guard Setting(rawValue: index) == .sensorHealthNotifications else { return nil }
+
+        return SettingsToggleControl(
+            isOn: { UserDefaults.standard.sensorHealthNotificationsEnabled },
+            setIsOn: { UserDefaults.standard.sensorHealthNotificationsEnabled = $0 }
+        )
+    }
     
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Setting in SettingsViewAlertSettingsViewModel onRowSelect") }
@@ -103,6 +129,8 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
             return .performSegue(withIdentifier: SettingsSegueIdentifier.settingsToAlertTypeSettings.rawValue, sender: nil)
         case .alerts:
             return .performSegue(withIdentifier: SettingsSegueIdentifier.settingsToAlertSettings.rawValue, sender: nil)
+        case .sensorHealthNotifications:
+            return .nothing
             
         case .volumeTestSoundPlayer:
             
@@ -167,6 +195,8 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
             return Texts_SettingsView.labelAlertTypes
         case .alerts:
             return Texts_SettingsView.labelAlerts
+        case .sensorHealthNotifications:
+            return Texts_SettingsView.sensorHealthNotifications
             
         case .volumeTestSoundPlayer:
             return Texts_SettingsView.volumeTestSoundPlayer
@@ -186,6 +216,9 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
         case .alertTypes, .alerts:
             
             return .disclosure
+
+        case .sensorHealthNotifications:
+            return .none
             
         case .volumeTestSoundPlayer, .volumeTestiOSSound:
             
