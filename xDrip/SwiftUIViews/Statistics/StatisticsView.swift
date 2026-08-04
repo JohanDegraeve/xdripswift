@@ -872,7 +872,7 @@ private struct StatisticsTrendCard: View {
                         trendChart(
                             title: Texts_Common.statisticsAverageTDD,
                             yDomain: upperDomain(values: trendPoints.compactMap(\.averageTDDPerDay), minimum: 20),
-                            decimalPlaces: 1,
+                            decimalPlaces: 0,
                             value: { $0.averageTDDPerDay },
                             labelText: { "\(GlucoseReportFormatting.number($0, decimalPlaces: 1)) U" }
                         )
@@ -903,65 +903,72 @@ private struct StatisticsTrendCard: View {
         value: @escaping (GlucoseReportTrendPoint) -> Double?,
         labelText: @escaping (Double) -> String
     ) -> some View {
-        Chart {
-            ForEach(trendPoints) { point in
-                if point.interval == .weekly, let valueForPoint = value(point) {
-                    LineMark(
-                        x: .value("Date", point.date),
-                        y: .value(title, valueForPoint)
-                    )
-                    .lineStyle(StrokeStyle(lineWidth: 2.0))
-                    .foregroundStyle(Color.cyan)
-                    .interpolationMethod(.catmullRom)
+        GeometryReader { geometry in
+            Chart {
+                ForEach(trendPoints) { point in
+                    if let valueForPoint = value(point) {
+                        LineMark(
+                            x: .value("Date", point.date),
+                            y: .value(title, valueForPoint)
+                        )
+                        .lineStyle(StrokeStyle(lineWidth: 2.0))
+                        .foregroundStyle(Color.cyan)
+                        .interpolationMethod(.catmullRom)
 
-                    PointMark(
-                        x: .value("Date", point.date),
-                        y: .value(title, valueForPoint)
-                    )
-                    .symbolSize(10)
-                    .foregroundStyle(Color.cyan)
-                    .annotation(position: .top, alignment: annotationAlignment(for: point)) {
-                        if isTerminalWeeklyPoint(point) {
-                            Text(labelText(valueForPoint))
-                                .font(.system(size: ConstantsStatistics.chartAxisLabelFontSize + 1, weight: .semibold))
-                                .foregroundStyle(ConstantsAppColors.warning)
-                                .monospacedDigit()
+                        PointMark(
+                            x: .value("Date", point.date),
+                            y: .value(title, valueForPoint)
+                        )
+                        .symbolSize(10)
+                        .foregroundStyle(Color.cyan)
+                        .annotation(position: .top, alignment: annotationAlignment(for: point)) {
+                            if isTerminalTrendPoint(point) {
+                                Text(labelText(valueForPoint))
+                                    .font(.system(size: ConstantsStatistics.chartAxisLabelFontSize + 1, weight: .semibold))
+                                    .foregroundStyle(ConstantsAppColors.warning)
+                                    .monospacedDigit()
+                            }
                         }
                     }
                 }
             }
-        }
-        .chartLegend(.hidden)
-        .chartXScale(domain: xDomain)
-        .chartYScale(domain: yDomain)
-        .chartYAxis {
-            AxisMarks(position: .trailing, values: yAxisValues(for: yDomain)) { value in
-                AxisGridLine()
-                    .foregroundStyle(Color(.colorSecondary).opacity(0.55))
-                AxisValueLabel {
-                    if let axisValue = value.as(Double.self) {
-                        Text(GlucoseReportFormatting.number(axisValue, decimalPlaces: decimalPlaces))
-                            .font(.system(size: ConstantsStatistics.chartAxisLabelFontSize + 1))
-                            .foregroundStyle(Color(.colorSecondary))
-                            .monospacedDigit()
+            .chartLegend(.hidden)
+            .chartXScale(domain: xDomain)
+            .chartYScale(domain: yDomain)
+            .chartYAxis {
+                AxisMarks(position: .trailing, values: yAxisValues(for: yDomain)) { value in
+                    AxisGridLine()
+                        .foregroundStyle(Color(.colorSecondary).opacity(0.55))
+                    AxisValueLabel {
+                        if let axisValue = value.as(Double.self) {
+                            Text(GlucoseReportFormatting.number(axisValue, decimalPlaces: decimalPlaces))
+                                .font(.system(size: ConstantsStatistics.chartAxisLabelFontSize + 1))
+                                .foregroundStyle(Color(.colorSecondary))
+                                .monospacedDigit()
+                                .frame(width: ConstantsStatistics.chartYAxisLabelWidth, alignment: .leading)
+                        }
                     }
                 }
             }
-        }
-        .chartXAxis {
-            AxisMarks(values: xGridDates) { _ in
-                AxisGridLine()
-                    .foregroundStyle(Color(.colorSecondary).opacity(0.55))
+            .chartXAxis {
+                AxisMarks(values: xGridDates) { _ in
+                    AxisGridLine()
+                        .foregroundStyle(Color(.colorSecondary).opacity(0.55))
+                }
+            }
+            // Fix the plot width itself so differing axis values cannot move the final time point.
+            .chartPlotStyle { plotArea in
+                plotArea.frame(width: max(0, geometry.size.width - ConstantsStatistics.chartTrailingAxisWidth))
+            }
+            .overlay {
+                if trendPoints.isEmpty {
+                    Text(Texts_Common.statisticsInsufficientData)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color(.colorSecondary))
+                }
             }
         }
         .frame(height: 76)
-        .overlay {
-            if trendPoints.isEmpty {
-                Text(Texts_Common.statisticsInsufficientData)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color(.colorSecondary))
-            }
-        }
     }
 
     private var hasTDDTrendData: Bool {
@@ -985,15 +992,13 @@ private struct StatisticsTrendCard: View {
         return 0 ... max(minimum, ceil(maximum * 1.15 / 10) * 10)
     }
 
-    private var weeklyTrendPoints: [GlucoseReportTrendPoint] {
-        trendPoints
-            .filter { $0.interval == .weekly }
-            .sorted { $0.date < $1.date }
+    private var orderedTrendPoints: [GlucoseReportTrendPoint] {
+        trendPoints.sorted { $0.date < $1.date }
     }
 
     private var xDomain: ClosedRange<Date> {
-        guard let firstDate = weeklyTrendPoints.first?.date,
-              let lastDate = weeklyTrendPoints.last?.date,
+        guard let firstDate = orderedTrendPoints.first?.date,
+              let lastDate = orderedTrendPoints.last?.date,
               firstDate < lastDate else {
             let now = Date()
             return now.addingTimeInterval(-24 * 60 * 60) ... now
@@ -1009,13 +1014,13 @@ private struct StatisticsTrendCard: View {
         }
     }
 
-    private func isTerminalWeeklyPoint(_ point: GlucoseReportTrendPoint) -> Bool {
-        point.date == weeklyTrendPoints.first?.date || point.date == weeklyTrendPoints.last?.date
+    private func isTerminalTrendPoint(_ point: GlucoseReportTrendPoint) -> Bool {
+        point.date == orderedTrendPoints.first?.date || point.date == orderedTrendPoints.last?.date
     }
 
     private func annotationAlignment(for point: GlucoseReportTrendPoint) -> Alignment {
-        guard let firstDate = weeklyTrendPoints.first?.date,
-              let lastDate = weeklyTrendPoints.last?.date else {
+        guard let firstDate = orderedTrendPoints.first?.date,
+              let lastDate = orderedTrendPoints.last?.date else {
             return .center
         }
 

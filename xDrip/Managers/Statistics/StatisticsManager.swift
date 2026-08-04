@@ -79,7 +79,6 @@ public final class StatisticsManager: @unchecked Sendable {
     private let operationQueue: OperationQueue
     private let coreDataManager: CoreDataManager
     private let calendar = Calendar.current
-    private static let weeklyTrendBucketDuration = 7 * 24 * 60 * 60.0
     private var contextSaveObservers = [NSObjectProtocol]()
 
     private var sampleCache: CGMWindowCache?
@@ -461,7 +460,7 @@ public final class StatisticsManager: @unchecked Sendable {
             agpPoints: makeAGPPoints(samples: samples),
             dailyGlucoseProfiles: makeDailyGlucoseProfiles(samples: samples, periodEnd: periodEnd, dayCount: 7),
             dailySummaries: makeDailySummaries(samples: samples, periodEnd: periodEnd, periodDays: configuration.period.rawValue),
-            trendPoints: makeTrendPoints(samples: samples, fromDate: periodStart, toDate: periodEnd),
+            trendPoints: makeTrendPoints(samples: samples, fromDate: periodStart, toDate: periodEnd, period: configuration.period),
             sensorCount: reportSensorSummary.count,
             averageSensorDuration: reportSensorSummary.averageDuration,
             calibrationCount: calibrationCount(fromDate: periodStart, toDate: periodEnd),
@@ -1022,23 +1021,34 @@ public final class StatisticsManager: @unchecked Sendable {
         return summaries
     }
 
-    private func makeTrendPoints(samples: [CGMSample], fromDate: Date, toDate: Date) -> [GlucoseReportTrendPoint] {
-        // Seven-day buckets are anchored to the selected analysis window. Calendar-week keys can
-        // otherwise place the first point before the requested period and make the chart appear to
-        // stop early in the current month.
-        let grouped = Dictionary(grouping: samples) { weeklyTrendBucketIndex(for: $0.date, fromDate: fromDate) }
-        let treatmentTrendValues = treatmentTrendValues(fromDate: fromDate, toDate: toDate)
+    private func makeTrendPoints(
+        samples: [CGMSample],
+        fromDate: Date,
+        toDate: Date,
+        period: GlucoseReportPeriod
+    ) -> [GlucoseReportTrendPoint] {
+        // Short analysis windows need finer buckets to show a useful trend. Longer windows retain
+        // weekly averages so the plots remain clinically readable instead of becoming noisy.
+        let bucket = trendBucket(for: period)
+        let grouped = Dictionary(grouping: samples) {
+            trendBucketIndex(for: $0.date, fromDate: fromDate, duration: bucket.duration)
+        }
+        let treatmentTrendValues = treatmentTrendValues(
+            fromDate: fromDate,
+            toDate: toDate,
+            bucketDuration: bucket.duration
+        )
 
         return grouped.keys.sorted().compactMap { bucketIndex -> GlucoseReportTrendPoint? in
             guard let bucketSamples = grouped[bucketIndex], bucketSamples.count >= 12 else { return nil }
             let values = bucketSamples.map(\.valueMgDl)
             let average = values.reduce(0, +) / Double(values.count)
             let standardDeviation = Self.standardDeviation(values: values, average: average)
-            let date = weeklyTrendBucketDate(at: bucketIndex, fromDate: fromDate, toDate: toDate)
+            let date = trendBucketDate(at: bucketIndex, fromDate: fromDate, toDate: toDate, duration: bucket.duration)
 
             return GlucoseReportTrendPoint(
                 date: date,
-                interval: .weekly,
+                interval: bucket.interval,
                 averageMgDl: average,
                 coefficientOfVariation: average > 0 ? standardDeviation / average * 100 : 0,
                 averageTDDPerDay: treatmentTrendValues.averageTDDPerDay[bucketIndex],
@@ -1048,7 +1058,11 @@ public final class StatisticsManager: @unchecked Sendable {
         }
     }
 
-    private func treatmentTrendValues(fromDate: Date, toDate: Date) -> (averageTDDPerDay: [Int: Double], averageCarbsPerDay: [Int: Double]) {
+    private func treatmentTrendValues(
+        fromDate: Date,
+        toDate: Date,
+        bucketDuration: TimeInterval
+    ) -> (averageTDDPerDay: [Int: Double], averageCarbsPerDay: [Int: Double]) {
         let treatments = treatmentSamples(fromDate: fromDate, toDate: toDate)
         let insulinTreatments = treatments.filter { $0.type == .Insulin && $0.value > 0 && $0.value < 300 }
         let carbTreatments = treatments.filter { $0.type == .Carbs && $0.value > 0 && $0.value < 1000 }
@@ -1059,8 +1073,8 @@ public final class StatisticsManager: @unchecked Sendable {
         }
 
         return (
-            weeklyAveragePerDay(from: insulinTreatments, fromDate: fromDate, toDate: toDate),
-            weeklyAveragePerDay(from: carbTreatments, fromDate: fromDate, toDate: toDate)
+            averagePerDay(from: insulinTreatments, fromDate: fromDate, toDate: toDate, bucketDuration: bucketDuration),
+            averagePerDay(from: carbTreatments, fromDate: fromDate, toDate: toDate, bucketDuration: bucketDuration)
         )
     }
 
@@ -1090,27 +1104,43 @@ public final class StatisticsManager: @unchecked Sendable {
         return samples
     }
 
-    private func weeklyAveragePerDay(from treatments: [TreatmentSample], fromDate: Date, toDate: Date) -> [Int: Double] {
+    private func averagePerDay(
+        from treatments: [TreatmentSample],
+        fromDate: Date,
+        toDate: Date,
+        bucketDuration: TimeInterval
+    ) -> [Int: Double] {
         let grouped = Dictionary(grouping: treatments) { treatment in
-            weeklyTrendBucketIndex(for: treatment.date, fromDate: fromDate)
+            trendBucketIndex(for: treatment.date, fromDate: fromDate, duration: bucketDuration)
         }
 
         return grouped.reduce(into: [Int: Double]()) { result, item in
-            let bucketStart = fromDate.addingTimeInterval(Double(item.key) * Self.weeklyTrendBucketDuration)
-            let bucketEnd = min(bucketStart.addingTimeInterval(Self.weeklyTrendBucketDuration), toDate)
+            let bucketStart = fromDate.addingTimeInterval(Double(item.key) * bucketDuration)
+            let bucketEnd = min(bucketStart.addingTimeInterval(bucketDuration), toDate)
             let days = max(bucketEnd.timeIntervalSince(bucketStart) / (24 * 60 * 60), 1)
             let total = item.value.map(\.value).reduce(0, +)
             result[item.key] = total / days
         }
     }
 
-    private func weeklyTrendBucketIndex(for date: Date, fromDate: Date) -> Int {
-        Int(max(0, date.timeIntervalSince(fromDate)) / Self.weeklyTrendBucketDuration)
+    private func trendBucket(for period: GlucoseReportPeriod) -> (duration: TimeInterval, interval: GlucoseReportTrendInterval) {
+        switch period {
+        case .seven:
+            return (24 * 60 * 60, .daily)
+        case .thirty:
+            return (3 * 24 * 60 * 60, .threeDay)
+        case .sixty, .ninety, .oneEighty, .oneYear:
+            return (7 * 24 * 60 * 60, .weekly)
+        }
     }
 
-    private func weeklyTrendBucketDate(at index: Int, fromDate: Date, toDate: Date) -> Date {
-        let bucketStart = fromDate.addingTimeInterval(Double(index) * Self.weeklyTrendBucketDuration)
-        let bucketEnd = min(bucketStart.addingTimeInterval(Self.weeklyTrendBucketDuration), toDate)
+    private func trendBucketIndex(for date: Date, fromDate: Date, duration: TimeInterval) -> Int {
+        Int(max(0, date.timeIntervalSince(fromDate)) / duration)
+    }
+
+    private func trendBucketDate(at index: Int, fromDate: Date, toDate: Date, duration: TimeInterval) -> Date {
+        let bucketStart = fromDate.addingTimeInterval(Double(index) * duration)
+        let bucketEnd = min(bucketStart.addingTimeInterval(duration), toDate)
         return bucketStart.addingTimeInterval(bucketEnd.timeIntervalSince(bucketStart) / 2)
     }
 

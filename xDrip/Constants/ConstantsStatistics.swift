@@ -13,6 +13,12 @@ enum ConstantsStatistics {
 
     /// shared axis label size for charts in the SwiftUI statistics view
     static let chartAxisLabelFontSize: CGFloat = 12
+
+    /// fixed trailing axis column keeps the AGP and metric trend plot areas horizontally aligned
+    static let chartYAxisLabelWidth: CGFloat = 28
+
+    /// total space reserved between the trailing plot edge and the edge of its Statistics card
+    static let chartTrailingAxisWidth: CGFloat = 32
     
     /// animation speed when drawing the pie chart
     static let pieChartAnimationSpeed = 0.3

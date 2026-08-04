@@ -400,6 +400,8 @@ struct GlucoseReportDailySummary: Identifiable {
 }
 
 enum GlucoseReportTrendInterval: String {
+    case daily = "Daily"
+    case threeDay = "3-day"
     case weekly = "Weekly"
 }
 
@@ -548,6 +550,8 @@ enum GlucoseReportText {
     case estimatedA1cGMI
     case lowerIsGenerallyBetter
     case cv
+    case daily
+    case threeDay
     case weekly
     case insufficientData
     case gmiFootnote
@@ -619,6 +623,8 @@ enum GlucoseReportText {
         case .estimatedA1cGMI: return "Estimated A1c / GMI"
         case .lowerIsGenerallyBetter: return "Lower is generally better"
         case .cv: return "CV"
+        case .daily: return "Daily"
+        case .threeDay: return "3-day"
         case .weekly: return "Weekly"
         case .insufficientData: return "Insufficient data"
         case .gmiFootnote: return "GMI is CGM-derived and should be interpreted as an estimate, not a laboratory HbA1c result."
@@ -692,6 +698,8 @@ enum GlucoseReportText {
         case .estimatedA1cGMI: return "A1c Estimada / GMI"
         case .lowerIsGenerallyBetter: return "Más bajo suele ser mejor"
         case .cv: return "CV"
+        case .daily: return "Diario"
+        case .threeDay: return "Cada 3 días"
         case .weekly: return "Semanal"
         case .insufficientData: return "Datos insuficientes"
         case .gmiFootnote: return "El GMI se deriva de la MCG y debe interpretarse como una estimación, no como un resultado de HbA1c de laboratorio."
@@ -765,6 +773,8 @@ enum GlucoseReportText {
         case .estimatedA1cGMI: return "A1c Estimée / GMI"
         case .lowerIsGenerallyBetter: return "Plus bas est généralement meilleur"
         case .cv: return "CV"
+        case .daily: return "Quotidien"
+        case .threeDay: return "Tous les 3 jours"
         case .weekly: return "Hebdomadaire"
         case .insufficientData: return "Données insuffisantes"
         case .gmiFootnote: return "Le GMI est dérivé de la MCG et doit être interprété comme une estimation, pas comme un résultat d'HbA1c de laboratoire."
@@ -838,6 +848,8 @@ enum GlucoseReportText {
         case .estimatedA1cGMI: return "Geschatte A1c / GMI"
         case .lowerIsGenerallyBetter: return "Lager is meestal beter"
         case .cv: return "CV"
+        case .daily: return "Dagelijks"
+        case .threeDay: return "Elke 3 dagen"
         case .weekly: return "Wekelijks"
         case .insufficientData: return "Onvoldoende gegevens"
         case .gmiFootnote: return "GMI is afgeleid van CGM en moet worden geïnterpreteerd als een schatting, niet als een laboratorium-HbA1c-resultaat."
@@ -911,6 +923,8 @@ enum GlucoseReportText {
         case .estimatedA1cGMI: return "Geschätzte A1c / GMI"
         case .lowerIsGenerallyBetter: return "Niedriger ist im Allgemeinen besser"
         case .cv: return "CV"
+        case .daily: return "Täglich"
+        case .threeDay: return "Alle 3 Tage"
         case .weekly: return "Wöchentlich"
         case .insufficientData: return "Nicht genügend Daten"
         case .gmiFootnote: return "GMI wird aus CGM-Daten abgeleitet und sollte als Schätzung interpretiert werden, nicht als Labor-HbA1c-Ergebnis."
@@ -984,6 +998,8 @@ enum GlucoseReportText {
         case .estimatedA1cGMI: return "A1c Stimata / GMI"
         case .lowerIsGenerallyBetter: return "Più basso è generalmente meglio"
         case .cv: return "CV"
+        case .daily: return "Giornaliero"
+        case .threeDay: return "Ogni 3 giorni"
         case .weekly: return "Settimanale"
         case .insufficientData: return "Dati insufficienti"
         case .gmiFootnote: return "Il GMI deriva dal CGM e deve essere interpretato come una stima, non come un risultato HbA1c di laboratorio."
@@ -1057,6 +1073,8 @@ enum GlucoseReportText {
         case .estimatedA1cGMI: return "A1c Estimada / GMI"
         case .lowerIsGenerallyBetter: return "Mais baixo é geralmente melhor"
         case .cv: return "CV"
+        case .daily: return "Diário"
+        case .threeDay: return "A cada 3 dias"
         case .weekly: return "Semanal"
         case .insufficientData: return "Dados insuficientes"
         case .gmiFootnote: return "O GMI é derivado da MCG e deve ser interpretado como uma estimativa, não como um resultado laboratorial de HbA1c."

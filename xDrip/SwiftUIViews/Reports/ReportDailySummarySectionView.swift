@@ -9,6 +9,7 @@
 import Charts
 import SwiftUI
 
+/// Renders daily glucose summaries for the generated report.
 struct GlucoseReportDailySummarySectionView: View {
     let summaries: [GlucoseReportDailySummary]
     let usesMgDl: Bool
@@ -157,6 +158,7 @@ struct GlucoseReportDailySummarySectionView: View {
 
 }
 
+/// Renders glucose, insulin and carbohydrate trends at the interval selected for the report period.
 struct GlucoseReportMetricTrendSectionView: View {
     let trendPoints: [GlucoseReportTrendPoint]
     let language: GlucoseReportLanguage
@@ -201,7 +203,15 @@ struct GlucoseReportMetricTrendSectionView: View {
 
     private var legend: some View {
         HStack(spacing: 8) {
-            legendItem(color: GlucoseReportColors.clinicalBlue, title: language.text(.weekly))
+            legendItem(color: GlucoseReportColors.clinicalBlue, title: trendIntervalTitle)
+        }
+    }
+
+    private var trendIntervalTitle: String {
+        switch trendPoints.first?.interval {
+        case .daily: return language.text(.daily)
+        case .threeDay: return language.text(.threeDay)
+        case .weekly, .none: return language.text(.weekly)
         }
     }
 
@@ -234,7 +244,7 @@ struct GlucoseReportMetricTrendSectionView: View {
                 }
 
                 ForEach(trendPoints) { point in
-                    if point.interval == .weekly, let pointValue = value(point) {
+                    if let pointValue = value(point) {
                         LineMark(
                             x: .value("Date", point.date),
                             y: .value(title, pointValue)
@@ -249,7 +259,7 @@ struct GlucoseReportMetricTrendSectionView: View {
                         .symbolSize(10)
                         .foregroundStyle(by: .value("Interval", point.interval.rawValue))
                         .annotation(position: .top, alignment: annotationAlignment(for: point, value: value)) {
-                            if isTerminalWeeklyPoint(point, value: value) {
+                            if isTerminalTrendPoint(point, value: value) {
                                 Text(labelText(pointValue))
                                     .font(.system(size: 6.5, weight: .semibold))
                                     .foregroundStyle(GlucoseReportColors.secondaryText)
@@ -260,6 +270,8 @@ struct GlucoseReportMetricTrendSectionView: View {
                 }
             }
             .chartForegroundStyleScale([
+                GlucoseReportTrendInterval.daily.rawValue: GlucoseReportColors.clinicalBlue,
+                GlucoseReportTrendInterval.threeDay.rawValue: GlucoseReportColors.clinicalBlue,
                 GlucoseReportTrendInterval.weekly.rawValue: GlucoseReportColors.clinicalBlue
             ])
             .chartLegend(.hidden)
@@ -365,8 +377,20 @@ struct GlucoseReportMetricTrendSectionView: View {
             return now ... now
         }
 
-        let paddedEndDate = Calendar.current.date(byAdding: .day, value: 7, to: endDate) ?? endDate
+        let paddedEndDate = Calendar.current.date(
+            byAdding: .day,
+            value: trendIntervalDayCount,
+            to: endDate
+        ) ?? endDate
         return startDate ... paddedEndDate
+    }
+
+    private var trendIntervalDayCount: Int {
+        switch trendPoints.first?.interval {
+        case .daily: return 1
+        case .threeDay: return 3
+        case .weekly, .none: return 7
+        }
     }
 
     private var monthTickDates: [Date] {
@@ -391,19 +415,17 @@ struct GlucoseReportMetricTrendSectionView: View {
         return ticks
     }
 
-    private var weeklyTrendPoints: [GlucoseReportTrendPoint] {
-        trendPoints
-            .filter { $0.interval == .weekly }
-            .sorted { $0.date < $1.date }
+    private var orderedTrendPoints: [GlucoseReportTrendPoint] {
+        trendPoints.sorted { $0.date < $1.date }
     }
 
     private func metricTrendPoints(
         value: (GlucoseReportTrendPoint) -> Double?
     ) -> [GlucoseReportTrendPoint] {
-        weeklyTrendPoints.filter { value($0) != nil }
+        orderedTrendPoints.filter { value($0) != nil }
     }
 
-    private func isTerminalWeeklyPoint(
+    private func isTerminalTrendPoint(
         _ point: GlucoseReportTrendPoint,
         value: (GlucoseReportTrendPoint) -> Double?
     ) -> Bool {

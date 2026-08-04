@@ -32,6 +32,7 @@ struct AGPChartView: View {
     let glucosePoints: [AGPChartGlucosePoint]
     let showsNowRule: Bool
     let emptyMessage: String
+    let fixedPlotWidth: CGFloat?
 
     init(
         points: [GlucoseReportAGPPoint],
@@ -39,7 +40,8 @@ struct AGPChartView: View {
         presentation: AGPChartPresentation,
         glucosePoints: [AGPChartGlucosePoint] = [],
         showsNowRule: Bool = false,
-        emptyMessage: String
+        emptyMessage: String,
+        fixedPlotWidth: CGFloat? = nil
     ) {
         self.points = points
         self.usesMgDl = usesMgDl
@@ -47,6 +49,7 @@ struct AGPChartView: View {
         self.glucosePoints = glucosePoints
         self.showsNowRule = showsNowRule
         self.emptyMessage = emptyMessage
+        self.fixedPlotWidth = fixedPlotWidth
     }
 
     var body: some View {
@@ -93,6 +96,7 @@ struct AGPChartView: View {
         .chartPlotStyle { plotArea in
             if showsPlotBorder {
                 plotArea
+                    .frame(width: fixedPlotWidth)
                     .border(ConstantsAppColors.agpPlotBorder, width: ConstantsGlucoseChartSwiftUI.chartPlotBorderLineWidth)
             } else {
                 plotArea
@@ -362,6 +366,11 @@ struct AGPChartView: View {
             .font(font)
             .foregroundStyle(color)
             .monospacedDigit()
+            .frame(width: statisticsYAxisLabelWidth, alignment: .leading)
+    }
+
+    private var statisticsYAxisLabelWidth: CGFloat? {
+        presentation == .statistics ? ConstantsStatistics.chartYAxisLabelWidth : nil
     }
 
     private func yAxisGridLineColor(for convertedValue: Double?) -> Color {
@@ -489,8 +498,10 @@ struct AGPChartView: View {
 
     private func timeLabel(minute: Int) -> String {
         switch minute {
-        case 0, 1440:
+        case 0:
             return "00:00"
+        case 1440:
+            return presentation == .printableReport ? "00:00" : "24:00"
         case 360:
             return "06:00"
         case 720:
