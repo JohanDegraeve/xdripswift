@@ -640,12 +640,21 @@ class Trace {
 
                     case .DexcomG7Type:
                         if blePeripheral.dexcomG7 != nil {
-                            
+
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-                            
+
                             traceInfo.appendStringAndNewLine("        15-day G7: " + (blePeripheral.name.startsWith("DXCM") ? UserDefaults.standard.is15DayDexcomG7.description : "n/a (not a G7)"))
                         }
-                        
+
+                    case .MedtrumTouchCareNanoType:
+                        if let medtrumNano = blePeripheral.medtrumTouchCareNano {
+
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            if let firmware = medtrumNano.firmware {
+                                traceInfo.appendStringAndNewLine("        Firmware: " + firmware)
+                            }
+                        }
+
                     }
                 }
                 

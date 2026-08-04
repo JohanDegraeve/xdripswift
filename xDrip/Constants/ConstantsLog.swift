@@ -94,6 +94,9 @@ enum ConstantsLog {
     /// medtrum easyview follow
     static let categoryMedtrumEasyViewFollowManager =       "MedtrumEasyViewFollowManager  "
 
+    /// medtrum touchcare nano cgm (BLE co-listener)
+    static let categoryCGMMedtrumTouchCareNano =            "CGMMedtrumTouchCareNano       "
+
     /// alertmanager
     static let categoryAlertManager =                       "AlertManager                  "
     

@@ -15,6 +15,7 @@ Current Status :
     - Droplet 1
     - Atom
     - Libre 2
+    - Medtrum TouchCare Nano CGM (passive BLE co-listener; requires the official Medtrum EasyPatch app to be installed and running on the same iPhone — EasyPatch performs the sensor authentication, and xDrip listens to the same notifications via iOS's GATT multiplexing. No internet connection needed; calibrations performed in EasyPatch are automatically picked up.)
 - 6 hour graph with readings
 - Alerting
 - Upload to Nightscout
