@@ -238,8 +238,17 @@ class BgReadingsAccessor: ObservableObject {
     ///   - endingAt: The window end time; the window start is "endingAt - 24h".
     /// - Returns: An array of timestamps sorted ascending. May be empty.
     func getReadingTimestampsForLast24h(forSensor sensor: Sensor?, endingAt endDate: Date) -> [Date] {
-        var timestamps: [Date] = []
         let twentyFourHoursBefore = endDate.addingTimeInterval(-24 * 3600)
+
+        return getReadingTimestamps(fromDate: twentyFourHoursBefore, toDate: endDate, forSensor: sensor)
+    }
+
+    /// Returns plain Date timestamps for readings in the requested window.
+    ///
+    /// This can optionally filter by Sensor relationship, but callers that represent a physical
+    /// sensor session should prefer passing nil and clamping `fromDate` to the sensor start date.
+    func getReadingTimestamps(fromDate: Date, toDate: Date, forSensor sensor: Sensor?) -> [Date] {
+        var timestamps: [Date] = []
 
         coreDataManager.mainManagedObjectContext.performAndWait {
             let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
@@ -255,7 +264,7 @@ class BgReadingsAccessor: ObservableObject {
                 NSPredicate(format: "rawData != 0.0")
             ]))
             // Time window
-            subpredicates.append(NSPredicate(format: "timeStamp >= %@ AND timeStamp <= %@", NSDate(timeIntervalSince1970: twentyFourHoursBefore.timeIntervalSince1970), NSDate(timeIntervalSince1970: endDate.timeIntervalSince1970)))
+            subpredicates.append(NSPredicate(format: "timeStamp >= %@ AND timeStamp <= %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970), NSDate(timeIntervalSince1970: toDate.timeIntervalSince1970)))
             // Sensor filter if provided
             if let sensorId = sensor?.id {
                 subpredicates.append(NSPredicate(format: "sensor.id == %@", sensorId as CVarArg))
@@ -270,7 +279,7 @@ class BgReadingsAccessor: ObservableObject {
                 }
             } catch {
                 let fetchError = error as NSError
-                trace("in getReadingTimestampsForLast24h, fetch error: %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
+                trace("in getReadingTimestamps, fetch error: %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
             }
         }
 

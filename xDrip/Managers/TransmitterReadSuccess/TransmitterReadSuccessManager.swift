@@ -50,8 +50,18 @@ final class TransmitterReadSuccessManager {
     /// - Returns: A display model with expected/actual/success for 24h and hourly bucket data.
     func getReadSuccess(forSensor sensor: Sensor, now: Date? = nil, notBefore cutoff: Date? = nil) -> TransmitterReadSuccessDisplay {
         let now = now ?? nowProvider()
+        let analysisStartDate = max(
+            sensor.startDate,
+            now.addingTimeInterval(-24 * 60 * 60)
+        )
 
-        let rawTimestamps = bgReadingsAccessor.getReadingTimestampsForLast24h(forSensor: sensor, endingAt: now)
+        // Read success is about the current physical sensor session. Do not filter by the current
+        // Core Data Sensor relationship because that can change during one transmitter session.
+        let rawTimestamps = bgReadingsAccessor.getReadingTimestamps(
+            fromDate: analysisStartDate,
+            toDate: now,
+            forSensor: nil
+        )
         let allTimestamps = cutoff.map { cutoff in rawTimestamps.filter { $0 >= cutoff } } ?? rawTimestamps
 
         let earliest24h = allTimestamps.first

@@ -89,7 +89,9 @@ enum ConstantsBgSmoothing {
 
     /// automatic live post processing can re-evaluate a recent history tail so
     /// smoothing has enough context to update the newest readings consistently.
-    static let automaticProcessingLookbackInterval: TimeInterval = .hours(3)
+    /// Ninety minutes leaves one hour of context before the downstream rewrite
+    /// window while avoiding repeated processing of older, unchanged readings.
+    static let automaticProcessingLookbackInterval: TimeInterval = .minutes(90)
 
     /// automatic downstream replacement should stay much tighter than the local
     /// smoothing context so metadata churn in older readings does not fan out

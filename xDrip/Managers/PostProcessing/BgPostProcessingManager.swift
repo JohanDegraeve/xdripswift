@@ -70,7 +70,7 @@ class BgPostProcessingManager {
     /// using the bounded automatic processing window.
     @discardableResult
     func processLatestReadings() -> Bool {
-        return processBgReadings(processingStartDateOverride: nil, allowHistoricalDownstreamRewrite: hasActiveDownstreamPostProcessing())
+        return processBgReadings(processingStartDateOverride: nil, allowHistoricalDownstreamRewrite: true)
     }
 
     /// compare the resolved source context against the stored one and reset the
@@ -117,12 +117,32 @@ class BgPostProcessingManager {
             return false
         }
 
+        let hasActivePostProcessing = hasActiveDownstreamPostProcessing()
+        let isExplicitHistoricalPass = allowHistoricalDownstreamRewrite
+            && (processingStartDateOverride != nil || forceFullDownstreamRewrite)
+
+        // Automatic reading updates have nothing to recalculate when adjustment, smoothing and
+        // cadence reduction are all disabled. Explicit settings changes still process their
+        // requested history so disabling an existing configuration clears its stored values.
+        guard hasActivePostProcessing || isExplicitHistoricalPass else { return false }
+
         let currentSensor = UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
         let fromDate = processingStartDate(for: processingStartDateOverride, currentSensor: currentSensor)
 
         // Work in ascending time order so each processing step can move forward
-        // through the readings without needing to constantly look backwards.
-        let bgReadings = Array(bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: fromDate, forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).reversed())
+        // through the readings without needing to constantly look backwards. In master mode,
+        // the sensor session's time window is authoritative. Do not filter by the current
+        // Sensor relationship because that relationship can change during one physical session.
+        let bgReadings = Array(
+            bgReadingsAccessor.getLatestBgReadings(
+                limit: nil,
+                fromDate: fromDate,
+                forSensor: nil,
+                ignoreRawData: true,
+                ignoreCalculatedValue: true,
+                includingSuppressed: true
+            ).reversed()
+        )
 
         guard bgReadings.count > 0 else { return false }
 
@@ -133,7 +153,11 @@ class BgPostProcessingManager {
 
         recomputeAdjustedValues(bgReadings: bgReadings, sourceContextIdentifier: sourceContextIdentifier)
         recomputeSmoothedValues(bgReadings: bgReadings)
-        recomputeFiveMinuteCadenceSuppression(bgReadings: bgReadings, fiveMinuteReadingsStartTimeStampOverride: fiveMinuteReadingsStartTimeStampOverride)
+        recomputeFiveMinuteCadenceSuppression(
+            bgReadings: bgReadings,
+            fiveMinuteReadingsStartTimeStampOverride: fiveMinuteReadingsStartTimeStampOverride,
+            rebuildCadenceFromStart: fiveMinuteReadingsStartTimeStampOverride != nil
+        )
         recomputeSlopes(bgReadings: bgReadings)
 
         coreDataManager.saveChanges()
@@ -503,26 +527,42 @@ class BgPostProcessingManager {
 
     private func processingStartDate(for processingStartDateOverride: Date?, currentSensor: Sensor?) -> Date? {
         if let processingStartDateOverride = processingStartDateOverride {
-            return processingStartDateOverride
+            return startDateClampedToCurrentSensorSession(processingStartDateOverride, currentSensor: currentSensor)
         }
 
         let configuredStartDate = UserDefaults.standard.postProcessingApplyFromTimeStamp ?? UserDefaults.standard.postProcessingStartTimeStamp
+        let sourceWindowStartDate = startDateClampedToCurrentSensorSession(configuredStartDate, currentSensor: currentSensor)
 
-        guard hasActiveDownstreamPostProcessing() else {
-            return configuredStartDate
-        }
-
-        guard let latestBgReading = bgReadingsAccessor.getLatestBgReadings(limit: 1, fromDate: nil, forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).first else {
-            return configuredStartDate
+        guard let latestBgReading = bgReadingsAccessor.getLatestBgReadings(
+            limit: 1,
+            fromDate: sourceWindowStartDate,
+            forSensor: nil,
+            ignoreRawData: true,
+            ignoreCalculatedValue: true,
+            includingSuppressed: true
+        ).first else {
+            return sourceWindowStartDate
         }
 
         let boundedAutomaticStartDate = latestBgReading.timeStamp.addingTimeInterval(-ConstantsBgSmoothing.automaticProcessingLookbackInterval)
 
-        if let configuredStartDate = configuredStartDate {
-            return max(configuredStartDate, boundedAutomaticStartDate)
+        if let sourceWindowStartDate = sourceWindowStartDate {
+            return max(sourceWindowStartDate, boundedAutomaticStartDate)
         }
 
         return boundedAutomaticStartDate
+    }
+
+    private func startDateClampedToCurrentSensorSession(_ requestedStartDate: Date?, currentSensor: Sensor?) -> Date? {
+        guard UserDefaults.standard.isMaster, let currentSensor = currentSensor else {
+            return requestedStartDate
+        }
+
+        guard let requestedStartDate = requestedStartDate else {
+            return currentSensor.startDate
+        }
+
+        return max(requestedStartDate, currentSensor.startDate)
     }
 
     private func recomputeAdjustedValues(bgReadings: [BgReading], sourceContextIdentifier: String) {
@@ -638,27 +678,25 @@ class BgPostProcessingManager {
     /// when the user has chosen to reduce a faster CGM stream down to 5 minute output.
     /// This way the original values are still available for overlays, reprocessing and
     /// debugging while normal downstream consumers only see the reduced cadence stream.
-    private func recomputeFiveMinuteCadenceSuppression(bgReadings: [BgReading], fiveMinuteReadingsStartTimeStampOverride: Date?) {
+    private func recomputeFiveMinuteCadenceSuppression(bgReadings: [BgReading], fiveMinuteReadingsStartTimeStampOverride: Date?, rebuildCadenceFromStart: Bool) {
         let sourceStartTimeStamp = UserDefaults.standard.postProcessingStartTimeStamp ?? .distantPast
         let fiveMinuteReadingsStartTimeStamp = fiveMinuteReadingsStartTimeStampOverride ?? UserDefaults.standard.fiveMinuteReadingsStartTimeStamp ?? sourceStartTimeStamp
-        let sourceCanUseFiveMinuteReadings = sourceCanUseFiveMinuteReadings(bgReadings: bgReadings)
-
-        if !sourceCanUseFiveMinuteReadings {
-            // Stale suppression flags can block normal five-minute sources from upload. If the current
-            // source cannot use cadence reduction, clear from the source start because
-            // every suppressed value in this source is invalid.
-            clearFiveMinuteCadenceSuppression(bgReadings: bgReadings, from: sourceStartTimeStamp)
-            return
-        }
 
         if !UserDefaults.standard.useFiveMinuteReadings {
             // Five minute output remains an independent downstream option when smoothing is disabled.
-            // When a faster source has been reduced and the user switches the
-            // option off from Now, old suppressed history should remain unchanged.
-            clearFiveMinuteCadenceSuppression(bgReadings: bgReadings, from: fiveMinuteReadingsStartTimeStamp)
+            // Only an explicit settings change may reveal readings again. Automatic processing uses a
+            // rolling window and must not progressively clear suppression as that window advances.
+            if rebuildCadenceFromStart {
+                clearFiveMinuteCadenceSuppression(bgReadings: bgReadings, from: fiveMinuteReadingsStartTimeStamp)
+            }
 
             return
         }
+
+        // Cadence detection only sees the fetched processing slice. A rolling slice can eventually
+        // contain only five-minute points even when older one-minute points were deliberately hidden.
+        // Preserve those stored decisions instead of treating them as stale and revealing history.
+        guard sourceCanUseFiveMinuteReadings(bgReadings: bgReadings) else { return }
 
         let readingGroups = contiguousReadingIndexGroups(readingDates: bgReadings.map { $0.timeStamp })
         let minimumTimeBetweenVisibleReadingsInSeconds = ConstantsBgSmoothing.fiveMinuteCadenceMinimumTimeBetweenReadingsInMinutes * 60.0
@@ -684,7 +722,10 @@ class BgPostProcessingManager {
                         bgReading.isSuppressedByFiveMinuteCadence = false
                         latestVisibleReadingTimeStamp = bgReading.timeStamp
                     }
-                } else {
+                } else if rebuildCadenceFromStart || !bgReading.isSuppressedByFiveMinuteCadence {
+                    // An explicit apply owns the whole selected range and establishes a new anchor.
+                    // An automatic rolling pass must retain leading suppressed readings until it
+                    // reaches the first previously visible anchor inside the fetched slice.
                     bgReading.isSuppressedByFiveMinuteCadence = false
                     latestVisibleReadingTimeStamp = bgReading.timeStamp
                 }
@@ -982,9 +1023,9 @@ class BgPostProcessingManager {
 
     private func latestBgReadingForCurrentSourceContext() -> BgReading? {
         let currentSensor = UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
-        let fromDate = UserDefaults.standard.postProcessingStartTimeStamp
+        let fromDate = startDateClampedToCurrentSensorSession(UserDefaults.standard.postProcessingStartTimeStamp, currentSensor: currentSensor)
 
-        return bgReadingsAccessor.getLatestBgReadings(limit: 1, fromDate: fromDate, forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).first
+        return bgReadingsAccessor.getLatestBgReadings(limit: 1, fromDate: fromDate, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).first
     }
 
     private func hasEffectiveAdjustmentForCurrentSource() -> Bool {
@@ -995,12 +1036,23 @@ class BgPostProcessingManager {
         return abs(latestBgAdjustment.intercept) > 0.0001 || abs(latestBgAdjustment.slope - 1.0) > 0.0001
     }
 
+    /// Returns whether the current source has a stable cadence that can be reduced to five minutes.
     func currentSourceCanUseFiveMinuteReadings() -> Bool {
         let currentSensor = UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
+        let fromDate = startDateClampedToCurrentSensorSession(Date(timeIntervalSinceNow: -24 * 60 * 60), currentSensor: currentSensor)
 
         // getLatestBgReadings returns newest first. Sort oldest first before
         // calculating gaps or every interval is negative and cadence detection fails.
-        let currentSourceReadingDates = bgReadingsAccessor.getLatestBgReadings(limit: 288, fromDate: Date(timeIntervalSinceNow: -24 * 60 * 60), forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).map { $0.timeStamp }.sorted()
+        let currentSourceReadingDates = bgReadingsAccessor.getLatestBgReadings(
+            limit: 288,
+            fromDate: fromDate,
+            forSensor: nil,
+            ignoreRawData: true,
+            ignoreCalculatedValue: true,
+            includingSuppressed: true
+        )
+        .map(\.timeStamp)
+        .sorted()
 
         return sourceCanUseFiveMinuteReadings(readingDates: currentSourceReadingDates)
     }
