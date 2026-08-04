@@ -59,7 +59,6 @@ struct RootHomeGlucoseReadingView: View {
                 .minimumScaleFactor(0.2)
                 .allowsTightening(true)
                 .frame(maxWidth: .infinity)
-                .onTapGesture(perform: actions.toggleExpandedAIDInfo)
                 .onLongPressGesture(minimumDuration: 0.5, perform: actions.keepScreenAwake)
         }
     }

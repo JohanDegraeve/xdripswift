@@ -224,6 +224,7 @@ struct NightscoutDeviceStatus: Codable, Sendable {
         return nil
     }
     
+    /// Uses the shared loop state for every color, title and icon presentation.
     func deviceStatusColor(referenceDate: Date = .now) -> Color {
         loopStatusState(referenceDate: referenceDate).color
     }

@@ -712,7 +712,7 @@ final class RootHomeStateModel: ObservableObject {
         let followsAID = UserDefaults.standard.nightscoutEnabled && UserDefaults.standard.nightscoutUrl != nil && UserDefaults.standard.nightscoutFollowType != .none
 
         return RootHomeVisibilityState(
-            showsPump: followsAID && UserDefaults.standard.nightscoutFollowShowExpandedInfo && !usesScreenLockNightLayout,
+            showsPump: followsAID && !usesScreenLockNightLayout,
             showsLoop: followsAID && !usesScreenLockNightLayout,
             showsMiniChart: UserDefaults.standard.showMiniChart && !usesScreenLockNightLayout,
             showsStatistics: UserDefaults.standard.showStatistics && !usesScreenLockNightLayout,
@@ -807,7 +807,6 @@ struct RootHomeActions {
     var showHideItems: () -> Void = {}
     var toggleScreenLock: () -> Void = {}
     var keepScreenAwake: () -> Void = {}
-    var toggleExpandedAIDInfo: () -> Void = {}
     var refreshPumpAndLoopStatus: () -> Void = {}
     var statisticsDaysChanged: (Int) -> Void = { _ in }
     var cycleStatisticsType: () -> Void = {}

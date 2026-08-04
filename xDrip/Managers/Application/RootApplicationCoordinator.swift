@@ -1241,12 +1241,6 @@ import AppIntents
             toolbarLongPressActivated: {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             },
-            toggleExpandedAIDInfo: { [weak self] in
-                guard UserDefaults.standard.nightscoutFollowType != .none else { return }
-
-                UserDefaults.standard.nightscoutFollowShowExpandedInfo.toggle()
-                self?.updatePumpAndAIDStatusViews()
-            },
             refreshPumpAndLoopStatus: { [weak self] in
                 self?.publishRootHomeState()
             },
