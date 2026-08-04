@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Asetukset";
-"settingsviews_glucoseDisplaySectionTitle" = "Glukoosinäkymä";
+"settingsviews_glucoseDisplaySectionTitle" = "Näyttö";
 "settingsviews_glucoseRangesSectionTitle" = "Glukoosialueet";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Hälytykset ja ilmoitukset";
 "settingsviews_sharingAndServicesSectionTitle" = "Jakaminen ja palvelut";
@@ -202,7 +202,7 @@
 "settingsviews_followerKeepAliveTypeAggressive" = "Aggressive";
 
 /// statistics settings, prefer standard time in range
-"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+"settingsviews_timeInRangeTypeStandardRange" = "Vakio";
 
 /// statistics settings, the type of time in range selected
 "settingsviews_labelTimeInRangeType" = "Time In Range";
@@ -225,6 +225,7 @@
 
 /// CGM data source settings, section title
 "settingsviews_sectionTitleDataSource" = "Tietolähde";
+"settingsviews_dataSourceMasterDevicesFooter" = "Lisää yhteensopivia laitteita Laitteet-välilehdellä.";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

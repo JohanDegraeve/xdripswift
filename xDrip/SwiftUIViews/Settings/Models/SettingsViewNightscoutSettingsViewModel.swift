@@ -99,12 +99,45 @@ class SettingsViewNightscoutSettingsViewModel {
         let nightscoutEnabled = UserDefaults.standard.nightscoutEnabled
         let masterModeRowsVisible = nightscoutEnabled && UserDefaults.standard.isMaster
         let sensorStartTimeRowVisible = masterModeRowsVisible || (nightscoutEnabled && isLibreLinkUpFollower)
+        let followTypes = NightscoutFollowType.allCasesForList
+        var followTypeRow = nativeSettingsRow(
+            id: "nightscout.followType",
+            index: Setting.nightscoutFollowType.rawValue,
+            sectionID: sectionID,
+            isVisible: nightscoutEnabled
+        )
+        followTypeRow.accessory = .none
+        followTypeRow.control = .menu(
+            options: {
+                followTypes.map {
+                    SettingsMenuOption(
+                        title: $0 == .openAPS ? "Trio/iAPS/AAPS" : $0.description,
+                        isSelected: $0 == UserDefaults.standard.nightscoutFollowType
+                    )
+                }
+            },
+            selectOption: { index in
+                guard followTypes.indices.contains(index) else { return }
+                let oldFollowType = UserDefaults.standard.nightscoutFollowType
+                let newFollowType = followTypes[index]
+                guard newFollowType != oldFollowType else { return }
+                UserDefaults.standard.nightscoutFollowType = newFollowType
+                trace(
+                    "Nightscout follower type was changed from '%{public}@' to '%{public}@'",
+                    log: self.log,
+                    category: ConstantsLog.categoryNightscoutSettingsViewModel,
+                    type: .info,
+                    oldFollowType.description,
+                    newFollowType.description
+                )
+            }
+        )
 
         switch rowGroup {
         case .nightscout:
             return [
                 nativeSettingsRow(id: "nightscout.enabled", index: Setting.nightscoutEnabled.rawValue, sectionID: sectionID),
-                nativeSettingsRow(id: "nightscout.followType", index: Setting.nightscoutFollowType.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled)
+                followTypeRow
             ]
         case .connectionSettings:
             return [

@@ -77,6 +77,25 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
     // MARK: - Native SwiftUI rows
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
+        var screenLockDimmingRow = nativeSettingsRow(
+            id: "homeScreen.screenLockDimmingType",
+            index: Setting.screenLockDimmingType.rawValue,
+            sectionID: sectionID
+        )
+        screenLockDimmingRow.accessory = .none
+        screenLockDimmingRow.control = .menu(
+            options: {
+                ScreenLockDimmingType.allCases.map {
+                    SettingsMenuOption(title: $0.description, isSelected: $0 == UserDefaults.standard.screenLockDimmingType)
+                }
+            },
+            selectOption: { index in
+                let options = ScreenLockDimmingType.allCases
+                guard options.indices.contains(index) else { return }
+                UserDefaults.standard.screenLockDimmingType = options[index]
+            }
+        )
+
         let mainChartRows = [
             nativeSettingsRow(id: "homeScreen.showOriginalBGReadings", index: Setting.showOriginalBGReadings.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "homeScreen.showSensorNoise", index: Setting.showSensorNoise.rawValue, sectionID: sectionID),
@@ -90,7 +109,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         let screenLockRows = [
             nativeSettingsRow(id: "homeScreen.allowScreenRotation", index: Setting.allowScreenRotation.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "homeScreen.showClockWhenScreenIsLocked", index: Setting.showClockWhenScreenIsLocked.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "homeScreen.screenLockDimmingType", index: Setting.screenLockDimmingType.rawValue, sectionID: sectionID)
+            screenLockDimmingRow
         ]
 
         let sensorLifetimeRows = [

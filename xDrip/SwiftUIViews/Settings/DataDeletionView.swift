@@ -106,6 +106,8 @@ struct DataDeletionView: View {
                     Text(rangeMode.title).tag(rangeMode)
                 }
             }
+            .pickerStyle(.menu)
+            .tint(Color(.colorTertiary))
             .onChange(of: viewModel.rangeMode) { _ in viewModel.rangeModeChanged() }
 
             switch viewModel.rangeMode {
@@ -115,6 +117,8 @@ struct DataDeletionView: View {
                         Text(Texts_SettingsView.cleanDataDays(days)).tag(days)
                     }
                 }
+                .pickerStyle(.menu)
+                .tint(Color(.colorTertiary))
             case .custom:
                 DatePicker(
                     Texts_SettingsView.cleanDataFrom,

@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Настройки";
-"settingsviews_glucoseDisplaySectionTitle" = "Отображение глюкозы";
+"settingsviews_glucoseDisplaySectionTitle" = "Отображение";
 "settingsviews_glucoseRangesSectionTitle" = "Диапазоны глюкозы";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Оповещения и уведомления";
 "settingsviews_sharingAndServicesSectionTitle" = "Обмен и сервисы";
@@ -155,7 +155,7 @@
 "settingsviews_followerKeepAliveTypeAggressive" = "Aggressive";
 
 /// statistics settings, prefer standard time in range
-"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+"settingsviews_timeInRangeTypeStandardRange" = "Стандартный";
 
 /// statistics settings, the type of time in range selected
 "settingsviews_labelTimeInRangeType" = "Time In Range";
@@ -175,6 +175,7 @@
 
 /// CGM data source settings, section title
 "settingsviews_sectionTitleDataSource" = "Источник данных";
+"settingsviews_dataSourceMasterDevicesFooter" = "Добавьте совместимые устройства на вкладке «Устройства».";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

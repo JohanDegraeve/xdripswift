@@ -73,6 +73,20 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
         let developerRowsVisible = UserDefaults.standard.showDeveloperSettings
+        let loopShareTypes = LoopShareType.allCases
+        var loopShareTypeRow = nativeSettingsRow(id: "developer.loopShareType", index: Setting.loopShareType.rawValue, sectionID: sectionID)
+        loopShareTypeRow.accessory = .none
+        loopShareTypeRow.control = .menu(
+            options: {
+                loopShareTypes.map {
+                    SettingsMenuOption(title: $0.description, isSelected: $0 == UserDefaults.standard.loopShareType)
+                }
+            },
+            selectOption: { index in
+                guard loopShareTypes.indices.contains(index) else { return }
+                UserDefaults.standard.loopShareType = loopShareTypes[index]
+            }
+        )
 
         let advancedRows = [
             SettingsRow(
@@ -100,7 +114,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         ]
 
         let osAidLoopShareRows = [
-            nativeSettingsRow(id: "developer.loopShareType", index: Setting.loopShareType.rawValue, sectionID: sectionID),
+            loopShareTypeRow,
             nativeSettingsRow(id: "developer.loopDelay", index: Setting.loopDelay.rawValue, sectionID: sectionID, isVisible: UserDefaults.standard.loopShareType != .disabled),
             nativeSettingsRow(id: "developer.loopShareMedtrumNano", index: Setting.loopShareMedtrumNano.rawValue, sectionID: sectionID, isVisible: UserDefaults.standard.loopShareMedtrumNanoAvailable),
             nativeSettingsRow(id: "developer.loopShareSmoothedData", index: Setting.loopShareSmoothedData.rawValue, sectionID: sectionID, isVisible: showLoopShareSmoothedDataRow)

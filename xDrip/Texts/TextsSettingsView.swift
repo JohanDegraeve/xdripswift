@@ -17,7 +17,7 @@ class Texts_SettingsView {
     }()
 
     static let glucoseDisplaySectionTitle: String = {
-        return NSLocalizedString("settingsviews_glucoseDisplaySectionTitle", tableName: filename, bundle: Bundle.main, value: "Glucose Display", comment: "settings group title for glucose display options")
+        return NSLocalizedString("settingsviews_glucoseDisplaySectionTitle", tableName: filename, bundle: Bundle.main, value: "Display", comment: "settings group title for display options")
     }()
 
     static let glucoseRangesSectionTitle: String = {
@@ -97,6 +97,16 @@ class Texts_SettingsView {
 
     static let sectionTitleDataSource: String = {
         return NSLocalizedString("settingsviews_sectionTitleDataSource", tableName: filename, bundle: Bundle.main, value: "Data Source", comment: "data source settings, section title")
+    }()
+
+    static let dataSourceMasterDevicesFooter: String = {
+        return NSLocalizedString(
+            "settingsviews_dataSourceMasterDevicesFooter",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Go to the Devices tab to add compatible devices.",
+            comment: "data source settings, master mode footer directing users to the Devices tab"
+        )
     }()
     
     static let labelMasterOrFollower: String = {
@@ -435,7 +445,13 @@ class Texts_SettingsView {
     }()
     
     static let timeInRangeTypeStandardRange: String = {
-        return NSLocalizedString("settingsviews_timeInRangeTypeStandardRange", tableName: filename, bundle: Bundle.main, value: "Standard Range", comment: "statistics settings, prefer standard time in range")
+        return NSLocalizedString(
+            "settingsviews_timeInRangeTypeStandardRange",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Standard",
+            comment: "statistics settings, prefer standard time in range"
+        )
     }()
     
     static let timeInRangeTypeTightRange: String = {

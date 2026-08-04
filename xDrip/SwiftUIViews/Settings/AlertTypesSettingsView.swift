@@ -222,13 +222,10 @@ final class AlertTypeEditorViewModel: ObservableObject {
                 validator: nil
             )
 
-        case .defaultSnoozePeriod:
-            showSnoozePeriodSelection()
-
         case .soundName:
             showSoundSelection()
 
-        case .enabled, .vibrate, .overrideMute, .snoozeViaNotification:
+        case .enabled, .vibrate, .overrideMute, .snoozeViaNotification, .defaultSnoozePeriod:
             break
         }
     }
@@ -325,28 +322,6 @@ final class AlertTypeEditorViewModel: ObservableObject {
         )
     }
 
-    /// Opens the fixed snooze-duration picker. Snooze periods must always come
-    /// from ConstantsAlerts so alert types cannot store unsupported free-entry
-    /// values.
-    private func showSnoozePeriodSelection() {
-        let selectedRow = snoozePeriodSelectedRow
-
-        selectionList = SettingsSelectionListContent(
-            title: Texts_AlertTypeSettingsView.alertTypeDefaultSnoozePeriod,
-            data: ConstantsAlerts.snoozeValueStrings,
-            selectedRow: selectedRow,
-            actionTitle: Texts_Common.Ok,
-            cancelTitle: Texts_Common.Cancel,
-            action: { [weak self] index in
-                guard ConstantsAlerts.snoozeValueMinutes.indices.contains(index) else { return }
-
-                self?.snoozePeriod = Int16(ConstantsAlerts.snoozeValueMinutes[index])
-            },
-            cancel: nil,
-            didSelectRow: nil
-        )
-    }
-
     /// Shows the same localized text in the detail row as the picker uses in its
     /// option list. If an older unsupported value is still present, display the
     /// nearest supported value that will be selected when the picker opens.
@@ -369,6 +344,15 @@ final class AlertTypeEditorViewModel: ObservableObject {
         }
 
         return 0
+    }
+
+    /// Adapts the stored minute value to the fixed native menu-picker options.
+    var snoozePeriodPickerIndex: Int {
+        get { snoozePeriodSelectedRow }
+        set {
+            guard ConstantsAlerts.snoozeValueMinutes.indices.contains(newValue) else { return }
+            snoozePeriod = Int16(ConstantsAlerts.snoozeValueMinutes[newValue])
+        }
     }
 
     /// Stops a preview sound before another sound is played or the picker closes.
@@ -476,7 +460,23 @@ struct AlertTypeEditorView: View {
             }
             .tint(.green)
 
-        case .name, .soundName, .defaultSnoozePeriod:
+        case .defaultSnoozePeriod:
+            Picker(
+                viewModel.title(for: setting),
+                selection: Binding(
+                    get: { viewModel.snoozePeriodPickerIndex },
+                    set: { viewModel.snoozePeriodPickerIndex = $0 }
+                )
+            ) {
+                ForEach(ConstantsAlerts.snoozeValueStrings.indices, id: \.self) { index in
+                    Text(ConstantsAlerts.snoozeValueStrings[index])
+                        .tag(index)
+                }
+            }
+            .pickerStyle(.menu)
+            .tint(Color(.colorTertiary))
+
+        case .name, .soundName:
             SettingsStaticRowView(
                 title: viewModel.title(for: setting),
                 detail: viewModel.detail(for: setting),

@@ -76,6 +76,29 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
         let calendarRowsVisible = calendarEventRowsVisible
+        let historyOptions = [0, 30, 60, 120, 240]
+        var includeHistoryRow = nativeSettingsRow(
+            id: "calendarEvents.includeHistory",
+            index: Setting.includeHistory.rawValue,
+            sectionID: sectionID,
+            isVisible: calendarRowsVisible
+        )
+        includeHistoryRow.accessory = .none
+        includeHistoryRow.control = .menu(
+            options: {
+                historyOptions.map {
+                    SettingsMenuOption(
+                        title: $0.description + " " + Texts_Common.minutes,
+                        isSelected: $0 == UserDefaults.standard.calendarShareHistoryInMinutes
+                    )
+                }
+            },
+            selectOption: { index in
+                guard historyOptions.indices.contains(index) else { return }
+                UserDefaults.standard.calendarShareHistoryInMinutes = historyOptions[index]
+                UserDefaults.standard.calendarShareStatus = CalendarShareStatus.waiting.rawValue
+            }
+        )
 
         switch rowGroup {
         case .connection:
@@ -96,7 +119,7 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
                 ),
                 nativeSettingsRow(id: "calendarEvents.lastValue", index: Setting.lastValue.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
                 nativeSettingsRow(id: "calendarEvents.timestamp", index: Setting.timestamp.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
-                nativeSettingsRow(id: "calendarEvents.includeHistory", index: Setting.includeHistory.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible)
+                includeHistoryRow
             ]
         case .preview:
             return [

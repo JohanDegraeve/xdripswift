@@ -12,9 +12,20 @@ struct SettingsViewM5StackGeneralSettingsViewModel: SettingsViewModelProtocol {
     // MARK: - Native SwiftUI rows
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
-        [
-            nativeSettingsRow(id: "m5stackGeneral.textColor", index: Setting.textColor.rawValue, sectionID: sectionID)
-        ]
+        let colors = M5StackColor.allCases
+        var textColorRow = nativeSettingsRow(id: "m5stackGeneral.textColor", index: Setting.textColor.rawValue, sectionID: sectionID)
+        textColorRow.accessory = .none
+        textColorRow.control = .menu(
+            options: {
+                let currentColor = UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor
+                return colors.map { SettingsMenuOption(title: $0.description, isSelected: $0 == currentColor) }
+            },
+            selectOption: { index in
+                guard colors.indices.contains(index) else { return }
+                UserDefaults.standard.m5StackTextColor = colors[index]
+            }
+        )
+        return [textColorRow]
     }
 
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}

@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Ρυθμίσεις";
-"settingsviews_glucoseDisplaySectionTitle" = "Εμφάνιση γλυκόζης";
+"settingsviews_glucoseDisplaySectionTitle" = "Προβολή";
 "settingsviews_glucoseRangesSectionTitle" = "Εύρη γλυκόζης";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Συναγερμοί και ειδοποιήσεις";
 "settingsviews_sharingAndServicesSectionTitle" = "Κοινή χρήση και υπηρεσίες";
@@ -155,7 +155,7 @@
 "settingsviews_followerKeepAliveTypeAggressive" = "Aggressive";
 
 /// statistics settings, prefer standard time in range
-"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+"settingsviews_timeInRangeTypeStandardRange" = "Τυπικό";
 
 /// statistics settings, the type of time in range selected
 "settingsviews_labelTimeInRangeType" = "Time In Range";
@@ -175,6 +175,7 @@
 
 /// CGM data source settings, section title
 "settingsviews_sectionTitleDataSource" = "Πηγή δεδομένων";
+"settingsviews_dataSourceMasterDevicesFooter" = "Προσθέστε συμβατές συσκευές στην καρτέλα Συσκευές.";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

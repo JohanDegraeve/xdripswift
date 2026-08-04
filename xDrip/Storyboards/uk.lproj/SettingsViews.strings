@@ -238,7 +238,7 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
-"settingsviews_glucoseDisplaySectionTitle" = "Відображення глюкози";
+"settingsviews_glucoseDisplaySectionTitle" = "Відображення";
 "settingsviews_glucoseRangesSectionTitle" = "Діапазони глюкози";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Оповіщення та сповіщення";
 "settingsviews_sharingAndServicesSectionTitle" = "Обмін і сервіси";
@@ -372,7 +372,7 @@
 "settingsviews_followerKeepAliveTypeAggressive" = "Aggressive";
 
 /// statistics settings, prefer standard time in range
-"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+"settingsviews_timeInRangeTypeStandardRange" = "Стандартний";
 
 /// statistics settings, the type of time in range selected
 "settingsviews_labelTimeInRangeType" = "Time In Range";
@@ -395,6 +395,7 @@
 
 /// CGM data source settings, section title
 "settingsviews_sectionTitleDataSource" = "Джерело даних";
+"settingsviews_dataSourceMasterDevicesFooter" = "Додайте сумісні пристрої на вкладці «Пристрої».";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

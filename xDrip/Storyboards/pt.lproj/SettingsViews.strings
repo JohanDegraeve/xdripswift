@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Definições";
-"settingsviews_glucoseDisplaySectionTitle" = "Visualização da glicose";
+"settingsviews_glucoseDisplaySectionTitle" = "Visualização";
 "settingsviews_glucoseRangesSectionTitle" = "Intervalos da glicose";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alertas e notificações";
 "settingsviews_sharingAndServicesSectionTitle" = "Partilha e serviços";
@@ -176,7 +176,7 @@
 "settingsviews_followerKeepAliveTypeAggressive" = "Aggressive";
 
 /// statistics settings, prefer standard time in range
-"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+"settingsviews_timeInRangeTypeStandardRange" = "Padrão";
 
 /// statistics settings, the type of time in range selected
 "settingsviews_labelTimeInRangeType" = "Time In Range";
@@ -199,6 +199,7 @@
 
 /// CGM data source settings, section title
 "settingsviews_sectionTitleDataSource" = "Fonte de dados";
+"settingsviews_dataSourceMasterDevicesFooter" = "Adicione dispositivos compatíveis no separador Dispositivos.";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

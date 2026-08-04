@@ -213,6 +213,12 @@ struct SettingsIndicator {
     var accessibilityLabel: String? = nil
 }
 
+/// One value shown by an inline Settings picker and whether it matches the stored selection.
+struct SettingsMenuOption {
+    let title: String
+    let isSelected: Bool
+}
+
 enum SettingsAccessory {
     case automatic
     case none
@@ -223,6 +229,9 @@ enum SettingsAccessory {
 
 enum SettingsControl {
     case toggle(isOn: () -> Bool, setIsOn: (Bool) -> Void, confirmation: ((Bool) -> SettingsToggleConfirmationContent?)? = nil)
+    /// Presents a short mutually-exclusive menu. Two-state rows can continue to use their existing
+    /// row action. Multi-option rows provide the selected index directly.
+    case menu(options: () -> [SettingsMenuOption], selectOption: ((Int) -> Void)? = nil)
     case warningBanner(message: String, severity: SettingsWarningBannerSeverity = .warning)
     case custom(content: () -> AnyView)
 }
@@ -817,6 +826,40 @@ private struct SettingsNativeRowView: View {
                 rowText
             }
             .tint(.green)
+            .disabled(!row.isEnabled)
+
+        case let .some(.menu(options, selectOption)):
+            Picker(
+                selection: Binding(
+                    get: {
+                        options().firstIndex(where: \.isSelected) ?? 0
+                    },
+                    set: { selectedIndex in
+                        let menuOptions = options()
+                        guard menuOptions.indices.contains(selectedIndex), !menuOptions[selectedIndex].isSelected else { return }
+                        if let selectOption {
+                            selectOption(selectedIndex)
+                            reload(row.reloadScope ?? .section(sectionID))
+                        } else {
+                            selectRow()
+                        }
+                    }
+                ),
+                content: {
+                    ForEach(Array(options().enumerated()), id: \.offset) { index, option in
+                        Text(option.title)
+                            .tag(index)
+                    }
+                },
+                label: {
+                    Text(row.title)
+                        .foregroundStyle(row.titleColor ?? (row.isEnabled ? Color(.colorPrimary) : .gray))
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.75)
+                }
+            )
+            .pickerStyle(.menu)
+            .tint(row.isEnabled ? (row.detailColor ?? Color(.colorTertiary)) : .gray)
             .disabled(!row.isEnabled)
 
         case .none:

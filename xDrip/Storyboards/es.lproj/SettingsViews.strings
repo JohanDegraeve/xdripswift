@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Configuración";
-"settingsviews_glucoseDisplaySectionTitle" = "Visualización de glucosa";
+"settingsviews_glucoseDisplaySectionTitle" = "Visualización";
 "settingsviews_glucoseRangesSectionTitle" = "Rangos de glucosa";
 "settingsviews_glucoseRangesSectionFooter" = "Los rangos de glucosa solo afectan a los colores del gráfico principal. No están relacionados con los valores de alarma.";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alertas y notificaciones";
@@ -17,6 +17,7 @@
 "settingsviews_follower" = "Seguidor";
 
 "settingsviews_sectionTitleDataSource" = "Fuente de datos";
+"settingsviews_dataSourceMasterDevicesFooter" = "Ve a la pestaña Dispositivos para añadir dispositivos compatibles.";
 "settingsviews_labelFollowerDataSourceType" = "Fuente de datos";
 "settingsviews_labelUploadDataToNightscout" = "Subir a Nightscout";
 "settingsviews_labelfollowerKeepAliveType" = "Mantener activo";
@@ -66,7 +67,7 @@
 "settingsviews_daysToUseStatisticsTitle" = "Días a Calcular";
 "settingsviews_daysToUseStatisticsMessage" = "Máximos días a intentar usar para calcular las estadísticas?\n\n(Entrar 0 para calcular el día de hoy desde las 00:00hrs)";
 "settingsviews_labelTimeInRangeType" = "Tipo de Tiempo en Rango";
-"settingsviews_timeInRangeTypeStandardRange" = "Rango Estándar";
+"settingsviews_timeInRangeTypeStandardRange" = "Estándar";
 "settingsviews_timeInRangeTypeTightRange" = "Rango Estrecho";
 "settingsviews_timeInRangeTypeUserDefinedRange" = "Rango Usuario";
 "settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";

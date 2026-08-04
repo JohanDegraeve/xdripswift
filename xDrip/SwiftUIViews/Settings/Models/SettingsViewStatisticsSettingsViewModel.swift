@@ -28,14 +28,29 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
     // MARK: - Native SwiftUI rows
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
-        [
+        var timeInRangeTypeRow = nativeSettingsRow(
+            id: "statistics.timeInRangeType",
+            index: Setting.timeInRangeType.rawValue,
+            sectionID: sectionID,
+            isVisible: UserDefaults.standard.showStatistics
+        )
+        timeInRangeTypeRow.accessory = .none
+        timeInRangeTypeRow.control = .menu(
+            options: {
+                TimeInRangeType.allCases.map {
+                    SettingsMenuOption(title: $0.description + $0.rangeString(), isSelected: $0 == UserDefaults.standard.timeInRangeType)
+                }
+            },
+            selectOption: { index in
+                let options = TimeInRangeType.allCases
+                guard options.indices.contains(index) else { return }
+                UserDefaults.standard.timeInRangeType = options[index]
+            }
+        )
+
+        return [
             nativeSettingsRow(id: "statistics.showStatistics", index: Setting.showStatistics.rawValue, sectionID: sectionID),
-            nativeSettingsRow(
-                id: "statistics.timeInRangeType",
-                index: Setting.timeInRangeType.rawValue,
-                sectionID: sectionID,
-                isVisible: UserDefaults.standard.showStatistics
-            ),
+            timeInRangeTypeRow,
             nativeSettingsRow(
                 id: "statistics.useIFCCA1C",
                 index: Setting.useIFCCA1C.rawValue,

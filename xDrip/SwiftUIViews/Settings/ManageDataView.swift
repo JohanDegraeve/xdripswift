@@ -218,6 +218,8 @@ struct DataRetentionView: View {
                         Text(Texts_SettingsView.cleanDataDays(days)).tag(days)
                     }
                 }
+                .pickerStyle(.menu)
+                .tint(Color(.colorTertiary))
                 .disabled(!viewModel.automaticHousekeepingEnabled)
                 .onChange(of: viewModel.automaticRetentionDays) { _ in
                     viewModel.automaticRetentionDaysChanged()

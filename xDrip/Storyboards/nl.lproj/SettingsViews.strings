@@ -3,7 +3,7 @@
 "settingsviews_transmitterid_text_for_button" = "Zender-ID";
 
 "settingsviews_settingstitle" = "Instellingen";
-"settingsviews_glucoseDisplaySectionTitle" = "Glucoseweergave";
+"settingsviews_glucoseDisplaySectionTitle" = "Weergave";
 "settingsviews_glucoseRangesSectionTitle" = "Glucosebereiken";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarmen en meldingen";
 "settingsviews_sharingAndServicesSectionTitle" = "Delen en diensten";
@@ -218,7 +218,7 @@
 "settingsviews_followerKeepAliveTypeAggressive" = "Aggressive";
 
 /// statistics settings, prefer standard time in range
-"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+"settingsviews_timeInRangeTypeStandardRange" = "Standaard";
 
 /// statistics settings, the type of time in range selected
 "settingsviews_labelTimeInRangeType" = "Time In Range";
@@ -241,6 +241,7 @@
 
 /// CGM data source settings, section title
 "settingsviews_sectionTitleDataSource" = "Gegevensbron";
+"settingsviews_dataSourceMasterDevicesFooter" = "Ga naar Apparaten om compatibele apparaten toe te voegen.";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

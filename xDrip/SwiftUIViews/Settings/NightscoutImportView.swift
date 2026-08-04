@@ -144,6 +144,8 @@ struct NightscoutImportView: View {
                     Text(period.title).tag(period)
                 }
             }
+            .pickerStyle(.menu)
+            .tint(Color(.colorTertiary))
             LabeledContent(Texts_SettingsView.cleanDataFrom, value: viewModel.proposedFromDate.formatted(date: .abbreviated, time: .shortened))
             LabeledContent(Texts_SettingsView.cleanDataUntil, value: Date().formatted(date: .abbreviated, time: .shortened))
         } header: {

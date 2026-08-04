@@ -40,7 +40,7 @@ enum ConstantsUI {
     /// dark red tint used for warning-style SwiftUI sections
     static let warningSectionBackgroundColor = Color(red: 0.20, green: 0.12, blue: 0.12)
 
-    /// default grouped row background for informational Settings banners
+    // default grouped row background for informational Settings banners
     // secondarySystemGroupedBackground is unavailable in watchOS, but this constants
     // file is also compiled into the watch targets.
     #if os(watchOS)

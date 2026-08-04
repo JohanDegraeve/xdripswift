@@ -481,7 +481,7 @@ struct DataManagementView: View {
             manifest.firstBgReadingDate,
             manifest.firstTreatmentDate ?? fallbackFirstTreatmentDate,
             manifest.firstDeviceStatusDate ?? fallbackFirstDeviceStatusDate,
-            manifest.firstProfileDate ?? fallbackFirstProfileDate,
+            manifest.firstProfileDate ?? fallbackFirstProfileDate
         ]
         .compactMap { $0 }
         .min()

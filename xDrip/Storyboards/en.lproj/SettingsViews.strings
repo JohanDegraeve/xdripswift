@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Settings";
-"settingsviews_glucoseDisplaySectionTitle" = "Glucose Display";
+"settingsviews_glucoseDisplaySectionTitle" = "Display";
 "settingsviews_glucoseRangesSectionTitle" = "Glucose Ranges";
 "settingsviews_glucoseRangesSectionFooter" = "Glucose Ranges only affect the main chart display colours. They are not related to Alarm values.";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alerts and Notifications";
@@ -18,6 +18,7 @@
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Follower";
 "settingsviews_sectionTitleDataSource" = "Data Source";
+"settingsviews_dataSourceMasterDevicesFooter" = "Go to the Devices tab to add compatible devices.";
 "settingsviews_labelFollowerDataSourceType" = "Data Source";
 "settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 "settingsviews_labelfollowerKeepAliveType" = "Keep-alive";
@@ -83,7 +84,7 @@
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
 "settingsviews_daysToUseStatisticsMessage" = "Maximum days we should try to use to calculate the statistics?\n\n(Enter 0 to calculate today since midnight)";
 "settingsviews_labelTimeInRangeType" = "Time In Range";
-"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+"settingsviews_timeInRangeTypeStandardRange" = "Standard";
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 "settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";

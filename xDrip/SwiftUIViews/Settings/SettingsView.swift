@@ -480,10 +480,12 @@ struct SettingsGroupedRow {
 struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, SettingsNativeSectionProvider {
     private let title: String
     private let rows: [SettingsGroupedRow]
+    private let leadingRows: () -> [SettingsRow]
 
-    init(title: String, rows: [SettingsGroupedRow]) {
+    init(title: String, rows: [SettingsGroupedRow], leadingRows: @escaping () -> [SettingsRow] = { [] }) {
         self.title = title
         self.rows = rows.filter(\.isVisible)
+        self.leadingRows = leadingRows
     }
 
     static func glucoseDisplay() -> SettingsViewGroupedSettingsViewModel {
@@ -527,7 +529,27 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                         )
                     }
                 )
-            ]
+            ],
+            leadingRows: {
+                [
+                    SettingsRow(
+                        id: "display.bloodGlucoseUnit",
+                        title: Texts_SettingsView.labelSelectBgUnit,
+                        detail: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol,
+                        accessory: .none,
+                        control: .menu(options: {
+                            [
+                                SettingsMenuOption(title: Texts_Common.mgdl, isSelected: UserDefaults.standard.bloodGlucoseUnitIsMgDl),
+                                SettingsMenuOption(title: Texts_Common.mmol, isSelected: !UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                            ]
+                        }),
+                        reloadScope: .all,
+                        action: .run {
+                            UserDefaults.standard.bloodGlucoseUnitIsMgDl.toggle()
+                        }
+                    )
+                ]
+            }
         )
     }
 
@@ -774,7 +796,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
     }
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
-        rows.map { row in
+        leadingRows() + rows.map { row in
             SettingsRow(
                 id: row.id,
                 title: row.title,
@@ -830,16 +852,37 @@ enum SettingsListFactory {
         coreDataManager: CoreDataManager?,
         presenter: SettingsActionPresenter
     ) -> [SettingsSectionModel] {
-        SettingsRootSection.allCases.map { section in
+        SettingsRootSection.allCases.flatMap { section -> [SettingsSectionModel] in
             let viewModel = section.viewModel(coreDataManager: coreDataManager)
             configure(viewModel: viewModel, presenter: presenter)
 
-            return SettingsSectionModel(id: section.rawValue) {
+            if let dataSourceViewModel = viewModel as? SettingsViewDataSourceSettingsViewModel {
+                let sectionIDBase = section.rawValue * 10
+
+                return (0 ..< 3).map { offset in
+                    let sectionID = sectionIDBase + offset
+
+                    return SettingsSectionModel(id: sectionID) {
+                        let settingsSection = dataSourceViewModel.settingsSections(sectionIDBase: sectionIDBase)[offset]
+
+                        return SettingsSection(
+                            title: settingsSection.title,
+                            iconSymbolName: offset == 0 ? section.iconSymbolName : nil,
+                            footer: settingsSection.footer,
+                            rows: settingsSection.rows
+                        )
+                    }
+                }
+            }
+
+            let sectionID = section.rawValue * 10
+
+            return [SettingsSectionModel(id: sectionID) {
                 guard let nativeProvider = viewModel as? SettingsNativeSectionProvider else {
                     fatalError("Settings view model must provide a native Settings section")
                 }
 
-                let settingsSection = nativeProvider.settingsSection(sectionID: section.rawValue)
+                let settingsSection = nativeProvider.settingsSection(sectionID: sectionID)
 
                 return SettingsSection(
                     title: settingsSection.title,
@@ -847,7 +890,7 @@ enum SettingsListFactory {
                     footer: settingsSection.footer,
                     rows: settingsSection.rows
                 )
-            }
+            }]
         }
     }
 

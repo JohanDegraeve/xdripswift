@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Réglages";
-"settingsviews_glucoseDisplaySectionTitle" = "Affichage du glucose";
+"settingsviews_glucoseDisplaySectionTitle" = "Affichage";
 "settingsviews_glucoseRangesSectionTitle" = "Plages de glucose";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alertes et notifications";
 "settingsviews_sharingAndServicesSectionTitle" = "Partage et services";
@@ -232,7 +232,7 @@
 "settingsviews_followerKeepAliveTypeAggressive" = "Aggressive";
 
 /// statistics settings, prefer standard time in range
-"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+"settingsviews_timeInRangeTypeStandardRange" = "Standard";
 
 /// statistics settings, the type of time in range selected
 "settingsviews_labelTimeInRangeType" = "Time In Range";
@@ -255,6 +255,7 @@
 
 /// CGM data source settings, section title
 "settingsviews_sectionTitleDataSource" = "Source de données";
+"settingsviews_dataSourceMasterDevicesFooter" = "Ajoutez des appareils compatibles dans l’onglet Appareils.";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

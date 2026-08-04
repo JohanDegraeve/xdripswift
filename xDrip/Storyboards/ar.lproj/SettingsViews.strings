@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "الإعدادات";
-"settingsviews_glucoseDisplaySectionTitle" = "عرض الجلوكوز";
+"settingsviews_glucoseDisplaySectionTitle" = "العرض";
 "settingsviews_glucoseRangesSectionTitle" = "نطاقات الجلوكوز";
 "settingsviews_alertsAndNotificationsSectionTitle" = "التنبيهات والإشعارات";
 "settingsviews_sharingAndServicesSectionTitle" = "المشاركة والخدمات";
@@ -172,7 +172,7 @@
 "settingsviews_followerKeepAliveTypeAggressive" = "Aggressive";
 
 /// statistics settings, prefer standard time in range
-"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+"settingsviews_timeInRangeTypeStandardRange" = "قياسي";
 
 /// statistics settings, the type of time in range selected
 "settingsviews_labelTimeInRangeType" = "Time In Range";
@@ -195,6 +195,7 @@
 
 /// CGM data source settings, section title
 "settingsviews_sectionTitleDataSource" = "مصدر البيانات";
+"settingsviews_dataSourceMasterDevicesFooter" = "انتقل إلى علامة تبويب الأجهزة لإضافة أجهزة متوافقة.";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

@@ -86,23 +86,171 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     // MARK: - Native SwiftUI rows
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
+        settingsSections(sectionIDBase: sectionID).flatMap(\.rows)
+    }
+
+    /// Keeps the shared Data Source identity in the first titled section while separating the
+    /// mutually exclusive follower configuration and master upload controls into their own cards.
+    func settingsSections(sectionIDBase: Int) -> [SettingsSection] {
         let visibleRowCount = visibleRowCountForCurrentDataSourceMode
+        let primarySectionID = sectionIDBase
+        let followerSectionID = sectionIDBase + 1
+        let masterSectionID = sectionIDBase + 2
+        var masterFollowerRow = nativeSettingsRow(
+            id: "dataSource.masterFollower",
+            index: Setting.masterFollower.rawValue,
+            sectionID: primarySectionID
+        )
+        masterFollowerRow.accessory = .none
+        masterFollowerRow.control = .menu(options: {
+            [
+                SettingsMenuOption(title: Texts_SettingsView.master, isSelected: UserDefaults.standard.isMaster),
+                SettingsMenuOption(title: Texts_SettingsView.follower, isSelected: !UserDefaults.standard.isMaster)
+            ]
+        })
+        let keepAliveTypes = FollowerBackgroundKeepAliveType.allCases
+        var keepAliveTypeRow = nativeSettingsRow(
+            id: "dataSource.followerExtraRow3",
+            index: Setting.followerExtraRow3.rawValue,
+            sectionID: followerSectionID,
+            isVisible: !UserDefaults.standard.isMaster && Setting.followerExtraRow3.rawValue < visibleRowCount
+        )
+        keepAliveTypeRow.accessory = .none
+        keepAliveTypeRow.control = .menu(
+            options: {
+                keepAliveTypes.map {
+                    SettingsMenuOption(
+                        title: $0.description,
+                        isSelected: $0 == UserDefaults.standard.followerBackgroundKeepAliveType
+                    )
+                }
+            },
+            selectOption: { index in
+                guard keepAliveTypes.indices.contains(index) else { return }
+                self.applyFollowerBackgroundKeepAliveType(keepAliveTypes[index])
+            }
+        )
+        let followerDataSourceTypes = FollowerDataSourceType.allEnabledCases
+        var followerDataSourceTypeRow = nativeSettingsRow(
+            id: "dataSource.followerExtraRow4",
+            index: Setting.followerExtraRow4.rawValue,
+            sectionID: followerSectionID,
+            isVisible: !UserDefaults.standard.isMaster && Setting.followerExtraRow4.rawValue < visibleRowCount
+        )
+        followerDataSourceTypeRow.accessory = .none
+        followerDataSourceTypeRow.control = .menu(
+            options: {
+                followerDataSourceTypes.map {
+                    SettingsMenuOption(
+                        title: $0.description,
+                        isSelected: $0 == UserDefaults.standard.followerDataSourceType
+                    )
+                }
+            },
+            selectOption: { index in
+                guard followerDataSourceTypes.indices.contains(index) else { return }
+                self.applyFollowerDataSourceType(followerDataSourceTypes[index])
+            }
+        )
+        let followerNativeSettings = [
+            Setting.followerExtraRow2, Setting.followerExtraRow6,
+            Setting.followerExtraRow7, Setting.followerExtraRow8,
+            Setting.followerExtraRow9, Setting.followerExtraRow10,
+            Setting.followerExtraRow11, Setting.followerExtraRow12
+        ]
+        let followerNativeRows = followerNativeSettings.map { setting in
+            nativeSettingsRow(
+                id: "dataSource.followerExtraRow\(setting.rawValue)",
+                index: setting.rawValue,
+                sectionID: followerSectionID,
+                isVisible: !UserDefaults.standard.isMaster && setting.rawValue < visibleRowCount
+            )
+        }
+        let followerStatus = followerStatusRow(
+            sectionID: followerSectionID,
+            isVisible: !UserDefaults.standard.isMaster
+                && Setting.followerExtraRow5.rawValue < visibleRowCount
+        )
+        let followerRows = Array(followerNativeRows.prefix(1))
+            + [keepAliveTypeRow, followerDataSourceTypeRow, followerStatus]
+            + Array(followerNativeRows.dropFirst())
 
         return [
-            nativeSettingsRow(id: "dataSource.bloodGlucoseUnit", index: Setting.bloodGlucoseUnit.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "dataSource.masterFollower", index: Setting.masterFollower.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "dataSource.followerExtraRow2", index: Setting.followerExtraRow2.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow2.rawValue < visibleRowCount),
-            nativeSettingsRow(id: "dataSource.followerExtraRow3", index: Setting.followerExtraRow3.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow3.rawValue < visibleRowCount),
-            nativeSettingsRow(id: "dataSource.followerExtraRow4", index: Setting.followerExtraRow4.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow4.rawValue < visibleRowCount),
-            followerStatusRow(sectionID: sectionID, isVisible: Setting.followerExtraRow5.rawValue < visibleRowCount),
-            nativeSettingsRow(id: "dataSource.followerExtraRow6", index: Setting.followerExtraRow6.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow6.rawValue < visibleRowCount),
-            nativeSettingsRow(id: "dataSource.followerExtraRow7", index: Setting.followerExtraRow7.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow7.rawValue < visibleRowCount),
-            nativeSettingsRow(id: "dataSource.followerExtraRow8", index: Setting.followerExtraRow8.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow8.rawValue < visibleRowCount),
-            nativeSettingsRow(id: "dataSource.followerExtraRow9", index: Setting.followerExtraRow9.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow9.rawValue < visibleRowCount),
-            nativeSettingsRow(id: "dataSource.followerExtraRow10", index: Setting.followerExtraRow10.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow10.rawValue < visibleRowCount),
-            nativeSettingsRow(id: "dataSource.followerExtraRow11", index: Setting.followerExtraRow11.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow11.rawValue < visibleRowCount),
-            nativeSettingsRow(id: "dataSource.followerExtraRow12", index: Setting.followerExtraRow12.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow12.rawValue < visibleRowCount)
+            SettingsSection(
+                title: sectionTitle(),
+                footer: UserDefaults.standard.isMaster ? Texts_SettingsView.dataSourceMasterDevicesFooter : nil,
+                rows: [masterFollowerRow]
+            ),
+            SettingsSection(rows: followerRows),
+            SettingsSection(
+                rows: [
+                    nativeSettingsRow(
+                        id: "dataSource.masterUploadToNightscout",
+                        index: Setting.followerExtraRow2.rawValue,
+                        sectionID: masterSectionID,
+                        isVisible: UserDefaults.standard.isMaster
+                    )
+                ]
+            )
         ]
+    }
+
+    private func applyFollowerBackgroundKeepAliveType(_ newType: FollowerBackgroundKeepAliveType) {
+        let oldType = UserDefaults.standard.followerBackgroundKeepAliveType
+        guard newType != oldType else { return }
+
+        UserDefaults.standard.followerBackgroundKeepAliveType = newType
+        trace(
+            "follower background keep-alive type was changed from '%{public}@' to '%{public}@'",
+            log: log,
+            category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+            type: .info,
+            oldType.description,
+            newType.description
+        )
+
+        let message: String
+        switch newType {
+        case .disabled:
+            message = Texts_SettingsView.followerKeepAliveTypeDisabledMessage
+        case .normal:
+            message = Texts_SettingsView.followerKeepAliveTypeNormalMessage
+        case .aggressive:
+            message = Texts_SettingsView.followerKeepAliveTypeAggressiveMessage
+        case .heartbeat:
+            message = Texts_SettingsView.followerKeepAliveTypeHeartbeatMessage
+        }
+
+        callMessageHandlerInMainThread(title: Texts_SettingsView.labelfollowerKeepAliveType, message: "\n" + message)
+    }
+
+    private func applyFollowerDataSourceType(_ newType: FollowerDataSourceType) {
+        let oldType = UserDefaults.standard.followerDataSourceType
+        guard newType != oldType else { return }
+
+        UserDefaults.standard.followerDataSourceType = newType
+        checkFollowerServiceStatus()
+
+        trace(
+            "follower source data type was changed from '%{public}@' to '%{public}@'",
+            log: log,
+            category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+            type: .info,
+            oldType.description,
+            newType.description
+        )
+
+        if newType == .dexcomShare && UserDefaults.standard.uploadReadingstoDexcomShare {
+            callMessageHandlerInMainThread(
+                title: FollowerDataSourceType.dexcomShare.fullDescription,
+                message: Texts_SettingsView.warningChangeToFollowerDexcomShare
+            )
+            UserDefaults.standard.uploadReadingstoDexcomShare = false
+        }
+
+        if newType == .calendar && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
+            UserDefaults.standard.followerBackgroundKeepAliveType = .normal
+        }
     }
 
     private func followerStatusRow(sectionID: Int, isVisible: Bool) -> SettingsRow {
@@ -331,31 +479,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             }
             
             return .selectFromList(title: Texts_SettingsView.labelfollowerKeepAliveType, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: { (index: Int) in
-                // we'll set this here so that we can use it for logging
-                let oldFollowerBackgroundKeepAliveType = UserDefaults.standard.followerBackgroundKeepAliveType
-                
-                if index != selectedRow {
-                    UserDefaults.standard.followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: index) ?? .normal
-                    
-                    let newFollowerBackgroundKeepAliveType = UserDefaults.standard.followerBackgroundKeepAliveType
-                    
-                    trace("follower background keep-alive type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, oldFollowerBackgroundKeepAliveType.description, newFollowerBackgroundKeepAliveType.description)
-                    
-                    var message = "\n"
-                    
-                    switch newFollowerBackgroundKeepAliveType {
-                    case .disabled:
-                        message += Texts_SettingsView.followerKeepAliveTypeDisabledMessage
-                    case .normal:
-                        message += Texts_SettingsView.followerKeepAliveTypeNormalMessage
-                    case .aggressive:
-                        message += Texts_SettingsView.followerKeepAliveTypeAggressiveMessage
-                    case .heartbeat:
-                        message += Texts_SettingsView.followerKeepAliveTypeHeartbeatMessage
-                    }
-                    
-                    self.callMessageHandlerInMainThread(title: Texts_SettingsView.labelfollowerKeepAliveType, message: message)
-                }
+                guard FollowerBackgroundKeepAliveType.allCases.indices.contains(index) else { return }
+                self.applyFollowerBackgroundKeepAliveType(FollowerBackgroundKeepAliveType.allCases[index])
             }, cancelHandler: nil, didSelectRowHandler: nil)
             
         case .followerExtraRow4:
@@ -367,28 +492,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             
             return .selectFromList(title: Texts_SettingsView.labelFollowerDataSourceType, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: { (index: Int) in
                 let enabled = FollowerDataSourceType.allEnabledCases
-                // Safety: ensure index is valid
-                guard index >= 0, index < enabled.count else { return }
-                
-                let oldFollowerDataSourceType = UserDefaults.standard.followerDataSourceType
-                let newFollowerDataSourceType = enabled[index]
-                
-                if newFollowerDataSourceType != oldFollowerDataSourceType {
-                    UserDefaults.standard.followerDataSourceType = newFollowerDataSourceType
-                    self.checkFollowerServiceStatus()
-                    
-                    trace("follower source data type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, oldFollowerDataSourceType.description, newFollowerDataSourceType.description)
-                    
-                    // make sure we disable dexcom share upload if we are using the share follow option
-                    if newFollowerDataSourceType == .dexcomShare && UserDefaults.standard.uploadReadingstoDexcomShare {
-                        self.callMessageHandlerInMainThread(title: FollowerDataSourceType.dexcomShare.fullDescription, message: Texts_SettingsView.warningChangeToFollowerDexcomShare)
-                        UserDefaults.standard.uploadReadingstoDexcomShare = false
-                    }
-
-                    if newFollowerDataSourceType == .calendar && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
-                        UserDefaults.standard.followerBackgroundKeepAliveType = .normal
-                    }
-                }
+                guard enabled.indices.contains(index) else { return }
+                self.applyFollowerDataSourceType(enabled[index])
             }, cancelHandler: nil, didSelectRowHandler: nil)
             
         case .followerExtraRow5:

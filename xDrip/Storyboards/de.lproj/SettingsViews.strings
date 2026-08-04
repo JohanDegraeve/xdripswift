@@ -50,7 +50,7 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Einstellungen";
-"settingsviews_glucoseDisplaySectionTitle" = "Glukoseanzeige";
+"settingsviews_glucoseDisplaySectionTitle" = "Anzeige";
 "settingsviews_glucoseRangesSectionTitle" = "Glukosebereiche";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarme und Mitteilungen";
 "settingsviews_sharingAndServicesSectionTitle" = "Teilen und Dienste";
@@ -386,7 +386,7 @@
 "settingsviews_followerKeepAliveTypeAggressive" = "Aggressive";
 
 /// statistics settings, prefer standard time in range
-"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+"settingsviews_timeInRangeTypeStandardRange" = "Standard";
 
 /// statistics settings, the type of time in range selected
 "settingsviews_labelTimeInRangeType" = "Time In Range";
@@ -409,6 +409,7 @@
 
 /// CGM data source settings, section title
 "settingsviews_sectionTitleDataSource" = "Datenquelle";
+"settingsviews_dataSourceMasterDevicesFooter" = "Füge kompatible Geräte im Tab Geräte hinzu.";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

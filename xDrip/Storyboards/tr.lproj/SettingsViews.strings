@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Ayarlar";
-"settingsviews_glucoseDisplaySectionTitle" = "Glikoz Görünümü";
+"settingsviews_glucoseDisplaySectionTitle" = "Görünüm";
 "settingsviews_glucoseRangesSectionTitle" = "Glikoz Aralıkları";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Uyarılar ve Bildirimler";
 "settingsviews_sharingAndServicesSectionTitle" = "Paylaşım ve Servisler";
@@ -145,7 +145,7 @@
 "settingsviews_followerKeepAliveTypeAggressive" = "Aggressive";
 
 /// statistics settings, prefer standard time in range
-"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+"settingsviews_timeInRangeTypeStandardRange" = "Standart";
 
 /// statistics settings, the type of time in range selected
 "settingsviews_labelTimeInRangeType" = "Time In Range";
@@ -177,6 +177,7 @@
 
 /// CGM data source settings, section title
 "settingsviews_sectionTitleDataSource" = "Veri kaynağı";
+"settingsviews_dataSourceMasterDevicesFooter" = "Uyumlu aygıtları Aygıtlar sekmesinden ekleyin.";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

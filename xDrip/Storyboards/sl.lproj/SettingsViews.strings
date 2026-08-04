@@ -44,7 +44,7 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
-"settingsviews_glucoseDisplaySectionTitle" = "Prikaz glukoze";
+"settingsviews_glucoseDisplaySectionTitle" = "Prikaz";
 "settingsviews_glucoseRangesSectionTitle" = "Razponi glukoze";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarmi in obvestila";
 "settingsviews_sharingAndServicesSectionTitle" = "Deljenje in storitve";
@@ -417,7 +417,7 @@
 "settingsviews_followerKeepAliveTypeAggressive" = "Aggressive";
 
 /// statistics settings, prefer standard time in range
-"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+"settingsviews_timeInRangeTypeStandardRange" = "Standardno";
 
 /// statistics settings, the type of time in range selected
 "settingsviews_labelTimeInRangeType" = "Time In Range";
@@ -440,6 +440,7 @@
 
 /// CGM data source settings, section title
 "settingsviews_sectionTitleDataSource" = "Vir podatkov";
+"settingsviews_dataSourceMasterDevicesFooter" = "Združljive naprave dodajte na zavihku Naprave.";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";
