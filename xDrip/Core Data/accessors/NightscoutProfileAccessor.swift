@@ -53,15 +53,24 @@ final class NightscoutProfileAccessor {
     ///
     /// Re-importing a profile replaces its schedule rows as one operation. This avoids mixing an
     /// old schedule with a revised Nightscout profile that happens to use the same identifier.
-    func upsert(_ profile: NightscoutProfile) {
+    ///
+    /// Live profiles are stored directly on the private context because they are never edited by the UI.
+    func upsert(_ profile: NightscoutProfile) async {
         guard profile.startDate > .distantPast || !profile.id.isEmpty else { return }
 
-        let context = coreDataManager.mainManagedObjectContext
-        context.performAndWait {
-            let entry = self.existingEntry(for: profile, on: context) ?? NightscoutProfileEntry(context: context)
-            self.apply(profile, to: entry, on: context)
+        let context = coreDataManager.privateManagedObjectContext
+        let log = log
+        await context.perform {
+            let entry = Self.existingEntry(for: profile, on: context) ?? NightscoutProfileEntry(context: context)
+            Self.apply(profile, to: entry, on: context)
+            do {
+                if context.hasChanges {
+                    try context.save()
+                }
+            } catch {
+                trace("in NightscoutProfileAccessor.upsert, error = %{public}@", log: log, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+            }
         }
-        coreDataManager.saveChanges()
     }
 
     /// Returns the newest detached profile, including every normalized schedule.
@@ -146,7 +155,7 @@ final class NightscoutProfileAccessor {
         return deletedCount
     }
 
-    private func existingEntry(for profile: NightscoutProfile, on context: NSManagedObjectContext) -> NightscoutProfileEntry? {
+    private static func existingEntry(for profile: NightscoutProfile, on context: NSManagedObjectContext) -> NightscoutProfileEntry? {
         let request: NSFetchRequest<NightscoutProfileEntry> = NightscoutProfileEntry.fetchRequest()
         request.fetchLimit = 1
         if !profile.id.isEmpty {
@@ -157,7 +166,7 @@ final class NightscoutProfileAccessor {
         return try? context.fetch(request).first
     }
 
-    private func apply(_ profile: NightscoutProfile, to entry: NightscoutProfileEntry, on context: NSManagedObjectContext) {
+    private static func apply(_ profile: NightscoutProfile, to entry: NightscoutProfileEntry, on context: NSManagedObjectContext) {
         entry.id = profile.id.isEmpty ? "startDate-\(Int(profile.startDate.timeIntervalSince1970 * 1000))" : profile.id
         entry.startDate = profile.startDate
         entry.createdAt = profile.createdAt
@@ -180,7 +189,7 @@ final class NightscoutProfileAccessor {
         addSchedules(profile.targetHigh, kind: .targetHigh, profileEntry: entry, on: context)
     }
 
-    private func addSchedules(_ schedules: [NightscoutProfile.TimeValue]?, kind: NightscoutProfileScheduleKind, profileEntry: NightscoutProfileEntry, on context: NSManagedObjectContext) {
+    private static func addSchedules(_ schedules: [NightscoutProfile.TimeValue]?, kind: NightscoutProfileScheduleKind, profileEntry: NightscoutProfileEntry, on context: NSManagedObjectContext) {
         schedules?.forEach { timeValue in
             let entry = NightscoutProfileScheduleEntry(context: context)
             entry.kind = kind.rawValue

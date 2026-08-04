@@ -923,7 +923,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     }
 
                     if shouldPersistProfile {
-                        self.nightscoutProfileAccessor.upsert(newProfile)
+                        await self.nightscoutProfileAccessor.upsert(newProfile)
                         // Store in userdefaults for quick access
                         if let profileData = try? JSONEncoder().encode(newProfile) {
                             UserDefaults.standard.nightscoutProfile = profileData
@@ -1049,7 +1049,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 deviceStatus.sanitizingFutureDates()
 
                 let downloadedDeviceStatus = deviceStatus
-                await MainActor.run {
+                let deviceStatusToPersist = await MainActor.run { () -> NightscoutDeviceStatus? in
                     var mergedDeviceStatus = downloadedDeviceStatus
                     var storedDeviceStatus = self.deviceStatus
                     storedDeviceStatus.sanitizingFutureDates()
@@ -1072,10 +1072,13 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     trace("in updateDeviceStatus, deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, String(describing: mergedDeviceStatus))
                     
                     self.deviceStatus = mergedDeviceStatus
-                    if signatureChanged {
-                        self.nightscoutDeviceStatusAccessor.upsert(mergedDeviceStatus)
-                    }
                     self.didUpdateDeviceStatusDuringLastSync = signatureChanged
+
+                    return signatureChanged ? mergedDeviceStatus : nil
+                }
+
+                if let deviceStatusToPersist {
+                    await self.nightscoutDeviceStatusAccessor.upsert(deviceStatusToPersist)
                 }
             } catch {
                 trace("in updateDeviceStatus, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)

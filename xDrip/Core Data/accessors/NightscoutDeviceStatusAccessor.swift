@@ -67,15 +67,24 @@ final class NightscoutDeviceStatusAccessor {
     ///
     /// Nightscout identifiers are preferred for identity. Some compatible servers omit them, so
     /// `createdAt` provides a deterministic fallback and keeps repeated imports idempotent.
-    func upsert(_ status: NightscoutDeviceStatus) {
+    ///
+    /// Live status is stored directly on the private context because it is never edited by the UI.
+    func upsert(_ status: NightscoutDeviceStatus) async {
         guard status.createdAt > .distantPast || status.lastLoopDate > .distantPast else { return }
 
-        let context = coreDataManager.mainManagedObjectContext
-        context.performAndWait {
-            let entry = self.existingEntry(for: status, on: context) ?? NightscoutDeviceStatusEntry(context: context)
-            self.apply(status, to: entry)
+        let context = coreDataManager.privateManagedObjectContext
+        let log = log
+        await context.perform {
+            let entry = Self.existingEntry(for: status, on: context) ?? NightscoutDeviceStatusEntry(context: context)
+            Self.apply(status, to: entry)
+            do {
+                if context.hasChanges {
+                    try context.save()
+                }
+            } catch {
+                trace("in NightscoutDeviceStatusAccessor.upsert, error = %{public}@", log: log, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+            }
         }
-        coreDataManager.saveChanges()
     }
 
     /// Returns the newest detached status without exposing its managed object or context.
@@ -154,7 +163,7 @@ final class NightscoutDeviceStatusAccessor {
         return deletedCount
     }
 
-    private func existingEntry(for status: NightscoutDeviceStatus, on context: NSManagedObjectContext) -> NightscoutDeviceStatusEntry? {
+    private static func existingEntry(for status: NightscoutDeviceStatus, on context: NSManagedObjectContext) -> NightscoutDeviceStatusEntry? {
         let request: NSFetchRequest<NightscoutDeviceStatusEntry> = NightscoutDeviceStatusEntry.fetchRequest()
         request.fetchLimit = 1
         if !status.id.isEmpty {
@@ -165,7 +174,7 @@ final class NightscoutDeviceStatusAccessor {
         return try? context.fetch(request).first
     }
 
-    private func apply(_ status: NightscoutDeviceStatus, to entry: NightscoutDeviceStatusEntry) {
+    private static func apply(_ status: NightscoutDeviceStatus, to entry: NightscoutDeviceStatusEntry) {
         entry.id = status.id.isEmpty ? "createdAt-\(Int(status.createdAt.timeIntervalSince1970 * 1000))" : status.id
         entry.createdAt = status.createdAt
         entry.updatedDate = status.updatedDate
@@ -249,6 +258,7 @@ final class NightscoutDeviceStatusAccessor {
 }
 
 extension NightscoutDeviceStatusSnapshot {
+    /// Rebuilds the live model used by existing Home, Watch and widget presentation code.
     func deviceStatus() -> NightscoutDeviceStatus {
         var status = NightscoutDeviceStatus()
         status.id = id
