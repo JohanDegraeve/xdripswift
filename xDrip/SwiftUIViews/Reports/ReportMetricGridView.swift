@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// Renders the main clinical metrics as a compact report grid.
 struct GlucoseReportMetricGridView: View {
     let analytics: GlucoseReportAnalytics
     let language: GlucoseReportLanguage

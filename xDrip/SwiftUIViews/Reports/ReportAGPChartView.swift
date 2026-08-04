@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// Renders the AGP chart used inside the generated report.
 struct GlucoseReportAGPChartView: View {
     let points: [GlucoseReportAGPPoint]
     let usesMgDl: Bool

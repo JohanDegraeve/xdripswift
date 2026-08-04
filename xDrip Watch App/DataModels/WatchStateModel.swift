@@ -520,6 +520,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         }
     }
 
+    /// Maps the stored daily AGP profile onto the dates currently visible on the Watch chart.
     func agpBackgroundPointsMatching(startDate: Date, endDate: Date) -> [GlucoseChartAGPPoint] {
         // convert the stored minute-of-day profile into real chart dates for this render pass
         mapAGPProfileToVisibleRange(startDate: startDate, endDate: endDate)

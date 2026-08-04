@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Loads report analytics and period availability for the Statistics screen.
 @MainActor
 final class StatisticsViewModel: ObservableObject {
     @Published var selectedPeriod: GlucoseReportPeriod = .ninety {
@@ -27,6 +28,7 @@ final class StatisticsViewModel: ObservableObject {
         self.statisticsManager = statisticsManager
     }
 
+    /// Loads available periods before requesting analytics for the selected period.
     func load() {
         Task {
             isLoading = true

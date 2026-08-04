@@ -871,7 +871,7 @@ final class NightscoutImportService: @unchecked Sendable {
             rangeQuery: { interval in
                 [
                     URLQueryItem(name: "find[created_at][$gte]", value: Self.iso8601String(from: interval.start)),
-                    URLQueryItem(name: "find[created_at][$lt]", value: Self.iso8601String(from: interval.end)),
+                    URLQueryItem(name: "find[created_at][$lt]", value: Self.iso8601String(from: interval.end))
                 ]
             },
             type: NightscoutTreatmentDocument.self
@@ -890,7 +890,7 @@ final class NightscoutImportService: @unchecked Sendable {
             rangeQuery: { interval in
                 [
                     URLQueryItem(name: "find[created_at][$gte]", value: Self.iso8601String(from: interval.start)),
-                    URLQueryItem(name: "find[created_at][$lt]", value: Self.iso8601String(from: interval.end)),
+                    URLQueryItem(name: "find[created_at][$lt]", value: Self.iso8601String(from: interval.end))
                 ]
             },
             type: NightscoutDeviceStatusResponse.self

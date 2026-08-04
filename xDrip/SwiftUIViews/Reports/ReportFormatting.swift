@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Shared unit, number and date formatting for on-screen and PDF reports.
 enum GlucoseReportFormatting {
     static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()

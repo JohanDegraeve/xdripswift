@@ -198,7 +198,7 @@ struct RootHomeMiniChartView: View {
     }
 
     /// Uses one time-equivalent inset for both rounded corners without changing chart data. The
-    /// trailing span protects the `now` edge; the overview-only clamp protects the leading edge.
+    /// trailing span protects the `now` edge. The overview-only clamp protects the leading edge.
     private func overviewEdgeInsetTimeInterval(chartWidth: CGFloat) -> TimeInterval {
         let visibleTimeInterval = chartState.endDate.timeIntervalSince(chartState.startDate)
         return ConstantsGlucoseChartSwiftUI.miniChartEdgeInsetTimeInterval(

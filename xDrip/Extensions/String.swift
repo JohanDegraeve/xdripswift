@@ -58,12 +58,12 @@ extension String {
     }
     
     func sha1() -> String {
-        // CryptoKit returns a digest sequence; keep the previous lowercase hex string format.
+        // CryptoKit returns a digest sequence. Keep the previous lowercase hex string format.
         return Insecure.SHA1.hash(data: Data(self.utf8)).map { String(format: "%02x", $0) }.joined()
     }
         
     func sha256() -> String {
-        // CryptoKit returns a digest sequence; keep the previous lowercase hex string format.
+        // CryptoKit returns a digest sequence. Keep the previous lowercase hex string format.
         return SHA256.hash(data: Data(self.utf8)).map { String(format: "%02x", $0) }.joined()
     }
     

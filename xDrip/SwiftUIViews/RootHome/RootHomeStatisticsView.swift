@@ -131,19 +131,19 @@ struct RootHomePieChartView: View {
         }
         .frame(width: 52, height: 52)
     }
-    
+
     private var total: Double {
         low + inRange + high
     }
-    
+
     private var inRangeAngle: Double {
         360 * inRange / total
     }
-    
+
     private var lowAngle: Double {
         360 * low / total
     }
-    
+
     private var referenceAngle: Double {
         90 - (inRangeAngle / 2)
     }

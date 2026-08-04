@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// Renders time-in-range distribution bars and their clinical targets.
 struct GlucoseReportTimeInRangeBarView: View {
     let distribution: GlucoseReportRangeDistribution
     let title: String

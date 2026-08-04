@@ -9,6 +9,7 @@
 import Charts
 import SwiftUI
 
+/// Presents CGM, AGP and trend statistics for the selected period.
 struct StatisticsView: View {
     @StateObject private var viewModel: StatisticsViewModel
     @State private var isShowingReportGenerator = false

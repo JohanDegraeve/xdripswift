@@ -122,7 +122,7 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
     ///
     /// Unlike the main-chart gesture, the overview itself does not scroll: the drag moves its
     /// active-window selection in the same direction as the user's finger. The leading inset only
-    /// constrains this overview gesture; direct main-chart scrolling remains unrestricted.
+    /// constrains this overview gesture. Direct main-chart scrolling remains unrestricted.
     func updateVisibleRangeFromOverview(
         value: DragGesture.Value,
         overviewStartDate: Date,

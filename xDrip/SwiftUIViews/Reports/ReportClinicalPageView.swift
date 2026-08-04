@@ -9,6 +9,7 @@
 import Charts
 import SwiftUI
 
+/// Renders the clinical summary pages used by the PDF generator.
 struct GlucoseReportClinicalPageView: View {
     let configuration: GlucoseReportConfiguration
     let analytics: GlucoseReportAnalytics
@@ -805,7 +806,7 @@ private struct GlucoseReportLoopalyzerChart: View {
             Spacer()
             axisLabel(yDomain.lowerBound)
         }
-        // Align labels to the plot rectangle only; the Chart's remaining height belongs to
+        // Align labels to the plot rectangle only. The Chart's remaining height belongs to
         // x-axis labels and must not push the lower y value below its actual baseline.
         .frame(width: Layout.yAxisLabelWidth, height: Layout.plotHeight, alignment: .leading)
     }

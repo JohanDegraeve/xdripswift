@@ -13,6 +13,7 @@ enum GenerateReportPresentation {
     case embedded
 }
 
+/// Collects report options and starts PDF generation.
 struct GenerateReportView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: GenerateReportViewModel

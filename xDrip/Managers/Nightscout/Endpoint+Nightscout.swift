@@ -12,7 +12,7 @@ extension Endpoint {
     ///     - minimumTimeStamp : only return readings at or after this timestamp
     ///     - token: the Nightscout token used for authentication (optional)
     ///     - port: Nightscout server port number (optional)
-    static func getEndpointForLatestNSEntries(hostAndScheme:String, count: Int, minimumTimeStamp: Date, token: String?) -> Endpoint? {
+    static func getEndpointForLatestNSEntries(hostAndScheme: String, count: Int, minimumTimeStamp: Date, token: String?) -> Endpoint? {
         
         // split hostAndScheme in host and scheme
         let (host, scheme) = EndPointScheme.getHostAndScheme(hostAndScheme: hostAndScheme)

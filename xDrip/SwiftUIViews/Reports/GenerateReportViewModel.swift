@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Owns report availability, configuration and generation state.
 @MainActor
 final class GenerateReportViewModel: ObservableObject {
     @Published var patientName: String {
@@ -54,6 +55,7 @@ final class GenerateReportViewModel: ObservableObject {
         language = UserDefaults.standard.reportLanguage
     }
 
+    /// Loads the periods that have enough stored data for a meaningful report.
     func loadAvailability() {
         Task {
             isLoadingAvailability = true
@@ -66,6 +68,7 @@ final class GenerateReportViewModel: ObservableObject {
         }
     }
 
+    /// Builds the selected report and publishes it for preview.
     func generateReport() {
         guard !isGenerating else { return }
 

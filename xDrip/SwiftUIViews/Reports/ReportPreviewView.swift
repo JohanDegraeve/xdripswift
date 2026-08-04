@@ -10,6 +10,7 @@ import PDFKit
 import SwiftUI
 import UIKit
 
+/// Presents the generated PDF with sharing and print actions.
 struct GlucoseReportPreviewView: View {
     let report: GlucoseReport
     @State private var shareItem: ReportShareItem?

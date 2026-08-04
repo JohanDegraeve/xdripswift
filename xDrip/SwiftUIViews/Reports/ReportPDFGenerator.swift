@@ -9,8 +9,10 @@
 import SwiftUI
 import UIKit
 
+/// Renders report pages into a PDF stored in the app's Reports directory.
 @MainActor
 final class GlucoseReportPDFGenerator {
+    /// Generates every report page and returns the completed file URL.
     func generatePDF(configuration: GlucoseReportConfiguration, analytics: GlucoseReportAnalytics, generatedAt: Date) async throws -> URL {
         let pageCount = analytics.aidAnalytics == nil ? 3 : 4
         let pageSize = configuration.paperSize.pageSize
