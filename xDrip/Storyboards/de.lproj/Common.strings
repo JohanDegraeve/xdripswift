@@ -108,6 +108,7 @@
 "invalidAccountOrPassword" = "Konto oder Passwort ungültig";
 
 "common_days" = "Tage";
+"common_landscape_comparingWithLast" = "Vergleich mit den letzten:";
 "common_today" = "Heute";
 
 "common_statistics_low" = "Niedrig";

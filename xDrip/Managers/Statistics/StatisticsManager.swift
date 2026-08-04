@@ -35,6 +35,17 @@ public final class StatisticsManager: @unchecked Sendable {
         let agpPoints: [GlucoseReportAGPPoint]
     }
 
+    struct LandscapeLoopalyzerSnapshot {
+        let points: [GlucoseReportLoopalyzerPoint]
+        let insulinTreatmentMarkers: [GlucoseReportLoopalyzerTreatmentMarker]
+        let carbTreatmentMarkers: [GlucoseReportLoopalyzerTreatmentMarker]
+    }
+
+    struct LandscapeAnalytics {
+        let baseline: LandscapeBaseline
+        let loopalyzer: LandscapeLoopalyzerSnapshot?
+    }
+
     struct NightscoutLoopSnapshots {
         let deviceStatuses: [NightscoutDeviceStatusSnapshot]
         let profiles: [NightscoutProfileSnapshot]
@@ -50,6 +61,16 @@ public final class StatisticsManager: @unchecked Sendable {
         let date: Date
         let value: Double
         let type: TreatmentType
+    }
+
+    private struct BasalTreatmentSample {
+        let date: Date
+        let rate: Double
+        let durationMinutes: Double
+
+        var endDate: Date {
+            date.addingTimeInterval(durationMinutes * 60)
+        }
     }
 
     private struct ReportSensorSummary {
@@ -260,6 +281,92 @@ public final class StatisticsManager: @unchecked Sendable {
                     usesMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
                     agpPoints: self.makeAGPPoints(samples: samples)
                 ))
+            }
+        }
+    }
+
+    /// Returns the AGP baseline and optional selected-day OS-AID traces in one queued operation.
+    func landscapeAnalytics(referenceDate: Date, daysBack: Int, includesAID: Bool) async -> LandscapeAnalytics {
+        await withCheckedContinuation { continuation in
+            operationQueue.addOperation { [weak self] in
+                guard let self else {
+                    continuation.resume(returning: LandscapeAnalytics(
+                        baseline: StatisticsManager.emptyLandscapeBaseline(),
+                        loopalyzer: nil
+                    ))
+                    return
+                }
+
+                let selectedDayStart = self.calendar.startOfDay(for: referenceDate)
+                let selectedDayEnd = min(
+                    self.calendar.date(byAdding: .day, value: 1, to: selectedDayStart)?.addingTimeInterval(-1) ?? selectedDayStart,
+                    Date()
+                )
+                guard let baselineStart = self.calendar.date(
+                    byAdding: .day,
+                    value: -max(1, daysBack),
+                    to: selectedDayStart
+                ) else {
+                    continuation.resume(returning: LandscapeAnalytics(
+                        baseline: StatisticsManager.emptyLandscapeBaseline(),
+                        loopalyzer: nil
+                    ))
+                    return
+                }
+
+                // Fetch the complete window once, then keep the selected day out of its own AGP baseline.
+                let samples = self.cachedSamples(fromDate: baselineStart, toDate: selectedDayEnd)
+                    .filter { Self.isValidGlucoseMgDl($0.valueMgDl) }
+                    .sorted { $0.date < $1.date }
+                let baselineSamples = samples.filter { $0.date < selectedDayStart }
+                let selectedDaySamples = samples.filter { $0.date >= selectedDayStart && $0.date <= selectedDayEnd }
+                let baselineDays = Set(baselineSamples.map { self.calendar.startOfDay(for: $0.date) })
+                let baseline = LandscapeBaseline(
+                    dayCount: baselineDays.count,
+                    usesMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
+                    agpPoints: self.makeAGPPoints(samples: baselineSamples)
+                )
+
+                guard includesAID else {
+                    continuation.resume(returning: LandscapeAnalytics(baseline: baseline, loopalyzer: nil))
+                    return
+                }
+
+                let statusAccessor = NightscoutDeviceStatusAccessor(coreDataManager: self.coreDataManager)
+                let profileAccessor = NightscoutProfileAccessor(coreDataManager: self.coreDataManager)
+                let statuses = statusAccessor.fetch(fromDate: selectedDayStart, toDate: selectedDayEnd)
+                    .filter { $0.createdAt >= selectedDayStart && $0.createdAt <= selectedDayEnd }
+                    .sorted { $0.createdAt < $1.createdAt }
+                // Include the earliest known profile as a fallback when Nightscout has no
+                // historical profile snapshot preceding the selected day.
+                let profiles = profileAccessor.fetch(fromDate: nil, toDate: nil)
+                    .sorted { $0.startDate < $1.startDate }
+                let basalTreatments = self.basalTreatmentSamples(
+                    fromDate: selectedDayStart.addingTimeInterval(-24 * 60 * 60),
+                    toDate: selectedDayEnd
+                )
+
+                let loopalyzer = LandscapeLoopalyzerSnapshot(
+                    points: self.makeLoopalyzerPoints(
+                        statuses: statuses,
+                        profiles: profiles,
+                        samples: selectedDaySamples,
+                        selectedDayRange: selectedDayStart ... selectedDayEnd,
+                        basalTreatments: basalTreatments
+                    ),
+                    insulinTreatmentMarkers: self.loopalyzerTreatmentMarkers(
+                        fromDate: selectedDayStart,
+                        toDate: selectedDayEnd,
+                        treatmentType: .Insulin
+                    ),
+                    carbTreatmentMarkers: self.loopalyzerTreatmentMarkers(
+                        fromDate: selectedDayStart,
+                        toDate: selectedDayEnd,
+                        treatmentType: .Carbs
+                    )
+                )
+
+                continuation.resume(returning: LandscapeAnalytics(baseline: baseline, loopalyzer: loopalyzer))
             }
         }
     }
@@ -637,7 +744,13 @@ public final class StatisticsManager: @unchecked Sendable {
         }
     }
 
-    private func makeLoopalyzerPoints(statuses: [NightscoutDeviceStatusSnapshot], profiles: [NightscoutProfileSnapshot], samples: [CGMSample]) -> [GlucoseReportLoopalyzerPoint] {
+    private func makeLoopalyzerPoints(
+        statuses: [NightscoutDeviceStatusSnapshot],
+        profiles: [NightscoutProfileSnapshot],
+        samples: [CGMSample],
+        selectedDayRange: ClosedRange<Date>? = nil,
+        basalTreatments: [BasalTreatmentSample] = []
+    ) -> [GlucoseReportLoopalyzerPoint] {
         let bucketSize = GlucoseReportLoopalyzerPoint.bucketDurationMinutes
         let groupedStatuses = Dictionary(grouping: statuses) { status in
             let components = calendar.dateComponents([.hour, .minute], from: status.createdAt)
@@ -656,10 +769,19 @@ public final class StatisticsManager: @unchecked Sendable {
             let bucketSamples = groupedSamples[bucket] ?? []
             guard bucketStatuses.count >= 2 || bucketSamples.count >= 3 else { return nil }
             let minuteOfDay = bucket * bucketSize
-            let scheduledRate = average(bucketStatuses.compactMap { scheduledBasalRate(for: $0.createdAt, profiles: profiles) })
-            let actualBasalRate = average(bucketStatuses.compactMap(\.rate))
-            let basalDeltaRate = scheduledRate.flatMap { scheduled in
-                actualBasalRate.map { actual in actual - scheduled }
+            let selectedDayBasal = selectedDayRange.map {
+                selectedDayBasalValues(
+                    minuteOfDay: minuteOfDay,
+                    dateRange: $0,
+                    profiles: profiles,
+                    basalTreatments: basalTreatments
+                )
+            }
+            let scheduledRate = selectedDayBasal?.scheduledRate ?? average(
+                bucketStatuses.compactMap { scheduledBasalRate(for: $0.createdAt, profiles: profiles) }
+            )
+            let basalDeltaRate = selectedDayBasal?.deltaRate ?? scheduledRate.flatMap { scheduled in
+                average(bucketStatuses.compactMap(\.rate)).map { actual in actual - scheduled }
             }
 
             return GlucoseReportLoopalyzerPoint(
@@ -671,6 +793,31 @@ public final class StatisticsManager: @unchecked Sendable {
                 cob: average(bucketStatuses.compactMap(\.cob))
             )
         }
+    }
+
+    private func selectedDayBasalValues(
+        minuteOfDay: Int,
+        dateRange: ClosedRange<Date>,
+        profiles: [NightscoutProfileSnapshot],
+        basalTreatments: [BasalTreatmentSample]
+    ) -> (scheduledRate: Double?, deltaRate: Double?) {
+        let bucketStart = dateRange.lowerBound.addingTimeInterval(Double(minuteOfDay) * 60)
+        let minuteSamples = (0 ..< GlucoseReportLoopalyzerPoint.bucketDurationMinutes)
+            .map { bucketStart.addingTimeInterval((Double($0) + 0.5) * 60) }
+            .filter { $0 <= dateRange.upperBound }
+
+        let scheduledRates = minuteSamples.compactMap { scheduledBasalRate(for: $0, profiles: profiles) }
+        let deltaRates = basalTreatments.isEmpty ? [] : minuteSamples.compactMap { date -> Double? in
+            guard let scheduledRate = scheduledBasalRate(for: date, profiles: profiles) else { return nil }
+            let enactedRate = basalTreatments.last { treatment in
+                treatment.date <= date && treatment.endDate > date
+            }?.rate
+
+            // Outside a temp-basal interval, delivered basal follows the scheduled profile.
+            return (enactedRate ?? scheduledRate) - scheduledRate
+        }
+
+        return (average(scheduledRates), average(deltaRates))
     }
 
     private func aidProfileSchedules(from profiles: [NightscoutProfileSnapshot], periodEnd: Date) -> [GlucoseReportAIDProfileSchedule] {
@@ -744,9 +891,42 @@ public final class StatisticsManager: @unchecked Sendable {
         return markers
     }
 
+    private func basalTreatmentSamples(fromDate: Date, toDate: Date) -> [BasalTreatmentSample] {
+        let context = coreDataManager.privateManagedObjectContext
+        var samples = [BasalTreatmentSample]()
+
+        context.performAndWait {
+            let request: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
+            request.sortDescriptors = [NSSortDescriptor(key: #keyPath(TreatmentEntry.date), ascending: true)]
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSPredicate(format: "date >= %@ AND date <= %@", fromDate as NSDate, toDate as NSDate),
+                NSPredicate(format: "treatmentType == %@", NSNumber(value: TreatmentType.Basal.rawValue)),
+                NSCompoundPredicate(orPredicateWithSubpredicates: [
+                    NSPredicate(format: "treatmentdeleted == NO"),
+                    NSPredicate(format: "treatmentdeleted == nil")
+                ]),
+                NSPredicate(format: "value >= 0 AND valueSecondary > 0")
+            ])
+            request.returnsObjectsAsFaults = false
+            request.includesPropertyValues = true
+
+            guard let treatments = try? context.fetch(request) else { return }
+            samples = treatments.map {
+                BasalTreatmentSample(
+                    date: $0.date,
+                    rate: $0.value,
+                    durationMinutes: $0.valueSecondary
+                )
+            }
+        }
+
+        return samples
+    }
+
     private func scheduledBasalRate(for date: Date, profiles: [NightscoutProfileSnapshot]) -> Double? {
-        guard let profile = profiles.last(where: { $0.startDate <= date }),
-              !profile.basal.isEmpty else {
+        let profile = profiles.last { $0.startDate <= date && !$0.basal.isEmpty }
+            ?? profiles.first { !$0.basal.isEmpty }
+        guard let profile else {
             return nil
         }
 

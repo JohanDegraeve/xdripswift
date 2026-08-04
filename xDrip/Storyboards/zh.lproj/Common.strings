@@ -102,6 +102,7 @@
 
 /// literal translation needed
 "common_days" = "days";
+"common_landscape_comparingWithLast" = "与最近时段比较：";
 
 /// the word average
 "common_statistics_average" = "Average";

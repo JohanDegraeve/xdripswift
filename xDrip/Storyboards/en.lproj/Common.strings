@@ -15,6 +15,7 @@
 "common_minute" = "min";
 "common_day" = "day";
 "common_days" = "days";
+"common_landscape_comparingWithLast" = "Comparing with the last:";
 "common_today" = "Today";
 "common_week" = "week";
 "common_hourshort" = "h";

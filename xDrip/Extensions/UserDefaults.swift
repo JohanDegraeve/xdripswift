@@ -122,6 +122,8 @@ extension UserDefaults {
         case miniChartHoursToShow = "miniChartHoursToShow"
         /// should the screen/chart be allowed to rotate?
         case allowScreenRotation = "allowScreenRotation"
+        /// number of preceding days used by the landscape AGP comparison
+        case landscapeComparisonDays = "landscapeComparisonDays"
         /// should the clock view be shown when the screen is locked?
         case showClockWhenScreenIsLocked = "showClockWhenScreenIsLocked"
         /// how (and if) the screen should be dimmed when screen lock is enabled
@@ -1345,6 +1347,18 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.allowScreenRotation.rawValue)
+        }
+    }
+
+    /// number of preceding days used by the landscape AGP comparison
+    var landscapeComparisonDays: Int {
+        get {
+            let storedValue = integer(forKey: Key.landscapeComparisonDays.rawValue)
+            return [3, 7, 30, 60, 90].contains(storedValue) ? storedValue : 7
+        }
+        set {
+            let validatedValue = [3, 7, 30, 60, 90].contains(newValue) ? newValue : 7
+            set(validatedValue, forKey: Key.landscapeComparisonDays.rawValue)
         }
     }
 

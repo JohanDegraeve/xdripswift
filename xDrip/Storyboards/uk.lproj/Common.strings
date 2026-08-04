@@ -122,6 +122,7 @@
 
 /// literal translation needed
 "common_days" = "days";
+"common_landscape_comparingWithLast" = "Порівняння з останніми:";
 
 /// the word today
 "common_todayshort" = "Today";

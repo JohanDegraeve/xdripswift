@@ -8,6 +8,21 @@
 
 import SwiftUI
 
+/// Supported history periods for the landscape comparison baseline.
+enum LandscapeComparisonPeriod: Int, CaseIterable, Identifiable {
+    case threeDays = 3
+    case sevenDays = 7
+    case thirtyDays = 30
+    case sixtyDays = 60
+    case ninetyDays = 90
+
+    var id: Int { rawValue }
+
+    var title: String {
+        "\(rawValue) \(Texts_Common.days)"
+    }
+}
+
 // MARK: - State Model
 
 /// Owns the selected day trace and recent AGP baseline for the landscape comparison view.
@@ -17,12 +32,16 @@ final class LandscapeChartStateModel: ObservableObject {
     @Published var displayedDate = Date().toMidnight()
     @Published var chartState = GlucoseChartState.empty(startDate: Date().toMidnight(), endDate: Date().toMidnight().addingTimeInterval(.hours(24) - 1))
     @Published var baseline = StatisticsManager.LandscapeBaseline.empty
+    @Published var loopalyzerSnapshot: StatisticsManager.LandscapeLoopalyzerSnapshot?
+    @Published private(set) var comparisonPeriod: LandscapeComparisonPeriod
+    let showsAIDCharts: Bool
 
     private let coreDataManager: CoreDataManager
     private let nightscoutSyncManager: NightscoutSyncManager
+    private let statisticsManager: StatisticsManager
     private var activeLoadID = UUID()
-    private var cachedSnapshots: [Date: LandscapeDaySnapshot] = [:]
-    private var prefetchingDates = Set<Date>()
+    private var cachedSnapshots: [LandscapeSnapshotCacheKey: LandscapeDaySnapshot] = [:]
+    private var prefetchingSnapshots = Set<LandscapeSnapshotCacheKey>()
     // Each temporary manager must remain alive until its asynchronous chart request completes.
     private var snapshotChartStateManagers: [UUID: GlucoseChartStateManager] = [:]
 
@@ -36,6 +55,9 @@ final class LandscapeChartStateModel: ObservableObject {
     init(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager) {
         self.coreDataManager = coreDataManager
         self.nightscoutSyncManager = nightscoutSyncManager
+        statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
+        showsAIDCharts = UserDefaults.standard.nightscoutFollowType != .none
+        comparisonPeriod = LandscapeComparisonPeriod(rawValue: UserDefaults.standard.landscapeComparisonDays) ?? .sevenDays
 
         refresh()
     }
@@ -65,6 +87,19 @@ final class LandscapeChartStateModel: ObservableObject {
         guard !Calendar.current.isDateInToday(selectedDate) else { return }
 
         selectDate(Date().toMidnight())
+    }
+
+    func selectComparisonPeriod(_ period: LandscapeComparisonPeriod) {
+        guard comparisonPeriod != period else { return }
+
+        comparisonPeriod = period
+        UserDefaults.standard.landscapeComparisonDays = period.rawValue
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.comparisonPeriod == period else { return }
+
+            self.startLoad(referenceDate: self.selectedDate, forceResetChart: false)
+        }
     }
 
     func refresh() {
@@ -119,107 +154,117 @@ final class LandscapeChartStateModel: ObservableObject {
 
     private func startLoad(referenceDate: Date, forceResetChart: Bool) {
         let loadID = UUID()
-        let key = cacheKey(for: referenceDate)
+        let key = snapshotCacheKey(for: referenceDate, comparisonPeriod: comparisonPeriod)
 
         activeLoadID = loadID
 
         if let snapshot = cachedSnapshots[key], !forceResetChart {
-            commitSnapshot(snapshot, loadID: loadID, referenceDate: key)
+            commitSnapshot(snapshot, loadID: loadID, cacheKey: key)
             return
         }
 
-        buildSnapshot(referenceDate: key, forceResetChart: forceResetChart) { [weak self] snapshot in
+        buildSnapshot(cacheKey: key, forceResetChart: forceResetChart) { [weak self] snapshot in
             self?.cachedSnapshots[key] = snapshot
-            self?.commitSnapshot(snapshot, loadID: loadID, referenceDate: key)
+            self?.commitSnapshot(snapshot, loadID: loadID, cacheKey: key)
         }
     }
 
-    private func buildSnapshot(referenceDate: Date, forceResetChart: Bool, completion: @escaping (LandscapeDaySnapshot) -> Void) {
-        let key = cacheKey(for: referenceDate)
+    private func buildSnapshot(cacheKey: LandscapeSnapshotCacheKey, forceResetChart: Bool, completion: @escaping (LandscapeDaySnapshot) -> Void) {
         var loadedChartState: GlucoseChartState?
-        var loadedBaseline: StatisticsManager.LandscapeBaseline?
+        var loadedAnalytics: StatisticsManager.LandscapeAnalytics?
 
-        // Commit the glucose trace and AGP baseline together so the chart never shows mixed dates.
+        // Commit every visible series together so date navigation never shows mixed days.
         let completeIfReady: () -> Void = { [weak self] in
             guard self != nil,
                   let loadedChartState,
-                  let loadedBaseline else { return }
+                  let loadedAnalytics else { return }
 
-            completion(LandscapeDaySnapshot(chartState: loadedChartState, baseline: loadedBaseline))
+            completion(LandscapeDaySnapshot(
+                chartState: loadedChartState,
+                baseline: loadedAnalytics.baseline,
+                loopalyzerSnapshot: loadedAnalytics.loopalyzer
+            ))
         }
 
-        refreshChart(referenceDate: key, forceReset: forceResetChart) { chartState in
+        refreshChart(referenceDate: cacheKey.date, forceReset: forceResetChart) { chartState in
             loadedChartState = chartState
             completeIfReady()
         }
 
-        refreshBaselineSnapshot(referenceDate: key) { baseline in
-            loadedBaseline = baseline
+        refreshAnalytics(referenceDate: cacheKey.date, daysBack: cacheKey.comparisonDays) { analytics in
+            loadedAnalytics = analytics
             completeIfReady()
         }
     }
 
-    private func refreshBaselineSnapshot(referenceDate: Date, completion: @escaping (StatisticsManager.LandscapeBaseline) -> Void) {
-        let statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
-
+    private func refreshAnalytics(referenceDate: Date, daysBack: Int, completion: @escaping (StatisticsManager.LandscapeAnalytics) -> Void) {
         Task {
-            let baseline = await statisticsManager.landscapeBaseline(
+            let analytics = await statisticsManager.landscapeAnalytics(
                 referenceDate: referenceDate,
-                daysBack: 7
+                daysBack: daysBack,
+                includesAID: showsAIDCharts
             )
 
             await MainActor.run {
-                completion(baseline)
+                completion(analytics)
             }
         }
     }
 
-    private func commitSnapshot(_ snapshot: LandscapeDaySnapshot, loadID: UUID, referenceDate: Date) {
+    private func commitSnapshot(_ snapshot: LandscapeDaySnapshot, loadID: UUID, cacheKey: LandscapeSnapshotCacheKey) {
         guard activeLoadID == loadID,
-              Calendar.current.isDate(selectedDate, inSameDayAs: referenceDate) else { return }
+              comparisonPeriod.rawValue == cacheKey.comparisonDays,
+              Calendar.current.isDate(selectedDate, inSameDayAs: cacheKey.date) else { return }
 
-        displayedDate = referenceDate
+        displayedDate = cacheKey.date
         chartState = snapshot.chartState
         baseline = snapshot.baseline
-        prefetchAdjacentDates(around: referenceDate)
+        loopalyzerSnapshot = snapshot.loopalyzerSnapshot
+        prefetchAdjacentDates(around: cacheKey.date, comparisonPeriod: comparisonPeriod)
     }
 
-    private func prefetchAdjacentDates(around referenceDate: Date) {
-        let today = cacheKey(for: Date())
+    private func prefetchAdjacentDates(around referenceDate: Date, comparisonPeriod: LandscapeComparisonPeriod) {
+        let today = Date().toMidnight()
 
         // Warm the most likely navigation targets without changing the visible loading state.
         [-1, 1, -2, 2].forEach { dayOffset in
             guard let adjacentDate = Calendar.current.date(byAdding: .day, value: dayOffset, to: referenceDate) else { return }
 
-            let date = cacheKey(for: adjacentDate)
+            let key = snapshotCacheKey(for: adjacentDate, comparisonPeriod: comparisonPeriod)
 
-            if date <= today {
-                prefetchSnapshot(referenceDate: date)
+            if key.date <= today {
+                prefetchSnapshot(cacheKey: key)
             }
         }
     }
 
-    private func prefetchSnapshot(referenceDate: Date) {
-        guard cachedSnapshots[referenceDate] == nil,
-              !prefetchingDates.contains(referenceDate) else { return }
+    private func prefetchSnapshot(cacheKey: LandscapeSnapshotCacheKey) {
+        guard cachedSnapshots[cacheKey] == nil,
+              !prefetchingSnapshots.contains(cacheKey) else { return }
 
-        prefetchingDates.insert(referenceDate)
+        prefetchingSnapshots.insert(cacheKey)
 
-        buildSnapshot(referenceDate: referenceDate, forceResetChart: false) { [weak self] snapshot in
-            self?.cachedSnapshots[referenceDate] = snapshot
-            self?.prefetchingDates.remove(referenceDate)
+        buildSnapshot(cacheKey: cacheKey, forceResetChart: false) { [weak self] snapshot in
+            self?.cachedSnapshots[cacheKey] = snapshot
+            self?.prefetchingSnapshots.remove(cacheKey)
         }
     }
 
-    private func cacheKey(for date: Date) -> Date {
-        date.toMidnight()
+    private func snapshotCacheKey(for date: Date, comparisonPeriod: LandscapeComparisonPeriod) -> LandscapeSnapshotCacheKey {
+        LandscapeSnapshotCacheKey(date: date.toMidnight(), comparisonDays: comparisonPeriod.rawValue)
     }
 
+}
+
+private struct LandscapeSnapshotCacheKey: Hashable {
+    let date: Date
+    let comparisonDays: Int
 }
 
 private struct LandscapeDaySnapshot {
     let chartState: GlucoseChartState
     let baseline: StatisticsManager.LandscapeBaseline
+    let loopalyzerSnapshot: StatisticsManager.LandscapeLoopalyzerSnapshot?
 }
 
 private extension StatisticsManager.LandscapeBaseline {
@@ -241,24 +286,17 @@ struct LandscapeChartView: View {
 
     private enum Layout {
         static let screenPadding: CGFloat = 6
-        static let spacing: CGFloat = 7
-        static let toolbarHeight: CGFloat = 46
+        static let contentSpacing: CGFloat = 8
+        static let chartColumnSpacing: CGFloat = 18
+        static let agpColumnFraction = 0.65
+        static let toolbarHeight: CGFloat = 48
     }
 
     var body: some View {
-        VStack(spacing: Layout.spacing) {
+        VStack(spacing: Layout.contentSpacing) {
             toolbar
 
-            LandscapeAGPComparisonChart(
-                chartState: stateModel.chartState,
-                baseline: stateModel.baseline,
-                displayedDate: stateModel.displayedDate,
-                canMoveForward: stateModel.canMoveForward,
-                moveBackOneDay: stateModel.moveBackOneDay,
-                moveForwardOneDay: stateModel.moveForwardOneDay,
-                selectToday: stateModel.selectToday
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            chartContent
         }
         .padding(Layout.screenPadding)
         .padding(.top, 2)
@@ -266,41 +304,119 @@ struct LandscapeChartView: View {
         .background(ConstantsAppColors.background)
     }
 
+    @ViewBuilder private var chartContent: some View {
+        if stateModel.showsAIDCharts {
+            GeometryReader { geometry in
+                let availableWidth = geometry.size.width - Layout.chartColumnSpacing
+
+                HStack(spacing: Layout.chartColumnSpacing) {
+                    landscapeAGPColumn
+                        .frame(width: availableWidth * Layout.agpColumnFraction)
+
+                    LandscapeLoopalyzerCharts(snapshot: stateModel.loopalyzerSnapshot)
+                        .frame(width: availableWidth * (1 - Layout.agpColumnFraction))
+                }
+            }
+        } else {
+            landscapeAGPColumn
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
+    private var landscapeAGPColumn: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            comparisonPeriodMenu
+                .padding(.leading, 8)
+
+            landscapeAGPChart
+        }
+    }
+
+    private var landscapeAGPChart: some View {
+        LandscapeAGPComparisonChart(
+            chartState: stateModel.chartState,
+            baseline: stateModel.baseline,
+            displayedDate: stateModel.displayedDate,
+            canMoveForward: stateModel.canMoveForward,
+            moveBackOneDay: stateModel.moveBackOneDay,
+            moveForwardOneDay: stateModel.moveForwardOneDay,
+            selectToday: stateModel.selectToday
+        )
+    }
+
     private var toolbar: some View {
         HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 1) {
-                Text(stateModel.selectedDateText)
-                    .font(.system(size: 18, weight: .heavy))
-                    .foregroundStyle(ConstantsAppColors.primaryText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
-
-                Text(comparisonContextText)
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(ConstantsAppColors.secondaryText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-            .onTapGesture(count: 2) {
-                stateModel.selectToday()
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            Text(stateModel.selectedDateText)
+                .font(.system(size: 22, weight: .heavy))
+                .foregroundStyle(ConstantsAppColors.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .onTapGesture(count: 2) {
+                    stateModel.selectToday()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             LandscapeTIRBadge(
                 chartState: stateModel.chartState,
                 referenceDate: stateModel.displayedDate
             )
         }
+        .padding(.horizontal, 14)
         .frame(height: Layout.toolbarHeight)
+        .background(ConstantsAppColors.homePanelBackground)
+        .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius + 8, style: .continuous))
     }
 
-    private var comparisonContextText: String {
-        let dayCount = max(1, stateModel.baseline.dayCount)
-        let daysText = dayCount == 1 ? "day" : "days"
+    private var comparisonPeriodMenu: some View {
+        HStack(spacing: 0) {
+            Text(Texts_Common.landscapeComparingWithLast)
+                .foregroundStyle(ConstantsAppColors.secondaryText)
+                .font(.body)
 
-        return "Comparing to the previous \(dayCount) \(daysText)"
+            Picker(
+                "",
+                selection: Binding(
+                    get: { stateModel.comparisonPeriod },
+                    set: { stateModel.selectComparisonPeriod($0) }
+                )
+            ) {
+                ForEach(LandscapeComparisonPeriod.allCases) { period in
+                    Text(period.title)
+                        .tag(period)
+                }
+            }
+            .labelsHidden()
+            .pickerStyle(.menu)
+            .tint(ConstantsAppColors.secondaryText)
+
+        }
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
     }
 
+}
+
+private struct LandscapeLoopalyzerCharts: View {
+    let snapshot: StatisticsManager.LandscapeLoopalyzerSnapshot?
+
+    private enum Layout {
+        static let chartSpacing: CGFloat = 14
+        static let chartChromeHeight: CGFloat = 112
+    }
+
+    var body: some View {
+        GeometryReader { geometry in
+            if let snapshot {
+                LandscapeLoopalyzerChart(
+                    points: snapshot.points,
+                    insulinTreatmentMarkers: snapshot.insulinTreatmentMarkers,
+                    carbTreatmentMarkers: snapshot.carbTreatmentMarkers,
+                    plotHeight: max(44, (geometry.size.height - Layout.chartChromeHeight) / 3),
+                    chartSpacing: Layout.chartSpacing
+                )
+            }
+        }
+    }
 }
 
 // MARK: - Chart
@@ -496,7 +612,7 @@ private struct LandscapeGlucosePoint: Identifiable {
 
 private struct LandscapeTIRBadge: View {
 
-    private enum RangeMode {
+    private enum RangeMode: CaseIterable {
         case timeInRange
         case timeInTightRange
 
@@ -527,14 +643,6 @@ private struct LandscapeTIRBadge: View {
             }
         }
 
-        mutating func toggle() {
-            switch self {
-            case .timeInRange:
-                self = .timeInTightRange
-            case .timeInTightRange:
-                self = .timeInRange
-            }
-        }
     }
 
     let chartState: GlucoseChartState
@@ -545,11 +653,6 @@ private struct LandscapeTIRBadge: View {
     var body: some View {
         HStack(spacing: 12) {
             HStack(spacing: 0) {
-                Text("\(rangeMode.title): ")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(ConstantsAppColors.secondaryText)
-                    .lineLimit(1)
-
                 percentageText(lowPercentage, ConstantsAppColors.statisticsLow)
                 separator
                 percentageText(inRangePercentage, ConstantsAppColors.statisticsInRange, weight: .bold)
@@ -558,14 +661,22 @@ private struct LandscapeTIRBadge: View {
             }
             .fixedSize(horizontal: true, vertical: false)
 
-            tirBar
+            HStack(spacing: 0) {
+                tirBar
+
+                Picker("", selection: $rangeMode) {
+                    ForEach(RangeMode.allCases, id: \.self) { mode in
+                        Text(mode.title)
+                            .tag(mode)
+                    }
+                }
+                .labelsHidden()
+                .pickerStyle(.menu)
+                .tint(ConstantsAppColors.primaryText)
+            }
+            .fixedSize(horizontal: true, vertical: false)
         }
         .frame(height: 40)
-        .contentShape(Rectangle())
-        .onTapGesture(count: 2) {
-            // This is intentionally view-local and always starts with standard TIR.
-            rangeMode.toggle()
-        }
         .accessibilityLabel(rangeMode.title)
         .accessibilityValue("\(Texts_Common.lowStatistics) \(percentage(lowPercentage)), \(Texts_Common.inRangeStatistics) \(percentage(inRangePercentage)), \(Texts_Common.highStatistics) \(percentage(highPercentage))")
     }
@@ -588,7 +699,7 @@ private struct LandscapeTIRBadge: View {
             .background(Color.white.opacity(0.14))
             .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
         }
-        .frame(width: 210, height: 18)
+        .frame(width: 160, height: 18)
     }
 
     private var analysisPoints: [LandscapeGlucosePoint] {

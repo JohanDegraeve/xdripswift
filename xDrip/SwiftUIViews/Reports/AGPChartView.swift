@@ -100,13 +100,7 @@ struct AGPChartView: View {
                     .border(ConstantsAppColors.agpPlotBorder, width: ConstantsGlucoseChartSwiftUI.chartPlotBorderLineWidth)
             } else {
                 plotArea
-            }
-        }
-        .overlay(alignment: .topLeading) {
-            if presentation == .landscapeComparison {
-                landscapeLegend
-                    .padding(.top, 6)
-                    .padding(.leading, 8)
+                    .frame(width: fixedPlotWidth)
             }
         }
         .overlay {
@@ -218,26 +212,6 @@ struct AGPChartView: View {
         }
     }
 
-    private var landscapeLegend: some View {
-        HStack(spacing: 10) {
-            legend(color: ConstantsGlucoseChart.glucoseInRangeColor, title: Texts_Common.today)
-            legend(color: ConstantsAppColors.agpMedian, title: "usual median")
-            legend(color: ConstantsAppColors.agpInnerBand, title: "usual range")
-        }
-    }
-
-    private func legend(color: Color, title: String) -> some View {
-        HStack(spacing: 4) {
-            RoundedRectangle(cornerRadius: 2)
-                .fill(color)
-                .frame(width: 18, height: 4)
-
-            Text(title)
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(ConstantsAppColors.secondaryText)
-        }
-    }
-
     private var chartPointsForDisplay: [GlucoseReportAGPPoint] {
         let smoothedPoints = GlucoseReportAGPDisplayPoints.smoothedDisplayPoints(from: points)
         let presentationPoints = presentation == .landscapeComparison ? landscapeSmoothedDisplayPoints(from: smoothedPoints) : smoothedPoints
@@ -328,7 +302,7 @@ struct AGPChartView: View {
         case .statistics:
             return .system(size: ConstantsStatistics.chartAxisLabelFontSize + 1)
         case .landscapeComparison:
-            return .system(size: 14, weight: .semibold)
+            return .system(size: ConstantsStatistics.chartAxisLabelFontSize + 1)
         case .printableReport:
             return .system(size: 7)
         }
@@ -339,7 +313,7 @@ struct AGPChartView: View {
         case .statistics:
             return Color(.colorSecondary)
         case .landscapeComparison:
-            return ConstantsAppColors.tertiaryText
+            return Color(.colorSecondary)
         case .printableReport:
             return GlucoseReportColors.secondaryText
         }

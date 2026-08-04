@@ -94,6 +94,10 @@ class Texts_Common {
     static let days = {
         return NSLocalizedString("common_days", tableName: filename, bundle: Bundle.main, value: "days", comment: "literal translation needed")
     }()
+
+    static let landscapeComparingWithLast = {
+        return NSLocalizedString("common_landscape_comparingWithLast", tableName: filename, bundle: Bundle.main, value: "Comparing with the last:", comment: "label before a selectable number of days used for the landscape AGP comparison")
+    }()
     
     static let today = {
         return NSLocalizedString("common_today", tableName: filename, bundle: Bundle.main, value: "Today", comment: "the word today")
