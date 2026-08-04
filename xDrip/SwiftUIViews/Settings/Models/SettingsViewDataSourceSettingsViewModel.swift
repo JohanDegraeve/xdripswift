@@ -89,13 +89,16 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         settingsSections(sectionIDBase: sectionID).flatMap(\.rows)
     }
 
-    /// Keeps the shared Data Source identity in the first titled section while separating the
-    /// mutually exclusive follower configuration and master upload controls into their own cards.
+    /// Keeps the master upload control with the mode selector while follower settings use a separate section.
     func settingsSections(sectionIDBase: Int) -> [SettingsSection] {
         let visibleRowCount = visibleRowCountForCurrentDataSourceMode
         let primarySectionID = sectionIDBase
         let followerSectionID = sectionIDBase + 1
-        let masterSectionID = sectionIDBase + 2
+        // The Devices guidance is only useful in master mode before the first peripheral has been configured.
+        let hasNoStoredDevices = coreDataManager.map {
+            BLEPeripheralAccessor(coreDataManager: $0).getBLEPeripherals().isEmpty
+        } ?? false
+        let showsMasterDevicesFooter = UserDefaults.standard.isMaster && hasNoStoredDevices
         var masterFollowerRow = nativeSettingsRow(
             id: "dataSource.masterFollower",
             index: Setting.masterFollower.rawValue,
@@ -174,24 +177,20 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         let followerRows = Array(followerNativeRows.prefix(1))
             + [keepAliveTypeRow, followerDataSourceTypeRow, followerStatus]
             + Array(followerNativeRows.dropFirst())
+        let uploadToNightscoutRow = nativeSettingsRow(
+            id: "dataSource.masterUploadToNightscout",
+            index: Setting.followerExtraRow2.rawValue,
+            sectionID: primarySectionID,
+            isVisible: UserDefaults.standard.isMaster
+        )
 
         return [
             SettingsSection(
                 title: sectionTitle(),
-                footer: UserDefaults.standard.isMaster ? Texts_SettingsView.dataSourceMasterDevicesFooter : nil,
-                rows: [masterFollowerRow]
+                footer: showsMasterDevicesFooter ? warningPrefix + Texts_SettingsView.dataSourceMasterDevicesFooter : nil,
+                rows: [masterFollowerRow, uploadToNightscoutRow]
             ),
-            SettingsSection(rows: followerRows),
-            SettingsSection(
-                rows: [
-                    nativeSettingsRow(
-                        id: "dataSource.masterUploadToNightscout",
-                        index: Setting.followerExtraRow2.rawValue,
-                        sectionID: masterSectionID,
-                        isVisible: UserDefaults.standard.isMaster
-                    )
-                ]
-            )
+            SettingsSection(rows: followerRows)
         ]
     }
 

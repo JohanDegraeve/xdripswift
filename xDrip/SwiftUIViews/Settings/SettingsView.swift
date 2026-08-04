@@ -859,7 +859,7 @@ enum SettingsListFactory {
             if let dataSourceViewModel = viewModel as? SettingsViewDataSourceSettingsViewModel {
                 let sectionIDBase = section.rawValue * 10
 
-                return (0 ..< 3).map { offset in
+                return (0 ..< 2).map { offset in
                     let sectionID = sectionIDBase + offset
 
                     return SettingsSectionModel(id: sectionID) {
