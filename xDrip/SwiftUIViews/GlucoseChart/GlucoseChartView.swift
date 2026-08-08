@@ -1080,7 +1080,7 @@ private extension GlucoseChartTreatmentPoints {
 
 // MARK: - Visible Step Series Edges
 
-private extension Array where Element == GlucoseChartPoint {
+extension Array where Element == GlucoseChartPoint {
 
     /// Adds synthetic start/end edge points so step lines remain continuous when a visible range cuts through a basal segment.
     ///
@@ -1090,7 +1090,13 @@ private extension Array where Element == GlucoseChartPoint {
         guard startDate < endDate, !isEmpty else { return [] }
 
         var visiblePoints = [GlucoseChartPoint]()
-        let points = sorted { $0.date < $1.date }
+        // Equal-time step points must retain their original previous-rate then new-rate order.
+        // Reversing that pair changes the rendered basal value while scrolling the same range.
+        let points = enumerated().sorted { lhs, rhs in
+            lhs.element.date == rhs.element.date
+                ? lhs.offset < rhs.offset
+                : lhs.element.date < rhs.element.date
+        }.map(\.element)
 
         if let startPoint = points.last(where: { $0.date <= startDate }) {
             visiblePoints.append(GlucoseChartPoint(date: startDate, value: startPoint.value, idPrefix: "\(idPrefix)-start"))

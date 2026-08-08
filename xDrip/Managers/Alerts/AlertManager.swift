@@ -292,11 +292,10 @@ public class AlertManager: NSObject {
     func checkNotLoopingAlert(deviceStatus: NotLoopingDeviceStatus?) -> Bool {
         let deviceStatus = deviceStatus?.sanitizingFutureDates()
 
-        guard UserDefaults.standard.nightscoutEnabled,
-              UserDefaults.standard.nightscoutFollowType != .none,
+        guard UserDefaults.standard.dataFlowPolicy.showsAIDData,
               let deviceStatus
         else {
-            trace("in checkNotLoopingAlert, skipping because Nightscout is disabled, follow type is disabled, or device status is unavailable", log: log, category: ConstantsLog.categoryAlertManager, type: .info)
+            trace("in checkNotLoopingAlert, skipping because OS-AID status import is disabled or device status is unavailable", log: log, category: ConstantsLog.categoryAlertManager, type: .info)
             clearNotLoopingNotifications()
             resetNotLoopingNotificationThrottle()
             return false

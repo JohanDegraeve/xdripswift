@@ -1,0 +1,374 @@
+//
+//  CareLinkModels.swift
+//  xdripswift
+//
+//  Created by Paul Plant on 1/7/26.
+//  Copyright © 2026 Johan Degraeve. All rights reserved.
+//
+//  CareLink follower protocol and state models.
+//
+
+import Foundation
+
+// MARK: - Web session and region
+
+/// Thread-safe gate for UI and navigation callbacks that may discover login completion together.
+final class CareLinkOneShot {
+    private let lock = NSLock()
+    private var hasRun = false
+
+    /// Runs `action` only for the first caller and returns whether that caller won the race.
+    @discardableResult func run(_ action: () -> Void) -> Bool {
+        lock.lock()
+        guard !hasRun else {
+            lock.unlock()
+            return false
+        }
+        hasRun = true
+        lock.unlock()
+        action()
+        return true
+    }
+}
+
+/// Selects Medtronic's independently hosted US or Outside-US CareLink environment.
+enum CareLinkRegion: String, Codable, CaseIterable {
+    case unitedStates
+    case outsideUnitedStates
+
+    /// Provides a first-login default only. A persisted user selection is authoritative afterward.
+    static var inferred: CareLinkRegion {
+        Locale.current.region?.identifier.uppercased() == "US" ? .unitedStates : .outsideUnitedStates
+    }
+
+    /// User-facing region label used consistently in Settings and recovery messages.
+    var title: String {
+        switch self {
+        case .unitedStates: return Texts_SettingsView.careLinkUnitedStates
+        case .outsideUnitedStates: return Texts_SettingsView.careLinkOutsideUnitedStatesLong
+        }
+    }
+
+    /// Browser sessions use the regional CareLink web host, not the mobile API host.
+    var webBaseURL: URL {
+        URL(string: self == .unitedStates ? "https://carelink.minimed.com" : "https://carelink.minimed.eu")!
+    }
+}
+
+// MARK: - Observable connection state
+
+/// Stable states presented in the follower row and the detailed CareLink status screen.
+enum CareLinkConnectionStatus: String, Codable {
+    case loginRequired
+    case connecting
+    case selectPatient
+    case noData
+    case active
+    case stale
+    case rateLimited
+    case error
+
+    /// Concise label for the parent follower Status row.
+    var title: String {
+        switch self {
+        case .loginRequired: return Texts_SettingsView.followerLogInRequired
+        case .connecting: return Texts_SettingsView.careLinkConnecting
+        case .selectPatient: return Texts_SettingsView.followerSelectPatient
+        case .noData: return Texts_SettingsView.careLinkNoData
+        case .active: return Texts_SettingsView.careLinkActive
+        case .stale: return Texts_SettingsView.followerStale
+        case .rateLimited: return Texts_SettingsView.careLinkRateLimited
+        case .error: return Texts_SettingsView.careLinkError
+        }
+    }
+}
+
+/// Supplies the account details required by the Medtronic-owned login page.
+struct CareLinkLoginCredentials: Equatable {
+    let username: String
+    let password: String
+
+    static func stored(in defaults: UserDefaults = .standard) -> CareLinkLoginCredentials? {
+        guard let username = defaults.careLinkUsername?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !username.isEmpty,
+              let password = defaults.careLinkPassword,
+              !password.isEmpty
+        else {
+            return nil
+        }
+
+        return CareLinkLoginCredentials(username: username, password: password)
+    }
+}
+
+/// Central timing policy shared by the manager and deterministic scheduler tests.
+enum CareLinkPollingPolicy {
+    /// Normal foreground/background heartbeat poll cadence.
+    static let interval: TimeInterval = 60
+    /// Reading age is deliberately independent of request failures and backoff.
+    static let staleAfter: TimeInterval = 20 * 60
+
+    /// Evaluates reading age even when the most recent network request succeeded.
+    static func isStale(lastReadingAt: Date?, now: Date) -> Bool {
+        guard let lastReadingAt else { return true }
+        return now.timeIntervalSince(lastReadingAt) > staleAfter
+    }
+
+    /// Bounds transient network/server backoff at five minutes so recovery remains automatic.
+    static func backoff(failureCount: Int) -> TimeInterval {
+        min(15 * pow(2, Double(max(0, failureCount - 1))), 5 * 60)
+    }
+}
+
+/// Resolves a retained or unambiguous patient without depending on UI state.
+enum CareLinkPatientSelection {
+    /// Retains a valid selection, auto-selects exactly one patient, otherwise requires a choice.
+    static func resolve(patients: [CareLinkPatient], savedID: String?) -> String? {
+        if let savedID, patients.contains(where: { $0.id == savedID || $0.username == savedID }) {
+            return savedID
+        }
+        return patients.count == 1 ? patients[0].id : nil
+    }
+}
+
+/// Normalizes the role names observed in the two CareLink regional environments.
+enum CareLinkAccountRole {
+    static func isCarePartner(_ role: String?) -> Bool {
+        role == "CARE_PARTNER" || role == "CARE_PARTNER_OUS"
+    }
+
+    static func isPatient(_ role: String?) -> Bool {
+        role == "PATIENT" || role == "PATIENT_OUS"
+    }
+
+    /// Family/caregiver followers and professional followers share Medtronic's Care Partner role.
+    static func isSupportedFollower(_ role: String?) -> Bool {
+        isPatient(role) || isCarePartner(role)
+    }
+}
+
+/// Maps protocol failures onto the small user-facing connection-state vocabulary.
+enum CareLinkStatePolicy {
+    /// Keeps pure state mapping reusable by the manager and unit tests.
+    static func status(for error: CareLinkError) -> CareLinkConnectionStatus {
+        switch error {
+        case .notAuthenticated, .reconnectRequired, .regionMismatch, .accountRejected: return .loginRequired
+        case .rateLimited: return .rateLimited
+        case .noGlucoseData: return .noData
+        default: return .error
+        }
+    }
+
+    /// Distinguishes a healthy service response from a pump that has lost its phone relay.
+    /// Historical glucose remains importable, but the follower must not advertise live delivery.
+    static func status(hasGlucose: Bool, lastReadingAt: Date?, pump: CareLinkPumpSnapshot, now: Date) -> CareLinkConnectionStatus {
+        if pump.isCommunicating == false || pump.isInRange == false { return .noData }
+        guard hasGlucose else { return .noData }
+        return CareLinkPollingPolicy.isStale(lastReadingAt: lastReadingAt, now: now) ? .stale : .active
+    }
+
+    /// Gives a successful but disconnected pump response a clear recovery explanation.
+    static func detail(hasGlucose: Bool, pump: CareLinkPumpSnapshot) -> String? {
+        if pump.isCommunicating == false || pump.isInRange == false {
+            return Texts_SettingsView.careLinkPumpNotCommunicating
+        }
+        return hasGlucose ? nil : Texts_SettingsView.careLinkNoGlucoseReadings
+    }
+}
+
+// MARK: - Account and protocol models
+
+/// Glucose API families shared by patient and Care Partner accounts.
+enum CareLinkDataRoute: String, Codable {
+    case monitor
+    case periodic
+    case guardianM2M
+    case legacyConnect
+}
+
+/// A patient represented either by the authenticated account or by a Care Partner link.
+struct CareLinkPatient: Codable, Equatable, Identifiable {
+    let id: String
+    let username: String
+    let firstName: String?
+    let lastName: String?
+
+    /// Uses returned names when available and falls back to the stable CareLink username.
+    var displayName: String {
+        let name = [firstName, lastName].compactMap { $0 }.joined(separator: " ")
+        return name.isEmpty ? username : name
+    }
+}
+
+/// Best-effort account, device and sensor facts displayed for troubleshooting.
+/// Fields remain optional because payload content differs by pump and CGM generation.
+struct CareLinkMetadata: Codable, Equatable {
+    var accountName: String?
+    var role: String?
+    var countryCode: String?
+    var patientName: String?
+    var deviceFamily: String?
+    var deviceModel: String?
+    var deviceSerial: String?
+    var sensorType: String?
+    var sensorState: String?
+    var sensorRemainingMinutes: Int?
+    var route: CareLinkDataRoute?
+}
+
+/// Normalized pump information shared by Settings, Home and the CareLink detail screen.
+///
+/// CareLink payloads use different names across pump generations. Keeping that protocol detail
+/// out of the views prevents each screen from interpreting the same response differently.
+struct CareLinkPumpSnapshot: Equatable {
+    var observedAt: Date?
+    var lastDataUpdateAt: Date?
+    var activeInsulin: Double?
+    var activeInsulinAt: Date?
+    var currentBasalRate: Double?
+    var reservoirUnits: Double?
+    var reservoirPercent: Int?
+    var batteryPercent: Int?
+    var isSuspended: Bool?
+    var isCommunicating: Bool?
+    var isInRange: Bool?
+    var algorithmState: String?
+    var algorithmReadiness: String?
+    var lowGlucoseSuspendState: String?
+    var maximumAutoBasalRate: Double?
+    var maximumBolusAmount: Double?
+
+    /// Medtronic uses the shield for active SmartGuard automatic basal states.
+    /// Unknown and disabled states remain ordinary pump status rather than inferred automation.
+    var reportsActiveSmartGuard: Bool {
+        guard let state = algorithmState?.uppercased() else { return false }
+        return state == "AUTO_BASAL" || state == "SAFE_BASAL"
+    }
+
+    /// Uses CareLink's pump communication flags for the status shown and stored by the app.
+    /// A suspended pump remains the more clinically useful state when both conditions are reported.
+    var pumpStatusTitle: String {
+        if isSuspended == true { return Texts_SettingsView.careLinkSuspended }
+        if isCommunicating == false || isInRange == false { return Texts_SettingsView.careLinkDisconnected }
+        return Texts_SettingsView.careLinkActive
+    }
+}
+
+/// One CareLink treatment ready for the app's existing treatment pipeline.
+///
+/// `value` is insulin units, carbohydrate grams or basal units per hour according to `type`.
+/// Basal `durationMinutes` is stored in `TreatmentEntry.valueSecondary` for Nightscout export.
+struct CareLinkTherapyRecord: Equatable {
+    let sourceIdentifier: String
+    let date: Date
+    let type: TreatmentType
+    let value: Double
+    let durationMinutes: Double
+    let nightscoutEventType: String
+    let notes: String?
+}
+
+/// Parsing result produced from the same response that carries CareLink glucose readings.
+struct CareLinkTherapyPayload: Equatable {
+    var pump = CareLinkPumpSnapshot()
+    var treatments: [CareLinkTherapyRecord] = []
+}
+
+/// One immutable-at-publication view of the manager's account and polling state.
+/// `CareLinkAccountState` publishes this value on the main actor for SwiftUI and Settings.
+struct CareLinkStatusSnapshot: Equatable {
+    var status: CareLinkConnectionStatus = .loginRequired
+    var region: CareLinkRegion = .inferred
+    var patients: [CareLinkPatient] = []
+    var selectedPatientID: String?
+    var metadata = CareLinkMetadata()
+    var lastReadingAt: Date?
+    var lastCheckAt: Date?
+    var lastTokenRefreshAt: Date?
+    var rateLimitedUntil: Date?
+    var serviceReachable: Bool?
+    var detail: String?
+    var pump = CareLinkPumpSnapshot()
+    var importedTreatmentCount = 0
+    var lastTherapyImportAt: Date?
+    var importedPumpStatusCount = 0
+    var lastPumpHistoryImportAt: Date?
+
+    /// Resolves both modern IDs and legacy username-based saved selections.
+    var selectedPatient: CareLinkPatient? {
+        patients.first { $0.id == selectedPatientID || $0.username == selectedPatientID }
+    }
+}
+
+struct CareLinkAPIConfiguration: Equatable {
+    let careLinkBaseURL: URL
+}
+
+/// One browser cookie retained only because CareLink requires it when refreshing the web token.
+struct CareLinkCookie: Codable, Equatable {
+    let name: String
+    let value: String
+    let domain: String
+    let path: String
+    let secure: Bool
+    let expiresAt: Date?
+}
+
+/// Web-session credential captured after Medtronic completes login in `WKWebView`.
+/// This model excludes the account details used to pre-fill the login page and is persisted in Keychain.
+struct CareLinkToken: Codable, Equatable {
+    var accessToken: String
+    var expiresAt: Date
+    var cookies: [CareLinkCookie]
+    var region: CareLinkRegion
+    var countryCode: String?
+
+    /// Refreshes ten minutes early, matching the proven personal browser-session clients.
+    func needsRefresh(at date: Date) -> Bool {
+        expiresAt.timeIntervalSince(date) < 10 * 60
+    }
+}
+
+/// Typed failures used to preserve actionable UI state without exposing session credentials.
+/// Debug builds may trace non-secret response bodies to support closed protocol testing.
+enum CareLinkError: LocalizedError, Equatable {
+    case invalidConfiguration
+    case invalidCallback
+    case cancelled
+    case notAuthenticated
+    case unsupportedRole(CareLinkMetadata)
+    case patientIdentityMissing
+    case patientSelectionRequired
+    case reconnectRequired
+    case regionMismatch(selected: CareLinkRegion, authenticated: CareLinkRegion)
+    case accountRejected(CareLinkRegion)
+    case rateLimited(Date)
+    case noGlucoseData
+    case http(Int)
+    case malformedResponse
+    case offline
+
+    /// Provides actionable, non-sensitive copy suitable for the native status screen.
+    var errorDescription: String? {
+        switch self {
+        case .invalidConfiguration: return Texts_SettingsView.careLinkLoginOpenFailed
+        case .invalidCallback: return Texts_SettingsView.careLinkInvalidLoginResponse
+        case .cancelled: return Texts_SettingsView.careLinkLoginCancelled
+        case .notAuthenticated: return Texts_SettingsView.careLinkLoginToContinue
+        case .unsupportedRole: return Texts_SettingsView.careLinkUnsupportedAccount
+        case .patientIdentityMissing: return Texts_SettingsView.careLinkPatientIdentityMissing
+        case .patientSelectionRequired: return Texts_SettingsView.careLinkSelectPatient
+        case .reconnectRequired: return Texts_SettingsView.careLinkSessionExpired
+        case let .regionMismatch(selected, authenticated):
+            return Texts_SettingsView.careLinkRegionMismatch(authenticated: authenticated.title, selected: selected.title)
+        case let .accountRejected(region):
+            let alternative = region == .unitedStates ? CareLinkRegion.outsideUnitedStates : .unitedStates
+            return Texts_SettingsView.careLinkAccountRejected(region: region.title, alternative: alternative.title)
+        case .rateLimited: return Texts_SettingsView.careLinkTemporarilyRateLimited
+        case .noGlucoseData: return Texts_SettingsView.careLinkNoAccountGlucose
+        case let .http(code): return Texts_SettingsView.careLinkHTTPError(code)
+        case .malformedResponse: return Texts_SettingsView.careLinkMalformedResponse
+        case .offline: return Texts_SettingsView.careLinkOffline
+        }
+    }
+}

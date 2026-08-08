@@ -192,6 +192,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutSyncRequired.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerUploadDataToNightscout.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.therapyDataSourceType.rawValue, options: .new, context: nil)
     }
     
     deinit {
@@ -206,25 +207,18 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutSyncRequired.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerUploadDataToNightscout.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.therapyDataSourceType.rawValue)
         NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - public functions
 
     public func shouldAllowNightscoutBgWrites() -> Bool {
-        if UserDefaults.standard.isMaster {
-            return UserDefaults.standard.masterUploadDataToNightscout
-        }
-
-        if UserDefaults.standard.followerDataSourceType == .nightscout {
-            return false
-        }
-
-        return UserDefaults.standard.followerUploadDataToNightscout
+        UserDefaults.standard.dataFlowPolicy.exportsGlucoseToNightscout
     }
     
     public func shouldAllowNightscoutBgPostProcessingWrites() -> Bool {
-        return UserDefaults.standard.isMaster || UserDefaults.standard.followerDataSourceType != .nightscout
+        UserDefaults.standard.dataFlowPolicy.exportsGlucoseToNightscout
     }
 
     public func replacePostProcessingNotesInNightscout(notesToDelete: [TreatmentEntry], noteToUpload: TreatmentEntry) {
@@ -562,10 +556,11 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         }
                     }
                     
-                case UserDefaults.Key.nightscoutFollowType:
+                case UserDefaults.Key.nightscoutFollowType, UserDefaults.Key.therapyDataSourceType:
                     // nillify the deviceStatus to force a new sync/parse using the new model selected
                     DispatchQueue.main.async {
                         self.deviceStatus = NightscoutDeviceStatus()
+                        self.profile = NightscoutProfile()
                     }
                     
                     DispatchQueue.main.async { [weak self] in
@@ -868,7 +863,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
 
     /// Allows follower-mode downloads while backgrounded so Loop data stays fresh when BLE wakes the app.
     private func performBackgroundFollowerRefreshIfNeeded() {
-        guard UserDefaults.standard.nightscoutFollowType != .none else { return }
+        guard UserDefaults.standard.dataFlowPolicy.importsStatusFromNightscout else { return }
         let now = Date()
         if now.timeIntervalSince(lastBackgroundFollowerRefreshAt) < backgroundFollowerRefreshCooldown {
             return
@@ -881,8 +876,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     /// check if a new profile update is required, see if the downloaded response is newer than the stored one and then import it if necessary
     private func updateProfile() {
-        // if the user doesn't want to follow any type of AID system, just do nothing and return
-        guard UserDefaults.standard.nightscoutFollowType != .none else { return }
+        // Only the authoritative therapy service may publish profile and pump state.
+        guard UserDefaults.standard.dataFlowPolicy.importsStatusFromNightscout else { return }
         
         guard UserDefaults.standard.nightscoutUrl != nil else {
             trace("in updateProfile, nightscoutURL is nil", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
@@ -905,6 +900,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         Task {
             do {
                 let profileResponses: [NightscoutProfileResponse]? = try await nightscoutRequest(path: nightscoutProfilePath, responseType: [NightscoutProfileResponse].self)
+                guard UserDefaults.standard.dataFlowPolicy.importsStatusFromNightscout else { return }
                 if let profileResponse = profileResponses?.first {
                     let newProfile = NightscoutProfile(from: profileResponse)
                     let shouldPersistProfile = await MainActor.run { () -> Bool in
@@ -938,7 +934,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     /// check if a new deviceStatus update is required, see if the downloaded response is newer than the stored one and then import it if necessary
     private func updateDeviceStatus() {
-        guard UserDefaults.standard.nightscoutFollowType != .none else { return }
+        guard UserDefaults.standard.dataFlowPolicy.importsStatusFromNightscout else { return }
         guard UserDefaults.standard.nightscoutUrl != nil else {
             trace("in updateDeviceStatus, nightscoutURL is nil", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
             return
@@ -957,6 +953,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         Task {
             do {
                 let unifiedResponses: [NightscoutDeviceStatusResponse]? = try await nightscoutRequest(path: nightscoutDeviceStatusPath, responseType: [NightscoutDeviceStatusResponse].self)
+                guard UserDefaults.standard.dataFlowPolicy.importsStatusFromNightscout else { return }
                 guard let unifiedResponses = unifiedResponses, let latest = unifiedResponses.sorted(by: { ($0.createdAt ?? "") > ($1.createdAt ?? "") }).first else {
                     trace("in updateDeviceStatus, no valid device status found in Nightscout response", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
                     return
@@ -1127,10 +1124,22 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     ///     - completionHandler : handler that will be called with the result TreatmentNSResponse array
     ///     - treatmentsToSync : main goal of the function is not to upload, but to download. However the response will be used to verify if it has any of the treatments that has no id yet and also to verify if existing treatments have changed
     private func getLatestTreatmentsNSResponses(treatmentsToSync: [TreatmentEntry], completionHandler: @escaping (_ result: NightscoutResult) -> Void) {
+        // Nightscout may remain enabled as an export destination while CareLink owns therapy data.
+        // In that mode, skipping the GET prevents exported CareLink treatments from immediately
+        // returning through a second authoritative import path.
+        guard UserDefaults.standard.dataFlowPolicy.importsTreatmentsFromNightscout else {
+            completionHandler(.success(0))
+            return
+        }
+
         // query for treatments older than maxHoursTreatmentsToDownload
         let queries = [URLQueryItem(name: "find[created_at][$gte]", value: String(Date(timeIntervalSinceNow: TimeInterval(hours: -ConstantsNightscout.maxHoursTreatmentsToDownload)).ISOStringFromDate()))]
         
         performHTTPRequest(path: nightscoutTreatmentPath, queries: queries, httpMethod: nil) { (data: Data?, nightscoutResult: NightscoutResult) in
+            guard UserDefaults.standard.dataFlowPolicy.importsTreatmentsFromNightscout else {
+                completionHandler(.success(0))
+                return
+            }
             
             guard nightscoutResult.successFull() else {
                 trace("in getLatestTreatmentsNSResponses, result is not success", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error)
@@ -1176,7 +1185,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         }
                         
                         // A bulk treatment download is not authoritative enough to infer remote deletion.
-                        // Keep explicit local deletes only; otherwise a truncated or delayed Nightscout response can hide valid local treatments.
+                        // Keep explicit local deletes only. Otherwise a truncated or delayed Nightscout response can hide valid local treatments.
                         let totalActivity = amountOfNewTreatments + amountMarkedAsUploaded + amountOfUpdatedTreatments
                         if totalActivity > 0 {
                             trace("in getLatestTreatmentsNSResponses, Nightscout sync summary: new = %{public}@, markedUploaded = %{public}@, updated = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfNewTreatments.description, amountMarkedAsUploaded.description, amountOfUpdatedTreatments.description)
@@ -1868,7 +1877,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             for otherTreatmentEntry in otherTreatmentEntries {
                 // no need to add treatmentToDelete.
                 if otherTreatmentEntry.id != treatmentToDelete.id {
-                    // if there was already another treatmentEntry, then add it; otherwise create one
+                    // Add another treatment entry when one already exists. Otherwise create it.
                     if treatmentToUpdateAsDictionary != nil {
                         treatmentToUpdateAsDictionary?[otherTreatmentEntry.treatmentType.nightscoutFieldname()] = otherTreatmentEntry.value
                     } else {

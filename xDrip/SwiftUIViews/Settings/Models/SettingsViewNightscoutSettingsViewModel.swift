@@ -99,12 +99,16 @@ class SettingsViewNightscoutSettingsViewModel {
         let nightscoutEnabled = UserDefaults.standard.nightscoutEnabled
         let masterModeRowsVisible = nightscoutEnabled && UserDefaults.standard.isMaster
         let sensorStartTimeRowVisible = masterModeRowsVisible || (nightscoutEnabled && isLibreLinkUpFollower)
+        // AID parsing belongs to Nightscout only while Nightscout owns therapy imports.
+        // CareLink therapy mode keeps Nightscout available as an export destination without
+        // allowing both services to compete for pump state.
+        let nightscoutOwnsTherapyImports = UserDefaults.standard.dataFlowPolicy.therapyDataSource == .nightscout
         let followTypes = NightscoutFollowType.allCasesForList
         var followTypeRow = nativeSettingsRow(
             id: "nightscout.followType",
             index: Setting.nightscoutFollowType.rawValue,
             sectionID: sectionID,
-            isVisible: nightscoutEnabled
+            isVisible: nightscoutEnabled && nightscoutOwnsTherapyImports
         )
         followTypeRow.accessory = .none
         followTypeRow.control = .menu(

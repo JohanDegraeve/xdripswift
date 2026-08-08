@@ -120,8 +120,7 @@ final class GenerateReportViewModel: ObservableObject {
     }
 
     var aidReportIsAvailable: Bool {
-        UserDefaults.standard.nightscoutEnabled
-            && UserDefaults.standard.nightscoutFollowType != .none
+        UserDefaults.standard.dataFlowPolicy.showsAIDData
     }
 
     private var trimmedPasswordToOpen: String? {

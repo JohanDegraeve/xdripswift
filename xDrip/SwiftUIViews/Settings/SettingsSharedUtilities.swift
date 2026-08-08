@@ -145,6 +145,7 @@ struct SettingsSectionModel: Identifiable {
 
 struct SettingsScreen {
     let title: String
+    let toolbarActions: @MainActor () -> [SettingsToolbarAction]
     let makeSections: @MainActor (SettingsActionPresenter) -> [SettingsSectionModel]
 
     /// Describes a pushed Settings screen without coupling it to a specific host.
@@ -152,19 +153,35 @@ struct SettingsScreen {
     /// mix of existing section providers for the child screen.
     init(
         title: String,
+        toolbarActions: @escaping @MainActor () -> [SettingsToolbarAction] = { [] },
         makeSections: @escaping @MainActor (SettingsActionPresenter) -> [SettingsSectionModel]
     ) {
         self.title = title
+        self.toolbarActions = toolbarActions
         self.makeSections = makeSections
     }
 
     /// Convenience initializer for the common case where a child Settings screen
     /// is just a title and a list of existing native section providers.
-    init(title: String, providers: @escaping () -> [SettingsNativeSectionProvider]) {
-        self.init(title: title) { presenter in
+    init(
+        title: String,
+        toolbarActions: @escaping @MainActor () -> [SettingsToolbarAction] = { [] },
+        providers: @escaping () -> [SettingsNativeSectionProvider]
+    ) {
+        self.init(title: title, toolbarActions: toolbarActions) { presenter in
             SettingsListFactory.makeSections(providers: providers(), presenter: presenter)
         }
     }
+}
+
+/// Describes one reactive SF Symbol action in a pushed Settings screen toolbar.
+struct SettingsToolbarAction: Identifiable {
+    let id: String
+    let title: String
+    let symbolName: String
+    let tint: Color
+    var isEnabled: () -> Bool = { true }
+    let action: () -> Void
 }
 
 struct SettingsSection {
@@ -232,7 +249,14 @@ enum SettingsControl {
     /// Presents a short mutually-exclusive menu. Two-state rows can continue to use their existing
     /// row action. Multi-option rows provide the selected index directly.
     case menu(options: () -> [SettingsMenuOption], selectOption: ((Int) -> Void)? = nil)
+    /// Keeps a compact value in the row while retaining explanatory labels inside the menu.
+    case menuWithSelectionTitle(
+        options: () -> [SettingsMenuOption],
+        selectionTitle: () -> String,
+        selectOption: (Int) -> Void
+    )
     case warningBanner(message: String, severity: SettingsWarningBannerSeverity = .warning)
+    case statusBanner(message: String, symbolName: String, symbolColor: Color, titleColor: Color, backgroundColor: Color)
     case custom(content: () -> AnyView)
 }
 
@@ -793,6 +817,17 @@ private struct SettingsNativeRowView: View {
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                 .listRowBackground(severity.backgroundColor)
 
+        case let .some(.statusBanner(message, symbolName, symbolColor, titleColor, backgroundColor)):
+            SettingsStatusBannerView(
+                title: row.title,
+                message: message,
+                symbolName: symbolName,
+                symbolColor: symbolColor,
+                titleColor: titleColor
+            )
+                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                .listRowBackground(backgroundColor)
+
         case let .some(.custom(content)):
             content()
                 .disabled(!row.isEnabled)
@@ -860,6 +895,40 @@ private struct SettingsNativeRowView: View {
             )
             .pickerStyle(.menu)
             .tint(row.isEnabled ? (row.detailColor ?? Color(.colorTertiary)) : .gray)
+            .disabled(!row.isEnabled)
+
+        case let .some(.menuWithSelectionTitle(options, selectionTitle, selectOption)):
+            Menu {
+                ForEach(Array(options().enumerated()), id: \.offset) { index, option in
+                    Button {
+                        guard !option.isSelected else { return }
+                        selectOption(index)
+                        reload(row.reloadScope ?? .section(sectionID))
+                    } label: {
+                        if option.isSelected {
+                            Label(option.title, systemImage: "checkmark")
+                        } else {
+                            Text(option.title)
+                        }
+                    }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Text(row.title)
+                        .foregroundStyle(row.titleColor ?? (row.isEnabled ? Color(.colorPrimary) : .gray))
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.75)
+                    Spacer(minLength: 8)
+                    Text(selectionTitle())
+                        .foregroundStyle(row.isEnabled ? (row.detailColor ?? Color(.colorTertiary)) : .gray)
+                        .lineLimit(1)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(row.isEnabled ? (row.detailColor ?? Color(.colorTertiary)) : .gray)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
             .disabled(!row.isEnabled)
 
         case .none:
@@ -983,6 +1052,35 @@ private struct SettingsWarningBannerView: View {
     }
 }
 
+private struct SettingsStatusBannerView: View {
+    let title: String
+    let message: String
+    let symbolName: String
+    let symbolColor: Color
+    let titleColor: Color
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: symbolName)
+                .font(.title2)
+                .foregroundStyle(symbolColor)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(titleColor)
+
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 4)
+    }
+}
+
 extension SettingsViewModelProtocol {
     /// Builds a row from indexed view-model logic with explicit identity and visibility.
     func nativeSettingsRow(
@@ -1011,7 +1109,6 @@ extension SettingsViewModelProtocol {
                 title: settingsRowText(index: index),
                 detail: detailedText(index: index),
                 indicator: nativeIndicator(index: index),
-                detailIndicator: nativeDetailIndicator(index: index),
                 accessory: accessoryType,
                 control: .toggle(
                     isOn: toggle.isOn,
@@ -1029,7 +1126,6 @@ extension SettingsViewModelProtocol {
             title: settingsRowText(index: index),
             detail: detailedText(index: index),
             indicator: nativeIndicator(index: index),
-            detailIndicator: nativeDetailIndicator(index: index),
             accessory: accessoryType,
             isEnabled: isEnabled,
             isVisible: isVisible,
@@ -1046,16 +1142,6 @@ extension SettingsViewModelProtocol {
 
         guard let homeScreenViewModel = self as? SettingsViewHomeScreenSettingsViewModel,
               let color = homeScreenViewModel.rowIndicatorColor(index: index) else {
-            return nil
-        }
-
-        return SettingsIndicator(color: color)
-    }
-
-    /// Returns the optional colored marker shown before the detail.
-    private func nativeDetailIndicator(index: Int) -> SettingsIndicator? {
-        guard let dataSourceViewModel = self as? SettingsViewDataSourceSettingsViewModel,
-              let color = dataSourceViewModel.followerServiceStatusIndicatorColor(index: index) else {
             return nil
         }
 
@@ -1412,7 +1498,7 @@ struct SettingsTextEntryView: View {
     }
 
     /// Validates and commits the text entry. Validation errors stay on the pushed
-    /// screen; successful entries call the original action and close the screen.
+    /// screen. Successful entries call the original action and close the screen.
     private func submit() {
         if let validator = textEntry.validator, let message = validator(value) {
             validationMessage = message

@@ -55,6 +55,7 @@ struct SettingsNavigationView: View {
     init(
         coreDataManager: CoreDataManager,
         soundPlayer: SoundPlayer,
+        selectedFollowerActions: SelectedFollowerActions,
         incomingBackupRequest: IncomingBackupRequest?,
         consumeIncomingBackup: @escaping (UUID) -> Void
     ) {
@@ -62,6 +63,7 @@ struct SettingsNavigationView: View {
         let presenter = SettingsActionPresenter(router: router)
         let sections = SettingsListFactory.makeRootSections(
             coreDataManager: coreDataManager,
+            selectedFollowerActions: selectedFollowerActions,
             presenter: presenter
         )
 
@@ -201,10 +203,12 @@ private struct SettingsScreenDestinationView: View {
     @StateObject private var listModel: SettingsListModel
     @ObservedObject private var presenter: SettingsActionPresenter
     private let title: String
+    private let toolbarActions: @MainActor () -> [SettingsToolbarAction]
 
     init(settingsScreen: SettingsScreen, presenter: SettingsActionPresenter) {
         self.presenter = presenter
         self.title = settingsScreen.title
+        self.toolbarActions = settingsScreen.toolbarActions
         _listModel = StateObject(wrappedValue: SettingsListModel(
             sections: settingsScreen.makeSections(presenter)
         ))
@@ -220,6 +224,18 @@ private struct SettingsScreenDestinationView: View {
         )
         .onAppear {
             listModel.reload(.all)
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                ForEach(toolbarActions()) { action in
+                    Button(action: action.action) {
+                        Image(systemName: action.symbolName)
+                    }
+                    .tint(action.tint)
+                    .disabled(!action.isEnabled())
+                    .accessibilityLabel(action.title)
+                }
+            }
         }
     }
 }
@@ -432,9 +448,19 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
 
     /// Creates the Settings view model for this root section.
     func viewModel(coreDataManager: CoreDataManager?) -> SettingsViewModelProtocol {
+        viewModel(coreDataManager: coreDataManager, selectedFollowerActions: .none)
+    }
+
+    func viewModel(
+        coreDataManager: CoreDataManager?,
+        selectedFollowerActions: SelectedFollowerActions = .none
+    ) -> SettingsViewModelProtocol {
         switch self {
         case .dataSource:
-            return SettingsViewDataSourceSettingsViewModel(coreDataManager: coreDataManager)
+            return SettingsViewDataSourceSettingsViewModel(
+                coreDataManager: coreDataManager,
+                selectedFollowerActions: selectedFollowerActions
+            )
         case .glucoseDisplay:
             return SettingsViewGroupedSettingsViewModel.glucoseDisplay()
         case .alertsAndNotifications:
@@ -850,10 +876,14 @@ enum SettingsListFactory {
     /// Builds the root Settings sections and connects each view model to the presenter.
     static func makeRootSections(
         coreDataManager: CoreDataManager?,
+        selectedFollowerActions: SelectedFollowerActions,
         presenter: SettingsActionPresenter
     ) -> [SettingsSectionModel] {
         SettingsRootSection.allCases.flatMap { section -> [SettingsSectionModel] in
-            let viewModel = section.viewModel(coreDataManager: coreDataManager)
+            let viewModel = section.viewModel(
+                coreDataManager: coreDataManager,
+                selectedFollowerActions: selectedFollowerActions
+            )
             configure(viewModel: viewModel, presenter: presenter)
 
             if let dataSourceViewModel = viewModel as? SettingsViewDataSourceSettingsViewModel {

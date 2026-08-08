@@ -128,6 +128,10 @@ class Texts_SettingsView {
     static let labelFollowerDataSourceType: String = {
         return NSLocalizedString("settingsviews_labelFollowerDataSourceType", tableName: filename, bundle: Bundle.main, value: "Data Source", comment: "data source settings, data source")
     }()
+
+    static let labelTherapyDataSourceType: String = {
+        return NSLocalizedString("settingsviews_labelTherapyDataSourceType", tableName: filename, bundle: Bundle.main, value: "Pump & Treatments", comment: "data source settings, authoritative remote source for pump and treatment imports")
+    }()
     
     static let labelUploadDataToNightscout: String = {
         return NSLocalizedString("settingsviews_labelUploadDataToNightscout", tableName: filename, bundle: Bundle.main, value: "Upload to Nightscout", comment: "data source settings, enable Nightscout upload")
@@ -1384,6 +1388,144 @@ class Texts_SettingsView {
     static let nightscoutImportErrorRateLimited = NSLocalizedString("settingsviews_nightscoutImportErrorRateLimited", tableName: filename, bundle: Bundle.main, value: "Nightscout is receiving too many requests. Wait a moment and resume the import.", comment: "nightscout import, rate limit error")
     static let nightscoutImportErrorInvalidResponse = NSLocalizedString("settingsviews_nightscoutImportErrorInvalidResponse", tableName: filename, bundle: Bundle.main, value: "Nightscout returned data that could not be read safely. No data from the affected batch was imported.", comment: "nightscout import, invalid response error")
     static let nightscoutImportErrorResponseLimit = NSLocalizedString("settingsviews_nightscoutImportErrorResponseLimit", tableName: filename, bundle: Bundle.main, value: "A Nightscout batch remained too large after being divided into small time ranges. No truncated data was imported.", comment: "nightscout import, response limit error")
+
+    // Follower account screens
+    static let followerSectionAccount = NSLocalizedString("settingsviews_followerSectionAccount", tableName: filename, bundle: Bundle.main, value: "Account", comment: "follower settings section")
+    static let followerSectionConnection = NSLocalizedString("settingsviews_followerSectionConnection", tableName: filename, bundle: Bundle.main, value: "Connection", comment: "follower settings section")
+    static let followerSectionProfile = NSLocalizedString("settingsviews_followerSectionProfile", tableName: filename, bundle: Bundle.main, value: "Profile", comment: "follower settings section")
+    static let followerSectionSensor = NSLocalizedString("settingsviews_followerSectionSensor", tableName: filename, bundle: Bundle.main, value: "Sensor", comment: "follower settings section")
+    static let followerSectionActivity = NSLocalizedString("settingsviews_followerSectionActivity", tableName: filename, bundle: Bundle.main, value: "Activity", comment: "follower settings section")
+    static let followerSectionService = NSLocalizedString("settingsviews_followerSectionService", tableName: filename, bundle: Bundle.main, value: "Service", comment: "follower settings section")
+    static let followerSectionServer = NSLocalizedString("settingsviews_followerSectionServer", tableName: filename, bundle: Bundle.main, value: "Server", comment: "follower settings section")
+    static let followerSectionCalendar = NSLocalizedString("settingsviews_followerSectionCalendar", tableName: filename, bundle: Bundle.main, value: "Calendar", comment: "calendar follower settings section")
+    static let followerSectionLatestData = NSLocalizedString("settingsviews_followerSectionLatestData", tableName: filename, bundle: Bundle.main, value: "Latest Data", comment: "calendar follower settings section")
+    static let followerLogIn = NSLocalizedString("settingsviews_followerLogIn", tableName: filename, bundle: Bundle.main, value: "Log In", comment: "follower account action")
+    static let followerLogOut = NSLocalizedString("settingsviews_followerLogOut", tableName: filename, bundle: Bundle.main, value: "Log Out", comment: "follower account action")
+    static let followerRefresh = NSLocalizedString("settingsviews_followerRefresh", tableName: filename, bundle: Bundle.main, value: "Refresh", comment: "follower refresh action")
+    static let followerNotConfigured = NSLocalizedString("settingsviews_followerNotConfigured", tableName: filename, bundle: Bundle.main, value: "Not Configured", comment: "follower connection status")
+    static let followerLogInRequired = NSLocalizedString("settingsviews_followerLogInRequired", tableName: filename, bundle: Bundle.main, value: "Log In Required", comment: "follower connection status")
+    static let followerAcceptTerms = NSLocalizedString("settingsviews_followerAcceptTerms", tableName: filename, bundle: Bundle.main, value: "Accept Terms", comment: "follower connection status")
+    static let followerSelectPatient = NSLocalizedString("settingsviews_followerSelectPatient", tableName: filename, bundle: Bundle.main, value: "Select Patient", comment: "follower connection status")
+    static let followerConnected = NSLocalizedString("settingsviews_followerConnected", tableName: filename, bundle: Bundle.main, value: "Connected", comment: "follower connection status")
+    static let followerStale = NSLocalizedString("settingsviews_followerStale", tableName: filename, bundle: Bundle.main, value: "Stale", comment: "follower connection status")
+    static let followerConnectionFailed = NSLocalizedString("settingsviews_followerConnectionFailed", tableName: filename, bundle: Bundle.main, value: "Connection Failed", comment: "follower connection status")
+    static let followerServiceStatusTitle = NSLocalizedString("settingsviews_followerServiceStatusTitle", tableName: filename, bundle: Bundle.main, value: "Service Status", comment: "generic follower operational status row")
+    static let followerOperational = NSLocalizedString("settingsviews_followerOperational", tableName: filename, bundle: Bundle.main, value: "Operational", comment: "healthy follower service status")
+    static let followerDegraded = NSLocalizedString("settingsviews_followerDegraded", tableName: filename, bundle: Bundle.main, value: "Degraded", comment: "degraded follower service status")
+    static let followerOutage = NSLocalizedString("settingsviews_followerOutage", tableName: filename, bundle: Bundle.main, value: "Outage", comment: "unavailable follower service status")
+    static let followerOptional = NSLocalizedString("settingsviews_followerOptional", tableName: filename, bundle: Bundle.main, value: "Optional", comment: "optional follower alias value")
+    static let followerNever = NSLocalizedString("settingsviews_followerNever", tableName: filename, bundle: Bundle.main, value: "Never", comment: "no successful follower connection")
+    static let followerLastChecked = NSLocalizedString("settingsviews_followerLastChecked", tableName: filename, bundle: Bundle.main, value: "Last checked", comment: "operational service check timestamp")
+    static let followerFetchError = NSLocalizedString("settingsviews_followerFetchError", tableName: filename, bundle: Bundle.main, value: "Fetch Error", comment: "operational service status")
+    static let followerNightscoutConfigurationRequired = NSLocalizedString("settingsviews_followerNightscoutConfigurationRequired", tableName: filename, bundle: Bundle.main, value: "Enable Nightscout and enter a valid server URL.", comment: "Nightscout follower configuration status")
+    static let followerCalendarSelectionRequired = NSLocalizedString("settingsviews_followerCalendarSelectionRequired", tableName: filename, bundle: Bundle.main, value: "Choose the shared calendar to follow.", comment: "Calendar follower configuration status")
+    static let followerCalendarConnected = NSLocalizedString("settingsviews_followerCalendarConnected", tableName: filename, bundle: Bundle.main, value: "Calendar data is being received.", comment: "Calendar follower connection status")
+    static let followerCalendarWaiting = NSLocalizedString("settingsviews_followerCalendarWaiting", tableName: filename, bundle: Bundle.main, value: "Waiting for a Calendar Share update.", comment: "Calendar follower connection status")
+    static let followerCalendarNoData = NSLocalizedString("settingsviews_followerCalendarNoData", tableName: filename, bundle: Bundle.main, value: "No Calendar Share data has been found yet.", comment: "Calendar follower connection status")
+    static let followerCalendarStale = NSLocalizedString("settingsviews_followerCalendarStale", tableName: filename, bundle: Bundle.main, value: "The latest Calendar Share data is stale.", comment: "Calendar follower connection status")
+    static let followerCalendarReadError = NSLocalizedString("settingsviews_followerCalendarReadError", tableName: filename, bundle: Bundle.main, value: "The selected calendar could not be read.", comment: "Calendar follower connection status")
+    static let followerWaitingForFirstConnection = NSLocalizedString("settingsviews_followerWaitingForFirstConnection", tableName: filename, bundle: Bundle.main, value: "Waiting for the first successful connection.", comment: "follower connection status")
+    static let followerLastAttemptFailed = NSLocalizedString("settingsviews_followerLastAttemptFailed", tableName: filename, bundle: Bundle.main, value: "The last connection attempt did not succeed.", comment: "follower connection status")
+    static let therapyDataSourceAutomatic = NSLocalizedString("settingsviews_therapyDataSourceAutomatic", tableName: filename, bundle: Bundle.main, value: "Automatic", comment: "automatic pump and treatment source")
+    static let therapyDataSourceNone = NSLocalizedString("settingsviews_therapyDataSourceNone", tableName: filename, bundle: Bundle.main, value: "None", comment: "no remote pump and treatment source")
+    static let followerRussia = NSLocalizedString("settingsviews_followerRussia", tableName: filename, bundle: Bundle.main, value: "Russia", comment: "LibreLinkUp Russia region")
+
+    static func dexcomServer(_ number: String) -> String {
+        String(format: NSLocalizedString("settingsviews_dexcomServer", tableName: filename, bundle: Bundle.main, value: "Dexcom Server %@", comment: "Dexcom Share regional server information title"), number)
+    }
+
+    // CareLink follower
+    static let careLinkCredentialsFooter = NSLocalizedString("settingsviews_careLinkCredentialsFooter", tableName: filename, bundle: Bundle.main, value: "Username and password are required before Log In is available. Region selects the CareLink service that owns this account.", comment: "CareLink account settings footer")
+    static let careLinkCredentialsRequiredFooter = NSLocalizedString("settingsviews_careLinkCredentialsRequiredFooter", tableName: filename, bundle: Bundle.main, value: "Enter the CareLink username and password above to enable Log In.", comment: "CareLink connection settings footer")
+    static let careLinkDevice = NSLocalizedString("settingsviews_careLinkDevice", tableName: filename, bundle: Bundle.main, value: "Device", comment: "CareLink settings section")
+    static let careLinkAccount = NSLocalizedString("settingsviews_careLinkAccount", tableName: filename, bundle: Bundle.main, value: "Account", comment: "CareLink account name row")
+    static let careLinkRole = NSLocalizedString("settingsviews_careLinkRole", tableName: filename, bundle: Bundle.main, value: "Role", comment: "CareLink account role row")
+    static let careLinkPatient = NSLocalizedString("settingsviews_careLinkPatient", tableName: filename, bundle: Bundle.main, value: "Patient", comment: "CareLink selected patient row")
+    static let careLinkAccountCountry = NSLocalizedString("settingsviews_careLinkAccountCountry", tableName: filename, bundle: Bundle.main, value: "Account Country", comment: "CareLink account country row")
+    static let careLinkPump = NSLocalizedString("settingsviews_careLinkPump", tableName: filename, bundle: Bundle.main, value: "Pump", comment: "CareLink pump row")
+    static let careLinkSerialNumber = NSLocalizedString("settingsviews_careLinkSerialNumber", tableName: filename, bundle: Bundle.main, value: "Serial Number", comment: "CareLink serial number row")
+    static let careLinkDataRoute = NSLocalizedString("settingsviews_careLinkDataRoute", tableName: filename, bundle: Bundle.main, value: "Data Route", comment: "CareLink API route row")
+    static let careLinkPumpBattery = NSLocalizedString("settingsviews_careLinkPumpBattery", tableName: filename, bundle: Bundle.main, value: "Pump Battery", comment: "CareLink pump battery row")
+    static let careLinkReservoir = NSLocalizedString("settingsviews_careLinkReservoir", tableName: filename, bundle: Bundle.main, value: "Reservoir", comment: "CareLink reservoir row")
+    static let careLinkLastReading = NSLocalizedString("settingsviews_careLinkLastReading", tableName: filename, bundle: Bundle.main, value: "Last Reading", comment: "CareLink activity row")
+    static let careLinkLastCheck = NSLocalizedString("settingsviews_careLinkLastCheck", tableName: filename, bundle: Bundle.main, value: "Last Check", comment: "CareLink activity row")
+    static let careLinkSessionRefresh = NSLocalizedString("settingsviews_careLinkSessionRefresh", tableName: filename, bundle: Bundle.main, value: "Session Refresh", comment: "CareLink activity row")
+    static let careLinkTherapyImport = NSLocalizedString("settingsviews_careLinkTherapyImport", tableName: filename, bundle: Bundle.main, value: "Therapy Import", comment: "CareLink activity row")
+    static let careLinkNewTreatments = NSLocalizedString("settingsviews_careLinkNewTreatments", tableName: filename, bundle: Bundle.main, value: "New Treatments", comment: "CareLink activity row")
+    static let careLinkServiceReachable = NSLocalizedString("settingsviews_careLinkServiceReachable", tableName: filename, bundle: Bundle.main, value: "Service Reachable", comment: "CareLink activity row")
+    static let careLinkUnitedStates = NSLocalizedString("settingsviews_careLinkUnitedStates", tableName: filename, bundle: Bundle.main, value: "United States", comment: "CareLink region menu")
+    static let careLinkOutsideUnitedStates = NSLocalizedString("settingsviews_careLinkOutsideUnitedStates", tableName: filename, bundle: Bundle.main, value: "Outside US", comment: "CareLink region menu")
+    static let careLinkLogIn = NSLocalizedString("settingsviews_careLinkLogIn", tableName: filename, bundle: Bundle.main, value: "CareLink Log In", comment: "CareLink browser login title")
+    static let careLinkOutsideUnitedStatesLong = NSLocalizedString("settingsviews_careLinkOutsideUnitedStatesLong", tableName: filename, bundle: Bundle.main, value: "Outside United States", comment: "CareLink region name in a message")
+    static let careLinkConnecting = NSLocalizedString("settingsviews_careLinkConnecting", tableName: filename, bundle: Bundle.main, value: "Connecting...", comment: "CareLink connection state")
+    static let careLinkNoData = NSLocalizedString("settingsviews_careLinkNoData", tableName: filename, bundle: Bundle.main, value: "No Data", comment: "CareLink connection state")
+    static let careLinkActive = NSLocalizedString("settingsviews_careLinkActive", tableName: filename, bundle: Bundle.main, value: "Active", comment: "CareLink connection or pump state")
+    static let careLinkRateLimited = NSLocalizedString("settingsviews_careLinkRateLimited", tableName: filename, bundle: Bundle.main, value: "Rate Limited", comment: "CareLink connection state")
+    static let careLinkError = NSLocalizedString("settingsviews_careLinkError", tableName: filename, bundle: Bundle.main, value: "Error", comment: "CareLink connection state")
+    static let careLinkSuspended = NSLocalizedString("settingsviews_careLinkSuspended", tableName: filename, bundle: Bundle.main, value: "Suspended", comment: "CareLink pump state")
+    static let careLinkDisconnected = NSLocalizedString("settingsviews_careLinkDisconnected", tableName: filename, bundle: Bundle.main, value: "Disconnected", comment: "CareLink pump state")
+    static let careLinkPumpNotCommunicating = NSLocalizedString("settingsviews_careLinkPumpNotCommunicating", tableName: filename, bundle: Bundle.main, value: "CareLink is connected, but the pump is not currently communicating with the phone.", comment: "CareLink pump communication status")
+    static let careLinkNoGlucoseReadings = NSLocalizedString("settingsviews_careLinkNoGlucoseReadings", tableName: filename, bundle: Bundle.main, value: "CareLink returned no glucose readings.", comment: "CareLink successful response without glucose")
+    static let careLinkLoginOpenFailed = NSLocalizedString("settingsviews_careLinkLoginOpenFailed", tableName: filename, bundle: Bundle.main, value: "CareLink login could not be opened.", comment: "CareLink login error")
+    static let careLinkInvalidLoginResponse = NSLocalizedString("settingsviews_careLinkInvalidLoginResponse", tableName: filename, bundle: Bundle.main, value: "CareLink returned an invalid login response.", comment: "CareLink login error")
+    static let careLinkLoginCancelled = NSLocalizedString("settingsviews_careLinkLoginCancelled", tableName: filename, bundle: Bundle.main, value: "CareLink login was cancelled.", comment: "CareLink login error")
+    static let careLinkLoginToContinue = NSLocalizedString("settingsviews_careLinkLoginToContinue", tableName: filename, bundle: Bundle.main, value: "Log in to CareLink to continue.", comment: "CareLink authentication error")
+    static let careLinkUnsupportedAccount = NSLocalizedString("settingsviews_careLinkUnsupportedAccount", tableName: filename, bundle: Bundle.main, value: "This CareLink account type is not supported.", comment: "CareLink account error")
+    static let careLinkPatientIdentityMissing = NSLocalizedString("settingsviews_careLinkPatientIdentityMissing", tableName: filename, bundle: Bundle.main, value: "CareLink did not return the personal account identity.", comment: "CareLink account error")
+    static let careLinkSelectPatient = NSLocalizedString("settingsviews_careLinkSelectPatient", tableName: filename, bundle: Bundle.main, value: "Select a CareLink patient.", comment: "CareLink patient selection error")
+    static let careLinkSessionExpired = NSLocalizedString("settingsviews_careLinkSessionExpired", tableName: filename, bundle: Bundle.main, value: "The CareLink session expired. Log in again.", comment: "CareLink authentication error")
+    static let careLinkTemporarilyRateLimited = NSLocalizedString("settingsviews_careLinkTemporarilyRateLimited", tableName: filename, bundle: Bundle.main, value: "CareLink is temporarily rate limiting requests.", comment: "CareLink service error")
+    static let careLinkNoAccountGlucose = NSLocalizedString("settingsviews_careLinkNoAccountGlucose", tableName: filename, bundle: Bundle.main, value: "No glucose data is available for this CareLink account.", comment: "CareLink data error")
+    static let careLinkMalformedResponse = NSLocalizedString("settingsviews_careLinkMalformedResponse", tableName: filename, bundle: Bundle.main, value: "CareLink returned data that could not be read.", comment: "CareLink response error")
+    static let careLinkOffline = NSLocalizedString("settingsviews_careLinkOffline", tableName: filename, bundle: Bundle.main, value: "CareLink could not be reached.", comment: "CareLink network error")
+    static let careLinkCredentialsRequired = NSLocalizedString("settingsviews_careLinkCredentialsRequired", tableName: filename, bundle: Bundle.main, value: "Enter the CareLink username and password before logging in.", comment: "CareLink login requirement")
+    static let careLinkRefreshing = NSLocalizedString("settingsviews_careLinkRefreshing", tableName: filename, bundle: Bundle.main, value: "Refreshing…", comment: "CareLink refresh status")
+    static let careLinkNoLinkedPatients = NSLocalizedString("settingsviews_careLinkNoLinkedPatients", tableName: filename, bundle: Bundle.main, value: "No patients are linked to this CareLink account.", comment: "CareLink Care Partner account status")
+    static let careLinkTherapy = NSLocalizedString("settingsviews_careLinkTherapy", tableName: filename, bundle: Bundle.main, value: "Therapy", comment: "CareLink pump detail section")
+    static let careLinkDelivery = NSLocalizedString("settingsviews_careLinkDelivery", tableName: filename, bundle: Bundle.main, value: "Delivery", comment: "CareLink pump detail row")
+    static let careLinkReadiness = NSLocalizedString("settingsviews_careLinkReadiness", tableName: filename, bundle: Bundle.main, value: "Readiness", comment: "CareLink pump detail row")
+    static let careLinkLowGlucoseSuspend = NSLocalizedString("settingsviews_careLinkLowGlucoseSuspend", tableName: filename, bundle: Bundle.main, value: "Low Glucose Suspend", comment: "CareLink pump detail row")
+    static let careLinkActiveInsulin = NSLocalizedString("settingsviews_careLinkActiveInsulin", tableName: filename, bundle: Bundle.main, value: "Active Insulin", comment: "CareLink pump detail row")
+    static let careLinkBasalRate = NSLocalizedString("settingsviews_careLinkBasalRate", tableName: filename, bundle: Bundle.main, value: "Basal Rate", comment: "CareLink pump detail row")
+    static let careLinkSensorRemaining = NSLocalizedString("settingsviews_careLinkSensorRemaining", tableName: filename, bundle: Bundle.main, value: "Sensor Remaining", comment: "CareLink pump detail row")
+    static let careLinkLastPumpUpdate = NSLocalizedString("settingsviews_careLinkLastPumpUpdate", tableName: filename, bundle: Bundle.main, value: "Last Pump Update", comment: "CareLink pump detail row")
+    static let careLinkModel = NSLocalizedString("settingsviews_careLinkModel", tableName: filename, bundle: Bundle.main, value: "Model", comment: "CareLink pump detail row")
+    static let careLinkStatus = NSLocalizedString("settingsviews_careLinkStatus", tableName: filename, bundle: Bundle.main, value: "Status", comment: "CareLink pump detail row")
+    static let careLinkBattery = NSLocalizedString("settingsviews_careLinkBattery", tableName: filename, bundle: Bundle.main, value: "Battery", comment: "CareLink pump detail row")
+    static let careLinkCommunication = NSLocalizedString("settingsviews_careLinkCommunication", tableName: filename, bundle: Bundle.main, value: "Communication", comment: "CareLink pump detail section")
+    static let careLinkPumpConnected = NSLocalizedString("settingsviews_careLinkPumpConnected", tableName: filename, bundle: Bundle.main, value: "Pump Connected", comment: "CareLink pump detail row")
+    static let careLinkPumpInRange = NSLocalizedString("settingsviews_careLinkPumpInRange", tableName: filename, bundle: Bundle.main, value: "Pump in Range", comment: "CareLink pump detail row")
+    static let careLinkLastCareLinkCheck = NSLocalizedString("settingsviews_careLinkLastCareLinkCheck", tableName: filename, bundle: Bundle.main, value: "Last CareLink Check", comment: "CareLink pump detail row")
+    static let careLinkReportedLimits = NSLocalizedString("settingsviews_careLinkReportedLimits", tableName: filename, bundle: Bundle.main, value: "Reported Limits", comment: "CareLink pump detail section")
+    static let careLinkMaximumAutoBasal = NSLocalizedString("settingsviews_careLinkMaximumAutoBasal", tableName: filename, bundle: Bundle.main, value: "Maximum Auto Basal", comment: "CareLink pump detail row")
+    static let careLinkMaximumBolus = NSLocalizedString("settingsviews_careLinkMaximumBolus", tableName: filename, bundle: Bundle.main, value: "Maximum Bolus", comment: "CareLink pump detail row")
+
+    static func careLinkRegionMismatch(authenticated: String, selected: String) -> String {
+        String(format: NSLocalizedString("settingsviews_careLinkRegionMismatch", tableName: filename, bundle: Bundle.main, value: "This login belongs to %@, but %@ is selected. Log in again to use the selected region.", comment: "CareLink region mismatch error"), authenticated, selected)
+    }
+
+    static func careLinkAccountRejected(region: String, alternative: String) -> String {
+        String(format: NSLocalizedString("settingsviews_careLinkAccountRejected", tableName: filename, bundle: Bundle.main, value: "CareLink rejected this login in the %@ region. Log in again, or try %@.", comment: "CareLink regional login error"), region, alternative)
+    }
+
+    static func careLinkHTTPError(_ code: Int) -> String {
+        String(format: NSLocalizedString("settingsviews_careLinkHTTPError", tableName: filename, bundle: Bundle.main, value: "CareLink returned HTTP %d.", comment: "CareLink HTTP error"), code)
+    }
+
+    // Medtrum follower
+    static let medtrumPatientList = NSLocalizedString("settingsviews_medtrumPatientList", tableName: filename, bundle: Bundle.main, value: "Patient List", comment: "Medtrum cached patient list row")
+    static let medtrumUsingCachedList = NSLocalizedString("settingsviews_medtrumUsingCachedList", tableName: filename, bundle: Bundle.main, value: "Using cached list", comment: "Medtrum cached patient list status")
+    static let medtrumAccountType = NSLocalizedString("settingsviews_medtrumAccountType", tableName: filename, bundle: Bundle.main, value: "Account Type", comment: "Medtrum account type row")
+    static let medtrumCaregiver = NSLocalizedString("settingsviews_medtrumCaregiver", tableName: filename, bundle: Bundle.main, value: "Caregiver", comment: "Medtrum caregiver account type")
+    static let medtrumPatient = NSLocalizedString("settingsviews_medtrumPatient", tableName: filename, bundle: Bundle.main, value: "Patient", comment: "Medtrum patient account type")
+
+    static func medtrumPatientID(_ identifier: Int) -> String {
+        String(format: NSLocalizedString("settingsviews_medtrumPatientID", tableName: filename, bundle: Bundle.main, value: "Patient ID: %d", comment: "Medtrum patient identifier"), identifier)
+    }
+
+    static func followerLastConnected(_ interval: String) -> String {
+        String(format: NSLocalizedString("settingsviews_followerLastConnected", tableName: filename, bundle: Bundle.main, value: "Last connected %@.", comment: "follower connection age"), interval)
+    }
 
     static func cleanDataDays(_ days: Int) -> String {
         return String(format: NSLocalizedString("settingsviews_cleanDataDays", tableName: filename, bundle: Bundle.main, value: "%d days", comment: "clean data, number of days to retain"), days)

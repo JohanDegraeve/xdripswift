@@ -56,7 +56,7 @@ final class LandscapeChartStateModel: ObservableObject {
         self.coreDataManager = coreDataManager
         self.nightscoutSyncManager = nightscoutSyncManager
         statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
-        showsAIDCharts = UserDefaults.standard.nightscoutFollowType != .none
+        showsAIDCharts = UserDefaults.standard.dataFlowPolicy.showsAIDData
         comparisonPeriod = LandscapeComparisonPeriod(rawValue: UserDefaults.standard.landscapeComparisonDays) ?? .sevenDays
 
         refresh()

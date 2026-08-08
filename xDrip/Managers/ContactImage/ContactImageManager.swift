@@ -150,7 +150,7 @@ class ContactImageManager: NSObject {
             
             // we're going to use the app name as the given name of the contact we want to use/create/update
             let keyToFetch = [CNContactGivenNameKey, CNContactFamilyNameKey, CNContactOrganizationNameKey, CNContactImageDataKey] as [CNKeyDescriptor]
-            let updatedString = (UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "Updated" : UserDefaults.standard.followerDataSourceType.fullDescription) + ": \(Date().formatted(date: .omitted, time: .shortened))"
+            let updatedString = (UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "Updated" : UserDefaults.standard.followerDataSourceType.description) + ": \(Date().formatted(date: .omitted, time: .shortened))"
 
             // 1) Try identifier match first
             let storedIdentifier = UserDefaults.standard.string(forKey: self.contactIdentifierKey)

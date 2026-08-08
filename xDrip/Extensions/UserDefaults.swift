@@ -34,6 +34,8 @@ extension UserDefaults {
         case masterUploadDataToNightscout = "masterUploadDataToNightscout"
         /// which follower mode is selected?
         case followerDataSourceType = "followerDataSourceType"
+        /// which remote service owns treatment and pump imports?
+        case therapyDataSourceType = "therapyDataSourceType"
         /// should follower data (if not from Nightscout) be uploaded to Nightscout?
         case followerUploadDataToNightscout = "followerUploadDataToNightscout"
         /// should we try to keep the follower alive in the background? If so, which type?
@@ -50,6 +52,8 @@ extension UserDefaults {
         case libreLinkUpPassword = "libreLinkUpPassword"
         /// LibreLinkUp login is allowed, or prevented?
         case libreLinkUpPreventLogin = "libreLinkUpPreventLogin"
+        /// The user explicitly ended the local LibreLinkUp session.
+        case libreLinkUpManuallyLoggedOut = "libreLinkUpManuallyLoggedOut"
         /// LibreLinkUp region
         case libreLinkUpRegion = "libreLinkUpRegion"
         /// LibreLinkUp countr abbreviation (send in server response)
@@ -68,12 +72,22 @@ extension UserDefaults {
         case medtrumEasyViewPassword = "medtrumEasyViewPassword"
         /// Medtrum EasyView login is allowed, or prevented?
         case medtrumEasyViewPreventLogin = "medtrumEasyViewPreventLogin"
+        /// The user explicitly ended the local Medtrum EasyView session.
+        case medtrumEasyViewManuallyLoggedOut = "medtrumEasyViewManuallyLoggedOut"
         /// Medtrum EasyView user type from login response ("P" = patient, "M" = caregiver/monitor)
         case medtrumEasyViewUserType = "medtrumEasyViewUserType"
         /// Cached JSON data of caregiver's patient connections (serialized [MedtrumEasyViewPatientConnection])
         case medtrumEasyViewCachedConnections = "medtrumEasyViewCachedConnections"
         /// Selected patient UID for caregiver accounts (nil = "My Account" / patient mode)
         case medtrumEasyViewSelectedPatientUid = "medtrumEasyViewSelectedPatientUid"
+        /// CareLink account username used to pre-fill the Medtronic login page.
+        case careLinkUsername = "careLinkUsername"
+        /// CareLink account password used to pre-fill the Medtronic login page.
+        case careLinkPassword = "careLinkPassword"
+        /// Non-secret CareLink environment selected explicitly or inferred on first use.
+        case careLinkRegion = "careLinkRegion"
+        /// Non-secret stable identifier for the personal CareLink account represented as a patient.
+        case careLinkSelectedPatientID = "careLinkSelectedPatientID"
         /// Flag indicating if the last connections fetch failed (to show error in UI)
         case medtrumEasyViewConnectionsFetchFailed = "medtrumEasyViewConnectionsFetchFailed"
 
@@ -316,6 +330,8 @@ extension UserDefaults {
         case dexcomShareRegion = "dexcomShareRegion"
         /// the timestamp of the last failed login attempt
         case dexcomShareLoginFailedTimestamp = "dexcomShareLoginFailedTimestamp"
+        /// The user explicitly ended the local Dexcom Share session.
+        case dexcomShareManuallyLoggedOut = "dexcomShareManuallyLoggedOut"
         /// dexcom share serial number
         case dexcomShareUploadSerialNumber = "dexcomShareUploadSerialNumber"
         /// should schedule be used for dexcom share upload ?
@@ -624,6 +640,54 @@ extension UserDefaults {
         }
     }
 
+    /// Stores the user's therapy-source preference independently of the glucose source.
+    /// Automatic is deliberately the default so existing installations adopt the safe routing
+    /// rules without a destructive migration or a forced Settings choice.
+    var therapyDataSourceType: TherapyDataSourceType {
+        get {
+            let rawValue = integer(forKey: Key.therapyDataSourceType.rawValue)
+            return TherapyDataSourceType(rawValue: rawValue) ?? .automatic
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.therapyDataSourceType.rawValue)
+        }
+    }
+
+    /// Captures the current settings as one immutable policy for managers and presentation code.
+    var dataFlowPolicy: DataFlowPolicy {
+        DataFlowPolicy(
+            isMaster: isMaster,
+            followerDataSource: followerDataSourceType,
+            therapyDataSourceSelection: therapyDataSourceType,
+            nightscoutEnabled: nightscoutEnabled,
+            masterUploadsGlucoseToNightscout: masterUploadDataToNightscout,
+            followerUploadsGlucoseToNightscout: followerUploadDataToNightscout,
+            nightscoutFollowType: nightscoutFollowType
+        )
+    }
+
+    /// CareLink account details follow the same UserDefaults storage pattern as other followers.
+    @objc dynamic var careLinkUsername: String? {
+        get { string(forKey: Key.careLinkUsername.rawValue) }
+        set { set(newValue, forKey: Key.careLinkUsername.rawValue) }
+    }
+
+    @objc dynamic var careLinkPassword: String? {
+        get { string(forKey: Key.careLinkPassword.rawValue) }
+        set { set(newValue, forKey: Key.careLinkPassword.rawValue) }
+    }
+
+    /// CareLink region and patient selection are non-secret account preferences.
+    @objc dynamic var careLinkRegion: String? {
+        get { string(forKey: Key.careLinkRegion.rawValue) }
+        set { set(newValue, forKey: Key.careLinkRegion.rawValue) }
+    }
+
+    @objc dynamic var careLinkSelectedPatientID: String? {
+        get { string(forKey: Key.careLinkSelectedPatientID.rawValue) }
+        set { set(newValue, forKey: Key.careLinkSelectedPatientID.rawValue) }
+    }
+
     /// holds the enum integer of the type of follower keep-alive to be used
     /// it would default to 0 (disabled) so to avoid this, we'll manually set it to normal the first time get is called
     var followerBackgroundKeepAliveType: FollowerBackgroundKeepAliveType {
@@ -751,6 +815,11 @@ extension UserDefaults {
         }
     }
 
+    @objc dynamic var libreLinkUpManuallyLoggedOut: Bool {
+        get { bool(forKey: Key.libreLinkUpManuallyLoggedOut.rawValue) }
+        set { set(newValue, forKey: Key.libreLinkUpManuallyLoggedOut.rawValue) }
+    }
+
     // MARK: - Medtrum EasyView Follower Settings
 
     /// Medtrum EasyView account username/email
@@ -782,6 +851,11 @@ extension UserDefaults {
         set {
             set(newValue, forKey: Key.medtrumEasyViewPreventLogin.rawValue)
         }
+    }
+
+    @objc dynamic var medtrumEasyViewManuallyLoggedOut: Bool {
+        get { bool(forKey: Key.medtrumEasyViewManuallyLoggedOut.rawValue) }
+        set { set(newValue, forKey: Key.medtrumEasyViewManuallyLoggedOut.rawValue) }
     }
 
     /// Medtrum EasyView user type ("P" for patient, "M" for caregiver/monitor)
@@ -2084,6 +2158,11 @@ extension UserDefaults {
         set {
             set(newValue, forKey: Key.dexcomShareLoginFailedTimestamp.rawValue)
         }
+    }
+
+    var dexcomShareManuallyLoggedOut: Bool {
+        get { bool(forKey: Key.dexcomShareManuallyLoggedOut.rawValue) }
+        set { set(newValue, forKey: Key.dexcomShareManuallyLoggedOut.rawValue) }
     }
 
     /// dexcom share serial number

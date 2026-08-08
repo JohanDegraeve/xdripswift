@@ -6,6 +6,7 @@
 //  Copyright © 2024 Johan Degraeve. All rights reserved.
 //
 
+import Combine
 import Foundation
 import OSLog
 import WatchConnectivity
@@ -50,6 +51,9 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
     /// keep track of when we last forced a complication update from within the code
     private var lastForcedComplicationUpdateTimeStamp: Date = .distantPast
 
+    /// Sends CareLink connection transitions without waiting for the next glucose reading.
+    private var careLinkStatusObserver: AnyCancellable?
+
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryWatchManager)
 
@@ -74,6 +78,16 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
 
         // add observer to sync to the watch once the device status was updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutDeviceStatusWasUpdated.rawValue, options: .new, context: nil)
+
+        careLinkStatusObserver = CareLinkAccountState.shared.$snapshot
+            .map(\.status)
+            .removeDuplicates()
+            .dropFirst()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                guard UserDefaults.standard.followerDataSourceType == .careLink else { return }
+                self?.processWatchUpdate(updateTypes: [.status], forceComplicationUpdate: false)
+            }
 
         processWatchUpdate(updateTypes: [.status, .bgReadings], forceComplicationUpdate: false)
     }
@@ -192,6 +206,9 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
         status.isMaster = UserDefaults.standard.isMaster
         status.followerDataSourceTypeRawValue = UserDefaults.standard.followerDataSourceType.rawValue
         status.followerBackgroundKeepAliveTypeRawValue = UserDefaults.standard.followerBackgroundKeepAliveType.rawValue
+        status.followerConnectionStatusRawValue = UserDefaults.standard.followerDataSourceType == .careLink
+            ? CareLinkAccountState.shared.snapshot.status.rawValue
+            : nil
         status.keepAliveIsDisabled = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
 
         if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
@@ -237,7 +254,7 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
         }
 
         // add AID/loop status data
-        if !UserDefaults.standard.nightscoutEnabled || UserDefaults.standard.nightscoutUrl == nil || UserDefaults.standard.nightscoutFollowType == .none {
+        if !UserDefaults.standard.dataFlowPolicy.showsAIDData {
             status.deviceStatusAvailable = false
         } else if UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil, nightscoutSyncManager.deviceStatus.createdAt != .distantPast {
             status.deviceStatusAvailable = true

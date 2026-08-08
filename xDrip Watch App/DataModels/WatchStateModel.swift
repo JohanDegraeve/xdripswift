@@ -117,6 +117,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var isMaster: Bool = true
     @Published var followerDataSourceType: FollowerDataSourceType = .nightscout
     @Published var followerBackgroundKeepAliveType: FollowerBackgroundKeepAliveType = .normal
+    @Published var followerConnectionStatusRawValue: String?
     @Published var keepAliveIsDisabled: Bool = false
 
     @Published var lastUpdatedTextString: String = Texts_WatchApp.requestingData
@@ -349,6 +350,17 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// check when the last follower connection was and compare that to the actual time
     /// - Returns: color of the follower connection status indicator
     func followerConnectionIndicatorColor() -> Color {
+        if followerDataSourceType == .careLink, let followerConnectionStatusRawValue {
+            switch followerConnectionStatusRawValue {
+            case "loginRequired", "selectPatient": return .gray
+            case "connecting", "noData": return .yellow
+            case "active": return .green
+            case "stale", "rateLimited": return .orange
+            case "error": return .red
+            default: break
+            }
+        }
+
         if timeStampOfLastFollowerConnection > Date().addingTimeInterval(-Double(secondsUntilFollowerDisconnectWarning)) {
             return .green
         } else {
@@ -683,6 +695,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         isMaster = dictionary["isMaster"] as? Bool ?? true
         followerDataSourceType = FollowerDataSourceType(rawValue: dictionary["followerDataSourceTypeRawValue"] as? Int ?? 0) ?? .nightscout
         followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: dictionary["followerBackgroundKeepAliveTypeRawValue"] as? Int ?? 0) ?? .normal
+        followerConnectionStatusRawValue = dictionary["followerConnectionStatusRawValue"] as? String
         timeStampOfLastFollowerConnection = Date(timeIntervalSince1970: dictionary["timeStampOfLastFollowerConnection"] as? Double ?? 0)
         secondsUntilFollowerDisconnectWarning = dictionary["secondsUntilFollowerDisconnectWarning"] as? Int ?? 0
         timeStampOfLastHeartBeat = Date(timeIntervalSince1970: dictionary["timeStampOfLastHeartBeat"] as? Double ?? 0)

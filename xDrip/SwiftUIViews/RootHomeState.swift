@@ -114,6 +114,9 @@ struct RootHomeDataSourceState {
     var title = ""
     var detail = ""
     var detailColor = ConstantsAppColors.secondaryText
+    var detailSystemImage: String?
+    var detailSystemImageColor = ConstantsAppColors.secondaryText
+    var detailSystemImageAccessibilityLabel = ""
     var showsConnectionIcon = false
     var connectionColor = ConstantsAppColors.urgent
     var showsKeepAliveIcon = false
@@ -210,13 +213,19 @@ final class RootHomeStateModel: ObservableObject {
 
         let latestReadings = bgReadingsAccessor?.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4) ?? []
         let latestSiteChangeDate = treatmentEntryAccessor?.latestSiteChangeDate()
-        let deviceStatus = nightscoutSyncManager?.deviceStatus as? NightscoutDeviceStatus
+        let dataFlowPolicy = UserDefaults.standard.dataFlowPolicy
+        let careLinkSnapshot = CareLinkAccountState.shared.snapshot
+        let deviceStatus = dataFlowPolicy.importsTherapyFromCareLink
+            ? careLinkSnapshot.pump.homeDeviceStatus(metadata: careLinkSnapshot.metadata, checkedAt: careLinkSnapshot.lastCheckAt)
+            : nightscoutSyncManager?.deviceStatus as? NightscoutDeviceStatus
         let cgmTransmitter = bluetoothPeripheralManager?.getCGMTransmitter()
 
         var newState = state
         newState.glucose = glucoseState(from: latestReadings)
         newState.pump = pumpState(deviceStatus: deviceStatus, latestSiteChangeDate: latestSiteChangeDate)
-        newState.loop = loopState(deviceStatus: deviceStatus)
+        newState.loop = dataFlowPolicy.importsTherapyFromCareLink
+            ? careLinkLoopState(snapshot: careLinkSnapshot)
+            : loopState(deviceStatus: deviceStatus)
         newState.sensor = sensorState(activeSensor: activeSensor, cgmTransmitter: cgmTransmitter)
         newState.sensorNoise = sensorNoiseState(activeSensor: activeSensor)
         newState.dataSource = dataSourceState(sensorState: newState.sensor, activeSensor: activeSensor, cgmTransmitter: cgmTransmitter)
@@ -226,6 +235,37 @@ final class RootHomeStateModel: ObservableObject {
         newState.usesScreenLockNightLayout = usesScreenLockNightLayout
 
         publish(newState)
+    }
+
+    /// Refreshes cloud pump presentation without recalculating unrelated Home controls.
+    ///
+    /// Pump followers can publish several state changes during one request. Keeping this update
+    /// focused avoids repeatedly evaluating alert snooze state for pump-only changes.
+    func refreshPumpAndLoopStatus() {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async {
+                self.refreshPumpAndLoopStatus()
+            }
+
+            return
+        }
+
+        let dataFlowPolicy = UserDefaults.standard.dataFlowPolicy
+        let careLinkSnapshot = CareLinkAccountState.shared.snapshot
+        let deviceStatus = dataFlowPolicy.importsTherapyFromCareLink
+            ? careLinkSnapshot.pump.homeDeviceStatus(metadata: careLinkSnapshot.metadata, checkedAt: careLinkSnapshot.lastCheckAt)
+            : nightscoutSyncManager?.deviceStatus as? NightscoutDeviceStatus
+        let latestSiteChangeDate = treatmentEntryAccessor?.latestSiteChangeDate()
+
+        updateState { state in
+            state.pump = self.pumpState(
+                deviceStatus: deviceStatus,
+                latestSiteChangeDate: latestSiteChangeDate
+            )
+            state.loop = dataFlowPolicy.importsTherapyFromCareLink
+                ? self.careLinkLoopState(snapshot: careLinkSnapshot)
+                : self.loopState(deviceStatus: deviceStatus)
+        }
     }
 
     func setStatisticsLoading() {
@@ -453,6 +493,63 @@ final class RootHomeStateModel: ObservableObject {
         )
     }
 
+    /// Presents CareLink pump activity without pretending it is a Nightscout OS-AID loop record.
+    func careLinkLoopState(snapshot: CareLinkStatusSnapshot, referenceDate: Date = .now) -> RootHomeLoopState {
+        let pump = snapshot.pump
+        let observedAt = pump.observedAt ?? pump.lastDataUpdateAt
+        let isRecent = observedAt.map {
+            $0 <= referenceDate.addingTimeInterval(60)
+                && $0 > referenceDate.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes)
+        } ?? false
+        let statusTitle: String
+        let statusColor: Color
+        let statusImage: String
+
+        if snapshot.status == .connecting && observedAt == nil {
+            statusImage = "shield.lefthalf.filled"
+        } else if pump.isSuspended == true {
+            statusImage = "pause.circle.fill"
+        } else if pump.isCommunicating == false || pump.isInRange == false {
+            statusImage = "exclamationmark.triangle.fill"
+        } else if isRecent {
+            statusImage = pump.reportsActiveSmartGuard ? "shield.lefthalf.filled" : "checkmark.circle.fill"
+        } else {
+            statusImage = "clock.badge.exclamationmark"
+        }
+
+        if snapshot.status == .connecting && observedAt == nil {
+            statusTitle = Texts_Common.checking
+            statusColor = ConstantsAppColors.secondaryText
+        } else if pump.isSuspended == true {
+            statusTitle = Texts_SettingsView.careLinkSuspended
+            statusColor = ConstantsAppColors.warning
+        } else if pump.isCommunicating == false || pump.isInRange == false {
+            statusTitle = Texts_SettingsView.careLinkDisconnected
+            statusColor = ConstantsAppColors.urgent
+        } else if isRecent {
+            statusTitle = pump.algorithmState.map(Self.readableCareLinkValue) ?? Texts_SettingsView.careLinkActive
+            statusColor = ConstantsAppColors.normal
+        } else {
+            statusTitle = Texts_SettingsView.careLinkNoData
+            statusColor = ConstantsAppColors.warning
+        }
+
+        return RootHomeLoopState(
+            iob: RootHomeMetricState(title: "IOB", value: isRecent ? pump.activeInsulin.map { "\($0.round(toDecimalPlaces: 2)) U" } ?? "- U" : "- U"),
+            cob: RootHomeMetricState(title: "COB", value: "- g"),
+            statusTitle: statusTitle,
+            statusSystemImage: statusImage,
+            statusColor: statusColor,
+            statusTimeAgo: observedAt?.daysAndHoursAgo() ?? "",
+            showsStatusTimeAgo: observedAt != nil,
+            showsActivityIndicator: snapshot.status == .connecting
+        )
+    }
+
+    private static func readableCareLinkValue(_ value: String) -> String {
+        value.replacingOccurrences(of: "_", with: " ").capitalized
+    }
+
     private func cageText(_ siteChangeDate: Date?, referenceDate: Date, usesRelativeCageTime: Bool) -> String {
         guard let siteChangeDate else { return "-" }
         guard !usesRelativeCageTime else { return siteChangeDate.daysAndHoursAgo() }
@@ -543,6 +640,9 @@ final class RootHomeStateModel: ObservableObject {
         var title = sensorState.title
         var detail = sensorState.maxAge
         var detailColor = ConstantsAppColors.dataSourceText
+        var detailSystemImage: String?
+        var detailSystemImageColor = ConstantsAppColors.secondaryText
+        var detailSystemImageAccessibilityLabel = ""
 
         if isMaster, sensorState.title.isEmpty {
             if cgmTransmitter?.cgmTransmitterType().sensorType() == .Libre, activeSensor?.startDate != nil {
@@ -553,7 +653,7 @@ final class RootHomeStateModel: ObservableObject {
                 title = " ⚠️  " + Texts_HomeView.noDataSourceConnected
             }
         } else if !isMaster {
-            title = UserDefaults.standard.followerDataSourceType.fullDescription
+            title = UserDefaults.standard.followerDataSourceType.description
 
             switch UserDefaults.standard.followerDataSourceType {
             case .nightscout:
@@ -609,6 +709,26 @@ final class RootHomeStateModel: ObservableObject {
                 } else {
                     detail = UserDefaults.standard.followerPatientName ?? UserDefaults.standard.calendarFollowCalendarId ?? ""
                 }
+            case .careLink:
+                // CareLink exposes a native observable state instead of a public status-page API.
+                let snapshot = CareLinkAccountState.shared.snapshot
+                let patientName = snapshot.selectedPatient?.displayName ?? snapshot.metadata.patientName
+                let showsPatient = snapshot.status == .active || snapshot.status == .connecting && patientName != nil
+                if showsPatient {
+                    detail = patientName ?? ""
+                    if let remainingMinutes = snapshot.metadata.sensorRemainingMinutes {
+                        detailSystemImage = remainingMinutes <= Int(ConstantsHomeView.sensorProgressViewWarningInMinutes)
+                            ? "sensor.tag.radiowaves.forward.fill"
+                            : "sensor.tag.radiowaves.forward"
+                        detailSystemImageColor = careLinkSensorColor(remainingMinutes: remainingMinutes)
+                        detailSystemImageAccessibilityLabel = Texts_HomeView.sensorLifetimeRemaining(Double(remainingMinutes).minutesToDaysAndHours())
+                    }
+                } else {
+                    detail = snapshot.status.title
+                    if snapshot.status != .connecting {
+                        detailColor = snapshot.status.indicatorColor
+                    }
+                }
             }
         }
 
@@ -616,6 +736,9 @@ final class RootHomeStateModel: ObservableObject {
             title: title,
             detail: detail,
             detailColor: detailColor,
+            detailSystemImage: detailSystemImage,
+            detailSystemImageColor: detailSystemImageColor,
+            detailSystemImageAccessibilityLabel: detailSystemImageAccessibilityLabel,
             showsConnectionIcon: !isMaster,
             connectionColor: followerConnectionColor,
             showsKeepAliveIcon: !isMaster,
@@ -634,6 +757,18 @@ final class RootHomeStateModel: ObservableObject {
         }
 
         return ConstantsAppColors.sensorText
+    }
+
+    /// Uses the same expiry thresholds and warning colours as the app's master sensors.
+    private func careLinkSensorColor(remainingMinutes: Int) -> Color {
+        if remainingMinutes <= 0 {
+            return ConstantsAppColors.sensorExpired
+        } else if remainingMinutes <= Int(ConstantsHomeView.sensorProgressViewUrgentInMinutes) {
+            return ConstantsAppColors.sensorUrgent
+        } else if remainingMinutes <= Int(ConstantsHomeView.sensorProgressViewWarningInMinutes) {
+            return ConstantsAppColors.sensorWarning
+        }
+        return .green
     }
 
     private func sensorNoiseState(activeSensor: Sensor?) -> RootHomeSensorNoiseState {
@@ -674,6 +809,12 @@ final class RootHomeStateModel: ObservableObject {
     }
 
     private var followerConnectionColor: Color {
+        // CareLink publishes account and connection state directly. A previous successful reading
+        // must not keep Home green after the retained browser session requires a new login.
+        if UserDefaults.standard.followerDataSourceType == .careLink {
+            return CareLinkAccountState.shared.snapshot.status.indicatorColor
+        }
+
         // Calendar Follow has its own payload status. Use this instead of the
         // generic follower connection timestamp so the Home dot matches Settings.
         if UserDefaults.standard.followerDataSourceType == .calendar {
@@ -708,11 +849,11 @@ final class RootHomeStateModel: ObservableObject {
     // MARK: - Visibility and Controls
 
     private func visibilityState(sensorState: RootHomeSensorState, usesScreenLockNightLayout: Bool) -> RootHomeVisibilityState {
-        let followsAID = UserDefaults.standard.nightscoutEnabled && UserDefaults.standard.nightscoutUrl != nil && UserDefaults.standard.nightscoutFollowType != .none
+        let dataFlowPolicy = UserDefaults.standard.dataFlowPolicy
 
         return RootHomeVisibilityState(
-            showsPump: followsAID && !usesScreenLockNightLayout,
-            showsLoop: followsAID && !usesScreenLockNightLayout,
+            showsPump: dataFlowPolicy.showsPumpData && !usesScreenLockNightLayout,
+            showsLoop: dataFlowPolicy.showsTherapyStatus && !usesScreenLockNightLayout,
             showsMiniChart: UserDefaults.standard.showMiniChart && !usesScreenLockNightLayout,
             showsStatistics: UserDefaults.standard.showStatistics && !usesScreenLockNightLayout,
             showsSensor: !sensorState.maxAge.isEmpty && !usesScreenLockNightLayout,

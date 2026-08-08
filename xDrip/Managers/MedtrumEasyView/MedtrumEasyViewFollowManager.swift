@@ -96,6 +96,23 @@ class MedtrumEasyViewFollowManager: NSObject {
 
     // MARK: - Public Functions
 
+    public func logIn() {
+        UserDefaults.standard.medtrumEasyViewManuallyLoggedOut = false
+        UserDefaults.standard.medtrumEasyViewPreventLogin = false
+        FollowerSessionState.shared.update(.loggingIn, for: .medtrumEasyView)
+        verifyUserDefaultsAndStartOrStopFollowMode()
+    }
+
+    public func logOut() {
+        UserDefaults.standard.medtrumEasyViewManuallyLoggedOut = true
+        invalidateDownLoadTimerClosure?()
+        invalidateDownLoadTimerClosure = nil
+        disableSuspensionPrevention()
+        medtrumUserId = nil
+        lastFetchedTimestamp = nil
+        FollowerSessionState.shared.update(.loggedOut, for: .medtrumEasyView)
+    }
+
     /// Creates a BgReading for reading downloaded from Medtrum EasyView
     /// - parameters:
     ///     - followGlucoseData : glucose data from which new BgReading needs to be created
@@ -135,6 +152,10 @@ class MedtrumEasyViewFollowManager: NSObject {
             trace("    followerDataSourceType is not medtrumEasyView", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
             return
         }
+        guard !UserDefaults.standard.medtrumEasyViewManuallyLoggedOut else {
+            FollowerSessionState.shared.update(.loggedOut, for: .medtrumEasyView)
+            return
+        }
 
         // Check if credentials exist
         guard UserDefaults.standard.medtrumEasyViewEmail != nil else {
@@ -156,11 +177,14 @@ class MedtrumEasyViewFollowManager: NSObject {
 
                 // Step 1: Login if needed
                 if self.medtrumUserId == nil {
+                    FollowerSessionState.shared.update(.loggingIn, for: .medtrumEasyView)
                     let loginResponse = try await self.requestLogin()
+                    guard !UserDefaults.standard.medtrumEasyViewManuallyLoggedOut else { return }
                     self.medtrumUserId = loginResponse.uid
                     // need to cleanly unwrap because uid can technically be nil in a failed login response
                     if let uid = loginResponse.uid {
                         trace("    login successful, userId = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, uid.description)
+                        FollowerSessionState.shared.update(.loggedIn, for: .medtrumEasyView)
                     }
 
                     // Cache user type
@@ -217,6 +241,11 @@ class MedtrumEasyViewFollowManager: NSObject {
                     }
                 }
 
+                if self.medtrumUserId != nil {
+                    guard !UserDefaults.standard.medtrumEasyViewManuallyLoggedOut else { return }
+                    FollowerSessionState.shared.update(.loggedIn, for: .medtrumEasyView)
+                }
+
                 // Step 2: Fetch monitor data
                 let selectedPatientUid = UserDefaults.standard.medtrumEasyViewSelectedPatientUid
 
@@ -231,6 +260,7 @@ class MedtrumEasyViewFollowManager: NSObject {
                     selectedPatientUid : self.medtrumUserId
                 if let userId = userIdToFetch {
                     let monitorResponse = try await self.requestMonitorStatus(userId: userId)
+                    guard !UserDefaults.standard.medtrumEasyViewManuallyLoggedOut else { return }
 
                     if let monitorData = monitorResponse.data {
                         trace("    monitor data downloaded successfully", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
@@ -265,6 +295,7 @@ class MedtrumEasyViewFollowManager: NSObject {
             } catch MedtrumEasyViewFollowError.sessionExpired {
                 trace("    session expired, will re-login on next download", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
                 self.medtrumUserId = nil
+                FollowerSessionState.shared.update(.loggingIn, for: .medtrumEasyView)
                 self.lastFetchedTimestamp = nil  // Reset to fetch fresh data after re-login
                 // Clear cached user type and connections
                 UserDefaults.standard.medtrumEasyViewUserType = nil
@@ -276,6 +307,7 @@ class MedtrumEasyViewFollowManager: NSObject {
                 UserDefaults.standard.medtrumEasyViewPreventLogin = true
                 UserDefaults.standard.timeStampOfLastFollowerConnection = .distantPast
                 self.medtrumUserId = nil
+                FollowerSessionState.shared.update(.loggedOut, for: .medtrumEasyView)
                 // Clear cached user type and connections
                 UserDefaults.standard.medtrumEasyViewUserType = nil
                 UserDefaults.standard.medtrumEasyViewCachedConnections = nil
@@ -559,7 +591,8 @@ class MedtrumEasyViewFollowManager: NSObject {
 
     /// Schedule next download
     private func scheduleNewDownload() {
-        guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
+        guard !UserDefaults.standard.medtrumEasyViewManuallyLoggedOut,
+              UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
 
         trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
 
@@ -633,9 +666,11 @@ class MedtrumEasyViewFollowManager: NSObject {
         let shouldRun = !UserDefaults.standard.isMaster &&
                        UserDefaults.standard.followerDataSourceType == .medtrumEasyView &&
                        UserDefaults.standard.medtrumEasyViewEmail != nil &&
-                       UserDefaults.standard.medtrumEasyViewPassword != nil
+                       UserDefaults.standard.medtrumEasyViewPassword != nil &&
+                       !UserDefaults.standard.medtrumEasyViewManuallyLoggedOut
 
         if shouldRun {
+            FollowerSessionState.shared.update(.loggingIn, for: .medtrumEasyView)
             // this will enable the suspension prevention sound playing if background keep-alive is needed
             // (i.e. not disabled and not using a heartbeat)
             if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
@@ -647,6 +682,7 @@ class MedtrumEasyViewFollowManager: NSObject {
             // Start downloading
             download()
         } else {
+            FollowerSessionState.shared.update(.loggedOut, for: .medtrumEasyView)
             // disable the suspension prevention
             disableSuspensionPrevention()
             
@@ -672,19 +708,17 @@ class MedtrumEasyViewFollowManager: NSObject {
             }
 
         case .medtrumEasyViewEmail, .medtrumEasyViewPassword:
-            // Credentials changed, clear everything
-            if keyValueObserverTimeKeeper.verifyKey(forKey: keyPath, withMinimumDelayMilliSeconds: 200) {
-                trace("    credentials changed, resetting state", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
-                self.medtrumUserId = nil
-                self.lastFetchedTimestamp = nil
-                // Clear cached user type, connections, and selection
-                UserDefaults.standard.medtrumEasyViewUserType = nil
-                UserDefaults.standard.medtrumEasyViewCachedConnections = nil
-                UserDefaults.standard.medtrumEasyViewSelectedPatientUid = 0
-                UserDefaults.standard.medtrumEasyViewConnectionsFetchFailed = false
-                UserDefaults.standard.medtrumEasyViewPreventLogin = false
-                verifyUserDefaultsAndStartOrStopFollowMode()
-            }
+            // Credentials are bound to the authenticated user ID. End the current session and
+            // leave the account logged out until the user explicitly logs in with the new values.
+            trace("    credentials changed, logging out and resetting state", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
+            logOut()
+            // Clear cached user type, connections, and selection
+            UserDefaults.standard.medtrumEasyViewUserType = nil
+            UserDefaults.standard.medtrumEasyViewCachedConnections = nil
+            UserDefaults.standard.medtrumEasyViewSelectedPatientUid = 0
+            UserDefaults.standard.medtrumEasyViewConnectionsFetchFailed = false
+            UserDefaults.standard.medtrumEasyViewPreventLogin = false
+            UserDefaults.standard.timeStampOfLastFollowerConnection = nil
 
         case .medtrumEasyViewSelectedPatientUid:
             // Selected patient changed, only reset user ID and timestamp to trigger refetch

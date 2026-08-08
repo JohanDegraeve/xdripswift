@@ -70,19 +70,52 @@ final class NightscoutDeviceStatusAccessor {
     ///
     /// Live status is stored directly on the private context because it is never edited by the UI.
     func upsert(_ status: NightscoutDeviceStatus) async {
-        guard status.createdAt > .distantPast || status.lastLoopDate > .distantPast else { return }
+        _ = await upsert([status])
+    }
+
+    /// Stores a response-sized status history in one private-context transaction.
+    ///
+    /// The batch path avoids one Core Data save for every historical pump point. Stable identifiers
+    /// make repeated overlapping follower responses idempotent.
+    @discardableResult
+    func upsert(_ statuses: [NightscoutDeviceStatus]) async -> Int {
+        let validStatuses = statuses.filter { $0.createdAt > .distantPast || $0.lastLoopDate > .distantPast }
+        guard !validStatuses.isEmpty else { return 0 }
 
         let context = coreDataManager.privateManagedObjectContext
         let log = log
-        await context.perform {
-            let entry = Self.existingEntry(for: status, on: context) ?? NightscoutDeviceStatusEntry(context: context)
-            Self.apply(status, to: entry)
+        return await context.perform {
             do {
+                let request: NSFetchRequest<NightscoutDeviceStatusEntry> = NightscoutDeviceStatusEntry.fetchRequest()
+                let identifiers = validStatuses.map(Self.storageIdentifier)
+                request.predicate = NSPredicate(format: "id IN %@", identifiers)
+                request.returnsObjectsAsFaults = false
+                var entriesByIdentifier = [String: NightscoutDeviceStatusEntry]()
+                try context.fetch(request).forEach { entry in
+                    entriesByIdentifier[entry.id] = entry
+                }
+                var insertedCount = 0
+
+                for status in validStatuses {
+                    let identifier = Self.storageIdentifier(status)
+                    let entry: NightscoutDeviceStatusEntry
+                    if let existing = entriesByIdentifier[identifier] {
+                        entry = existing
+                    } else {
+                        entry = NightscoutDeviceStatusEntry(context: context)
+                        entriesByIdentifier[identifier] = entry
+                        insertedCount += 1
+                    }
+                    Self.apply(status, to: entry)
+                }
+
                 if context.hasChanges {
                     try context.save()
                 }
+                return insertedCount
             } catch {
                 trace("in NightscoutDeviceStatusAccessor.upsert, error = %{public}@", log: log, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+                return 0
             }
         }
     }
@@ -98,6 +131,31 @@ final class NightscoutDeviceStatusAccessor {
                 NSSortDescriptor(key: #keyPath(NightscoutDeviceStatusEntry.createdAt), ascending: false),
                 NSSortDescriptor(key: #keyPath(NightscoutDeviceStatusEntry.lastLoopDate), ascending: false)
             ]
+            request.returnsObjectsAsFaults = false
+            request.includesPropertyValues = true
+            snapshot = try? context.fetch(request).first.map(Self.snapshot(from:))
+        }
+        return snapshot
+    }
+
+    /// Returns the newest status at or before one point on the historical timeline.
+    ///
+    /// This bounded lookup lets Home render the first historical frame immediately while its
+    /// larger scrolling cache is still loading. The result is source-neutral because every pump
+    /// follower persists the same normalized device-status entity.
+    func latest(atOrBefore date: Date, maximumAge: TimeInterval) -> NightscoutDeviceStatusSnapshot? {
+        let context = coreDataManager.privateManagedObjectContext
+        var snapshot: NightscoutDeviceStatusSnapshot?
+        context.performAndWait {
+            let request: NSFetchRequest<NightscoutDeviceStatusEntry> = NightscoutDeviceStatusEntry.fetchRequest()
+            request.fetchLimit = 1
+            request.sortDescriptors = [
+                NSSortDescriptor(key: #keyPath(NightscoutDeviceStatusEntry.createdAt), ascending: false)
+            ]
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSPredicate(format: "createdAt <= %@", date as NSDate),
+                NSPredicate(format: "createdAt >= %@", date.addingTimeInterval(-maximumAge) as NSDate)
+            ])
             request.returnsObjectsAsFaults = false
             request.includesPropertyValues = true
             snapshot = try? context.fetch(request).first.map(Self.snapshot(from:))
@@ -163,15 +221,8 @@ final class NightscoutDeviceStatusAccessor {
         return deletedCount
     }
 
-    private static func existingEntry(for status: NightscoutDeviceStatus, on context: NSManagedObjectContext) -> NightscoutDeviceStatusEntry? {
-        let request: NSFetchRequest<NightscoutDeviceStatusEntry> = NightscoutDeviceStatusEntry.fetchRequest()
-        request.fetchLimit = 1
-        if !status.id.isEmpty {
-            request.predicate = NSPredicate(format: "id == %@", status.id)
-        } else {
-            request.predicate = NSPredicate(format: "createdAt == %@", status.createdAt as NSDate)
-        }
-        return try? context.fetch(request).first
+    private static func storageIdentifier(_ status: NightscoutDeviceStatus) -> String {
+        status.id.isEmpty ? "createdAt-\(Int(status.createdAt.timeIntervalSince1970 * 1000))" : status.id
     }
 
     private static func apply(_ status: NightscoutDeviceStatus, to entry: NightscoutDeviceStatusEntry) {
@@ -215,7 +266,20 @@ final class NightscoutDeviceStatusAccessor {
     }
 
     private static func snapshot(from entry: NightscoutDeviceStatusEntry) -> NightscoutDeviceStatusSnapshot {
-        NightscoutDeviceStatusSnapshot(
+        let isCareLink = entry.device?.hasPrefix("carelink://") == true
+
+        /// Older CareLink builds stored negative unavailable-value sentinels before normalization.
+        func careLinkDouble(_ number: NSNumber?) -> Double? {
+            guard let value = number?.doubleValue else { return nil }
+            return isCareLink && value < 0 ? nil : value
+        }
+
+        func careLinkPercent(_ number: NSNumber?) -> Int? {
+            guard let value = number?.intValue else { return nil }
+            return isCareLink && !(0 ... 100).contains(value) ? nil : value
+        }
+
+        return NightscoutDeviceStatusSnapshot(
             id: entry.id,
             createdAt: entry.createdAt,
             updatedDate: entry.updatedDate,
@@ -225,14 +289,14 @@ final class NightscoutDeviceStatusAccessor {
             device: entry.device,
             appVersion: entry.appVersion,
             activeProfile: entry.activeProfile,
-            iob: entry.iob?.doubleValue,
+            iob: careLinkDouble(entry.iob),
             cob: entry.cob?.doubleValue,
             eventualBG: entry.eventualBG?.doubleValue,
             currentTarget: entry.currentTarget?.doubleValue,
             isf: entry.isf?.doubleValue,
             insulinReq: entry.insulinReq?.doubleValue,
             bolusVolume: entry.bolusVolume?.doubleValue,
-            rate: entry.rate?.doubleValue,
+            rate: careLinkDouble(entry.rate),
             duration: entry.duration?.intValue,
             reason: entry.reason,
             sensitivityRatio: entry.sensitivityRatio?.doubleValue,
@@ -243,8 +307,8 @@ final class NightscoutDeviceStatusAccessor {
             overrideMinValue: entry.overrideMinValue?.doubleValue,
             overrideMaxValue: entry.overrideMaxValue?.doubleValue,
             overrideMultiplier: entry.overrideMultiplier?.doubleValue,
-            pumpBatteryPercent: entry.pumpBatteryPercent?.intValue,
-            pumpReservoir: entry.pumpReservoir?.doubleValue,
+            pumpBatteryPercent: careLinkPercent(entry.pumpBatteryPercent),
+            pumpReservoir: careLinkDouble(entry.pumpReservoir),
             pumpIsBolusing: entry.pumpIsBolusing?.boolValue,
             pumpIsSuspended: entry.pumpIsSuspended?.boolValue,
             pumpStatus: entry.pumpStatus,

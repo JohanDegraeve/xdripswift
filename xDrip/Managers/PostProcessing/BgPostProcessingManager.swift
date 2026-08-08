@@ -1074,6 +1074,9 @@ class BgPostProcessingManager {
             return "medtrumeasyview|\(UserDefaults.standard.medtrumEasyViewEmail ?? "unknown")|\(UserDefaults.standard.medtrumEasyViewSelectedPatientUid)"
         case .calendar:
             return "calendar|\(UserDefaults.standard.calendarFollowCalendarId ?? "unknown")|\(UserDefaults.standard.followerPatientName ?? "unknown")"
+        case .careLink:
+            // Region and selected patient define a non-secret follower identity without tokens.
+            return "carelink|\(UserDefaults.standard.careLinkRegion ?? "unknown")|\(UserDefaults.standard.careLinkSelectedPatientID ?? "unknown")"
         }
     }
 
@@ -1082,7 +1085,7 @@ class BgPostProcessingManager {
             return UserDefaults.standard.activeSensorDescription
         }
 
-        return UserDefaults.standard.followerDataSourceType.fullDescription
+        return UserDefaults.standard.followerDataSourceType.description
     }
 
     private enum AdjustmentDisabledReason {

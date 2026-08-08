@@ -20,7 +20,7 @@ import OSLog
 
     @Published private(set) var filteredTreatments: [TreatmentSnapshot] = []
     @Published private(set) var selectedDateDayName = ""
-    @Published private(set) var showBasalFilter = UserDefaults.standard.nightscoutFollowType != .none
+    @Published private(set) var showBasalFilter = UserDefaults.standard.dataFlowPolicy.showsPumpData
     @Published var datePickerReset = UUID()
 
     @Published private(set) var showSmallBolusTreatments = UserDefaults.standard.showSmallBolusTreatmentsInList
@@ -157,7 +157,7 @@ import OSLog
         showBasalTreatments = UserDefaults.standard.showBasalTreatmentsInList
         showBgCheckTreatments = UserDefaults.standard.showBgCheckTreatmentsInList
         showNoteTreatments = UserDefaults.standard.showNoteTreatmentsInList
-        showBasalFilter = UserDefaults.standard.nightscoutFollowType != .none
+        showBasalFilter = UserDefaults.standard.dataFlowPolicy.showsPumpData
     }
 
     private func applyFilters() {

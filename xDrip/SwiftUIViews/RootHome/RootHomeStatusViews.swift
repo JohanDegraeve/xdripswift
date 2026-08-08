@@ -89,6 +89,13 @@ struct RootHomeLoopView: View {
                     .opacity(state.isHistorical.rootHomeHistoricalValueOpacity)
             }
 
+            if state.showsActivityIndicator {
+                ProgressView()
+                    .scaleEffect(0.75)
+                    .tint(state.isHistorical ? ConstantsAppColors.secondaryText : ConstantsAppColors.primaryText)
+                    .opacity(state.isHistorical.rootHomeHistoricalValueOpacity)
+            }
+
             if state.showsStatusTimeAgo {
                 Text(state.statusTimeAgo)
                     .font(.system(size: 16))
@@ -97,13 +104,6 @@ struct RootHomeLoopView: View {
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.65)
-            }
-
-            if state.showsActivityIndicator {
-                ProgressView()
-                    .scaleEffect(0.75)
-                    .tint(state.isHistorical ? ConstantsAppColors.secondaryText : ConstantsAppColors.primaryText)
-                    .opacity(state.isHistorical.rootHomeHistoricalValueOpacity)
             }
 
             if let statusSystemImage = state.statusSystemImage {

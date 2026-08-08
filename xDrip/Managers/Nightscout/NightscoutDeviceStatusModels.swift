@@ -445,6 +445,21 @@ extension NightscoutDeviceStatus {
         }
     }
 
+    /// Builds one display record from the newest status and recent older partial statuses.
+    ///
+    /// Some followers publish basal history more often than the complete pump telemetry snapshot.
+    /// Forward-filling only missing fields keeps the selected record's rate and timestamps while
+    /// retaining the latest previously observed reservoir, battery and active insulin values.
+    static func composingDisplayValues(fromNewestFirst statuses: [NightscoutDeviceStatus]) -> NightscoutDeviceStatus? {
+        guard var result = statuses.first else { return nil }
+
+        for fallback in statuses.dropFirst() {
+            result.fillMissingDisplayValues(from: fallback)
+        }
+
+        return result
+    }
+
     mutating func sanitizingFutureDates(referenceDate: Date = Date(), futureTolerance: TimeInterval = 20) {
         let maximumAllowedDate = referenceDate.addingTimeInterval(futureTolerance)
         if createdAt > maximumAllowedDate { createdAt = .distantPast }

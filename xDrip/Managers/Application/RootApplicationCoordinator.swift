@@ -105,6 +105,9 @@ import AppIntents
     /// CalendarFollowManager instance
     private var calendarFollowManager: CalendarFollowManager?
 
+    /// Long-lived CareLink follower manager. Switching sources pauses it without clearing login.
+    private var careLinkFollowManager: CareLinkFollowManager?
+
     /// LoopFollowManager instance
     private var loopFollowManager: LoopFollowManager?
     
@@ -321,6 +324,11 @@ import AppIntents
                     updateScreenLock: { [weak self] overrideCurrentState, nightMode in
                         self?.updateScreenLock(overrideCurrentState: overrideCurrentState, nightMode: nightMode) ?? false
                     },
+                    selectedFollowerActions: SelectedFollowerActions(
+                        refresh: { [weak self] in self?.refreshSelectedFollower() },
+                        logIn: { [weak self] in self?.logInSelectedFollower() },
+                        logOut: { [weak self] in self?.logOutSelectedFollower() }
+                    ),
                     sensorProvider: self
                 )
             }
@@ -450,6 +458,7 @@ import AppIntents
         
         // if the Nightscout Follower type changes, update the UI
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.therapyDataSourceType.rawValue, options: .new, context: nil)
         
         // if the Nightscout device status changes, update the UI
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutDeviceStatus.rawValue, options: .new, context: nil)
@@ -514,6 +523,7 @@ import AppIntents
         // add tracing when app comes to foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyTraceAppGoesToForeground, closure: {
             trace("Application will enter foreground", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            self.refreshSelectedFollower()
         })
         
         // add tracing when app will terminate - this only works for non-suspended apps, probably (not tested) also works for apps that crash in the background
@@ -558,6 +568,58 @@ import AppIntents
             self.setNightscoutSyncRequiredToTrue(forceNow: false)
         })
         
+    }
+
+    /// Requests one immediate update from the selected follower whenever the app returns.
+    private func refreshSelectedFollower() {
+        guard !UserDefaults.standard.isMaster else { return }
+
+        switch UserDefaults.standard.followerDataSourceType {
+        case .nightscout:
+            nightscoutFollowManager?.download()
+        case .libreLinkUp, .libreLinkUpRussia:
+            libreLinkUpFollowManager?.download()
+        case .dexcomShare:
+            dexcomShareFollowManager?.download()
+        case .medtrumEasyView:
+            medtrumEasyViewFollowManager?.download()
+        case .calendar:
+            calendarFollowManager?.download()
+        case .careLink:
+            careLinkFollowManager?.refreshNow()
+        }
+    }
+
+    private func logInSelectedFollower() {
+        guard !UserDefaults.standard.isMaster else { return }
+        switch UserDefaults.standard.followerDataSourceType {
+        case .libreLinkUp, .libreLinkUpRussia:
+            libreLinkUpFollowManager?.logIn()
+        case .dexcomShare:
+            dexcomShareFollowManager?.logIn()
+        case .medtrumEasyView:
+            medtrumEasyViewFollowManager?.logIn()
+        case .careLink:
+            CareLinkAccountState.shared.logIn()
+        case .nightscout, .calendar:
+            break
+        }
+    }
+
+    private func logOutSelectedFollower() {
+        guard !UserDefaults.standard.isMaster else { return }
+        switch UserDefaults.standard.followerDataSourceType {
+        case .libreLinkUp, .libreLinkUpRussia:
+            libreLinkUpFollowManager?.logOut()
+        case .dexcomShare:
+            dexcomShareFollowManager?.logOut()
+        case .medtrumEasyView:
+            medtrumEasyViewFollowManager?.logOut()
+        case .careLink:
+            CareLinkAccountState.shared.logOut()
+        case .nightscout, .calendar:
+            break
+        }
     }
     
     /// sets AVAudioSession category to AVAudioSession.Category.playback with option mixWithOthers and
@@ -627,6 +689,9 @@ import AppIntents
 
         // setup calendarFollowManager
         calendarFollowManager = CalendarFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+
+        // Set up CareLink beside the other followers so it shares delegate and heartbeat behavior.
+        careLinkFollowManager = CareLinkFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
 
         // setup loop follow manager
         loopFollowManager = LoopFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
@@ -727,6 +792,8 @@ import AppIntents
             self.dexcomShareFollowManager?.download()
             self.medtrumEasyViewFollowManager?.download()
             self.calendarFollowManager?.download()
+            // In heartbeat mode this tick owns CareLink cadence instead of its internal timer.
+            self.careLinkFollowManager?.download()
         }, cgmTransmitterInfoChanged: cgmTransmitterInfoChanged)
         
         // to initialize UserDefaults.standard.transmitterTypeAsString
@@ -1123,9 +1190,12 @@ import AppIntents
             // check and configure the live activity and widgets if applicable
             updateLiveActivityAndWidgets(forceRestart: false)
             
-        case UserDefaults.Key.nightscoutFollowType:
+        case UserDefaults.Key.nightscoutFollowType, UserDefaults.Key.therapyDataSourceType:
             // check and configure the live activity if applicable
             updateLiveActivityAndWidgets(forceRestart: false)
+
+            // Therapy ownership changes pump and OS-AID visibility independently of glucose.
+            updatePumpAndAIDStatusViews()
             
             watchManager?.updateWatchApp(forceComplicationUpdate: false)
             
@@ -1242,7 +1312,7 @@ import AppIntents
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             },
             refreshPumpAndLoopStatus: { [weak self] in
-                self?.publishRootHomeState()
+                self?.rootHomeStateModel.refreshPumpAndLoopStatus()
             },
             statisticsDaysChanged: { [weak self] days in
                 self?.setStatisticsDaysFromRootHome(days)
@@ -1551,7 +1621,7 @@ import AppIntents
             }
 
         case .medtrumTouchCareNano:
-            // Values arrive already calibrated to mg/dL — the transmitter applies the Medtrum per-sensor
+            // Values arrive already calibrated to mg/dL. The transmitter applies the Medtrum per-sensor
             // calibration factor decoded from each packet, so xDrip should not run its own calibrator.
             calibrator = NoCalibrator()
 
@@ -2130,7 +2200,7 @@ import AppIntents
                     bgReadingDates.append(bgReading.timeStamp)
                 }
                 
-                let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
+                let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.description
                 var sensorNoiseStateRawValue: Int?
 
                 if UserDefaults.standard.isMaster,
@@ -2158,7 +2228,7 @@ import AppIntents
                 var deviceStatusCreatedAt: Date?
                 var deviceStatusLastLoopDate: Date?
                 
-                if let deviceStatus = nightscoutSyncManager?.deviceStatus as? NightscoutDeviceStatus, UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutFollowType != .none, deviceStatus.createdAt != .distantPast {
+                if let deviceStatus = nightscoutSyncManager?.deviceStatus as? NightscoutDeviceStatus, UserDefaults.standard.dataFlowPolicy.showsAIDData, deviceStatus.createdAt != .distantPast {
                     deviceStatusCreatedAt = deviceStatus.createdAt
                     deviceStatusLastLoopDate = deviceStatus.lastLoopDate
                 }
@@ -2531,6 +2601,13 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
 
                     case .calendar:
                         if let followManager = calendarFollowManager {
+                            newReading = followManager.createBgReading(followGlucoseData: followGlucoseData)
+                        }
+
+                    case .careLink:
+                        // Convert through CareLink's follower factory, then continue through the
+                        // same Core Data and downstream integration flow as every other source.
+                        if let followManager = careLinkFollowManager {
                             newReading = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
 

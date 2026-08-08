@@ -72,6 +72,7 @@ struct RootTabDependencies {
     let stopSensor: () -> Void
     let submitCalibration: (Double) -> String?
     let updateScreenLock: (Bool, Bool) -> Bool
+    let selectedFollowerActions: SelectedFollowerActions
 }
 
 /// Publishes existing application services to the SwiftUI tab hierarchy.
@@ -254,6 +255,7 @@ struct RootTabDependencies {
         stopSensor: @escaping () -> Void,
         submitCalibration: @escaping (Double) -> String?,
         updateScreenLock: @escaping (Bool, Bool) -> Bool,
+        selectedFollowerActions: SelectedFollowerActions,
         sensorProvider: ActiveSensorProviding
     ) {
         self.sensorProvider = sensorProvider
@@ -277,7 +279,8 @@ struct RootTabDependencies {
             startSensor: startSensor,
             stopSensor: stopSensor,
             submitCalibration: submitCalibration,
-            updateScreenLock: updateScreenLock
+            updateScreenLock: updateScreenLock,
+            selectedFollowerActions: selectedFollowerActions
         )
     }
 }
@@ -388,6 +391,7 @@ struct RootTabView: View {
                         SettingsNavigationView(
                             coreDataManager: dependencies.coreDataManager,
                             soundPlayer: dependencies.soundPlayer,
+                            selectedFollowerActions: dependencies.selectedFollowerActions,
                             incomingBackupRequest: stateModel.incomingBackupRequest,
                             consumeIncomingBackup: stateModel.consumeIncomingBackup
                         )
@@ -569,6 +573,7 @@ private struct RootHomeTabView: View {
         case bgAdjustments
         case showHideItems
         case aidStatus
+        case careLinkPumpStatus
 
         var id: String { rawValue }
     }
@@ -658,7 +663,11 @@ private struct RootHomeTabView: View {
         actions.showCalibration = { presentedView = .sensorCalibration }
         actions.showBgAdjustments = { presentedView = .bgAdjustments }
         actions.showHideItems = { presentedView = .showHideItems }
-        actions.showAIDStatus = { presentedView = .aidStatus }
+        actions.showAIDStatus = {
+            presentedView = UserDefaults.standard.dataFlowPolicy.importsTherapyFromCareLink
+                ? .careLinkPumpStatus
+                : .aidStatus
+        }
         actions.showBluetooth = showBluetooth
         actions.toggleScreenLock = { updateScreenLock(using: dependencies, overrideCurrentState: false, nightMode: true) }
         actions.keepScreenAwake = { updateScreenLock(using: dependencies, overrideCurrentState: true, nightMode: false) }
@@ -698,6 +707,8 @@ private struct RootHomeTabView: View {
             case .aidStatus:
                 AIDStatusView()
                     .environmentObject(dependencies.nightscoutSyncManager)
+            case .careLinkPumpStatus:
+                CareLinkPumpStatusView()
             }
         }
     }

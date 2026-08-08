@@ -50,5 +50,8 @@ extension TreatmentEntry {
 
     /// free-form note text used by Nightscout Note treatments
     @NSManaged public var notes: String?
+
+    /// Stable CareLink marker identity used to prevent duplicate imports across overlapping polls.
+    @NSManaged public var careLinkSourceIdentifier: String?
     
 }

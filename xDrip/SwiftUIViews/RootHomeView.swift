@@ -133,6 +133,27 @@ struct RootHomeView: View {
             }
             actions.refreshPumpAndLoopStatus()
         }
+        .onReceive(CareLinkAccountState.shared.$snapshot.map(\.pump).removeDuplicates().receive(on: RunLoop.main)) { _ in
+            guard UserDefaults.standard.dataFlowPolicy.importsTherapyFromCareLink else { return }
+            actions.refreshPumpAndLoopStatus()
+        }
+        .onReceive(CareLinkAccountState.shared.$snapshot.map(\.metadata).removeDuplicates().receive(on: RunLoop.main)) { _ in
+            guard !UserDefaults.standard.isMaster,
+                  UserDefaults.standard.followerDataSourceType == .careLink
+            else { return }
+            actions.refreshPumpAndLoopStatus()
+        }
+        .onReceive(CareLinkAccountState.shared.$snapshot.map(\.status).removeDuplicates().receive(on: RunLoop.main)) { _ in
+            guard !UserDefaults.standard.isMaster,
+                  UserDefaults.standard.followerDataSourceType == .careLink
+            else { return }
+            actions.refreshPumpAndLoopStatus()
+        }
+        .onReceive(CareLinkAccountState.shared.$snapshot.map(\.lastPumpHistoryImportAt).removeDuplicates().receive(on: RunLoop.main)) { date in
+            guard date != nil, UserDefaults.standard.dataFlowPolicy.importsTherapyFromCareLink else { return }
+            historicalDataCache.reset()
+            prepareHistoricalDataIfNeeded(at: endDate)
+        }
         .onChange(of: selectedRange) { newRange in
             chartWidthInHours = newRange.rawValue
             scrollCoordinator.setVisibleTimeInterval(newRange.timeInterval)
@@ -327,17 +348,29 @@ struct RootHomeView: View {
         )
     }
 
+    /// Uses the same point on the historical timeline for glucose, pump and loop presentation.
+    ///
+    /// The chart window includes space after its newest visible glucose point. Selecting pump and
+    /// loop data from that padded edge can incorrectly expire an otherwise valid status record.
+    /// Anchoring every historical strip to the latest visible reading keeps the display independent
+    /// of the service that originally supplied the normalized Core Data entries.
+    private var historicalReferenceDate: Date {
+        latestVisibleReadingAtChartEndDate()?.date ?? endDate
+    }
+
     private var pumpDisplayState: RootHomePumpState {
         guard !scrollCoordinator.isShowingCurrentTimeRange else {
             return state.pump
         }
 
-        let referenceDate = endDate
+        // Establish an explicit SwiftUI dependency on asynchronous cache completion.
+        _ = historicalDataCache.revision
+        let referenceDate = historicalReferenceDate
         let historicalData = historicalDataCache.selection(at: referenceDate)
 
         return historicalPumpState(
             stateModel.pumpState(
-                deviceStatus: historicalData.deviceStatus?.deviceStatus(),
+                deviceStatus: historicalData.deviceStatus,
                 latestSiteChangeDate: historicalData.siteChangeDate,
                 referenceDate: referenceDate,
                 usesRelativeCageTime: false,
@@ -351,7 +384,9 @@ struct RootHomeView: View {
             return state.loop
         }
 
-        let referenceDate = endDate
+        // Pump and loop must refresh together when the shared historical cache finishes loading.
+        _ = historicalDataCache.revision
+        let referenceDate = historicalReferenceDate
         guard let snapshot = historicalDataCache.selection(at: referenceDate).deviceStatus else {
             let loopStatusState = LoopStatusState(deviceStatusCreatedAt: nil, lastLoopDate: nil, referenceDate: referenceDate)
             return historicalLoopState(RootHomeLoopState(
@@ -365,7 +400,7 @@ struct RootHomeView: View {
 
         return historicalLoopState(
             stateModel.loopState(
-                deviceStatus: snapshot.deviceStatus(),
+                deviceStatus: snapshot,
                 referenceDate: referenceDate,
                 usesRelativeStatusTime: false,
                 defaultTextColor: ConstantsAppColors.secondaryText
@@ -571,7 +606,7 @@ struct RootHomeView: View {
 private final class RootHomeHistoricalDataCache: ObservableObject {
 
     struct Selection {
-        let deviceStatus: NightscoutDeviceStatusSnapshot?
+        let deviceStatus: NightscoutDeviceStatus?
         let siteChangeDate: Date?
     }
 
@@ -689,9 +724,28 @@ private final class RootHomeHistoricalDataCache: ObservableObject {
 
     /// Resolves both strips from the same cached status snapshot for one selected timestamp.
     func selection(at date: Date) -> Selection {
-        let statusIndex = deviceStatuses.lastIndexAtOrBefore(date, date: \.createdAt)
-        let status = statusIndex.map { deviceStatuses[$0] }.flatMap {
-            $0.createdAt >= date.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) ? $0 : nil
+        let oldestAllowedDate = date.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes)
+        var statusIndex = deviceStatuses.lastIndexAtOrBefore(date, date: \.createdAt)
+
+        // The buffered range is loaded asynchronously. Resolve its first requested point directly
+        // so the strips do not remain blank until another chart movement causes a redraw.
+        let dateIsOutsideCache = cacheStartDate.map { date < $0 } ?? true
+            || cacheEndDate.map { date > $0 } ?? true
+        if statusIndex == nil, dateIsOutsideCache || isLoading {
+            merge(deviceStatusAccessor.fetch(fromDate: oldestAllowedDate, toDate: date))
+            statusIndex = deviceStatuses.lastIndexAtOrBefore(date, date: \.createdAt)
+        }
+
+        let status: NightscoutDeviceStatus?
+        if let statusIndex, deviceStatuses[statusIndex].createdAt >= oldestAllowedDate {
+            let firstRelevantIndex = deviceStatuses.firstIndexAtOrAfter(oldestAllowedDate, date: \.createdAt)
+                ?? statusIndex
+            let newestFirst = deviceStatuses[firstRelevantIndex ... statusIndex]
+                .reversed()
+                .map { $0.deviceStatus() }
+            status = NightscoutDeviceStatus.composingDisplayValues(fromNewestFirst: newestFirst)
+        } else {
+            status = nil
         }
         let siteChangeIndex = siteChangeDates.lastIndexBefore(date)
 
@@ -730,6 +784,25 @@ private final class RootHomeHistoricalDataCache: ObservableObject {
 }
 
 private extension Array {
+    /// Binary-searches an ascending value-snapshot array for its first value at or after a date.
+    func firstIndexAtOrAfter(_ targetDate: Date, date: (Element) -> Date) -> Index? {
+        var lowerBound = startIndex
+        var upperBound = endIndex
+
+        while lowerBound < upperBound {
+            let distance = self.distance(from: lowerBound, to: upperBound)
+            let middle = index(lowerBound, offsetBy: distance / 2)
+
+            if date(self[middle]) < targetDate {
+                lowerBound = index(after: middle)
+            } else {
+                upperBound = middle
+            }
+        }
+
+        return lowerBound == endIndex ? nil : lowerBound
+    }
+
     /// Binary-searches an ascending value-snapshot array without rebuilding filtered copies per frame.
     func lastIndexAtOrBefore(_ targetDate: Date, date: (Element) -> Date) -> Index? {
         var lowerBound = startIndex

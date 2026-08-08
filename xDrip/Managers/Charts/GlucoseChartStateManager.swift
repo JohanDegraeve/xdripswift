@@ -392,7 +392,7 @@ final class GlucoseChartStateManager: ObservableObject {
     }
 
     private func minimumChartValue(startDate: Date, endDate: Date, showTreatments: Bool) -> Double {
-        guard showTreatments, UserDefaults.standard.nightscoutFollowType != .none else {
+        guard showTreatments, UserDefaults.standard.dataFlowPolicy.showsPumpData else {
             return ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
         }
 
@@ -681,7 +681,7 @@ final class GlucoseChartStateManager: ObservableObject {
         treatmentPoints.basalRates.removeAll()
         treatmentPoints.basalRateFill.removeAll()
 
-        guard UserDefaults.standard.nightscoutFollowType != .none else { return }
+        guard UserDefaults.standard.dataFlowPolicy.showsPumpData else { return }
 
         let basalTreatments = cachedTreatments.filter { $0.date >= startDate && $0.date <= endDate && !$0.isDeleted && $0.type == .Basal }.sorted { $0.date < $1.date }
 
@@ -690,7 +690,7 @@ final class GlucoseChartStateManager: ObservableObject {
         updateBasalScaler(minimumChartValue: minimumChartValue)
         treatmentPoints.scheduledBasalRates = makeScheduledBasalPoints(startDate: startDate, endDate: endDate, minimumChartValue: minimumChartValue)
         treatmentPoints.basalRates = makeTempBasalPoints(startDate: startDate, endDate: endDate, basalTreatments: basalTreatments, minimumChartValue: minimumChartValue)
-        treatmentPoints.basalRateFill = basalRateFillPoints(startDate: startDate, endDate: endDate, basalRatePoints: treatmentPoints.basalRates, minimumChartValue: minimumChartValue)
+        treatmentPoints.basalRateFill = basalRateFillPoints(from: treatmentPoints.basalRates)
     }
 
     private func treatmentSeparationOffset() -> Double {
@@ -934,15 +934,12 @@ final class GlucoseChartStateManager: ObservableObject {
         return chartPoints
     }
 
-    /// Creates the filled basal area by closing the temp basal line down to the basal baseline.
-    private func basalRateFillPoints(startDate: Date, endDate: Date, basalRatePoints: [GlucoseChartPoint], minimumChartValue: Double) -> [GlucoseChartPoint] {
-        guard !basalRatePoints.isEmpty else { return [] }
-
-        var fillPoints = [basalPoint(value: 0, date: startDate, minimumChartValue: minimumChartValue, idPrefix: "temp-basal-fill")]
-        fillPoints.append(contentsOf: basalRatePoints)
-        fillPoints.append(basalPoint(value: 0, date: endDate, minimumChartValue: minimumChartValue, idPrefix: "temp-basal-fill"))
-
-        return fillPoints
+    /// Reuses the basal step series for the area because each AreaMark already fills to the baseline.
+    /// Artificial zero endpoints would make the fill collapse at the visible edge while the line continues.
+    private func basalRateFillPoints(from basalRatePoints: [GlucoseChartPoint]) -> [GlucoseChartPoint] {
+        basalRatePoints.map {
+            GlucoseChartPoint(date: $0.date, value: $0.value, idPrefix: "temp-basal-fill")
+        }
     }
 
     private func basalPoint(value: Double, date: Date, minimumChartValue: Double, idPrefix: String) -> GlucoseChartPoint {

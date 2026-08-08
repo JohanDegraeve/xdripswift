@@ -8,16 +8,13 @@
 
 import Foundation
 
-/// To hide/ignore follower types at runtime, provide a key in the override file using rawValues in an array:
+/// To hide follower types at runtime, provide their stored raw values in the override file:
 /// IGNORE_FOLLOWER_TYPES = [1,2]
-
-/// Resolved disabled set (Info.plist wins, falls back to default, i.e. nothing ignored)
 private var disabledFollowerDataSources: Set<FollowerDataSourceType> {
-    let followerTypeArray = parseIgnoredFollowerTypes()
-    return !followerTypeArray.isEmpty ? followerTypeArray : []
+    parseIgnoredFollowerTypes()
 }
 
-/// Read IgnoreFollowerTypes from Info.plist. Expects a JSON array of integer raw values (e.g. [1,3]).
+/// The build setting reaches the app as a JSON array stored in Info.plist.
 private func parseIgnoredFollowerTypes() -> Set<FollowerDataSourceType> {
     guard let raw = Bundle.main.object(forInfoDictionaryKey: "IgnoreFollowerTypes") as? String,
           !raw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
@@ -25,7 +22,7 @@ private func parseIgnoredFollowerTypes() -> Set<FollowerDataSourceType> {
           let ints = try? JSONDecoder().decode([Int].self, from: data) else {
         return []
     }
-    // ensure that Nightscout cannot be disabled ever - we need to have one fallback FollowerDataSourceType
+    // Nightscout is the safe fallback for a removed or invalid stored selection.
     return Set(ints.compactMap { FollowerDataSourceType(rawValue: $0) }).filter { $0 != .nightscout }
 }
 
@@ -42,6 +39,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
     case dexcomShare = 3
     case medtrumEasyView = 4
     case calendar = 5
+    // Persisted raw values are append-only. Never move CareLink ahead of existing cases.
+    case careLink = 6
 
     /// UI display order for the follower source picker.
     ///
@@ -52,24 +51,29 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             .nightscout,
             .dexcomShare,
             .calendar,
+            .careLink,
             .libreLinkUp,
             .libreLinkUpRussia,
             .medtrumEasyView
         ]
     }
 
-    /// All display-ordered cases filtered to those currently enabled. Prefer this over 'allCases' when populating UI.
+    /// Display-ordered cases available in the current build.
     static var allEnabledCases: [FollowerDataSourceType] {
         Self.allCasesForList.filter { $0.isEnabled }
     }
-    
-    /// Validate a stored selection against current enabled cases. If invalid, return the first enabled case
-    /// or fall back to the first declared case.
-    static func validatedSelection(storedRawValue: Int?) -> FollowerDataSourceType {
-        if let raw = storedRawValue, let type = FollowerDataSourceType(rawValue: raw), type.isEnabled {
+
+    /// Preserves valid stored values and falls back safely when a build hides that source.
+    static func validatedSelection(
+        storedRawValue: Int?,
+        enabledCases: [FollowerDataSourceType] = FollowerDataSourceType.allEnabledCases
+    ) -> FollowerDataSourceType {
+        if let raw = storedRawValue,
+           let type = FollowerDataSourceType(rawValue: raw),
+           enabledCases.contains(type) {
             return type
         }
-        return Self.allEnabledCases.first ?? Self.allCases.first!
+        return enabledCases.first ?? .nightscout
     }
     
     /// Whether this data source is enabled for use (controlled by disabledFollowerDataSources).
@@ -91,28 +95,11 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return "Medtrum EasyView"
         case .calendar:
             return "Shared Calendar"
+        case .careLink:
+            return "CareLink"
         }
     }
     
-    // this is an alternate description to be used by the UI away from the "choose a data source" context.
-    // it is basically a full description of "XXXX Follower Mode" and can be modified for available space
-    var fullDescription: String {
-        switch self {
-        case .nightscout:
-            return "Nightscout"
-        case .libreLinkUp:
-            return "LibreLinkUp"
-        case .libreLinkUpRussia:
-            return "LibreLinkUp Russia"
-        case .dexcomShare:
-            return "Dexcom Share"
-        case .medtrumEasyView:
-            return "Medtrum EasyView"
-        case .calendar:
-            return "Shared Calendar"
-        }
-    }
-
     // shorter description for compact UI surfaces like the Watch app
     var shortDescription: String {
         switch self {
@@ -126,6 +113,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return "Medtrum"
         case .calendar:
             return "Calendar"
+        case .careLink:
+            return "CareLink"
         }
     }
     
@@ -141,6 +130,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return "ME"
         case .calendar:
             return "CAL"
+        case .careLink:
+            return "CL"
         }
     }
     
@@ -156,83 +147,13 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return ConstantsFollower.secondsUntilFollowerDisconnectWarningMedtrumEasyView
         case .calendar:
             return ConstantsFollower.secondsUntilFollowerDisconnectWarningNightscout
+        case .careLink:
+            return 20 * 60
         }
     }
 
-    /// does this follower mode need a username and password?
-    func needsUserNameAndPassword() -> Bool {
-        switch self {
-        case .nightscout:
-            return false
-        case .libreLinkUp, .libreLinkUpRussia, .dexcomShare, .medtrumEasyView:
-            return true
-        case .calendar:
-            return false
-        }
-    }
-    
     /// description of the follower mode to be used for logging
     func descriptionForLogging() -> String {
-        switch self {
-        case .nightscout:
-            return "Nightscout Follower"
-        case .libreLinkUp:
-            return "LibreLinkUp Follower"
-        case .libreLinkUpRussia:
-            return "LibreLinkUp Russia Follower"
-        case .dexcomShare:
-            return "Dexcom Share Follower"
-        case .medtrumEasyView:
-            return "Medtrum EasyView Follower"
-        case .calendar:
-            return "Shared Calendar Follower"
-        }
-    }
-    
-    func hasServiceStatus() -> Bool {
-        switch self {
-        case .nightscout, .libreLinkUp, .libreLinkUpRussia, .dexcomShare:
-            return true
-        default:
-            return false
-        }
-    }
-    
-    // as an enum should be a simple value type without access to UserDefaults or app data,
-    // we pass the Nightscout URL and port in from the settings/view model layer.
-    func serviceStatusBaseUrlString(nightscoutUrl: String? = "", nightscoutPort: Int = 0) -> String {
-        switch self {
-        case .nightscout:
-            guard let nightscoutUrl,
-                  var components = URLComponents(string: nightscoutUrl) else {
-                return nightscoutUrl ?? ""
-            }
-
-            if (1...65_535).contains(nightscoutPort) {
-                components.port = nightscoutPort
-            }
-
-            return components.string ?? nightscoutUrl
-        case .dexcomShare:
-            return ConstantsFollower.followerStatusDexcomBaseUrl
-        case .libreLinkUp, .libreLinkUpRussia:
-            return ConstantsFollower.followerStatusAbbottBaseUrl
-        default:
-            return ""
-        }
-    }
-    
-    func serviceStatusApiPathString() -> String {
-        switch self {
-        case .nightscout:
-            // for Nightscout, just use the basic status response from v1
-            return ConstantsFollower.followerStatusNightscoutApiPath
-        case .dexcomShare, .libreLinkUp, .libreLinkUpRussia:
-            // both Dexcom and Abbott use Atlassian Statuspage to show
-            // their service status so the API path is common and public
-            return ConstantsFollower.followerStatusAtlassianApiPath
-        default:
-            return ""
-        }
+        description + " Follower"
     }
 }

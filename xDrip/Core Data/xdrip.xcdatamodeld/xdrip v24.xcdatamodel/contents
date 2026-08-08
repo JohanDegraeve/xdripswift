@@ -245,6 +245,7 @@
         <attribute name="snoozeTimeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
     </entity>
     <entity name="TreatmentEntry" representedClassName=".TreatmentEntry" syncable="YES">
+        <attribute name="careLinkSourceIdentifier" optional="YES" attributeType="String"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="enteredBy" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="String"/>

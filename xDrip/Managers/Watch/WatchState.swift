@@ -35,6 +35,7 @@ struct WatchStatus: WatchPayload {
     var isMaster: Bool = true
     var followerDataSourceTypeRawValue: Int = 0
     var followerBackgroundKeepAliveTypeRawValue: Int = 0
+    var followerConnectionStatusRawValue: String?
     var timeStampOfLastFollowerConnection: Double?
     var secondsUntilFollowerDisconnectWarning: Int?
     var timeStampOfLastHeartBeat: Double?

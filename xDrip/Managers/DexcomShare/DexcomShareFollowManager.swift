@@ -111,6 +111,22 @@ class DexcomShareFollowManager: NSObject {
     }
     
     // MARK: - public functions
+
+    public func logIn() {
+        UserDefaults.standard.dexcomShareManuallyLoggedOut = false
+        UserDefaults.standard.dexcomShareLoginFailedTimestamp = nil
+        FollowerSessionState.shared.update(.loggingIn, for: .dexcomShare)
+        verifyUserDefaultsAndStartOrStopFollowMode()
+    }
+
+    public func logOut() {
+        UserDefaults.standard.dexcomShareManuallyLoggedOut = true
+        invalidateDownLoadTimerClosure?()
+        invalidateDownLoadTimerClosure = nil
+        disableSuspensionPrevention()
+        dexcomShareSessionId = nil
+        FollowerSessionState.shared.update(.loggedOut, for: .dexcomShare)
+    }
     
     /// Creates a BgReading object from a FollowerBgReading (Dexcom Share download).
     /// - Parameters
@@ -160,7 +176,8 @@ class DexcomShareFollowManager: NSObject {
     
     /// Schedule new download with timer, when timer expires download() will be called
     private func scheduleNewDownload() {
-        guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
+        guard !UserDefaults.standard.dexcomShareManuallyLoggedOut,
+              UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
         
         // invalidate any previously scheduled download timer before creating a new one
         if let invalidateDownLoadTimerClosure = invalidateDownLoadTimerClosure {
@@ -196,6 +213,10 @@ class DexcomShareFollowManager: NSObject {
             trace("    followerDataSourceType is not Dexcom Share", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug)
             return
         }
+        guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else {
+            FollowerSessionState.shared.update(.loggedOut, for: .dexcomShare)
+            return
+        }
         
         let username = UserDefaults.standard.dexcomShareAccountName
         let password = UserDefaults.standard.dexcomSharePassword
@@ -208,8 +229,10 @@ class DexcomShareFollowManager: NSObject {
             do {
                 // try and download, if it returns nil it's because we need to login
                 if (try? await self.downloadAndProcessEGVs(force: true)) == nil {
+                    FollowerSessionState.shared.update(.loggingIn, for: .dexcomShare)
                     try await self.login(username: username, password: password)
-                    _ = try await self.downloadAndProcessEGVs(force: true) // ignore returned array here; delegate call happens inside
+                    // The delegate receives the readings inside downloadAndProcessEGVs.
+                    _ = try await self.downloadAndProcessEGVs(force: true)
                 }
             } catch DexcomShareFollowError.sessionExpired {
                 // re-login once and retry on expired session
@@ -239,6 +262,8 @@ class DexcomShareFollowManager: NSObject {
     ///     - password: Dexcom Share account password
     /// - Throws: DexcomShareFollowError if login fails for all regions
     private func login(username: String, password: String) async throws {
+        guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
+
         // If a region is already stored, try only that region
         let storedRegion = UserDefaults.standard.dexcomShareRegion
         if storedRegion != .none {
@@ -247,6 +272,7 @@ class DexcomShareFollowManager: NSObject {
                 trace("    in login, login successful using stored region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, storedRegion.description)
                 return
             } catch {
+                guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
                 trace("    in login, login failed using stored region: %{public}@, trying again with the other regions. Error: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, storedRegion.description, error.localizedDescription)
             }
         } else {
@@ -259,6 +285,7 @@ class DexcomShareFollowManager: NSObject {
         // The stored region didn't work or there wasn't one stored, so try the other
         // regions (except the one we just tried) in order until one succeeds
         for region in DexcomShareRegion.allCases {
+            guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
             if region != .none && region != storedRegion {
                 trace("    in login, attempting login to region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, region.description)
                 do {
@@ -269,15 +296,19 @@ class DexcomShareFollowManager: NSObject {
                     trace("    in login, login succeeded to region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, region.description)
                     return
                 } catch {
+                    guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
                     trace("    in login, login failed for region: %{public}@, error: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, region.description, error.localizedDescription)
                     lastError = error
                 }
             }
         }
         
+        guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
+
         // If all fail, clear the region and set loginFailedTimestamp
         UserDefaults.standard.dexcomShareRegion = .none
         UserDefaults.standard.dexcomShareLoginFailedTimestamp = Date()
+        FollowerSessionState.shared.update(.loggedOut, for: .dexcomShare)
         trace("    in login, all region login attempts failed, setting loginFailedTimestamp. Error: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, lastError.localizedDescription)
         throw lastError
     }
@@ -321,6 +352,7 @@ class DexcomShareFollowManager: NSObject {
         loginRequest.httpBody = try JSONSerialization.data(withJSONObject: loginBody, options: [])
         
         let (loginData, loginResponse) = try await URLSession.shared.data(for: loginRequest)
+        guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
         let loginStatusCode = (loginResponse as? HTTPURLResponse)?.statusCode ?? 0
         
         if loginStatusCode >= 400 {
@@ -336,6 +368,7 @@ class DexcomShareFollowManager: NSObject {
         
         // we're now sucessfully logged in, so set the sessionId
         self.dexcomShareSessionId = sessionId
+        FollowerSessionState.shared.update(.loggedIn, for: .dexcomShare)
     }
     
     /// Downloads and processes EGVs (glucose values) from Dexcom Share.
@@ -415,6 +448,7 @@ class DexcomShareFollowManager: NSObject {
             let localCopy = followGlucoseDataArray
             await MainActor.run { [weak self] in
                 guard let self = self else { return }
+                guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { return }
                 // call delegate followerInfoReceived which will process the new readings
                 if let followerDelegate = self.followerDelegate {
                     var array = localCopy
@@ -457,13 +491,16 @@ class DexcomShareFollowManager: NSObject {
         request.httpBody = Data() // POST with empty body per community examples
         
         let (data, response) = try await URLSession.shared.data(for: request)
+        guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { return [] }
         if let http = response as? HTTPURLResponse, http.statusCode == 401 {
             self.dexcomShareSessionId = nil
+            FollowerSessionState.shared.update(.loggingIn, for: .dexcomShare)
             throw DexcomShareFollowError.sessionExpired
         }
         
         // store the current timestamp as a successful server connection
         UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
+        FollowerSessionState.shared.update(.loggedIn, for: .dexcomShare)
         
         do {
             return try JSONDecoder().decode([DexcomEGV].self, from: data)
@@ -532,7 +569,8 @@ class DexcomShareFollowManager: NSObject {
     
     /// verifies UserDefaults and either starts or stops follower mode, including enabling/disabling suspension prevention and triggering the first download if applicable.
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
-        if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .dexcomShare && UserDefaults.standard.dexcomShareAccountName != nil && UserDefaults.standard.dexcomSharePassword != nil {
+        if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .dexcomShare && UserDefaults.standard.dexcomShareAccountName != nil && UserDefaults.standard.dexcomSharePassword != nil && !UserDefaults.standard.dexcomShareManuallyLoggedOut {
+            FollowerSessionState.shared.update(.loggingIn, for: .dexcomShare)
             // this will enable the suspension prevention sound playing if background keep-alive is needed
             // (i.e. not disabled and not using a heartbeat)
             if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
@@ -545,6 +583,7 @@ class DexcomShareFollowManager: NSObject {
             self.download()
             
         } else {
+            FollowerSessionState.shared.update(.loggedOut, for: .dexcomShare)
             // disable the suspension prevention
             self.disableSuspensionPrevention()
             
@@ -587,7 +626,14 @@ class DexcomShareFollowManager: NSObject {
         if let keyPath = keyPath {
             if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
                 switch keyPathEnum {
-                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType, UserDefaults.Key.dexcomShareAccountName, UserDefaults.Key.dexcomSharePassword:
+                case UserDefaults.Key.dexcomShareAccountName, UserDefaults.Key.dexcomSharePassword:
+                    trace("Dexcom Share credentials changed; logging out", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info)
+                    self.logOut()
+                    UserDefaults.standard.dexcomShareRegion = .none
+                    UserDefaults.standard.dexcomShareLoginFailedTimestamp = nil
+                    UserDefaults.standard.timeStampOfLastFollowerConnection = nil
+
+                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType:
                     trace("UserDefaults key changed: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, keyPathEnum.rawValue)
                     // change by user, should not be done within 200 ms
                     if self.keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {

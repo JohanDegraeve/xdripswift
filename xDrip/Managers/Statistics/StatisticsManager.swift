@@ -582,8 +582,7 @@ public final class StatisticsManager: @unchecked Sendable {
     private func makeAIDAnalytics(fromDate: Date, toDate: Date, samples: [CGMSample], isIncluded: Bool) -> GlucoseReportAIDAnalytics? {
         guard fromDate < toDate,
               isIncluded,
-              UserDefaults.standard.nightscoutEnabled,
-              UserDefaults.standard.nightscoutFollowType != .none else {
+              UserDefaults.standard.dataFlowPolicy.showsAIDData else {
             return nil
         }
 

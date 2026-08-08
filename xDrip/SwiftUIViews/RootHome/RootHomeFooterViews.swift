@@ -263,13 +263,21 @@ struct RootHomeDataSourceView: View {
 
             Spacer(minLength: 8)
 
-            HStack(spacing: 0) {
+            HStack(spacing: 4) {
                 Text(dataSourceDetailText)
                     .font(.system(size: 14))
                     .foregroundStyle(dataSourceDetailColor)
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
+
+                if let systemImage = state.detailSystemImage, sensorState.currentAge.isEmpty {
+                    Image(systemName: systemImage)
+                        .font(.system(size: 14))
+                        .foregroundStyle(state.detailSystemImageColor)
+                        .fixedSize()
+                        .accessibilityLabel(state.detailSystemImageAccessibilityLabel)
+                }
 
                 if let maxAgeText {
                     Text(maxAgeText)
