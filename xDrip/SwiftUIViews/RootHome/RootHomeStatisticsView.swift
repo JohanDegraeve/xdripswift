@@ -11,6 +11,8 @@ import SwiftUI
 /// Statistics values and time-in-range pie chart for the selected period.
 struct RootHomeStatisticsView: View {
     let state: RootHomeStatisticsState
+    let statisticsDays: Int
+    let statisticsDaysChanged: (Int) -> Void
     let action: () -> Void
 
     private enum Layout {
@@ -40,11 +42,30 @@ struct RootHomeStatisticsView: View {
                 }
                 .frame(height: Layout.pieSize)
 
-                Text(state.timePeriodText)
-                    .font(.caption2)
-                    .foregroundStyle(ConstantsAppColors.tertiaryText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                // The menu Picker ignores the requested label font, so provide its label directly.
+                Menu {
+                    Picker(
+                        Texts_SettingsView.labelDaysToUseStatisticsTitle,
+                        selection: Binding(
+                            get: { statisticsDays },
+                            set: statisticsDaysChanged
+                        )
+                    ) {
+                        ForEach(RootHomeStatisticsPeriod.options, id: \.self) { days in
+                            Text(RootHomeStatisticsPeriod.title(for: days))
+                                .tag(days)
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 2) {
+                        Text(RootHomeStatisticsPeriod.title(for: statisticsDays))
+                        Image(systemName: "chevron.up.chevron.down")
+                    }
+                    .font(.system(size: 13))
+                    .foregroundStyle(ConstantsAppColors.primaryText)
+                }
+                .fixedSize(horizontal: true, vertical: false)
+                .accessibilityLabel(Texts_SettingsView.labelDaysToUseStatisticsTitle)
             }
             .frame(maxWidth: .infinity)
         }
@@ -54,7 +75,7 @@ struct RootHomeStatisticsView: View {
         .contentShape(Rectangle())
         .onTapGesture(count: 2, perform: action)
         .transaction { transaction in
-            // Calculation updates replace label text immediately. Threshold colors animate separately.
+            // Calculation updates replace statistic values immediately. Threshold colors animate separately.
             transaction.animation = nil
         }
     }

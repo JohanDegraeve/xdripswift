@@ -232,7 +232,7 @@ struct RootHomeView: View {
                 }
 
                 RootHomeMainChartView(
-                    selectedRange: selectedRange,
+                    selectedRange: $selectedRange,
                     chartState: visibleChartState,
                     isLoading: isLoadingChart,
                     scrollCoordinator: scrollCoordinator,
@@ -272,18 +272,11 @@ struct RootHomeView: View {
 
     @ViewBuilder private func lowerStatusContent() -> some View {
         VStack(spacing: Layout.bottomRowSpacing) {
-            if state.visibility.showsControls {
-                RootHomeSelectorView(
-                    selectedRange: $selectedRange,
-                    statisticsDays: state.controls.statisticsDays,
-                    showsStatistics: state.visibility.showsStatistics,
-                    onStatisticsDaysChanged: updateStatisticsDays
-                )
-            }
-
             if state.visibility.showsStatistics {
                 RootHomeStatisticsView(
                     state: state.statistics,
+                    statisticsDays: state.controls.statisticsDays,
+                    statisticsDaysChanged: actions.statisticsDaysChanged,
                     action: actions.cycleStatisticsType
                 )
             }
@@ -587,11 +580,6 @@ struct RootHomeView: View {
         default:
             miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
         }
-    }
-
-    private func updateStatisticsDays(_ days: Int) {
-        UserDefaults.standard.daysToUseStatistics = days
-        actions.statisticsDaysChanged(days)
     }
 
     private func beginOriginalGlucosePeek() {

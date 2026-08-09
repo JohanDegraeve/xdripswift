@@ -8,24 +8,17 @@
 
 import Foundation
 
-/// Main chart width options shown on the home screen.
+/// Available visible widths for the main Home chart.
 ///
 /// The raw value is the visible width in hours. The negative time interval mirrors the previous
 /// UIKit chart manager contract, where the start date is calculated by subtracting the selected
 /// range from the chart end date.
-enum RootHomeChartRange: Double, CaseIterable, Identifiable {
+enum RootHomeChartRange: Double, CaseIterable {
     case threeHours = 3
     case fiveHours = 5
     case eightHours = 8
     case twelveHours = 12
-
-    var id: Double {
-        rawValue
-    }
-
-    var title: String {
-        "\(Int(rawValue))\(Texts_Common.hourshort)"
-    }
+    case twentyFourHours = 24
 
     var timeInterval: TimeInterval {
         .hours(-rawValue)
@@ -42,6 +35,38 @@ enum RootHomeChartRange: Double, CaseIterable, Identifiable {
             return 6.0
         case .twelveHours:
             return 7.2
+        case .twentyFourHours:
+            return 10.0
+        }
+    }
+
+    var nextShorterRange: RootHomeChartRange? {
+        switch self {
+        case .threeHours:
+            return nil
+        case .fiveHours:
+            return .threeHours
+        case .eightHours:
+            return .fiveHours
+        case .twelveHours:
+            return .eightHours
+        case .twentyFourHours:
+            return .twelveHours
+        }
+    }
+
+    var nextLongerRange: RootHomeChartRange? {
+        switch self {
+        case .threeHours:
+            return .fiveHours
+        case .fiveHours:
+            return .eightHours
+        case .eightHours:
+            return .twelveHours
+        case .twelveHours:
+            return .twentyFourHours
+        case .twentyFourHours:
+            return nil
         }
     }
 

@@ -266,7 +266,6 @@
 		4D21B0042FF8000100000001 /* RootHomeStatusViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0042FF8000100000001 /* RootHomeStatusViews.swift */; };
 		4D21B0052FF8000100000001 /* RootHomeGlucoseReadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0052FF8000100000001 /* RootHomeGlucoseReadingView.swift */; };
 		4D21B0062FF8000100000001 /* RootHomeChartViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0062FF8000100000001 /* RootHomeChartViews.swift */; };
-		4D21B0072FF8000100000001 /* RootHomeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0072FF8000100000001 /* RootHomeSelectorView.swift */; };
 		4D21B0082FF8000100000001 /* RootHomeStatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0082FF8000100000001 /* RootHomeStatisticsView.swift */; };
 		4D21B0092FF8000100000001 /* RootHomeFooterViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0092FF8000100000001 /* RootHomeFooterViews.swift */; };
 		4D21B00A2FF8000100000001 /* RootHomeClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A00A2FF8000100000001 /* RootHomeClockView.swift */; };
@@ -306,6 +305,7 @@
 		4F2500143002000100000001 /* SensorHealthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2500133002000100000001 /* SensorHealthModels.swift */; };
 		4F2600013002000200000001 /* SensorNoisePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2600113002000200000001 /* SensorNoisePersistenceTests.swift */; };
 		4F2600023002000200000001 /* SensorHealthIssueManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2600123002000200000001 /* SensorHealthIssueManagerTests.swift */; };
+		4F2800013004000100000001 /* RootHomeInteractionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2800113004000100000001 /* RootHomeInteractionTests.swift */; };
 		4F2800023004000100000001 /* GlucoseChartYAxisRetentionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2800123004000100000001 /* GlucoseChartYAxisRetentionTests.swift */; };
 		4F2700123003000100000001 /* LiveActivitySettingsPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2700113003000100000001 /* LiveActivitySettingsPreview.swift */; };
 		4F67A33C4EC32A86ABC85882 /* CareLinkFollowerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBC8BB898BFD4C30858ED5D /* CareLinkFollowerSettings.swift */; };
@@ -1130,7 +1130,6 @@
 		4D21A0042FF8000100000001 /* RootHomeStatusViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeStatusViews.swift; sourceTree = "<group>"; };
 		4D21A0052FF8000100000001 /* RootHomeGlucoseReadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeGlucoseReadingView.swift; sourceTree = "<group>"; };
 		4D21A0062FF8000100000001 /* RootHomeChartViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeChartViews.swift; sourceTree = "<group>"; };
-		4D21A0072FF8000100000001 /* RootHomeSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeSelectorView.swift; sourceTree = "<group>"; };
 		4D21A0082FF8000100000001 /* RootHomeStatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeStatisticsView.swift; sourceTree = "<group>"; };
 		4D21A0092FF8000100000001 /* RootHomeFooterViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeFooterViews.swift; sourceTree = "<group>"; };
 		4D21A00A2FF8000100000001 /* RootHomeClockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeClockView.swift; sourceTree = "<group>"; };
@@ -1174,6 +1173,7 @@
 		4F2500133002000100000001 /* SensorHealthModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorHealthModels.swift; sourceTree = "<group>"; };
 		4F2600113002000200000001 /* SensorNoisePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorNoisePersistenceTests.swift; sourceTree = "<group>"; };
 		4F2600123002000200000001 /* SensorHealthIssueManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorHealthIssueManagerTests.swift; sourceTree = "<group>"; };
+		4F2800113004000100000001 /* RootHomeInteractionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeInteractionTests.swift; sourceTree = "<group>"; };
 		4F2800123004000100000001 /* GlucoseChartYAxisRetentionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartYAxisRetentionTests.swift; sourceTree = "<group>"; };
 		4F2600133002000200000001 /* xdripTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = xdripTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4F2700113003000100000001 /* LiveActivitySettingsPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivitySettingsPreview.swift; sourceTree = "<group>"; };
@@ -2419,7 +2419,6 @@
 				4D21A00A2FF8000100000001 /* RootHomeClockView.swift */,
 				4D21A0092FF8000100000001 /* RootHomeFooterViews.swift */,
 				4D21A0052FF8000100000001 /* RootHomeGlucoseReadingView.swift */,
-				4D21A0072FF8000100000001 /* RootHomeSelectorView.swift */,
 				4D21A0082FF8000100000001 /* RootHomeStatisticsView.swift */,
 				4D21A0042FF8000100000001 /* RootHomeStatusViews.swift */,
 				4D21A0032FF8000100000001 /* RootHomeToolbarView.swift */,
@@ -2511,6 +2510,7 @@
 			children = (
 				A40000020000000000000001 /* FollowerSettingsTests.swift */,
 				4F2800123004000100000001 /* GlucoseChartYAxisRetentionTests.swift */,
+				4F2800113004000100000001 /* RootHomeInteractionTests.swift */,
 				4F2600123002000200000001 /* SensorHealthIssueManagerTests.swift */,
 				4F2600113002000200000001 /* SensorNoisePersistenceTests.swift */,
 				15CBE00BF86A714EC59FA546 /* CareLink */,
@@ -4258,6 +4258,7 @@
 			files = (
 				4F2600023002000200000001 /* SensorHealthIssueManagerTests.swift in Sources */,
 				4F2800023004000100000001 /* GlucoseChartYAxisRetentionTests.swift in Sources */,
+				4F2800013004000100000001 /* RootHomeInteractionTests.swift in Sources */,
 				A40000010000000000000001 /* FollowerSettingsTests.swift in Sources */,
 				4F2600013002000200000001 /* SensorNoisePersistenceTests.swift in Sources */,
 				377EBC0A484BFC8EA77C623C /* CareLinkTests.swift in Sources */,
@@ -4658,7 +4659,6 @@
 				4D21B0042FF8000100000001 /* RootHomeStatusViews.swift in Sources */,
 				4D21B0052FF8000100000001 /* RootHomeGlucoseReadingView.swift in Sources */,
 				4D21B0062FF8000100000001 /* RootHomeChartViews.swift in Sources */,
-				4D21B0072FF8000100000001 /* RootHomeSelectorView.swift in Sources */,
 				4D21B0082FF8000100000001 /* RootHomeStatisticsView.swift in Sources */,
 				4D21B0092FF8000100000001 /* RootHomeFooterViews.swift in Sources */,
 				4D21B00A2FF8000100000001 /* RootHomeClockView.swift in Sources */,

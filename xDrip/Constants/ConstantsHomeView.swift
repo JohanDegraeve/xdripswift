@@ -96,6 +96,15 @@ enum ConstantsHomeView {
     /// Standard corner radius for Home panels and compact status views.
     static let standardCornerRadius: CGFloat = 10
 
+    /// Magnification change required before a main-chart pinch changes the visible range.
+    static let mainChartZoomMagnificationThreshold = 0.15
+
+    /// How long the selected main-chart range remains fully visible after a pinch.
+    static let mainChartZoomOverlayVisibleDuration = 1.5
+
+    /// Duration of the main-chart range overlay fade-out animation.
+    static let mainChartZoomOverlayFadeDuration = 1.0
+
     /// How long the main chart retains an expanded upper y-axis after scrolling stops.
     static let mainChartYAxisAutoResetDelay = 10.0
     

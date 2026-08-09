@@ -256,13 +256,6 @@ import AppIntents
         UserDefaults.standard.highMarkValueInUserChosenUnit = UserDefaults.standard.highMarkValueInUserChosenUnit
         UserDefaults.standard.bloodGlucoseUnitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
                 
-        // on 10Jan2025 the chart width options were changed from 3/5/12/24 to 3/5/8/12
-        // this is just a quick check to catch any users that had 24 selected when they updated
-        // NOTE: The UI showed 3/6/12/24, but it was actually using 3/5/12/24 for 4 years and nobody noticed the missing hour :)
-        if UserDefaults.standard.chartWidthInHours == 24 {
-            UserDefaults.standard.chartWidthInHours = 12
-        }
-        
         // enable or disable the sensor management button on top, depending on master or follower
         changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
         
@@ -1327,10 +1320,9 @@ import AppIntents
     }
 
     private func setStatisticsDaysFromRootHome(_ days: Int) {
-        UserDefaults.standard.daysToUseStatistics = days
+        guard UserDefaults.standard.daysToUseStatistics != days else { return }
 
-        updateStatistics(animate: false, overrideApplicationState: false)
-        publishRootHomeState()
+        UserDefaults.standard.daysToUseStatistics = days
     }
 
     private func cycleTimeInRangeTypeFromRootHome() {
@@ -1890,7 +1882,7 @@ import AppIntents
 
         rootHomeStateModel.setStatisticsLoading()
         statisticsManager?.calculateStatistics(fromDate: fromDate, toDate: nil) { [weak self] statistics in
-            self?.rootHomeStateModel.updateStatistics(statistics, days: daysToUseStatistics)
+            self?.rootHomeStateModel.updateStatistics(statistics)
         }
         return
     }

@@ -80,14 +80,22 @@ struct RootHomeStatisticsState {
     var cv = RootHomeMetricState(title: Texts_Common.cvStatistics, value: "-")
     var lowLimitText = ""
     var highLimitText = ""
-    var timePeriodText = "- - -"
     var showsActivityIndicator = false
 }
 
-/// Shared compact label for the selected statistics calculation period.
-enum RootHomeStatisticsPeriodText {
+/// Picker values and labels for the selected statistics calculation period.
+enum RootHomeStatisticsPeriod {
+    static let options = [0, 1, 7, 30, 90]
+
     static func title(for days: Int) -> String {
-        days == 0 ? Texts_Common.todayshort : "\(days)\(Texts_Common.dayshort)"
+        switch days {
+        case 0:
+            return Texts_Common.today
+        case 1:
+            return "1 \(Texts_Common.day)"
+        default:
+            return "\(days) \(Texts_Common.days)"
+        }
     }
 }
 
@@ -132,13 +140,11 @@ struct RootHomeVisibilityState {
     var showsStatistics = false
     var showsSensor = false
     var showsDataSource = false
-    var showsControls = true
     var showsClock = false
 }
 
 /// Values used by Home controls which are not part of the clinical status sections.
 struct RootHomeControlsState {
-    var chartHours = UserDefaults.standard.chartWidthInHours
     var statisticsDays = UserDefaults.standard.daysToUseStatistics
     var clockText = ""
     var sensorButtonEnabled = UserDefaults.standard.isMaster
@@ -277,11 +283,10 @@ final class RootHomeStateModel: ObservableObject {
             state.statistics.average.value = "-"
             state.statistics.a1c.value = "-"
             state.statistics.cv.value = "-"
-            state.statistics.timePeriodText = "- - -"
         }
     }
 
-    func updateStatistics(_ statistics: StatisticsManager.Statistics, days: Int) {
+    func updateStatistics(_ statistics: StatisticsManager.Statistics) {
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         let hasData = statistics.averageStatisticValue.value > 0
         let glucoseUnit = isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
@@ -298,8 +303,6 @@ final class RootHomeStateModel: ObservableObject {
             a1cValue = "\(statistics.a1CStatisticValue.round(toDecimalPlaces: 1))%"
         }
 
-        let timePeriodText = hasData ? RootHomeStatisticsPeriodText.title(for: days) : "-"
-
         updateState { state in
             state.statistics = RootHomeStatisticsState(
                 low: RootHomeMetricState(title: Texts_Common.lowStatistics, value: "\(Int(statistics.lowStatisticValue.round(toDecimalPlaces: 0)))%", valueColor: ConstantsAppColors.statisticsLow),
@@ -310,7 +313,6 @@ final class RootHomeStateModel: ObservableObject {
                 cv: RootHomeMetricState(title: Texts_Common.cvStatistics, value: statistics.cVStatisticValue.value > 0 ? "\(Int(statistics.cVStatisticValue.round(toDecimalPlaces: 0)))%" : "-"),
                 lowLimitText: "(<\(self.formattedLimit(statistics.lowLimitForTIR, isMgDl: isMgDl)))",
                 highLimitText: "(>\(self.formattedLimit(statistics.highLimitForTIR, isMgDl: isMgDl)))",
-                timePeriodText: timePeriodText,
                 showsActivityIndicator: false
             )
         }
@@ -858,14 +860,12 @@ final class RootHomeStateModel: ObservableObject {
             showsStatistics: UserDefaults.standard.showStatistics && !usesScreenLockNightLayout,
             showsSensor: !sensorState.maxAge.isEmpty && !usesScreenLockNightLayout,
             showsDataSource: !usesScreenLockNightLayout,
-            showsControls: !usesScreenLockNightLayout,
             showsClock: usesScreenLockNightLayout && UserDefaults.standard.showClockWhenScreenIsLocked
         )
     }
 
     private func controlsState(alertManager: AlertManager?, bgPostProcessingManager: BgPostProcessingManager?) -> RootHomeControlsState {
         RootHomeControlsState(
-            chartHours: UserDefaults.standard.chartWidthInHours,
             statisticsDays: UserDefaults.standard.daysToUseStatistics,
             clockText: state.controls.clockText,
             sensorButtonEnabled: UserDefaults.standard.isMaster,

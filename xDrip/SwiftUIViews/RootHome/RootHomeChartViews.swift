@@ -10,7 +10,7 @@ import SwiftUI
 
 /// Main interactive chart with loading state and the reading shown at the panned end date.
 struct RootHomeMainChartView: View {
-    let selectedRange: RootHomeChartRange
+    @Binding var selectedRange: RootHomeChartRange
     let chartState: GlucoseChartState
     let isLoading: Bool
     let scrollCoordinator: GlucoseChartScrollCoordinator
@@ -18,9 +18,21 @@ struct RootHomeMainChartView: View {
     let updateChartStateIfNeeded: () -> Void
     let finishChartScroll: (_ forceReset: Bool, _ showsLoading: Bool) -> Void
 
+    @State private var showsRangeOverlay = false
+    @State private var hideRangeOverlayWorkItem: DispatchWorkItem?
+    @State private var hasUpdatedRangeDuringPinch = false
+
+    private enum Layout {
+        static let rangeOverlayTopInset: CGFloat = 8
+        static let rangeOverlayHorizontalPadding: CGFloat = 10
+        static let rangeOverlayVerticalPadding: CGFloat = 5
+        static let rangeOverlayFontSize: CGFloat = 16
+        static let rangeOverlayMinimumWidth: CGFloat = 70
+    }
+
     var body: some View {
         GeometryReader { geometry in
-            ZStack(alignment: .topLeading) {
+            ZStack(alignment: .top) {
                 GlucoseChartView(
                     glucoseChartType: .widgetSystemLarge,
                     bgReadingValues: nil,
@@ -60,7 +72,35 @@ struct RootHomeMainChartView: View {
                     scrollCoordinator.resetToNow()
                     finishChartScroll(true, true)
                 })
+                .simultaneousGesture(
+                    MagnificationGesture()
+                        .onChanged(updateRange)
+                        .onEnded { _ in
+                            hasUpdatedRangeDuringPinch = false
+                        }
+                )
                 .clipped()
+
+                if showsRangeOverlay {
+                    HStack(spacing: 4) {
+                        Text("\(Int(selectedRange.rawValue))")
+                            .fontWeight(.semibold)
+                            .monospacedDigit()
+                        Text(Texts_Common.hours)
+                    }
+                    .font(.system(size: Layout.rangeOverlayFontSize))
+                    .foregroundStyle(ConstantsAppColors.secondaryText)
+                    .frame(minWidth: Layout.rangeOverlayMinimumWidth)
+                    .padding(.horizontal, Layout.rangeOverlayHorizontalPadding)
+                    .padding(.vertical, Layout.rangeOverlayVerticalPadding)
+                    .background(
+                        ConstantsAppColors.homePanelBackground,
+                        in: RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous)
+                    )
+                    .padding(.top, Layout.rangeOverlayTopInset)
+                    .allowsHitTesting(false)
+                    .accessibilityElement(children: .combine)
+                }
 
                 if isLoading {
                     ProgressView()
@@ -71,6 +111,54 @@ struct RootHomeMainChartView: View {
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
         }
+        .onDisappear {
+            hideRangeOverlayWorkItem?.cancel()
+            hideRangeOverlayWorkItem = nil
+        }
+    }
+
+    private func updateRange(magnification: CGFloat) {
+        guard !hasUpdatedRangeDuringPinch else { return }
+
+        let threshold = ConstantsHomeView.mainChartZoomMagnificationThreshold
+        let newRange: RootHomeChartRange?
+
+        // One pinch changes one range step as soon as it crosses the deliberate threshold.
+        if magnification >= 1 + threshold {
+            newRange = selectedRange.nextShorterRange
+        } else if magnification <= 1 - threshold {
+            newRange = selectedRange.nextLongerRange
+        } else {
+            newRange = nil
+        }
+
+        guard let newRange else { return }
+
+        hasUpdatedRangeDuringPinch = true
+        selectedRange = newRange
+        showRangeOverlay()
+    }
+
+    private func showRangeOverlay() {
+        hideRangeOverlayWorkItem?.cancel()
+
+        var transaction = Transaction()
+        transaction.animation = nil
+        withTransaction(transaction) {
+            showsRangeOverlay = true
+        }
+
+        // Restart the delayed fade whenever another successful pinch selects a range.
+        let workItem = DispatchWorkItem {
+            withAnimation(.easeOut(duration: ConstantsHomeView.mainChartZoomOverlayFadeDuration)) {
+                showsRangeOverlay = false
+            }
+        }
+        hideRangeOverlayWorkItem = workItem
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + ConstantsHomeView.mainChartZoomOverlayVisibleDuration,
+            execute: workItem
+        )
     }
 }
 
