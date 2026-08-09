@@ -26,6 +26,7 @@ enum BackupAccountCategory: String, CaseIterable, Hashable, Identifiable, Sendab
     case dexcomShare
     case libreLinkUp
     case medtrumEasyView
+    case careLink
     case m5Stack
 
     var id: String { rawValue }
@@ -36,6 +37,7 @@ enum BackupAccountCategory: String, CaseIterable, Hashable, Identifiable, Sendab
         case .dexcomShare: "Dexcom Share"
         case .libreLinkUp: "LibreLinkUp"
         case .medtrumEasyView: "Medtrum EasyView"
+        case .careLink: "CareLink"
         case .m5Stack: "M5Stack Connections"
         }
     }
@@ -69,6 +71,13 @@ enum BackupAccountCategory: String, CaseIterable, Hashable, Identifiable, Sendab
                 UserDefaults.Key.medtrumEasyViewPassword.rawValue,
                 UserDefaults.Key.medtrumEasyViewSelectedPatientUid.rawValue,
             ]
+        case .careLink:
+            [
+                UserDefaults.Key.careLinkUsername.rawValue,
+                UserDefaults.Key.careLinkPassword.rawValue,
+                UserDefaults.Key.careLinkRegion.rawValue,
+                UserDefaults.Key.careLinkSelectedPatientID.rawValue,
+            ]
         case .m5Stack:
             [
                 UserDefaults.Key.m5StackBlePassword.rawValue,
@@ -93,6 +102,8 @@ enum BackupAccountCategory: String, CaseIterable, Hashable, Identifiable, Sendab
             [UserDefaults.Key.libreLinkUpEmail.rawValue]
         case .medtrumEasyView:
             [UserDefaults.Key.medtrumEasyViewEmail.rawValue]
+        case .careLink:
+            [UserDefaults.Key.careLinkUsername.rawValue]
         case .m5Stack:
             [
                 UserDefaults.Key.m5StackBlePassword.rawValue,
@@ -228,6 +239,7 @@ struct BackupBgReading: Codable, Sendable {
 }
 
 struct BackupTreatment: Codable, Sendable {
+    let careLinkSourceIdentifier: String?
     let date: Date
     let enteredBy: String?
     let id: String

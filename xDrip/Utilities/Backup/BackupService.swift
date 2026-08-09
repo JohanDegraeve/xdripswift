@@ -464,6 +464,7 @@ final class BackupService: @unchecked Sendable {
         request.fetchBatchSize = 500
         return try context.fetch(request).map {
             BackupTreatment(
+                careLinkSourceIdentifier: $0.careLinkSourceIdentifier,
                 date: $0.date,
                 enteredBy: $0.enteredBy,
                 id: $0.id,
@@ -682,6 +683,7 @@ final class BackupService: @unchecked Sendable {
                 nsManagedObjectContext: context
             )
             treatment.treatmentdeleted = record.treatmentDeleted
+            treatment.careLinkSourceIdentifier = record.careLinkSourceIdentifier
             if !record.id.isEmpty {
                 ids.insert(record.id)
             }
@@ -914,6 +916,7 @@ final class BackupService: @unchecked Sendable {
 
     private func treatmentFingerprint(_ treatment: TreatmentEntry) -> String {
         treatmentFingerprint(BackupTreatment(
+            careLinkSourceIdentifier: treatment.careLinkSourceIdentifier,
             date: treatment.date,
             enteredBy: treatment.enteredBy,
             id: treatment.id,

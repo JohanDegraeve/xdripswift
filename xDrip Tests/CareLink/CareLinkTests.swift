@@ -28,6 +28,53 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(FollowerDataSourceType.careLink.rawValue, 6)
     }
 
+    func testBackupClassifiesEveryCareLinkAccountValueAsSensitive() {
+        XCTAssertEqual(
+            BackupAccountCategory.careLink.keys,
+            [
+                UserDefaults.Key.careLinkUsername.rawValue,
+                UserDefaults.Key.careLinkPassword.rawValue,
+                UserDefaults.Key.careLinkRegion.rawValue,
+                UserDefaults.Key.careLinkSelectedPatientID.rawValue,
+            ]
+        )
+        XCTAssertEqual(
+            BackupAccountCategory.careLink.availabilityKeys,
+            [UserDefaults.Key.careLinkUsername.rawValue]
+        )
+        XCTAssertFalse(
+            BackupAccountCategory.allKeys.contains(UserDefaults.Key.automaticBasalRenderingStyle.rawValue)
+        )
+    }
+
+    func testBackupTreatmentPreservesCareLinkIdentityAndDecodesLegacyRecords() throws {
+        let treatment = BackupTreatment(
+            careLinkSourceIdentifier: "patient|AUTO_BASAL_DELIVERY|marker-1",
+            date: now,
+            enteredBy: "CareLink",
+            id: "",
+            nightscoutEventType: nil,
+            notes: nil,
+            treatmentDeleted: false,
+            treatmentType: TreatmentType.AutomaticBasal.rawValue,
+            uploaded: false,
+            value: 0.125,
+            valueSecondary: 5
+        )
+        let encoded = try JSONEncoder().encode(treatment)
+        XCTAssertEqual(
+            try JSONDecoder().decode(BackupTreatment.self, from: encoded).careLinkSourceIdentifier,
+            treatment.careLinkSourceIdentifier
+        )
+
+        var legacyObject = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: encoded) as? [String: Any]
+        )
+        legacyObject.removeValue(forKey: "careLinkSourceIdentifier")
+        let legacyData = try JSONSerialization.data(withJSONObject: legacyObject)
+        XCTAssertNil(try JSONDecoder().decode(BackupTreatment.self, from: legacyData).careLinkSourceIdentifier)
+    }
+
     func testConnectionIndicatorPaletteDoesNotUseReadingFreshness() {
         XCTAssertEqual(CareLinkConnectionStatus.loginRequired.indicatorColor, Color.gray)
         XCTAssertEqual(CareLinkConnectionStatus.connecting.indicatorColor, ConstantsAppColors.warning)
