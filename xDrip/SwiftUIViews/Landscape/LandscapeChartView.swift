@@ -19,7 +19,7 @@ enum LandscapeComparisonPeriod: Int, CaseIterable, Identifiable {
     var id: Int { rawValue }
 
     var title: String {
-        "\(rawValue) \(Texts_Common.days)"
+        Texts_Common.landscapeComparisonDays(rawValue)
     }
 }
 

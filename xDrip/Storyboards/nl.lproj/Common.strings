@@ -15,6 +15,7 @@
 "common_day" = "dag";
 "common_days" = "dagen";
 "common_landscape_comparingWithLast" = "Vergelijken met de laatste:";
+"common_landscape_comparisonDays" = "%d dagen";
 "common_today" = "Vandaag";
 "common_week" = "week";
 "common_hourshort" = "u";

@@ -15,6 +15,7 @@
 "common_day" = "dia";
 "common_days" = "dias";
 "common_landscape_comparingWithLast" = "Comparação com os últimos:";
+"common_landscape_comparisonDays" = "%d dias";
 "common_today" = "Hoje";
 "common_week" = "semana";
 "common_hourshort" = "h";
