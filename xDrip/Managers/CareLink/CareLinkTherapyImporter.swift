@@ -10,7 +10,7 @@ import CoreData
 import Foundation
 import os
 
-/// Persists normalized CareLink treatments in the app's existing treatment store.
+/// Persists native CareLink treatments in the app's existing treatment store.
 ///
 /// Imported records deliberately retain an empty Nightscout identifier and `uploaded == false`.
 /// This allows the normal Nightscout manager to export them without creating a second upload path.
@@ -64,6 +64,7 @@ final class CareLinkTherapyImporter {
     /// The legacy content fingerprint also protects users who imported treatments before the
     /// dedicated source field was added to the Core Data model.
     func importTreatments(_ records: [CareLinkTherapyRecord]) async -> Int {
+        await migrateLegacyAutomaticBasals()
         guard !records.isEmpty else { return 0 }
         let context = coreDataManager.privateChildManagedObjectContext()
         let earliest = records.map(\.date).min() ?? .now
@@ -71,7 +72,7 @@ final class CareLinkTherapyImporter {
         let requestedSourceIdentifiers = records.map(\.sourceIdentifier)
 
         do {
-            let added = try await context.perform {
+            let result = try await context.perform {
                 let request: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
                 request.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
                     NSPredicate(format: "careLinkSourceIdentifier IN %@", requestedSourceIdentifiers),
@@ -94,30 +95,30 @@ final class CareLinkTherapyImporter {
                     grouping: existing.filter { $0.careLinkSourceIdentifier == nil },
                     by: Self.fingerprint
                 )
-                var basalEntriesByEvent = Dictionary(
-                    grouping: existing.filter { $0.treatmentType == .Basal },
+                var automaticBasalEntriesByEvent = Dictionary(
+                    grouping: existing.filter { $0.treatmentType == .AutomaticBasal },
                     by: Self.basalEventKey
                 )
                 var added = 0
                 for record in records {
                     if let existingEntry = entriesBySourceIdentifier[record.sourceIdentifier] {
                         Self.apply(record, to: existingEntry)
-                        if record.type == .Basal {
+                        if record.type == .AutomaticBasal {
                             let eventKey = Self.basalEventKey(record)
-                            basalEntriesByEvent[eventKey]?
+                            automaticBasalEntriesByEvent[eventKey]?
                                 .filter { $0 != existingEntry }
                                 .forEach(context.delete)
-                            basalEntriesByEvent[eventKey] = [existingEntry]
+                            automaticBasalEntriesByEvent[eventKey] = [existingEntry]
                         }
                         continue
                     }
-                    if record.type == .Basal,
-                       var matchingEntries = basalEntriesByEvent[Self.basalEventKey(record)],
+                    if record.type == .AutomaticBasal,
+                       var matchingEntries = automaticBasalEntriesByEvent[Self.basalEventKey(record)],
                        let existingEntry = matchingEntries.popLast() {
                         Self.apply(record, to: existingEntry)
                         existingEntry.careLinkSourceIdentifier = record.sourceIdentifier
                         matchingEntries.forEach(context.delete)
-                        basalEntriesByEvent[Self.basalEventKey(record)] = [existingEntry]
+                        automaticBasalEntriesByEvent[Self.basalEventKey(record)] = [existingEntry]
                         entriesBySourceIdentifier[record.sourceIdentifier] = existingEntry
                         continue
                     }
@@ -143,18 +144,23 @@ final class CareLinkTherapyImporter {
                     entriesBySourceIdentifier[record.sourceIdentifier] = treatment
                     added += 1
                 }
-                if context.hasChanges { try context.save() }
-                return added
+                let hadChanges = context.hasChanges
+                if hadChanges { try context.save() }
+                return (added: added, hadChanges: hadChanges)
             }
-            guard added > 0 else { return added }
-            await MainActor.run {
-                coreDataManager.saveChanges()
-                if UserDefaults.standard.dataFlowPolicy.exportsTreatmentsToNightscout {
-                    UserDefaults.standard.nightscoutSyncRequired = true
+            if result.hadChanges {
+                await MainActor.run {
+                    coreDataManager.saveChanges()
+                    UserDefaults.standard.nightscoutTreatmentsUpdateCounter += 1
+                    if UserDefaults.standard.dataFlowPolicy.exportsTreatmentsToNightscout {
+                        UserDefaults.standard.nightscoutSyncRequired = true
+                    }
                 }
             }
-            trace("CareLink imported %{public}d therapy records", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .info, added)
-            return added
+            if result.added > 0 {
+                trace("CareLink imported %{public}d therapy records", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .info, result.added)
+            }
+            return result.added
         } catch {
             trace("CareLink therapy import failed: %{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .error, error.localizedDescription)
             return 0
@@ -163,6 +169,41 @@ final class CareLinkTherapyImporter {
 
     /// A readable source label is kept separate from the Nightscout identifier.
     private static let enteredBy = "CareLink"
+
+    /// Converts the earlier CareLink U/hr representation into native delivered insulin amounts.
+    /// The query itself is the migration marker, so this remains safe to run before every import.
+    private func migrateLegacyAutomaticBasals() async {
+        let context = coreDataManager.privateChildManagedObjectContext()
+
+        do {
+            let migrated = try await context.perform {
+                let request: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
+                request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                    NSPredicate(format: "treatmentType == %@", NSNumber(value: TreatmentType.Basal.rawValue)),
+                    NSPredicate(format: "enteredBy == %@", Self.enteredBy),
+                    NSPredicate(format: "value >= 0 AND valueSecondary > 0")
+                ])
+                request.includesPropertyValues = true
+
+                let treatments = try context.fetch(request)
+                for treatment in treatments {
+                    treatment.value = treatment.value * treatment.valueSecondary / 60
+                    treatment.treatmentType = .AutomaticBasal
+                }
+                if context.hasChanges { try context.save() }
+                return treatments.count
+            }
+
+            guard migrated > 0 else { return }
+            await MainActor.run {
+                coreDataManager.saveChanges()
+                UserDefaults.standard.nightscoutTreatmentsUpdateCounter += 1
+            }
+            trace("CareLink migrated %{public}d automatic basal treatments to native doses", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .info, migrated)
+        } catch {
+            trace("CareLink automatic basal migration failed: %{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .error, error.localizedDescription)
+        }
+    }
 
     /// Uses whole-second time because CareLink may alternate between ISO seconds and epoch millis.
     private static func fingerprint(_ record: CareLinkTherapyRecord) -> String {
@@ -179,18 +220,25 @@ final class CareLinkTherapyImporter {
     }
 
     private static func basalEventKey(_ record: CareLinkTherapyRecord) -> String {
-        basalEventKey(date: record.date, type: record.type)
+        basalEventKey(date: record.date)
     }
 
     private static func basalEventKey(_ treatment: TreatmentEntry) -> String {
-        basalEventKey(date: treatment.date, type: treatment.treatmentType)
+        basalEventKey(date: treatment.date)
     }
 
-    private static func basalEventKey(date: Date, type: TreatmentType) -> String {
-        "\(Int64(date.timeIntervalSince1970.rounded()))|\(type.rawValue)"
+    private static func basalEventKey(date: Date) -> String {
+        "\(Int64(date.timeIntervalSince1970.rounded()))|automatic-basal"
     }
 
     private static func apply(_ record: CareLinkTherapyRecord, to treatment: TreatmentEntry) {
+        let changed = treatment.date != record.date
+            || treatment.value != record.value
+            || treatment.valueSecondary != record.durationMinutes
+            || treatment.treatmentType != record.type
+            || treatment.nightscoutEventType != record.nightscoutEventType
+            || treatment.notes != record.notes
+
         treatment.date = record.date
         treatment.value = record.value
         treatment.valueSecondary = record.durationMinutes
@@ -199,6 +247,9 @@ final class CareLinkTherapyImporter {
         treatment.enteredBy = enteredBy
         treatment.notes = record.notes
         treatment.treatmentdeleted = false
+        if changed {
+            treatment.uploaded = false
+        }
     }
 }
 
@@ -207,7 +258,7 @@ extension CareLinkTherapyRecord {
     /// `lastLoopDate` carries proven SmartGuard activity into the existing status model. It does
     /// not represent a synthetic loop cycle or a Nightscout result.
     func historicalPumpDeviceStatus(metadata: CareLinkMetadata, checkedAt: Date) -> NightscoutDeviceStatus? {
-        guard type == .Basal,
+        guard type == .AutomaticBasal,
               sourceIdentifier.contains("|AUTO_BASAL_DELIVERY|"),
               value.isFinite,
               value >= 0,
@@ -225,7 +276,7 @@ extension CareLinkTherapyRecord {
         status.lastLoopDate = date
         status.timestamp = date
         status.device = "carelink://pump-history"
-        status.rate = value
+        status.rate = AutomaticBasalTreatmentMath.rate(amount: value, durationSeconds: durationMinutes * 60)
         status.duration = Int(durationMinutes.rounded())
         status.pumpStatus = "Automatic Basal"
         status.pumpStatusTimestamp = date

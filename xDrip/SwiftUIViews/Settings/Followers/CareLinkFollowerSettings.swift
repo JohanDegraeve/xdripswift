@@ -49,6 +49,7 @@ private enum CareLinkSettingsSection: CaseIterable {
     case credentials
     case connection
     case profile
+    case therapyDisplay
     case device
     case activity
 }
@@ -72,6 +73,7 @@ private final class CareLinkSettingsSectionProvider: SettingsNativeSectionProvid
         case .connection: return nil
         case .profile: return Texts_SettingsView.followerSectionProfile
         case .device: return Texts_SettingsView.careLinkDevice
+        case .therapyDisplay: return Texts_SettingsView.careLinkTherapyDisplay
         case .activity: return Texts_SettingsView.followerSectionActivity
         }
     }
@@ -84,6 +86,8 @@ private final class CareLinkSettingsSectionProvider: SettingsNativeSectionProvid
             return CareLinkLoginCredentials.stored() == nil
                 ? Texts_SettingsView.careLinkCredentialsRequiredFooter
                 : snapshot.detail
+        case .therapyDisplay:
+            return Texts_SettingsView.careLinkAutomaticBasalFooter
         case .profile, .device, .activity:
             return nil
         }
@@ -95,6 +99,7 @@ private final class CareLinkSettingsSectionProvider: SettingsNativeSectionProvid
         case .connection: return connectionRows()
         case .profile: return profileRows()
         case .device: return deviceRows()
+        case .therapyDisplay: return therapyDisplayRows()
         case .activity: return activityRows()
         }
     }
@@ -257,6 +262,32 @@ private final class CareLinkSettingsSectionProvider: SettingsNativeSectionProvid
             to: &rows
         )
         return rows
+    }
+
+    private func therapyDisplayRows() -> [SettingsRow] {
+        let styles = AutomaticBasalRenderingStyle.allCases
+        return [
+            SettingsRow(
+                id: "careLink.automaticBasalRenderingStyle",
+                title: Texts_SettingsView.careLinkAutomaticBasal,
+                control: .menuWithSelectionTitle(
+                    options: {
+                        styles.map {
+                            SettingsMenuOption(
+                                title: $0.title,
+                                isSelected: $0 == UserDefaults.standard.automaticBasalRenderingStyle
+                            )
+                        }
+                    },
+                    selectionTitle: { UserDefaults.standard.automaticBasalRenderingStyle.title },
+                    selectOption: { index in
+                        guard styles.indices.contains(index) else { return }
+                        UserDefaults.standard.automaticBasalRenderingStyle = styles[index]
+                    }
+                ),
+                keepsControlLabelOnSingleLine: true
+            )
+        ]
     }
 
     /// Protocol fields that are not present are omitted instead of shown as placeholders.

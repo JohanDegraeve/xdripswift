@@ -32,6 +32,7 @@ struct RootHomeView: View {
     private struct ChartSeriesSettings: Equatable {
         let showTreatments: Bool
         let showOriginalBGReadings: Bool
+        let automaticBasalRenderingStyleRawValue: Int
     }
 
     // MARK: - State
@@ -56,6 +57,7 @@ struct RootHomeView: View {
     @AppStorage(UserDefaults.Key.showOriginalBGReadings.rawValue) private var hideOriginalBGReadings = false
     @AppStorage(UserDefaults.Key.enableAdjustment.rawValue) private var enableAdjustment = false
     @AppStorage(UserDefaults.Key.enableSmoothing.rawValue) private var enableSmoothing = false
+    @AppStorage(UserDefaults.Key.automaticBasalRenderingStyle.rawValue) private var automaticBasalRenderingStyleRawValue = AutomaticBasalRenderingStyle.deliveredDoses.rawValue
 
     private let actions: RootHomeActions
     private let chartRefreshTimer = Timer.publish(every: ConstantsHomeView.updateHomeViewIntervalInSeconds, on: .main, in: .common).autoconnect()
@@ -462,7 +464,11 @@ struct RootHomeView: View {
     }
 
     private var chartSeriesSettings: ChartSeriesSettings {
-        ChartSeriesSettings(showTreatments: showTreatments, showOriginalBGReadings: showOriginalBGReadings)
+        ChartSeriesSettings(
+            showTreatments: showTreatments,
+            showOriginalBGReadings: showOriginalBGReadings,
+            automaticBasalRenderingStyleRawValue: automaticBasalRenderingStyleRawValue
+        )
     }
 
     private var miniChartHoursToShowForChart: Double {

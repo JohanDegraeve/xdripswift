@@ -491,3 +491,10 @@
 "settingsviews_followerServiceStatus" = "Status";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Håll aktiv.";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Håll aktiv disabled.\n\nContact Image function cannot work without Håll aktiv.";
+
+/// Visning av automatisk basal från CareLink
+"settingsviews_careLinkTherapyDisplay" = "Terapivisning";
+"settingsviews_careLinkAutomaticBasal" = "Automatisk basal";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Basalpulser";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Tillfälliga basaler";
+"settingsviews_careLinkAutomaticBasalFooter" = "Basalpulser visar varje automatisk basaldos som en kort puls i huvudglukosdiagrammet. Tillfälliga basaler visar motsvarande hastighet i E/tim mellan doserna.";

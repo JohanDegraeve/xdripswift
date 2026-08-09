@@ -503,3 +503,10 @@
 "settingsviews_followerServiceStatus" = "Tila";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Keep-alive.";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Keep-alive disabled.\n\nContact Image function cannot work without Keep-alive.";
+
+/// CareLinkin automaattisen basaalin näyttö
+"settingsviews_careLinkTherapyDisplay" = "Hoidon näyttö";
+"settingsviews_careLinkAutomaticBasal" = "Automaattinen basaali";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Basaalipulssit";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Väliaikaiset basaalit";
+"settingsviews_careLinkAutomaticBasalFooter" = "Basaalipulssit näyttää jokaisen automaattisen basaaliannoksen lyhyenä pulssina pääglukoosikaaviossa. Väliaikaiset basaalit näyttää vastaavan U/h-nopeuden annosten välillä.";

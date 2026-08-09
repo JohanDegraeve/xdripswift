@@ -131,7 +131,7 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(reading.timeStamp.timeIntervalSince1970, now.timeIntervalSince1970, accuracy: 1)
     }
 
-    func testTherapyParserNormalizesPumpBolusMealAndAutoBasal() throws {
+    func testTherapyParserStoresNativeAutoBasalAmountAndNormalizesPumpRate() throws {
         let markers: [[String: Any]] = [
             marker(type: "AUTO_BASAL_DELIVERY", timestamp: "2027-01-15T08:55:00", values: ["bolusAmount": "0.125"]),
             marker(type: "AUTO_BASAL_DELIVERY", timestamp: "2027-01-15T08:55:00", values: ["bolusAmount": "0.125"]),
@@ -161,8 +161,8 @@ final class CareLinkTests: XCTestCase {
 
         let payload = try CareLinkTherapyParser.payload(from: data, patientID: "patient-1", now: now)
         XCTAssertEqual(payload.treatments.count, 3)
-        let basal = try XCTUnwrap(payload.treatments.first(where: { $0.type == .Basal }))
-        XCTAssertEqual(basal.value, 1.5, accuracy: 0.0001)
+        let basal = try XCTUnwrap(payload.treatments.first(where: { $0.type == .AutomaticBasal }))
+        XCTAssertEqual(basal.value, 0.125, accuracy: 0.0001)
         XCTAssertEqual(basal.durationMinutes, 5)
         let insulin = try XCTUnwrap(payload.treatments.first(where: { $0.type == .Insulin }))
         XCTAssertEqual(insulin.value, 1.5, accuracy: 0.0001)
@@ -188,7 +188,8 @@ final class CareLinkTests: XCTestCase {
         let original = try XCTUnwrap(firstPayload.treatments.first)
         let recalculated = try XCTUnwrap(secondPayload.treatments.min(by: { $0.date < $1.date }))
         XCTAssertEqual(original.sourceIdentifier, recalculated.sourceIdentifier)
-        XCTAssertNotEqual(original.value, recalculated.value)
+        XCTAssertEqual(original.value, recalculated.value)
+        XCTAssertNotEqual(original.durationMinutes, recalculated.durationMinutes)
     }
 
     func testSmartGuardShieldRequiresAnAutomaticBasalState() throws {
@@ -426,8 +427,8 @@ final class CareLinkTests: XCTestCase {
         let record = CareLinkTherapyRecord(
             sourceIdentifier: "patient|AUTO_BASAL_DELIVERY|marker-1",
             date: now.addingTimeInterval(-300),
-            type: .Basal,
-            value: 1.5,
+            type: .AutomaticBasal,
+            value: 0.125,
             durationMinutes: 5,
             nightscoutEventType: "Temp Basal",
             notes: nil
@@ -459,8 +460,8 @@ final class CareLinkTests: XCTestCase {
         let basalStatus = try XCTUnwrap(CareLinkTherapyRecord(
             sourceIdentifier: "patient|AUTO_BASAL_DELIVERY|marker-2",
             date: now.addingTimeInterval(-300),
-            type: .Basal,
-            value: 1.5,
+            type: .AutomaticBasal,
+            value: 0.125,
             durationMinutes: 5,
             nightscoutEventType: "Temp Basal",
             notes: nil
@@ -476,6 +477,28 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(composed.iob, 1.25)
         XCTAssertEqual(composed.pumpReservoir, 42)
         XCTAssertEqual(composed.pumpBatteryPercent, 75)
+    }
+
+    func testAutomaticBasalRateMathPreservesDeliveredDose() throws {
+        XCTAssertEqual(
+            try XCTUnwrap(AutomaticBasalTreatmentMath.rate(amount: 0.125, durationSeconds: 5 * 60)),
+            1.5,
+            accuracy: 0.0001
+        )
+        XCTAssertEqual(
+            try XCTUnwrap(AutomaticBasalTreatmentMath.rate(
+                amount: 0.125,
+                durationSeconds: ConstantsGlucoseChart.automaticBasalPulseDisplayDuration
+            )),
+            3.0,
+            accuracy: 0.0001
+        )
+        XCTAssertNil(AutomaticBasalTreatmentMath.rate(amount: 0.125, durationSeconds: 0))
+    }
+
+    func testAutomaticBasalTreatmentTypeIsAppended() {
+        XCTAssertEqual(TreatmentType.AutomaticBasal.rawValue, 9)
+        XCTAssertEqual(TreatmentType.AutomaticBasal.unit(), Texts_TreatmentsView.insulinUnit)
     }
 
     func testVisibleBasalStepsPreserveEqualTimestampOrder() {

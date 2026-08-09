@@ -461,3 +461,10 @@
 "settingsviews_followerServiceStatus" = "Status";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Hold aktiv.";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Hold aktiv disabled.\n\nContact Image function cannot work without Hold aktiv.";
+
+/// Visning af automatisk basal fra CareLink
+"settingsviews_careLinkTherapyDisplay" = "Terapivisning";
+"settingsviews_careLinkAutomaticBasal" = "Automatisk basal";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Basalimpulser";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Midlertidige basaler";
+"settingsviews_careLinkAutomaticBasalFooter" = "Basalimpulser viser hver automatisk basaltilførsel som en kort impuls på hovedglukosegrafen. Midlertidige basaler viser den tilsvarende hastighed i E/t mellem tilførslerne.";

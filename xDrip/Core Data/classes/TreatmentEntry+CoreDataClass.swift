@@ -25,6 +25,9 @@ import CoreData
     case SensorStart
     case PumpBatteryChange
     case Note
+    /// One automatic basal insulin delivery stored natively in units.
+    /// `TreatmentEntry.valueSecondary` retains the observed interval to the next delivery in minutes.
+    case AutomaticBasal = 9
 	
 	/// String representation.
 	public func asString() -> String {
@@ -39,6 +42,8 @@ import CoreData
             return Texts_TreatmentsView.bgCheck
         case .Basal:
             return Texts_TreatmentsView.basalRate
+        case .AutomaticBasal:
+            return Texts_TreatmentsView.automaticBasal
         case .SiteChange:
             return Texts_TreatmentsView.siteChange
         case .SensorStart:
@@ -63,6 +68,8 @@ import CoreData
 			return Texts_TreatmentsView.exerciseUnit
         case .Basal:
             return Texts_TreatmentsView.basalRateUnit
+        case .AutomaticBasal:
+            return Texts_TreatmentsView.insulinUnit
         case .BgCheck:
             return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol
         case .SiteChange, .SensorStart, .PumpBatteryChange, .Note:
@@ -91,6 +98,8 @@ import CoreData
         case .BgCheck:
             return "glucose"
         case .Basal:
+            return "rate"
+        case .AutomaticBasal:
             return "rate"
         case .Note:
             return "note"
@@ -189,6 +198,13 @@ public class TreatmentEntry: NSManagedObject, Comparable {
             dict["eventType"] = "Temp Basal" // maybe overwritten in next statement
             dict["rate"] = self.value
             dict["duration"] = self.valueSecondary
+        case .AutomaticBasal:
+            dict["eventType"] = "Temp Basal"
+            dict["rate"] = AutomaticBasalTreatmentMath.rate(
+                amount: self.value,
+                durationSeconds: self.valueSecondary * 60
+            ) ?? 0
+            dict["duration"] = self.valueSecondary
         case .SiteChange:
             dict["eventType"] = "Site Change" // maybe overwritten in next statement
         case .SensorStart:
@@ -210,6 +226,18 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 		return dict
 	}
 
+}
+
+/// Shared conversion used only at presentation and compatibility boundaries.
+/// Automatic basal treatments remain stored as delivered insulin amounts in units.
+enum AutomaticBasalTreatmentMath {
+    static func rate(amount: Double, durationSeconds: TimeInterval) -> Double? {
+        guard amount.isFinite, amount >= 0, durationSeconds.isFinite, durationSeconds > 0 else {
+            return nil
+        }
+
+        return amount * 60 * 60 / durationSeconds
+    }
 }
 
 // MARK: - conform to Comparable

@@ -2,6 +2,21 @@ import Foundation
 import UIKit
 import ActivityKit
 
+/// Controls how native automatic-basal insulin deliveries are presented on glucose charts.
+enum AutomaticBasalRenderingStyle: Int, CaseIterable {
+    case deliveredDoses = 0
+    case simulatedTempBasals = 1
+
+    var title: String {
+        switch self {
+        case .deliveredDoses:
+            return Texts_SettingsView.careLinkAutomaticBasalDeliveredDoses
+        case .simulatedTempBasals:
+            return Texts_SettingsView.careLinkAutomaticBasalSimulatedTempBasals
+        }
+    }
+}
+
 extension UserDefaults {
 
     /// shared user defaults
@@ -171,6 +186,8 @@ extension UserDefaults {
         case showTreatmentsOnChart = "showTreatmentsOnChart"
         /// should the treatments be shown on the landscape chart?
         case showTreatmentsOnLandscapeChart = "showTreatmentsOnLandscapeChart"
+        /// how native automatic-basal deliveries should be rendered on glucose charts
+        case automaticBasalRenderingStyle = "automaticBasalRenderingStyle"
         /// micro-bolus threshold level in units
         case smallBolusTreatmentThreshold = "smallBolusTreatmentThreshold"
         /// should the micro-boluses be listed in the treatment list/table?
@@ -1526,6 +1543,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.showTreatmentsOnLandscapeChart.rawValue)
+        }
+    }
+
+    /// Native delivered-dose pulses are the default for sources that expose automatic basal amounts.
+    var automaticBasalRenderingStyle: AutomaticBasalRenderingStyle {
+        get {
+            AutomaticBasalRenderingStyle(rawValue: integer(forKey: Key.automaticBasalRenderingStyle.rawValue)) ?? .deliveredDoses
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.automaticBasalRenderingStyle.rawValue)
         }
     }
 

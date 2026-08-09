@@ -693,3 +693,10 @@
 "settingsviews_followerServiceStatus" = "Status";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Aktiv halten.";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Aktiv halten disabled.\n\nContact Image function cannot work without Aktiv halten.";
+
+/// Darstellung der automatischen CareLink-Basalabgabe
+"settingsviews_careLinkTherapyDisplay" = "Therapieanzeige";
+"settingsviews_careLinkAutomaticBasal" = "Automatische Basalabgabe";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Basalimpulse";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Temporäre Basalraten";
+"settingsviews_careLinkAutomaticBasalFooter" = "Basalimpulse zeigen jede automatische Basalabgabe als kurzen Impuls im Hauptglukosediagramm. Temporäre Basalraten zeigen die entsprechende Rate in E/h zwischen den Abgaben.";

@@ -673,3 +673,10 @@
 "settingsviews_followerServiceStatus" = "Статус";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Підтримка активності.";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Підтримка активності disabled.\n\nContact Image function cannot work without Підтримка активності.";
+
+/// Відображення автоматичної базальної подачі CareLink
+"settingsviews_careLinkTherapyDisplay" = "Відображення терапії";
+"settingsviews_careLinkAutomaticBasal" = "Автоматична базальна подача";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Базальні імпульси";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Тимчасові базальні";
+"settingsviews_careLinkAutomaticBasalFooter" = "Базальні імпульси показують кожну автоматичну базальну подачу як короткий імпульс на основному графіку глюкози. Тимчасові базальні показують еквівалентну швидкість в Од/год між подачами.";

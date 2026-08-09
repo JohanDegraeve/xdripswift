@@ -465,3 +465,10 @@
 "settingsviews_followerServiceStatus" = "Durum";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Canlı tut.";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Canlı tut disabled.\n\nContact Image function cannot work without Canlı tut.";
+
+/// CareLink otomatik bazal görünümü
+"settingsviews_careLinkTherapyDisplay" = "Tedavi görünümü";
+"settingsviews_careLinkAutomaticBasal" = "Otomatik bazal";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Bazal atımları";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Geçici bazallar";
+"settingsviews_careLinkAutomaticBasalFooter" = "Bazal atımları, her otomatik bazal dozunu ana glikoz grafiğinde kısa bir atım olarak gösterir. Geçici bazallar, dozlar arasındaki eşdeğer U/sa hızını gösterir.";

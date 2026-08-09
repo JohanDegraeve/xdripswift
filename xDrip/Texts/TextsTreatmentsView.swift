@@ -44,6 +44,10 @@ enum Texts_TreatmentsView {
         return NSLocalizedString("treatments_basalRate", tableName: filename, bundle: Bundle.main, value: "Temp Basal", comment: "Temp Basal")
     }()
 
+    static let automaticBasal: String = {
+        return NSLocalizedString("treatments_automaticBasal", tableName: filename, bundle: Bundle.main, value: "Automatic Basal", comment: "One automatic basal insulin delivery")
+    }()
+
     static let siteChange:String = {
         return NSLocalizedString("treatments_siteChange", tableName: filename, bundle: Bundle.main, value: "Site Change", comment: "Site Change")
     }()

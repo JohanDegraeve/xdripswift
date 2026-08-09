@@ -654,6 +654,16 @@ struct GlucoseChartView: View {
                     .foregroundStyle(GlucoseChartTreatmentStyle.basalLineColor)
                 }
 
+                ForEach(visibleTreatmentPoints.automaticBasalPulses) { pulse in
+                    RectangleMark(
+                        xStart: .value("Start", pulse.startDate),
+                        xEnd: .value("End", pulse.endDate),
+                        yStart: .value("BG", chartState.minimumChartValueInMgDl),
+                        yEnd: .value("BG", pulse.value)
+                    )
+                    .foregroundStyle(GlucoseChartTreatmentStyle.automaticBasalPulseColor)
+                }
+
                 ForEach(visibleTreatmentPoints.scheduledBasalRates) { point in
                     LineMark(x: .value("Time", point.date),
                              y: .value("BG", point.value),
@@ -1146,7 +1156,8 @@ private extension GlucoseChartTreatmentPoints {
             notes: notes.filter { $0.date >= startDate && $0.date <= endDate },
             scheduledBasalRates: scheduledBasalRates.visibleStepPoints(from: startDate, to: endDate, idPrefix: "visible-scheduled-basal"),
             basalRates: basalRates.visibleStepPoints(from: startDate, to: endDate, idPrefix: "visible-temp-basal"),
-            basalRateFill: basalRateFill.visibleStepPoints(from: startDate, to: endDate, idPrefix: "visible-temp-basal-fill")
+            basalRateFill: basalRateFill.visibleStepPoints(from: startDate, to: endDate, idPrefix: "visible-temp-basal-fill"),
+            automaticBasalPulses: automaticBasalPulses.filter { $0.endDate >= startDate && $0.startDate <= endDate }
         )
     }
 
@@ -1164,6 +1175,7 @@ private extension GlucoseChartTreatmentPoints {
         + scheduledBasalRates.map { $0.value }
         + basalRates.map { $0.value }
         + basalRateFill.map { $0.value }
+        + automaticBasalPulses.map { $0.value }
     }
 
 }

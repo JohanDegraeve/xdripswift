@@ -477,3 +477,10 @@
 "settingsviews_followerServiceStatus" = "Estado";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Manter ativo.";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Manter ativo disabled.\n\nContact Image function cannot work without Manter ativo.";
+
+/// Apresentação da basal automática do CareLink
+"settingsviews_careLinkTherapyDisplay" = "Visualização da terapia";
+"settingsviews_careLinkAutomaticBasal" = "Basal automática";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Pulsos basais";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Basais temporárias";
+"settingsviews_careLinkAutomaticBasalFooter" = "Pulsos basais mostra cada administração basal automática como um pulso curto no gráfico principal de glicose. Basais temporárias mostra a taxa equivalente em U/h entre administrações.";

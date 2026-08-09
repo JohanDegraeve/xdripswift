@@ -60,3 +60,4 @@
 
 /// filter the treatments by type
 "treatments_filterTreatmentsLabel" = "Filter";
+"treatments_automaticBasal" = "Автоматична базальна подача";

@@ -180,7 +180,7 @@ import OSLog
         }
 
         if !showBasalTreatments {
-            filteredTreatments.removeAll(where: { $0.treatmentType == .Basal })
+            filteredTreatments.removeAll(where: { $0.treatmentType == .Basal || $0.treatmentType == .AutomaticBasal })
         }
 
         if !showBgCheckTreatments {
@@ -264,7 +264,7 @@ struct TreatmentSnapshot: Hashable {
             return "heart.fill"
         case .BgCheck:
             return "drop.fill"
-        case .Basal:
+        case .Basal, .AutomaticBasal:
             return "chart.bar.fill"
         case .SiteChange:
             return "cross.vial.fill"
@@ -289,7 +289,7 @@ struct TreatmentSnapshot: Hashable {
             baseColor = Color(red: 1, green: 0, blue: 1)
         case .BgCheck:
             baseColor = ConstantsGlucoseChart.bgCheckTreatmentColorInner
-        case .Basal:
+        case .Basal, .AutomaticBasal:
             baseColor = ConstantsGlucoseChart.basalTreatmentColor
         case .SiteChange, .SensorStart, .PumpBatteryChange:
             baseColor = .yellow

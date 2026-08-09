@@ -210,6 +210,7 @@ struct SettingsRow: Identifiable {
     var detailIndicator: SettingsIndicator? = nil
     var accessory: SettingsAccessory = .automatic
     var control: SettingsControl? = nil
+    var keepsControlLabelOnSingleLine: Bool = false
     var isEnabled: Bool = true
     var isVisible: Bool = true
     var reloadScope: SettingsReloadScope? = nil
@@ -906,9 +907,15 @@ private struct SettingsNativeRowView: View {
                         reload(row.reloadScope ?? .section(sectionID))
                     } label: {
                         if option.isSelected {
-                            Label(option.title, systemImage: "checkmark")
+                            Label {
+                                Text(option.title)
+                                    .lineLimit(row.keepsControlLabelOnSingleLine ? 1 : nil)
+                            } icon: {
+                                Image(systemName: "checkmark")
+                            }
                         } else {
                             Text(option.title)
+                                .lineLimit(row.keepsControlLabelOnSingleLine ? 1 : nil)
                         }
                     }
                 }
@@ -916,8 +923,9 @@ private struct SettingsNativeRowView: View {
                 HStack(spacing: 8) {
                     Text(row.title)
                         .foregroundStyle(row.titleColor ?? (row.isEnabled ? Color(.colorPrimary) : .gray))
-                        .lineLimit(2)
+                        .lineLimit(row.keepsControlLabelOnSingleLine ? 1 : 2)
                         .minimumScaleFactor(0.75)
+                        .allowsTightening(row.keepsControlLabelOnSingleLine)
                     Spacer(minLength: 8)
                     Text(selectionTitle())
                         .foregroundStyle(row.isEnabled ? (row.detailColor ?? Color(.colorTertiary)) : .gray)

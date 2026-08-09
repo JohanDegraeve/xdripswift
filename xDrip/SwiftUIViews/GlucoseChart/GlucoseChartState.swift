@@ -155,7 +155,23 @@ struct GlucoseChartTreatmentPoints {
     var scheduledBasalRates: [GlucoseChartPoint] = []
     var basalRates: [GlucoseChartPoint] = []
     var basalRateFill: [GlucoseChartPoint] = []
+    var automaticBasalPulses: [GlucoseChartBasalPulse] = []
 
+}
+
+/// One native automatic-basal delivery rendered for an exact time width in the basal band.
+struct GlucoseChartBasalPulse: Identifiable, Hashable {
+    let id: String
+    let startDate: Date
+    let endDate: Date
+    let value: Double
+
+    init(startDate: Date, endDate: Date, value: Double) {
+        self.startDate = startDate
+        self.endDate = endDate
+        self.value = value
+        self.id = "automatic-basal-pulse-\(startDate.timeIntervalSince1970)-\(endDate.timeIntervalSince1970)-\(value)"
+    }
 }
 
 /// Simple dated chart point used for calibrations and basal series.
@@ -248,6 +264,8 @@ enum GlucoseChartTreatmentStyle {
     static let basalLineColor = Color.mint.opacity(0.7)
     static let basalLineWidth = 0.9
     static let basalFillColor = Color.mint.opacity(0.28)
+    /// Native automatic-basal doses use the basal hue with stronger emphasis than rate-area fill.
+    static let automaticBasalPulseColor = Color.mint.opacity(0.5)
 
     // MARK: - Labels
 

@@ -87,6 +87,9 @@ enum ConstantsGlucoseChart {
 
     /// the amount of days we should use to calculate the max basal rate to allow scaling. It should be enough to allow casual scrolling back 1-2 days without forcing a re-scale
     static let basalScaleDaysForCalculation: Double = 1
+
+    /// Visual width of one native automatic-basal delivery on the glucose chart.
+    static let automaticBasalPulseDisplayDuration: TimeInterval = 150
     
     /// amount (in mg/dL) the treatments marker be offset above/below the BG value marker
     static let defaultOffsetTreatmentPositionFromBgMarker: Double = 20

@@ -517,3 +517,10 @@
 "settingsviews_followerServiceStatus" = "Status";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Actief houden.";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Actief houden disabled.\n\nContact Image function cannot work without Actief houden.";
+
+/// Weergave van automatische basaalafgifte via CareLink
+"settingsviews_careLinkTherapyDisplay" = "Therapieweergave";
+"settingsviews_careLinkAutomaticBasal" = "Automatische basaal";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Basaalpulsen";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Tijdelijke basaalstanden";
+"settingsviews_careLinkAutomaticBasalFooter" = "Basaalpulsen toont elke automatische basaalafgifte als een korte puls in de hoofdglucosegrafiek. Tijdelijke basaalstanden toont de equivalente snelheid in E/u tussen afgiften.";

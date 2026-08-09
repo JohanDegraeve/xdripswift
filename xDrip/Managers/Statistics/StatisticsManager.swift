@@ -899,7 +899,10 @@ public final class StatisticsManager: @unchecked Sendable {
             request.sortDescriptors = [NSSortDescriptor(key: #keyPath(TreatmentEntry.date), ascending: true)]
             request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 NSPredicate(format: "date >= %@ AND date <= %@", fromDate as NSDate, toDate as NSDate),
-                NSPredicate(format: "treatmentType == %@", NSNumber(value: TreatmentType.Basal.rawValue)),
+                NSPredicate(
+                    format: "treatmentType IN %@",
+                    [TreatmentType.Basal.rawValue, TreatmentType.AutomaticBasal.rawValue].map(NSNumber.init(value:))
+                ),
                 NSCompoundPredicate(orPredicateWithSubpredicates: [
                     NSPredicate(format: "treatmentdeleted == NO"),
                     NSPredicate(format: "treatmentdeleted == nil")
@@ -910,12 +913,12 @@ public final class StatisticsManager: @unchecked Sendable {
             request.includesPropertyValues = true
 
             guard let treatments = try? context.fetch(request) else { return }
-            samples = treatments.map {
-                BasalTreatmentSample(
-                    date: $0.date,
-                    rate: $0.value,
-                    durationMinutes: $0.valueSecondary
-                )
+            samples = treatments.compactMap {
+                let rate = $0.treatmentType == .AutomaticBasal
+                    ? AutomaticBasalTreatmentMath.rate(amount: $0.value, durationSeconds: $0.valueSecondary * 60)
+                    : $0.value
+                guard let rate else { return nil }
+                return BasalTreatmentSample(date: $0.date, rate: rate, durationMinutes: $0.valueSecondary)
             }
         }
 

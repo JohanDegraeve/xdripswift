@@ -437,3 +437,10 @@
 "settingsviews_followerServiceStatus" = "Κατάσταση";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Keep-alive.";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Keep-alive disabled.\n\nContact Image function cannot work without Keep-alive.";
+
+/// Προβολή αυτόματης βασικής χορήγησης CareLink
+"settingsviews_careLinkTherapyDisplay" = "Προβολή θεραπείας";
+"settingsviews_careLinkAutomaticBasal" = "Αυτόματη βασική χορήγηση";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Βασικοί παλμοί";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Προσωρινοί βασικοί ρυθμοί";
+"settingsviews_careLinkAutomaticBasalFooter" = "Οι βασικοί παλμοί εμφανίζουν κάθε αυτόματη βασική χορήγηση ως σύντομο παλμό στο κύριο γράφημα γλυκόζης. Οι προσωρινοί βασικοί ρυθμοί εμφανίζουν τον ισοδύναμο ρυθμό σε U/ώρα μεταξύ των χορηγήσεων.";

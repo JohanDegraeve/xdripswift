@@ -29,7 +29,9 @@ enum CareLinkTherapyParser {
         let treatments = Dictionary(grouping: parsedMarkers, by: \.sourceIdentifier)
             .compactMap { $0.value.first }
             .sorted { $0.date > $1.date }
-        let latestBasalRate = treatments.first(where: { $0.type == .Basal })?.value
+        let latestBasalRate = treatments
+            .first(where: { $0.type == .AutomaticBasal })
+            .flatMap { AutomaticBasalTreatmentMath.rate(amount: $0.value, durationSeconds: $0.durationMinutes * 60) }
 
         let activeInsulin = root["activeInsulin"] as? [String: Any]
         let algorithm = root["therapyAlgorithmState"] as? [String: Any]
@@ -101,9 +103,9 @@ enum CareLinkTherapyParser {
         )
     }
 
-    /// Bounds each auto-basal micro-dose by the next marker and uses five minutes for the last one.
+    /// Stores each native auto-basal amount and retains the interval to the next marker as metadata.
     ///
-    /// The interval and rate normalization was adapted from Nocturne's CareLink treatment mapper:
+    /// The interval calculation was adapted from Nocturne's CareLink treatment mapper:
     /// https://github.com/nightscout/nocturne/blob/7df0daaabe59e3430c375272e86695423c885dfa/src/Connectors/Nocturne.Connectors.CareLink/Mappers/CareLinkTreatmentMapper.cs
     private static func autoBasalRecords(_ markers: [[String: Any]], patientID: String, offset: TimeInterval, now: Date) -> [CareLinkTherapyRecord] {
         var seen = Set<String>()
@@ -126,15 +128,14 @@ enum CareLinkTherapyParser {
         return values.enumerated().map { index, value in
             let nextDate = values.indices.contains(index + 1) ? values[index + 1].date : nil
             let duration = nextDate.map { max(1, $0.timeIntervalSince(value.date) / 60) } ?? markerDurationMinutes
-            let rate = value.amount * 60 / duration
             let timestamp = Int64(value.date.timeIntervalSince1970.rounded())
-            // Rate and duration can change when the next marker arrives. Raw time and dose do not.
+            // The interval can change when the next marker arrives. Raw time and dose do not.
             let eventIdentity = value.id ?? [String(timestamp), value.amount.description].joined(separator: ":")
             return CareLinkTherapyRecord(
                 sourceIdentifier: [patientID, "AUTO_BASAL_DELIVERY", eventIdentity].joined(separator: "|"),
                 date: value.date,
-                type: .Basal,
-                value: rate,
+                type: .AutomaticBasal,
+                value: value.amount,
                 durationMinutes: duration,
                 nightscoutEventType: "Temp Basal",
                 notes: nil

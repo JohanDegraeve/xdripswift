@@ -718,3 +718,10 @@
 "settingsviews_followerServiceStatus" = "Stanje";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Ohranjanje aktivnosti.";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Ohranjanje aktivnosti disabled.\n\nContact Image function cannot work without Ohranjanje aktivnosti.";
+
+/// Prikaz samodejnega bazala CareLink
+"settingsviews_careLinkTherapyDisplay" = "Prikaz terapije";
+"settingsviews_careLinkAutomaticBasal" = "Samodejni bazal";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Bazalni pulzi";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Začasni bazali";
+"settingsviews_careLinkAutomaticBasalFooter" = "Bazalni pulzi prikažejo vsak samodejni bazalni odmerek kot kratek pulz na glavnem grafikonu glukoze. Začasni bazali prikažejo enakovredno hitrost v E/h med odmerki.";

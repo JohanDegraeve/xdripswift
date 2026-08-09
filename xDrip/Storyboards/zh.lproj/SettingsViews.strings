@@ -643,3 +643,10 @@
 "settingsviews_followerServiceStatus" = "状态";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for 保持活动.";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with 保持活动 disabled.\n\nContact Image function cannot work without 保持活动.";
+
+/// CareLink 自动基础输注显示
+"settingsviews_careLinkTherapyDisplay" = "治疗显示";
+"settingsviews_careLinkAutomaticBasal" = "自动基础输注";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "基础脉冲";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "临时基础率";
+"settingsviews_careLinkAutomaticBasalFooter" = "基础脉冲会在主血糖图表上将每次自动基础输注显示为短脉冲。临时基础率会显示两次输注之间的等效 U/小时速率。";

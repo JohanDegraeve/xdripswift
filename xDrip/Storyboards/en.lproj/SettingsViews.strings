@@ -432,3 +432,10 @@
 "calendarFollowHistoricalReadingsFooter" = "Historical readings from the latest payload are imported only when they are missing locally.";
 "settingsviews_followerServiceStatus" = "Status";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Keep-alive disabled.\n\nContact Image function cannot work without Keep-alive.";
+
+/// CareLink automatic basal chart presentation
+"settingsviews_careLinkTherapyDisplay" = "Therapy Display";
+"settingsviews_careLinkAutomaticBasal" = "Automatic Basal";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Basal Pulses";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Temp Basals";
+"settingsviews_careLinkAutomaticBasalFooter" = "Basal Pulses shows each automatic basal delivery as a short pulse on the main glucose chart. Temp Basals shows the equivalent U/hr rate between deliveries.";

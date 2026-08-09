@@ -104,6 +104,12 @@ final class FollowerSettingsTests: XCTestCase {
         )
     }
 
+    func testAutomaticBasalRenderingDefaultsToDeliveredDoses() {
+        XCTAssertEqual(defaults.automaticBasalRenderingStyle, .deliveredDoses)
+        defaults.automaticBasalRenderingStyle = .simulatedTempBasals
+        XCTAssertEqual(defaults.automaticBasalRenderingStyle, .simulatedTempBasals)
+    }
+
     // MARK: - Service status
 
     func testOperationalPayloadDecodingAndResponseValidation() {
@@ -150,6 +156,12 @@ final class FollowerSettingsTests: XCTestCase {
         let ids = screenRowIDs(screen)
         XCTAssertEqual(ids, ["nightscout.connection.banner", "nightscout.server.status"])
         XCTAssertFalse(ids.contains { $0.hasPrefix("nightscout.account") || $0.contains("test") })
+    }
+
+    @MainActor
+    func testCareLinkChildExposesAutomaticBasalRenderingChoice() {
+        let screen = CareLinkFollowerSettingsScreen.make()
+        XCTAssertTrue(screenRowIDs(screen).contains("careLink.automaticBasalRenderingStyle"))
     }
 
     @MainActor

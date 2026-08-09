@@ -64,6 +64,7 @@ final class GlucoseChartStateManager: ObservableObject {
     private var treatmentPointsStartDate: Date?
     private var treatmentPointsEndDate: Date?
     private var treatmentPointsMinimumChartValue: Double?
+    private var treatmentPointsAutomaticBasalRenderingStyle: AutomaticBasalRenderingStyle?
     private let showsSensorNoiseBands: Bool
 
     // MARK: - Basal State
@@ -178,6 +179,7 @@ final class GlucoseChartStateManager: ObservableObject {
         treatmentPointsStartDate = nil
         treatmentPointsEndDate = nil
         treatmentPointsMinimumChartValue = nil
+        treatmentPointsAutomaticBasalRenderingStyle = nil
         scheduledBasalRates.removeAll()
         scheduledBasalRatesLastUpdatedForStartDate = .distantPast
         basalRateMaximum = 0
@@ -547,22 +549,27 @@ final class GlucoseChartStateManager: ObservableObject {
     /// first/last point and because the basal scaler can change if a newly loaded basal treatment is
     /// larger than the previous known maximum.
     private func updateTreatmentPointCacheIfNeeded(startDate: Date, endDate: Date, bgReadings: [CachedBgReading], minimumChartValue: Double, showTreatments: Bool) {
+        let automaticBasalRenderingStyle = UserDefaults.standard.automaticBasalRenderingStyle
         guard showTreatments else {
             cachedTreatmentPoints = GlucoseChartTreatmentPoints()
             treatmentPointsStartDate = nil
             treatmentPointsEndDate = nil
             treatmentPointsMinimumChartValue = nil
+            treatmentPointsAutomaticBasalRenderingStyle = nil
 
             return
         }
 
         guard startDate < endDate else { return }
 
-        if treatmentPointsMinimumChartValue != minimumChartValue {
+        if treatmentPointsMinimumChartValue != minimumChartValue
+            || treatmentPointsAutomaticBasalRenderingStyle != automaticBasalRenderingStyle {
             cachedTreatmentPoints = GlucoseChartTreatmentPoints()
             treatmentPointsStartDate = nil
             treatmentPointsEndDate = nil
             treatmentPointsMinimumChartValue = minimumChartValue
+            treatmentPointsAutomaticBasalRenderingStyle = automaticBasalRenderingStyle
+            basalRateMaximum = 0
         }
 
         guard let currentStartDate = treatmentPointsStartDate, let currentEndDate = treatmentPointsEndDate else {
@@ -570,6 +577,7 @@ final class GlucoseChartStateManager: ObservableObject {
             treatmentPointsStartDate = startDate
             treatmentPointsEndDate = endDate
             treatmentPointsMinimumChartValue = minimumChartValue
+            treatmentPointsAutomaticBasalRenderingStyle = automaticBasalRenderingStyle
 
             return
         }
@@ -680,17 +688,38 @@ final class GlucoseChartStateManager: ObservableObject {
         treatmentPoints.scheduledBasalRates.removeAll()
         treatmentPoints.basalRates.removeAll()
         treatmentPoints.basalRateFill.removeAll()
+        treatmentPoints.automaticBasalPulses.removeAll()
 
         guard UserDefaults.standard.dataFlowPolicy.showsPumpData else { return }
 
-        let basalTreatments = cachedTreatments.filter { $0.date >= startDate && $0.date <= endDate && !$0.isDeleted && $0.type == .Basal }.sorted { $0.date < $1.date }
+        let renderingStyle = UserDefaults.standard.automaticBasalRenderingStyle
+        let automaticBasalTreatments = cachedTreatments.filter {
+            $0.date >= startDate.addingTimeInterval(-ConstantsGlucoseChart.automaticBasalPulseDisplayDuration)
+                && $0.date <= endDate
+                && !$0.isDeleted
+                && $0.type == .AutomaticBasal
+        }.sorted { $0.date < $1.date }
+        let allTempBasalTreatments = tempBasalTreatments(renderingStyle: renderingStyle)
+        let basalTreatments = allTempBasalTreatments.filter { $0.date >= startDate && $0.date <= endDate }
 
         // Keep scheduled profile, enacted temp basal line and baseline fill as separate series.
         updateScheduledBasalRatesIfNeeded(startDate: startDate)
-        updateBasalScaler(minimumChartValue: minimumChartValue)
+        updateBasalScaler(minimumChartValue: minimumChartValue, renderingStyle: renderingStyle)
+        updateBasalScalerForVisibleTreatments(
+            basalTreatments: basalTreatments,
+            automaticBasalTreatments: automaticBasalTreatments,
+            minimumChartValue: minimumChartValue,
+            renderingStyle: renderingStyle
+        )
         treatmentPoints.scheduledBasalRates = makeScheduledBasalPoints(startDate: startDate, endDate: endDate, minimumChartValue: minimumChartValue)
-        treatmentPoints.basalRates = makeTempBasalPoints(startDate: startDate, endDate: endDate, basalTreatments: basalTreatments, minimumChartValue: minimumChartValue)
+        treatmentPoints.basalRates = makeTempBasalPoints(startDate: startDate, endDate: endDate, basalTreatments: basalTreatments, allBasalTreatments: allTempBasalTreatments, minimumChartValue: minimumChartValue)
         treatmentPoints.basalRateFill = basalRateFillPoints(from: treatmentPoints.basalRates)
+        if renderingStyle == .deliveredDoses {
+            treatmentPoints.automaticBasalPulses = makeAutomaticBasalPulses(
+                treatments: automaticBasalTreatments,
+                minimumChartValue: minimumChartValue
+            )
+        }
     }
 
     private func treatmentSeparationOffset() -> Double {
@@ -750,7 +779,7 @@ final class GlucoseChartStateManager: ObservableObject {
     /// Basal U/hr values are not plotted on the glucose scale. They are compressed into the reserved
     /// basal band below the normal glucose floor so the
     /// basal graph can share the glucose chart without needing a second y-axis.
-    private func updateBasalScaler(minimumChartValue: Double) {
+    private func updateBasalScaler(minimumChartValue: Double, renderingStyle: AutomaticBasalRenderingStyle) {
         if basalRateMaximum == 0 {
             let managedObjectContext = coreDataManager.privateManagedObjectContext
             let basalHistory = mapTreatments(
@@ -760,10 +789,10 @@ final class GlucoseChartStateManager: ObservableObject {
                     on: managedObjectContext
                 ),
                 on: managedObjectContext
-            ).filter { !$0.isDeleted && $0.type == .Basal }
+            ).filter { !$0.isDeleted && ($0.type == .Basal || $0.type == .AutomaticBasal) }
 
             basalRateMaximum = max(
-                basalHistory.map { $0.value }.max() ?? 0,
+                basalHistory.compactMap { renderedBasalRate(for: $0, renderingStyle: renderingStyle) }.max() ?? 0,
                 scheduledBasalRates.map { $0.value }.max() ?? 0
             )
 
@@ -778,6 +807,15 @@ final class GlucoseChartStateManager: ObservableObject {
     }
 
     private func updateScheduledBasalRatesIfNeeded(startDate: Date) {
+        // CareLink currently supplies delivered automatic-basal doses and current pump status,
+        // but it does not supply a scheduled basal profile. Do not reuse a profile retained from a
+        // previous Nightscout or master-mode data source while CareLink owns therapy data.
+        guard !UserDefaults.standard.dataFlowPolicy.importsTherapyFromCareLink else {
+            scheduledBasalRates.removeAll()
+            scheduledBasalRatesLastUpdatedForStartDate = .distantPast
+            return
+        }
+
         guard let scheduledBasalRatesFromProfile = nightscoutSyncManager.profile.basal, nightscoutSyncManager.profile.hasData() else {
             scheduledBasalRates.removeAll()
 
@@ -840,7 +878,7 @@ final class GlucoseChartStateManager: ObservableObject {
         return chartPoints
     }
 
-    private func makeTempBasalPoints(startDate: Date, endDate: Date, basalTreatments: [CachedTreatment], minimumChartValue: Double) -> [GlucoseChartPoint] {
+    private func makeTempBasalPoints(startDate: Date, endDate: Date, basalTreatments: [CachedTreatment], allBasalTreatments: [CachedTreatment], minimumChartValue: Double) -> [GlucoseChartPoint] {
         var chartPoints = [GlucoseChartPoint]()
         var previousBasalTreatment: CachedTreatment?
 
@@ -890,16 +928,16 @@ final class GlucoseChartStateManager: ObservableObject {
                 if basalTreatment.value != previousBasalTreatment.value {
                     let previousBasalEndDate = previousBasalTreatment.date.addingTimeInterval(TimeInterval(previousBasalTreatment.valueSecondary * 60))
 
-                    if previousBasalEndDate < basalTreatment.date && nightscoutSyncManager.profile.hasData() {
+                    if previousBasalEndDate < basalTreatment.date && !scheduledBasalRates.isEmpty {
                         addScheduledBasalPointsIfNeeded(isFirstEntry: false, previousBasalRate: previousBasalTreatment.value, previousBasalEndDate: previousBasalEndDate, nextBasalDate: basalTreatment.date)
                     } else {
                         chartPoints.append(basalPoint(value: previousBasalTreatment.value, date: basalTreatment.date, minimumChartValue: minimumChartValue, idPrefix: "temp-basal"))
                     }
                 }
-            } else if let previousTreatment = cachedTreatments.filter({ !$0.isDeleted && $0.type == .Basal && $0.date < startDate && $0.date >= startDate.addingTimeInterval(-Self.basalTreatmentLookbackTimeInterval) }).last {
+            } else if let previousTreatment = allBasalTreatments.filter({ $0.date < startDate && $0.date >= startDate.addingTimeInterval(-Self.basalTreatmentLookbackTimeInterval) }).last {
                 let previousBasalEndDate = previousTreatment.date.addingTimeInterval(TimeInterval(previousTreatment.valueSecondary * 60))
 
-                if previousBasalEndDate < basalTreatment.date && nightscoutSyncManager.profile.hasData() {
+                if previousBasalEndDate < basalTreatment.date && !scheduledBasalRates.isEmpty {
                     addScheduledBasalPointsIfNeeded(isFirstEntry: true, previousBasalRate: previousTreatment.value, previousBasalEndDate: previousBasalEndDate, nextBasalDate: basalTreatment.date)
                 } else {
                     chartPoints.append(basalPoint(value: previousTreatment.value, date: startDate, minimumChartValue: minimumChartValue, idPrefix: "temp-basal"))
@@ -919,7 +957,7 @@ final class GlucoseChartStateManager: ObservableObject {
         if let previousBasalTreatment = previousBasalTreatment {
             let previousBasalEndDate = previousBasalTreatment.date.addingTimeInterval(TimeInterval(previousBasalTreatment.valueSecondary * 60))
 
-            if previousBasalEndDate < min(endDate, Date()) && nightscoutSyncManager.profile.hasData() {
+            if previousBasalEndDate < min(endDate, Date()) && !scheduledBasalRates.isEmpty {
                 addScheduledBasalPointsIfNeeded(isFirstEntry: false, previousBasalRate: previousBasalTreatment.value, previousBasalEndDate: previousBasalEndDate, nextBasalDate: nil)
             } else {
                 chartPoints.append(basalPoint(value: previousBasalTreatment.value, date: min(min(endDate, previousBasalEndDate), Date()), minimumChartValue: minimumChartValue, idPrefix: "temp-basal"))
@@ -939,6 +977,110 @@ final class GlucoseChartStateManager: ObservableObject {
     private func basalRateFillPoints(from basalRatePoints: [GlucoseChartPoint]) -> [GlucoseChartPoint] {
         basalRatePoints.map {
             GlucoseChartPoint(date: $0.date, value: $0.value, idPrefix: "temp-basal-fill")
+        }
+    }
+
+    private func tempBasalTreatments(renderingStyle: AutomaticBasalRenderingStyle) -> [CachedTreatment] {
+        let automaticBasalTreatments = cachedTreatments.filter {
+            !$0.isDeleted && $0.type == .AutomaticBasal
+        }
+
+        return cachedTreatments.compactMap { treatment in
+            guard !treatment.isDeleted else { return nil }
+            if treatment.type == .Basal {
+                guard !overlapsAutomaticBasalCoverage(
+                    treatment,
+                    automaticBasalTreatments: automaticBasalTreatments
+                )
+                else {
+                    return nil
+                }
+                return treatment
+            }
+            guard treatment.type == .AutomaticBasal,
+                  renderingStyle == .simulatedTempBasals,
+                  let rate = simulatedBasalRate(for: treatment)
+            else {
+                return nil
+            }
+
+            return CachedTreatment(
+                date: treatment.date,
+                value: rate,
+                valueSecondary: treatment.valueSecondary,
+                type: .Basal,
+                isDeleted: false,
+                notes: treatment.notes
+            )
+        }.sorted { $0.date < $1.date }
+    }
+
+    private func simulatedBasalRate(for treatment: CachedTreatment) -> Double? {
+        AutomaticBasalTreatmentMath.rate(
+            amount: treatment.value,
+            durationSeconds: treatment.valueSecondary * 60
+        )
+    }
+
+    /// Native automatic-basal deliveries replace rate-style temp basal records for the same time.
+    /// This prevents stale or parallel therapy sources from drawing both representations together.
+    private func overlapsAutomaticBasalCoverage(
+        _ basalTreatment: CachedTreatment,
+        automaticBasalTreatments: [CachedTreatment]
+    ) -> Bool {
+        let basalEndDate = basalTreatment.date.addingTimeInterval(basalTreatment.valueSecondary * 60)
+        guard basalEndDate > basalTreatment.date else { return false }
+
+        return automaticBasalTreatments.contains { automaticBasalTreatment in
+            let automaticBasalEndDate = automaticBasalTreatment.date.addingTimeInterval(
+                automaticBasalTreatment.valueSecondary * 60
+            )
+            return automaticBasalTreatment.date < basalEndDate
+                && automaticBasalEndDate > basalTreatment.date
+        }
+    }
+
+    private func renderedBasalRate(for treatment: CachedTreatment, renderingStyle: AutomaticBasalRenderingStyle) -> Double? {
+        switch treatment.type {
+        case .Basal:
+            return treatment.value
+        case .AutomaticBasal:
+            let duration = renderingStyle == .deliveredDoses
+                ? ConstantsGlucoseChart.automaticBasalPulseDisplayDuration
+                : treatment.valueSecondary * 60
+            return AutomaticBasalTreatmentMath.rate(amount: treatment.value, durationSeconds: duration)
+        default:
+            return nil
+        }
+    }
+
+    private func updateBasalScalerForVisibleTreatments(
+        basalTreatments: [CachedTreatment],
+        automaticBasalTreatments: [CachedTreatment],
+        minimumChartValue: Double,
+        renderingStyle: AutomaticBasalRenderingStyle
+    ) {
+        let visibleMaximum = (basalTreatments + automaticBasalTreatments)
+            .compactMap { renderedBasalRate(for: $0, renderingStyle: renderingStyle) }
+            .max() ?? 0
+        guard visibleMaximum > basalRateMaximum else { return }
+        basalRateMaximum = visibleMaximum
+        basalRateScaler = (ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl - minimumChartValue) / visibleMaximum
+    }
+
+    private func makeAutomaticBasalPulses(treatments: [CachedTreatment], minimumChartValue: Double) -> [GlucoseChartBasalPulse] {
+        treatments.compactMap { treatment in
+            guard let rate = AutomaticBasalTreatmentMath.rate(
+                amount: treatment.value,
+                durationSeconds: ConstantsGlucoseChart.automaticBasalPulseDisplayDuration
+            ) else {
+                return nil
+            }
+            return GlucoseChartBasalPulse(
+                startDate: treatment.date,
+                endDate: treatment.date.addingTimeInterval(ConstantsGlucoseChart.automaticBasalPulseDisplayDuration),
+                value: (rate * basalRateScaler) + minimumChartValue
+            )
         }
     }
 
@@ -1022,6 +1164,7 @@ private extension GlucoseChartTreatmentPoints {
         veryLargeCarbs.merge(treatmentPoints.veryLargeCarbs)
         bgChecks.merge(treatmentPoints.bgChecks)
         notes.merge(treatmentPoints.notes)
+        automaticBasalPulses.merge(treatmentPoints.automaticBasalPulses)
     }
 
     mutating func trim(from startDate: Date, to endDate: Date) {
@@ -1038,6 +1181,7 @@ private extension GlucoseChartTreatmentPoints {
         scheduledBasalRates.removeAll { $0.date < startDate || $0.date > endDate }
         basalRates.removeAll { $0.date < startDate || $0.date > endDate }
         basalRateFill.removeAll { $0.date < startDate || $0.date > endDate }
+        automaticBasalPulses.removeAll { $0.endDate < startDate || $0.startDate > endDate }
     }
 
 }
@@ -1119,5 +1263,11 @@ private extension Array where Element == GlucoseChartPoint {
 private extension Array where Element == GlucoseChartTreatmentPoint {
     mutating func merge(_ elements: [GlucoseChartTreatmentPoint]) {
         self = Array(Set(self).union(elements)).sorted { $0.date < $1.date }
+    }
+}
+
+private extension Array where Element == GlucoseChartBasalPulse {
+    mutating func merge(_ elements: [GlucoseChartBasalPulse]) {
+        self = Array(Set(self).union(elements)).sorted { $0.startDate < $1.startDate }
     }
 }

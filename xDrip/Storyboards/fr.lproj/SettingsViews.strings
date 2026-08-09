@@ -533,3 +533,10 @@
 "settingsviews_followerServiceStatus" = "État";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Maintien actif.";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Maintien actif disabled.\n\nContact Image function cannot work without Maintien actif.";
+
+/// Affichage de la basale automatique CareLink
+"settingsviews_careLinkTherapyDisplay" = "Affichage du traitement";
+"settingsviews_careLinkAutomaticBasal" = "Basale automatique";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Impulsions basales";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Basales temporaires";
+"settingsviews_careLinkAutomaticBasalFooter" = "Impulsions basales affiche chaque administration basale automatique sous forme d'une courte impulsion sur le graphique principal de glycémie. Basales temporaires affiche le débit équivalent en U/h entre les administrations.";

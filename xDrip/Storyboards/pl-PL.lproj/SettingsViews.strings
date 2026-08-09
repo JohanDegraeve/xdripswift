@@ -718,3 +718,10 @@
 "settingsviews_followerServiceStatus" = "Stan";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Podtrzymanie.";
 "settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Podtrzymanie disabled.\n\nContact Image function cannot work without Podtrzymanie.";
+
+/// Wyświetlanie automatycznej bazy CareLink
+"settingsviews_careLinkTherapyDisplay" = "Widok terapii";
+"settingsviews_careLinkAutomaticBasal" = "Automatyczna baza";
+"settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Impulsy bazy";
+"settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Bazy tymczasowe";
+"settingsviews_careLinkAutomaticBasalFooter" = "Impulsy bazy pokazują każdą automatyczną dawkę bazową jako krótki impuls na głównym wykresie glukozy. Bazy tymczasowe pokazują równoważne tempo w j./h pomiędzy dawkami.";
