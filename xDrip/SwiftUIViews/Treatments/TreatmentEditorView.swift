@@ -103,6 +103,8 @@ struct TreatmentEditorView: View {
                                 .tag(treatmentType)
                         }
                     }
+                    .pickerStyle(.menu)
+                    .tint(Color(.colorTertiary))
                 } else {
                     HStack {
                         Text(Texts_TreatmentsView.type)
