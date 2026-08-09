@@ -627,8 +627,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         var processedUpdate = false
 
         if let statusDictionary = dictionary["status"] as? [String: Any] {
-            processStatusFromDictionary(dictionary: statusDictionary)
-            processedUpdate = true
+            processedUpdate = processStatusFromDictionary(dictionary: statusDictionary)
         }
 
         if let bgReadingsDictionary = dictionary["bgReadings"] as? [String: Any] {
@@ -680,13 +679,20 @@ final class WatchStateModel: NSObject, ObservableObject {
         return false
     }
 
-    private func processStatusFromDictionary(dictionary: [String: Any]) {
+    private func processStatusFromDictionary(dictionary: [String: Any]) -> Bool {
+        // transferUserInfo queues every payload while the Watch app is inactive. Ignore old status
+        // updates so reopening the app does not replay days of state changes one by one.
+        guard let generatedAt = dictionary["generatedAt"] as? Double,
+              Date(timeIntervalSince1970: generatedAt) > Date(timeIntervalSinceNow: -60 * 60) else {
+            return false
+        }
+
         isMgDl = dictionary["isMgDl"] as? Bool ?? true
         urgentLowLimitInMgDl = dictionary["urgentLowLimitInMgDl"] as? Double ?? 60
         lowLimitInMgDl = dictionary["lowLimitInMgDl"] as? Double ?? 70
         highLimitInMgDl = dictionary["highLimitInMgDl"] as? Double ?? 180
         urgentHighLimitInMgDl = dictionary["urgentHighLimitInMgDl"] as? Double ?? 250
-        updatedDate = Date(timeIntervalSince1970: dictionary["generatedAt"] as? Double ?? Date().timeIntervalSince1970)
+        updatedDate = Date(timeIntervalSince1970: generatedAt)
         activeSensorDescription = dictionary["activeSensorDescription"] as? String ?? ""
         sensorAgeInMinutes = dictionary["sensorAgeInMinutes"] as? Double ?? 0
         sensorMaxAgeInMinutes = dictionary["sensorMaxAgeInMinutes"] as? Double ?? 0
@@ -723,6 +729,8 @@ final class WatchStateModel: NSObject, ObservableObject {
         }
 
         deviceStatusLastLoopDateTimeAgoString = deviceStatusLastLoopMinsAgoString()
+
+        return true
     }
 
     private func processAGPFromDictionary(dictionary: [String: Any]) {
