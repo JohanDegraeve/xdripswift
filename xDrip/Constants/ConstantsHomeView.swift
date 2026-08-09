@@ -95,6 +95,9 @@ enum ConstantsHomeView {
 
     /// Standard corner radius for Home panels and compact status views.
     static let standardCornerRadius: CGFloat = 10
+
+    /// How long the main chart retains an expanded upper y-axis after scrolling stops.
+    static let mainChartYAxisAutoResetDelay = 10.0
     
     /// how often to update the labels in the homeview (ie label with latest reading, minutes ago, etc..)
     static let updateHomeViewIntervalInSeconds = 15.0

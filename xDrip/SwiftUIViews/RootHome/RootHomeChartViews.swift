@@ -14,6 +14,7 @@ struct RootHomeMainChartView: View {
     let chartState: GlucoseChartState
     let isLoading: Bool
     let scrollCoordinator: GlucoseChartScrollCoordinator
+    let yAxisResetRevision: Int
     let updateChartStateIfNeeded: () -> Void
     let finishChartScroll: (_ forceReset: Bool, _ showsLoading: Bool) -> Void
 
@@ -37,7 +38,9 @@ struct RootHomeMainChartView: View {
                     highContrast: nil,
                     chartState: chartState
                 )
-                .mainChartYAxisContext()
+                .mainChartYAxisContext(
+                    resetRevision: yAxisResetRevision
+                )
                 .transaction { transaction in
                     transaction.animation = nil
                 }

@@ -1443,9 +1443,9 @@ import AppIntents
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyCreateupdateLabelsAndChartTimer, closure: {
             updateLabelsAndChartTimer = createAndScheduleUpdateLabelsAndChartTimer()
             
-            // reset the chart when coming to the foreground if the user has selected that option
-            // if they hadn't selected, then just refresh anyway because it seems to prevent the "empty chart" that sometimes happens
-            self.updateLabelsAndChart(overrideApplicationState: true, forceReset: UserDefaults.standard.allowMainChartAutoReset)
+            // Reset the chart when coming to the foreground. Refreshing here also prevents the
+            // empty chart that can otherwise occasionally appear after returning to the app.
+            self.updateLabelsAndChart(overrideApplicationState: true, forceReset: true)
         })
         
         // when app goes to background

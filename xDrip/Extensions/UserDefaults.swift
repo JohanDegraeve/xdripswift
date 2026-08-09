@@ -142,8 +142,6 @@ extension UserDefaults {
         case showClockWhenScreenIsLocked = "showClockWhenScreenIsLocked"
         /// how (and if) the screen should be dimmed when screen lock is enabled
         case screenLockDimmingType = "screenLockDimmingType"
-        /// should the main chart y-axis be automatically rescaled back down to current chart values and the end date reset when necessary?
-        case allowMainChartAutoReset = "allowMainChartAutoReset"
         /// should the original glucose values be shown on the main chart when post processing is enabled?
         case showOriginalBGReadings = "showOriginalBGReadings"
         /// should visible sensor noise UI be shown?
@@ -1456,17 +1454,6 @@ extension UserDefaults {
         }
         set {
             set(newValue.rawValue, forKey: Key.screenLockDimmingType.rawValue)
-        }
-    }
-
-    /// should the main chart y-axis be automatically rescaled back down to current chart values and the end date reset when necessary?
-    @objc dynamic var allowMainChartAutoReset: Bool {
-        // default value for bool in userdefaults is false, as default we want the chart to automatically rescale
-        get {
-            return !bool(forKey: Key.allowMainChartAutoReset.rawValue)
-        }
-        set {
-            set(!newValue, forKey: Key.allowMainChartAutoReset.rawValue)
         }
     }
 

@@ -22,32 +22,29 @@ fileprivate enum Setting:Int, CaseIterable {
     // show a fixed scale mini-chart under the main scrollable chart?
     case showMiniChart = 3
     
-    // allow the main chart y-axis to auto rescale to the current chart values?
-    case allowMainChartAutoReset = 4
-
     // show the original glucose readings on the main chart when post processing is enabled?
-    case showOriginalBGReadings = 5
+    case showOriginalBGReadings = 4
 
     // show visible sensor noise UI?
-    case showSensorNoise = 6
+    case showSensorNoise = 5
     
     //urgent high value
-    case urgentHighMarkValue = 7
+    case urgentHighMarkValue = 6
     
     //high value
-    case highMarkValue = 8
+    case highMarkValue = 7
     
     //target value
-    case targetMarkValue = 9
+    case targetMarkValue = 8
     
     //low value
-    case lowMarkValue = 10
+    case lowMarkValue = 9
     
     //urgent low value
-    case urgentLowMarkValue = 11
+    case urgentLowMarkValue = 10
 
     // show the active sensor lifetime as time remaining instead of time elapsed?
-    case preferSensorCountdown = 12
+    case preferSensorCountdown = 11
     
 }
 
@@ -98,8 +95,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         let mainChartRows = [
             nativeSettingsRow(id: "homeScreen.showOriginalBGReadings", index: Setting.showOriginalBGReadings.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "homeScreen.showSensorNoise", index: Setting.showSensorNoise.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "homeScreen.allowMainChartAutoReset", index: Setting.allowMainChartAutoReset.rawValue, sectionID: sectionID)
+            nativeSettingsRow(id: "homeScreen.showSensorNoise", index: Setting.showSensorNoise.rawValue, sectionID: sectionID)
         ]
 
         let miniChartRows = [
@@ -162,11 +158,6 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
             return SettingsToggleControl(
                 isOn: { UserDefaults.standard.showMiniChart },
                 setIsOn: { UserDefaults.standard.showMiniChart = $0 }
-            )
-        case .allowMainChartAutoReset:
-            return SettingsToggleControl(
-                isOn: { UserDefaults.standard.allowMainChartAutoReset },
-                setIsOn: { UserDefaults.standard.allowMainChartAutoReset = $0 }
             )
         case .showOriginalBGReadings:
             return SettingsToggleControl(
@@ -290,15 +281,6 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
                 }
             })
             
-        case .allowMainChartAutoReset:
-            return SettingsSelectedRowAction.callFunction(function: {
-                if UserDefaults.standard.allowMainChartAutoReset {
-                    UserDefaults.standard.allowMainChartAutoReset = false
-                } else {
-                    UserDefaults.standard.allowMainChartAutoReset = true
-                }
-            })
-            
         case .showOriginalBGReadings:
             return SettingsSelectedRowAction.callFunction(function: {
                 if UserDefaults.standard.showOriginalBGReadings {
@@ -389,9 +371,6 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .showMiniChart:
             return Texts_SettingsView.showMiniChart
             
-        case .allowMainChartAutoReset:
-            return Texts_SettingsView.allowMainChartAutoReset
-
         case .showOriginalBGReadings:
             return Texts_SettingsView.showOriginalBGReadings
 
@@ -447,7 +426,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
             return SettingsAccessory.disclosure
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings, .showSensorNoise, .preferSensorCountdown:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .showOriginalBGReadings, .showSensorNoise, .preferSensorCountdown:
             return SettingsAccessory.none
             
         }
@@ -476,7 +455,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .screenLockDimmingType:
             return UserDefaults.standard.screenLockDimmingType.description
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings, .showSensorNoise, .preferSensorCountdown:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .showOriginalBGReadings, .showSensorNoise, .preferSensorCountdown:
             return nil
             
         }

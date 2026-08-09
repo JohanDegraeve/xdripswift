@@ -331,10 +331,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show Mini-Chart", comment: "home screen settings, should the mini-chart be shown")
     }()
     
-    static let allowMainChartAutoReset: String = {
-        return NSLocalizedString("settingsviews_allowMainChartAutoReset", tableName: filename, bundle: Bundle.main, value: "Auto Reset Chart", comment: "home screen settings, should the main chart automatically reset the y-axis and date to current values every 15 seconds")
-    }()
-    
     static let showOriginalBGReadings: String = {
         return NSLocalizedString("settingsviews_showOriginalBGReadings", tableName: filename, bundle: Bundle.main, value: "Original Values", comment: "home screen settings, should the original glucose values be shown on the main chart when post processing is enabled")
     }()

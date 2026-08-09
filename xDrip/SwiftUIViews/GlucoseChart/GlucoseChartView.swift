@@ -10,6 +10,27 @@ import Charts
 import SwiftUI
 import Foundation
 
+/// Retains the largest upper domain encountered by an interactive chart until an explicit reset.
+///
+/// Keeping this as presentation state avoids coupling y-axis interaction behaviour to chart data
+/// loading. Compact charts never opt into it and therefore remain fully adaptive.
+struct GlucoseChartYAxisRetentionState {
+
+    private(set) var retainedMaximumInMgDl: Double?
+
+    mutating func retain(maximumInMgDl: Double) {
+        retainedMaximumInMgDl = max(retainedMaximumInMgDl ?? maximumInMgDl, maximumInMgDl)
+    }
+
+    mutating func reset(to maximumInMgDl: Double) {
+        retainedMaximumInMgDl = maximumInMgDl
+    }
+
+    func effectiveMaximum(for maximumInMgDl: Double) -> Double {
+        max(retainedMaximumInMgDl ?? maximumInMgDl, maximumInMgDl)
+    }
+}
+
 /// Swift Charts implementation for rendering glucose readings and related chart annotations.
 ///
 /// Lightweight callers can pass BG values and dates directly. Full-chart callers pass `chartState`,
@@ -60,6 +81,10 @@ struct GlucoseChartView: View {
     /// Widgets, watch, notification and Live Activity charts stay adaptive by default. The main Home
     /// chart keeps enough low and high context for visually coherent scrolling.
     var usesMainChartYAxisContext = false
+    var mainChartYAxisResetRevision = 0
+
+    @State private var yAxisRetentionState = GlucoseChartYAxisRetentionState()
+    @State private var yAxisAutoResetWorkItem: DispatchWorkItem?
 
     private enum YAxisLabelStyle {
         case objective
@@ -191,9 +216,10 @@ struct GlucoseChartView: View {
     ///
     /// Compact charts intentionally stay adaptive by default so widgets, watch charts,
     /// notifications and live activities do not reserve unnecessary vertical space.
-    func mainChartYAxisContext() -> Self {
+    func mainChartYAxisContext(resetRevision: Int = 0) -> Self {
         var view = self
         view.usesMainChartYAxisContext = true
+        view.mainChartYAxisResetRevision = resetRevision
 
         return view
     }
@@ -515,10 +541,17 @@ struct GlucoseChartView: View {
         let lowerDomainPadding = showsBasalDomain ? ConstantsGlucoseChartSwiftUI.yAxisBasalDomainPaddingInMgDl : ConstantsGlucoseChartSwiftUI.yAxisDomainPaddingInMgDl
         let minimumDomainValue = min((allBgValues.min() ?? 40), urgentLowLimitInMgDl, chartState?.minimumChartValueInMgDl ?? urgentLowLimitInMgDl)
         let maximumRenderableValue = max((allBgValues.max() ?? urgentHighLimitInMgDl), urgentHighLimitInMgDl)
-        let yAxisContextMarks = mainChartYAxisContextMarks(maximumRenderableValue: maximumRenderableValue)
+        let calculatedYAxisContextMarks = mainChartYAxisContextMarks(maximumRenderableValue: maximumRenderableValue)
+        let calculatedYAxisContextValues = calculatedYAxisContextMarks.labeledValues + calculatedYAxisContextMarks.gridOnlyValues
+        let calculatedMaximumContextValue = calculatedYAxisContextValues.max() ?? maximumRenderableValue
+        let calculatedMaximumDomainValue = max(maximumRenderableValue, calculatedMaximumContextValue)
+        let maximumDomainValue = usesMainChartYAxisContext
+            ? yAxisRetentionState.effectiveMaximum(for: calculatedMaximumDomainValue)
+            : calculatedMaximumDomainValue
+        // Retain the matching context marks as well as the scale so labels do not disappear while
+        // the upper domain itself is being held steady.
+        let yAxisContextMarks = mainChartYAxisContextMarks(maximumRenderableValue: maximumDomainValue)
         let yAxisContextValues = yAxisContextMarks.labeledValues + yAxisContextMarks.gridOnlyValues
-        let maximumContextValue = yAxisContextValues.max() ?? maximumRenderableValue
-        let maximumDomainValue = max(maximumRenderableValue, maximumContextValue)
         let upperDomainPadding = usesMainChartYAxisContext ? ConstantsGlucoseChartSwiftUI.yAxisMainChartContextTopPaddingInMgDl : ConstantsGlucoseChartSwiftUI.yAxisDomainPaddingInMgDl
         let domain = (minimumDomainValue - lowerDomainPadding) ... (maximumDomainValue + upperDomainPadding)
         let xAxisLabelEveryHours = xAxisLabelEveryHours()
@@ -883,6 +916,63 @@ struct GlucoseChartView: View {
         }
         .modifier(ChartBackgroundModifier(chartType: chartType))
         .clipShape(RoundedRectangle(cornerRadius: chartType.cornerRadius()))
+        .onAppear {
+            guard usesMainChartYAxisContext else { return }
+
+            resetRetainedYAxisMaximum(to: calculatedMaximumDomainValue)
+        }
+        .onChange(of: calculatedMaximumDomainValue) { newMaximum in
+            guard usesMainChartYAxisContext else { return }
+
+            retainYAxisMaximum(newMaximum)
+            // Cached chart data can arrive after scrolling stops. Restarting the idle period for
+            // every candidate change prevents an older pending reset from superseding newer data.
+            scheduleYAxisAutoReset(to: newMaximum)
+        }
+        .onChange(of: visibleEndDate) { _ in
+            guard usesMainChartYAxisContext else { return }
+
+            retainYAxisMaximum(calculatedMaximumDomainValue)
+            scheduleYAxisAutoReset(to: calculatedMaximumDomainValue)
+        }
+        .onChange(of: mainChartYAxisResetRevision) { _ in
+            guard usesMainChartYAxisContext else { return }
+
+            resetRetainedYAxisMaximum(to: calculatedMaximumDomainValue)
+        }
+        .onDisappear {
+            yAxisAutoResetWorkItem?.cancel()
+            yAxisAutoResetWorkItem = nil
+        }
+    }
+
+    private func retainYAxisMaximum(_ maximumInMgDl: Double) {
+        var retentionState = yAxisRetentionState
+        retentionState.retain(maximumInMgDl: maximumInMgDl)
+        yAxisRetentionState = retentionState
+    }
+
+    private func resetRetainedYAxisMaximum(to maximumInMgDl: Double) {
+        yAxisAutoResetWorkItem?.cancel()
+        yAxisAutoResetWorkItem = nil
+
+        var retentionState = yAxisRetentionState
+        retentionState.reset(to: maximumInMgDl)
+        yAxisRetentionState = retentionState
+    }
+
+    private func scheduleYAxisAutoReset(to maximumInMgDl: Double) {
+        yAxisAutoResetWorkItem?.cancel()
+        yAxisAutoResetWorkItem = nil
+
+        let workItem = DispatchWorkItem {
+            resetRetainedYAxisMaximum(to: maximumInMgDl)
+        }
+        yAxisAutoResetWorkItem = workItem
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + ConstantsHomeView.mainChartYAxisAutoResetDelay,
+            execute: workItem
+        )
     }
 
     // MARK: - Chart Mark Helpers

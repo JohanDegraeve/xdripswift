@@ -59,7 +59,6 @@
 "settingsviews_screenLockDimmingTypeDimmed" = "Dimmed";
 "settingsviews_screenLockDimmingTypeDark" = "Dark";
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
-"settingsviews_allowMainChartAutoReset" = "Auto Reset Chart";
 "settingsviews_showOriginalBGReadings" = "Original Values";
 "settingsviews_showSensorNoise" = "Show Sensor Noise";
 "settingsviews_sensorHealthNotifications" = "Sensor Health Warnings";

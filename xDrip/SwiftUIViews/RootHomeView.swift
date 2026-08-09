@@ -49,6 +49,7 @@ struct RootHomeView: View {
     @State private var isLoadingChart = false
     @State private var isBackgroundLoadingChart = false
     @State private var showOriginalBGReadingsOnly = false
+    @State private var chartYAxisResetRevision = 0
     @AppStorage(UserDefaults.KeysCharts.chartWidthInHours.rawValue) private var chartWidthInHours = ConstantsGlucoseChart.defaultChartWidthInHours
     @AppStorage(UserDefaults.Key.miniChartHoursToShow.rawValue) private var miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
     @AppStorage(UserDefaults.Key.showTreatmentsOnChart.rawValue) private var hideTreatmentsOnChart = false
@@ -104,6 +105,8 @@ struct RootHomeView: View {
         }
         .colorScheme(.dark)
         .onAppear {
+            scrollCoordinator.resetToNow()
+            chartYAxisResetRevision &+= 1
             refreshChartRangeFromStoredSettings()
             requestChartState(forceReset: true)
             requestMiniChartState(forceReset: true)
@@ -231,8 +234,12 @@ struct RootHomeView: View {
                     chartState: visibleChartState,
                     isLoading: isLoadingChart,
                     scrollCoordinator: scrollCoordinator,
+                    yAxisResetRevision: chartYAxisResetRevision,
                     updateChartStateIfNeeded: requestChartStateIfNeeded,
                     finishChartScroll: { forceReset, showsLoading in
+                        if forceReset {
+                            chartYAxisResetRevision &+= 1
+                        }
                         requestChartState(forceReset: forceReset, showsLoading: showsLoading)
                     }
                 )
@@ -548,6 +555,7 @@ struct RootHomeView: View {
 
     private func resetChartsToNow() {
         scrollCoordinator.resetToNow()
+        chartYAxisResetRevision &+= 1
         requestChartState(forceReset: false, showsLoading: false, refreshCachedData: true)
         requestMiniChartState(forceReset: false, refreshCachedData: true)
     }
