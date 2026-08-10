@@ -148,6 +148,9 @@ struct RootHomePieChartView: View {
 
                 RootHomePieSlice(startAngle: .degrees(referenceAngle + inRangeAngle + lowAngle), endAngle: .degrees(referenceAngle + 360))
                     .fill(ConstantsAppColors.statisticsHigh)
+            } else {
+                Circle()
+                    .fill(ConstantsAppColors.homePanelBackground)
             }
         }
         .frame(width: 52, height: 52)
