@@ -38,6 +38,18 @@ actor CareLinkClient {
     func tokenRefreshDate() -> Date? { lastTokenRefreshAt }
     func authenticatedRegion() -> CareLinkRegion? { try? tokenStore.load()?.region }
 
+    /// Removes local authentication without contacting CareLink. This is used when an app install
+    /// has no configured account but a Keychain item from an earlier installation still exists.
+    func clearLocalSession() {
+        refreshTask?.cancel()
+        refreshTask = nil
+        refreshIdentifier = nil
+        sessionGeneration += 1
+        try? tokenStore.clear()
+        cachedRoute = nil
+        lastTokenRefreshAt = nil
+    }
+
     /// Creates the personal web-login URL for the selected region and best available country.
     func loginURL(region: CareLinkRegion) -> URL {
         let country = Self.resolvedCountryCode(region: region, accountCountry: nil).lowercased()
@@ -169,12 +181,7 @@ actor CareLinkClient {
     /// The request uses the captured credential so a slow response cannot clear a newer login.
     func revokeAndClear() async {
         let credential = try? tokenStore.load()
-        refreshTask?.cancel()
-        refreshTask = nil
-        refreshIdentifier = nil
-        sessionGeneration += 1
-        try? tokenStore.clear()
-        cachedRoute = nil
+        clearLocalSession()
         guard let credential else { return }
         let logout = configuration(region: credential.region).careLinkBaseURL.appendingPathComponent("patient/sso/logout")
         _ = try? await authorizedRequest(logout, credential: credential)

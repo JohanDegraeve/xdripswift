@@ -574,6 +574,35 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(delegate.received.map(\.sgv), [121])
     }
 
+    func testLifecyclePolicyRequiresSelectionCredentialsAndSessionForPolling() {
+        XCTAssertEqual(
+            CareLinkLifecyclePolicy.state(isSelected: false, hasCredentials: true, hasSession: true),
+            .inactive
+        )
+        XCTAssertEqual(
+            CareLinkLifecyclePolicy.state(isSelected: true, hasCredentials: false, hasSession: true),
+            .awaitingCredentials
+        )
+        XCTAssertEqual(
+            CareLinkLifecyclePolicy.state(isSelected: true, hasCredentials: true, hasSession: false),
+            .awaitingLogin
+        )
+        XCTAssertEqual(
+            CareLinkLifecyclePolicy.state(isSelected: true, hasCredentials: true, hasSession: true),
+            .authenticated
+        )
+        XCTAssertTrue(CareLinkLifecyclePolicy.permitsPolling(.authenticated))
+        for state in [
+            CareLinkLifecycleState.inactive,
+            .awaitingCredentials,
+            .awaitingLogin,
+            .invalidatingSession,
+            .authenticating,
+        ] {
+            XCTAssertFalse(CareLinkLifecyclePolicy.permitsPolling(state))
+        }
+    }
+
     func testRefreshCommandDoesNotUseLogoutPath() {
         let state = CareLinkAccountState()
         let controller = CareLinkControllerSpy()
@@ -904,6 +933,31 @@ final class CareLinkTests: XCTestCase {
         XCTAssertTrue(URLProtocolStub.paths.contains("/patient/sso/logout"))
     }
 
+    func testLocalSessionClearRemovesOrphanWithoutNetworkRequest() async throws {
+        let store = CareLinkMemoryTokenStore()
+        try store.save(credential())
+        let client = CareLinkClient(session: URLSession(configuration: stubConfiguration()), tokenStore: store, now: { self.now })
+
+        await client.clearLocalSession()
+
+        XCTAssertNil(try store.load())
+        XCTAssertTrue(URLProtocolStub.paths.isEmpty)
+    }
+
+    func testConcurrentRevocationsSendAtMostOneLogoutRequest() async throws {
+        URLProtocolStub.logoutDelay = 0.2
+        let store = CareLinkMemoryTokenStore()
+        try store.save(credential())
+        let client = CareLinkClient(session: URLSession(configuration: stubConfiguration()), tokenStore: store, now: { self.now })
+
+        async let first: Void = client.revokeAndClear()
+        async let second: Void = client.revokeAndClear()
+        _ = await (first, second)
+
+        XCTAssertNil(try store.load())
+        XCTAssertEqual(URLProtocolStub.paths.filter { $0 == "/patient/sso/logout" }.count, 1)
+    }
+
     func testSlowLogoutCannotClearANewerSession() async throws {
         URLProtocolStub.logoutDelay = 0.2
         let store = CareLinkMemoryTokenStore()
@@ -942,6 +996,26 @@ final class CareLinkTests: XCTestCase {
         _ = await accountRequest.value
 
         XCTAssertNil(try store.load())
+    }
+
+    func testTokenRefreshCannotRestoreASessionAfterLocalClear() async throws {
+        URLProtocolStub.reauthDelay = 0.2
+        let store = CareLinkMemoryTokenStore()
+        try store.save(credential(expiresAt: now))
+        let client = CareLinkClient(session: URLSession(configuration: stubConfiguration()), tokenStore: store, now: { self.now })
+        let reauthStarted = expectation(description: "Reauthentication started")
+        URLProtocolStub.expectReauth(reauthStarted)
+
+        let accountRequest = Task {
+            try? await client.userAndPatients(region: .outsideUnitedStates)
+        }
+        await fulfillment(of: [reauthStarted], timeout: 2)
+
+        await client.clearLocalSession()
+        _ = await accountRequest.value
+
+        XCTAssertNil(try store.load())
+        XCTAssertFalse(URLProtocolStub.paths.contains("/patient/sso/logout"))
     }
 
     // MARK: - Helpers
