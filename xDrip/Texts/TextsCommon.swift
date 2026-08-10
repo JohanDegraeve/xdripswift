@@ -308,6 +308,10 @@ class Texts_Common {
         return NSLocalizedString("common_statistics_insufficientAGPData", tableName: filename, bundle: Bundle.main, value: "Insufficient data for AGP percentile chart", comment: "statistics AGP empty chart message")
     }()
 
+    static let statisticsWaitingForGlucoseData = {
+        return NSLocalizedString("common_statistics_waitingForGlucoseData", tableName: filename, bundle: Bundle.main, value: "Waiting for glucose data...", comment: "statistics AGP chart message while no glucose readings are available")
+    }()
+
     static let statisticsInsufficientData = {
         return NSLocalizedString("common_statistics_insufficientData", tableName: filename, bundle: Bundle.main, value: "Insufficient data", comment: "statistics chart empty message")
     }()

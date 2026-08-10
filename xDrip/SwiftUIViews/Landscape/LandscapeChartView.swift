@@ -446,7 +446,7 @@ private struct LandscapeAGPComparisonChart: View {
             presentation: .landscapeComparison,
             glucosePoints: agpGlucosePoints,
             showsNowRule: Calendar.current.isDateInToday(displayedDate),
-            emptyMessage: "Glucose data will appear once recent readings are available."
+            emptyMessage: Texts_Common.statisticsWaitingForGlucoseData
         )
         .padding(.horizontal, 6)
         .padding(.top, 2)

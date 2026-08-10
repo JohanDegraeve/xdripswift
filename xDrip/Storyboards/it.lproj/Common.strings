@@ -230,3 +230,4 @@
 "common_statistics_averageTDD" = "TDD Media";
 "common_statistics_averageCarbs" = "Carboidrati medi";
 "common_statistics_tempBasalDelta" = "Delta basale temporanea";
+"common_statistics_waitingForGlucoseData" = "In attesa dei dati glicemici...";

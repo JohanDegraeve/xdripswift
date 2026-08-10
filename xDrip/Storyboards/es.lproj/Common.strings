@@ -116,3 +116,4 @@
 "common_statistics_averageTDD" = "TDD Media";
 "common_statistics_averageCarbs" = "Carbohidratos medios";
 "common_statistics_tempBasalDelta" = "Delta Basal Temporal";
+"common_statistics_waitingForGlucoseData" = "Esperando datos de glucosa...";

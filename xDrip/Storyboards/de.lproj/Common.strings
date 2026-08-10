@@ -196,3 +196,4 @@
 "common_statistics_averageTDD" = "Durchschn. TDD";
 "common_statistics_averageCarbs" = "Durchschn. Kohlenhydrate";
 "common_statistics_tempBasalDelta" = "Temporäre Basal-Differenz";
+"common_statistics_waitingForGlucoseData" = "Warten auf Glukosedaten...";

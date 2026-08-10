@@ -123,3 +123,4 @@
 "common_report_aidPeriod" = "Looping Data";
 "common_report_notIncluded" = "Not Included";
 "common_statistics_tempBasalDelta" = "Temp Basal Delta";
+"common_statistics_waitingForGlucoseData" = "Waiting for glucose data...";
