@@ -17,7 +17,7 @@ import SwiftUI
 struct RootHomeView: View {
 
     private enum Layout {
-        static let sectionSpacing: CGFloat = 10
+        static let sectionSpacing: CGFloat = 14
         static let rowSpacing: CGFloat = 9
         static let bottomRowSpacing: CGFloat = 3
         static let screenHorizontalMargin: CGFloat = 12
