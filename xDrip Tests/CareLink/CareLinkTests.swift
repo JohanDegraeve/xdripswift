@@ -376,7 +376,7 @@ final class CareLinkTests: XCTestCase {
         XCTAssertTrue(CareLinkAccountRole.isPatient("PATIENT_OUS"))
         XCTAssertFalse(CareLinkAccountRole.isPatient("CARE_PARTNER"))
         XCTAssertTrue(CareLinkAccountRole.isSupportedFollower("CARE_PARTNER_OUS"))
-        XCTAssertEqual(CareLinkPollingPolicy.interval, 60)
+        XCTAssertEqual(CareLinkPollingPolicy.interval, 15)
         XCTAssertTrue(CareLinkPollingPolicy.isStale(lastReadingAt: now.addingTimeInterval(-1201), now: now))
         XCTAssertEqual(CareLinkPollingPolicy.backoff(failureCount: 99), 300)
         XCTAssertEqual(CareLinkStatePolicy.status(for: .reconnectRequired), .loginRequired)
@@ -629,6 +629,22 @@ final class CareLinkTests: XCTestCase {
         }
 
         await fulfillment(of: [published], timeout: 2)
+        withExtendedLifetime(observer) {}
+        observer.cancel()
+    }
+
+    @MainActor
+    func testAccountStatePublishesOnlyChangedSnapshots() {
+        let state = CareLinkAccountState()
+        var publicationCount = 0
+        let observer = state.$snapshot.sink { _ in publicationCount += 1 }
+
+        state.update { $0.status = .loginRequired }
+        XCTAssertEqual(publicationCount, 1)
+
+        state.update { $0.status = .active }
+        XCTAssertEqual(publicationCount, 2)
+
         withExtendedLifetime(observer) {}
         observer.cancel()
     }

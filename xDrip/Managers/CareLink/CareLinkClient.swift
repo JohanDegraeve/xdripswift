@@ -394,21 +394,36 @@ actor CareLinkClient {
         }
     }
 
-    /// Logs full non-credential request context in Debug while suppressing reusable session values.
+    /// Keeps routine traces payload-free while retaining redacted protocol details at debug level.
     private func traceRequest(_ request: URLRequest) {
+        let method = request.httpMethod ?? "GET"
+        let url = request.url?.absoluteString ?? "<missing>"
+        trace("CareLink request method=%{public}@ url=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .info, method, url)
+
         let headers = request.allHTTPHeaderFields?.map { key, value in
             "\(key)=\(["Authorization", "Cookie"].contains(where: { $0.caseInsensitiveCompare(key) == .orderedSame }) ? "<redacted>" : value)"
         }.sorted().joined(separator: "; ") ?? ""
         let body = diagnosticBody(request.httpBody)
-        trace("CareLink request method=%{public}@ url=%{public}@ headers=%{public}@ body=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .info, request.httpMethod ?? "GET", request.url?.absoluteString ?? "<missing>", headers, body)
+        trace("CareLink request debug headers=%{public}@ body=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .debug, headers, body)
     }
 
     private func traceResponse(data: Data, response: HTTPURLResponse, request: URLRequest) {
+        let url = request.url?.absoluteString ?? "<missing>"
+        trace("CareLink response status=%{public}d url=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: response.statusCode >= 400 ? .error : .info, response.statusCode, url)
+
         let headers = response.allHeaderFields.map { key, value in
             let name = String(describing: key)
             return "\(name)=\(name.caseInsensitiveCompare("Set-Cookie") == .orderedSame ? "<redacted>" : String(describing: value))"
         }.sorted().joined(separator: "; ")
-        trace("CareLink response status=%{public}d url=%{public}@ headers=%{public}@ body=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: response.statusCode >= 400 ? .error : .info, response.statusCode, request.url?.absoluteString ?? "<missing>", headers, diagnosticBody(data))
+        // Response payloads can contain account and medical data. Record only their size.
+        trace(
+            "CareLink response debug headers=%{public}@ bodyBytes=%{public}d",
+            log: log,
+            category: ConstantsLog.categoryCareLinkFollowManager,
+            type: .debug,
+            headers,
+            data.count
+        )
     }
 
     private func diagnosticBody(_ data: Data?) -> String {

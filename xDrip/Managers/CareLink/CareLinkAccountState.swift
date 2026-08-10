@@ -27,6 +27,8 @@ final class CareLinkAccountState: ObservableObject {
         }
         var next = snapshot
         transform(&next)
+        // Published replays rebuild Home consumers, so do not emit when no account state changed.
+        guard next != snapshot else { return }
         snapshot = next
     }
 

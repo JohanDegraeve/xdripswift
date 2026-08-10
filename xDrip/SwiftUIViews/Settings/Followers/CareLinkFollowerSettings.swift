@@ -324,7 +324,7 @@ private final class CareLinkSettingsSectionProvider: SettingsNativeSectionProvid
               !countryCode.isEmpty else { return nil }
         let code = countryCode.uppercased()
         guard let country = Locale.current.localizedString(forRegionCode: code) else { return code }
-        return "\(country) (\(code))"
+        return country
     }
 
     func storeSectionReloadClosure(sectionReloadClosure: @escaping () -> Void) {

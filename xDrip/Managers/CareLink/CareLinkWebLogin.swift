@@ -129,7 +129,7 @@ final class CareLinkWebLoginViewController: UIViewController, WKNavigationDelega
                     "CareLink browser cookie check reason=%{public}@ url=%{public}@ cookies=%{public}@ validTo=%{public}@ parsedValidTo=%{public}@",
                     log: log,
                     category: ConstantsLog.categoryCareLinkFollowManager,
-                    type: .info,
+                    type: .debug,
                     reason,
                     webView.url?.absoluteString ?? "<none>",
                     names,

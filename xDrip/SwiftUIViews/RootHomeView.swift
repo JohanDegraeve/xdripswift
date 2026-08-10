@@ -145,23 +145,37 @@ struct RootHomeView: View {
             }
             actions.refreshPumpAndLoopStatus()
         }
-        .onReceive(CareLinkAccountState.shared.$snapshot.map(\.pump).removeDuplicates().receive(on: RunLoop.main)) { _ in
+        // Home state already reads the current CareLink snapshot during refresh. Ignore each
+        // subscription's replay so rebuilding this view cannot start a publish and rebuild loop.
+        .onReceive(
+            CareLinkAccountState.shared.$snapshot.map(\.pump).removeDuplicates().dropFirst().receive(on: RunLoop.main)
+        ) { _ in
             guard UserDefaults.standard.dataFlowPolicy.importsTherapyFromCareLink else { return }
             actions.refreshPumpAndLoopStatus()
         }
-        .onReceive(CareLinkAccountState.shared.$snapshot.map(\.metadata).removeDuplicates().receive(on: RunLoop.main)) { _ in
+        .onReceive(
+            CareLinkAccountState.shared.$snapshot.map(\.metadata).removeDuplicates().dropFirst().receive(on: RunLoop.main)
+        ) { _ in
             guard !UserDefaults.standard.isMaster,
                   UserDefaults.standard.followerDataSourceType == .careLink
             else { return }
             actions.refreshPumpAndLoopStatus()
         }
-        .onReceive(CareLinkAccountState.shared.$snapshot.map(\.status).removeDuplicates().receive(on: RunLoop.main)) { _ in
+        .onReceive(
+            CareLinkAccountState.shared.$snapshot.map(\.status).removeDuplicates().dropFirst().receive(on: RunLoop.main)
+        ) { _ in
             guard !UserDefaults.standard.isMaster,
                   UserDefaults.standard.followerDataSourceType == .careLink
             else { return }
             actions.refreshPumpAndLoopStatus()
         }
-        .onReceive(CareLinkAccountState.shared.$snapshot.map(\.lastPumpHistoryImportAt).removeDuplicates().receive(on: RunLoop.main)) { date in
+        .onReceive(
+            CareLinkAccountState.shared.$snapshot
+                .map(\.lastPumpHistoryImportAt)
+                .removeDuplicates()
+                .dropFirst()
+                .receive(on: RunLoop.main)
+        ) { date in
             guard date != nil, UserDefaults.standard.dataFlowPolicy.importsTherapyFromCareLink else { return }
             historicalDataCache.reset()
             prepareHistoricalDataIfNeeded(at: endDate)

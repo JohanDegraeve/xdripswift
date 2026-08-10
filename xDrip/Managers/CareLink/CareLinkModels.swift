@@ -103,8 +103,8 @@ struct CareLinkLoginCredentials: Equatable {
 
 /// Central timing policy shared by the manager and deterministic scheduler tests.
 enum CareLinkPollingPolicy {
-    /// Normal foreground/background heartbeat poll cadence.
-    static let interval: TimeInterval = 60
+    /// Matches the proven Nightscout follower's one-shot download cadence.
+    static let interval: TimeInterval = 15
     /// Reading age is deliberately independent of request failures and backoff.
     static let staleAfter: TimeInterval = 20 * 60
 

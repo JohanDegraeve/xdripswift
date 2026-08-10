@@ -36,8 +36,8 @@ enum CareLinkLifecyclePolicy {
 /// Bridges CareLink's asynchronous cloud API into the app's established follower pipeline.
 ///
 /// `RootApplicationCoordinator` retains one instance for the application lifetime. The manager
-/// mirrors the other follower managers: KVO controls activation, `download()` is the heartbeat
-/// entry point, and readings leave through a weak `FollowerDelegate`.
+/// mirrors the other follower managers: KVO controls activation, `download()` is the polling
+/// entry point, and glucose readings leave through a weak `FollowerDelegate`.
 ///
 /// Account sessions, linked-patient handling, regional routing and CareLink data endpoint
 /// workflows were based upon the concepts implemented in these open-source community projects:
@@ -65,12 +65,12 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     private let therapyImporter: CareLinkTherapyImporter
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCareLinkFollowManager)
     private let keyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
-    /// Used only outside heartbeat mode. Heartbeat cadence belongs to the root coordinator.
-    private var timer: Timer?
+    /// Invalidates the one-shot download timer used outside heartbeat mode.
+    private var invalidateDownloadTimer: (() -> Void)?
     /// A single in-flight poll prevents timer, foreground and heartbeat callbacks from overlapping.
     private var pollTask: Task<Void, Never>?
     private var pollIdentifier: UUID?
-    /// Prevents frequent coordinator and keep-alive ticks from bypassing the 60-second service cadence.
+    /// Prevents frequent coordinator callbacks from bypassing the Nightscout-matched cadence.
     private var lastPollStartedAt = Date.distantPast
     /// Retains one explicit Refresh request when a scheduled poll is already in progress.
     private var refreshRequestedWhilePolling = false
@@ -85,8 +85,8 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     private var failureCount = 0
     private var audioPlayer: AVAudioPlayer?
     private var playSoundTimer: RepeatingTimer?
-    private let backgroundKey = "CareLinkFollowManager-Background"
-    private let foregroundKey = "CareLinkFollowManager-Foreground"
+    private let applicationManagerKeyResumePlaySoundTimer = "CareLinkFollowerManager-ResumePlaySoundTimer"
+    private let applicationManagerKeySuspendPlaySoundTimer = "CareLinkFollowerManager-SuspendPlaySoundTimer"
 
     /// Creates the long-lived manager and immediately evaluates the current follower selection.
     init(coreDataManager: CoreDataManager, followerDelegate: FollowerDelegate, client: CareLinkClient = CareLinkClient(), state: CareLinkAccountState = .shared) {
@@ -96,10 +96,20 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         self.client = client
         self.state = state
         self.therapyImporter = CareLinkTherapyImporter(coreDataManager: coreDataManager)
-        super.init()
         if let url = Bundle.main.url(forResource: ConstantsSuspensionPrevention.soundFileName, withExtension: "") {
-            audioPlayer = try? AVAudioPlayer(contentsOf: url)
+            do {
+                audioPlayer = try AVAudioPlayer(contentsOf: url)
+            } catch let error {
+                trace(
+                    "in init, exception while trying to create audioplayer, error = %{public}@",
+                    log: self.log,
+                    category: ConstantsLog.categoryCareLinkFollowManager,
+                    type: .error,
+                    error.localizedDescription
+                )
+            }
         }
+        super.init()
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
@@ -115,8 +125,8 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
 
     // MARK: - Existing follower integration
 
-    /// Creates the same Core Data entity used by other followers so alerts, post-processing,
-    /// Watch, HealthKit, Live Activities, Calendar, Bluetooth and Nightscout remain downstream.
+    /// Creates the same Core Data entity used by other followers. Glucose persistence and all
+    /// glucose-specific downstream work remain owned by `RootApplicationCoordinator`.
     func createBgReading(followGlucoseData: FollowerBgReading) -> BgReading {
         let reading = BgReading(timeStamp: followGlucoseData.timeStamp, sensor: nil, calibration: nil, rawData: followGlucoseData.sgv, deviceName: ConstantsHomeView.applicationName + " (CareLink)", nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
         reading.calculatedValue = followGlucoseData.sgv
@@ -145,8 +155,8 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         delegate?.followerInfoReceived(followGlucoseDataArray: &copy)
     }
 
-    /// Entry point shared by immediate startup, the 60-second timer, app lifecycle callbacks and
-    /// the coordinator heartbeat. Calls are coalesced while a poll is already running.
+    /// Entry point shared by immediate startup, the one-shot timer and the coordinator heartbeat.
+    /// Calls are coalesced while a poll is already running.
     @objc func download() {
         dispatchPollRequest(force: false)
     }
@@ -231,8 +241,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             guard let self,
                   CareLinkLifecyclePolicy.permitsPolling(lifecycleState),
                   isActive else { return }
-            timer?.invalidate()
-            timer = nil
+            cancelScheduledDownload()
             updateStateOnMain {
                 $0.status = .connecting
                 $0.detail = Texts_SettingsView.careLinkRefreshing
@@ -349,7 +358,11 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             loginIdentifier = nil
             lifecycleState = .authenticated
             updateStateOnMain { $0.lastTokenRefreshAt = Date() }
-            configureSuspensionPrevention()
+            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
+                enableSuspensionPrevention()
+            } else {
+                disableSuspensionPrevention()
+            }
             refreshNow()
         } catch CareLinkError.cancelled {
             guard loginIdentifier == identifier else { return }
@@ -454,7 +467,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                         $0.detail = CareLinkError.patientIdentityMissing.localizedDescription
                     }
                 }
-                schedule(after: CareLinkPollingPolicy.interval, generation: generation)
+                await scheduleNewDownload(generation: generation)
                 return
             }
             guard let selectedID, let patient = account.patients.first(where: { $0.id == selectedID || $0.username == selectedID }) else {
@@ -463,7 +476,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                     $0.status = .selectPatient
                     $0.detail = CareLinkError.patientSelectionRequired.localizedDescription
                 }
-                schedule(after: CareLinkPollingPolicy.interval, generation: generation)
+                await scheduleNewDownload(generation: generation)
                 return
             }
             let response = try await client.fetchPatientData(region: currentRegion, patient: patient, username: account.metadata.accountName, accountRole: account.metadata.role, countryCode: account.metadata.countryCode, linkedPatientCount: account.patients.count)
@@ -517,7 +530,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                     snapshot.lastPumpHistoryImportAt = Date()
                 }
             }
-            // Core Data and all downstream behavior remain owned by the existing follower delegate.
+            // Glucose persistence and downstream behavior remain owned by the follower delegate.
             trace(
                 "CareLink poll succeeded, route=%{public}@ readings=%{public}d therapy=%{public}d imported=%{public}d pump=%{public}@ status=%{public}@ communicating=%{public}@ inRange=%{public}@",
                 log: log,
@@ -539,7 +552,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                     Self.deliver(readings, to: self.followerDelegate)
                 }
             }
-            schedule(after: CareLinkPollingPolicy.interval, generation: generation)
+            await scheduleNewDownload(generation: generation)
         } catch let error as CareLinkError {
             guard isActive, !Task.isCancelled else { return }
             trace("CareLink poll failed: %{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .error, error.localizedDescription)
@@ -553,7 +566,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                 $0.detail = error.localizedDescription
                 $0.serviceReachable = false
             }
-            schedule(after: backoff, generation: generation)
+            await scheduleRetry(after: backoff, generation: generation)
         }
     }
 
@@ -568,7 +581,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                 $0.detail = error.localizedDescription
                 $0.serviceReachable = true
             }
-            schedule(after: max(1, until.timeIntervalSinceNow), generation: generation)
+            await scheduleRetry(after: max(1, until.timeIntervalSinceNow), generation: generation)
         case .reconnectRequired, .regionMismatch, .notAuthenticated:
             await transitionToAwaitingLogin(generation: generation)
             await updateState(generation: generation) {
@@ -592,7 +605,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                 $0.serviceReachable = true
                 $0.lastReadingAt = nil
             }
-            schedule(after: CareLinkPollingPolicy.interval, generation: generation)
+            await scheduleNewDownload(generation: generation)
         case let .unsupportedRole(metadata):
             await updateState(generation: generation) {
                 $0.status = .error
@@ -608,31 +621,60 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                 $0.detail = error.localizedDescription
                 $0.serviceReachable = error != .offline
             }
-            schedule(after: backoff, generation: generation)
+            await scheduleRetry(after: backoff, generation: generation)
         }
     }
 
     /// Current bounded delay for transient network/server failures.
     private var backoff: TimeInterval { CareLinkPollingPolicy.backoff(failureCount: failureCount) }
 
-    /// Schedules one poll unless coordinator heartbeat mode owns cadence.
-    private func schedule(after interval: TimeInterval, generation: Int) {
-        Task { @MainActor [weak self] in
-            guard let self,
-                  self.pollIsCurrentOnMain(generation),
-                  UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
-            self.timer?.invalidate()
-            let timer = Timer(timeInterval: interval, target: self, selector: #selector(self.download), userInfo: nil, repeats: false)
-            RunLoop.main.add(timer, forMode: .common)
-            self.timer = timer
+    /// Schedules the next download using the Nightscout follower's one-shot timer workflow.
+    @MainActor
+    private func scheduleNewDownload(generation: Int) {
+        guard pollIsCurrentOnMain(generation) else { return }
+        guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
+        cancelScheduledDownload()
+        trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryCareLinkFollowManager, type: .info)
+        let downloadTimer = Timer.scheduledTimer(
+            timeInterval: CareLinkPollingPolicy.interval,
+            target: self,
+            selector: #selector(self.download),
+            userInfo: nil,
+            repeats: false
+        )
+        invalidateDownloadTimer = {
+            downloadTimer.invalidate()
         }
+    }
+
+    /// Retains CareLink's service-specific delay for errors and rate limits.
+    @MainActor
+    private func scheduleRetry(after interval: TimeInterval, generation: Int) {
+        guard pollIsCurrentOnMain(generation),
+              UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
+        cancelScheduledDownload()
+        let downloadTimer = Timer.scheduledTimer(
+            timeInterval: interval,
+            target: self,
+            selector: #selector(self.download),
+            userInfo: nil,
+            repeats: false
+        )
+        invalidateDownloadTimer = {
+            downloadTimer.invalidate()
+        }
+    }
+
+    @MainActor
+    private func cancelScheduledDownload() {
+        invalidateDownloadTimer?()
+        invalidateDownloadTimer = nil
     }
 
     /// Cancels both scheduled and active work so logout/source switching cannot receive a late poll.
     @MainActor
     private func stopPolling() {
-        timer?.invalidate()
-        timer = nil
+        cancelScheduledDownload()
         pollTask?.cancel()
         pollTask = nil
         pollIdentifier = nil
@@ -647,6 +689,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     private func reconcileLifecycle() {
         lifecycleGeneration += 1
         let generation = lifecycleGeneration
+        // Reconciliation is idempotent. Tear down the prior generation before enabling a new one.
         stopPolling()
         disableSuspensionPrevention()
         Task { @MainActor [weak self] in
@@ -684,7 +727,11 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             guard lifecycleGeneration == generation else { return }
             lifecycleState = CareLinkLifecyclePolicy.state(isSelected: true, hasCredentials: true, hasSession: hasSession)
             if lifecycleState == .authenticated {
-                configureSuspensionPrevention()
+                if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
+                    enableSuspensionPrevention()
+                } else {
+                    disableSuspensionPrevention()
+                }
                 download()
             } else {
                 stopPolling()
@@ -764,31 +811,74 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         await client.clearLocalSession()
     }
 
-    /// Reuses the app's established silent-audio keep-alive behavior for normal/aggressive modes.
-    private func configureSuspensionPrevention() {
-        disableSuspensionPrevention()
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: foregroundKey) { [weak self] in
-            self?.playSoundTimer?.suspend()
-        }
-        guard UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive else { return }
-        let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal ? ConstantsSuspensionPrevention.intervalNormal : ConstantsSuspensionPrevention.intervalAggressive
-        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(interval)) { [weak self] in
-            guard let self else { return }
-            if self.audioPlayer?.isPlaying == false { self.audioPlayer?.play() }
-            self.download()
-        }
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: backgroundKey) { [weak self] in
-            self?.playSoundTimer?.resume()
-            self?.audioPlayer?.play()
-            self?.download()
-        }
-    }
-
     /// Suspends local audio work and removes both application lifecycle callbacks.
     private func disableSuspensionPrevention() {
-        playSoundTimer?.suspend()
-        ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: backgroundKey)
-        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: foregroundKey)
+        if let playSoundTimer = playSoundTimer {
+            playSoundTimer.suspend()
+        }
+        ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer)
+        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer)
+    }
+
+    /// Launches the same silent-audio timer used by the Nightscout follower.
+    private func enableSuspensionPrevention() {
+        if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
+            trace(
+                "not enabling suspension prevention as keep-alive type is: %{public}@",
+                log: self.log,
+                category: ConstantsLog.categoryCareLinkFollowManager,
+                type: .debug,
+                UserDefaults.standard.followerBackgroundKeepAliveType.description
+            )
+            return
+        }
+        let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal
+            ? ConstantsSuspensionPrevention.intervalNormal
+            : ConstantsSuspensionPrevention.intervalAggressive
+        // This timer maintains audio only. Polling is scheduled independently after each request.
+        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval))) { [weak self] in
+            guard let self = self else { return }
+            trace(
+                "in eventhandler checking if audioplayer exists",
+                log: self.log,
+                category: ConstantsLog.categoryCareLinkFollowManager,
+                type: .info
+            )
+            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
+                trace(
+                    "playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@",
+                    log: self.log,
+                    category: ConstantsLog.categoryCareLinkFollowManager,
+                    type: .info,
+                    interval.description,
+                    UserDefaults.standard.followerDataSourceType.description,
+                    UserDefaults.standard.followerBackgroundKeepAliveType.description
+                )
+                audioPlayer.play()
+            }
+        }
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(
+            key: applicationManagerKeyResumePlaySoundTimer
+        ) { [weak self] in
+            guard let self = self else { return }
+            // Match Nightscout by starting audio here without forcing a network request.
+            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
+                if let playSoundTimer = self.playSoundTimer {
+                    playSoundTimer.resume()
+                }
+                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
+                    audioPlayer.play()
+                }
+            }
+        }
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(
+            key: applicationManagerKeySuspendPlaySoundTimer
+        ) { [weak self] in
+            guard let self = self else { return }
+            if let playSoundTimer = self.playSoundTimer {
+                playSoundTimer.suspend()
+            }
+        }
     }
 
     /// Applies synchronous state mutations from code already executing on the main actor.
@@ -812,14 +902,9 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             Task { @MainActor [weak self] in
                 await self?.invalidateSession(revokeRemotely: true)
             }
-        case .isMaster, .followerDataSourceType:
+        case .isMaster, .followerDataSourceType, .followerBackgroundKeepAliveType:
             guard keyValueObserverTimeKeeper.verifyKey(forKey: keyPath, withMinimumDelayMilliSeconds: 200) else { return }
             Task { @MainActor [weak self] in self?.reconcileLifecycle() }
-        case .followerBackgroundKeepAliveType:
-            Task { @MainActor [weak self] in
-                guard let self, self.lifecycleState == .authenticated else { return }
-                self.configureSuspensionPrevention()
-            }
         case .careLinkSelectedPatientID:
             refreshNow()
         default: break
@@ -831,7 +916,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         for key in [UserDefaults.Key.isMaster, .followerDataSourceType, .followerBackgroundKeepAliveType, .careLinkSelectedPatientID, .careLinkUsername, .careLinkPassword] {
             UserDefaults.standard.removeObserver(self, forKeyPath: key.rawValue)
         }
-        timer?.invalidate()
+        invalidateDownloadTimer?()
         pollTask?.cancel()
         let loginController = authController
         Task { @MainActor in loginController?.cancel() }
