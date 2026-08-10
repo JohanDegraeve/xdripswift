@@ -16,8 +16,12 @@ class BgPostProcessingManager {
     // MARK: - Properties
 
     private struct BgReadingStateBeforeProcessing {
+        let adjustedValue: NSNumber?
+        let smoothedValue: NSNumber?
         let finalValue: Double
         let isSuppressedByFiveMinuteCadence: Bool
+        let calculatedValueSlope: Double
+        let hideSlope: Bool
     }
 
     private struct BgReadingDownstreamChange {
@@ -148,7 +152,14 @@ class BgPostProcessingManager {
 
         var statesBeforeProcessing = [NSManagedObjectID: BgReadingStateBeforeProcessing]()
         for bgReading in bgReadings {
-            statesBeforeProcessing[bgReading.objectID] = BgReadingStateBeforeProcessing(finalValue: bgReading.finalValue, isSuppressedByFiveMinuteCadence: bgReading.isSuppressedByFiveMinuteCadence)
+            statesBeforeProcessing[bgReading.objectID] = BgReadingStateBeforeProcessing(
+                adjustedValue: bgReading.adjustedValue,
+                smoothedValue: bgReading.smoothedValue,
+                finalValue: bgReading.finalValue,
+                isSuppressedByFiveMinuteCadence: bgReading.isSuppressedByFiveMinuteCadence,
+                calculatedValueSlope: bgReading.calculatedValueSlope,
+                hideSlope: bgReading.hideSlope
+            )
         }
 
         recomputeAdjustedValues(bgReadings: bgReadings, sourceContextIdentifier: sourceContextIdentifier)
@@ -159,6 +170,29 @@ class BgPostProcessingManager {
             rebuildCadenceFromStart: fiveMinuteReadingsStartTimeStampOverride != nil
         )
         recomputeSlopes(bgReadings: bgReadings)
+
+        let latestVisibleBgReading = bgReadings.last(where: { !$0.isSuppressedByFiveMinuteCadence })
+        let automaticRewriteStartDate = latestVisibleBgReading?.timeStamp.addingTimeInterval(-ConstantsBgSmoothing.automaticDownstreamRewriteLookbackInterval)
+
+        // Automatic processing uses the wider fetched segment as calculation context only.
+        // Restore older managed objects before saving so every historical value changed in
+        // Core Data belongs to the same tail that is replaced in Nightscout and HealthKit.
+        if processingStartDateOverride == nil {
+            let contextOnlyBgReadings = bgReadings.filter { bgReading in
+                guard let automaticRewriteStartDate = automaticRewriteStartDate else { return true }
+                return bgReading.timeStamp < automaticRewriteStartDate
+            }
+
+            for bgReading in contextOnlyBgReadings {
+                guard let stateBeforeProcessing = statesBeforeProcessing[bgReading.objectID] else { continue }
+
+                bgReading.adjustedValue = stateBeforeProcessing.adjustedValue
+                bgReading.smoothedValue = stateBeforeProcessing.smoothedValue
+                bgReading.isSuppressedByFiveMinuteCadence = stateBeforeProcessing.isSuppressedByFiveMinuteCadence
+                bgReading.calculatedValueSlope = stateBeforeProcessing.calculatedValueSlope
+                bgReading.hideSlope = stateBeforeProcessing.hideSlope
+            }
+        }
 
         coreDataManager.saveChanges()
 
@@ -180,8 +214,7 @@ class BgPostProcessingManager {
         let bgReadingsToReplaceDownstream: [BgReading]
         if shouldRewriteFullDownstreamWindow {
             bgReadingsToReplaceDownstream = bgReadings.filter { !$0.isSuppressedByFiveMinuteCadence }
-        } else if let latestVisibleBgReading = bgReadings.last(where: { !$0.isSuppressedByFiveMinuteCadence }) {
-            let automaticRewriteStartDate = latestVisibleBgReading.timeStamp.addingTimeInterval(-ConstantsBgSmoothing.automaticDownstreamRewriteLookbackInterval)
+        } else if let latestVisibleBgReading = latestVisibleBgReading, let automaticRewriteStartDate = automaticRewriteStartDate {
             let automaticRewriteCandidates = bgReadings.filter { bgReading in
                 return bgReading.timeStamp >= automaticRewriteStartDate
                     && bgReading.objectID != latestVisibleBgReading.objectID
