@@ -140,41 +140,8 @@ struct NightscoutDeviceStatus: Codable, Sendable {
     // as the minimum deployment target is iOS16.2, we need to provide a nice option for people running it
     // even if nearly all users will be running iOS18
     func batteryImage(percent: Int?) -> (image: Image, color: Color)? {
-        if let percent {
-            switch percent {
-            case 0...10:
-                if #available(iOS 17.0, *) {
-                    return (Image(systemName: "battery.0percent"), Color(.systemRed))
-                } else {
-                    return (Image(systemName: "minus.plus.batteryblock.slash"), Color(.systemRed))
-                }
-            case 11...25:
-                if #available(iOS 17.0, *) {
-                    return (Image(systemName: "battery.25percent"), Color(.systemYellow))
-                } else {
-                    return (Image(systemName: "minus.plus.batteryblock"), Color(.systemYellow))
-                }
-            case 26...65:
-                if #available(iOS 17.0, *) {
-                    return (Image(systemName: "battery.50percent"), Color(.colorSecondary))
-                } else {
-                    return (Image(systemName: "minus.plus.batteryblock"), Color(.colorSecondary))
-                }
-            case 66...90:
-                if #available(iOS 17.0, *) {
-                    return (Image(systemName: "battery.75percent"), Color(.colorSecondary))
-                } else {
-                    return (Image(systemName: "minus.plus.batteryblock.fill"), Color(.colorSecondary))
-                }
-            default:
-                if #available(iOS 17.0, *) {
-                    return (Image(systemName: "battery.100percent"), Color(.colorSecondary))
-                } else {
-                    return (Image(systemName: "minus.plus.batteryblock.fill"), Color(.colorSecondary))
-                }
-            }
-        }
-        return nil
+        guard let indicator = ConstantsHomeView.batteryIndicator(percent: percent) else { return nil }
+        return (Image(systemName: indicator.systemImage), indicator.color)
     }
     
     func uploaderBatteryImageRVCStatusView() -> (batteryImageSystemName: String, batteryImageColor: UIColor)? {

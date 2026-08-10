@@ -87,7 +87,11 @@ struct CareLinkPumpStatusView: View {
             row(Texts_SettingsView.careLinkActiveInsulin, units(pump.activeInsulin))
             row(Texts_SettingsView.careLinkBasalRate, rate(pump.currentBasalRate))
             if let remainingMinutes = snapshot.metadata.sensorRemainingMinutes {
-                row(Texts_SettingsView.careLinkSensorRemaining, Double(remainingMinutes).minutesToDaysAndHours())
+                row(
+                    Texts_SettingsView.careLinkSensorRemaining,
+                    Double(remainingMinutes).minutesToDaysAndHours(),
+                    indicator: ConstantsHomeView.careLinkSensorIndicator(remainingMinutes: remainingMinutes)
+                )
             }
             row(Texts_SettingsView.careLinkLastPumpUpdate, formatted(pump.observedAt ?? pump.lastDataUpdateAt))
         }
@@ -97,7 +101,11 @@ struct CareLinkPumpStatusView: View {
         Section(Texts_SettingsView.careLinkPump) {
             row(Texts_SettingsView.careLinkModel, deviceName)
             row(Texts_SettingsView.careLinkStatus, pump.pumpStatusTitle)
-            row(Texts_SettingsView.careLinkBattery, pump.batteryPercent.map { "\($0) %" })
+            row(
+                Texts_SettingsView.careLinkBattery,
+                pump.batteryPercent.map { "\($0) %" },
+                indicator: ConstantsHomeView.batteryIndicator(percent: pump.batteryPercent)
+            )
             row(Texts_SettingsView.careLinkReservoir, units(pump.reservoirUnits))
         }
     }
@@ -156,13 +164,21 @@ struct CareLinkPumpStatusView: View {
         pump.observedAt != nil || pump.lastDataUpdateAt != nil
     }
 
-    private func row(_ title: String, _ value: String?) -> some View {
+    private func row(_ title: String, _ value: String?, indicator: StatusSymbolPresentation? = nil) -> some View {
         HStack {
             Text(title)
             Spacer(minLength: 12)
-            Text(value?.isEmpty == false ? value! : "-")
-                .foregroundStyle(ConstantsAppColors.secondaryText)
-                .multilineTextAlignment(.trailing)
+            HStack(spacing: 5) {
+                if let indicator {
+                    Image(systemName: indicator.systemImage)
+                        .foregroundStyle(indicator.color)
+                        .fixedSize()
+                        .accessibilityHidden(true)
+                }
+                Text(value?.isEmpty == false ? value! : "-")
+                    .foregroundStyle(ConstantsAppColors.secondaryText)
+                    .multilineTextAlignment(.trailing)
+            }
         }
     }
 

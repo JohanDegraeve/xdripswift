@@ -5,6 +5,13 @@ import SwiftUI
 import UIKit
 #endif
 
+#if os(iOS)
+struct StatusSymbolPresentation: Equatable {
+    let systemImage: String
+    let color: Color
+}
+#endif
+
 enum LoopStatusState {
     case recent
     case aging
@@ -231,5 +238,60 @@ enum ConstantsHomeView {
     
     /// below what percentage should we show the pump battery as an urgent condition (red)?
     static let pumpBatteryPercentUrgent: Int = 10
+
+    #if os(iOS)
+    /// Uses the same sensor lifetime thresholds in Home and the CareLink status screen.
+    static func careLinkSensorIndicator(remainingMinutes: Int) -> StatusSymbolPresentation {
+        let color: Color
+        if remainingMinutes <= 0 {
+            color = .red
+        } else if remainingMinutes <= Int(sensorProgressViewUrgentInMinutes) {
+            color = .orange
+        } else if remainingMinutes <= Int(sensorProgressViewWarningInMinutes) {
+            color = .yellow
+        } else {
+            color = .green
+        }
+        return StatusSymbolPresentation(systemImage: "sensor.tag.radiowaves.forward.fill", color: color)
+    }
+
+    /// Provides the battery symbol buckets and colors shared by Loop and CareLink status rows.
+    static func batteryIndicator(percent: Int?) -> StatusSymbolPresentation? {
+        guard let percent else { return nil }
+
+        switch percent {
+        case 0...10:
+            if #available(iOS 17.0, *) {
+                return StatusSymbolPresentation(systemImage: "battery.0percent", color: .red)
+            } else {
+                return StatusSymbolPresentation(systemImage: "minus.plus.batteryblock.slash", color: .red)
+            }
+        case 11...25:
+            if #available(iOS 17.0, *) {
+                return StatusSymbolPresentation(systemImage: "battery.25percent", color: .yellow)
+            } else {
+                return StatusSymbolPresentation(systemImage: "minus.plus.batteryblock", color: .yellow)
+            }
+        case 26...65:
+            if #available(iOS 17.0, *) {
+                return StatusSymbolPresentation(systemImage: "battery.50percent", color: Color("colorSecondary"))
+            } else {
+                return StatusSymbolPresentation(systemImage: "minus.plus.batteryblock", color: Color("colorSecondary"))
+            }
+        case 66...90:
+            if #available(iOS 17.0, *) {
+                return StatusSymbolPresentation(systemImage: "battery.75percent", color: Color("colorSecondary"))
+            } else {
+                return StatusSymbolPresentation(systemImage: "minus.plus.batteryblock.fill", color: Color("colorSecondary"))
+            }
+        default:
+            if #available(iOS 17.0, *) {
+                return StatusSymbolPresentation(systemImage: "battery.100percent", color: Color("colorSecondary"))
+            } else {
+                return StatusSymbolPresentation(systemImage: "minus.plus.batteryblock.fill", color: Color("colorSecondary"))
+            }
+        }
+    }
+    #endif
     
 }

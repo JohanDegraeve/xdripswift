@@ -35,4 +35,43 @@ final class RootHomeInteractionTests: XCTestCase {
         XCTAssertEqual(RootHomeStatisticsPeriod.title(for: 30), "30 \(Texts_Common.days)")
         XCTAssertEqual(RootHomeStatisticsPeriod.title(for: 90), "90 \(Texts_Common.days)")
     }
+
+    func testCareLinkSensorIndicatorUsesHomeLifetimeThresholds() {
+        let expired = ConstantsHomeView.careLinkSensorIndicator(remainingMinutes: 0)
+        let urgent = ConstantsHomeView.careLinkSensorIndicator(
+            remainingMinutes: Int(ConstantsHomeView.sensorProgressViewUrgentInMinutes)
+        )
+        let warning = ConstantsHomeView.careLinkSensorIndicator(
+            remainingMinutes: Int(ConstantsHomeView.sensorProgressViewWarningInMinutes)
+        )
+        let normal = ConstantsHomeView.careLinkSensorIndicator(
+            remainingMinutes: Int(ConstantsHomeView.sensorProgressViewWarningInMinutes) + 1
+        )
+
+        XCTAssertEqual(expired.systemImage, "sensor.tag.radiowaves.forward.fill")
+        XCTAssertEqual(urgent.systemImage, expired.systemImage)
+        XCTAssertEqual(warning.systemImage, expired.systemImage)
+        XCTAssertEqual(normal.systemImage, expired.systemImage)
+        XCTAssertEqual(expired.color, ConstantsAppColors.sensorExpired)
+        XCTAssertEqual(urgent.color, ConstantsAppColors.sensorUrgent)
+        XCTAssertEqual(warning.color, ConstantsAppColors.sensorWarning)
+        XCTAssertEqual(normal.color, .green)
+    }
+
+    func testBatteryIndicatorMatchesLoopStatusBuckets() {
+        XCTAssertNil(ConstantsHomeView.batteryIndicator(percent: nil))
+        XCTAssertEqual(ConstantsHomeView.batteryIndicator(percent: 10)?.color, ConstantsAppColors.urgent)
+        XCTAssertEqual(ConstantsHomeView.batteryIndicator(percent: 11)?.color, ConstantsAppColors.warning)
+        XCTAssertEqual(ConstantsHomeView.batteryIndicator(percent: 26)?.color, ConstantsAppColors.secondaryText)
+        XCTAssertEqual(ConstantsHomeView.batteryIndicator(percent: 66)?.color, ConstantsAppColors.secondaryText)
+        XCTAssertEqual(ConstantsHomeView.batteryIndicator(percent: 91)?.color, ConstantsAppColors.secondaryText)
+
+        if #available(iOS 17.0, *) {
+            XCTAssertEqual(ConstantsHomeView.batteryIndicator(percent: 10)?.systemImage, "battery.0percent")
+            XCTAssertEqual(ConstantsHomeView.batteryIndicator(percent: 11)?.systemImage, "battery.25percent")
+            XCTAssertEqual(ConstantsHomeView.batteryIndicator(percent: 26)?.systemImage, "battery.50percent")
+            XCTAssertEqual(ConstantsHomeView.batteryIndicator(percent: 66)?.systemImage, "battery.75percent")
+            XCTAssertEqual(ConstantsHomeView.batteryIndicator(percent: 91)?.systemImage, "battery.100percent")
+        }
+    }
 }

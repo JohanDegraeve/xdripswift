@@ -719,10 +719,9 @@ final class RootHomeStateModel: ObservableObject {
                 if showsPatient {
                     detail = patientName ?? ""
                     if let remainingMinutes = snapshot.metadata.sensorRemainingMinutes {
-                        detailSystemImage = remainingMinutes <= Int(ConstantsHomeView.sensorProgressViewWarningInMinutes)
-                            ? "sensor.tag.radiowaves.forward.fill"
-                            : "sensor.tag.radiowaves.forward"
-                        detailSystemImageColor = careLinkSensorColor(remainingMinutes: remainingMinutes)
+                        let indicator = ConstantsHomeView.careLinkSensorIndicator(remainingMinutes: remainingMinutes)
+                        detailSystemImage = indicator.systemImage
+                        detailSystemImageColor = indicator.color
                         detailSystemImageAccessibilityLabel = Texts_HomeView.sensorLifetimeRemaining(Double(remainingMinutes).minutesToDaysAndHours())
                     }
                 } else {
@@ -759,18 +758,6 @@ final class RootHomeStateModel: ObservableObject {
         }
 
         return ConstantsAppColors.sensorText
-    }
-
-    /// Uses the same expiry thresholds and warning colours as the app's master sensors.
-    private func careLinkSensorColor(remainingMinutes: Int) -> Color {
-        if remainingMinutes <= 0 {
-            return ConstantsAppColors.sensorExpired
-        } else if remainingMinutes <= Int(ConstantsHomeView.sensorProgressViewUrgentInMinutes) {
-            return ConstantsAppColors.sensorUrgent
-        } else if remainingMinutes <= Int(ConstantsHomeView.sensorProgressViewWarningInMinutes) {
-            return ConstantsAppColors.sensorWarning
-        }
-        return .green
     }
 
     private func sensorNoiseState(activeSensor: Sensor?) -> RootHomeSensorNoiseState {
