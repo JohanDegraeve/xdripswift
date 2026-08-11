@@ -19,6 +19,9 @@ enum NightscoutFollowerSettingsScreen {
                     let presentation = FollowerConnectionPresentation.resolve(source: .nightscout)
                     return [FollowerConnectionPresentation.bannerRow(id: "nightscout.connection.banner", presentation: presentation)]
                 },
+                FollowerSettingsSectionProvider(title: { Texts_SettingsView.followerSectionProfile }) { _ in
+                    [FollowerSettingsRows.aliasRow(id: "nightscout.profile.alias")]
+                },
                 FollowerSettingsSectionProvider(
                     title: { Texts_SettingsView.followerSectionServer },
                     footer: { FollowerSettingsRows.serviceStatusFooter(monitor: monitor) },
