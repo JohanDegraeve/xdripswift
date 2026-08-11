@@ -22,6 +22,7 @@ struct RootHomeView: View {
         static let bottomRowSpacing: CGFloat = 3
         static let screenHorizontalMargin: CGFloat = 12
         static let glucoseStatusRowHeight: CGFloat = 120
+        static let ipadPortraitAGPHeight: CGFloat = 280
     }
 
     /// Settings that affect which cached chart series are included in the main chart state.
@@ -38,6 +39,7 @@ struct RootHomeView: View {
     // MARK: - State
 
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @ObservedObject private var stateModel: RootHomeStateModel
     @ObservedObject private var sensorHealthIssueManager: SensorHealthIssueManager
     @StateObject private var glucoseChartStateManager: GlucoseChartStateManager
@@ -45,12 +47,14 @@ struct RootHomeView: View {
     @StateObject private var scrollCoordinator: GlucoseChartScrollCoordinator
     @StateObject private var historicalDataCache: RootHomeHistoricalDataCache
 
+    private let coreDataManager: CoreDataManager
     private let nightscoutSyncManager: NightscoutSyncManager
     @State private var selectedRange: RootHomeChartRange
     @State private var isLoadingChart = false
     @State private var isBackgroundLoadingChart = false
     @State private var showOriginalBGReadingsOnly = false
     @State private var chartYAxisResetRevision = 0
+    @State private var showsExpandedIPadChart = false
     @AppStorage(UserDefaults.KeysCharts.chartWidthInHours.rawValue) private var chartWidthInHours = ConstantsGlucoseChart.defaultChartWidthInHours
     @AppStorage(UserDefaults.Key.miniChartHoursToShow.rawValue) private var miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
     @AppStorage(UserDefaults.Key.showTreatmentsOnChart.rawValue) private var hideTreatmentsOnChart = false
@@ -85,6 +89,7 @@ struct RootHomeView: View {
         self.stateModel = stateModel
         self.sensorHealthIssueManager = sensorHealthIssueManager
         self.actions = actions
+        self.coreDataManager = coreDataManager
         self.nightscoutSyncManager = nightscoutSyncManager
         // only the main chart can show sensor noise background bands. The mini-chart keeps the
         // same clean overview behaviour and does not need the extra Core Data fetch.
@@ -109,7 +114,9 @@ struct RootHomeView: View {
         .onAppear {
             scrollCoordinator.resetToNow()
             chartYAxisResetRevision &+= 1
-            refreshChartRangeFromStoredSettings()
+            if UIDevice.current.userInterfaceIdiom != .pad {
+                refreshChartRangeFromStoredSettings()
+            }
             requestChartState(forceReset: true)
             requestMiniChartState(forceReset: true)
         }
@@ -185,80 +192,57 @@ struct RootHomeView: View {
 
             resetChartsToNow()
         }
+        .fullScreenCover(isPresented: $showsExpandedIPadChart) {
+            expandedIPadChart
+        }
     }
 
+    @ViewBuilder
     private func rootContent() -> some View {
-        VStack(spacing: Layout.sectionSpacing) {
-            RootHomeToolbarView(
-                state: state,
-                actions: actions,
-                beginOriginalGlucosePeek: beginOriginalGlucosePeek,
-                endOriginalGlucosePeek: endOriginalGlucosePeek
-            )
-
-            // Home owns the visible explanation for every active sensor-health episode. Keeping the
-            // banner inside this layout makes it dismissible and removes all reserved space when it
-            // is absent. The user chooses when to open the relevant detail view from here.
-            if let issue = sensorHealthIssueManager.visibleIssue {
-                SensorHealthBannerView(
-                    issue: issue,
-                    action: {
-                        switch issue.destination {
-                        case .sensorManagement:
-                            actions.showSensorManagement()
-                        case .bluetoothPeripheral:
-                            actions.showBluetooth()
-                        }
-                    },
-                    dismiss: sensorHealthIssueManager.dismissVisibleIssue
-                )
-                .transition(.move(edge: .top).combined(with: .opacity))
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            GeometryReader { geometry in
+                Group {
+                    if IPadLayoutClass.resolve(
+                        isPad: true,
+                        width: geometry.size.width,
+                        usesAccessibilityText: dynamicTypeSize.isAccessibilitySize
+                    ) == .compact {
+                        phoneContent()
+                    } else {
+                        ipadContent(size: geometry.size)
+                    }
+                }
+                .onAppear {
+                    applyIPadChartRange(for: geometry.size)
+                }
+                .onChange(of: geometry.size) { newSize in
+                    applyIPadChartRange(for: newSize)
+                }
             }
+        } else {
+            phoneContent()
+        }
+    }
+
+    /// The original iPhone hierarchy remains isolated here so the tablet composition cannot alter
+    /// phone sizing, ordering, or gesture behaviour.
+    private func phoneContent() -> some View {
+        VStack(spacing: Layout.sectionSpacing) {
+            homeHeader
 
             VStack(spacing: Layout.rowSpacing) {
-                HStack(spacing: 0) {
-                    if state.visibility.showsPump {
-                        RootHomePumpView(state: pumpDisplayState)
-                            .frame(maxHeight: .infinity)
-                    }
-
-                    RootHomeGlucoseReadingView(state: glucoseDisplayState, isScreenLocked: state.isScreenLocked, actions: actions)
-                        .frame(maxWidth: .infinity)
-                }
-                .frame(height: Layout.glucoseStatusRowHeight)
+                glucoseStatusRow
 
                 if state.visibility.showsLoop {
                     RootHomeLoopView(state: loopDisplayState, actions: actions)
                 }
 
-                RootHomeMainChartView(
-                    selectedRange: $selectedRange,
-                    chartState: visibleChartState,
-                    isLoading: isLoadingChart,
-                    scrollCoordinator: scrollCoordinator,
-                    yAxisResetRevision: chartYAxisResetRevision,
-                    updateChartStateIfNeeded: requestChartStateIfNeeded,
-                    finishChartScroll: { forceReset, showsLoading in
-                        if forceReset {
-                            chartYAxisResetRevision &+= 1
-                        }
-                        requestChartState(forceReset: forceReset, showsLoading: showsLoading)
-                    }
-                )
+                mainChart
                 .frame(maxHeight: .infinity)
                 .layoutPriority(1)
 
                 if state.visibility.showsMiniChart {
-                    RootHomeMiniChartView(
-                        miniChartHoursToShow: miniChartHoursToShowForChart,
-                        chartState: miniChartState,
-                        scrollCoordinator: scrollCoordinator,
-                        updateChartStateIfNeeded: requestChartStateIfNeeded,
-                        finishChartScroll: {
-                            requestChartState(forceReset: false, showsLoading: false)
-                        },
-                        cycleMiniChartHoursToShow: cycleMiniChartHoursToShow
-                    )
+                    miniChart
                 }
 
                 lowerStatusContent()
@@ -268,6 +252,266 @@ struct RootHomeView: View {
         .padding(.horizontal, Layout.screenHorizontalMargin)
         .frame(maxHeight: .infinity, alignment: .top)
         .animation(.easeOut(duration: 0.22), value: sensorHealthIssueManager.visibleIssue?.id)
+    }
+
+    /// The iPad Home screen is a vertical clinical dashboard in every orientation. Rotation only
+    /// changes section proportions; it never trades chart width for an independent status rail.
+    @ViewBuilder
+    private func ipadContent(size: CGSize) -> some View {
+        if size.width > size.height {
+            ipadLandscapeContent(size: size)
+        } else {
+            ipadPortraitContent(size: size)
+        }
+    }
+
+    /// Landscape prioritizes the live glucose timeline. The mini-chart keeps its own intrinsic
+    /// height and the main chart receives all remaining vertical space.
+    private func ipadLandscapeContent(size: CGSize) -> some View {
+        VStack(spacing: 12) {
+            homeHeader
+
+            ipadGlanceBand(availableWidth: max(size.width - 40, 0))
+
+            VStack(spacing: Layout.bottomRowSpacing) {
+                ipadPreChartStatusContent
+            }
+
+            expandableMainChart
+                .frame(maxHeight: .infinity)
+                .layoutPriority(1)
+
+            if state.visibility.showsMiniChart {
+                miniChart
+            }
+
+            ipadDataSourceContent
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 12)
+        .frame(width: size.width, height: size.height, alignment: .top)
+        .animation(.easeOut(duration: 0.22), value: sensorHealthIssueManager.visibleIssue?.id)
+    }
+
+    private func ipadPortraitContent(size: CGSize) -> some View {
+        VStack(spacing: 16) {
+            homeHeader
+
+            ipadGlanceBand(availableWidth: max(size.width - 40, 0))
+
+            VStack(spacing: Layout.bottomRowSpacing) {
+                ipadPreChartStatusContent
+            }
+
+            expandableMainChart
+                .frame(maxHeight: .infinity)
+                .layoutPriority(1)
+
+            if state.visibility.showsMiniChart {
+                miniChart
+            }
+
+            ipadDataSourceContent
+
+            ipadAGP
+                .frame(height: Layout.ipadPortraitAGPHeight)
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 24)
+        .frame(width: size.width, height: size.height, alignment: .top)
+        .animation(.easeOut(duration: 0.22), value: sensorHealthIssueManager.visibleIssue?.id)
+    }
+
+    private var ipadAGP: some View {
+        IPadHomeAGPView(
+            coreDataManager: coreDataManager,
+            nightscoutSyncManager: nightscoutSyncManager,
+            refreshRevision: state.chartRevision
+        )
+    }
+
+    @ViewBuilder private func ipadGlanceBand(availableWidth: CGFloat) -> some View {
+        if availableWidth < 720 || dynamicTypeSize.isAccessibilitySize {
+            VStack(spacing: 12) {
+                ipadCurrentStatusCard
+
+                if state.visibility.showsStatistics {
+                    ipadStatisticsCard
+                }
+            }
+        } else {
+            HStack(alignment: .top, spacing: 14) {
+                ipadCurrentStatusCard
+                    .frame(width: state.visibility.showsStatistics ? availableWidth * 0.4 : availableWidth)
+
+                if state.visibility.showsStatistics {
+                    ipadStatisticsCard
+                }
+            }
+        }
+    }
+
+    private var ipadCurrentStatusCard: some View {
+        VStack(spacing: 8) {
+            glucoseStatusRow
+
+            if state.visibility.showsLoop {
+                RootHomeLoopView(state: loopDisplayState, actions: actions)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .top)
+        .background(ConstantsAppColors.homePanelBackground)
+        .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
+    }
+
+    private var ipadStatisticsCard: some View {
+        statisticsContent
+            .padding(.horizontal, 10)
+            .padding(.vertical, 30)
+            .frame(maxWidth: .infinity)
+            .background(ConstantsAppColors.homePanelBackground)
+            .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
+    }
+
+    @ViewBuilder private var homeHeader: some View {
+        RootHomeToolbarView(
+            state: state,
+            actions: actions,
+            beginOriginalGlucosePeek: beginOriginalGlucosePeek,
+            endOriginalGlucosePeek: endOriginalGlucosePeek
+        )
+
+        if let issue = sensorHealthIssueManager.visibleIssue {
+            SensorHealthBannerView(
+                issue: issue,
+                action: {
+                    switch issue.destination {
+                    case .sensorManagement:
+                        actions.showSensorManagement()
+                    case .bluetoothPeripheral:
+                        actions.showBluetooth()
+                    }
+                },
+                dismiss: sensorHealthIssueManager.dismissVisibleIssue
+            )
+            .transition(.move(edge: .top).combined(with: .opacity))
+        }
+    }
+
+    private var glucoseStatusRow: some View {
+        HStack(spacing: 0) {
+            if state.visibility.showsPump {
+                RootHomePumpView(state: pumpDisplayState)
+                    .frame(maxHeight: .infinity)
+            }
+
+            RootHomeGlucoseReadingView(
+                state: glucoseDisplayState,
+                isScreenLocked: state.isScreenLocked,
+                actions: actions
+            )
+            .frame(maxWidth: .infinity)
+        }
+        .frame(height: Layout.glucoseStatusRowHeight)
+    }
+
+    private var mainChart: some View {
+        RootHomeMainChartView(
+            selectedRange: $selectedRange,
+            chartState: visibleChartState,
+            isLoading: isLoadingChart,
+            scrollCoordinator: scrollCoordinator,
+            yAxisResetRevision: chartYAxisResetRevision,
+            updateChartStateIfNeeded: requestChartStateIfNeeded,
+            finishChartScroll: { forceReset, showsLoading in
+                if forceReset {
+                    chartYAxisResetRevision &+= 1
+                }
+                requestChartState(forceReset: forceReset, showsLoading: showsLoading)
+            }
+        )
+    }
+
+    private var expandableMainChart: some View {
+        mainChart
+            .overlay(alignment: .topTrailing) {
+                Button {
+                    showsExpandedIPadChart = true
+                } label: {
+                    Image(systemName: "arrow.up.left.and.arrow.down.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .frame(width: 36, height: 36)
+                        .background(.ultraThinMaterial, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(ConstantsAppColors.navigationTint)
+                .padding(8)
+                .accessibilityLabel(Texts_HomeView.expandChart)
+            }
+    }
+
+    private var miniChart: some View {
+        RootHomeMiniChartView(
+            miniChartHoursToShow: miniChartHoursToShowForChart,
+            chartState: miniChartState,
+            scrollCoordinator: scrollCoordinator,
+            updateChartStateIfNeeded: requestChartStateIfNeeded,
+            finishChartScroll: {
+                requestChartState(forceReset: false, showsLoading: false)
+            },
+            cycleMiniChartHoursToShow: cycleMiniChartHoursToShow
+        )
+    }
+
+    private var statisticsContent: some View {
+        RootHomeStatisticsView(
+            state: state.statistics,
+            statisticsDays: state.controls.statisticsDays,
+            statisticsDaysChanged: actions.statisticsDaysChanged,
+            action: actions.cycleStatisticsType
+        )
+    }
+
+    @ViewBuilder private var ipadPreChartStatusContent: some View {
+        if state.visibility.showsClock {
+            RootHomeClockView(text: state.controls.clockText)
+        }
+
+        if state.visibility.showsSensor {
+            RootHomeSensorLifetimeView(state: state.sensor)
+        }
+    }
+
+    @ViewBuilder private var ipadDataSourceContent: some View {
+        if state.visibility.showsDataSource {
+            RootHomeDataSourceView(
+                state: state.dataSource,
+                sensorState: state.sensor,
+                sensorNoiseState: state.sensorNoise,
+                action: actions.hideFollowerUrl
+            )
+        }
+    }
+
+    private var expandedIPadChart: some View {
+        NavigationStack {
+            mainChart
+                .padding(20)
+                .background(ConstantsAppColors.background.ignoresSafeArea())
+                .navigationTitle(Texts_HomeView.showHideGlucoseChartTitle)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button(Texts_Common.dismiss) {
+                            showsExpandedIPadChart = false
+                        }
+                        .tint(ConstantsAppColors.toolbarAction)
+                    }
+                }
+        }
+        .colorScheme(.dark)
     }
 
     @ViewBuilder private func lowerStatusContent() -> some View {
@@ -493,6 +737,15 @@ struct RootHomeView: View {
         if range != selectedRange {
             selectedRange = range
         }
+    }
+
+    private func applyIPadChartRange(for size: CGSize) {
+        guard size.width > 0, size.height > 0 else { return }
+
+        let orientationRange: RootHomeChartRange = size.width > size.height ? .twentyFourHours : .twelveHours
+        guard selectedRange != orientationRange else { return }
+
+        selectedRange = orientationRange
     }
 
     private func refreshCurrentTimeRangeIfNeeded(showsLoading: Bool = true) {

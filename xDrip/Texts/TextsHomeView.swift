@@ -3,6 +3,10 @@ import Foundation
 /// all texts related to calibration
 enum Texts_HomeView {
     static private let filename = "HomeView"
+
+    static let expandChart: String = {
+        return NSLocalizedString("home_expandChart", tableName: filename, bundle: Bundle.main, value: "Expand chart", comment: "accessibility label for the iPad full screen chart button")
+    }()
     
     static let snoozeButton:String = {
         return NSLocalizedString("presnooze", tableName: filename, bundle: Bundle.main, value: "Snooze", comment: "Text in button on home screen")

@@ -17,6 +17,28 @@ private enum RootTabLayout {
     static let contentBottomPadding: CGFloat = 4
 }
 
+/// Window-based layout classes shared by iPad screens. An iPad in Slide Over deliberately receives
+/// the compact composition, and accessibility text avoids dense multi-column arrangements.
+enum IPadLayoutClass: Equatable {
+    case compact
+    case regular
+    case wide
+
+    static func resolve(isPad: Bool, width: CGFloat, usesAccessibilityText: Bool) -> Self {
+        guard isPad, !usesAccessibilityText else { return .compact }
+        if width >= 980 { return .wide }
+        if width >= 650 { return .regular }
+        return .compact
+    }
+}
+
+enum RootOrientationPolicy {
+    static func supportedOrientations(isPad: Bool, isHome: Bool, allowsHomeRotation: Bool) -> UIInterfaceOrientationMask {
+        if isPad { return .all }
+        return isHome && allowsHomeRotation ? .allButUpsideDown : .portrait
+    }
+}
+
 // MARK: - Presentation Requests
 
 /// Simple application alert requested by a manager or delegate callback.
@@ -327,81 +349,8 @@ struct RootTabView: View {
                 ConstantsAppColors.background
                     .ignoresSafeArea()
 
-                TabView(selection: $selectedTab) {
-                    RootHomeTabView(
-                        applicationCoordinator: applicationCoordinator,
-                        dependencies: stateModel.dependencies,
-                        snoozeDismissalRequest: stateModel.snoozeDismissalRequest,
-                        isLandscape: isLandscape,
-                        showBluetooth: {
-                            bluetoothDetailNavigationRequest += 1
-                            selectedTab = .bluetooth
-                        }
-                    )
-                    .tag(Tab.home)
-                    .tabItem {
-                        tabLabel(title: tabTitles.home, systemImage: "drop.fill")
-                    }
-
-                    tabContent { dependencies in
-                        NavigationStack {
-                            TreatmentsView(coreDataManager: dependencies.coreDataManager)
-                        }
-                        .tint(ConstantsAppColors.navigationTint)
-                    }
-                    .tag(Tab.treatments)
-                    .tabItem {
-                        tabLabel(title: tabTitles.treatments, systemImage: "list.clipboard.fill")
-                    }
-
-                    Group {
-                        if let dependencies = stateModel.dependencies {
-                            RootStatisticsTabView(dependencies: dependencies)
-                        } else {
-                            ZStack {
-                                ConstantsAppColors.background
-                                    .ignoresSafeArea()
-
-                                ProgressView()
-                            }
-                        }
-                    }
-                    .tag(Tab.statistics)
-                    .tabItem {
-                        tabLabel(title: tabTitles.statistics, systemImage: "chart.bar.xaxis")
-                    }
-
-                    tabContent { dependencies in
-                        BluetoothPeripheralsNavigationView(
-                            coreDataManager: dependencies.coreDataManager,
-                            bluetoothPeripheralManager: dependencies.bluetoothPeripheralManager,
-                            sensorProvider: stateModel.sensorProvider,
-                            sensorHealthDetailRequest: bluetoothDetailNavigationRequest
-                        )
-                    }
-                    .tag(Tab.bluetooth)
-                    .tabItem {
-                        tabLabel(
-                            title: tabTitles.devices,
-                            systemImage: "antenna.radiowaves.left.and.right"
-                        )
-                    }
-
-                    tabContent { dependencies in
-                        SettingsNavigationView(
-                            coreDataManager: dependencies.coreDataManager,
-                            soundPlayer: dependencies.soundPlayer,
-                            selectedFollowerActions: dependencies.selectedFollowerActions,
-                            incomingBackupRequest: stateModel.incomingBackupRequest,
-                            consumeIncomingBackup: stateModel.consumeIncomingBackup
-                        )
-                    }
-                    .tag(Tab.settings)
-                    .tabItem {
-                        tabLabel(title: tabTitles.settings, systemImage: "gearshape.fill")
-                    }
-                }
-                .tint(ConstantsAppColors.selectedTab)
+                adaptiveTabView(isLandscape: isLandscape)
+                    .tint(ConstantsAppColors.selectedTab)
 
                 if let dependencies = stateModel.dependencies {
                     RootScreenLockOverlay(
@@ -491,6 +440,94 @@ struct RootTabView: View {
         }
     }
 
+    /// Uses the modern iPad top-tab presentation, which can expand into a sidebar. The existing
+    /// iPhone tab bar remains byte-for-byte the same view hierarchy on every supported iOS release.
+    @ViewBuilder private func adaptiveTabView(isLandscape: Bool) -> some View {
+        if #available(iOS 18.0, *), UIDevice.current.userInterfaceIdiom == .pad {
+            tabs(isLandscape: isLandscape)
+                .tabViewStyle(.sidebarAdaptable)
+        } else {
+            tabs(isLandscape: isLandscape)
+        }
+    }
+
+    private func tabs(isLandscape: Bool) -> some View {
+        TabView(selection: $selectedTab) {
+                    RootHomeTabView(
+                        applicationCoordinator: applicationCoordinator,
+                        dependencies: stateModel.dependencies,
+                        snoozeDismissalRequest: stateModel.snoozeDismissalRequest,
+                        isLandscape: isLandscape,
+                        showBluetooth: {
+                            bluetoothDetailNavigationRequest += 1
+                            selectedTab = .bluetooth
+                        }
+                    )
+                    .tag(Tab.home)
+                    .tabItem {
+                        tabLabel(title: tabTitles.home, systemImage: "drop.fill")
+                    }
+
+                    tabContent { dependencies in
+                        NavigationStack {
+                            TreatmentsView(coreDataManager: dependencies.coreDataManager)
+                        }
+                        .tint(ConstantsAppColors.navigationTint)
+                    }
+                    .tag(Tab.treatments)
+                    .tabItem {
+                        tabLabel(title: tabTitles.treatments, systemImage: "list.clipboard.fill")
+                    }
+
+                    Group {
+                        if let dependencies = stateModel.dependencies {
+                            RootStatisticsTabView(dependencies: dependencies)
+                        } else {
+                            ZStack {
+                                ConstantsAppColors.background
+                                    .ignoresSafeArea()
+
+                                ProgressView()
+                            }
+                        }
+                    }
+                    .tag(Tab.statistics)
+                    .tabItem {
+                        tabLabel(title: tabTitles.statistics, systemImage: "chart.bar.xaxis")
+                    }
+
+                    tabContent { dependencies in
+                        BluetoothPeripheralsNavigationView(
+                            coreDataManager: dependencies.coreDataManager,
+                            bluetoothPeripheralManager: dependencies.bluetoothPeripheralManager,
+                            sensorProvider: stateModel.sensorProvider,
+                            sensorHealthDetailRequest: bluetoothDetailNavigationRequest
+                        )
+                    }
+                    .tag(Tab.bluetooth)
+                    .tabItem {
+                        tabLabel(
+                            title: tabTitles.devices,
+                            systemImage: "antenna.radiowaves.left.and.right"
+                        )
+                    }
+
+                    tabContent { dependencies in
+                        SettingsNavigationView(
+                            coreDataManager: dependencies.coreDataManager,
+                            soundPlayer: dependencies.soundPlayer,
+                            selectedFollowerActions: dependencies.selectedFollowerActions,
+                            incomingBackupRequest: stateModel.incomingBackupRequest,
+                            consumeIncomingBackup: stateModel.consumeIncomingBackup
+                        )
+                    }
+                    .tag(Tab.settings)
+                    .tabItem {
+                        tabLabel(title: tabTitles.settings, systemImage: "gearshape.fill")
+                    }
+        }
+    }
+
     // MARK: - Tab Content
 
     /// Builds the image and localized title used by the native tab bar.
@@ -520,11 +557,11 @@ struct RootTabView: View {
     private func updateSupportedOrientations(for tab: Tab) {
         let supportedOrientations: UIInterfaceOrientationMask
 
-        if tab == .home && UserDefaults.standard.allowScreenRotation {
-            supportedOrientations = .allButUpsideDown
-        } else {
-            supportedOrientations = .portrait
-        }
+        supportedOrientations = RootOrientationPolicy.supportedOrientations(
+            isPad: UIDevice.current.userInterfaceIdiom == .pad,
+            isHome: tab == .home,
+            allowsHomeRotation: UserDefaults.standard.allowScreenRotation
+        )
 
         AppDelegate.supportedOrientations = supportedOrientations
 
@@ -538,7 +575,9 @@ struct RootTabView: View {
 
         rootController.setNeedsUpdateOfSupportedInterfaceOrientations()
 
-        if tab != .home && windowScene.interfaceOrientation.isLandscape {
+        if UIDevice.current.userInterfaceIdiom != .pad,
+           tab != .home,
+           windowScene.interfaceOrientation.isLandscape {
             windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
         }
     }
@@ -592,7 +631,7 @@ private struct RootHomeTabView: View {
     var body: some View {
         ZStack {
             if let dependencies {
-                if isLandscape {
+                if isLandscape && UIDevice.current.userInterfaceIdiom != .pad {
                     RootHomeLandscapeView(
                         dependencies: dependencies,
                         showSensorManagement: { presentedView = .sensorManagement },
@@ -612,9 +651,9 @@ private struct RootHomeTabView: View {
         }
         .padding(
             .bottom,
-            isLandscape ? 0 : RootTabLayout.contentBottomPadding
+            isLandscape && UIDevice.current.userInterfaceIdiom != .pad ? 0 : RootTabLayout.contentBottomPadding
         )
-        .toolbar(isLandscape ? .hidden : .automatic, for: .tabBar)
+        .toolbar(isLandscape && UIDevice.current.userInterfaceIdiom != .pad ? .hidden : .automatic, for: .tabBar)
         .onAppear {
             applicationCoordinator.homeDidBecomeVisible()
             updatePresentedViewOrientationLock()
@@ -680,10 +719,12 @@ private struct RootHomeTabView: View {
             switch presentedView {
             case .snooze:
                 SnoozeView(viewModel: SnoozeViewModel(alertManager: dependencies.alertManager))
+                    .ipadSheetMinimumSize(width: 560, height: 620)
             case .bgReadings:
                 BgReadingsView()
                     .environmentObject(dependencies.bgReadingsAccessor)
                     .environmentObject(dependencies.nightscoutSyncManager)
+                    .ipadSheetMinimumSize(width: 720, height: 720)
             case .sensorManagement, .sensorCalibration:
                 SensorManagementView(
                     activeSensorProvider: dependencies.activeSensorProvider,
@@ -696,19 +737,24 @@ private struct RootHomeTabView: View {
                     onSubmitCalibration: dependencies.submitCalibration,
                     initiallyShowsCalibration: presentedView == .sensorCalibration
                 )
+                .ipadSheetMinimumSize(width: 680, height: 720)
             case .bgAdjustments:
                 BgAdjustmentsView(
                     bgReadingsAccessor: dependencies.bgReadingsAccessor,
                     treatmentEntryAccessor: dependencies.treatmentEntryAccessor,
                     bgPostProcessingManager: dependencies.bgPostProcessingManager
                 )
+                .ipadSheetMinimumSize(width: 720, height: 740)
             case .showHideItems:
                 ShowHideItemsView()
+                    .ipadSheetMinimumSize(width: 680, height: 680)
             case .aidStatus:
                 AIDStatusView()
                     .environmentObject(dependencies.nightscoutSyncManager)
+                    .ipadSheetMinimumSize(width: 720, height: 720)
             case .careLinkPumpStatus:
                 CareLinkPumpStatusView()
+                    .ipadSheetMinimumSize(width: 720, height: 720)
             }
         }
     }
@@ -725,11 +771,11 @@ private struct RootHomeTabView: View {
     private func updatePresentedViewOrientationLock() {
         let supportedOrientations: UIInterfaceOrientationMask
 
-        if presentedView == nil && UserDefaults.standard.allowScreenRotation {
-            supportedOrientations = .allButUpsideDown
-        } else {
-            supportedOrientations = .portrait
-        }
+        supportedOrientations = RootOrientationPolicy.supportedOrientations(
+            isPad: UIDevice.current.userInterfaceIdiom == .pad,
+            isHome: presentedView == nil,
+            allowsHomeRotation: UserDefaults.standard.allowScreenRotation
+        )
 
         AppDelegate.supportedOrientations = supportedOrientations
 
@@ -743,7 +789,7 @@ private struct RootHomeTabView: View {
 
         rootController.setNeedsUpdateOfSupportedInterfaceOrientations()
 
-        if presentedView != nil {
+        if UIDevice.current.userInterfaceIdiom != .pad && presentedView != nil {
             windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
         }
     }
@@ -865,4 +911,36 @@ struct RootTabTitles {
     let statistics: String
     let devices: String
     let settings: String
+}
+
+extension View {
+    /// Keeps form and list content readable on a wide iPad while leaving the original iPhone view
+    /// completely unmodified. The outer frame still fills the detail area so backgrounds remain
+    /// continuous and split-view toolbars align with the window.
+    @ViewBuilder func ipadReadableContentWidth(_ maxWidth: CGFloat = 780) -> some View {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            frame(maxWidth: maxWidth)
+                .frame(maxWidth: .infinity)
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder func ipadSheetMinimumSize(width: CGFloat, height: CGFloat) -> some View {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            frame(minWidth: width, minHeight: height)
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder func ipadLargeSheet(width: CGFloat, height: CGFloat) -> some View {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            frame(minWidth: width, minHeight: height)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        } else {
+            self
+        }
+    }
 }

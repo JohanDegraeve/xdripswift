@@ -11,6 +11,28 @@ import XCTest
 
 final class RootHomeInteractionTests: XCTestCase {
 
+    func testIPadLayoutClassRespondsToWindowWidth() {
+        XCTAssertEqual(IPadLayoutClass.resolve(isPad: false, width: 1_366, usesAccessibilityText: false), .compact)
+        XCTAssertEqual(IPadLayoutClass.resolve(isPad: true, width: 500, usesAccessibilityText: false), .compact)
+        XCTAssertEqual(IPadLayoutClass.resolve(isPad: true, width: 744, usesAccessibilityText: false), .regular)
+        XCTAssertEqual(IPadLayoutClass.resolve(isPad: true, width: 1_024, usesAccessibilityText: false), .wide)
+    }
+
+    func testIPadLayoutClassUsesCompactCompositionForAccessibilityText() {
+        XCTAssertEqual(IPadLayoutClass.resolve(isPad: true, width: 1_366, usesAccessibilityText: true), .compact)
+    }
+
+    func testIPadOrientationPolicyAllowsAllTabsToRotate() {
+        XCTAssertEqual(
+            RootOrientationPolicy.supportedOrientations(isPad: true, isHome: false, allowsHomeRotation: false),
+            .all
+        )
+        XCTAssertEqual(
+            RootOrientationPolicy.supportedOrientations(isPad: false, isHome: false, allowsHomeRotation: true),
+            .portrait
+        )
+    }
+
     func testChartRangesStepShorterWithoutWrapping() {
         XCTAssertNil(RootHomeChartRange.threeHours.nextShorterRange)
         XCTAssertEqual(RootHomeChartRange.fiveHours.nextShorterRange, .threeHours)

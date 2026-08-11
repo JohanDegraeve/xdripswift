@@ -373,27 +373,70 @@ struct LandscapeChartView: View {
                 .foregroundStyle(ConstantsAppColors.secondaryText)
                 .font(.body)
 
-            Picker(
-                "",
-                selection: Binding(
-                    get: { stateModel.comparisonPeriod },
-                    set: { stateModel.selectComparisonPeriod($0) }
-                )
-            ) {
+            Menu {
                 ForEach(LandscapeComparisonPeriod.allCases) { period in
-                    Text(period.title)
-                        .tag(period)
+                    Button {
+                        stateModel.selectComparisonPeriod(period)
+                    } label: {
+                        if stateModel.comparisonPeriod == period {
+                            Label(period.title, systemImage: "checkmark")
+                        } else {
+                            Text(period.title)
+                        }
+                    }
                 }
+            } label: {
+                HStack(spacing: 2) {
+                    Text(stateModel.comparisonPeriod.title)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption.weight(.semibold))
+                }
+                .foregroundStyle(ConstantsAppColors.secondaryText)
             }
-            .labelsHidden()
-            .pickerStyle(.menu)
-            .tint(ConstantsAppColors.secondaryText)
+            .buttonStyle(.plain)
 
         }
         .lineLimit(1)
         .minimumScaleFactor(0.8)
     }
 
+}
+
+/// Full-width AGP insight card used at the end of the iPad Home dashboard. It shares the same
+/// state model and chart renderer as the dedicated landscape view, without its Loopalyzer column.
+struct IPadHomeAGPView: View {
+    @StateObject private var stateModel: LandscapeChartStateModel
+    let refreshRevision: Int
+
+    init(
+        coreDataManager: CoreDataManager,
+        nightscoutSyncManager: NightscoutSyncManager,
+        refreshRevision: Int
+    ) {
+        _stateModel = StateObject(wrappedValue: LandscapeChartStateModel(
+            coreDataManager: coreDataManager,
+            nightscoutSyncManager: nightscoutSyncManager
+        ))
+        self.refreshRevision = refreshRevision
+    }
+
+    var body: some View {
+        LandscapeAGPComparisonChart(
+            chartState: stateModel.chartState,
+            baseline: stateModel.baseline,
+            displayedDate: stateModel.displayedDate,
+            canMoveForward: stateModel.canMoveForward,
+            moveBackOneDay: stateModel.moveBackOneDay,
+            moveForwardOneDay: stateModel.moveForwardOneDay,
+            selectToday: stateModel.selectToday
+        )
+        .padding(8)
+        .background(ConstantsAppColors.homePanelBackground)
+        .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius + 8, style: .continuous))
+        .onChange(of: refreshRevision) { _ in
+            stateModel.refresh()
+        }
+    }
 }
 
 private struct LandscapeLoopalyzerCharts: View {
@@ -664,15 +707,27 @@ private struct LandscapeTIRBadge: View {
             HStack(spacing: 0) {
                 tirBar
 
-                Picker("", selection: $rangeMode) {
+                Menu {
                     ForEach(RangeMode.allCases, id: \.self) { mode in
-                        Text(mode.title)
-                            .tag(mode)
+                        Button {
+                            rangeMode = mode
+                        } label: {
+                            if rangeMode == mode {
+                                Label(mode.title, systemImage: "checkmark")
+                            } else {
+                                Text(mode.title)
+                            }
+                        }
                     }
+                } label: {
+                    HStack(spacing: 2) {
+                        Text(rangeMode.title)
+                        Image(systemName: "chevron.up.chevron.down")
+                            .font(.caption.weight(.semibold))
+                    }
+                    .foregroundStyle(ConstantsAppColors.primaryText)
                 }
-                .labelsHidden()
-                .pickerStyle(.menu)
-                .tint(ConstantsAppColors.primaryText)
+                .buttonStyle(.plain)
             }
             .fixedSize(horizontal: true, vertical: false)
         }
