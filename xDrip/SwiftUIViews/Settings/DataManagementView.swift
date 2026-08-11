@@ -391,12 +391,18 @@ struct DataManagementView: View {
 
     private var restoreOptionsSection: some View {
         Section(Texts_SettingsView.backupRestoreOptions) {
-            Picker(Texts_SettingsView.backupDataHandling, selection: $viewModel.mergeMode) {
-                Text(Texts_SettingsView.backupKeepCurrentData).tag(BackupMergeMode.keepCurrent)
-                Text(Texts_SettingsView.backupFillGaps).tag(BackupMergeMode.fillGaps)
-                Text(Texts_SettingsView.backupReplaceRange).tag(BackupMergeMode.replaceRange)
-                Text(Texts_SettingsView.backupIgnoreData).tag(BackupMergeMode.ignore)
+            Menu {
+                mergeModeOption(Texts_SettingsView.backupKeepCurrentData, mode: .keepCurrent)
+                mergeModeOption(Texts_SettingsView.backupFillGaps, mode: .fillGaps)
+                mergeModeOption(Texts_SettingsView.backupReplaceRange, mode: .replaceRange)
+                mergeModeOption(Texts_SettingsView.backupIgnoreData, mode: .ignore)
+            } label: {
+                conventionalMenuLabel(
+                    title: Texts_SettingsView.backupDataHandling,
+                    value: mergeModeTitle(viewModel.mergeMode)
+                )
             }
+            .buttonStyle(.plain)
             Toggle(Texts_SettingsView.backupRestoreSettingsAndAlerts, isOn: $viewModel.restoresSettings)
                 .tint(.green)
                 .disabled(viewModel.inspection?.payload.manifest.includesSettings != true)
@@ -428,6 +434,41 @@ struct DataManagementView: View {
             .tint(Self.successColor)
             .disabled(!viewModel.canRestore)
         }
+    }
+
+    @ViewBuilder private func mergeModeOption(_ title: String, mode: BackupMergeMode) -> some View {
+        Button {
+            viewModel.mergeMode = mode
+        } label: {
+            if viewModel.mergeMode == mode {
+                Label(title, systemImage: "checkmark")
+            } else {
+                Text(title)
+            }
+        }
+    }
+
+    private func mergeModeTitle(_ mode: BackupMergeMode) -> String {
+        switch mode {
+        case .keepCurrent: Texts_SettingsView.backupKeepCurrentData
+        case .fillGaps: Texts_SettingsView.backupFillGaps
+        case .replaceRange: Texts_SettingsView.backupReplaceRange
+        case .ignore: Texts_SettingsView.backupIgnoreData
+        }
+    }
+
+    private func conventionalMenuLabel(title: String, value: String) -> some View {
+        HStack(spacing: 8) {
+            Text(title)
+                .foregroundStyle(ConstantsAppColors.rowTitleText)
+            Spacer(minLength: 8)
+            Text(value)
+                .foregroundStyle(ConstantsAppColors.rowDetailText)
+            Image(systemName: "chevron.up.chevron.down")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ConstantsAppColors.rowDetailText)
+        }
+        .contentShape(Rectangle())
     }
 
     private func accountCategoryBinding(for category: BackupAccountCategory) -> Binding<Bool> {

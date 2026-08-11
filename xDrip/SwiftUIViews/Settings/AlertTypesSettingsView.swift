@@ -461,20 +461,32 @@ struct AlertTypeEditorView: View {
             .tint(.green)
 
         case .defaultSnoozePeriod:
-            Picker(
-                viewModel.title(for: setting),
-                selection: Binding(
-                    get: { viewModel.snoozePeriodPickerIndex },
-                    set: { viewModel.snoozePeriodPickerIndex = $0 }
-                )
-            ) {
+            Menu {
                 ForEach(ConstantsAlerts.snoozeValueStrings.indices, id: \.self) { index in
-                    Text(ConstantsAlerts.snoozeValueStrings[index])
-                        .tag(index)
+                    Button {
+                        viewModel.snoozePeriodPickerIndex = index
+                    } label: {
+                        if viewModel.snoozePeriodPickerIndex == index {
+                            Label(ConstantsAlerts.snoozeValueStrings[index], systemImage: "checkmark")
+                        } else {
+                            Text(ConstantsAlerts.snoozeValueStrings[index])
+                        }
+                    }
                 }
+            } label: {
+                HStack(spacing: 8) {
+                    Text(viewModel.title(for: setting))
+                        .foregroundStyle(ConstantsAppColors.rowTitleText)
+                    Spacer(minLength: 8)
+                    Text(ConstantsAlerts.snoozeValueStrings[viewModel.snoozePeriodPickerIndex])
+                        .foregroundStyle(ConstantsAppColors.rowDetailText)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(ConstantsAppColors.rowDetailText)
+                }
+                .contentShape(Rectangle())
             }
-            .pickerStyle(.menu)
-            .tint(Color(.colorTertiary))
+            .buttonStyle(.plain)
 
         case .name, .soundName:
             SettingsStaticRowView(

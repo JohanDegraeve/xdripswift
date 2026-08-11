@@ -139,13 +139,25 @@ struct NightscoutImportView: View {
 
     private var periodSection: some View {
         Section {
-            Picker(Texts_SettingsView.nightscoutImportPeriod, selection: $viewModel.period) {
+            Menu {
                 ForEach(viewModel.availablePeriods) { period in
-                    Text(period.title).tag(period)
+                    Button {
+                        viewModel.period = period
+                    } label: {
+                        if viewModel.period == period {
+                            Label(period.title, systemImage: "checkmark")
+                        } else {
+                            Text(period.title)
+                        }
+                    }
                 }
+            } label: {
+                conventionalMenuLabel(
+                    title: Texts_SettingsView.nightscoutImportPeriod,
+                    value: viewModel.period.title
+                )
             }
-            .pickerStyle(.menu)
-            .tint(Color(.colorTertiary))
+            .buttonStyle(.plain)
             LabeledContent(Texts_SettingsView.cleanDataFrom, value: viewModel.proposedFromDate.formatted(date: .abbreviated, time: .shortened))
             LabeledContent(Texts_SettingsView.cleanDataUntil, value: Date().formatted(date: .abbreviated, time: .shortened))
         } header: {
@@ -153,6 +165,20 @@ struct NightscoutImportView: View {
         } footer: {
             Text(Texts_SettingsView.nightscoutImportExistingDataFooter)
         }
+    }
+
+    private func conventionalMenuLabel(title: String, value: String) -> some View {
+        HStack(spacing: 8) {
+            Text(title)
+                .foregroundStyle(ConstantsAppColors.rowTitleText)
+            Spacer(minLength: 8)
+            Text(value)
+                .foregroundStyle(ConstantsAppColors.rowDetailText)
+            Image(systemName: "chevron.up.chevron.down")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ConstantsAppColors.rowDetailText)
+        }
+        .contentShape(Rectangle())
     }
 
     /// Keeps the primary action visually independent from the grouped settings sections above it.

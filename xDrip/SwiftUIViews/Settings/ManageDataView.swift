@@ -213,13 +213,26 @@ struct DataRetentionView: View {
                         viewModel.automaticHousekeepingEnabledChanged()
                     }
 
-                Picker(Texts_SettingsView.cleanDataKeepHistoricalData, selection: $viewModel.automaticRetentionDays) {
+                Menu {
                     ForEach(viewModel.availableAutomaticRetentionDays, id: \.self) { days in
-                        Text(Texts_SettingsView.cleanDataDays(days)).tag(days)
+                        Button {
+                            viewModel.automaticRetentionDays = days
+                        } label: {
+                            if viewModel.automaticRetentionDays == days {
+                                Label(Texts_SettingsView.cleanDataDays(days), systemImage: "checkmark")
+                            } else {
+                                Text(Texts_SettingsView.cleanDataDays(days))
+                            }
+                        }
                     }
+                } label: {
+                    conventionalMenuLabel(
+                        title: Texts_SettingsView.cleanDataKeepHistoricalData,
+                        value: Texts_SettingsView.cleanDataDays(viewModel.automaticRetentionDays),
+                        isEnabled: viewModel.automaticHousekeepingEnabled
+                    )
                 }
-                .pickerStyle(.menu)
-                .tint(Color(.colorTertiary))
+                .buttonStyle(.plain)
                 .disabled(!viewModel.automaticHousekeepingEnabled)
                 .onChange(of: viewModel.automaticRetentionDays) { _ in
                     viewModel.automaticRetentionDaysChanged()
@@ -249,6 +262,23 @@ struct DataRetentionView: View {
         }
         .tint(ConstantsAppColors.navigationTint)
         .onAppear(perform: viewModel.refresh)
+    }
+
+    private func conventionalMenuLabel(title: String, value: String, isEnabled: Bool = true) -> some View {
+        let titleColor = isEnabled ? ConstantsAppColors.rowTitleText : ConstantsAppColors.disabledText
+        let detailColor = isEnabled ? ConstantsAppColors.rowDetailText : ConstantsAppColors.disabledText
+
+        return HStack(spacing: 8) {
+            Text(title)
+                .foregroundStyle(titleColor)
+            Spacer(minLength: 8)
+            Text(value)
+                .foregroundStyle(detailColor)
+            Image(systemName: "chevron.up.chevron.down")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(detailColor)
+        }
+        .contentShape(Rectangle())
     }
 }
 

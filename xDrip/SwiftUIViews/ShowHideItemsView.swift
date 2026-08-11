@@ -84,7 +84,9 @@ struct ShowHideItemsView: View {
                             }
                     }
                 }
+                .tint(ConstantsAppColors.normal)
             }
+            .ipadReadableContentWidth(760)
             .navigationTitle(Texts_HomeView.showHideItemsTitle)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -110,9 +112,10 @@ struct ShowHideItemsView: View {
         // wrap the HStack in an AnyView so that it can be returned back to the caller
         let rowView = AnyView(HStack {
             Text(title)
+                .foregroundStyle(ConstantsAppColors.rowTitleText)
             Spacer()
             Text(data)
-                .foregroundStyle(Color(.colorSecondary))
+                .foregroundStyle(ConstantsAppColors.rowDetailText)
         })
         
         return rowView

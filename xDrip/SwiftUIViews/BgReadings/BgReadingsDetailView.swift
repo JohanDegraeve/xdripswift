@@ -91,6 +91,7 @@ struct BgReadingsDetailView: View {
         // wrap the HStack in an AnyView so that it can be returned back to the caller
         let rowView = AnyView(HStack {
             Text(title)
+                .foregroundStyle(ConstantsAppColors.rowTitleText)
             
             Spacer()
 
@@ -101,7 +102,7 @@ struct BgReadingsDetailView: View {
             }
             
             Text(data)
-                .foregroundColor(.secondary)
+                .foregroundStyle(ConstantsAppColors.rowDetailText)
         })
         
         return rowView

@@ -96,6 +96,7 @@ struct BgAdjustmentsView: View {
                     }
                 }
             }
+            .ipadReadableContentWidth(980)
             .navigationTitle(Texts_HomeView.postProcessingTitle)
             .toolbarBackground(ConstantsAppColors.groupedBackground, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -204,6 +205,7 @@ struct BgAdjustmentsView: View {
         Section(header: Text(Texts_HomeView.postProcessingAdjustment), footer: adjustmentSectionFooter()) {
             VStack(alignment: .leading, spacing: 4) {
                 Toggle(Texts_HomeView.postProcessingEnable, isOn: $enableAdjustment)
+                    .tint(ConstantsAppColors.normal)
                     .disabled(!shouldAllowAdjustmentForCurrentSource())
 
                 if effectiveEnableAdjustment(), let previewBgCheckHintText = previewBgCheckHintText() {
@@ -315,6 +317,7 @@ struct BgAdjustmentsView: View {
     private func smoothingSection() -> some View {
         Section(header: Text(Texts_HomeView.postProcessingSmoothing)) {
             Toggle(Texts_HomeView.postProcessingEnable, isOn: $enableSmoothing)
+                .tint(ConstantsAppColors.normal)
 
             if enableSmoothing {
                 Picker(Texts_HomeView.postProcessingStrength, selection: $smoothingStrength) {
@@ -325,12 +328,32 @@ struct BgAdjustmentsView: View {
                 .pickerStyle(.segmented)
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Picker(Texts_HomeView.postProcessingAlgorithm, selection: $smoothingAlgorithm) {
+                    Menu {
                         ForEach(BgSmoothingAlgorithm.allCases, id: \.self) { smoothingAlgorithm in
-                            Text(smoothingAlgorithm.description)
-                                .tag(smoothingAlgorithm)
+                            Button {
+                                self.smoothingAlgorithm = smoothingAlgorithm
+                            } label: {
+                                if self.smoothingAlgorithm == smoothingAlgorithm {
+                                    Label(smoothingAlgorithm.description, systemImage: "checkmark")
+                                } else {
+                                    Text(smoothingAlgorithm.description)
+                                }
+                            }
                         }
+                    } label: {
+                        HStack(spacing: 8) {
+                            Text(Texts_HomeView.postProcessingAlgorithm)
+                                .foregroundStyle(ConstantsAppColors.rowTitleText)
+                            Spacer(minLength: 8)
+                            Text(smoothingAlgorithm.description)
+                                .foregroundStyle(ConstantsAppColors.rowDetailText)
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(ConstantsAppColors.rowDetailText)
+                        }
+                        .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
 
                     Text(smoothingAlgorithm.footerDescription)
                         .font(.footnote)
@@ -345,6 +368,7 @@ struct BgAdjustmentsView: View {
         if sourceCanUseFiveMinuteReadings() {
             Section(header: Text(Texts_HomeView.postProcessingReadingFrequency)) {
                 Toggle(Texts_HomeView.postProcessingFiveMinuteReadings, isOn: $useFiveMinuteReadings)
+                    .tint(ConstantsAppColors.normal)
             }
         }
     }

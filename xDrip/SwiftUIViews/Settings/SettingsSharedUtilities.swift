@@ -865,37 +865,41 @@ private struct SettingsNativeRowView: View {
             .disabled(!row.isEnabled)
 
         case let .some(.menu(options, selectOption)):
-            Picker(
-                selection: Binding(
-                    get: {
-                        options().firstIndex(where: \.isSelected) ?? 0
-                    },
-                    set: { selectedIndex in
-                        let menuOptions = options()
-                        guard menuOptions.indices.contains(selectedIndex), !menuOptions[selectedIndex].isSelected else { return }
+            Menu {
+                ForEach(Array(options().enumerated()), id: \.offset) { index, option in
+                    Button {
+                        guard !option.isSelected else { return }
                         if let selectOption {
-                            selectOption(selectedIndex)
+                            selectOption(index)
                             reload(row.reloadScope ?? .section(sectionID))
                         } else {
                             selectRow()
                         }
+                    } label: {
+                        if option.isSelected {
+                            Label(option.title, systemImage: "checkmark")
+                        } else {
+                            Text(option.title)
+                        }
                     }
-                ),
-                content: {
-                    ForEach(Array(options().enumerated()), id: \.offset) { index, option in
-                        Text(option.title)
-                            .tag(index)
-                    }
-                },
-                label: {
+                }
+            } label: {
+                HStack(spacing: 8) {
                     Text(row.title)
-                        .foregroundStyle(row.titleColor ?? (row.isEnabled ? Color(.colorPrimary) : .gray))
+                        .foregroundStyle(row.titleColor ?? (row.isEnabled ? ConstantsAppColors.rowTitleText : ConstantsAppColors.disabledText))
                         .lineLimit(2)
                         .minimumScaleFactor(0.75)
+                    Spacer(minLength: 8)
+                    Text(selectedMenuTitle(options()))
+                        .foregroundStyle(row.isEnabled ? (row.detailColor ?? ConstantsAppColors.rowDetailText) : ConstantsAppColors.disabledText)
+                        .lineLimit(1)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(row.isEnabled ? (row.detailColor ?? ConstantsAppColors.rowDetailText) : ConstantsAppColors.disabledText)
                 }
-            )
-            .pickerStyle(.menu)
-            .tint(row.isEnabled ? (row.detailColor ?? Color(.colorTertiary)) : .gray)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
             .disabled(!row.isEnabled)
 
         case let .some(.menuWithSelectionTitle(options, selectionTitle, selectOption)):
@@ -922,17 +926,17 @@ private struct SettingsNativeRowView: View {
             } label: {
                 HStack(spacing: 8) {
                     Text(row.title)
-                        .foregroundStyle(row.titleColor ?? (row.isEnabled ? Color(.colorPrimary) : .gray))
+                        .foregroundStyle(row.titleColor ?? (row.isEnabled ? ConstantsAppColors.rowTitleText : ConstantsAppColors.disabledText))
                         .lineLimit(row.keepsControlLabelOnSingleLine ? 1 : 2)
                         .minimumScaleFactor(0.75)
                         .allowsTightening(row.keepsControlLabelOnSingleLine)
                     Spacer(minLength: 8)
                     Text(selectionTitle())
-                        .foregroundStyle(row.isEnabled ? (row.detailColor ?? Color(.colorTertiary)) : .gray)
+                        .foregroundStyle(row.isEnabled ? (row.detailColor ?? ConstantsAppColors.rowDetailText) : ConstantsAppColors.disabledText)
                         .lineLimit(1)
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(row.isEnabled ? (row.detailColor ?? Color(.colorTertiary)) : .gray)
+                        .foregroundStyle(row.isEnabled ? (row.detailColor ?? ConstantsAppColors.rowDetailText) : ConstantsAppColors.disabledText)
                 }
                 .contentShape(Rectangle())
             }
@@ -969,6 +973,10 @@ private struct SettingsNativeRowView: View {
             indicator: row.indicator,
             detailIndicator: row.detailIndicator
         )
+    }
+
+    private func selectedMenuTitle(_ options: [SettingsMenuOption]) -> String {
+        options.first(where: \.isSelected)?.title ?? options.first?.title ?? ""
     }
 
     private var showsDisclosure: Bool {
@@ -1197,7 +1205,7 @@ struct SettingsRowTextView: View {
     var body: some View {
         if centerTitle {
             Text(title)
-                .foregroundStyle(titleColor ?? (isEnabled ? Color(.colorPrimary) : .gray))
+                .foregroundStyle(titleColor ?? (isEnabled ? ConstantsAppColors.rowTitleText : ConstantsAppColors.disabledText))
                 .lineLimit(2)
                 .minimumScaleFactor(0.75)
                 .multilineTextAlignment(.center)
@@ -1217,7 +1225,7 @@ struct SettingsRowTextView: View {
                     }
 
                     Text(title)
-                        .foregroundStyle(titleColor ?? (isEnabled ? Color(.colorPrimary) : .gray))
+                        .foregroundStyle(titleColor ?? (isEnabled ? ConstantsAppColors.rowTitleText : ConstantsAppColors.disabledText))
                         .lineLimit(2)
                         .minimumScaleFactor(0.75)
                         .frame(alignment: .leading)
@@ -1236,7 +1244,7 @@ struct SettingsRowTextView: View {
                         }
 
                         Text(detail)
-                            .foregroundStyle(isEnabled ? (detailColor ?? Color(.colorTertiary)) : .gray)
+                            .foregroundStyle(isEnabled ? (detailColor ?? ConstantsAppColors.rowDetailText) : ConstantsAppColors.disabledText)
                             .lineLimit(1)
                             .truncationMode(.tail)
                             .multilineTextAlignment(.trailing)
@@ -1460,7 +1468,7 @@ struct SettingsTextEntryView: View {
 
                         if let unitText = textEntry.unitText {
                             Text(unitText)
-                                .foregroundStyle(Color(.colorTertiary))
+                                .foregroundStyle(ConstantsAppColors.rowDetailText)
                         }
                     }
                 }

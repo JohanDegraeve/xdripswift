@@ -20,6 +20,13 @@ enum ConstantsAppColors {
     static let tertiaryText = Color("colorTertiary")
     static let disabledText = Color.gray
 
+    // MARK: - Conventional rows
+
+    /// Default text hierarchy for ordinary title/detail rows. Semantic status and indicator
+    /// colours remain owned by their individual presentations.
+    static let rowTitleText = primaryText
+    static let rowDetailText = secondaryText
+
     // MARK: - Status
 
     static let normal = Color.green

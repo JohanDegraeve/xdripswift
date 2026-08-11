@@ -97,14 +97,25 @@ struct TreatmentEditorView: View {
         Form {
             Section(footer: editorFooterView()) {
                 if viewModel.isAddMode {
-                    Picker(Texts_TreatmentsView.type, selection: $viewModel.selectedType) {
+                    Menu {
                         ForEach(TreatmentEditorViewModel.supportedTreatmentTypes, id: \.rawValue) { treatmentType in
-                            Text(treatmentType.asString())
-                                .tag(treatmentType)
+                            Button {
+                                viewModel.selectedType = treatmentType
+                            } label: {
+                                if viewModel.selectedType == treatmentType {
+                                    Label(treatmentType.asString(), systemImage: "checkmark")
+                                } else {
+                                    Text(treatmentType.asString())
+                                }
+                            }
                         }
+                    } label: {
+                        conventionalMenuLabel(
+                            title: Texts_TreatmentsView.type,
+                            value: viewModel.selectedType.asString()
+                        )
                     }
-                    .pickerStyle(.menu)
-                    .tint(Color(.colorTertiary))
+                    .buttonStyle(.plain)
                 } else {
                     HStack {
                         Text(Texts_TreatmentsView.type)
@@ -176,6 +187,7 @@ struct TreatmentEditorView: View {
         }
         .listStyle(.insetGrouped)
         .colorScheme(.dark)
+        .ipadReadableContentWidth(720)
         .alert(item: $viewModel.alertMessage) { message in
             Alert(
                 title: Text(message.title),
@@ -189,6 +201,20 @@ struct TreatmentEditorView: View {
         .onChange(of: viewModel.selectedDate) { _ in
             viewModel.validateSelectedDateIfNeeded()
         }
+    }
+
+    private func conventionalMenuLabel(title: String, value: String) -> some View {
+        HStack(spacing: 8) {
+            Text(title)
+                .foregroundStyle(ConstantsAppColors.rowTitleText)
+            Spacer(minLength: 8)
+            Text(value)
+                .foregroundStyle(ConstantsAppColors.rowDetailText)
+            Image(systemName: "chevron.up.chevron.down")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ConstantsAppColors.rowDetailText)
+        }
+        .contentShape(Rectangle())
     }
 
     @ViewBuilder private func editorFooterView() -> some View {

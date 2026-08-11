@@ -35,11 +35,14 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
             isVisible: UserDefaults.standard.showStatistics
         )
         timeInRangeTypeRow.accessory = .none
-        timeInRangeTypeRow.control = .menu(
+        timeInRangeTypeRow.control = .menuWithSelectionTitle(
             options: {
                 TimeInRangeType.allCases.map {
                     SettingsMenuOption(title: $0.description + $0.rangeString(), isSelected: $0 == UserDefaults.standard.timeInRangeType)
                 }
+            },
+            selectionTitle: {
+                UserDefaults.standard.timeInRangeType.description
             },
             selectOption: { index in
                 let options = TimeInRangeType.allCases

@@ -35,7 +35,7 @@ struct BluetoothPeripheralSettingsRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Text(title)
-                .foregroundStyle(isEnabled ? Color(.colorPrimary) : Color.gray)
+                .foregroundStyle(isEnabled ? ConstantsAppColors.rowTitleText : ConstantsAppColors.disabledText)
                 .lineLimit(2)
 
             Spacer(minLength: 12)
@@ -56,7 +56,7 @@ struct BluetoothPeripheralSettingsRow: View {
                     }
 
                     Text(detail)
-                        .foregroundStyle(isEnabled ? Color(.colorSecondary) : Color.gray)
+                        .foregroundStyle(isEnabled ? ConstantsAppColors.rowDetailText : ConstantsAppColors.disabledText)
                         .multilineTextAlignment(.trailing)
                         .lineLimit(2)
                 }

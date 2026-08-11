@@ -101,24 +101,48 @@ struct DataDeletionView: View {
 
     private var dateRangeSection: some View {
         Section {
-            Picker(Texts_SettingsView.cleanDataCleanupMethod, selection: $viewModel.rangeMode) {
+            Menu {
                 ForEach(CleanDataRangeMode.allCases) { rangeMode in
-                    Text(rangeMode.title).tag(rangeMode)
+                    Button {
+                        viewModel.rangeMode = rangeMode
+                        viewModel.rangeModeChanged()
+                    } label: {
+                        if viewModel.rangeMode == rangeMode {
+                            Label(rangeMode.title, systemImage: "checkmark")
+                        } else {
+                            Text(rangeMode.title)
+                        }
+                    }
                 }
+            } label: {
+                conventionalMenuLabel(
+                    title: Texts_SettingsView.cleanDataCleanupMethod,
+                    value: viewModel.rangeMode.title
+                )
             }
-            .pickerStyle(.menu)
-            .tint(Color(.colorTertiary))
-            .onChange(of: viewModel.rangeMode) { _ in viewModel.rangeModeChanged() }
+            .buttonStyle(.plain)
 
             switch viewModel.rangeMode {
             case .keepRecent:
-                Picker(Texts_SettingsView.cleanDataKeep, selection: $viewModel.recentDataDays) {
+                Menu {
                     ForEach(DataDeletionViewModel.availableRecentDataDays, id: \.self) { days in
-                        Text(Texts_SettingsView.cleanDataDays(days)).tag(days)
+                        Button {
+                            viewModel.recentDataDays = days
+                        } label: {
+                            if viewModel.recentDataDays == days {
+                                Label(Texts_SettingsView.cleanDataDays(days), systemImage: "checkmark")
+                            } else {
+                                Text(Texts_SettingsView.cleanDataDays(days))
+                            }
+                        }
                     }
+                } label: {
+                    conventionalMenuLabel(
+                        title: Texts_SettingsView.cleanDataKeep,
+                        value: Texts_SettingsView.cleanDataDays(viewModel.recentDataDays)
+                    )
                 }
-                .pickerStyle(.menu)
-                .tint(Color(.colorTertiary))
+                .buttonStyle(.plain)
             case .custom:
                 DatePicker(
                     Texts_SettingsView.cleanDataFrom,
@@ -147,6 +171,20 @@ struct DataDeletionView: View {
                 Text(Texts_SettingsView.cleanDataDeleteAllFooter)
             }
         }
+    }
+
+    private func conventionalMenuLabel(title: String, value: String) -> some View {
+        HStack(spacing: 8) {
+            Text(title)
+                .foregroundStyle(ConstantsAppColors.rowTitleText)
+            Spacer(minLength: 8)
+            Text(value)
+                .foregroundStyle(ConstantsAppColors.rowDetailText)
+            Image(systemName: "chevron.up.chevron.down")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ConstantsAppColors.rowDetailText)
+        }
+        .contentShape(Rectangle())
     }
 
     private var reviewAction: some View {
