@@ -56,6 +56,7 @@ struct TreatmentsListView: View {
     // MARK: - private properties
 
     @ObservedObject var viewModel: TreatmentsViewModel
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var showScrollToTopButton = false
     private let topScrollAnchorID = "treatmentsTop"
     private let scrollToTopButtonThresholdIndex = 4
@@ -68,46 +69,16 @@ struct TreatmentsListView: View {
     var body: some View {
         ScrollViewReader { scrollProxy in
             ZStack(alignment: .bottomTrailing) {
-                VStack(spacing: 8) {
-                    TreatmentsControlsCard(viewModel: viewModel)
-                        .id(topScrollAnchorID)
-                        .onAppear { showScrollToTopButton = false }
-                        .padding(.horizontal, 16)
-                        .padding(.top, 8)
-
-                    List {
-                        if !viewModel.filteredTreatments.isEmpty {
-                            ForEach(Array(viewModel.filteredTreatments.enumerated()), id: \.element.objectID) { index, treatment in
-                                treatmentRow(for: treatment)
-                                    .id(treatment.objectID)
-                                    .onAppear {
-                                        if index == 0 {
-                                            showScrollToTopButton = false
-                                        } else if index >= scrollToTopButtonThresholdIndex {
-                                            showScrollToTopButton = true
-                                        }
-                                    }
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                        Button(role: .destructive) {
-                                            viewModel.deleteTreatment(treatment)
-                                        } label: {
-                                            Label(Texts_Common.delete, systemImage: "trash")
-                                        }
-                                    }
-                            }
-                            .listRowBackground(Color(.secondarySystemGroupedBackground))
-                        } else {
-                            Text(Texts_TreatmentsView.noTreatmentsToShow)
-                                .foregroundStyle(Color(.colorSecondary))
-                                .listRowSeparator(.hidden)
-                                .listRowBackground(Color.clear)
-                        }
+                GeometryReader { geometry in
+                    if IPadLayoutClass.resolve(
+                        isPad: UIDevice.current.userInterfaceIdiom == .pad,
+                        width: geometry.size.width,
+                        usesAccessibilityText: dynamicTypeSize.isAccessibilitySize
+                    ) != .compact {
+                        ipadContent
+                    } else {
+                        phoneContent
                     }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
-                    .background(Color(.systemGroupedBackground))
-                    .padding(.horizontal, 16)
-                    .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
                 }
                 .background(Color(.systemGroupedBackground).ignoresSafeArea())
 
@@ -155,6 +126,91 @@ struct TreatmentsListView: View {
                 viewModel.handleUserDefaultsDidChange()
             }
         }
+    }
+
+    private var phoneContent: some View {
+        VStack(spacing: 8) {
+            controlsCard
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+
+            treatmentList(horizontalPadding: 16)
+        }
+    }
+
+    private var ipadContent: some View {
+        HStack(alignment: .top, spacing: 18) {
+            VStack(spacing: 16) {
+                controlsCard
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Label(
+                        viewModel.selectedDateDayName,
+                        systemImage: "calendar"
+                    )
+                    .font(.headline)
+
+                    Text("\(viewModel.filteredTreatments.count) \(Texts_TreatmentsView.treatmentsTitle.lowercased())")
+                        .font(.subheadline)
+                        .foregroundStyle(Color(.colorSecondary))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16)
+                .background(Color(.secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+
+                Spacer()
+            }
+            .frame(width: 310)
+
+            treatmentList(horizontalPadding: 0)
+                .frame(maxWidth: 920)
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 12)
+    }
+
+    private var controlsCard: some View {
+        TreatmentsControlsCard(viewModel: viewModel)
+            .id(topScrollAnchorID)
+            .onAppear { showScrollToTopButton = false }
+    }
+
+    private func treatmentList(horizontalPadding: CGFloat) -> some View {
+        List {
+            if !viewModel.filteredTreatments.isEmpty {
+                ForEach(Array(viewModel.filteredTreatments.enumerated()), id: \.element.objectID) { index, treatment in
+                    treatmentRow(for: treatment)
+                        .id(treatment.objectID)
+                        .onAppear {
+                            if index == 0 {
+                                showScrollToTopButton = false
+                            } else if index >= scrollToTopButtonThresholdIndex {
+                                showScrollToTopButton = true
+                            }
+                        }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                viewModel.deleteTreatment(treatment)
+                            } label: {
+                                Label(Texts_Common.delete, systemImage: "trash")
+                            }
+                        }
+                }
+                .listRowBackground(Color(.secondarySystemGroupedBackground))
+            } else {
+                Text(Texts_TreatmentsView.noTreatmentsToShow)
+                    .foregroundStyle(Color(.colorSecondary))
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Color(.systemGroupedBackground))
+        .padding(.horizontal, horizontalPadding)
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
     }
 
     @ViewBuilder private func treatmentRow(for treatment: TreatmentSnapshot) -> some View {

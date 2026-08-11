@@ -16,6 +16,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_settingstitle", tableName: filename, bundle: Bundle.main, value: "Settings", comment: "shown on top of the first settings screen, literally 'Settings'")
     }()
 
+    static let selectCategory: String = {
+        return NSLocalizedString("settingsviews_selectCategory", tableName: filename, bundle: Bundle.main, value: "Select a category in the sidebar", comment: "iPad Settings detail placeholder")
+    }()
+
     static let glucoseDisplaySectionTitle: String = {
         return NSLocalizedString("settingsviews_glucoseDisplaySectionTitle", tableName: filename, bundle: Bundle.main, value: "Display", comment: "settings group title for display options")
     }()

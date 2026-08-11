@@ -12,6 +12,7 @@ import UIKit
 
 /// Presents the generated PDF with sharing and print actions.
 struct GlucoseReportPreviewView: View {
+    @Environment(\.dismiss) private var dismiss
     let report: GlucoseReport
     @State private var shareItem: ReportShareItem?
     @State private var isPreparingProtectedShare = false
@@ -23,6 +24,15 @@ struct GlucoseReportPreviewView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(Texts_Common.dismiss) {
+                            dismiss()
+                        }
+                        .tint(ConstantsAppColors.toolbarNeutralAction)
+                    }
+                }
+
                 ToolbarItem(placement: .principal) {
                     HStack(spacing: 5) {
                         if report.passwordToOpen != nil {

@@ -173,6 +173,7 @@ struct SensorManagementView: View {
                     }
                 }
             }
+            .ipadReadableContentWidth(860)
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationTitle(Texts_HomeView.sensorManagementTitle)
             .toolbar {
@@ -384,9 +385,10 @@ struct SensorManagementView: View {
         }
     }
 
-    private func row(title: String, data: String, dataColor: Color = Color(.colorSecondary)) -> some View {
+    private func row(title: String, data: String, dataColor: Color = ConstantsAppColors.rowDetailText) -> some View {
         HStack {
             Text(title)
+                .foregroundStyle(ConstantsAppColors.rowTitleText)
             Spacer()
             Text(data)
                 .foregroundStyle(dataColor)

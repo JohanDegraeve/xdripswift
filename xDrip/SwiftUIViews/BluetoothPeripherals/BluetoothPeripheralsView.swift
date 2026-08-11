@@ -38,14 +38,31 @@ struct BluetoothPeripheralsNavigationView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $router.path) {
-            BluetoothPeripheralsView(viewModel: viewModel, router: router)
-                .navigationDestination(for: BluetoothPeripheralsRoute.self, destination: destination)
-        }
+        navigationContent
         .tint(ConstantsAppColors.navigationTint)
         .colorScheme(.dark)
         .onAppear(perform: handleSensorHealthDetailRequest)
         .onChange(of: sensorHealthDetailRequest) { _ in handleSensorHealthDetailRequest() }
+    }
+
+    @ViewBuilder private var navigationContent: some View {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            NavigationSplitView {
+                BluetoothPeripheralsView(viewModel: viewModel, router: router)
+                    .navigationSplitViewColumnWidth(min: 300, ideal: 350, max: 430)
+            } detail: {
+                NavigationStack(path: $router.path) {
+                    BluetoothIPadPlaceholderView()
+                        .navigationDestination(for: BluetoothPeripheralsRoute.self, destination: destination)
+                }
+            }
+            .navigationSplitViewStyle(.balanced)
+        } else {
+            NavigationStack(path: $router.path) {
+                BluetoothPeripheralsView(viewModel: viewModel, router: router)
+                    .navigationDestination(for: BluetoothPeripheralsRoute.self, destination: destination)
+            }
+        }
     }
 
     @ViewBuilder private func destination(for route: BluetoothPeripheralsRoute) -> some View {
@@ -88,6 +105,23 @@ struct BluetoothPeripheralsNavigationView: View {
         lastSensorHealthDetailRequest = sensorHealthDetailRequest
         router.path.removeAll()
         router.openPeripheral(peripheral, type: peripheral.bluetoothPeripheralType())
+    }
+}
+
+private struct BluetoothIPadPlaceholderView: View {
+    var body: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "antenna.radiowaves.left.and.right")
+                .font(.system(size: 44, weight: .light))
+                .foregroundStyle(Color(.colorTertiary))
+
+            Text(Texts_BluetoothPeripheralsView.screenTitle)
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(Color(.colorPrimary))
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(ConstantsUI.listBackGroundColor.ignoresSafeArea())
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -338,13 +372,13 @@ private struct BluetoothPeripheralListRowView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(row.title)
                     .fontWeight(row.connectionStatus.isActive ? .bold : .regular)
-                    .foregroundStyle(row.connectionStatus.isActive ? Color(.colorPrimary) : Color(.colorSecondary))
+                    .foregroundStyle(ConstantsAppColors.rowTitleText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
 
                 Text(row.typeTitle)
                     .font(.footnote)
-                    .foregroundStyle(Color(.colorTertiary))
+                    .foregroundStyle(ConstantsAppColors.rowDetailText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
             }
@@ -352,7 +386,7 @@ private struct BluetoothPeripheralListRowView: View {
 
             Text(row.connectionStatus.statusText)
                 .font(.subheadline)
-                .foregroundStyle(Color(.colorSecondary))
+                .foregroundStyle(ConstantsAppColors.rowDetailText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
                 .fixedSize(horizontal: true, vertical: false)
@@ -450,13 +484,13 @@ private struct BluetoothPeripheralSelectionRow: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
-                    .foregroundStyle(Color(.colorPrimary))
+                    .foregroundStyle(ConstantsAppColors.rowTitleText)
                     .lineLimit(1)
 
                 if let subtitle {
                     Text(subtitle)
                         .font(.subheadline)
-                        .foregroundStyle(Color(.colorTertiary))
+                        .foregroundStyle(ConstantsAppColors.rowDetailText)
                         .lineLimit(1)
                 }
             }

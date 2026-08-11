@@ -91,6 +91,8 @@ struct BluetoothPeripheralDetailView: View {
         }
         .alert(item: $state.pendingAlert, content: makeAlert)
         .onAppear(perform: state.start)
+        .frame(maxWidth: UIDevice.current.userInterfaceIdiom == .pad ? 780 : .infinity)
+        .frame(maxWidth: .infinity)
     }
 
     private var connectButtonTint: Color {

@@ -355,6 +355,7 @@ struct AIDStatusView: View {
                     }
                 }
             }
+            .ipadReadableContentWidth(920)
             .background(ConstantsAppColors.groupedBackground.ignoresSafeArea())
             .navigationTitle("Follow Status")
             .toolbarBackground(ConstantsAppColors.groupedBackground, for: .navigationBar)
@@ -386,9 +387,10 @@ struct AIDStatusView: View {
         // wrap the HStack in an AnyView so that it can be returned back to the caller
         let rowView = AnyView(HStack {
             Text(title)
+                .foregroundStyle(ConstantsAppColors.rowTitleText)
             Spacer()
             Text(data)
-                .foregroundStyle(Color(.colorSecondary))
+                .foregroundStyle(ConstantsAppColors.rowDetailText)
         })
         
         return rowView

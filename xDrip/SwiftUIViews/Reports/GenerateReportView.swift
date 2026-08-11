@@ -41,17 +41,30 @@ struct GenerateReportView: View {
                         }
                     }
             }
+            .background(Color(.systemGroupedBackground).ignoresSafeArea())
+            .colorScheme(.dark)
         case .embedded:
             reportForm
         }
     }
 
-    private var reportForm: some View {
+    @ViewBuilder private var reportForm: some View {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            reportFormContent
+                .fullScreenCover(item: $viewModel.generatedReport, content: reportPreview)
+        } else {
+            reportFormContent
+                .sheet(item: $viewModel.generatedReport, content: reportPreview)
+        }
+    }
+
+    private var reportFormContent: some View {
         Form {
             patientSection
             reportDataSection
             outputOptionsSection
         }
+        .ipadReadableContentWidth(760)
         .disabled(viewModel.isGenerating)
         .overlay {
             if viewModel.isGenerating {
@@ -81,10 +94,11 @@ struct GenerateReportView: View {
         } message: {
             Text(viewModel.errorMessage ?? "")
         }
-        .sheet(item: $viewModel.generatedReport) { report in
-            NavigationStack {
-                GlucoseReportPreviewView(report: report)
-            }
+    }
+
+    private func reportPreview(_ report: GlucoseReport) -> some View {
+        NavigationStack {
+            GlucoseReportPreviewView(report: report)
         }
     }
 

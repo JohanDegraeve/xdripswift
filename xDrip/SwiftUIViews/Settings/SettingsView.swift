@@ -77,10 +77,7 @@ struct SettingsNavigationView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $router.path) {
-            SettingsView(listModel: listModel, presenter: presenter)
-                .navigationDestination(for: SettingsRoute.self, destination: destination)
-        }
+        navigationContent
         .environment(\.settingsNavigationActions, navigationActions)
         .sheet(isPresented: $router.showsTraceEmail) {
             SettingsTraceMailView(isPresented: $router.showsTraceEmail) {
@@ -100,6 +97,26 @@ struct SettingsNavigationView: View {
         .onChange(of: router.path) { path in
             if path.isEmpty {
                 listModel.reload(.all)
+            }
+        }
+    }
+
+    @ViewBuilder private var navigationContent: some View {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            NavigationSplitView {
+                SettingsIPadSidebarView(listModel: listModel, presenter: presenter)
+                    .navigationSplitViewColumnWidth(min: 300, ideal: 350, max: 430)
+            } detail: {
+                NavigationStack(path: $router.path) {
+                    SettingsIPadPlaceholderView()
+                        .navigationDestination(for: SettingsRoute.self, destination: destination)
+                }
+            }
+            .navigationSplitViewStyle(.balanced)
+        } else {
+            NavigationStack(path: $router.path) {
+                SettingsView(listModel: listModel, presenter: presenter)
+                    .navigationDestination(for: SettingsRoute.self, destination: destination)
             }
         }
     }
@@ -194,6 +211,72 @@ struct SettingsNavigationView: View {
             content(router.closeCurrentView)
                 .navigationTitle(title)
                 .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+/// Calm detail placeholder shown before an iPad Settings category is selected.
+private struct SettingsIPadPlaceholderView: View {
+    var body: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "gearshape.2")
+                .font(.system(size: 44, weight: .light))
+                .foregroundStyle(Color(.colorTertiary))
+
+            Text(Texts_SettingsView.screenTitle)
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(Color(.colorPrimary))
+
+            Text(Texts_SettingsView.selectCategory)
+                .font(.body)
+                .foregroundStyle(Color(.colorSecondary))
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(ConstantsUI.listBackGroundColor.ignoresSafeArea())
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// Adds iPad navigation chrome around the unchanged Settings list. Row construction and styling
+/// remain shared with iPhone so the split view cannot introduce platform-specific value colors.
+private struct SettingsIPadSidebarView: View {
+    @Environment(\.openURL) private var openURL
+    @ObservedObject var listModel: SettingsListModel
+    @ObservedObject var presenter: SettingsActionPresenter
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                Text(Texts_SettingsView.screenTitle)
+                    .font(.largeTitle.weight(.bold))
+                    .foregroundStyle(Color(.colorPrimary))
+
+                Spacer()
+
+                Button(action: showOnlineHelp) {
+                    Image(systemName: "questionmark.circle")
+                        .font(.title3)
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(ConstantsAppColors.toolbarAction)
+                .accessibilityLabel(Texts_SettingsView.showOnlineHelp)
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+
+            SettingsView(listModel: listModel, presenter: presenter)
+                .frame(maxWidth: 780)
+                .frame(maxWidth: .infinity)
+        }
+        .background(ConstantsUI.listBackGroundColor.ignoresSafeArea())
+        .toolbar(.hidden, for: .navigationBar)
+    }
+
+    private func showOnlineHelp() {
+        if let url = SettingsOnlineHelp.url() {
+            openURL(url)
         }
     }
 }
@@ -363,16 +446,18 @@ struct SettingsView: View {
         )
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    if let url = SettingsOnlineHelp.url() {
-                        openURL(url)
-                    }
-                } label: {
+                Button(action: showOnlineHelp) {
                     Image(systemName: "questionmark.circle")
                 }
                 .tint(ConstantsAppColors.toolbarAction)
                 .accessibilityLabel(Texts_SettingsView.showOnlineHelp)
             }
+        }
+    }
+
+    private func showOnlineHelp() {
+        if let url = SettingsOnlineHelp.url() {
+            openURL(url)
         }
     }
 }
@@ -393,6 +478,7 @@ private struct SettingsAppBannerView: View {
                     .fontWeight(.semibold)
                     .foregroundStyle(Color(.colorSecondary))
             }
+
         }
         .padding(.vertical, 4)
     }

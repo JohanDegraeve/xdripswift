@@ -11,6 +11,7 @@ import SwiftUI
 
 /// Presents CGM, AGP and trend statistics for the selected period.
 struct StatisticsView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @StateObject private var viewModel: StatisticsViewModel
     @State private var isShowingReportGenerator = false
     @State private var selectedPage: StatisticsPage = .cgmData
@@ -45,6 +46,7 @@ struct StatisticsView: View {
         }
         .sheet(isPresented: $isShowingReportGenerator) {
             GenerateReportView(statisticsManager: statisticsManager)
+                .ipadLargeSheet(width: 980, height: 840)
         }
         .task {
             viewModel.load()
@@ -57,24 +59,81 @@ struct StatisticsView: View {
                 .controlSize(.large)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let analytics = viewModel.analytics, analytics.hasData {
-            TabView(selection: $selectedPage) {
-                ForEach(StatisticsPage.allCases) { page in
-                    StatisticsPageScrollView {
-                        pagePicker
-                        pageContent(page, analytics: analytics)
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                GeometryReader { geometry in
+                    if IPadLayoutClass.resolve(
+                        isPad: true,
+                        width: geometry.size.width,
+                        usesAccessibilityText: dynamicTypeSize.isAccessibilitySize
+                    ) == .compact {
+                        phoneContent(analytics: analytics)
+                    } else {
+                        ipadContent(analytics: analytics, width: geometry.size.width)
                     }
-                    .tag(page)
                 }
+            } else {
+                phoneContent(analytics: analytics)
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             StatisticsEmptyStateView()
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
+    private func phoneContent(analytics: GlucoseReportAnalytics) -> some View {
+        TabView(selection: $selectedPage) {
+            ForEach(StatisticsPage.allCases) { page in
+                StatisticsPageScrollView {
+                    pagePicker
+                    pageContent(page, analytics: analytics)
+                }
+                .tag(page)
+            }
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func ipadContent(analytics: GlucoseReportAnalytics, width: CGFloat) -> some View {
+        ScrollView {
+            VStack(spacing: 14) {
+                pagePicker
+                    .frame(maxWidth: 520)
+
+                if selectedPage == .cgmData {
+                    HStack(alignment: .top, spacing: 14) {
+                        StatisticsSection(title: Texts_Common.statisticsTimeInRange, detail: "TIR") {
+                            StatisticsRangeCard(buckets: analytics.rangeDistribution.timeInRangeBuckets(usesMgDl: analytics.usesMgDl))
+                        }
+                        .frame(maxWidth: .infinity)
+
+                        StatisticsSection(title: Texts_Common.statisticsTimeInTightRange, detail: "TITR") {
+                            StatisticsRangeCard(buckets: analytics.tightRangeDistribution.tightRangeBuckets(usesMgDl: analytics.usesMgDl))
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+
+                    StatisticsSummaryView(analytics: analytics, columnCount: width >= 980 ? 4 : 2)
+                } else {
+                    StatisticsAGPCard(analytics: analytics)
+
+                    HStack(alignment: .top, spacing: 14) {
+                        StatisticsTrendCard(trendPoints: analytics.trendPoints)
+                            .frame(maxWidth: .infinity)
+                        StatisticsDailyPatternCard(analytics: analytics, period: viewModel.selectedPeriod)
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+            }
+            .frame(maxWidth: 1240)
+            .padding(.horizontal, 24)
+            .padding(.top, 10)
+            .padding(.bottom, 24)
+            .frame(maxWidth: .infinity)
         }
     }
 
@@ -113,6 +172,7 @@ struct StatisticsView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
                 .padding(.bottom, 8)
+                .frame(maxWidth: UIDevice.current.userInterfaceIdiom == .pad ? 560 : .infinity)
 
             Divider()
                 .overlay(Color(.separator))
@@ -187,10 +247,11 @@ private struct StatisticsCGMStatisticsPage: View {
 
 private struct StatisticsSummaryView: View {
     let analytics: GlucoseReportAnalytics
+    var columnCount = 2
 
     private let tileSpacing: CGFloat = 10
     private var columns: [GridItem] {
-        [GridItem(.flexible(), spacing: tileSpacing), GridItem(.flexible(), spacing: tileSpacing)]
+        Array(repeating: GridItem(.flexible(), spacing: tileSpacing), count: columnCount)
     }
 
     var body: some View {
