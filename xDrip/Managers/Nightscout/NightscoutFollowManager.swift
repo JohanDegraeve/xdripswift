@@ -31,6 +31,9 @@ class NightscoutFollowManager: NSObject {
     /// does not own silent-audio playback, replay timing, or application lifecycle callbacks.
     private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
 
+    /// Allows wiring tests to reconcile real manager state without starting follower networking.
+    private let startsInitialDownload: Bool
+
     /// constant for cancelling an active foreground gap fill when the app backgrounds
     private let applicationManagerKeyCancelGapFill = "NightscoutFollowerManager-CancelGapFill"
     
@@ -57,7 +60,8 @@ class NightscoutFollowManager: NSObject {
     init(
         coreDataManager: CoreDataManager,
         followerDelegate: FollowerDelegate,
-        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
+        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging,
+        startsInitialDownload: Bool = true
     ) {
         
         // initialize nextFollowDownloadTimeStamp to now, which is at the moment FollowManager is instantiated
@@ -68,6 +72,7 @@ class NightscoutFollowManager: NSObject {
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.followerDelegate = followerDelegate
         self.backgroundKeepAliveManager = backgroundKeepAliveManager
+        self.startsInitialDownload = startsInitialDownload
 
         // call super.init
         super.init()
@@ -119,7 +124,7 @@ class NightscoutFollowManager: NSObject {
         
     }
     
-    /// - download recent readings from nightscout, send result to delegate, and schedule new download (if followerBackgroundKeepAliveType != disabled)
+    /// - download recent readings from nightscout, send result to delegate, and schedule a new download unless heartbeat mode owns the polling cadence
     /// - no download is done if latest reading is less than 30 seconds old
     @objc public func download() {
         performDownload(fillGapsAfterSuccess: false)
@@ -413,6 +418,8 @@ class NightscoutFollowManager: NSObject {
         if isNightscoutFollowerActive {
             
             backgroundKeepAliveManager.start(for: .nightscout)
+
+            guard startsInitialDownload else { return }
             
             // do initial download, this will also schedule future downloads
             if isStartingNightscoutFollower {

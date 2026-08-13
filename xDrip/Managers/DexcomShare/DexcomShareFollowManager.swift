@@ -33,6 +33,9 @@ class DexcomShareFollowManager: NSObject {
     /// The root-owned shared keep-alive engine; this follower reports operational state only and
     /// does not own silent-audio playback, replay timing, or application lifecycle callbacks.
     private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
+
+    /// Allows wiring tests to reconcile real manager state without starting follower networking.
+    private let startsInitialDownload: Bool
     
     /// closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
     private var invalidateDownLoadTimerClosure: (() -> Void)?
@@ -51,7 +54,8 @@ class DexcomShareFollowManager: NSObject {
     init(
         coreDataManager: CoreDataManager,
         followerDelegate: FollowerDelegate,
-        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
+        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging,
+        startsInitialDownload: Bool = true
     ) {
         // clear failed login timestamp on init to always immediately allow a new login attempt
         UserDefaults.standard.dexcomShareLoginFailedTimestamp = nil
@@ -61,6 +65,7 @@ class DexcomShareFollowManager: NSObject {
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.followerDelegate = followerDelegate
         self.backgroundKeepAliveManager = backgroundKeepAliveManager
+        self.startsInitialDownload = startsInitialDownload
         
         // initialize the sessionId
         self.dexcomShareSessionId = nil
@@ -497,6 +502,8 @@ class DexcomShareFollowManager: NSObject {
         if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .dexcomShare && UserDefaults.standard.dexcomShareAccountName != nil && UserDefaults.standard.dexcomSharePassword != nil && !UserDefaults.standard.dexcomShareManuallyLoggedOut {
             FollowerSessionState.shared.update(.loggingIn, for: .dexcomShare)
             backgroundKeepAliveManager.start(for: .dexcomShare)
+
+            guard startsInitialDownload else { return }
             
             // do initial download, this will also schedule future downloads
             self.download()

@@ -156,6 +156,10 @@ class Texts_SettingsView {
     static let followerKeepAliveTypeAggressive: String = {
         return NSLocalizedString("settingsviews_followerKeepAliveTypeAggressive", tableName: filename, bundle: Bundle.main, value: "Aggressive", comment: "data source settings, keep-alive mode is set to aggressive")
     }()
+
+    static let followerKeepAliveTypeContinuous: String = {
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeContinuous", tableName: filename, bundle: Bundle.main, value: "Continuous", comment: "data source settings, keep-alive mode continuously plays silent audio")
+    }()
     
     static let followerKeepAliveTypeHeartbeat: String = {
         return NSLocalizedString("settingsviews_followerKeepAliveTypeHeartbeat", tableName: filename, bundle: Bundle.main, value: "Heartbeat", comment: "data source settings, keep-alive mode is set to use an external heartbeat")
@@ -171,6 +175,10 @@ class Texts_SettingsView {
     
     static let followerKeepAliveTypeAggressiveMessage: String = {
         return NSLocalizedString("settingsviews_followerKeepAliveTypeAggressiveMessage", tableName: filename, bundle: Bundle.main, value: "Keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.", comment: "data source settings, keep-alive mode is set to aggressive")
+    }()
+
+    static let followerKeepAliveTypeContinuousMessage: String = {
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeContinuousMessage", tableName: filename, bundle: Bundle.main, value: "Keep-alive is set to continuous.\n\nWhen the app is not on screen, silent audio will play continuously to make the strongest possible attempt to keep follower updates and alarms running.\n\nThis mode cannot guarantee that iOS will keep the app active. It has the highest impact on battery life and should only be used if Aggressive is unreliable.", comment: "data source settings, keep-alive mode continuously plays silent audio and has the highest battery impact")
     }()
     
     static let followerKeepAliveTypeHeartbeatMessage: String = {

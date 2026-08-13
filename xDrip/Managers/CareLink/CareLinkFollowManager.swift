@@ -65,6 +65,8 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     /// The root-owned shared keep-alive engine; CareLink registers only after authentication and
     /// never connects an audio lifecycle event or replay tick to its polling API.
     private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
+    /// Allows wiring tests to reconcile authenticated state without starting follower networking.
+    private let startsInitialDownload: Bool
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCareLinkFollowManager)
     private let keyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
     /// Invalidates the one-shot download timer used outside heartbeat mode.
@@ -92,7 +94,8 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         followerDelegate: FollowerDelegate,
         backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging,
         client: CareLinkClient = CareLinkClient(),
-        state: CareLinkAccountState = .shared
+        state: CareLinkAccountState = .shared,
+        startsInitialDownload: Bool = true
     ) {
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
@@ -101,6 +104,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         self.state = state
         self.therapyImporter = CareLinkTherapyImporter(coreDataManager: coreDataManager)
         self.backgroundKeepAliveManager = backgroundKeepAliveManager
+        self.startsInitialDownload = startsInitialDownload
         super.init()
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue, options: .new, context: nil)
@@ -350,7 +354,9 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             lifecycleState = .authenticated
             updateStateOnMain { $0.lastTokenRefreshAt = Date() }
             backgroundKeepAliveManager.start(for: .careLink)
-            refreshNow()
+            if startsInitialDownload {
+                refreshNow()
+            }
         } catch CareLinkError.cancelled {
             guard loginIdentifier == identifier else { return }
             loginIdentifier = nil
@@ -715,7 +721,9 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             lifecycleState = CareLinkLifecyclePolicy.state(isSelected: true, hasCredentials: true, hasSession: hasSession)
             if lifecycleState == .authenticated {
                 backgroundKeepAliveManager.start(for: .careLink)
-                download()
+                if startsInitialDownload {
+                    download()
+                }
             } else {
                 stopPolling()
                 backgroundKeepAliveManager.stop(for: .careLink)

@@ -92,14 +92,16 @@ import AppIntents
 
     /// The single application-wide background keep-alive engine shared by all follower managers.
     ///
-    /// Keeping this instance at the application root gives the silent-audio player, replay timer,
-    /// keep-alive setting observer, and foreground/background callbacks one stable owner for the
-    /// lifetime of application services. The same instance is injected into every selectable
-    /// follower manager below, replacing the separate audio engines those managers previously owned.
+    /// Keeping this instance at the application root gives both retained silent-audio players, the
+    /// one shared timer, keep-alive setting observer, interruption recovery, and foreground/background
+    /// callbacks one stable owner for the lifetime of application services. The same instance is
+    /// injected into every selectable follower manager below, replacing the separate audio engines
+    /// those managers previously owned.
     ///
     /// Individual followers only report when their source becomes operational or stops. They retain
     /// ownership of authentication, downloads, polling cadence, retries, and heartbeat-triggered
-    /// work; none of that networking is initiated or coordinated by this shared manager.
+    /// work. The choice between one-shot Normal/Aggressive playback and the isolated Continuous
+    /// loop remains opaque to them, and none of their networking is initiated or coordinated here.
     private let followerBackgroundKeepAliveManager = FollowerBackgroundKeepAliveManager()
     
     /// NightscoutFollowManager instance

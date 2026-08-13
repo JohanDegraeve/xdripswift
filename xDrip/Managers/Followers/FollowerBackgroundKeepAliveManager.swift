@@ -18,16 +18,53 @@ import os
 /// coordinator now owns one instance of this class and injects its narrow interface into every
 /// selectable follower manager.
 ///
-/// This class deliberately preserves the established keep-alive engine:
+/// ## Wiring a follower manager
 ///
-/// - one retained player for `1-millisecond-of-silence.caf`;
+/// Use this sequence whenever a follower source is added or its lifecycle is changed:
+///
+/// 1. Do not create this concrete manager inside the follower. Add a retained
+///    `FollowerBackgroundKeepAliveManaging` dependency to the follower's initializer and let
+///    `RootApplicationCoordinator` inject its one application-wide instance.
+/// 2. In the follower's existing activation or lifecycle-reconciliation method, first verify that
+///    follower mode is active, this source is selected, required configuration is present, and the
+///    source has not been logged out. Sources requiring authentication, such as CareLink, must also
+///    confirm a usable authenticated session.
+/// 3. Immediately after those checks pass, call `start(for:)` with this follower's
+///    `FollowerBackgroundKeepAliveSource`. This reports operational state only; keep the follower's
+///    initial download, recurring polling, retries, and heartbeat response in their existing code.
+/// 4. Shared Calendar alone calls `start(for:backgroundRefresh:)`, passing its existing throttled
+///    `downloadFromKeepAliveTick()` path. Every network-backed follower must use `start(for:)` so an
+///    audio health check can never initiate a network request.
+/// 5. Call `stop(for:)` on every path that makes the source non-operational: source deselection,
+///    master-mode selection, missing configuration, explicit logout, authentication loss, and
+///    `deinit`. It is safe for several teardown paths to call `stop`; a stale source cannot stop a
+///    newer source that has already registered.
+/// 6. Do not observe the keep-alive setting, create audio or keep-alive timers, register audio
+///    lifecycle callbacks, or call `refreshForSelectedMode()` from a follower manager. This class
+///    owns those responsibilities. Heartbeat polling guards and heartbeat-triggered downloads stay
+///    in the follower because they control networking rather than silent audio.
+///
+/// Both LibreLinkUp selections deliberately register the same `.libreLinkUp` source. The source
+/// descriptor is internal coordination state and must not be added to or substituted for the
+/// persisted `FollowerDataSourceType` setting.
+///
+/// This class deliberately preserves the established Normal and Aggressive engine:
+///
+/// - one retained one-shot player for `1-millisecond-of-silence.caf`;
 /// - ordinary one-shot playback, replayed only after `isPlaying` becomes `false`;
 /// - one suspended `RepeatingTimer`, using the existing 5-second or 2-second interval;
 /// - one shared background callback to resume/check playback;
 /// - one shared foreground callback to suspend the timer without altering the player.
 ///
+/// Continuous mode is intentionally isolated on a second retained player created from the same
+/// proven CAF. That player uses `AVAudioPlayer.numberOfLoops = -1` while the app is backgrounded.
+/// Keeping the players separate means entering or leaving Continuous mode can stop and reset its
+/// loop without ever stopping, replacing, or changing the established one-shot player. A five-
+/// second health timer can restart an interrupted loop and preserves Shared Calendar's established
+/// throttled refresh opportunity, but continuous playback does not depend on that timer firing.
+///
 /// The operational source remains registered in disabled and heartbeat modes. This is important
-/// because changing back to normal or aggressive can restore audio immediately without asking a
+/// because changing back to an audio mode can restore playback immediately without asking a
 /// follower manager to rebuild authentication, polling, or other source state. Heartbeat excludes
 /// silent audio here, while the separate heartbeat guards in each follower manager continue to
 /// control its own polling timers.
@@ -50,12 +87,22 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     /// never play audio after the user selects disabled or heartbeat mode.
     private let selectedKeepAliveType: () -> FollowerBackgroundKeepAliveType
     private let timerFactory: TimerFactory
+    private let notificationCenter: NotificationCenter
 
-    /// Created once during application-service initialization and retained for one-shot replays.
-    private var audioPlayer: FollowerBackgroundAudioPlaying?
+    /// The proven player used only for the existing Normal and Aggressive one-shot replays.
+    private var oneShotAudioPlayer: FollowerBackgroundAudioPlaying?
 
-    /// The only replay timer. A setting change suspends and replaces this instance as necessary.
-    private var playSoundTimer: FollowerBackgroundTimer?
+    /// A separate player that Continuous mode can stop without altering the one-shot engine.
+    private var continuousAudioPlayer: FollowerBackgroundAudioPlaying?
+
+    /// The only shared timer. It replays one-shot audio or health-checks Continuous playback.
+    private var keepAliveTimer: FollowerBackgroundTimer?
+
+    /// Invalidates callbacks already queued by a timer that has since been replaced.
+    private var timerGeneration = 0
+
+    /// Tracks lifecycle state so a setting change can take effect while already backgrounded.
+    private var applicationIsInBackground = false
 
     /// The follower that has passed its own operational checks, even if audio is currently off.
     private var activeSource: FollowerBackgroundKeepAliveSource?
@@ -63,31 +110,36 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     /// Optional Shared Calendar work to run after the audio check on background entry and ticks.
     private var backgroundRefresh: (() -> Void)?
 
+    /// Notification token for the single application-wide audio-interruption observer.
+    private var audioInterruptionObserver: NSObjectProtocol?
+
     private let applicationManagerKeyResumePlaySoundTimer = "FollowerBackgroundKeepAliveManager-ResumePlaySoundTimer"
     private let applicationManagerKeySuspendPlaySoundTimer = "FollowerBackgroundKeepAliveManager-SuspendPlaySoundTimer"
 
     /// Creates the single application-wide follower background keep-alive engine.
     ///
     /// The root application coordinator creates this manager while application services are being
-    /// assembled and the app is still in the foreground. Initializing it at that point creates and
-    /// retains the proven one-shot audio player before any follower needs background execution. It
-    /// also installs exactly one pair of application lifecycle callbacks and one observer for the
-    /// user's keep-alive setting, replacing the copies that previously lived in follower managers.
+    /// assembled and the app is still in the foreground. Initializing it at that point creates the
+    /// proven one-shot player and the isolated Continuous player before any follower needs
+    /// background execution. It also installs exactly one pair of application lifecycle callbacks,
+    /// one keep-alive setting observer, and one audio-interruption observer.
     ///
-    /// Audio-player creation is deliberately nonfatal. A missing or unreadable sound is logged,
-    /// while follower authentication and polling remain available because this class never owns or
-    /// controls those operations.
+    /// Each audio-player creation is independently nonfatal. If one player cannot be created, the
+    /// other mode can still operate, while follower authentication and polling always remain
+    /// available because this class never owns or controls those operations.
     ///
     /// - Parameters:
     ///   - applicationManager: Supplies the foreground and background lifecycle callbacks. The
     ///     production default uses the shared `ApplicationManager`; tests inject a passive fake.
     ///   - selectedKeepAliveType: Reads the user's current keep-alive selection. It is evaluated at
     ///     configuration time and again at every lifecycle event and timer tick so queued work
-    ///     cannot use an obsolete normal, aggressive, disabled, or heartbeat value.
-    ///   - audioPlayerFactory: Creates the retained player for the existing silent CAF resource.
-    ///     Injection allows tests to observe playback without producing audio.
-    ///   - timerFactory: Creates the single suspended replay timer at the established interval.
+    ///     cannot use an obsolete normal, aggressive, continuous, disabled, or heartbeat value.
+    ///   - audioPlayerFactory: Creates both retained players from the existing silent CAF resource.
+    ///     It is called once for the one-shot player and once for the isolated Continuous player.
+    ///   - timerFactory: Creates the single suspended keep-alive timer at the selected interval.
     ///     Injection allows tests to drive ticks deterministically without waiting in real time.
+    ///   - notificationCenter: Supplies audio-interruption notifications. The production default
+    ///     uses `NotificationCenter.default`; tests inject an isolated notification center.
     init(
         applicationManager: FollowerBackgroundApplicationManaging = ApplicationManager.shared,
         selectedKeepAliveType: @escaping () -> FollowerBackgroundKeepAliveType = {
@@ -96,20 +148,34 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
         audioPlayerFactory: @escaping AudioPlayerFactory = FollowerBackgroundKeepAliveManager.makeAudioPlayer,
         timerFactory: @escaping TimerFactory = { interval, eventHandler in
             RepeatingTimer(timeInterval: interval, eventHandler: eventHandler)
-        }
+        },
+        notificationCenter: NotificationCenter = .default
     ) {
         self.applicationManager = applicationManager
         self.selectedKeepAliveType = selectedKeepAliveType
         self.timerFactory = timerFactory
+        self.notificationCenter = notificationCenter
         super.init()
 
-        // Build the retained player while application services are initialized in the foreground.
-        // Failure is intentionally nonfatal: follower networking can continue without audio.
+        // Build both retained players while application services are initialized in the foreground.
+        // Failures are independent and nonfatal: follower networking can continue without audio.
         do {
-            audioPlayer = try audioPlayerFactory(ConstantsSuspensionPrevention.soundFileName)
+            oneShotAudioPlayer = try audioPlayerFactory(ConstantsSuspensionPrevention.soundFileName)
         } catch {
             trace(
-                "in init, exception while trying to create audioplayer, error = %{public}@",
+                "in init, exception while creating one-shot audioplayer, error = %{public}@",
+                log: log,
+                category: ConstantsLog.categoryFollowerBackgroundKeepAliveManager,
+                type: .error,
+                error.localizedDescription
+            )
+        }
+        do {
+            continuousAudioPlayer = try audioPlayerFactory(ConstantsSuspensionPrevention.soundFileName)
+            continuousAudioPlayer?.numberOfLoops = -1
+        } catch {
+            trace(
+                "in init, exception while creating continuous audioplayer, error = %{public}@",
                 log: log,
                 category: ConstantsLog.categoryFollowerBackgroundKeepAliveManager,
                 type: .error,
@@ -136,6 +202,14 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
             options: .new,
             context: nil
         )
+
+        audioInterruptionObserver = notificationCenter.addObserver(
+            forName: AVAudioSession.interruptionNotification,
+            object: nil,
+            queue: nil
+        ) { [weak self] notification in
+            self?.audioSessionWasInterrupted(notification)
+        }
     }
 
     /// Records the operational follower and configures the shared engine for the current setting.
@@ -147,9 +221,9 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     ///
     /// Re-registering the same source updates only its optional Calendar action and cannot create a
     /// duplicate timer or lifecycle callback. Registering another source replaces the previous
-    /// registration and rebuilds the one replay timer for the new source. Disabled and heartbeat
+    /// registration and rebuilds the one shared timer for the new source. Disabled and heartbeat
     /// retain the operational source without creating an audio timer, allowing a later change to
-    /// normal or aggressive to restore audio without restarting the follower.
+    /// an audio mode to restore playback without restarting the follower.
     ///
     /// - Parameters:
     ///   - source: The follower that is currently configured, selected, and operational.
@@ -173,42 +247,51 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     /// teardown. The source match is intentional: an asynchronous or delayed stop from the old
     /// follower cannot suspend a newer follower that has already called `start`.
     ///
-    /// A matching stop suspends and removes the replay timer, then clears the source and optional
-    /// Calendar action. It does not stop or replace the retained audio player, invalidate follower
-    /// sessions, or alter any polling timer.
+    /// A matching stop suspends and removes the shared timer, stops only the dedicated Continuous
+    /// player, then clears the source and optional Calendar action. It never alters the proven
+    /// one-shot player, follower sessions, or polling timers.
     ///
     /// - Parameter source: The follower whose operational registration should be cleared.
     func stop(for source: FollowerBackgroundKeepAliveSource) {
         guard activeSource == source else { return }
-        playSoundTimer?.suspend()
-        playSoundTimer = nil
+        replaceKeepAliveTimer(with: nil)
+        stopContinuousPlayback()
         activeSource = nil
         backgroundRefresh = nil
     }
 
-    /// Rebuilds only the shared replay timer to reflect the user's current keep-alive setting.
+    /// Rebuilds only shared audio scheduling to reflect the user's current keep-alive setting.
     ///
-    /// Normal and aggressive receive their exact existing intervals. Disabled and heartbeat leave
-    /// the operational source intact but suspend and remove the timer. The new timer starts in the
-    /// suspended state and is resumed only when the application enters the background. No follower
-    /// download, login, session, retry schedule, or authentication state is touched.
+    /// Normal and Aggressive retain their exact existing 5-second and 2-second replay intervals.
+    /// Continuous uses a 5-second health check while its separate player loops independently.
+    /// Disabled and Heartbeat leave the operational source intact but remove audio scheduling.
+    /// No follower download, login, session, retry schedule, or authentication state is touched.
     ///
     /// This operation is internal so the setting observer and focused tests can exercise the same
     /// reconfiguration path. Follower managers should report operational state through `start` and
     /// `stop` instead of calling this method when settings change.
     func refreshForSelectedMode() {
-        playSoundTimer?.suspend()
-        playSoundTimer = nil
+        replaceKeepAliveTimer(with: nil)
 
-        guard activeSource != nil else { return }
         let keepAliveType = selectedKeepAliveType()
-        guard keepAliveType.shouldKeepAlive else { return }
+        if keepAliveType != .continuous {
+            stopContinuousPlayback()
+        }
+        guard activeSource != nil,
+              let interval = keepAliveInterval(for: keepAliveType) else { return }
 
-        let interval = keepAliveType == .normal
-            ? ConstantsSuspensionPrevention.intervalNormal
-            : ConstantsSuspensionPrevention.intervalAggressive
-        playSoundTimer = timerFactory(TimeInterval(interval)) { [weak self] in
-            self?.keepAliveTimerFired(interval: interval)
+        timerGeneration += 1
+        let generation = timerGeneration
+        let timer = timerFactory(TimeInterval(interval)) { [weak self] in
+            self?.keepAliveTimerFired(interval: interval, generation: generation)
+        }
+        keepAliveTimer = timer
+
+        // Settings normally change while the app is visible, but applying this state immediately
+        // also makes an already-backgrounded transition deterministic.
+        if applicationIsInBackground, let activeSource {
+            timer.resume()
+            ensureAudioIsPlaying(for: keepAliveType, interval: interval, source: activeSource)
         }
     }
 
@@ -232,7 +315,11 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
             self,
             forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue
         )
-        playSoundTimer?.suspend()
+        replaceKeepAliveTimer(with: nil)
+        stopContinuousPlayback()
+        if let audioInterruptionObserver {
+            notificationCenter.removeObserver(audioInterruptionObserver)
+        }
         applicationManager.removeClosureToRunWhenAppDidEnterBackground(
             key: applicationManagerKeyResumePlaySoundTimer
         )
@@ -241,28 +328,34 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
         )
     }
 
-    /// Activates the existing replay timer and performs the immediate background-entry audio check.
+    /// Activates the selected audio mode and performs the immediate background-entry audio check.
     ///
     /// The callback first confirms that an operational follower is registered and that the current
     /// setting still permits silent audio. Shared Calendar's optional refresh runs only after the
     /// audio check. All other follower sources have no work attached to this lifecycle event.
     private func applicationDidEnterBackground() {
-        guard let activeSource, selectedKeepAliveType().shouldKeepAlive else { return }
+        applicationIsInBackground = true
+        let keepAliveType = selectedKeepAliveType()
+        guard let activeSource,
+              let interval = keepAliveInterval(for: keepAliveType) else { return }
 
-        // Match the proven follower behavior: start the wake timer and immediately ensure that the
-        // short sound is playing. The Calendar action runs only after this audio check.
-        playSoundTimer?.resume()
-        playAudioIfNeeded(interval: selectedInterval, source: activeSource)
+        // Normal and Aggressive keep their exact existing immediate one-shot check. Continuous
+        // starts its isolated loop. The Calendar action follows either audio check.
+        keepAliveTimer?.resume()
+        ensureAudioIsPlaying(for: keepAliveType, interval: interval, source: activeSource)
         backgroundRefresh?()
     }
 
     /// Suspends background replay when the application is returning to the foreground.
     ///
-    /// Suspending the timer preserves the proven lifecycle behavior. The retained player is not
-    /// stopped, replaced, reset, or converted into continuous playback.
+    /// Suspending the timer preserves the proven lifecycle behavior. The one-shot player is not
+    /// stopped, replaced, or reset. Only the separate Continuous player is stopped and rewound so
+    /// its indefinite loop cannot continue while the application is visible.
     private func applicationWillEnterForeground() {
-        // Do not stop, replace, or otherwise modify the retained player on foreground entry.
-        playSoundTimer?.suspend()
+        applicationIsInBackground = false
+        keepAliveTimer?.suspend()
+        // Preserve the proven one-shot player exactly. Only the dedicated Continuous player stops.
+        stopContinuousPlayback()
     }
 
     /// Handles one shared replay-timer tick after revalidating current source and setting state.
@@ -271,23 +364,65 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     /// to disabled or heartbeat. The optional Shared Calendar refresh follows the audio check; this
     /// method never invokes a network follower's polling API.
     ///
-    /// - Parameter interval: The established replay interval captured when this timer was created.
-    private func keepAliveTimerFired(interval: Int) {
+    /// - Parameters:
+    ///   - interval: The established interval captured when this timer was created.
+    ///   - generation: Identifies the currently installed timer and rejects a queued obsolete tick.
+    private func keepAliveTimerFired(interval: Int, generation: Int) {
         // Revalidate both pieces of state on every tick. This makes a pending callback harmless if
         // its source stopped or the user selected disabled/heartbeat while it was queued.
-        guard let activeSource, selectedKeepAliveType().shouldKeepAlive else { return }
-        playAudioIfNeeded(interval: interval, source: activeSource)
+        let keepAliveType = selectedKeepAliveType()
+        guard generation == timerGeneration,
+              applicationIsInBackground,
+              let activeSource,
+              keepAliveInterval(for: keepAliveType) == interval else { return }
+        ensureAudioIsPlaying(for: keepAliveType, interval: interval, source: activeSource)
         backgroundRefresh?()
     }
 
-    /// Returns the established replay interval for the currently selected audio-enabled mode.
+    /// Returns the shared timer interval for an audio-enabled keep-alive mode.
     ///
-    /// Callers reach this property only after confirming `shouldKeepAlive`, so normal maps to five
-    /// seconds and the remaining audio-enabled case, aggressive, maps to two seconds.
-    private var selectedInterval: Int {
-        selectedKeepAliveType() == .normal
-            ? ConstantsSuspensionPrevention.intervalNormal
-            : ConstantsSuspensionPrevention.intervalAggressive
+    /// Normal and Aggressive retain their proven intervals. Continuous uses the normal five-second
+    /// cadence only as a health check and Shared Calendar refresh opportunity; the audio itself is
+    /// already looping independently. Disabled and Heartbeat have no audio timer.
+    private func keepAliveInterval(for keepAliveType: FollowerBackgroundKeepAliveType) -> Int? {
+        switch keepAliveType {
+        case .normal, .continuous:
+            return ConstantsSuspensionPrevention.intervalNormal
+        case .aggressive:
+            return ConstantsSuspensionPrevention.intervalAggressive
+        case .disabled, .heartbeat:
+            return nil
+        }
+    }
+
+    /// Suspends and replaces the one shared keep-alive timer without leaving stale ticks active.
+    ///
+    /// - Parameter replacement: The newly configured timer, or `nil` when audio scheduling is off.
+    private func replaceKeepAliveTimer(with replacement: FollowerBackgroundTimer?) {
+        timerGeneration += 1
+        keepAliveTimer?.suspend()
+        keepAliveTimer = replacement
+    }
+
+    /// Selects the isolated Continuous player or the proven one-shot player for an audio check.
+    ///
+    /// This method contains no follower networking. Shared Calendar work remains outside it and is
+    /// invoked only after the audio check by the lifecycle and timer callers.
+    ///
+    /// - Parameters:
+    ///   - keepAliveType: The currently selected and revalidated keep-alive setting.
+    ///   - interval: The active timer interval, used only for diagnostic logging.
+    ///   - source: The currently registered follower, used only for diagnostic logging.
+    private func ensureAudioIsPlaying(
+        for keepAliveType: FollowerBackgroundKeepAliveType,
+        interval: Int,
+        source: FollowerBackgroundKeepAliveSource
+    ) {
+        if keepAliveType == .continuous {
+            playContinuousAudioIfNeeded(source: source)
+        } else {
+            playOneShotAudioIfNeeded(interval: interval, source: source)
+        }
     }
 
     /// Replays the retained one-shot sound only after its previous playback has ended.
@@ -299,14 +434,14 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     /// - Parameters:
     ///   - interval: The active timer interval, used only to make diagnostic logging explicit.
     ///   - source: The currently registered follower, used only to identify the owner in logging.
-    private func playAudioIfNeeded(interval: Int, source: FollowerBackgroundKeepAliveSource) {
+    private func playOneShotAudioIfNeeded(interval: Int, source: FollowerBackgroundKeepAliveSource) {
         trace(
             "in eventhandler checking if audioplayer exists",
             log: log,
             category: ConstantsLog.categoryFollowerBackgroundKeepAliveManager,
             type: .info
         )
-        guard let audioPlayer, !audioPlayer.isPlaying else { return }
+        guard let oneShotAudioPlayer, !oneShotAudioPlayer.isPlaying else { return }
         trace(
             "playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@",
             log: log,
@@ -316,17 +451,66 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
             source.description,
             selectedKeepAliveType().description
         )
-        audioPlayer.play()
+        oneShotAudioPlayer.play()
+    }
+
+    /// Starts or restores the isolated continuously looping silent-audio player.
+    ///
+    /// The loop uses the existing CAF and `numberOfLoops = -1`. The `isPlaying` check prevents
+    /// lifecycle, health-timer, and interruption callbacks from restarting healthy playback. This
+    /// operation never touches the one-shot player or initiates follower networking.
+    ///
+    /// - Parameter source: The currently registered follower, used only for diagnostic logging.
+    private func playContinuousAudioIfNeeded(source: FollowerBackgroundKeepAliveSource) {
+        guard let continuousAudioPlayer, !continuousAudioPlayer.isPlaying else { return }
+        continuousAudioPlayer.currentTime = 0
+        trace(
+            "starting continuous silent audio. %{public}@ keep-alive",
+            log: log,
+            category: ConstantsLog.categoryFollowerBackgroundKeepAliveManager,
+            type: .info,
+            source.description
+        )
+        continuousAudioPlayer.play()
+    }
+
+    /// Stops and rewinds only the player reserved for Continuous keep-alive.
+    ///
+    /// The proven Normal and Aggressive player is deliberately untouched, including when the app
+    /// enters the foreground or the selected mode changes.
+    private func stopContinuousPlayback() {
+        guard let continuousAudioPlayer else { return }
+        if continuousAudioPlayer.isPlaying {
+            continuousAudioPlayer.stop()
+        }
+        continuousAudioPlayer.currentTime = 0
+    }
+
+    /// Restores Continuous playback after the system ends an audio-session interruption.
+    ///
+    /// iOS may interrupt audio for calls, alarms, Siri, or another non-mixing audio session. The
+    /// manager restarts only when an operational follower remains registered, the app is still in
+    /// the background, Continuous remains selected, and playback actually stopped. It does not
+    /// reconfigure `AVAudioSession` or request follower networking.
+    ///
+    /// - Parameter notification: The `AVAudioSession.interruptionNotification` to interpret.
+    private func audioSessionWasInterrupted(_ notification: Notification) {
+        guard let typeValue = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+              AVAudioSession.InterruptionType(rawValue: typeValue) == .ended,
+              applicationIsInBackground,
+              selectedKeepAliveType() == .continuous,
+              let activeSource else { return }
+        playContinuousAudioIfNeeded(source: activeSource)
     }
 
     /// Creates the production `AVAudioPlayer` for the existing bundled silent-audio resource.
     ///
     /// The resource name already includes its extension, matching the legacy lookup exactly. The
-    /// resulting player is created once by the initializer and retained for all subsequent one-shot
-    /// replays.
+    /// factory is called once for the proven one-shot player and once for the separate Continuous
+    /// player so stopping the loop can never alter Normal or Aggressive playback.
     ///
     /// - Parameter resourceName: The complete bundled filename from `ConstantsSuspensionPrevention`.
-    /// - Returns: The audio player used by the shared keep-alive engine.
+    /// - Returns: A new audio player used by one side of the shared keep-alive engine.
     /// - Throws: A descriptive error when the resource is absent, or the error produced while
     ///   initializing `AVAudioPlayer` when the resource cannot be opened.
     private static func makeAudioPlayer(resourceName: String) throws -> FollowerBackgroundAudioPlaying {
@@ -373,9 +557,10 @@ protocol FollowerBackgroundKeepAliveManaging: AnyObject {
     /// Registers a fully operational follower with the application-wide shared keep-alive engine.
     ///
     /// Consumers report operational state only. The shared engine decides whether the current
-    /// normal, aggressive, disabled, or heartbeat setting permits silent audio and owns the player,
-    /// replay timer, mode observation, and application lifecycle callbacks. Calling this operation
-    /// never starts follower networking or changes authentication state.
+    /// normal, aggressive, continuous, disabled, or heartbeat setting permits silent audio and owns
+    /// both players, the shared timer, mode observation, interruption recovery, and application
+    /// lifecycle callbacks. Calling this operation never starts follower networking or changes
+    /// authentication state.
     ///
     /// Calling `start` repeatedly for the same source is safe and does not create duplicate timers
     /// or lifecycle callbacks. Starting a different source replaces the previous operational source.
@@ -415,10 +600,22 @@ extension FollowerBackgroundKeepAliveManaging {
 // AVAudioPlayer/RepeatingTimer/ApplicationManager engine while allowing deterministic unit tests
 // that do not play audio or move the test host between foreground and background.
 protocol FollowerBackgroundAudioPlaying: AnyObject {
-    /// Indicates whether the retained one-shot sound is still playing.
+    /// Indicates whether the retained sound is currently playing.
     ///
-    /// The shared engine checks this before every replay and leaves an in-progress playback alone.
+    /// The shared engine checks this before every replay or Continuous health check and leaves an
+    /// in-progress playback alone.
     var isPlaying: Bool { get }
+
+    /// Controls whether the player's audio repeats after reaching the end of the CAF.
+    ///
+    /// The dedicated Continuous player receives `-1`; the proven one-shot player retains the
+    /// `AVAudioPlayer` default of `0` and is never modified by Continuous mode.
+    var numberOfLoops: Int { get set }
+
+    /// Reads or rewinds the current playback position.
+    ///
+    /// Only the dedicated Continuous player is rewound when its background run ends or restarts.
+    var currentTime: TimeInterval { get set }
 
     /// Starts one ordinary playback of the existing silent-audio resource.
     ///
@@ -427,6 +624,12 @@ protocol FollowerBackgroundAudioPlaying: AnyObject {
     ///
     /// - Returns: `true` when the player accepted the playback request.
     @discardableResult func play() -> Bool
+
+    /// Stops only the dedicated Continuous player when its background run is no longer required.
+    ///
+    /// Normal and Aggressive never call this operation, preserving their established foreground
+    /// behavior in which an already-started short sound is allowed to finish.
+    func stop()
 }
 
 extension AVAudioPlayer: FollowerBackgroundAudioPlaying {}

@@ -20,6 +20,17 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
     case normal = 1
     case aggressive = 2
     case heartbeat = 3
+    case continuous = 4
+
+    /// The menu order groups the three silent-audio choices together without changing persisted
+    /// raw values. `continuous` remains appended as raw value 4 for storage compatibility.
+    public static let allCases: [FollowerBackgroundKeepAliveType] = [
+        .disabled,
+        .normal,
+        .aggressive,
+        .continuous,
+        .heartbeat
+    ]
     
     var description: String {
         switch self {
@@ -29,6 +40,8 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
             return Texts_SettingsView.followerKeepAliveTypeNormal
         case .aggressive:
             return Texts_SettingsView.followerKeepAliveTypeAggressive
+        case .continuous:
+            return Texts_SettingsView.followerKeepAliveTypeContinuous
         case .heartbeat:
             return Texts_SettingsView.followerKeepAliveTypeHeartbeat
         }
@@ -44,17 +57,8 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
             return 2
         case .heartbeat:
             return 3
-        }
-    }
-    
-    // return true if in follower mode and if the keep-alive type should provoke a background keep-alive action
-    // basically if not .disabled and if not .heartbeat
-    var shouldKeepAlive: Bool {
-        switch self {
-        case .disabled, .heartbeat:
-            return false
-        default:
-            return true
+        case .continuous:
+            return 4
         }
     }
     
@@ -67,6 +71,8 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
             return "n.circle"
         case .aggressive:
             return "a.circle"
+        case .continuous:
+            return "c.circle"
         case .heartbeat:
             return "heart.circle"
         }

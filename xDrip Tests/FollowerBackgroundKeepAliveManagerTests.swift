@@ -6,17 +6,24 @@
 //  Copyright © 2026 Johan Degraeve. All rights reserved.
 //
 
+import AVFoundation
 import XCTest
 @testable import xdrip
 
 final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
-    func testCreatesPlayerWithExistingShortSoundAndDoesNotPlayInForeground() {
+    func testCreatesBothPlayersWithExistingShortSoundAndDoesNotPlayInForeground() {
         let test = makeTestManager(mode: .normal)
 
         test.manager.start(for: .nightscout)
 
-        XCTAssertEqual(test.requestedSoundFile(), ConstantsSuspensionPrevention.soundFileName)
-        XCTAssertEqual(test.audioPlayer.playCount, 0)
+        XCTAssertEqual(
+            test.requestedSoundFiles(),
+            [ConstantsSuspensionPrevention.soundFileName, ConstantsSuspensionPrevention.soundFileName]
+        )
+        XCTAssertEqual(test.oneShotAudioPlayer.numberOfLoops, 0)
+        XCTAssertEqual(test.continuousAudioPlayer.numberOfLoops, -1)
+        XCTAssertEqual(test.oneShotAudioPlayer.playCount, 0)
+        XCTAssertEqual(test.continuousAudioPlayer.playCount, 0)
         XCTAssertEqual(test.timerFactory.timers.map(\.interval), [5])
         XCTAssertEqual(test.applicationManager.backgroundClosures.count, 1)
         XCTAssertEqual(test.applicationManager.foregroundClosures.count, 1)
@@ -29,7 +36,8 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
         test.applicationManager.enterBackground()
 
         XCTAssertEqual(test.timerFactory.timers.last?.resumeCount, 1)
-        XCTAssertEqual(test.audioPlayer.playCount, 1)
+        XCTAssertEqual(test.oneShotAudioPlayer.playCount, 1)
+        XCTAssertEqual(test.continuousAudioPlayer.playCount, 0)
     }
 
     func testTimerReplaysOnlyAfterShortSoundEnds() {
@@ -39,11 +47,11 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
         let timer = test.timerFactory.timers.last
 
         timer?.fire()
-        XCTAssertEqual(test.audioPlayer.playCount, 1)
+        XCTAssertEqual(test.oneShotAudioPlayer.playCount, 1)
 
-        test.audioPlayer.isPlaying = false
+        test.oneShotAudioPlayer.isPlaying = false
         timer?.fire()
-        XCTAssertEqual(test.audioPlayer.playCount, 2)
+        XCTAssertEqual(test.oneShotAudioPlayer.playCount, 2)
     }
 
     func testForegroundSuspendsTimerWithoutChangingPlayer() {
@@ -54,8 +62,9 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
         test.applicationManager.enterForeground()
 
         XCTAssertEqual(test.timerFactory.timers.last?.suspendCount, 1)
-        XCTAssertTrue(test.audioPlayer.isPlaying)
-        XCTAssertEqual(test.audioPlayer.playCount, 1)
+        XCTAssertTrue(test.oneShotAudioPlayer.isPlaying)
+        XCTAssertEqual(test.oneShotAudioPlayer.playCount, 1)
+        XCTAssertEqual(test.oneShotAudioPlayer.stopCount, 0)
     }
 
     func testAggressiveModeUsesTwoSeconds() {
@@ -74,7 +83,8 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
             test.applicationManager.enterBackground()
 
             XCTAssertTrue(test.timerFactory.timers.isEmpty)
-            XCTAssertEqual(test.audioPlayer.playCount, 0)
+            XCTAssertEqual(test.oneShotAudioPlayer.playCount, 0)
+            XCTAssertEqual(test.continuousAudioPlayer.playCount, 0)
         }
     }
 
@@ -95,7 +105,7 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
 
         XCTAssertEqual(aggressiveTimer?.suspendCount, 1)
         test.applicationManager.enterBackground()
-        XCTAssertEqual(test.audioPlayer.playCount, 0)
+        XCTAssertEqual(test.oneShotAudioPlayer.playCount, 0)
     }
 
     func testRepeatedStartDoesNotDuplicateTimerOrLifecycleCallbacks() {
@@ -120,7 +130,7 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
         test.applicationManager.enterBackground()
 
         XCTAssertEqual(test.timerFactory.timers.last?.resumeCount, 1)
-        XCTAssertEqual(test.audioPlayer.playCount, 1)
+        XCTAssertEqual(test.oneShotAudioPlayer.playCount, 1)
     }
 
     func testCalendarRefreshRunsOnBackgroundEntryAndEveryTick() {
@@ -148,7 +158,7 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
         test.timerFactory.timers.last?.fire()
 
         XCTAssertEqual(refreshCount, 0)
-        XCTAssertEqual(test.audioPlayer.playCount, 1)
+        XCTAssertEqual(test.oneShotAudioPlayer.playCount, 1)
     }
 
     func testEverySelectableFollowerSourceCanBecomeTheOperationalSource() {
@@ -172,7 +182,166 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
 
         XCTAssertEqual(test.timerFactory.timers.count, sources.count)
         XCTAssertEqual(test.timerFactory.timers.last?.resumeCount, 1)
-        XCTAssertEqual(test.audioPlayer.playCount, 1)
+        XCTAssertEqual(test.oneShotAudioPlayer.playCount, 1)
+    }
+
+    func testContinuousStartsLoopInBackgroundAndUsesFiveSecondHealthTimer() {
+        let test = makeTestManager(mode: .continuous)
+        test.manager.start(for: .nightscout)
+
+        XCTAssertEqual(test.timerFactory.timers.map(\.interval), [5])
+        XCTAssertEqual(test.continuousAudioPlayer.playCount, 0)
+
+        test.applicationManager.enterBackground()
+
+        XCTAssertEqual(test.timerFactory.timers.last?.resumeCount, 1)
+        XCTAssertEqual(test.continuousAudioPlayer.playCount, 1)
+        XCTAssertTrue(test.continuousAudioPlayer.isPlaying)
+        XCTAssertEqual(test.oneShotAudioPlayer.playCount, 0)
+    }
+
+    func testContinuousHealthTickLeavesHealthyLoopAloneAndRestartsEndedPlayback() {
+        let test = makeTestManager(mode: .continuous)
+        test.manager.start(for: .careLink)
+        test.applicationManager.enterBackground()
+        let timer = test.timerFactory.timers.last
+
+        timer?.fire()
+        XCTAssertEqual(test.continuousAudioPlayer.playCount, 1)
+
+        test.continuousAudioPlayer.isPlaying = false
+        test.continuousAudioPlayer.currentTime = 0.25
+        timer?.fire()
+
+        XCTAssertEqual(test.continuousAudioPlayer.playCount, 2)
+        XCTAssertEqual(test.continuousAudioPlayer.currentTime, 0)
+    }
+
+    func testForegroundStopsOnlyContinuousPlayer() {
+        let test = makeTestManager(mode: .continuous)
+        test.manager.start(for: .dexcomShare)
+        test.applicationManager.enterBackground()
+
+        test.applicationManager.enterForeground()
+
+        XCTAssertEqual(test.timerFactory.timers.last?.suspendCount, 1)
+        XCTAssertEqual(test.continuousAudioPlayer.stopCount, 1)
+        XCTAssertFalse(test.continuousAudioPlayer.isPlaying)
+        XCTAssertEqual(test.continuousAudioPlayer.currentTime, 0)
+        XCTAssertEqual(test.oneShotAudioPlayer.stopCount, 0)
+    }
+
+    func testContinuousModeChangesStopLoopAndRestoreOneShotEngineWhileBackgrounded() {
+        let test = makeTestManager(mode: .continuous)
+        test.manager.start(for: .nightscout)
+        test.applicationManager.enterBackground()
+        let continuousTimer = test.timerFactory.timers.last
+
+        test.setMode(.aggressive)
+        test.manager.refreshForSelectedMode()
+
+        XCTAssertEqual(continuousTimer?.suspendCount, 1)
+        XCTAssertEqual(test.continuousAudioPlayer.stopCount, 1)
+        XCTAssertEqual(test.oneShotAudioPlayer.playCount, 1)
+        XCTAssertEqual(test.timerFactory.timers.map(\.interval), [5, 2])
+
+        test.oneShotAudioPlayer.isPlaying = false
+        test.setMode(.continuous)
+        test.manager.refreshForSelectedMode()
+
+        XCTAssertEqual(test.continuousAudioPlayer.playCount, 2)
+        XCTAssertEqual(test.oneShotAudioPlayer.stopCount, 0)
+        XCTAssertEqual(test.timerFactory.timers.map(\.interval), [5, 2, 5])
+    }
+
+    func testDisabledAndHeartbeatStopContinuousImmediatelyButRetainSource() {
+        for mode in [FollowerBackgroundKeepAliveType.disabled, .heartbeat] {
+            let test = makeTestManager(mode: .continuous)
+            test.manager.start(for: .libreLinkUp)
+            test.applicationManager.enterBackground()
+
+            test.setMode(mode)
+            test.manager.refreshForSelectedMode()
+
+            XCTAssertEqual(test.continuousAudioPlayer.stopCount, 1)
+            XCTAssertFalse(test.continuousAudioPlayer.isPlaying)
+
+            test.setMode(.continuous)
+            test.manager.refreshForSelectedMode()
+            XCTAssertEqual(test.continuousAudioPlayer.playCount, 2)
+        }
+    }
+
+    func testEndedAudioInterruptionRestartsOnlyBackgroundContinuousPlayback() {
+        let test = makeTestManager(mode: .continuous)
+        test.manager.start(for: .careLink)
+        test.applicationManager.enterBackground()
+        test.continuousAudioPlayer.isPlaying = false
+
+        test.notificationCenter.post(
+            name: AVAudioSession.interruptionNotification,
+            object: nil,
+            userInfo: [AVAudioSessionInterruptionTypeKey: AVAudioSession.InterruptionType.ended.rawValue]
+        )
+
+        XCTAssertEqual(test.continuousAudioPlayer.playCount, 2)
+
+        test.applicationManager.enterForeground()
+        test.notificationCenter.post(
+            name: AVAudioSession.interruptionNotification,
+            object: nil,
+            userInfo: [AVAudioSessionInterruptionTypeKey: AVAudioSession.InterruptionType.ended.rawValue]
+        )
+        XCTAssertEqual(test.continuousAudioPlayer.playCount, 2)
+    }
+
+    func testActualKeepAlivePreferenceObservationReconfiguresTheSharedManager() {
+        let defaults = UserDefaults.standard
+        let key = UserDefaults.Key.followerBackgroundKeepAliveType.rawValue
+        let originalValue = defaults.object(forKey: key)
+        defer {
+            if let originalValue {
+                defaults.set(originalValue, forKey: key)
+            } else {
+                defaults.removeObject(forKey: key)
+            }
+        }
+        defaults.followerBackgroundKeepAliveType = .normal
+
+        let applicationManager = FakeFollowerApplicationManager()
+        let players = [FakeFollowerAudioPlayer(), FakeFollowerAudioPlayer()]
+        let timerFactory = FakeFollowerTimerFactory()
+        var playerIndex = 0
+        let manager = FollowerBackgroundKeepAliveManager(
+            applicationManager: applicationManager,
+            selectedKeepAliveType: { defaults.followerBackgroundKeepAliveType },
+            audioPlayerFactory: { _ in
+                defer { playerIndex += 1 }
+                return players[playerIndex]
+            },
+            timerFactory: timerFactory.makeTimer,
+            notificationCenter: NotificationCenter()
+        )
+        manager.start(for: .nightscout)
+        let normalTimer = timerFactory.timers.last
+
+        defaults.followerBackgroundKeepAliveType = .aggressive
+
+        XCTAssertEqual(normalTimer?.suspendCount, 1)
+        XCTAssertEqual(timerFactory.timers.map(\.interval), [5, 2])
+    }
+
+    func testPersistedRawValuesAndMenuOrderIncludeContinuousWithoutReorderingExistingModes() {
+        XCTAssertEqual(FollowerBackgroundKeepAliveType.disabled.rawValue, 0)
+        XCTAssertEqual(FollowerBackgroundKeepAliveType.normal.rawValue, 1)
+        XCTAssertEqual(FollowerBackgroundKeepAliveType.aggressive.rawValue, 2)
+        XCTAssertEqual(FollowerBackgroundKeepAliveType.heartbeat.rawValue, 3)
+        XCTAssertEqual(FollowerBackgroundKeepAliveType.continuous.rawValue, 4)
+        XCTAssertEqual(
+            FollowerBackgroundKeepAliveType.allCases,
+            [.disabled, .normal, .aggressive, .continuous, .heartbeat]
+        )
+        XCTAssertEqual(FollowerBackgroundKeepAliveType.continuous.keepAliveImageString, "c.circle")
     }
 
     func testAudioPlayerCreationFailureIsNonfatal() {
@@ -182,7 +351,8 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
             applicationManager: applicationManager,
             selectedKeepAliveType: { .normal },
             audioPlayerFactory: { _ in throw TestError.audioUnavailable },
-            timerFactory: timerFactory.makeTimer
+            timerFactory: timerFactory.makeTimer,
+            notificationCenter: NotificationCenter()
         )
         manager.start(for: .nightscout)
 
@@ -192,28 +362,280 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
         XCTAssertEqual(timerFactory.timers.last?.resumeCount, 1)
     }
 
+    func testEitherPlayerCanOperateWhenTheOtherPlayerCannotBeCreated() {
+        let scenarios: [(failedFactoryCall: Int, mode: FollowerBackgroundKeepAliveType)] = [
+            (0, .continuous),
+            (1, .normal)
+        ]
+
+        for scenario in scenarios {
+            let applicationManager = FakeFollowerApplicationManager()
+            let workingPlayer = FakeFollowerAudioPlayer()
+            let timerFactory = FakeFollowerTimerFactory()
+            var factoryCall = 0
+            let manager = FollowerBackgroundKeepAliveManager(
+                applicationManager: applicationManager,
+                selectedKeepAliveType: { scenario.mode },
+                audioPlayerFactory: { _ in
+                    defer { factoryCall += 1 }
+                    if factoryCall == scenario.failedFactoryCall {
+                        throw TestError.audioUnavailable
+                    }
+                    return workingPlayer
+                },
+                timerFactory: timerFactory.makeTimer,
+                notificationCenter: NotificationCenter()
+            )
+
+            manager.start(for: .nightscout)
+            applicationManager.enterBackground()
+
+            XCTAssertEqual(workingPlayer.playCount, 1)
+        }
+    }
+
+    func testAllNetworkFollowerManagersWireOperationalAndTeardownStatesToSharedManager() {
+        let snapshot = StandardDefaultsSnapshot(keys: [
+            .isMaster,
+            .followerDataSourceType,
+            .nightscoutUrl,
+            .nightscoutEnabled,
+            .libreLinkUpEmail,
+            .libreLinkUpPassword,
+            .libreLinkUpManuallyLoggedOut,
+            .dexcomShareAccountName,
+            .dexcomSharePassword,
+            .dexcomShareManuallyLoggedOut,
+            .medtrumEasyViewEmail,
+            .medtrumEasyViewPassword,
+            .medtrumEasyViewManuallyLoggedOut
+        ])
+        defer { snapshot.restore() }
+
+        let defaults = UserDefaults.standard
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let delegate = KeepAliveFollowerDelegateSpy()
+        let keepAlive = RecordingFollowerBackgroundKeepAliveManager()
+        defaults.isMaster = false
+
+        defaults.followerDataSourceType = .nightscout
+        defaults.nightscoutUrl = "https://example.invalid"
+        defaults.nightscoutEnabled = true
+        var nightscout: NightscoutFollowManager? = NightscoutFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: delegate,
+            backgroundKeepAliveManager: keepAlive,
+            startsInitialDownload: false
+        )
+        XCTAssertEqual(keepAlive.startedSources, [.nightscout])
+        defaults.followerDataSourceType = .dexcomShare
+        XCTAssertEqual(keepAlive.stoppedSources.last, .nightscout)
+        nightscout = nil
+        XCTAssertNil(nightscout)
+
+        keepAlive.reset()
+        defaults.libreLinkUpEmail = "follower@example.invalid"
+        defaults.libreLinkUpPassword = "password"
+        defaults.libreLinkUpManuallyLoggedOut = false
+        for source in [FollowerDataSourceType.libreLinkUp, .libreLinkUpRussia] {
+            defaults.followerDataSourceType = source
+            var libre: LibreLinkUpFollowManager? = LibreLinkUpFollowManager(
+                coreDataManager: coreDataManager,
+                followerDelegate: delegate,
+                backgroundKeepAliveManager: keepAlive,
+                startsInitialDownload: false
+            )
+            XCTAssertEqual(keepAlive.startedSources.last, .libreLinkUp)
+            libre?.logOut()
+            XCTAssertEqual(keepAlive.stoppedSources.last, .libreLinkUp)
+            libre = nil
+            defaults.libreLinkUpManuallyLoggedOut = false
+        }
+
+        keepAlive.reset()
+        defaults.followerDataSourceType = .dexcomShare
+        defaults.dexcomShareAccountName = "account"
+        defaults.dexcomSharePassword = "password"
+        defaults.dexcomShareManuallyLoggedOut = false
+        var dexcom: DexcomShareFollowManager? = DexcomShareFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: delegate,
+            backgroundKeepAliveManager: keepAlive,
+            startsInitialDownload: false
+        )
+        XCTAssertEqual(keepAlive.startedSources, [.dexcomShare])
+        dexcom?.logOut()
+        XCTAssertEqual(keepAlive.stoppedSources.last, .dexcomShare)
+        dexcom = nil
+        XCTAssertNil(dexcom)
+
+        keepAlive.reset()
+        defaults.followerDataSourceType = .medtrumEasyView
+        defaults.medtrumEasyViewEmail = "follower@example.invalid"
+        defaults.medtrumEasyViewPassword = "password"
+        defaults.medtrumEasyViewManuallyLoggedOut = false
+        var medtrum: MedtrumEasyViewFollowManager? = MedtrumEasyViewFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: delegate,
+            backgroundKeepAliveManager: keepAlive,
+            startsInitialDownload: false
+        )
+        XCTAssertEqual(keepAlive.startedSources, [.medtrumEasyView])
+        medtrum?.logOut()
+        XCTAssertEqual(keepAlive.stoppedSources.last, .medtrumEasyView)
+        medtrum = nil
+        XCTAssertNil(medtrum)
+    }
+
+    func testCalendarAloneSuppliesBackgroundRefreshAndStopsOnSourceChange() {
+        let snapshot = StandardDefaultsSnapshot(keys: [
+            .isMaster,
+            .followerDataSourceType,
+            .calendarFollowCalendarId,
+            .calendarFollowStatus
+        ])
+        defer { snapshot.restore() }
+
+        let defaults = UserDefaults.standard
+        defaults.isMaster = false
+        defaults.followerDataSourceType = .calendar
+        defaults.calendarFollowCalendarId = "Shared Calendar"
+        let keepAlive = RecordingFollowerBackgroundKeepAliveManager()
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        var manager: CalendarFollowManager? = CalendarFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: KeepAliveFollowerDelegateSpy(),
+            backgroundKeepAliveManager: keepAlive,
+            startsInitialDownload: false
+        )
+
+        XCTAssertEqual(keepAlive.startedSources, [.sharedCalendar])
+        XCTAssertEqual(keepAlive.backgroundRefreshWasProvided, [true])
+
+        defaults.followerDataSourceType = .nightscout
+        XCTAssertEqual(keepAlive.stoppedSources.last, .sharedCalendar)
+        manager = nil
+        XCTAssertNil(manager)
+    }
+
+    func testCareLinkRequiresCredentialsAndAuthenticatedSessionBeforeStartingSharedManager() async {
+        let snapshot = StandardDefaultsSnapshot(keys: [
+            .isMaster,
+            .followerDataSourceType,
+            .careLinkUsername,
+            .careLinkPassword,
+            .careLinkSelectedPatientID
+        ])
+        defer { snapshot.restore() }
+
+        let defaults = UserDefaults.standard
+        defaults.isMaster = false
+        defaults.followerDataSourceType = .careLink
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let delegate = KeepAliveFollowerDelegateSpy()
+
+        defaults.careLinkUsername = "care-partner@example.invalid"
+        defaults.careLinkPassword = "password"
+        let credentialsOnlyKeepAlive = RecordingFollowerBackgroundKeepAliveManager()
+        var credentialsOnlyManager: CareLinkFollowManager? = CareLinkFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: delegate,
+            backgroundKeepAliveManager: credentialsOnlyKeepAlive,
+            client: CareLinkClient(tokenStore: CareLinkMemoryTokenStore()),
+            state: CareLinkAccountState(),
+            startsInitialDownload: false
+        )
+        await waitUntil { credentialsOnlyKeepAlive.stoppedSources.count >= 2 }
+        XCTAssertTrue(credentialsOnlyKeepAlive.startedSources.isEmpty)
+        credentialsOnlyManager = nil
+        XCTAssertNil(credentialsOnlyManager)
+
+        defaults.careLinkUsername = nil
+        defaults.careLinkPassword = nil
+        let orphanedTokenStore = CareLinkMemoryTokenStore()
+        orphanedTokenStore.token = makeCareLinkTestToken()
+        let orphanedSessionKeepAlive = RecordingFollowerBackgroundKeepAliveManager()
+        var orphanedSessionManager: CareLinkFollowManager? = CareLinkFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: delegate,
+            backgroundKeepAliveManager: orphanedSessionKeepAlive,
+            client: CareLinkClient(tokenStore: orphanedTokenStore),
+            state: CareLinkAccountState(),
+            startsInitialDownload: false
+        )
+        await waitUntil { orphanedTokenStore.token == nil }
+        XCTAssertTrue(orphanedSessionKeepAlive.startedSources.isEmpty)
+        XCTAssertNil(orphanedTokenStore.token)
+        orphanedSessionManager = nil
+        XCTAssertNil(orphanedSessionManager)
+
+        defaults.careLinkUsername = "care-partner@example.invalid"
+        defaults.careLinkPassword = "password"
+        let authenticatedTokenStore = CareLinkMemoryTokenStore()
+        authenticatedTokenStore.token = makeCareLinkTestToken()
+        let authenticatedKeepAlive = RecordingFollowerBackgroundKeepAliveManager()
+        var authenticatedManager: CareLinkFollowManager? = CareLinkFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: delegate,
+            backgroundKeepAliveManager: authenticatedKeepAlive,
+            client: CareLinkClient(tokenStore: authenticatedTokenStore),
+            state: CareLinkAccountState(),
+            startsInitialDownload: false
+        )
+        await waitUntil { authenticatedKeepAlive.startedSources == [.careLink] }
+        XCTAssertEqual(authenticatedKeepAlive.startedSources, [.careLink])
+        authenticatedManager = nil
+        XCTAssertEqual(authenticatedKeepAlive.stoppedSources.last, .careLink)
+        XCTAssertNil(authenticatedManager)
+    }
+
+    private func waitUntil(_ condition: @escaping () -> Bool) async {
+        for _ in 0..<100 {
+            if condition() { return }
+            try? await Task.sleep(nanoseconds: 10_000_000)
+        }
+    }
+
+    private func makeCareLinkTestToken() -> CareLinkToken {
+        CareLinkToken(
+            accessToken: "test-token",
+            expiresAt: Date().addingTimeInterval(3_600),
+            cookies: [],
+            region: .outsideUnitedStates,
+            countryCode: "GB"
+        )
+    }
+
     private func makeTestManager(mode initialMode: FollowerBackgroundKeepAliveType) -> TestManager {
         let applicationManager = FakeFollowerApplicationManager()
-        let audioPlayer = FakeFollowerAudioPlayer()
+        let oneShotAudioPlayer = FakeFollowerAudioPlayer()
+        let continuousAudioPlayer = FakeFollowerAudioPlayer()
+        let players = [oneShotAudioPlayer, continuousAudioPlayer]
         let timerFactory = FakeFollowerTimerFactory()
+        let notificationCenter = NotificationCenter()
         var selectedMode = initialMode
-        var requestedSoundFile: String?
+        var requestedSoundFiles: [String] = []
+        var playerIndex = 0
         let manager = FollowerBackgroundKeepAliveManager(
             applicationManager: applicationManager,
             selectedKeepAliveType: { selectedMode },
             audioPlayerFactory: { resourceName in
-                requestedSoundFile = resourceName
-                return audioPlayer
+                requestedSoundFiles.append(resourceName)
+                defer { playerIndex += 1 }
+                return players[playerIndex]
             },
-            timerFactory: timerFactory.makeTimer
+            timerFactory: timerFactory.makeTimer,
+            notificationCenter: notificationCenter
         )
         return TestManager(
             manager: manager,
             applicationManager: applicationManager,
-            audioPlayer: audioPlayer,
+            oneShotAudioPlayer: oneShotAudioPlayer,
+            continuousAudioPlayer: continuousAudioPlayer,
             timerFactory: timerFactory,
+            notificationCenter: notificationCenter,
             setMode: { selectedMode = $0 },
-            requestedSoundFile: { requestedSoundFile }
+            requestedSoundFiles: { requestedSoundFiles }
         )
     }
 }
@@ -221,20 +643,88 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
 private struct TestManager {
     let manager: FollowerBackgroundKeepAliveManager
     let applicationManager: FakeFollowerApplicationManager
-    let audioPlayer: FakeFollowerAudioPlayer
+    let oneShotAudioPlayer: FakeFollowerAudioPlayer
+    let continuousAudioPlayer: FakeFollowerAudioPlayer
     let timerFactory: FakeFollowerTimerFactory
+    let notificationCenter: NotificationCenter
     let setMode: (FollowerBackgroundKeepAliveType) -> Void
-    let requestedSoundFile: () -> String?
+    let requestedSoundFiles: () -> [String]
+}
+
+/// Records the operational-state calls made by real follower managers without playing audio.
+private final class RecordingFollowerBackgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging {
+    private(set) var startedSources: [FollowerBackgroundKeepAliveSource] = []
+    private(set) var stoppedSources: [FollowerBackgroundKeepAliveSource] = []
+    private(set) var backgroundRefreshWasProvided: [Bool] = []
+
+    func start(for source: FollowerBackgroundKeepAliveSource, backgroundRefresh: (() -> Void)?) {
+        startedSources.append(source)
+        backgroundRefreshWasProvided.append(backgroundRefresh != nil)
+    }
+
+    func stop(for source: FollowerBackgroundKeepAliveSource) {
+        stoppedSources.append(source)
+    }
+
+    func reset() {
+        startedSources.removeAll()
+        stoppedSources.removeAll()
+        backgroundRefreshWasProvided.removeAll()
+    }
+}
+
+/// Satisfies the real follower initializers while the wiring tests deliberately suppress downloads.
+private final class KeepAliveFollowerDelegateSpy: FollowerDelegate {
+    func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading]) {}
+}
+
+/// Restores the exact standard-defaults state changed while real follower managers are exercised.
+private final class StandardDefaultsSnapshot {
+    private let defaults: UserDefaults
+    private let keys: [UserDefaults.Key]
+    private var existingValues: [String: Any] = [:]
+    private var missingKeys: Set<String> = []
+
+    init(defaults: UserDefaults = .standard, keys: [UserDefaults.Key]) {
+        self.defaults = defaults
+        self.keys = keys
+
+        for key in keys {
+            if let value = defaults.object(forKey: key.rawValue) {
+                existingValues[key.rawValue] = value
+            } else {
+                missingKeys.insert(key.rawValue)
+            }
+        }
+    }
+
+    func restore() {
+        for key in keys {
+            if missingKeys.contains(key.rawValue) {
+                defaults.removeObject(forKey: key.rawValue)
+            } else if let value = existingValues[key.rawValue] {
+                defaults.set(value, forKey: key.rawValue)
+            }
+        }
+    }
 }
 
 private final class FakeFollowerAudioPlayer: FollowerBackgroundAudioPlaying {
     var isPlaying = false
+    var numberOfLoops = 0
+    var currentTime: TimeInterval = 0
     private(set) var playCount = 0
+    private(set) var stopCount = 0
 
     func play() -> Bool {
         playCount += 1
         isPlaying = true
         return true
+    }
+
+    func stop() {
+        stopCount += 1
+        isPlaying = false
     }
 }
 

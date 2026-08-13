@@ -41,6 +41,9 @@ class CalendarFollowManager: NSObject {
     /// The root-owned shared keep-alive engine. This follower reports operational state and supplies
     /// only its existing throttled Calendar read; it does not own audio or lifecycle callbacks.
     private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
+
+    /// Allows wiring tests to reconcile real manager state without querying EventKit.
+    private let startsInitialDownload: Bool
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground
     private let applicationManagerKeyDownloadWhenAppWillEnterForeground = "CalendarFollowManager-DownloadWhenAppWillEnterForeground"
@@ -56,12 +59,14 @@ class CalendarFollowManager: NSObject {
     init(
         coreDataManager: CoreDataManager,
         followerDelegate: FollowerDelegate,
-        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
+        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging,
+        startsInitialDownload: Bool = true
     ) {
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.followerDelegate = followerDelegate
         self.backgroundKeepAliveManager = backgroundKeepAliveManager
+        self.startsInitialDownload = startsInitialDownload
         
         super.init()
         
@@ -273,7 +278,9 @@ class CalendarFollowManager: NSObject {
                 self?.downloadFromKeepAliveTick()
             }
             
-            downloadWhenFollowModeStarts()
+            if startsInitialDownload {
+                downloadWhenFollowModeStarts()
+            }
         } else {
             if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .calendar {
                 UserDefaults.standard.calendarFollowStatus = CalendarShareStatus.notConfigured.rawValue

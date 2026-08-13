@@ -35,6 +35,9 @@ class MedtrumEasyViewFollowManager: NSObject {
     /// does not own silent-audio playback, replay timing, or application lifecycle callbacks.
     private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
 
+    /// Allows wiring tests to reconcile real manager state without starting follower networking.
+    private let startsInitialDownload: Bool
+
     /// Closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
     private var invalidateDownLoadTimerClosure: (() -> Void)?
 
@@ -50,13 +53,15 @@ class MedtrumEasyViewFollowManager: NSObject {
     init(
         coreDataManager: CoreDataManager,
         followerDelegate: FollowerDelegate,
-        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
+        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging,
+        startsInitialDownload: Bool = true
     ) {
         // Initialize non optional private properties
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.followerDelegate = followerDelegate
         self.backgroundKeepAliveManager = backgroundKeepAliveManager
+        self.startsInitialDownload = startsInitialDownload
 
         // Initialize user ID as nil
         self.medtrumUserId = nil
@@ -602,6 +607,8 @@ class MedtrumEasyViewFollowManager: NSObject {
         if shouldRun {
             FollowerSessionState.shared.update(.loggingIn, for: .medtrumEasyView)
             backgroundKeepAliveManager.start(for: .medtrumEasyView)
+
+            guard startsInitialDownload else { return }
 
             // Start downloading
             download()

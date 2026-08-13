@@ -151,10 +151,13 @@ final class FollowerSettingsTests: XCTestCase {
     // MARK: - Child screens
 
     @MainActor
-    func testNightscoutChildContainsStatusOnly() {
+    func testNightscoutChildContainsConnectionAliasAndServerStatus() {
         let screen = NightscoutFollowerSettingsScreen.make()
         let ids = screenRowIDs(screen)
-        XCTAssertEqual(ids, ["nightscout.connection.banner", "nightscout.server.status"])
+        XCTAssertEqual(
+            ids,
+            ["nightscout.connection.banner", "nightscout.profile.alias", "nightscout.server.status"]
+        )
         XCTAssertFalse(ids.contains { $0.hasPrefix("nightscout.account") || $0.contains("test") })
     }
 

@@ -263,6 +263,7 @@ final class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModel
         case .disabled: message = Texts_SettingsView.followerKeepAliveTypeDisabledMessage
         case .normal: message = Texts_SettingsView.followerKeepAliveTypeNormalMessage
         case .aggressive: message = Texts_SettingsView.followerKeepAliveTypeAggressiveMessage
+        case .continuous: message = Texts_SettingsView.followerKeepAliveTypeContinuousMessage
         case .heartbeat: message = Texts_SettingsView.followerKeepAliveTypeHeartbeatMessage
         }
         showMessage(title: Texts_SettingsView.labelfollowerKeepAliveType, message: "\n" + message)

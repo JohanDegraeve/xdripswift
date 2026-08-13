@@ -103,6 +103,30 @@ public final class CoreDataManager {
         // Setup Core Data Stack
         setupCoreDataStack()
     }
+
+    /// Creates a synchronous in-memory Core Data stack for deterministic manager integration tests.
+    ///
+    /// Production callers continue to use `init(modelName:completion:)`, which opens the normal
+    /// SQLite store and installs application lifecycle saves. This initializer deliberately does
+    /// neither: its only purpose is to let tests instantiate real managers without touching the
+    /// user's application database or waiting for asynchronous persistent-store setup.
+    ///
+    /// - Parameter inMemoryModelName: The bundled managed-object model to load into memory.
+    init(inMemoryModelName: String) {
+        self.modelName = inMemoryModelName
+        self.completion = { _ in }
+
+        do {
+            try persistentStoreCoordinator.addPersistentStore(
+                ofType: NSInMemoryStoreType,
+                configurationName: nil,
+                at: nil,
+                options: nil
+            )
+        } catch {
+            fatalError("Unable to Add In-Memory Persistent Store: \(error.localizedDescription)")
+        }
+    }
     
     // MARK: - Helper Methods
     
