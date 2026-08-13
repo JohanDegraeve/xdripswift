@@ -22,9 +22,7 @@ private extension Bool {
 struct RootHomePumpView: View {
     let state: RootHomePumpState
 
-    private enum Layout {
-        static let width: CGFloat = 158
-    }
+    static let preferredWidth: CGFloat = 158
 
     var body: some View {
         VStack(spacing: 0) {
@@ -35,7 +33,7 @@ struct RootHomePumpView: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
-        .frame(width: Layout.width)
+        .frame(width: Self.preferredWidth)
         .frame(maxHeight: .infinity)
         .background(panelBackground(isHistorical: state.isHistorical))
         .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))

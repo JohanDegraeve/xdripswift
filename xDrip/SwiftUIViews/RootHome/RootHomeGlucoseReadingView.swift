@@ -21,33 +21,22 @@ struct RootHomeGlucoseReadingView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
-                HStack(spacing: 4) {
-                    Text(state.minutesText)
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundStyle(state.minutesColor)
-                        .monospacedDigit()
-
-                    Text(state.minutesAgoText)
-                        .font(.system(size: 20))
-                        .foregroundStyle(ConstantsAppColors.secondaryText)
-                }
+                ageText
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .allowsTightening(true)
+                    .layoutPriority(1)
 
                 Spacer(minLength: 8)
 
-                HStack(spacing: 4) {
-                    Text(state.deltaText)
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundStyle(state.deltaColor)
-                        .monospacedDigit()
-
-                    Text(state.deltaUnitText)
-                        .font(.system(size: 20))
-                        .foregroundStyle(ConstantsAppColors.secondaryText)
-                }
+                deltaText
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .allowsTightening(true)
+                    .layoutPriority(1)
             }
-            .lineLimit(1)
-            .minimumScaleFactor(0.5)
-            .allowsTightening(true)
             .padding(.horizontal, Layout.infoHorizontalPadding)
 
             Text(state.valueText)
@@ -61,5 +50,23 @@ struct RootHomeGlucoseReadingView: View {
                 .frame(maxWidth: .infinity)
                 .onLongPressGesture(minimumDuration: 0.5, perform: actions.keepScreenAwake)
         }
+    }
+
+    private var ageText: Text {
+        Text(state.minutesText)
+            .font(.system(size: 20, weight: .medium))
+            .foregroundColor(state.minutesColor)
+        + Text(state.minutesAgoText.isEmpty ? "" : " \(state.minutesAgoText)")
+            .font(.system(size: 20))
+            .foregroundColor(ConstantsAppColors.secondaryText)
+    }
+
+    private var deltaText: Text {
+        Text(state.deltaText)
+            .font(.system(size: 20, weight: .medium))
+            .foregroundColor(state.deltaColor)
+        + Text(state.deltaUnitText.isEmpty ? "" : " \(state.deltaUnitText)")
+            .font(.system(size: 20))
+            .foregroundColor(ConstantsAppColors.secondaryText)
     }
 }

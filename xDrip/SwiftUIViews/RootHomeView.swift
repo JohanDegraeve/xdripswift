@@ -22,6 +22,21 @@ struct RootHomeView: View {
         static let bottomRowSpacing: CGFloat = 3
         static let screenHorizontalMargin: CGFloat = 12
         static let glucoseStatusRowHeight: CGFloat = 120
+        static let ipadGlanceCardMinimumHorizontalPadding: CGFloat = 12
+        static let ipadGlanceCardHorizontalPadding: CGFloat = 30
+        static let ipadGlanceCardMinimumWidthForPadding: CGFloat = 360
+        static let ipadGlanceCardPreferredWidthForPadding: CGFloat = 500
+        static let ipadGlanceCardSpacing: CGFloat = 42
+        static let ipadGlanceCardVerticalPadding: CGFloat = 10
+        static let ipadLoopRowSpacing: CGFloat = 6
+        static let ipadLoopRowHeight: CGFloat = 34
+        static let ipadPumpGlucoseSpacing: CGFloat = 80
+        static let ipadMinimumGlucoseReadingWidth: CGFloat = 180
+        static let ipadChartExpansionButtonTrailingInset: CGFloat = 52
+        static let ipadStatisticsCardVerticalPadding: CGFloat = 30
+        static let ipadStatisticsMetricSpacing: CGFloat = 24
+        static let ipadStatisticsPieSpacing: CGFloat = 12
+        static let ipadStatisticsTextScale: CGFloat = 1.2
         static let ipadPortraitAGPHeight: CGFloat = 280
     }
 
@@ -291,7 +306,7 @@ struct RootHomeView: View {
                 ipadPreChartStatusContent
             }
 
-            expandableMainChart
+            expandableMainChart(showsExpansionButton: true)
                 .frame(maxHeight: .infinity)
                 .layoutPriority(1)
 
@@ -317,7 +332,7 @@ struct RootHomeView: View {
                 ipadPreChartStatusContent
             }
 
-            expandableMainChart
+            expandableMainChart(showsExpansionButton: false)
                 .frame(maxHeight: .infinity)
                 .layoutPriority(1)
 
@@ -347,44 +362,112 @@ struct RootHomeView: View {
     @ViewBuilder private func ipadGlanceBand(availableWidth: CGFloat) -> some View {
         if availableWidth < 720 || dynamicTypeSize.isAccessibilitySize {
             VStack(spacing: 12) {
-                ipadCurrentStatusCard
+                ipadCurrentStatusCard()
 
                 if state.visibility.showsStatistics {
-                    ipadStatisticsCard
+                    ipadStatisticsCard()
                 }
             }
         } else {
-            HStack(alignment: .top, spacing: 14) {
-                ipadCurrentStatusCard
-                    .frame(width: state.visibility.showsStatistics ? availableWidth * 0.4 : availableWidth)
+            let cardWidth = state.visibility.showsStatistics
+                ? max((availableWidth - Layout.ipadGlanceCardSpacing) / 2, 0)
+                : availableWidth
+            let currentStatusHorizontalPadding = ipadGlanceCardHorizontalPadding(for: cardWidth)
+
+            HStack(alignment: .top, spacing: Layout.ipadGlanceCardSpacing) {
+                ipadCurrentStatusCard(
+                    height: ipadGlanceCardHeight,
+                    horizontalPadding: currentStatusHorizontalPadding,
+                    pumpGlucoseSpacing: ipadPumpGlucoseSpacing(
+                        for: cardWidth,
+                        horizontalPadding: currentStatusHorizontalPadding
+                    )
+                )
+                    .frame(width: cardWidth)
 
                 if state.visibility.showsStatistics {
-                    ipadStatisticsCard
+                    ipadStatisticsCard(height: ipadGlanceCardHeight)
+                        .frame(width: cardWidth)
                 }
             }
         }
     }
 
-    private var ipadCurrentStatusCard: some View {
-        VStack(spacing: 8) {
-            glucoseStatusRow
+    private var ipadGlanceCardHeight: CGFloat {
+        let currentStatusHeight = Layout.glucoseStatusRowHeight
+            + (Layout.ipadGlanceCardVerticalPadding * 2)
+            + (state.visibility.showsLoop ? Layout.ipadLoopRowSpacing + Layout.ipadLoopRowHeight : 0)
+
+        guard state.visibility.showsStatistics else { return currentStatusHeight }
+
+        let statisticsHeight = RootHomeStatisticsView.preferredHeight(
+            for: Layout.ipadStatisticsTextScale,
+            metricSpacing: Layout.ipadStatisticsMetricSpacing
+        )
+            + (Layout.ipadStatisticsCardVerticalPadding * 2)
+
+        return max(currentStatusHeight, statisticsHeight)
+    }
+
+    private func ipadGlanceCardHorizontalPadding(for cardWidth: CGFloat) -> CGFloat {
+        let widthRange = Layout.ipadGlanceCardPreferredWidthForPadding
+            - Layout.ipadGlanceCardMinimumWidthForPadding
+        let widthProgress = (cardWidth - Layout.ipadGlanceCardMinimumWidthForPadding) / widthRange
+        let clampedProgress = min(max(widthProgress, 0), 1)
+
+        return Layout.ipadGlanceCardMinimumHorizontalPadding
+            + ((Layout.ipadGlanceCardHorizontalPadding - Layout.ipadGlanceCardMinimumHorizontalPadding) * clampedProgress)
+    }
+
+    private func ipadPumpGlucoseSpacing(
+        for cardWidth: CGFloat,
+        horizontalPadding: CGFloat
+    ) -> CGFloat {
+        guard state.visibility.showsPump else { return 0 }
+
+        let availableSpacing = cardWidth
+            - (horizontalPadding * 2)
+            - RootHomePumpView.preferredWidth
+            - Layout.ipadMinimumGlucoseReadingWidth
+
+        return min(Layout.ipadPumpGlucoseSpacing, max(availableSpacing, 0))
+    }
+
+    private func ipadCurrentStatusCard(
+        height: CGFloat? = nil,
+        horizontalPadding: CGFloat = Layout.ipadGlanceCardHorizontalPadding,
+        pumpGlucoseSpacing: CGFloat = Layout.ipadPumpGlucoseSpacing
+    ) -> some View {
+        VStack(spacing: Layout.ipadLoopRowSpacing) {
+            glucoseStatusRow(spacing: pumpGlucoseSpacing)
 
             if state.visibility.showsLoop {
                 RootHomeLoopView(state: loopDisplayState, actions: actions)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(10)
-        .frame(maxWidth: .infinity, alignment: .top)
+        .padding(.horizontal, horizontalPadding)
+        .padding(.vertical, Layout.ipadGlanceCardVerticalPadding)
+        .frame(maxWidth: .infinity)
+        .frame(height: height, alignment: .top)
         .background(ConstantsAppColors.homePanelBackground)
         .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
     }
 
-    private var ipadStatisticsCard: some View {
-        statisticsContent
+    private func ipadStatisticsCard(height: CGFloat? = nil) -> some View {
+        RootHomeStatisticsView(
+            state: state.statistics,
+            statisticsDays: state.controls.statisticsDays,
+            statisticsDaysChanged: actions.statisticsDaysChanged,
+            action: actions.cycleStatisticsType,
+            textScale: Layout.ipadStatisticsTextScale,
+            metricSpacing: Layout.ipadStatisticsMetricSpacing,
+            pieSpacing: Layout.ipadStatisticsPieSpacing
+        )
             .padding(.horizontal, 10)
-            .padding(.vertical, 30)
+            .padding(.vertical, Layout.ipadStatisticsCardVerticalPadding)
             .frame(maxWidth: .infinity)
+            .frame(height: height)
             .background(ConstantsAppColors.homePanelBackground)
             .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
     }
@@ -415,7 +498,11 @@ struct RootHomeView: View {
     }
 
     private var glucoseStatusRow: some View {
-        HStack(spacing: 0) {
+        glucoseStatusRow(spacing: 0)
+    }
+
+    private func glucoseStatusRow(spacing: CGFloat) -> some View {
+        HStack(spacing: spacing) {
             if state.visibility.showsPump {
                 RootHomePumpView(state: pumpDisplayState)
                     .frame(maxHeight: .infinity)
@@ -448,21 +535,24 @@ struct RootHomeView: View {
         )
     }
 
-    private var expandableMainChart: some View {
+    private func expandableMainChart(showsExpansionButton: Bool) -> some View {
         mainChart
             .overlay(alignment: .topTrailing) {
-                Button {
-                    showsExpandedIPadChart = true
-                } label: {
-                    Image(systemName: "arrow.up.left.and.arrow.down.right")
-                        .font(.system(size: 14, weight: .semibold))
-                        .frame(width: 36, height: 36)
-                        .background(.ultraThinMaterial, in: Circle())
+                if showsExpansionButton {
+                    Button {
+                        showsExpandedIPadChart = true
+                    } label: {
+                        Image(systemName: "arrow.up.left.and.arrow.down.right")
+                            .font(.system(size: 14, weight: .semibold))
+                            .frame(width: 36, height: 36)
+                            .background(.ultraThinMaterial, in: Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(ConstantsAppColors.navigationTint)
+                    .padding(.top, 8)
+                    .padding(.trailing, Layout.ipadChartExpansionButtonTrailingInset)
+                    .accessibilityLabel(Texts_HomeView.expandChart)
                 }
-                .buttonStyle(.plain)
-                .foregroundStyle(ConstantsAppColors.navigationTint)
-                .padding(8)
-                .accessibilityLabel(Texts_HomeView.expandChart)
             }
     }
 

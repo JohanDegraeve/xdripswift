@@ -8,12 +8,35 @@
 
 import SwiftUI
 
+private struct RootHomeStatisticsTextScaleKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 1
+}
+
+private struct RootHomeStatisticsMetricSpacingKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 10
+}
+
+private extension EnvironmentValues {
+    var rootHomeStatisticsTextScale: CGFloat {
+        get { self[RootHomeStatisticsTextScaleKey.self] }
+        set { self[RootHomeStatisticsTextScaleKey.self] = newValue }
+    }
+
+    var rootHomeStatisticsMetricSpacing: CGFloat {
+        get { self[RootHomeStatisticsMetricSpacingKey.self] }
+        set { self[RootHomeStatisticsMetricSpacingKey.self] = newValue }
+    }
+}
+
 /// Statistics values and time-in-range pie chart for the selected period.
 struct RootHomeStatisticsView: View {
     let state: RootHomeStatisticsState
     let statisticsDays: Int
     let statisticsDaysChanged: (Int) -> Void
     let action: () -> Void
+    var textScale: CGFloat = 1
+    var metricSpacing: CGFloat = 10
+    var pieSpacing: CGFloat = 6
 
     private enum Layout {
         static let rowHeight: CGFloat = 80
@@ -27,7 +50,7 @@ struct RootHomeStatisticsView: View {
             RootHomeStatisticsColumn(top: state.inRange, bottom: state.a1c, limitText: "")
             RootHomeStatisticsColumn(top: state.high, bottom: state.cv, limitText: state.highLimitText)
 
-            VStack(spacing: 6) {
+            VStack(spacing: pieSpacing) {
                 ZStack {
                     RootHomePieChartView(
                         low: state.low.percentValue,
@@ -61,7 +84,7 @@ struct RootHomeStatisticsView: View {
                         Text(RootHomeStatisticsPeriod.title(for: statisticsDays))
                         Image(systemName: "chevron.up.chevron.down")
                     }
-                    .font(.system(size: 13))
+                    .font(.system(size: 13 * textScale))
                     .foregroundStyle(ConstantsAppColors.primaryText)
                 }
                 .fixedSize(horizontal: true, vertical: false)
@@ -71,24 +94,32 @@ struct RootHomeStatisticsView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, Layout.verticalPadding)
-        .frame(height: Layout.rowHeight)
+        .frame(height: Self.preferredHeight(for: textScale, metricSpacing: metricSpacing))
         .contentShape(Rectangle())
         .onTapGesture(count: 2, perform: action)
         .transaction { transaction in
             // Calculation updates replace statistic values immediately. Threshold colors animate separately.
             transaction.animation = nil
         }
+        .environment(\.rootHomeStatisticsTextScale, textScale)
+        .environment(\.rootHomeStatisticsMetricSpacing, metricSpacing)
+    }
+
+    static func preferredHeight(for textScale: CGFloat, metricSpacing: CGFloat = 10) -> CGFloat {
+        (Layout.rowHeight * textScale) + max(metricSpacing - 10, 0)
     }
 }
 
 /// Vertical group of statistics with matching column alignment.
 struct RootHomeStatisticsColumn: View {
+    @Environment(\.rootHomeStatisticsMetricSpacing) private var metricSpacing
+
     let top: RootHomeMetricState
     let bottom: RootHomeMetricState
     let limitText: String
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: metricSpacing) {
             RootHomeStatisticsMetricView(metric: top, limitText: limitText)
             RootHomeStatisticsMetricView(metric: bottom)
         }
@@ -98,6 +129,8 @@ struct RootHomeStatisticsColumn: View {
 
 /// One statistics title, optional limit and calculated value.
 struct RootHomeStatisticsMetricView: View {
+    @Environment(\.rootHomeStatisticsTextScale) private var textScale
+
     let metric: RootHomeMetricState
     var limitText = ""
 
@@ -105,14 +138,14 @@ struct RootHomeStatisticsMetricView: View {
         VStack(spacing: 2) {
             HStack(spacing: 2) {
                 Text(metric.title)
-                    .font(.system(size: 12, weight: .bold))
+                    .font(.system(size: 12 * textScale, weight: .bold))
                     .foregroundStyle(ConstantsAppColors.primaryText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.65)
 
                 if !limitText.isEmpty {
                     Text(limitText)
-                        .font(.system(size: 12))
+                        .font(.system(size: 12 * textScale))
                         .foregroundStyle(ConstantsAppColors.secondaryText)
                         .lineLimit(1)
                         .minimumScaleFactor(0.65)
@@ -121,7 +154,7 @@ struct RootHomeStatisticsMetricView: View {
             .frame(maxWidth: .infinity, alignment: .center)
 
             Text(metric.value)
-                .font(.system(size: 12))
+                .font(.system(size: 12 * textScale))
                 .foregroundStyle(metric.valueColor)
                 .monospacedDigit()
                 .lineLimit(1)
