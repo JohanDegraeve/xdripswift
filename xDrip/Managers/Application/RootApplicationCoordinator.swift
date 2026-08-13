@@ -89,6 +89,18 @@ import AppIntents
     
     /// SoundPlayer instance
     private var soundPlayer: SoundPlayer?
+
+    /// The single application-wide background keep-alive engine shared by all follower managers.
+    ///
+    /// Keeping this instance at the application root gives the silent-audio player, replay timer,
+    /// keep-alive setting observer, and foreground/background callbacks one stable owner for the
+    /// lifetime of application services. The same instance is injected into every selectable
+    /// follower manager below, replacing the separate audio engines those managers previously owned.
+    ///
+    /// Individual followers only report when their source becomes operational or stops. They retain
+    /// ownership of authentication, downloads, polling cadence, retries, and heartbeat-triggered
+    /// work; none of that networking is initiated or coordinated by this shared manager.
+    private let followerBackgroundKeepAliveManager = FollowerBackgroundKeepAliveManager()
     
     /// NightscoutFollowManager instance
     private var nightscoutFollowManager: NightscoutFollowManager?
@@ -673,22 +685,46 @@ import AppIntents
         guard let soundPlayer = soundPlayer else { fatalError("in setupApplicationData, this looks very in appropriate, shame")}
         
         // setup nightscoutmanager
-        nightscoutFollowManager = NightscoutFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+        nightscoutFollowManager = NightscoutFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: self,
+            backgroundKeepAliveManager: followerBackgroundKeepAliveManager
+        )
         
         // setup libreLinkUpFollowManager
-        libreLinkUpFollowManager = LibreLinkUpFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+        libreLinkUpFollowManager = LibreLinkUpFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: self,
+            backgroundKeepAliveManager: followerBackgroundKeepAliveManager
+        )
         
         // setup dexcomShareFollowManager
-        dexcomShareFollowManager = DexcomShareFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+        dexcomShareFollowManager = DexcomShareFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: self,
+            backgroundKeepAliveManager: followerBackgroundKeepAliveManager
+        )
 
         // setup medtrumEasyViewFollowManager
-        medtrumEasyViewFollowManager = MedtrumEasyViewFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+        medtrumEasyViewFollowManager = MedtrumEasyViewFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: self,
+            backgroundKeepAliveManager: followerBackgroundKeepAliveManager
+        )
 
         // setup calendarFollowManager
-        calendarFollowManager = CalendarFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+        calendarFollowManager = CalendarFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: self,
+            backgroundKeepAliveManager: followerBackgroundKeepAliveManager
+        )
 
         // Set up CareLink beside the other followers so it shares delegate and heartbeat behavior.
-        careLinkFollowManager = CareLinkFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+        careLinkFollowManager = CareLinkFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: self,
+            backgroundKeepAliveManager: followerBackgroundKeepAliveManager
+        )
 
         // setup loop follow manager
         loopFollowManager = LoopFollowManager(coreDataManager: coreDataManager, followerDelegate: self)

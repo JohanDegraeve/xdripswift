@@ -100,6 +100,9 @@ enum ConstantsLog {
     /// CareLink follower network and lifecycle diagnostics
     static let categoryCareLinkFollowManager =              "CareLinkFollowManager         "
 
+    /// shared follower background audio lifecycle
+    static let categoryFollowerBackgroundKeepAliveManager = "FollowerBackgroundKeepAlive  "
+
     /// medtrum touchcare nano cgm (BLE co-listener)
     static let categoryCGMMedtrumTouchCareNano =            "CGMMedtrumTouchCareNano       "
 

@@ -1,7 +1,5 @@
 import Foundation
 import os
-import AVFoundation
-import AudioToolbox
 import UIKit
 
 /// instance of this class will do the follower functionality. Just make an instance, it will listen to the settings, do the regular download if needed - it could be deallocated when isMaster setting in Userdefaults changes, but that's not necessary to do
@@ -28,15 +26,10 @@ class NightscoutFollowManager: NSObject {
     
     /// delegate to pass back glucosedata
     private(set) weak var followerDelegate: FollowerDelegate?
-    
-    /// AVAudioPlayer to use
-    private var audioPlayer: AVAudioPlayer?
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create playsoundtimer
-    private let applicationManagerKeyResumePlaySoundTimer = "NightscoutFollowerManager-ResumePlaySoundTimer"
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate playsoundtimer
-    private let applicationManagerKeySuspendPlaySoundTimer = "NightscoutFollowerManager-SuspendPlaySoundTimer"
+
+    /// The root-owned shared keep-alive engine; this follower reports operational state only and
+    /// does not own silent-audio playback, replay timing, or application lifecycle callbacks.
+    private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
 
     /// constant for cancelling an active foreground gap fill when the app backgrounds
     private let applicationManagerKeyCancelGapFill = "NightscoutFollowerManager-CancelGapFill"
@@ -44,9 +37,6 @@ class NightscoutFollowManager: NSObject {
     /// closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
     private var invalidateDownLoadTimerClosure: (() -> Void)?
     
-    // timer for playsound
-    private var playSoundTimer: RepeatingTimer?
-
     /// Keeps historical audit state and networking out of the live follower implementation.
     private lazy var followerGapFillService = NightscoutFollowerGapFillService(
         coreDataManager: coreDataManager,
@@ -64,7 +54,11 @@ class NightscoutFollowManager: NSObject {
     // MARK: - initializer
     
     /// initializer
-    public init(coreDataManager: CoreDataManager, followerDelegate: FollowerDelegate) {
+    init(
+        coreDataManager: CoreDataManager,
+        followerDelegate: FollowerDelegate,
+        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
+    ) {
         
         // initialize nextFollowDownloadTimeStamp to now, which is at the moment FollowManager is instantiated
         nextFollowDownloadTimeStamp = Date()
@@ -73,22 +67,7 @@ class NightscoutFollowManager: NSObject {
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.followerDelegate = followerDelegate
-        
-        // set up audioplayer
-        if let url = Bundle.main.url(forResource: ConstantsSuspensionPrevention.soundFileName, withExtension: "")  {
-            
-            // create audioplayer
-            do {
-                
-                audioPlayer = try AVAudioPlayer(contentsOf: url)
-                
-            } catch let error {
-                
-                trace("in init, exception while trying to create audoplayer, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, error.localizedDescription)
-                
-            }
-            
-        }
+        self.backgroundKeepAliveManager = backgroundKeepAliveManager
 
         // call super.init
         super.init()
@@ -101,8 +80,6 @@ class NightscoutFollowManager: NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
         // changing the follower data source
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue, options: .new, context: nil)
-        // changing the follower keep alive type
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
         // setting nightscout url also does require action
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutUrl.rawValue, options: .new, context: nil)
         // changing the optional Nightscout port changes the effective site
@@ -421,62 +398,7 @@ class NightscoutFollowManager: NSObject {
         return responseWasValid
     }
     
-    /// disable suspension prevention by removing the closures from ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground and ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground
-    private func disableSuspensionPrevention() {
-        
-        // stop the timer for now, might be already suspended but doesn't harm
-        if let playSoundTimer = playSoundTimer {
-            playSoundTimer.suspend()
-        }
-        
-        // no need anymore to resume the player when coming in foreground
-        ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer)
-        
-        // no need anymore to suspend the soundplayer when entering foreground, because it's not even resumed
-        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer)
-        
-    }
-    
-    /// launches timer that will regular play sound - this will be played only when app goes to background and only if the user wants to keep the app alive
-    private func enableSuspensionPrevention() {
-        // if keep-alive is not needed, then just return and do nothing
-        if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-            trace("not enabling suspension prevention as keep-alive type is: %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .debug, UserDefaults.standard.followerBackgroundKeepAliveType.description)
-            return
-        }
-        let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal ? ConstantsSuspensionPrevention.intervalNormal : ConstantsSuspensionPrevention.intervalAggressive
-        // create playSoundTimer depending on the keep-alive type selected
-        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: { [weak self] in
-            guard let self = self else { return }
-            // play the sound
-            trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
-            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info, interval.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
-                audioPlayer.play()
-            }
-        })
-        // schedulePlaySoundTimer needs to be created when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                if let playSoundTimer = self.playSoundTimer {
-                    playSoundTimer.resume()
-                }
-                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                    audioPlayer.play()
-                }
-            }
-        })
-        // schedulePlaySoundTimer needs to be invalidated when app goes to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            if let playSoundTimer = self.playSoundTimer {
-                playSoundTimer.suspend()
-            }
-        })
-    }
-    
-    /// verifies values of applicable UserDefaults and either starts or stops follower mode, inclusive call to enableSuspensionPrevention or disableSuspensionPrevention - also first download is started if applicable
+    /// Verifies applicable settings and starts or stops follower mode and its background keep-alive registration.
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
 
         invalidateGapFillIntent()
@@ -490,13 +412,7 @@ class NightscoutFollowManager: NSObject {
 
         if isNightscoutFollowerActive {
             
-            // this will enable the suspension prevention sound playing if background keep-alive is needed
-            // (i.e. not disabled and not using a heartbeat)
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                enableSuspensionPrevention()
-            } else {
-                disableSuspensionPrevention()
-            }
+            backgroundKeepAliveManager.start(for: .nightscout)
             
             // do initial download, this will also schedule future downloads
             if isStartingNightscoutFollower {
@@ -507,8 +423,7 @@ class NightscoutFollowManager: NSObject {
             
         } else {
             
-            // disable the suspension prevention
-            disableSuspensionPrevention()
+            backgroundKeepAliveManager.stop(for: .nightscout)
             
             // invalidate the downloadtimer
             if let invalidateDownLoadTimerClosure = invalidateDownLoadTimerClosure {
@@ -527,7 +442,7 @@ class NightscoutFollowManager: NSObject {
                 
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType, UserDefaults.Key.followerBackgroundKeepAliveType, UserDefaults.Key.nightscoutUrl, UserDefaults.Key.nightscoutPort, UserDefaults.Key.nightscoutEnabled, UserDefaults.Key.nightscoutAPIKey, UserDefaults.Key.nightscoutToken :
+                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType, UserDefaults.Key.nightscoutUrl, UserDefaults.Key.nightscoutPort, UserDefaults.Key.nightscoutEnabled, UserDefaults.Key.nightscoutAPIKey, UserDefaults.Key.nightscoutToken :
                     
                     // change by user, should not be done within 200 ms
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
@@ -546,7 +461,6 @@ class NightscoutFollowManager: NSObject {
     deinit {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue)
-        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutUrl.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutPort.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutAPIKey.rawValue)
@@ -555,6 +469,6 @@ class NightscoutFollowManager: NSObject {
         ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyCancelGapFill)
         invalidateDownLoadTimerClosure?()
         invalidateGapFillIntent()
-        playSoundTimer?.suspend()
+        backgroundKeepAliveManager.stop(for: .nightscout)
     }
 }

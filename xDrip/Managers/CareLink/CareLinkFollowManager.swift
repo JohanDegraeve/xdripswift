@@ -6,7 +6,6 @@
 //  Copyright © 2026 Johan Degraeve. All rights reserved.
 //
 
-import AVFoundation
 import Foundation
 import os
 
@@ -63,6 +62,9 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     private let client: CareLinkClient
     private let state: CareLinkAccountState
     private let therapyImporter: CareLinkTherapyImporter
+    /// The root-owned shared keep-alive engine; CareLink registers only after authentication and
+    /// never connects an audio lifecycle event or replay tick to its polling API.
+    private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCareLinkFollowManager)
     private let keyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
     /// Invalidates the one-shot download timer used outside heartbeat mode.
@@ -83,36 +85,25 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     private var invalidationTask: Task<Void, Never>?
     private var invalidationIdentifier: UUID?
     private var failureCount = 0
-    private var audioPlayer: AVAudioPlayer?
-    private var playSoundTimer: RepeatingTimer?
-    private let applicationManagerKeyResumePlaySoundTimer = "CareLinkFollowerManager-ResumePlaySoundTimer"
-    private let applicationManagerKeySuspendPlaySoundTimer = "CareLinkFollowerManager-SuspendPlaySoundTimer"
 
     /// Creates the long-lived manager and immediately evaluates the current follower selection.
-    init(coreDataManager: CoreDataManager, followerDelegate: FollowerDelegate, client: CareLinkClient = CareLinkClient(), state: CareLinkAccountState = .shared) {
+    init(
+        coreDataManager: CoreDataManager,
+        followerDelegate: FollowerDelegate,
+        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging,
+        client: CareLinkClient = CareLinkClient(),
+        state: CareLinkAccountState = .shared
+    ) {
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.followerDelegate = followerDelegate
         self.client = client
         self.state = state
         self.therapyImporter = CareLinkTherapyImporter(coreDataManager: coreDataManager)
-        if let url = Bundle.main.url(forResource: ConstantsSuspensionPrevention.soundFileName, withExtension: "") {
-            do {
-                audioPlayer = try AVAudioPlayer(contentsOf: url)
-            } catch let error {
-                trace(
-                    "in init, exception while trying to create audioplayer, error = %{public}@",
-                    log: self.log,
-                    category: ConstantsLog.categoryCareLinkFollowManager,
-                    type: .error,
-                    error.localizedDescription
-                )
-            }
-        }
+        self.backgroundKeepAliveManager = backgroundKeepAliveManager
         super.init()
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.careLinkSelectedPatientID.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.careLinkUsername.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.careLinkPassword.rawValue, options: .new, context: nil)
@@ -358,11 +349,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             loginIdentifier = nil
             lifecycleState = .authenticated
             updateStateOnMain { $0.lastTokenRefreshAt = Date() }
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                enableSuspensionPrevention()
-            } else {
-                disableSuspensionPrevention()
-            }
+            backgroundKeepAliveManager.start(for: .careLink)
             refreshNow()
         } catch CareLinkError.cancelled {
             guard loginIdentifier == identifier else { return }
@@ -691,7 +678,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         let generation = lifecycleGeneration
         // Reconciliation is idempotent. Tear down the prior generation before enabling a new one.
         stopPolling()
-        disableSuspensionPrevention()
+        backgroundKeepAliveManager.stop(for: .careLink)
         Task { @MainActor [weak self] in
             guard let self else { return }
             let selected = isActive
@@ -700,7 +687,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             if !hasCredentials {
                 cancelLogin()
                 stopPolling()
-                disableSuspensionPrevention()
+                backgroundKeepAliveManager.stop(for: .careLink)
                 lifecycleState = selected ? .awaitingCredentials : .inactive
                 if selected, UserDefaults.standard.careLinkSelectedPatientID != nil {
                     UserDefaults.standard.careLinkSelectedPatientID = nil
@@ -716,7 +703,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             if !selected {
                 cancelLogin()
                 stopPolling()
-                disableSuspensionPrevention()
+                backgroundKeepAliveManager.stop(for: .careLink)
                 lifecycleState = .inactive
                 return
             }
@@ -727,15 +714,11 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             guard lifecycleGeneration == generation else { return }
             lifecycleState = CareLinkLifecyclePolicy.state(isSelected: true, hasCredentials: true, hasSession: hasSession)
             if lifecycleState == .authenticated {
-                if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                    enableSuspensionPrevention()
-                } else {
-                    disableSuspensionPrevention()
-                }
+                backgroundKeepAliveManager.start(for: .careLink)
                 download()
             } else {
                 stopPolling()
-                disableSuspensionPrevention()
+                backgroundKeepAliveManager.stop(for: .careLink)
                 publishLoginRequired(detail: nil)
             }
         }
@@ -748,7 +731,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         let generation = lifecycleGeneration
         cancelLogin()
         stopPolling()
-        disableSuspensionPrevention()
+        backgroundKeepAliveManager.stop(for: .careLink)
         lifecycleState = .invalidatingSession
         if UserDefaults.standard.careLinkSelectedPatientID != nil {
             UserDefaults.standard.careLinkSelectedPatientID = nil
@@ -804,81 +787,11 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             guard self.lifecycleGeneration == generation else { return false }
             self.lifecycleState = .awaitingLogin
             self.stopPolling()
-            self.disableSuspensionPrevention()
+            self.backgroundKeepAliveManager.stop(for: .careLink)
             return true
         }
         guard shouldClear else { return }
         await client.clearLocalSession()
-    }
-
-    /// Suspends local audio work and removes both application lifecycle callbacks.
-    private func disableSuspensionPrevention() {
-        if let playSoundTimer = playSoundTimer {
-            playSoundTimer.suspend()
-        }
-        ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer)
-        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer)
-    }
-
-    /// Launches the same silent-audio timer used by the Nightscout follower.
-    private func enableSuspensionPrevention() {
-        if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-            trace(
-                "not enabling suspension prevention as keep-alive type is: %{public}@",
-                log: self.log,
-                category: ConstantsLog.categoryCareLinkFollowManager,
-                type: .debug,
-                UserDefaults.standard.followerBackgroundKeepAliveType.description
-            )
-            return
-        }
-        let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal
-            ? ConstantsSuspensionPrevention.intervalNormal
-            : ConstantsSuspensionPrevention.intervalAggressive
-        // This timer maintains audio only. Polling is scheduled independently after each request.
-        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval))) { [weak self] in
-            guard let self = self else { return }
-            trace(
-                "in eventhandler checking if audioplayer exists",
-                log: self.log,
-                category: ConstantsLog.categoryCareLinkFollowManager,
-                type: .info
-            )
-            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                trace(
-                    "playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@",
-                    log: self.log,
-                    category: ConstantsLog.categoryCareLinkFollowManager,
-                    type: .info,
-                    interval.description,
-                    UserDefaults.standard.followerDataSourceType.description,
-                    UserDefaults.standard.followerBackgroundKeepAliveType.description
-                )
-                audioPlayer.play()
-            }
-        }
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(
-            key: applicationManagerKeyResumePlaySoundTimer
-        ) { [weak self] in
-            guard let self = self else { return }
-            // Match Nightscout by starting audio here without forcing a network request.
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                if let playSoundTimer = self.playSoundTimer {
-                    playSoundTimer.resume()
-                }
-                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                    audioPlayer.play()
-                }
-            }
-        }
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(
-            key: applicationManagerKeySuspendPlaySoundTimer
-        ) { [weak self] in
-            guard let self = self else { return }
-            if let playSoundTimer = self.playSoundTimer {
-                playSoundTimer.suspend()
-            }
-        }
     }
 
     /// Applies synchronous state mutations from code already executing on the main actor.
@@ -902,7 +815,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             Task { @MainActor [weak self] in
                 await self?.invalidateSession(revokeRemotely: true)
             }
-        case .isMaster, .followerDataSourceType, .followerBackgroundKeepAliveType:
+        case .isMaster, .followerDataSourceType:
             guard keyValueObserverTimeKeeper.verifyKey(forKey: keyPath, withMinimumDelayMilliSeconds: 200) else { return }
             Task { @MainActor [weak self] in self?.reconcileLifecycle() }
         case .careLinkSelectedPatientID:
@@ -913,14 +826,14 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
 
     /// Removes KVO, timers and lifecycle closures owned by this manager.
     deinit {
-        for key in [UserDefaults.Key.isMaster, .followerDataSourceType, .followerBackgroundKeepAliveType, .careLinkSelectedPatientID, .careLinkUsername, .careLinkPassword] {
+        for key in [UserDefaults.Key.isMaster, .followerDataSourceType, .careLinkSelectedPatientID, .careLinkUsername, .careLinkPassword] {
             UserDefaults.standard.removeObserver(self, forKeyPath: key.rawValue)
         }
         invalidateDownloadTimer?()
         pollTask?.cancel()
         let loginController = authController
         Task { @MainActor in loginController?.cancel() }
-        disableSuspensionPrevention()
+        backgroundKeepAliveManager.stop(for: .careLink)
     }
 
 }

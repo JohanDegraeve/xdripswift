@@ -6,8 +6,6 @@
 //  Copyright © 2023 Johan Degraeve. All rights reserved.
 //
 
-import AudioToolbox
-import AVFoundation
 import Foundation
 import os
 
@@ -31,21 +29,13 @@ class LibreLinkUpFollowManager: NSObject {
     
     /// delegate to pass back glucosedata
     private(set) weak var followerDelegate: FollowerDelegate?
-    
-    /// AVAudioPlayer to use
-    private var audioPlayer: AVAudioPlayer?
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create playsoundtimer
-    private let applicationManagerKeyResumePlaySoundTimer = "LibreLinkUpFollowerManager-ResumePlaySoundTimer"
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate playsoundtimer
-    private let applicationManagerKeySuspendPlaySoundTimer = "LibreLinkUpFollowerManager-SuspendPlaySoundTimer"
+
+    /// The root-owned shared keep-alive engine; this follower reports operational state only and
+    /// does not own silent-audio playback, replay timing, or application lifecycle callbacks.
+    private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
     
     /// closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
     private var invalidateDownLoadTimerClosure: (() -> Void)?
-    
-    /// timer for playsound
-    private var playSoundTimer: RepeatingTimer?
     
     /// http header array - need to append "version" key before making request
     /// https://gist.github.com/khskekec/6c13ba01b10d3018d816706a32ae8ab2#headers
@@ -85,11 +75,16 @@ class LibreLinkUpFollowManager: NSObject {
     // MARK: - initializer
     
     /// initializer
-    public init(coreDataManager: CoreDataManager, followerDelegate: FollowerDelegate) {
+    init(
+        coreDataManager: CoreDataManager,
+        followerDelegate: FollowerDelegate,
+        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
+    ) {
         // initialize non optional private properties
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.followerDelegate = followerDelegate
+        self.backgroundKeepAliveManager = backgroundKeepAliveManager
         
         // initialize the LibreLinkUpRegion
         self.libreLinkUpRegion = .notConfigured
@@ -101,17 +96,6 @@ class LibreLinkUpFollowManager: NSObject {
             trace("in init, updating userdefaults LibreLinkUp version from '%{public}@' to '%{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, UserDefaults.standard.libreLinkUpVersion ?? "nil", ConstantsLibreLinkUp.libreLinkUpVersionDefault)
             
             UserDefaults.standard.libreLinkUpVersion = ConstantsLibreLinkUp.libreLinkUpVersionDefault
-        }
-        
-        // set up audioplayer
-        if let url = Bundle.main.url(forResource: ConstantsSuspensionPrevention.soundFileName, withExtension: "") {
-            // create audioplayer
-            do {
-                self.audioPlayer = try AVAudioPlayer(contentsOf: url)
-                
-            } catch {
-                trace("in init, exception while trying to create audoplayer, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, error.localizedDescription)
-            }
         }
         
         // call super.init
@@ -142,7 +126,7 @@ class LibreLinkUpFollowManager: NSObject {
         UserDefaults.standard.libreLinkUpManuallyLoggedOut = true
         invalidateDownLoadTimerClosure?()
         invalidateDownLoadTimerClosure = nil
-        disableSuspensionPrevention()
+        backgroundKeepAliveManager.stop(for: .libreLinkUp)
         libreLinkUpToken = nil
         libreLinkUpExpires = nil
         libreLinkUpId = nil
@@ -722,83 +706,18 @@ class LibreLinkUpFollowManager: NSObject {
         }
     }
     
-    /// disable suspension prevention by removing the closures from ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground and ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground
-    private func disableSuspensionPrevention() {
-        // stop the timer for now, might be already suspended but doesn't harm
-        if let playSoundTimer = playSoundTimer {
-            playSoundTimer.suspend()
-        }
-        
-        // no need anymore to resume the player when coming in foreground
-        ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: self.applicationManagerKeyResumePlaySoundTimer)
-        
-        // no need anymore to suspend the soundplayer when entering foreground, because it's not even resumed
-        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeySuspendPlaySoundTimer)
-    }
-    
-    /// launches timer that will regular play sound - this will be played only when app goes to background and only if the user wants to keep the app alive
-    private func enableSuspensionPrevention() {
-        // if keep-alive is disabled or if using a heartbeat, then just return and do nothing
-        if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-            print("not enabling suspension prevention as keep-alive type is:  \(UserDefaults.standard.followerBackgroundKeepAliveType.description)")
-            
-            return
-        }
-        
-        let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal ? ConstantsSuspensionPrevention.intervalNormal : ConstantsSuspensionPrevention.intervalAggressive
-        
-        // create playSoundTimer depending on the keep-alive type selected
-        self.playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: { [weak self] in
-            guard let self = self else { return }
-            // play the sound
-            trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
-            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, interval.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
-                audioPlayer.play()
-            }
-        })
-        
-        // schedulePlaySoundTimer needs to be created when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: self.applicationManagerKeyResumePlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                if let playSoundTimer = self.playSoundTimer {
-                    playSoundTimer.resume()
-                }
-                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                    audioPlayer.play()
-                }
-            }
-        })
-        
-        // schedulePlaySoundTimer needs to be invalidated when app goes to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeySuspendPlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            if let playSoundTimer = self.playSoundTimer {
-                playSoundTimer.suspend()
-            }
-        })
-    }
-    
-    /// verifies values of applicable UserDefaults and either starts or stops follower mode, inclusive call to enableSuspensionPrevention or disableSuspensionPrevention - also first download is started if applicable
+    /// Verifies settings and either starts or stops follower mode and its background keep-alive registration.
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
         if !UserDefaults.standard.isMaster && (UserDefaults.standard.followerDataSourceType == .libreLinkUp || UserDefaults.standard.followerDataSourceType == .libreLinkUpRussia) && UserDefaults.standard.libreLinkUpEmail != nil && UserDefaults.standard.libreLinkUpPassword != nil && !UserDefaults.standard.libreLinkUpManuallyLoggedOut {
             updateSessionState(.loggingIn)
-            // this will enable the suspension prevention sound playing if background keep-alive is needed
-            // (i.e. not disabled and not using a heartbeat)
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                self.enableSuspensionPrevention()
-            } else {
-                self.disableSuspensionPrevention()
-            }
+            backgroundKeepAliveManager.start(for: .libreLinkUp)
             
             // do initial download, this will also schedule future downloads
             self.download()
                         
         } else {
             updateSessionState(.loggedOut)
-            // disable the suspension prevention
-            self.disableSuspensionPrevention()
+            backgroundKeepAliveManager.stop(for: .libreLinkUp)
             
             // invalidate the downloadtimer
             if let invalidateDownLoadTimerClosure = invalidateDownLoadTimerClosure {
@@ -814,8 +733,7 @@ class LibreLinkUpFollowManager: NSObject {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.libreLinkUpEmail.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.libreLinkUpPassword.rawValue)
 
-        // stop keep-alive helpers
-        disableSuspensionPrevention()
+        backgroundKeepAliveManager.stop(for: .libreLinkUp)
 
         // invalidate any pending download timer
         invalidateDownLoadTimerClosure?()

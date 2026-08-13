@@ -14,6 +14,8 @@
 		2BB9AEE4FF9AF41B59A1AA52 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C75EA5D78E3497AC44D3C8 /* SettingsView.swift */; };
 		360BF345E424B38E3822AA76 /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
 		377EBC0A484BFC8EA77C623C /* CareLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA4DE8668C9A16DFF21A411 /* CareLinkTests.swift */; };
+		FBA100020000000000000001 /* FollowerBackgroundKeepAliveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA100010000000000000001 /* FollowerBackgroundKeepAliveManager.swift */; };
+		FBA100040000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */; };
 		3A28B7171D22DFBFB68828A4 /* CareLinkModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A32F780DBE240AE91ECDBB /* CareLinkModels.swift */; };
 		47037B8E2C072346000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
 		47037B8F2C072973000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
@@ -951,6 +953,8 @@
 		472596042B76301F00459D12 /* WatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
 		4733B93D2AD17C99001D609D /* FollowerBgReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBgReading.swift; sourceTree = "<group>"; };
 		4733B93F2AD17D15001D609D /* FollowerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerDelegate.swift; sourceTree = "<group>"; };
+		FBA100010000000000000001 /* FollowerBackgroundKeepAliveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBackgroundKeepAliveManager.swift; sourceTree = "<group>"; };
+		FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBackgroundKeepAliveManagerTests.swift; sourceTree = "<group>"; };
 		4733B9412FF4C100001D609D /* CalendarFollowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarFollowManager.swift; sourceTree = "<group>"; };
 		4734FF542BEFE3F200C7115A /* AlertNotificationDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertNotificationDictionary.swift; sourceTree = "<group>"; };
 		473775812C14D8C100525B90 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
@@ -2210,6 +2214,7 @@
 			isa = PBXGroup;
 			children = (
 				DAF100022E7A000100000001 /* DataFlowPolicy.swift */,
+				FBA100010000000000000001 /* FollowerBackgroundKeepAliveManager.swift */,
 				47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */,
 				4733B93D2AD17C99001D609D /* FollowerBgReading.swift */,
 				47DB06CF2A70141E00267BE3 /* FollowerDataSourceType.swift */,
@@ -2491,6 +2496,7 @@
 		4F2600213002000200000001 /* xDrip Tests */ = {
 			isa = PBXGroup;
 			children = (
+				FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */,
 				BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */,
 				A40000020000000000000001 /* FollowerSettingsTests.swift */,
 				4F2800123004000100000001 /* GlucoseChartYAxisRetentionTests.swift */,
@@ -4237,6 +4243,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBA100040000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift in Sources */,
 				BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */,
 				4F2600023002000200000001 /* SensorHealthIssueManagerTests.swift in Sources */,
 				4F2800023004000100000001 /* GlucoseChartYAxisRetentionTests.swift in Sources */,
@@ -4251,6 +4258,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBA100020000000000000001 /* FollowerBackgroundKeepAliveManager.swift in Sources */,
 				BA0000020000000000000001 /* NightscoutFollowerGapFillService.swift in Sources */,
 				DAF100012E7A000100000001 /* DataFlowPolicy.swift in Sources */,
 				BA0000010000000000000001 /* BackupModels.swift in Sources */,

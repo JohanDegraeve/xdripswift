@@ -5,8 +5,6 @@
 //  Copyright © 2025 xDrip4iOS. All rights reserved.
 //
 
-import AudioToolbox
-import AVFoundation
 import Foundation
 import os
 
@@ -33,20 +31,12 @@ class MedtrumEasyViewFollowManager: NSObject {
     /// Delegate to pass back glucose data
     private(set) weak var followerDelegate: FollowerDelegate?
 
-    /// AVAudioPlayer to use for background keep-alive
-    private var audioPlayer: AVAudioPlayer?
-
-    /// Constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create playsoundtimer
-    private let applicationManagerKeyResumePlaySoundTimer = "MedtrumEasyViewFollowManager-ResumePlaySoundTimer"
-
-    /// Constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate playsoundtimer
-    private let applicationManagerKeySuspendPlaySoundTimer = "MedtrumEasyViewFollowManager-SuspendPlaySoundTimer"
+    /// The root-owned shared keep-alive engine; this follower reports operational state only and
+    /// does not own silent-audio playback, replay timing, or application lifecycle callbacks.
+    private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
 
     /// Closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
     private var invalidateDownLoadTimerClosure: (() -> Void)?
-
-    /// Timer for playsound (background keep-alive)
-    private var playSoundTimer: RepeatingTimer?
 
     /// User ID from login response (cached in memory)
     private var medtrumUserId: Int?
@@ -57,24 +47,19 @@ class MedtrumEasyViewFollowManager: NSObject {
     // MARK: - Initializer
 
     /// Initializer
-    public init(coreDataManager: CoreDataManager, followerDelegate: FollowerDelegate) {
+    init(
+        coreDataManager: CoreDataManager,
+        followerDelegate: FollowerDelegate,
+        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
+    ) {
         // Initialize non optional private properties
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.followerDelegate = followerDelegate
+        self.backgroundKeepAliveManager = backgroundKeepAliveManager
 
         // Initialize user ID as nil
         self.medtrumUserId = nil
-
-        // Set up audioplayer for background keep-alive
-        if let url = Bundle.main.url(forResource: ConstantsSuspensionPrevention.soundFileName, withExtension: "") {
-            // Create audioplayer
-            do {
-                self.audioPlayer = try AVAudioPlayer(contentsOf: url)
-            } catch {
-                trace("in init, exception while trying to create audioplayer, error = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error, error.localizedDescription)
-            }
-        }
 
         // Call super.init
         super.init()
@@ -107,7 +92,7 @@ class MedtrumEasyViewFollowManager: NSObject {
         UserDefaults.standard.medtrumEasyViewManuallyLoggedOut = true
         invalidateDownLoadTimerClosure?()
         invalidateDownLoadTimerClosure = nil
-        disableSuspensionPrevention()
+        backgroundKeepAliveManager.stop(for: .medtrumEasyView)
         medtrumUserId = nil
         lastFetchedTimestamp = nil
         FollowerSessionState.shared.update(.loggedOut, for: .medtrumEasyView)
@@ -605,61 +590,6 @@ class MedtrumEasyViewFollowManager: NSObject {
         }
     }
     
-    // MARK: - Background Keep-Alive Functions
-    
-    /// disable suspension prevention by removing the closures from ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground and ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground
-    private func disableSuspensionPrevention() {
-        // stop the timer for now, might be already suspended but doesn't harm
-        if let playSoundTimer = playSoundTimer {
-            playSoundTimer.suspend()
-        }
-        
-        // no need anymore to resume the player when coming in foreground
-        ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer)
-        
-        // no need anymore to suspend the soundplayer when entering foreground, because it's not even resumed
-        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer)
-    }
-    
-    /// launches timer that will regular play sound - this will be played only when app goes to background and only if the user wants to keep the app alive
-    private func enableSuspensionPrevention() {
-        // if keep-alive is not needed, then just return and do nothing
-        if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-            trace("not enabling suspension prevention as keep-alive type is: %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .debug, UserDefaults.standard.followerBackgroundKeepAliveType.description)
-            return
-        }
-        let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal ? ConstantsSuspensionPrevention.intervalNormal : ConstantsSuspensionPrevention.intervalAggressive
-        // create playSoundTimer depending on the keep-alive type selected
-        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: { [weak self] in
-            guard let self = self else { return }
-            // play the sound
-            trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
-            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, interval.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
-                audioPlayer.play()
-            }
-        })
-        // schedulePlaySoundTimer needs to be created when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                if let playSoundTimer = self.playSoundTimer {
-                    playSoundTimer.resume()
-                }
-                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                    audioPlayer.play()
-                }
-            }
-        })
-        // schedulePlaySoundTimer needs to be invalidated when app goes to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            if let playSoundTimer = self.playSoundTimer {
-                playSoundTimer.suspend()
-            }
-        })
-    }
-
     /// Verify UserDefaults and start or stop follower mode accordingly
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
         // Check if we should be running
@@ -671,20 +601,13 @@ class MedtrumEasyViewFollowManager: NSObject {
 
         if shouldRun {
             FollowerSessionState.shared.update(.loggingIn, for: .medtrumEasyView)
-            // this will enable the suspension prevention sound playing if background keep-alive is needed
-            // (i.e. not disabled and not using a heartbeat)
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                self.enableSuspensionPrevention()
-            } else {
-                self.disableSuspensionPrevention()
-            }
+            backgroundKeepAliveManager.start(for: .medtrumEasyView)
 
             // Start downloading
             download()
         } else {
             FollowerSessionState.shared.update(.loggedOut, for: .medtrumEasyView)
-            // disable the suspension prevention
-            disableSuspensionPrevention()
+            backgroundKeepAliveManager.stop(for: .medtrumEasyView)
             
             // invalidate the downloadtimer
             if let invalidateDownLoadTimerClosure = invalidateDownLoadTimerClosure {
@@ -744,8 +667,7 @@ class MedtrumEasyViewFollowManager: NSObject {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewPassword.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewSelectedPatientUid.rawValue)
         
-        // stop keep-alive helpers
-        disableSuspensionPrevention()
+        backgroundKeepAliveManager.stop(for: .medtrumEasyView)
 
         // invalidate any pending download timer
         invalidateDownLoadTimerClosure?()

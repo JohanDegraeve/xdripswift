@@ -6,8 +6,6 @@
 //  Copyright © 2026 Johan Degraeve. All rights reserved.
 //
 
-import AVFoundation
-import AudioToolbox
 import EventKit
 import Foundation
 import os
@@ -39,15 +37,10 @@ class CalendarFollowManager: NSObject {
     
     /// EventKit store used to read selected calendar events
     private let eventStore = EKEventStore()
-    
-    /// AVAudioPlayer to use for suspension prevention
-    private var audioPlayer: AVAudioPlayer?
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground
-    private let applicationManagerKeyResumePlaySoundTimer = "CalendarFollowManager-ResumePlaySoundTimer"
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground
-    private let applicationManagerKeySuspendPlaySoundTimer = "CalendarFollowManager-SuspendPlaySoundTimer"
+
+    /// The root-owned shared keep-alive engine. This follower reports operational state and supplies
+    /// only its existing throttled Calendar read; it does not own audio or lifecycle callbacks.
+    private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground
     private let applicationManagerKeyDownloadWhenAppWillEnterForeground = "CalendarFollowManager-DownloadWhenAppWillEnterForeground"
@@ -55,28 +48,25 @@ class CalendarFollowManager: NSObject {
     /// closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
     private var invalidateDownLoadTimerClosure: (() -> Void)?
     
-    /// timer for playsound
-    private var playSoundTimer: RepeatingTimer?
-    
     /// observer for calendar changes synced by iOS
     private var eventStoreChangedObserver: NSObjectProtocol?
     
     // MARK: - Initializer
     
-    init(coreDataManager: CoreDataManager, followerDelegate: FollowerDelegate) {
+    init(
+        coreDataManager: CoreDataManager,
+        followerDelegate: FollowerDelegate,
+        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
+    ) {
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.followerDelegate = followerDelegate
-        
-        if let url = Bundle.main.url(forResource: ConstantsSuspensionPrevention.soundFileName, withExtension: "") {
-            audioPlayer = try? AVAudioPlayer(contentsOf: url)
-        }
+        self.backgroundKeepAliveManager = backgroundKeepAliveManager
         
         super.init()
         
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.calendarFollowCalendarId.rawValue, options: .new, context: nil)
         
         eventStoreChangedObserver = NotificationCenter.default.addObserver(forName: .EKEventStoreChanged, object: eventStore, queue: .main) { [weak self] _ in
@@ -272,56 +262,6 @@ class CalendarFollowManager: NSObject {
         }
     }
     
-    /// disable suspension prevention by removing the closures from ApplicationManager.shared
-    private func disableSuspensionPrevention() {
-        playSoundTimer?.suspend()
-        
-        ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer)
-        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer)
-    }
-    
-    /// launches timer that will regularly play sound when the app is in the background and keep-alive is enabled
-    private func enableSuspensionPrevention() {
-        guard UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive else {
-            trace("not enabling suspension prevention as keep-alive type is: %{public}@", log: log, category: ConstantsLog.categoryCalendarManager, type: .debug, UserDefaults.standard.followerBackgroundKeepAliveType.description)
-            return
-        }
-        
-        disableSuspensionPrevention()
-        
-        let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal ? ConstantsSuspensionPrevention.intervalNormal : ConstantsSuspensionPrevention.intervalAggressive
-        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: { [weak self] in
-            guard let self = self else { return }
-            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                trace("playing audio every %{public}@ seconds. Calendar Follow keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryCalendarManager, type: .info, interval.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
-                audioPlayer.play()
-            }
-            
-            // playing sound keeps the app awake, but the wake tick should also do the calendar check
-            self.downloadFromKeepAliveTick()
-        })
-        
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                self.playSoundTimer?.resume()
-                
-                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                    audioPlayer.play()
-                }
-                
-                // do one immediate read when the app enters background
-                self.downloadFromKeepAliveTick()
-            }
-        })
-        
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            self.playSoundTimer?.suspend()
-        })
-    }
-    
     /// verifies values of applicable UserDefaults and either starts or stops follower mode
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
         if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .calendar && UserDefaults.standard.calendarFollowCalendarId != nil {
@@ -329,10 +269,8 @@ class CalendarFollowManager: NSObject {
                 self?.downloadWhenAppWillEnterForeground()
             })
             
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                enableSuspensionPrevention()
-            } else {
-                disableSuspensionPrevention()
+            backgroundKeepAliveManager.start(for: .sharedCalendar) { [weak self] in
+                self?.downloadFromKeepAliveTick()
             }
             
             downloadWhenFollowModeStarts()
@@ -341,7 +279,7 @@ class CalendarFollowManager: NSObject {
                 UserDefaults.standard.calendarFollowStatus = CalendarShareStatus.notConfigured.rawValue
             }
             
-            disableSuspensionPrevention()
+            backgroundKeepAliveManager.stop(for: .sharedCalendar)
             ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyDownloadWhenAppWillEnterForeground)
             invalidateDownLoadTimerClosure?()
         }
@@ -357,7 +295,7 @@ class CalendarFollowManager: NSObject {
         }
         
         switch keyPathEnum {
-        case .isMaster, .followerDataSourceType, .followerBackgroundKeepAliveType, .calendarFollowCalendarId:
+        case .isMaster, .followerDataSourceType, .calendarFollowCalendarId:
             verifyUserDefaultsAndStartOrStopFollowMode()
             
         default:
@@ -368,13 +306,12 @@ class CalendarFollowManager: NSObject {
     deinit {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue)
-        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.calendarFollowCalendarId.rawValue)
         if let eventStoreChangedObserver {
             NotificationCenter.default.removeObserver(eventStoreChangedObserver)
         }
         ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyDownloadWhenAppWillEnterForeground)
         invalidateDownLoadTimerClosure?()
-        playSoundTimer?.suspend()
+        backgroundKeepAliveManager.stop(for: .sharedCalendar)
     }
 }
