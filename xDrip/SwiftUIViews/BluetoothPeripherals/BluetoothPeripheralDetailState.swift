@@ -32,6 +32,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     // Allows the status footer to show a warning without changing the banner status text.
     @Published private(set) var statusFooterIsWarning = false
     @Published private(set) var connectionStatus = BluetoothPeripheralDisplayStatus.notScanning
+    @Published private(set) var connectionWaitStartedAt: Date?
     @Published private(set) var category = BluetoothPeripheralCategory.CGM
     @Published private(set) var canDeletePeripheral = false
     @Published var pendingAlert: BluetoothPeripheralDetailAlert?
@@ -55,6 +56,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     private var isScanning = false
     private var nfcScanNeeded = false
     private var nfcScanSuccessful = false
+    // Takes priority over saved connection history when this screen starts a fresh wait.
+    private var explicitlyStartedScanAt: Date?
     private var previousScanningResult: BluetoothTransmitter.startScanningResult?
     private var cachedTransmitterReadSuccessDisplay: TransmitterReadSuccessDisplay?
     private var cachedTransmitterReadSuccessSummaryText: String?
@@ -153,6 +156,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
 
     func refresh() {
         let connectButtonState = makeConnectButtonState()
+        let newConnectionStatus = makeConnectionDisplayStatus()
 
         connectButtonTitle = connectButtonState.title
         connectButtonIsEnabled = connectButtonState.isEnabled
@@ -165,7 +169,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         statusFooterText = makeStatusFooterText(activationBlockedMessage: activationBlockedMessage)
         statusFooterSystemImage = makeStatusFooterSystemImage(activationBlockedMessage: activationBlockedMessage)
         statusFooterIsWarning = activationBlockedMessage != nil
-        connectionStatus = makeConnectionDisplayStatus()
+        updateConnectionWaitStartedAt(for: newConnectionStatus)
+        connectionStatus = newConnectionStatus
         category = expectedBluetoothPeripheralType.category()
         canDeletePeripheral = bluetoothPeripheral != nil
         sections = makeSections()
@@ -484,11 +489,37 @@ private extension BluetoothPeripheralDetailState {
             bluetoothTransmitter = nil
         }
 
+        let isScanningForNewPeripheral = isScanning ||
+            bluetoothPeripheralManager?.isScanning() == true ||
+            bluetoothPeripheral?.blePeripheral.shouldconnect == true
+
         return BluetoothPeripheralDisplayStatus(
             bluetoothTransmitter: bluetoothTransmitter,
             // A saved device that should connect is still active while waiting for the next Bluetooth cycle.
-            isScanningForNewPeripheral: isScanning || bluetoothPeripheral?.blePeripheral.shouldconnect == true
+            // The manager check also covers a new Libre scan after NFC starts BLE internally.
+            isScanningForNewPeripheral: isScanningForNewPeripheral
         )
+    }
+
+    /// Uses an explicit scan start when this screen initiated the wait, including after Libre NFC.
+    /// Otherwise, a saved reconnect is anchored to the device's last Bluetooth state change.
+    func updateConnectionWaitStartedAt(for connectionStatus: BluetoothPeripheralDisplayStatus) {
+        let shouldShowElapsedTime = connectionStatus == .scanning &&
+            !nfcScanNeeded
+
+        guard shouldShowElapsedTime else {
+            connectionWaitStartedAt = nil
+            explicitlyStartedScanAt = nil
+            return
+        }
+
+        if let explicitlyStartedScanAt {
+            connectionWaitStartedAt = explicitlyStartedScanAt
+        } else if let lastConnectionStatusChange = bluetoothPeripheral?.blePeripheral.lastConnectionStatusChangeTimeStamp {
+            connectionWaitStartedAt = lastConnectionStatusChange
+        } else if connectionWaitStartedAt == nil {
+            connectionWaitStartedAt = Date()
+        }
     }
 
     // Used by the disabled button state. The alert text is not needed here
@@ -626,6 +657,10 @@ private extension BluetoothPeripheralDetailState {
                 setShouldConnectToFalse(for: bluetoothPeripheral, askUser: true)
             } else {
                 guard canActivateCurrentPeripheral() else { return }
+
+                if !nfcScanNeeded {
+                    explicitlyStartedScanAt = Date()
+                }
 
                 bluetoothPeripheral.blePeripheral.shouldconnect = true
                 coreDataManager.saveChanges()
@@ -880,6 +915,7 @@ private extension BluetoothPeripheralDetailState {
         switch startScanningResult {
         case .success:
             isScanning = true
+            explicitlyStartedScanAt = explicitlyStartedScanAt ?? Date()
             UIApplication.shared.isIdleTimerDisabled = true
 
             if !expectedBluetoothPeripheralType.needsNFCScanToConnect() {
@@ -987,6 +1023,7 @@ private extension BluetoothPeripheralDetailState {
 
             nfcScanSuccessful = true
             nfcScanNeeded = false
+            explicitlyStartedScanAt = Date()
 
             trace("in observeValue, nfcScanSuccessful has been set to true so will inform the user and try and update the connection status to Scanning", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .error)
             pendingAlert = BluetoothPeripheralDetailAlert(title: TextsLibreNFC.nfcScanSuccessfulTitle, message: TextsLibreNFC.nfcScanSuccessfulMessage)

@@ -200,6 +200,17 @@ private struct BluetoothPeripheralStatusBannerView: View {
                 .foregroundStyle(Color(.colorPrimary))
 
             Spacer()
+
+            if let connectionWaitStartedAt = state.connectionWaitStartedAt {
+                HStack(spacing: 4) {
+                    Image(systemName: "clock")
+                        .accessibilityHidden(true)
+
+                    Text(connectionWaitStartedAt, style: .timer)
+                        .monospacedDigit()
+                }
+                    .foregroundStyle(Color(.colorSecondary))
+            }
         }
         .padding(.vertical, 3)
     }
