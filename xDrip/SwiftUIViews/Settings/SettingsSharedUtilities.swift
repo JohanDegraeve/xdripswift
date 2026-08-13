@@ -234,7 +234,14 @@ struct SettingsIndicator {
 /// One value shown by an inline Settings picker and whether it matches the stored selection.
 struct SettingsMenuOption {
     let title: String
+    let symbolName: String?
     let isSelected: Bool
+
+    init(title: String, symbolName: String? = nil, isSelected: Bool) {
+        self.title = title
+        self.symbolName = symbolName
+        self.isSelected = isSelected
+    }
 }
 
 enum SettingsAccessory {
@@ -876,7 +883,21 @@ private struct SettingsNativeRowView: View {
                             selectRow()
                         }
                     } label: {
-                        if option.isSelected {
+                        if let symbolName = option.symbolName {
+                            HStack {
+                                Label {
+                                    Text(option.title)
+                                        .foregroundStyle(Color(.colorSecondary))
+                                } icon: {
+                                    Image(systemName: symbolName)
+                                        .foregroundStyle(Color(.colorSecondary))
+                                }
+
+                                if option.isSelected {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        } else if option.isSelected {
                             Label(option.title, systemImage: "checkmark")
                         } else {
                             Text(option.title)
@@ -890,9 +911,20 @@ private struct SettingsNativeRowView: View {
                         .lineLimit(2)
                         .minimumScaleFactor(0.75)
                     Spacer(minLength: 8)
-                    Text(selectedMenuTitle(options()))
-                        .foregroundStyle(row.isEnabled ? (row.detailColor ?? ConstantsAppColors.rowDetailText) : ConstantsAppColors.disabledText)
-                        .lineLimit(1)
+                    if let selectedOption = selectedMenuOption(options()), let symbolName = selectedOption.symbolName {
+                        HStack(spacing: 6) {
+                            Image(systemName: symbolName)
+                                .font(.callout)
+                                .foregroundStyle(row.isEnabled ? Color(.colorSecondary) : ConstantsAppColors.disabledText)
+                            Text(selectedOption.title)
+                                .foregroundStyle(row.isEnabled ? Color(.colorSecondary) : ConstantsAppColors.disabledText)
+                                .lineLimit(1)
+                        }
+                    } else {
+                        Text(selectedMenuTitle(options()))
+                            .foregroundStyle(row.isEnabled ? (row.detailColor ?? ConstantsAppColors.rowDetailText) : ConstantsAppColors.disabledText)
+                            .lineLimit(1)
+                    }
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(row.isEnabled ? (row.detailColor ?? ConstantsAppColors.rowDetailText) : ConstantsAppColors.disabledText)
@@ -900,6 +932,7 @@ private struct SettingsNativeRowView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .tint(options().contains { $0.symbolName != nil } ? Color(.colorSecondary) : nil)
             .disabled(!row.isEnabled)
 
         case let .some(.menuWithSelectionTitle(options, selectionTitle, selectOption)):
@@ -976,7 +1009,11 @@ private struct SettingsNativeRowView: View {
     }
 
     private func selectedMenuTitle(_ options: [SettingsMenuOption]) -> String {
-        options.first(where: \.isSelected)?.title ?? options.first?.title ?? ""
+        selectedMenuOption(options)?.title ?? ""
+    }
+
+    private func selectedMenuOption(_ options: [SettingsMenuOption]) -> SettingsMenuOption? {
+        options.first(where: \.isSelected) ?? options.first
     }
 
     private var showsDisclosure: Bool {

@@ -265,6 +265,32 @@ final class FollowerSettingsTests: XCTestCase {
         }
     }
 
+    func testKeepAlivePickerPairsEachDescriptionWithItsSymbol() {
+        let standard = UserDefaults.standard
+        let previousMaster = standard.isMaster
+        let previousKeepAliveType = standard.followerBackgroundKeepAliveType
+        defer {
+            standard.isMaster = previousMaster
+            standard.followerBackgroundKeepAliveType = previousKeepAliveType
+        }
+
+        standard.isMaster = false
+        standard.followerBackgroundKeepAliveType = .normal
+
+        let model = SettingsViewDataSourceSettingsViewModel(coreDataManager: nil)
+        let keepAliveRow = model.settingsSections(sectionIDBase: 0)[0].rows.first {
+            $0.id == "dataSource.followerKeepAlive"
+        }
+        guard case let .menu(options, _)? = keepAliveRow?.control else {
+            return XCTFail("Keep-alive row did not expose its menu options")
+        }
+
+        let menuOptions = options()
+        XCTAssertEqual(menuOptions.map(\.title), FollowerBackgroundKeepAliveType.allCases.map(\.description))
+        XCTAssertEqual(menuOptions.map(\.symbolName), ["d.circle", "n.circle", "a.circle", "c.circle", "heart.circle"])
+        XCTAssertEqual(menuOptions.filter(\.isSelected).map(\.symbolName), ["n.circle"])
+    }
+
     func testSourcePickerClearsConnectionTimestampWithoutDeletingCredentials() {
         let standard = UserDefaults.standard
         let previousMaster = standard.isMaster

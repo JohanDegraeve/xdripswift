@@ -146,7 +146,11 @@ final class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModel
         keepAliveRow.control = .menu(
             options: {
                 keepAliveTypes.map {
-                    SettingsMenuOption(title: $0.description, isSelected: $0 == defaults.followerBackgroundKeepAliveType)
+                    SettingsMenuOption(
+                        title: $0.description,
+                        symbolName: $0.keepAliveImageString,
+                        isSelected: $0 == defaults.followerBackgroundKeepAliveType
+                    )
                 }
             },
             selectOption: { [weak self] index in
