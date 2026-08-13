@@ -22,8 +22,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// bubble
     case BubbleType = "Nano/Bubble/Bubble Mini"
     
-    /// Dexcom
-    case DexcomType = "Dexcom G5/G6/ONE"
+    /// 2026-08-13: G5 remains supported for existing devices, but is no longer
+    /// advertised as an option when adding a new Dexcom transmitter.
+    case DexcomType = "Dexcom G6/ONE"
     
     /// Dexcom G7, Dexcom G7 heartbeat
     case DexcomG7Type, DexcomG7HeartBeatType = "Dexcom G7/ONE+/Stelo"

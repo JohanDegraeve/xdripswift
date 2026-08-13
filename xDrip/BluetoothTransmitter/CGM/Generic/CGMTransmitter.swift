@@ -86,7 +86,8 @@ protocol CGMTransmitter: AnyObject {
 /// cgm transmitter types
 enum CGMTransmitterType:String, CaseIterable {
     
-    /// dexcom G5, G6
+    /// 2026-08-13: Keep this legacy raw value because it is persisted in UserDefaults.
+    /// User-facing setup labels omit G5, while existing G5 transmitters remain supported.
     case dexcom = "Dexcom G5/G6/ONE"
     
     /// dexcom G7

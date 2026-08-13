@@ -13,7 +13,7 @@ xDrip4iOS is not related to the xDrip+ project for Android.
 
 Master mode currently includes:
 
-- Dexcom G5, G6, Anubis and ONE
+- Dexcom G6, Anubis and ONE
 - Dexcom G7, ONE+ and Stelo
 - Libre 2 and Libre 2 Plus EU sensors over direct Bluetooth
 - Compatible Libre sensors through MiaoMiao or Nano/Bubble/Bubble Mini transmitters

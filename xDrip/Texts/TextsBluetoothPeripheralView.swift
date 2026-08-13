@@ -97,7 +97,7 @@ class Texts_BluetoothPeripheralView {
     }()
 
     static let dexcomG6ScanNoticeTitle: String = {
-        return NSLocalizedString("dexcomG6ScanNoticeTitle", tableName: filename, bundle: Bundle.main, value: "Dexcom App Connection", comment: "title of the notice shown before scanning for a Dexcom G5, G6, or ONE transmitter")
+        return NSLocalizedString("dexcomG6ScanNoticeTitle", tableName: filename, bundle: Bundle.main, value: "Dexcom App Connection", comment: "title of the notice shown before scanning for a Dexcom G6 or ONE transmitter")
     }()
 
     static let dexcomG6ScanNoticeMessage: String = {
@@ -106,7 +106,7 @@ class Texts_BluetoothPeripheralView {
             tableName: filename,
             bundle: Bundle.main,
             value: "Before scanning, force-close the Dexcom app or disable Bluetooth permission for it.\n\nThe Dexcom app must not be connected to the transmitter while this app is scanning or receiving values.",
-            comment: "notice shown before scanning for a Dexcom G5, G6, or ONE transmitter, explaining how to avoid a competing Dexcom app connection"
+            comment: "notice shown before scanning for a Dexcom G6 or ONE transmitter, explaining how to avoid a competing Dexcom app connection"
         )
     }()
 

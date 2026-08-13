@@ -77,7 +77,7 @@
 "settingsviews_transmitterid_text_for_button" = "ID del Transmisor";
 "settingsviews_givetransmitterid" = "ID del Transmisor";
 "settingsviews_resettransmitter" = "Transmisor Anubis";
-"settingsviews_resetDexcomTransmitterMessage" = "Esta opción intentará resetear el transmisor durante la próxima conexión.\n\nEsto solo puede funcionar con transmisores G5 y transmisores G6 Anubis.\n\nNo funciona para transmisores normales tipo G6 y One.";
+"settingsviews_resetDexcomTransmitterMessage" = "Esta opción intentará restablecer su transmisor Anubis durante la próxima conexión.";
 "settingsviews_nonfixedtransmitter" = "Calibración multipunto";
 "settingsviews_labelNonFixed" = "Calibración Multi-punto";
 "settingsviews_labelAlgorithmType" = "Tipo de Algoritmo";
