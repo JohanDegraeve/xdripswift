@@ -516,7 +516,7 @@ import AppIntents
         // add tracing when app comes to foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyTraceAppGoesToForeground, closure: {
             trace("Application will enter foreground", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-            self.refreshSelectedFollower()
+            self.refreshSelectedFollower(fillNightscoutGaps: true)
         })
         
         // add tracing when app will terminate - this only works for non-suspended apps, probably (not tested) also works for apps that crash in the background
@@ -564,12 +564,16 @@ import AppIntents
     }
 
     /// Requests one immediate update from the selected follower whenever the app returns.
-    private func refreshSelectedFollower() {
+    private func refreshSelectedFollower(fillNightscoutGaps: Bool = false) {
         guard !UserDefaults.standard.isMaster else { return }
 
         switch UserDefaults.standard.followerDataSourceType {
         case .nightscout:
-            nightscoutFollowManager?.download()
+            if fillNightscoutGaps {
+                nightscoutFollowManager?.refreshAfterForeground()
+            } else {
+                nightscoutFollowManager?.download()
+            }
         case .libreLinkUp, .libreLinkUpRussia:
             libreLinkUpFollowManager?.download()
         case .dexcomShare:
@@ -2521,6 +2525,23 @@ extension RootApplicationCoordinator: @preconcurrency UNUserNotificationCenterDe
 // MARK: - conform to FollowerDelegate protocol
 
 extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
+    func followerGapFillDidAddHistoricalReadings(startingAt startDate: Date) {
+        guard !UserDefaults.standard.isMaster,
+              UserDefaults.standard.followerDataSourceType == .nightscout
+        else { return }
+
+        statisticsManager?.invalidate()
+        if let bgPostProcessingManager {
+            _ = bgPostProcessingManager.processBgReadings(
+                processingStartDateOverride: startDate,
+                allowHistoricalDownstreamRewrite: false
+            )
+        }
+        rootHomeStateModel.invalidateCharts()
+        updateMiniChart()
+        updateStatistics(animate: false)
+    }
+
     func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading]) {
         if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor { //}, let followManager = (UserDefaults.standard.followerDataSourceType == .nightscout ? self.nightscoutFollowManager : self.libreLinkUpFollowManager) {
 

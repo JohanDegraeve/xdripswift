@@ -337,6 +337,8 @@
 		BA0000010000000000000005 /* DataManagementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000015 /* DataManagementService.swift */; };
 		BA0000010000000000000006 /* DataDeletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000016 /* DataDeletionView.swift */; };
 		BA0000010000000000000007 /* NightscoutImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000017 /* NightscoutImportService.swift */; };
+		BA0000020000000000000001 /* NightscoutFollowerGapFillService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000020000000000000011 /* NightscoutFollowerGapFillService.swift */; };
+		BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */; };
 		BA0000010000000000000008 /* NightscoutImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000018 /* NightscoutImportView.swift */; };
 		BA0000010000000000000009 /* ManageDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000019 /* ManageDataView.swift */; };
 		BA000001000000000000000A /* ImportDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA000001000000000000001A /* ImportDataView.swift */; };
@@ -1200,6 +1202,8 @@
 		BA0000010000000000000015 /* DataManagementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementService.swift; sourceTree = "<group>"; };
 		BA0000010000000000000016 /* DataDeletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataDeletionView.swift; sourceTree = "<group>"; };
 		BA0000010000000000000017 /* NightscoutImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutImportService.swift; sourceTree = "<group>"; };
+		BA0000020000000000000011 /* NightscoutFollowerGapFillService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowerGapFillService.swift; sourceTree = "<group>"; };
+		BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowerGapFillTests.swift; sourceTree = "<group>"; };
 		BA0000010000000000000018 /* NightscoutImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutImportView.swift; sourceTree = "<group>"; };
 		BA0000010000000000000019 /* ManageDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageDataView.swift; sourceTree = "<group>"; };
 		BA000001000000000000001A /* ImportDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportDataView.swift; sourceTree = "<group>"; };
@@ -2487,6 +2491,7 @@
 		4F2600213002000200000001 /* xDrip Tests */ = {
 			isa = PBXGroup;
 			children = (
+				BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */,
 				A40000020000000000000001 /* FollowerSettingsTests.swift */,
 				4F2800123004000100000001 /* GlucoseChartYAxisRetentionTests.swift */,
 				4F2800113004000100000001 /* RootHomeInteractionTests.swift */,
@@ -2720,6 +2725,7 @@
 				F821CF52229BF43A005C1E43 /* NightscoutDateFormatter.swift */,
 				47AECB9D2CD2B618005F1814 /* NightscoutDeviceStatusModels.swift */,
 				F821CF65229EE68B005C1E43 /* NightscoutFollowManager.swift */,
+				BA0000020000000000000011 /* NightscoutFollowerGapFillService.swift */,
 				476A897D2CCA7E680073ED83 /* NightscoutFollowType.swift */,
 				476A897B2CC963AF0073ED83 /* NightscoutProfileModels.swift */,
 				BA0000010000000000000017 /* NightscoutImportService.swift */,
@@ -4231,6 +4237,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */,
 				4F2600023002000200000001 /* SensorHealthIssueManagerTests.swift in Sources */,
 				4F2800023004000100000001 /* GlucoseChartYAxisRetentionTests.swift in Sources */,
 				4F2800013004000100000001 /* RootHomeInteractionTests.swift in Sources */,
@@ -4244,6 +4251,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BA0000020000000000000001 /* NightscoutFollowerGapFillService.swift in Sources */,
 				DAF100012E7A000100000001 /* DataFlowPolicy.swift in Sources */,
 				BA0000010000000000000001 /* BackupModels.swift in Sources */,
 				BA0000010000000000000002 /* BackupCrypto.swift in Sources */,

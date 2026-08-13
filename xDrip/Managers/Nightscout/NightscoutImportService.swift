@@ -154,6 +154,14 @@ struct NightscoutImportResult: Sendable {
     let counts: NightscoutImportCounts
 }
 
+/// Summary from a focused BG-only range merge used by automatic follower gap filling.
+struct NightscoutBgRangeMergeResult: Sendable {
+    var documentsDownloaded = 0
+    var documentsInvalid = 0
+    var readingsAdded = 0
+    var readingsSkipped = 0
+}
+
 /// A lightweight update sent to the main-actor view model during network and Core Data work.
 struct NightscoutImportProgress: Sendable {
     let completedUnits: Int
@@ -480,6 +488,34 @@ final class NightscoutImportService: @unchecked Sendable {
 
     static func isImportedBgReadingID(_ id: String) -> Bool {
         id.hasPrefix(importedBgReadingIDPrefix)
+    }
+
+    /// Downloads and merge-fills only the supplied BG intervals.
+    ///
+    /// This deliberately bypasses the user-driven historical import checkpoint while reusing
+    /// its authenticated requests, validation, response subdivision and duplicate-safe merge.
+    func mergeBgReadings(in intervals: [DateInterval]) async throws -> NightscoutBgRangeMergeResult {
+        let validIntervals = intervals
+            .filter { $0.start < $0.end }
+            .sorted { $0.start < $1.start }
+        guard !validIntervals.isEmpty else { return NightscoutBgRangeMergeResult() }
+
+        let configuration = try currentConfiguration()
+        try await persistManagedObjectContexts()
+        var result = NightscoutBgRangeMergeResult()
+
+        for interval in validIntervals {
+            try Task.checkCancellation()
+            let documents = try await downloadEntries(in: interval, configuration: configuration)
+            let prepared = prepareBgReadings(documents, in: interval)
+            let applied = try await applyBgReadings(prepared.records, in: interval)
+            result.documentsDownloaded += documents.count
+            result.documentsInvalid += prepared.invalidCount
+            result.readingsAdded += applied.added
+            result.readingsSkipped += applied.skipped
+        }
+
+        return result
     }
 
     /// Creates exact 24-hour outer chunks. Inner safety subdivision happens only when a response is full.

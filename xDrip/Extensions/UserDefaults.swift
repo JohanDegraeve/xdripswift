@@ -484,6 +484,10 @@ extension UserDefaults {
         case timeStampLatestNSUploadedBgReadingToNightscout = "timeStampLatestUploadedBgReading"
         /// timestamp lastest treatment sync request to Nightscout
         case timeStampLatestNightscoutSyncRequest = "timeStampLatestNightscoutSyncRequest"
+        /// end of the most recent successful incremental Nightscout follower gap-fill audit
+        case nightscoutFollowerGapFillLastAuditEndDate = "nightscoutFollowerGapFillLastAuditEndDate"
+        /// normalized Nightscout site associated with the follower gap-fill audit timestamp
+        case nightscoutFollowerGapFillSite = "nightscoutFollowerGapFillSite"
         /// timestamp latest calibration uploaded to Nightscout
         case timeStampLatestNSUploadedCalibrationToNightscout = "timeStampLatestUploadedCalibration"
 
@@ -2056,6 +2060,26 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.timeStampLatestNightscoutSyncRequest.rawValue)
+        }
+    }
+
+    /// End of the most recent successful Nightscout follower gap-fill audit.
+    var nightscoutFollowerGapFillLastAuditEndDate: Date? {
+        get {
+            object(forKey: Key.nightscoutFollowerGapFillLastAuditEndDate.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.nightscoutFollowerGapFillLastAuditEndDate.rawValue)
+        }
+    }
+
+    /// Normalized Nightscout site associated with the follower gap-fill audit timestamp.
+    var nightscoutFollowerGapFillSite: String? {
+        get {
+            string(forKey: Key.nightscoutFollowerGapFillSite.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.nightscoutFollowerGapFillSite.rawValue)
         }
     }
 

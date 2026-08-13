@@ -2,6 +2,7 @@ import Foundation
 import os
 import AVFoundation
 import AudioToolbox
+import UIKit
 
 /// instance of this class will do the follower functionality. Just make an instance, it will listen to the settings, do the regular download if needed - it could be deallocated when isMaster setting in Userdefaults changes, but that's not necessary to do
 class NightscoutFollowManager: NSObject {
@@ -36,12 +37,29 @@ class NightscoutFollowManager: NSObject {
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate playsoundtimer
     private let applicationManagerKeySuspendPlaySoundTimer = "NightscoutFollowerManager-SuspendPlaySoundTimer"
+
+    /// constant for cancelling an active foreground gap fill when the app backgrounds
+    private let applicationManagerKeyCancelGapFill = "NightscoutFollowerManager-CancelGapFill"
     
     /// closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
     private var invalidateDownLoadTimerClosure: (() -> Void)?
     
     // timer for playsound
     private var playSoundTimer: RepeatingTimer?
+
+    /// Keeps historical audit state and networking out of the live follower implementation.
+    private lazy var followerGapFillService = NightscoutFollowerGapFillService(
+        coreDataManager: coreDataManager,
+        onReadingsAdded: { [weak self] startDate in
+            self?.followerDelegate?.followerGapFillDidAddHistoricalReadings(startingAt: startDate)
+        }
+    )
+
+    /// Invalidates delayed post-download triggers when follower lifecycle or configuration changes.
+    private var gapFillIntentGeneration = UUID()
+
+    /// Distinguishes a genuine Nightscout follower start from an in-place settings refresh.
+    private var wasNightscoutFollowerActive = false
 
     // MARK: - initializer
     
@@ -74,6 +92,10 @@ class NightscoutFollowManager: NSObject {
 
         // call super.init
         super.init()
+
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyCancelGapFill, closure: { [weak self] in
+            self?.invalidateGapFillIntent()
+        })
         
         // changing from follower to master or vice versa also requires ... attention
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
@@ -83,6 +105,8 @@ class NightscoutFollowManager: NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
         // setting nightscout url also does require action
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutUrl.rawValue, options: .new, context: nil)
+        // changing the optional Nightscout port changes the effective site
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutPort.rawValue, options: .new, context: nil)
         // setting nightscout API_SECRET also does require action
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutAPIKey.rawValue, options: .new, context: nil)
         // setting nightscout authentication token also does require action
@@ -121,6 +145,17 @@ class NightscoutFollowManager: NSObject {
     /// - download recent readings from nightscout, send result to delegate, and schedule new download (if followerBackgroundKeepAliveType != disabled)
     /// - no download is done if latest reading is less than 30 seconds old
     @objc public func download() {
+        performDownload(fillGapsAfterSuccess: false)
+    }
+
+    /// Performs the normal current-data refresh and then requests one bounded historical audit.
+    func refreshAfterForeground() {
+        performDownload(fillGapsAfterSuccess: true)
+    }
+
+    private func performDownload(fillGapsAfterSuccess: Bool) {
+
+        let requestedGapFillGeneration = fillGapsAfterSuccess ? gapFillIntentGeneration : nil
         
         trace("in download", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
         
@@ -165,6 +200,10 @@ class NightscoutFollowManager: NSObject {
             
             // schedule new download
             self.scheduleNewDownload()
+
+            if let requestedGapFillGeneration {
+                startGapFillIfForeground(for: requestedGapFillGeneration)
+            }
             
             return
         }
@@ -197,7 +236,7 @@ class NightscoutFollowManager: NSObject {
                 
                 // get array of FollowGlucoseData from json
                 var followGlucoseDataArray = [FollowerBgReading]()
-                self.processDownloadResponse(data: data, urlResponse: response, error: error, followGlucoseDataArray: &followGlucoseDataArray)
+                let responseWasSuccessful = self.processDownloadResponse(data: data, urlResponse: response, error: error, followGlucoseDataArray: &followGlucoseDataArray)
                 
                 trace("    finished download,  %{public}@ readings", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info, followGlucoseDataArray.count.description)
                 
@@ -210,6 +249,9 @@ class NightscoutFollowManager: NSObject {
                         var array = localCopy
                         followerDelegate.followerInfoReceived(followGlucoseDataArray: &array)
                     }
+                    if responseWasSuccessful, let requestedGapFillGeneration {
+                        self.startGapFillIfForeground(for: requestedGapFillGeneration)
+                    }
                     // schedule new download
                     self.scheduleNewDownload()
                 }
@@ -220,6 +262,26 @@ class NightscoutFollowManager: NSObject {
             
         }
 
+    }
+
+    private func startGapFillIfForeground(for requestedGeneration: UUID, retryAfterForegroundTransition: Bool = true) {
+        guard requestedGeneration == gapFillIntentGeneration else { return }
+        if UIApplication.shared.applicationState == .background {
+            guard retryAfterForegroundTransition else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.startGapFillIfForeground(
+                    for: requestedGeneration,
+                    retryAfterForegroundTransition: false
+                )
+            }
+            return
+        }
+        followerGapFillService.run(endingAt: Date())
+    }
+
+    private func invalidateGapFillIntent() {
+        gapFillIntentGeneration = UUID()
+        followerGapFillService.cancel()
     }
     
     // MARK: - private functions
@@ -273,15 +335,17 @@ class NightscoutFollowManager: NSObject {
     ///     - error : error as result from dataTask
     ///     - followGlucoseData : array input by caller, result will be in that array. Can be empty array. Array must be initialized to empty array by caller
     /// - returns: FollowGlucoseData , possibly empty - first entry is the youngest
-    private func processDownloadResponse(data:Data?, urlResponse:URLResponse?, error:Error?, followGlucoseDataArray:inout [FollowerBgReading] ) {
+    private func processDownloadResponse(data:Data?, urlResponse:URLResponse?, error:Error?, followGlucoseDataArray:inout [FollowerBgReading] ) -> Bool {
         
         // log info
         trace("in processDownloadResponse", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
         
+        var responseWasValid = true
+
         // if error log an error
         if let error = error {
             trace("    failed to download, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, error.localizedDescription)
-            return
+            return false
         }
         
         // if data not nil then check if response is nil
@@ -293,12 +357,6 @@ class NightscoutFollowManager: NSObject {
                     // store the current timestamp as a successful server response
                     UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
                         
-                    // convert data to String for logging purposes
-                    var dataAsString = ""
-                    if let aa = String(data: data, encoding: .utf8) {
-                        dataAsString = aa
-                    }
-                    
                     // try json deserialization
                     if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
                         
@@ -329,28 +387,38 @@ class NightscoutFollowManager: NSObject {
                                         }
 
                                     } else {
-                                        trace("     failed to create glucoseData, entry = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, entry.description)
+                                        responseWasValid = false
+                                        trace("     failed to create glucoseData from a Nightscout entry", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error)
                                     }
+                                } else {
+                                    responseWasValid = false
+                                    trace("     Nightscout response contained an invalid entry", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error)
                                 }
                             }
                             
                         } else {
-                            trace("     json deserialization failed, result is not a json array, data received = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, dataAsString)
+                            trace("     json deserialization failed, result is not a json array", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error)
+                            return false
                         }
                         
                     } else {
-                        trace("     json deserialization failed, data received = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, dataAsString)
+                        trace("     json deserialization failed", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error)
+                        return false
                     }
                     
                 } else {
                     trace("     urlResponse.statusCode  is not 200 value = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, urlResponse.statusCode.description)
+                    return false
                 }
             } else {
                 trace("    data is nil", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error)
+                return false
             }
         } else {
             trace("    urlResponse is not HTTPURLResponse", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error)
+            return false
         }
+        return responseWasValid
     }
     
     /// disable suspension prevention by removing the closures from ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground and ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground
@@ -410,8 +478,17 @@ class NightscoutFollowManager: NSObject {
     
     /// verifies values of applicable UserDefaults and either starts or stops follower mode, inclusive call to enableSuspensionPrevention or disableSuspensionPrevention - also first download is started if applicable
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
-        
-        if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout && UserDefaults.standard.nightscoutUrl != nil && UserDefaults.standard.nightscoutEnabled {
+
+        invalidateGapFillIntent()
+
+        let isNightscoutFollowerActive = !UserDefaults.standard.isMaster
+            && UserDefaults.standard.followerDataSourceType == .nightscout
+            && UserDefaults.standard.nightscoutUrl != nil
+            && UserDefaults.standard.nightscoutEnabled
+        let isStartingNightscoutFollower = isNightscoutFollowerActive && !wasNightscoutFollowerActive
+        wasNightscoutFollowerActive = isNightscoutFollowerActive
+
+        if isNightscoutFollowerActive {
             
             // this will enable the suspension prevention sound playing if background keep-alive is needed
             // (i.e. not disabled and not using a heartbeat)
@@ -422,7 +499,11 @@ class NightscoutFollowManager: NSObject {
             }
             
             // do initial download, this will also schedule future downloads
-            download()
+            if isStartingNightscoutFollower {
+                refreshAfterForeground()
+            } else {
+                download()
+            }
             
         } else {
             
@@ -446,7 +527,7 @@ class NightscoutFollowManager: NSObject {
                 
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType, UserDefaults.Key.followerBackgroundKeepAliveType, UserDefaults.Key.nightscoutUrl, UserDefaults.Key.nightscoutEnabled, UserDefaults.Key.nightscoutAPIKey, UserDefaults.Key.nightscoutToken :
+                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType, UserDefaults.Key.followerBackgroundKeepAliveType, UserDefaults.Key.nightscoutUrl, UserDefaults.Key.nightscoutPort, UserDefaults.Key.nightscoutEnabled, UserDefaults.Key.nightscoutAPIKey, UserDefaults.Key.nightscoutToken :
                     
                     // change by user, should not be done within 200 ms
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
@@ -467,10 +548,13 @@ class NightscoutFollowManager: NSObject {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutUrl.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutPort.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutAPIKey.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutToken.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutEnabled.rawValue)
+        ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyCancelGapFill)
         invalidateDownLoadTimerClosure?()
+        invalidateGapFillIntent()
         playSoundTimer?.suspend()
     }
 }

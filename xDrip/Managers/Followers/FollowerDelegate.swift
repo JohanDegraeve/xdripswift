@@ -16,4 +16,11 @@ protocol FollowerDelegate:AnyObject {
     ///     - followGlucoseDataArray : array of FollowGlucoseData, can be empty array, first entry is the youngest
     func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading])
 
+    /// Reports that a follower added older readings directly to Core Data.
+    func followerGapFillDidAddHistoricalReadings(startingAt: Date)
+
+}
+
+extension FollowerDelegate {
+    func followerGapFillDidAddHistoricalReadings(startingAt: Date) {}
 }
