@@ -578,7 +578,7 @@ private extension BluetoothPeripheralDetailState {
     // The Dexcom G5/G6/ONE mode symbol is a fixed UI marker.
     // It should change with the switch state but not be localized.
     func dexcomG5ModeSystemImage(useOtherApp: Bool) -> String {
-        useOtherApp ? "c.circle" : "p.circle"
+        useOtherApp ? "c.square.fill" : "p.square.fill"
     }
 
     func connectionTimestampTitle() -> String {
@@ -1581,13 +1581,13 @@ private extension BluetoothPeripheralDetailState {
     // The active mode is first because it explains the current switch state.
     func dexcomG5CoexistenceFooterLines(dexcomG5: DexcomG5) -> [BluetoothPeripheralDetailFooterLine] {
         let coexistenceLine = BluetoothPeripheralDetailFooterLine(
-            systemImage: "c.circle",
+            systemImage: dexcomG5ModeSystemImage(useOtherApp: true),
             text: Texts_BluetoothPeripheralView.useOtherDexcomAppCoexistenceFooter,
             isActive: dexcomG5.useOtherApp
         )
 
         let primaryLine = BluetoothPeripheralDetailFooterLine(
-            systemImage: "p.circle",
+            systemImage: dexcomG5ModeSystemImage(useOtherApp: false),
             text: Texts_BluetoothPeripheralView.useOtherDexcomAppPrimaryFooter,
             isActive: !dexcomG5.useOtherApp
         )
