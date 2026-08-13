@@ -931,7 +931,7 @@ struct GlucoseChartView: View {
 
             resetRetainedYAxisMaximum(to: calculatedMaximumDomainValue)
         }
-        .onChange(of: calculatedMaximumDomainValue) { newMaximum in
+        .onCompatibleChange(of: calculatedMaximumDomainValue) { newMaximum in
             guard usesMainChartYAxisContext else { return }
 
             retainYAxisMaximum(newMaximum)
@@ -939,13 +939,13 @@ struct GlucoseChartView: View {
             // every candidate change prevents an older pending reset from superseding newer data.
             scheduleYAxisAutoReset(to: newMaximum)
         }
-        .onChange(of: visibleEndDate) { _ in
+        .onCompatibleChange(of: visibleEndDate) { _ in
             guard usesMainChartYAxisContext else { return }
 
             retainYAxisMaximum(calculatedMaximumDomainValue)
             scheduleYAxisAutoReset(to: calculatedMaximumDomainValue)
         }
-        .onChange(of: mainChartYAxisResetRevision) { _ in
+        .onCompatibleChange(of: mainChartYAxisResetRevision) { _ in
             guard usesMainChartYAxisContext else { return }
 
             resetRetainedYAxisMaximum(to: calculatedMaximumDomainValue)
@@ -1228,6 +1228,27 @@ private struct DownTriangle: Shape {
         path.closeSubpath()
 
         return path
+    }
+
+}
+
+// MARK: - Compatibility
+
+private extension View {
+
+    /// Uses the modern change handler while preserving targets that still support iOS 16.
+    @ViewBuilder
+    func onCompatibleChange<Value: Equatable>(
+        of value: Value,
+        perform action: @escaping (Value) -> Void
+    ) -> some View {
+        if #available(iOS 17.0, watchOS 10.0, *) {
+            onChange(of: value) { _, newValue in
+                action(newValue)
+            }
+        } else {
+            onChange(of: value, perform: action)
+        }
     }
 
 }
