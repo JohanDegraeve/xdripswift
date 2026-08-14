@@ -244,6 +244,7 @@ public class HealthKitManager: NSObject {
             (success: Bool, error: Error?) in
                 guard let self = self else { return }
                 if success {
+                    trace("stored reading in HealthKit", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .debug, troubleshooting: .detailed(.integration(name: .healthKit, activity: .succeeded(itemCount: 1))))
                     self.healthKitTimestampUpdateQueue.async {
                         self.timeStampsOfBgReadingsCurrentlyBeingSaved.remove(timeStampLastReadingToUpload)
                         
@@ -257,7 +258,7 @@ public class HealthKitManager: NSObject {
                     self.healthKitTimestampUpdateQueue.async {
                         self.timeStampsOfBgReadingsCurrentlyBeingSaved.remove(timeStampLastReadingToUpload)
                     }
-                    trace("failed store reading in healthkit, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, error.localizedDescription)
+                    trace("failed store reading in healthkit, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, troubleshooting: .detailed(.integration(name: .healthKit, activity: .failed)), error.localizedDescription)
                 }
         })
     }

@@ -8,6 +8,7 @@
 
 import Combine
 import Foundation
+import os
 import UserNotifications
 
 /// Owns the active sensor-health episode and all of its presentation state.
@@ -57,6 +58,10 @@ final class SensorHealthIssueManager: ObservableObject {
 
     private let userDefaults: UserDefaults
     private let notificationCenter: SensorHealthNotificationScheduling
+    private let log = OSLog(
+        subsystem: ConstantsLog.subSystem,
+        category: ConstantsLog.categoryApplicationDataSensors
+    )
     private weak var oneOffAlarmRaiser: SensorHealthOneOffAlarmRaising?
     private var persistedState: PersistedState
 
@@ -109,6 +114,9 @@ final class SensorHealthIssueManager: ObservableObject {
             return
         }
 
+        // `showSensorNoise` controls optional presentation on Home, charts, Watch and Live Activity.
+        // It must never gate calculation, episode detection or Activity Log collection: a hidden UI
+        // preference must not erase the evidence that explains why a sensor-health alert appeared.
         let sessionID = reconcileSession(sensorID: sensorID, sensorStartDate: sensorStartDate)
 
         if measurement.state == .flatlineSuspected {
@@ -361,6 +369,41 @@ final class SensorHealthIssueManager: ObservableObject {
         persistedState.activeIssue = issue
         persistedState.dismissedEpisodeID = nil
         visibleIssue = issue
+
+        // `activate` is the episode transition boundary: repeated ten-minute calculations for the
+        // same problem return above, so one real alert creates exactly one consumer log row. Keep
+        // the controlled alert kind separate from sensor IDs, raw values and developer arguments.
+        let troubleshootingAlert: TroubleshootingSensorHealthAlert
+        switch reason {
+        case .persistentNoise:
+            troubleshootingAlert = .persistentNoise
+        case .flatline:
+            troubleshootingAlert = .possibleFlatline
+        case .dexcomExcessNoise:
+            troubleshootingAlert = .dexcomExcessNoise
+        case .dexcomTemporarySensorIssue:
+            troubleshootingAlert = .dexcomTemporarySensorIssue
+        case .dexcomQuestionMarks:
+            troubleshootingAlert = .dexcomQuestionMarks
+        case .dexcomSensorFailure:
+            troubleshootingAlert = .dexcomSensorFailure
+        case .dexcomTransmitterFailure:
+            troubleshootingAlert = .dexcomTransmitterFailure
+        case .libreSensorFailure:
+            troubleshootingAlert = .libreSensorFailure
+        case .dexcomTransmitterBatteryFailure:
+            troubleshootingAlert = .dexcomTransmitterBatteryFailure
+        }
+
+        trace(
+            "sensor-health alert activated: %{public}@",
+            log: log,
+            category: ConstantsLog.categoryApplicationDataSensors,
+            type: .info,
+            troubleshooting: .standard(.sensorHealthAlert(troubleshootingAlert), timestamp: now),
+            troubleshootingAlert.rawValue
+        )
+
         scheduleNotificationIfNeeded(for: issue)
     }
 

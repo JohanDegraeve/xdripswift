@@ -131,19 +131,28 @@ import OSLog
             return
         }
 
-        trace(
-            "deleting treatment %{public}@ at %{public}@",
-            log: log,
-            category: ConstantsLog.categoryApplicationDataTreatments,
-            type: .info,
-            treatmentEntry.treatmentType.asString(),
-            treatmentEntry.date.description
-        )
-
         treatmentEntry.treatmentdeleted = true
         treatmentEntry.uploaded = false
 
-        coreDataManager.saveChanges()
+        guard coreDataManager.saveChanges() else {
+            trace("failed to save a deleted treatment", log: log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error)
+            return
+        }
+
+        // Swipe deletion and editor deletion use the same typed fact. Emit it only after the local
+        // save succeeds, and keep all treatment values, notes and identifiers in private app data.
+        trace(
+            "deleted treatment %{public}@ at %{public}@",
+            log: log,
+            category: ConstantsLog.categoryApplicationDataTreatments,
+            type: .info,
+            troubleshooting: .standard(.treatment(.deleted(
+                kind: TroubleshootingTreatmentKind(treatmentEntry.treatmentType),
+                treatmentAt: treatmentEntry.date
+            ))),
+            treatmentEntry.treatmentType.asString(),
+            treatmentEntry.date.description
+        )
         setNightscoutSyncRequiredToTrue()
         reloadTreatments()
     }

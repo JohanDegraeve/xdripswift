@@ -669,6 +669,23 @@ private extension BluetoothPeripheralDetailState {
                 bluetoothPeripheral.blePeripheral.shouldconnect = true
                 coreDataManager.saveChanges()
 
+                // This row records the user's deliberate Connect action, not the transmitter's
+                // automatic scan/retry loop. The store will pair it with the next successful generic
+                // Bluetooth connection and expose exactly one useful completion row.
+                if let source = TroubleshootingLogSource(
+                    bluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType(),
+                    transmitterID: bluetoothPeripheral.blePeripheral.transmitterId
+                ) {
+                    trace(
+                        "user requested a connection to %{public}@",
+                        log: log,
+                        category: ConstantsLog.categoryBluetoothPeripheralViewController,
+                        type: .info,
+                        troubleshooting: .standard(.cgm(source: source, activity: .connectionRequested)),
+                        source.name
+                    )
+                }
+
                 if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: true) {
                     bluetoothTransmitter.bluetoothTransmitterDelegate = self
                     configureSpecificDelegate(for: bluetoothTransmitter)
@@ -739,9 +756,26 @@ private extension BluetoothPeripheralDetailState {
 
     func disconnect(bluetoothPeripheral: BluetoothPeripheral) {
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else { return }
+        let troubleshootingSource = TroubleshootingLogSource(
+            bluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType(),
+            transmitterID: bluetoothPeripheral.blePeripheral.transmitterId
+        )
 
         bluetoothPeripheral.blePeripheral.shouldconnect = false
         coreDataManager.saveChanges()
+
+        // Log only after the user's persisted `shouldconnect` choice has been saved. A routine BLE
+        // disconnect between readings never reaches this UI action and therefore never creates this row.
+        if let troubleshootingSource {
+            trace(
+                "user disconnected %{public}@",
+                log: log,
+                category: ConstantsLog.categoryBluetoothPeripheralViewController,
+                type: .info,
+                troubleshooting: .standard(.cgm(source: troubleshootingSource, activity: .disconnected)),
+                troubleshootingSource.name
+            )
+        }
 
         if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false), bluetoothTransmitter is CGMTransmitter {
             UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
@@ -754,6 +788,10 @@ private extension BluetoothPeripheralDetailState {
 
     func delete(bluetoothPeripheral: BluetoothPeripheral) {
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else { return }
+        let troubleshootingSource = TroubleshootingLogSource(
+            bluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType(),
+            transmitterID: bluetoothPeripheral.blePeripheral.transmitterId
+        )
 
         if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false), bluetoothTransmitter is CGMTransmitter {
             UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
@@ -761,6 +799,20 @@ private extension BluetoothPeripheralDetailState {
         }
 
         bluetoothPeripheralManager.deleteBluetoothPeripheral(bluetoothPeripheral: bluetoothPeripheral)
+
+        // Deleting a configured CGM is a distinct user action from merely disconnecting it. Persist
+        // only the controlled CGM family; the device name, alias, address and transmitter ID remain
+        // available solely in the developer trace files.
+        if let troubleshootingSource {
+            trace(
+                "user removed %{public}@",
+                log: log,
+                category: ConstantsLog.categoryBluetoothPeripheralViewController,
+                type: .info,
+                troubleshooting: .standard(.cgm(source: troubleshootingSource, activity: .removed)),
+                troubleshootingSource.name
+            )
+        }
         self.bluetoothPeripheral = nil
         closeDetailView()
     }
@@ -880,6 +932,23 @@ private extension BluetoothPeripheralDetailState {
         guard !type.needsTransmitterId() || transmitterIdTempValue != nil else { return }
 
         previousScanningResult = nil
+
+        // The button tap is the meaningful start of Add CGM. Lower-level scanning callbacks can fire
+        // repeatedly as Bluetooth state changes, so they stay in developer tracing and are filtered
+        // from the Activity Log. No entered transmitter identifier crosses this typed boundary.
+        if let source = TroubleshootingLogSource(
+            bluetoothPeripheralType: type,
+            transmitterID: transmitterIdTempValue
+        ) {
+            trace(
+                "user started adding %{public}@",
+                log: log,
+                category: ConstantsLog.categoryBluetoothPeripheralViewController,
+                type: .info,
+                troubleshooting: .standard(.cgm(source: source, activity: .addingStarted)),
+                source.name
+            )
+        }
 
         bluetoothPeripheralManager.startScanningForNewDevice(
             type: type,

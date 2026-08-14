@@ -140,16 +140,20 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
     
     func tagReaderSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
         if let readerError = error as? NFCReaderError {
+            let unsuccessfulResult: LibreNFCScanResult
             switch readerError.code {
             case .readerSessionInvalidationErrorSessionTimeout:
+                unsuccessfulResult = .timedOut
                 
                 xdrip.trace("NFC: scan time-out error", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info)
                 
             case .readerSessionInvalidationErrorUserCanceled:
+                unsuccessfulResult = .cancelled
 
                 xdrip.trace("NFC: user cancelled the NFC scan", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info)
                 
             default:
+                unsuccessfulResult = .failed
                 
                 var debugInfo = "NFC: scan error code: " + readerError.errorCode.description
                 xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
@@ -162,7 +166,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
             if self.nfcScanSuccessful {
                 xdrip.trace("NFC: passing NFC scan successful to the delegate and starting BLE scanning", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info)
                 
-                self.libreNFCDelegate?.nfcScanResult(successful: true)
+                self.libreNFCDelegate?.nfcScanResult(.succeeded)
                 
                 self.libreNFCDelegate?.nfcScanExpectedDevice(serialNumber: self.serialNumber, macAddress: self.macAddress)
                 
@@ -174,8 +178,14 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                 // play "failed" vibration
                 AudioServicesPlaySystemSound(1107)
                 
-                self.libreNFCDelegate?.nfcScanResult(successful: false)
+                self.libreNFCDelegate?.nfcScanResult(unsuccessfulResult)
             }
+        } else {
+            // Core NFC normally supplies `NFCReaderError`, but do not leave an unusual system error
+            // without a user-level outcome. The raw error remains developer-only; the delegate gets
+            // the same closed failure result used by the shareable Activity Log.
+            xdrip.trace("NFC: scan ended with an unexpected error: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .error, error.localizedDescription)
+            self.libreNFCDelegate?.nfcScanResult(.failed)
         }
     }
     

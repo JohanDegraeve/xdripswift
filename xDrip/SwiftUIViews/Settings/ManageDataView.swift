@@ -324,6 +324,7 @@ final class DataRetentionViewModel: ObservableObject {
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
+            troubleshooting: .standard(.dataManagement(.automaticCleanupChanged(enabled: automaticHousekeepingEnabled))),
             automaticHousekeepingEnabled.description
         )
     }
@@ -336,6 +337,7 @@ final class DataRetentionViewModel: ObservableObject {
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
+            troubleshooting: .standard(.dataManagement(.retentionChanged(days: automaticRetentionDays))),
             automaticRetentionDays.description
         )
     }

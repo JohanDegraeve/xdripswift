@@ -217,7 +217,7 @@ extension LiveActivityManager {
         await recoverOrphanedActivityIfNeeded()
         
         if !ActivityAuthorizationInfo().areActivitiesEnabled {
-            trace("in ensureActivity, live activities are disabled in the iPhone Settings or permission has not been given.", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+            trace("in ensureActivity, live activities are disabled in the iPhone Settings or permission has not been given.", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, troubleshooting: .detailed(.integration(name: .liveActivity, activity: .permissionDenied)))
             return
         }
         
@@ -261,7 +261,7 @@ extension LiveActivityManager {
             await endActivities()
             guard shouldRun else { return }
             await startActivity(contentState: contentState)
-            trace("in ensureActivity, restarted live activity after dismissal/end", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+            trace("in ensureActivity, restarted live activity after dismissal/end", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, troubleshooting: .detailed(.integration(name: .liveActivity, activity: .restarted)))
             return
         }
         
@@ -301,11 +301,11 @@ extension LiveActivityManager {
             // update the persistent content state with the new/updated content state
             persistentContentState = updatedContentState
             
-            trace("in startActivity, new live activity started: %{public}@", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: eventActivity?.id))
+            trace("in startActivity, new live activity started: %{public}@", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, troubleshooting: .detailed(.integration(name: .liveActivity, activity: .succeeded(itemCount: nil))), String(describing: eventActivity?.id))
         } catch {
             eventActivity = nil
             persistentContentState = updatedContentState
-            trace("in startActivity, error: %{public}@", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .error, error.localizedDescription)
+            trace("in startActivity, error: %{public}@", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .error, troubleshooting: .detailed(.integration(name: .liveActivity, activity: .failed)), error.localizedDescription)
         }
     }
     

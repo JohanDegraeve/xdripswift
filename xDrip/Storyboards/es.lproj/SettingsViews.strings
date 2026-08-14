@@ -5,7 +5,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alertas y notificaciones";
 "settingsviews_sharingAndServicesSectionTitle" = "Compartir y servicios";
 "settingsviews_osAidLoopShareSectionTitle" = "Compartir con OS-AID";
-"settingsviews_issueReportSectionTitle" = "Informe de problema";
+"settingsviews_troubleshootingTitle" = "Solución de problemas";
+"settingsviews_activityLogSectionTitle" = "Registro de actividad";
+"settingsviews_viewActivityLog" = "Registro de actividad";
+"settingsviews_troubleshootingLogSectionFooter" = "Consulta y comparte un registro en inglés sencillo de las últimas 12 horas. Incluye valores de glucosa, pero no datos de la cuenta ni identificadores de dispositivos.";
 "settingsviews_issueReportSectionFooter" = "No envíes un informe de problema a menos que te lo pida un desarrollador de xDrip4iOS o tu informe se eliminará automáticamente.";
 "settingsviews_appBannerVersion" = "Versión %@";
 "settingsviews_appInstalledSince" = "Instalado";
@@ -142,6 +145,7 @@
 "infoCalendarAccessRestricted" = "No se puede autorizar a que %@ tenga acceso a tu calendario. Podría ser debido a que restricciones tipo Controles Parentales o similares lo están impidiendo.";
 "sectionTitleTrace" = "Rastrear/Issue Reporting";
 "sendTraceFile" = "Enviar informe de problema";
+"settingsviews_issueReportTitle" = "Informe de problema";
 "describeProblem" = "Explicar en detalle porqué es necesario enviar este archivo de rastreo. Si ya has reportando previamente este problema en el grupo de Facebook '%@', confirmar tu Nombre en Facebook dentro del cuerpo del correo";
 "emailNotConfigured" = "Deberías tener configurado una cuenta de correo antes de enviar el archivo.";
 "emailbodyText" = "Problem Description: ";
@@ -161,7 +165,7 @@
 "oslog" = "OSLog";
 "nslog" = "NSLog";
 "developerSettings" = "Opciones avanzadas";
-"showDeveloperSettings" = "Mostrar";
+"showDeveloperSettings" = "Mostrar opciones avanzadas";
 "preferSensorCountdown" = "Preferir cuenta atrás del sensor";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Vida útil del sensor";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Controla si la vida útil del sensor se muestra como tiempo transcurrido o como cuenta atrás en el iPhone y el Apple Watch.";

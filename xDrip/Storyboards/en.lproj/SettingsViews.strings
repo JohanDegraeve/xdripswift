@@ -5,8 +5,11 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alerts and Notifications";
 "settingsviews_sharingAndServicesSectionTitle" = "Sharing and Services";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID Share";
-"settingsviews_issueReportSectionTitle" = "Issue Report";
+"settingsviews_troubleshootingTitle" = "Troubleshooting";
+"settingsviews_activityLogSectionTitle" = "Activity Log";
+"settingsviews_viewActivityLog" = "Activity Log";
 "settingsviews_issueReportSectionFooter" = "Do not send an Issue Report unless requested by an xDrip4iOS developer or your report will be automatically deleted.";
+"settingsviews_troubleshootingLogSectionFooter" = "View and share a plain-English record of the previous 12 hours. This log includes glucose values but excludes account details and device identifiers.";
 "settingsviews_appBannerVersion" = "Version %@";
 "settingsviews_appInstalledSince" = "Installed";
 "settingsviews_valueIsRequired" = "⚠️ Required";
@@ -166,6 +169,7 @@
 "settingsviews_contactImageCreatedByString" = "Contact automatically created by";
 "sectionTitleTrace" = "Issue Reporting";
 "sendTraceFile" = "Send Issue Report";
+"settingsviews_issueReportTitle" = "Issue Report";
 "describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
 "emailNotConfigured" = "You must configure an e-mail account on your iOS device.";
 "emailbodyText" = "Problem Description: ";
@@ -183,7 +187,7 @@
 "nightscoutToken" = "Token";
 "giveNightscoutToken" = "Enter Token";
 "developerSettings" = "Advanced Settings";
-"showDeveloperSettings" = "Show";
+"showDeveloperSettings" = "Show Advanced";
 "preferSensorCountdown" = "Prefer Sensor Countdown";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensor Lifetime";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Controls whether sensor lifetime is shown as elapsed time or as a countdown on iPhone and Apple Watch.";

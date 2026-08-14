@@ -4,7 +4,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alertes et notifications";
 "settingsviews_sharingAndServicesSectionTitle" = "Partage et services";
 "settingsviews_osAidLoopShareSectionTitle" = "Partage OS-AID";
-"settingsviews_issueReportSectionTitle" = "Rapport de problème";
+"settingsviews_troubleshootingTitle" = "Dépannage";
+"settingsviews_activityLogSectionTitle" = "Journal d’activité";
+"settingsviews_viewActivityLog" = "Journal d’activité";
+"settingsviews_troubleshootingLogSectionFooter" = "Consultez et partagez un journal en anglais simple couvrant les 12 dernières heures. Il contient les valeurs de glycémie, mais exclut les détails du compte et les identifiants d’appareil.";
 "settingsviews_appBannerVersion" = "Version %@";
 "settingsviews_appInstalledSince" = "Installé";
 "settingsviews_sectiontitleNotifications" = "Géneral";
@@ -85,6 +88,7 @@
 "infoCalendarAccessRestricted" = "Vous n'avez pas donné les autorisations à %@ pour accéder à votre calendrier. Cela peut aussi être du à une restriction parentale.";
 "sectionTitleTrace" = "Trace";
 "sendTraceFile" = "Envoyer le rapport de problème";
+"settingsviews_issueReportTitle" = "Rapport de problème";
 "describeProblem" = "Décrire la raison de l'envoi du fichier de trace avec un maximum de détail. Si vous avez déjà reporté un probème via Facebook - dans le groupe'%@'-, merci de mentionner votre nom facebook dans l'email";
 "emailNotConfigured" = "Vous devez configurer un email sur votre compte IOS.";
 "emailbodyText" = "Description du problème";
@@ -141,7 +145,7 @@
 
 /// Advanced Settings, section title
 "developerSettings" = "Paramètres avancés";
-"showDeveloperSettings" = "Afficher";
+"showDeveloperSettings" = "Afficher les paramètres avancés";
 "preferSensorCountdown" = "Préférer le compte à rebours du capteur";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Durée de vie du capteur";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Détermine si la durée de vie du capteur est affichée sous forme de temps écoulé ou de compte à rebours sur l’iPhone et l’Apple Watch.";

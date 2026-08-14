@@ -255,6 +255,8 @@ class BgPostProcessingManager {
     /// reset source-specific post processing whenever the active master sensor
     /// or follower source changes
     func handleSourceContextChanged() {
+        let previousTroubleshootingSettings = troubleshootingPostProcessingSettings()
+
         // Source-specific processing must not leak into a new master sensor session
         // or a different follower stream. Reset the entire editing state so any
         // new source starts from neutral values and disabled post processing.
@@ -264,6 +266,11 @@ class BgPostProcessingManager {
         UserDefaults.standard.postProcessingStartTimeStamp = sourceHistoryStartTimeStamp()
         UserDefaults.standard.postProcessingApplyFromTimeStamp = UserDefaults.standard.postProcessingStartTimeStamp
         UserDefaults.standard.postProcessingSourceContextIdentifier = nil
+
+        let currentTroubleshootingSettings = troubleshootingPostProcessingSettings()
+        if previousTroubleshootingSettings != currentTroubleshootingSettings {
+            traceTroubleshootingPostProcessingSettings(currentTroubleshootingSettings)
+        }
     }
 
     private func sourceHistoryStartTimeStamp() -> Date {
@@ -284,19 +291,72 @@ class BgPostProcessingManager {
         return bgAdjustmentsAccessor.latestActiveBgAdjustment(forSourceContextIdentifier: sourceContextIdentifier, on: coreDataManager.mainManagedObjectContext)
     }
 
+    /// Builds the one consumer-safe snapshot used for every post-processing Activity Log row.
+    ///
+    /// Only bounded settings cross this boundary. The user's entered comparison glucose, source
+    /// glucose, Core Data identifiers and the verbose developer description are intentionally not
+    /// represented by `TroubleshootingPostProcessingSettings` and therefore cannot be shared.
+    private func troubleshootingPostProcessingSettings(
+        applyRange: TroubleshootingPostProcessingApplyRange? = nil
+    ) -> TroubleshootingPostProcessingSettings {
+        let defaults = UserDefaults.standard
+        let activeAdjustment = defaults.enableAdjustment ? latestActiveBgAdjustment() : nil
+        let adjustmentShape = activeAdjustment
+            .flatMap { BgAdjustmentShapeType(rawValue: $0.adjustmentShapeType) }
+            ?? ConstantsBgAdjustment.defaultShapeType
+        let fiveMinuteReadings: TroubleshootingFiveMinuteReadingsMode
+        if !currentSourceCanUseFiveMinuteReadings() {
+            fiveMinuteReadings = .notApplicable
+        } else {
+            fiveMinuteReadings = defaults.useFiveMinuteReadings ? .enabled : .disabled
+        }
+
+        return TroubleshootingPostProcessingSettings(
+            adjustmentEnabled: defaults.enableAdjustment && activeAdjustment != nil,
+            adjustmentSlope: activeAdjustment?.slope,
+            adjustmentIntercept: activeAdjustment?.intercept,
+            adjustmentEmphasis: TroubleshootingAdjustmentEmphasis(adjustmentShape),
+            smoothingEnabled: defaults.enableSmoothing,
+            smoothingAlgorithm: TroubleshootingSmoothingAlgorithm(defaults.bgSmoothingAlgorithm),
+            smoothingPeriodMinutes: defaults.bgSmoothingPeriodInMinutes,
+            smoothingStrength: defaults.bgSmoothingStrength,
+            fiveMinuteReadings: fiveMinuteReadings,
+            applyRange: applyRange
+        )
+    }
+
+    /// Sends the complete state through the normal trace bridge so developer and consumer logging
+    /// retain one call path while still keeping their payloads strictly separate.
+    private func traceTroubleshootingPostProcessingSettings(
+        _ settings: TroubleshootingPostProcessingSettings
+    ) {
+        trace(
+            "post-processing settings applied",
+            log: log,
+            category: ConstantsLog.categoryApplicationDataBgReadings,
+            type: .info,
+            troubleshooting: .standard(.configuration(.postProcessingSettings(settings)))
+        )
+    }
+
     /// store the current smoothing settings and immediately reprocess the latest readings
     func updateSmoothing(enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingPeriodInMinutes: Int, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm) {
+        let previousTroubleshootingSettings = troubleshootingPostProcessingSettings()
         if UserDefaults.standard.useFiveMinuteReadings != useFiveMinuteReadings {
             UserDefaults.standard.fiveMinuteReadingsStartTimeStamp = latestBgReadingForCurrentSourceContext()?.timeStamp ?? Date()
         }
 
         updateSmoothingSettings(enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingPeriodInMinutes: smoothingPeriodInMinutes, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm)
+        let currentTroubleshootingSettings = troubleshootingPostProcessingSettings()
+        if previousTroubleshootingSettings != currentTroubleshootingSettings {
+            traceTroubleshootingPostProcessingSettings(currentTroubleshootingSettings)
+        }
         let rewriteStartDate = UserDefaults.standard.postProcessingApplyFromTimeStamp ?? UserDefaults.standard.postProcessingStartTimeStamp
         _ = processBgReadings(processingStartDateOverride: rewriteStartDate, fiveMinuteReadingsStartTimeStampOverride: rewriteStartDate, allowHistoricalDownstreamRewrite: true)
         notifyBgPostProcessingDidUpdate()
     }
 
-    func applyPostProcessing(enableAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, applyFromTimeStamp: Date, isBasicAdjustment: Bool, enteredBgValue: Double?, sourceCalculatedValue: Double?, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingPeriodInMinutes: Int, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm, processingStartDateOverride: Date? = nil) {
+    func applyPostProcessing(enableAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, applyFromTimeStamp: Date, isBasicAdjustment: Bool, enteredBgValue: Double?, sourceCalculatedValue: Double?, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingPeriodInMinutes: Int, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm, processingStartDateOverride: Date? = nil, troubleshootingApplyRange: TroubleshootingPostProcessingApplyRange = .now) {
         trace("%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, applyPostProcessingDescription(enableAdjustment: enableAdjustment, slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: applyFromTimeStamp, enteredBgValue: enteredBgValue, sourceCalculatedValue: sourceCalculatedValue, enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm, processingStartDateOverride: processingStartDateOverride))
 
         if enableAdjustment, let slope = slope, let intercept = intercept {
@@ -317,6 +377,14 @@ class BgPostProcessingManager {
         UserDefaults.standard.postProcessingApplyFromTimeStamp = applyFromTimeStamp
 
         updateSmoothingSettings(enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingPeriodInMinutes: smoothingPeriodInMinutes, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm)
+
+        // Treat Apply as one user action. The Activity Log receives the complete resulting state,
+        // never three inferred statements about which individual toggles the user did or did not
+        // touch. The semantic range comes directly from the selected UI option, so delayed follower
+        // readings cannot turn "3 hours ago" into an inaccurate timestamp-derived estimate.
+        traceTroubleshootingPostProcessingSettings(
+            troubleshootingPostProcessingSettings(applyRange: troubleshootingApplyRange)
+        )
 
         let rewriteStartDate = processingStartDateOverride ?? applyFromTimeStamp
         _ = processBgReadings(processingStartDateOverride: rewriteStartDate, fiveMinuteReadingsStartTimeStampOverride: rewriteStartDate, allowHistoricalDownstreamRewrite: true)
@@ -1189,6 +1257,9 @@ class BgPostProcessingManager {
         trace("in syncAdjustmentAvailabilityForCurrentSource, disabling BG adjustment because the current source no longer allows it. reason = %{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, String(describing: adjustmentDisabledReason))
 
         disableCurrentAdjustment()
+        // This is an automatic state correction rather than a direct toggle tap. Report the complete
+        // resulting configuration so the Activity Log does not imply a user explicitly disabled it.
+        traceTroubleshootingPostProcessingSettings(troubleshootingPostProcessingSettings())
         notifyBgPostProcessingDidUpdate()
     }
 }

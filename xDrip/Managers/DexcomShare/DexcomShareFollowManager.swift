@@ -101,6 +101,13 @@ class DexcomShareFollowManager: NSObject {
     // MARK: - public functions
 
     public func logIn() {
+        trace(
+            "user requested Dexcom Share login",
+            log: log,
+            category: ConstantsLog.categoryDexcomShareFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: .dexcomShare, activity: .loginStarted))
+        )
         UserDefaults.standard.dexcomShareManuallyLoggedOut = false
         UserDefaults.standard.dexcomShareLoginFailedTimestamp = nil
         FollowerSessionState.shared.update(.loggingIn, for: .dexcomShare)
@@ -108,6 +115,13 @@ class DexcomShareFollowManager: NSObject {
     }
 
     public func logOut() {
+        trace(
+            "Dexcom Share logged out",
+            log: log,
+            category: ConstantsLog.categoryDexcomShareFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: .dexcomShare, activity: .loggedOut))
+        )
         UserDefaults.standard.dexcomShareManuallyLoggedOut = true
         invalidateDownLoadTimerClosure?()
         invalidateDownLoadTimerClosure = nil
@@ -186,7 +200,7 @@ class DexcomShareFollowManager: NSObject {
     
     /// Downloads recent readings from Dexcom Share, sends result to delegate, and schedules the next download.
     @objc public func download() {
-        trace("in download. Current session ID: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, String(describing: self.dexcomShareSessionId))
+        trace("in download. Current session ID: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .detailed(.follower(source: .dexcomShare, activity: .downloadStarted)), String(describing: self.dexcomShareSessionId))
         
         if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? .distantPast).timeIntervalSinceNow < -15 {
             trace("    setting nightscoutSyncRequired to true, this will also initiate a treatments/devicestatus sync", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug)
@@ -224,15 +238,15 @@ class DexcomShareFollowManager: NSObject {
                 }
             } catch DexcomShareFollowError.sessionExpired {
                 // re-login once and retry on expired session
-                trace("    in download, session expired, re-logging in", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info)
+                trace("    in download, session expired, re-logging in", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info, troubleshooting: .standard(.follower(source: .dexcomShare, activity: .sessionExpired)))
                 do {
                     try await self.login(username: username, password: password)
                     _ = try await self.downloadAndProcessEGVs(force: true)
                 } catch {
-                    trace("    in download, session expired and re-login failed: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .error, error.localizedDescription)
+                    trace("    in download, session expired and re-login failed: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .error, troubleshooting: .standard(.follower(source: .dexcomShare, activity: .loginFailed)), error.localizedDescription)
                 }
             } catch {
-                trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .error, error.localizedDescription)
+                trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .error, troubleshooting: .standard(.follower(source: .dexcomShare, activity: .downloadFailed)), error.localizedDescription)
             }
             // rescheduling the timer must be done on the main actor
             // we do it here at the end of the function so that it is always rescheduled once a valid connection is established, irrespective of whether we get values.
@@ -251,13 +265,20 @@ class DexcomShareFollowManager: NSObject {
     /// - Throws: DexcomShareFollowError if login fails for all regions
     private func login(username: String, password: String) async throws {
         guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
+        trace(
+            "Dexcom Share login started",
+            log: log,
+            category: ConstantsLog.categoryDexcomShareFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: .dexcomShare, activity: .loginStarted))
+        )
 
         // If a region is already stored, try only that region
         let storedRegion = UserDefaults.standard.dexcomShareRegion
         if storedRegion != .none {
             do {
                 try await self.loginToRegion(region: storedRegion, username: username, password: password)
-                trace("    in login, login successful using stored region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, storedRegion.description)
+                trace("    in login, login successful using stored region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .detailed(.follower(source: .dexcomShare, activity: .loginSucceeded)), storedRegion.description)
                 return
             } catch {
                 guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
@@ -275,13 +296,13 @@ class DexcomShareFollowManager: NSObject {
         for region in DexcomShareRegion.allCases {
             guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
             if region != .none && region != storedRegion {
-                trace("    in login, attempting login to region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, region.description)
+                trace("    in login, attempting login to region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .detailed(.follower(source: .dexcomShare, activity: .loginStarted)), region.description)
                 do {
                     try await self.loginToRegion(region: region, username: username, password: password)
                     // On success, store the working region and clear the timestamp
                     UserDefaults.standard.dexcomShareRegion = region
                     UserDefaults.standard.dexcomShareLoginFailedTimestamp = nil
-                    trace("    in login, login succeeded to region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, region.description)
+                    trace("    in login, login succeeded to region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .detailed(.follower(source: .dexcomShare, activity: .loginSucceeded)), region.description)
                     return
                 } catch {
                     guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
@@ -297,7 +318,7 @@ class DexcomShareFollowManager: NSObject {
         UserDefaults.standard.dexcomShareRegion = .none
         UserDefaults.standard.dexcomShareLoginFailedTimestamp = Date()
         FollowerSessionState.shared.update(.loggedOut, for: .dexcomShare)
-        trace("    in login, all region login attempts failed, setting loginFailedTimestamp. Error: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, lastError.localizedDescription)
+        trace("    in login, all region login attempts failed, setting loginFailedTimestamp. Error: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .standard(.follower(source: .dexcomShare, activity: .loginFailed)), lastError.localizedDescription)
         throw lastError
     }
     
@@ -415,6 +436,7 @@ class DexcomShareFollowManager: NSObject {
             
             // if no data is returned, do nothing
             if glucoseMeasurementsArray.isEmpty {
+                trace("    in downloadAndProcessEGVs, no glucose values returned", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .standard(.follower(source: .dexcomShare, activity: .noReadings)))
                 return []
             }
             
@@ -443,6 +465,7 @@ class DexcomShareFollowManager: NSObject {
                     followerDelegate.followerInfoReceived(followGlucoseDataArray: &array)
                 }
             }
+            trace("    in downloadAndProcessEGVs, download succeeded with %{public}d readings", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .standard(.follower(source: .dexcomShare, activity: .downloadSucceeded(readingCount: glucoseMeasurementsArray.count))), glucoseMeasurementsArray.count)
             return glucoseMeasurementsArray
         } catch let error as NSError where error.code == 401 {
             throw DexcomShareFollowError.invalidCredentials

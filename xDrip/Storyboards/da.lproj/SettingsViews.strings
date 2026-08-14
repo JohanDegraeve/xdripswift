@@ -4,7 +4,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarmer og notifikationer";
 "settingsviews_sharingAndServicesSectionTitle" = "Deling og tjenester";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID-deling";
-"settingsviews_issueReportSectionTitle" = "Problemrapport";
+"settingsviews_troubleshootingTitle" = "Fejlfinding";
+"settingsviews_activityLogSectionTitle" = "Aktivitetslog";
+"settingsviews_viewActivityLog" = "Aktivitetslog";
+"settingsviews_troubleshootingLogSectionFooter" = "Se og del en letforståelig engelsksproget log over de seneste 12 timer. Loggen indeholder glukoseværdier, men ikke kontooplysninger eller enheds-id'er.";
 "settingsviews_appBannerVersion" = "Version %@";
 "settingsviews_appInstalledSince" = "Installeret";
 "settingsviews_showOnlineHelp" = "Open Online Help";
@@ -94,6 +97,7 @@
 "displayDeltaInCalendarEvent" = "Delta";
 "sectionTitleTrace" = "Issue Reporting";
 "sendTraceFile" = "Send problemrapport";
+"settingsviews_issueReportTitle" = "Problemrapport";
 "describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
 "emailNotConfigured" = "You must configure an e-mail account on your iOS device.";
 "emailbodyText" = "Problem Description: ";
@@ -106,7 +110,7 @@
 "warningChangeFromMasterToFollower" = "Switching from Master to Follower will stop your current sensor. Do you want to continue?";
 "nightscoutPort" = "Port";
 "developerSettings" = "Avancerede indstillinger";
-"showDeveloperSettings" = "Vis";
+"showDeveloperSettings" = "Vis avancerede indstillinger";
 "preferSensorCountdown" = "Foretræk nedtælling for sensor";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensorlevetid";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Styrer, om sensorens levetid vises som forløbet tid eller som en nedtælling på iPhone og Apple Watch.";

@@ -20,9 +20,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     
     /// Transmitter is calling this delegate function to indicate that bluetooth pairing is needed. If the app is in the background, the user will be informed, after opening the app a pairing request will be initiated. if the app is in the foreground, the pairing request will be initiated immediately
     func transmitterNeedsPairing(bluetoothTransmitter: BluetoothTransmitter) {
-        
-        trace("transmitter needs pairing", log: log, category: ConstantsLog.categoryRootView, type: .info)
-        
+
         if let timeStampLastNotificationForPairing = PropertyHolder.timeStampLastNotificationForPairing {
             
             // check timestamp of last notification, if too soon then return
@@ -33,6 +31,17 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         
         // set timeStampLastNotificationForPairing
         PropertyHolder.timeStampLastNotificationForPairing = Date()
+
+        // Pairing is a meaningful CGM milestone, but the callback can repeat while the same system
+        // prompt is outstanding. Emit it only after the existing notification throttle accepts the
+        // request, and never expose the transmitter name or identifier to the shareable log.
+        trace(
+            "transmitter needs pairing",
+            log: log,
+            category: ConstantsLog.categoryRootView,
+            type: .info,
+            troubleshooting: .standard(.bluetooth(.pairingRequested))
+        )
         
         // remove existing notification if any
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
@@ -96,6 +105,13 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     }
 
     func successfullyPaired() {
+        trace(
+            "transmitter paired successfully",
+            log: log,
+            category: ConstantsLog.categoryRootView,
+            type: .info,
+            troubleshooting: .standard(.bluetooth(.pairingSucceeded))
+        )
         
         // remove existing notification if any
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
@@ -112,6 +128,14 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
 
     
     func pairingFailed() {
+        trace(
+            "transmitter pairing did not complete",
+            log: log,
+            category: ConstantsLog.categoryRootView,
+            type: .error,
+            troubleshooting: .standard(.bluetooth(.pairingFailed))
+        )
+
         // this should be the consequence of the user not accepting the pairing request, there's no need to inform the user
         // invalidate transmitterPairingResponseTimer
         if let transmitterPairingResponseTimer = PropertyHolder.transmitterPairingResponseTimer {
@@ -328,8 +352,19 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
 
     // to confirm to protocol BluetoothPeripheralDelegate
     func heartBeat() {
-        // bluetooth peripheral's heart is beating
-        // if a heartBeat function is set, then call it
+        // Every transmitter heartbeat converges here after the transmitter's own minimum-interval
+        // guard. Recording the typed fact at this boundary captures every real heartbeat without
+        // exposing a transmitter identifier, packet contents or the developer trace message.
+        trace(
+            "heartbeat received",
+            log: log,
+            category: ConstantsLog.categoryBluetoothPeripheralManager,
+            type: .info,
+            troubleshooting: .standard(.heartbeatReceived)
+        )
+
+        // Keep the existing callback behavior completely independent from consumer persistence.
+        // A slow or failed troubleshooting write must never alter heartbeat-driven app behavior.
         if let heartBeatFunction = heartBeatFunction {
             heartBeatFunction()
         }

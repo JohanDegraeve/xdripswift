@@ -6,10 +6,15 @@
 //  Copyright © 2026 Johan Degraeve. All rights reserved.
 //
 
+import os
 import SwiftUI
 
 /// Builds the Dexcom Share account, connection, profile, activity and service sections.
 enum DexcomShareFollowerSettingsScreen {
+    private static let log = OSLog(
+        subsystem: ConstantsLog.subSystem,
+        category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel
+    )
     static func make(actions: SelectedFollowerActions) -> SettingsScreen {
         let monitor = FollowerServiceStatusMonitor(source: .dexcomShare)
         return SettingsScreen(
@@ -64,6 +69,13 @@ enum DexcomShareFollowerSettingsScreen {
                 UserDefaults.standard.dexcomShareRegion = .none
                 UserDefaults.standard.dexcomShareLoginFailedTimestamp = nil
                 UserDefaults.standard.timeStampOfLastFollowerConnection = nil
+                trace(
+                    "Dexcom Share username was changed",
+                    log: log,
+                    category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                    type: .info,
+                    troubleshooting: .standard(.configuration(.credentialChanged(source: .dexcomShare, field: .username, isSet: value != nil)))
+                )
             },
             FollowerSettingsRows.textEntryRow(
                 id: "dexcomShare.account.password",
@@ -77,6 +89,13 @@ enum DexcomShareFollowerSettingsScreen {
                 UserDefaults.standard.dexcomShareRegion = .none
                 UserDefaults.standard.dexcomShareLoginFailedTimestamp = nil
                 UserDefaults.standard.timeStampOfLastFollowerConnection = nil
+                trace(
+                    "Dexcom Share password was changed",
+                    log: log,
+                    category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                    type: .info,
+                    troubleshooting: .standard(.configuration(.credentialChanged(source: .dexcomShare, field: .password, isSet: value != nil)))
+                )
             },
         ]
     }

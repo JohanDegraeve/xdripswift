@@ -336,6 +336,7 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
         // if not, then just send it as a normal priority transferUserInfo (but limit the sending to once every 5 minutes!) which will be queued and sent as soon as the watch app is reachable again (this will help get the app showing data quicker)
         if let userInfo = payload(updateTypes: updateTypes) {
             if session.isReachable {
+                trace("sending foreground watch update", log: log, category: ConstantsLog.categoryWatchManager, type: .debug)
                 session.sendMessage(userInfo, replyHandler: nil, errorHandler: { [weak self] error in
                     guard let self = self else { return }
                     trace("error sending watch update, error = %{public}@", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)

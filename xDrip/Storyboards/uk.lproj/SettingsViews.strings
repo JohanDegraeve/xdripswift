@@ -131,6 +131,7 @@
 
 /// in Settings, row title to send settings
 "sendTraceFile" = "Надіслати звіт про проблему";
+"settingsviews_issueReportTitle" = "Звіт про проблему";
 
 /// M5 stack bluetooth  settings, pop up that asks user to enter the password
 "m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth Password";
@@ -244,13 +245,16 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Оповіщення та сповіщення";
 "settingsviews_sharingAndServicesSectionTitle" = "Обмін і сервіси";
 "settingsviews_osAidLoopShareSectionTitle" = "Обмін OS-AID";
-"settingsviews_issueReportSectionTitle" = "Звіт про проблему";
+"settingsviews_troubleshootingTitle" = "Усунення несправностей";
+"settingsviews_activityLogSectionTitle" = "Журнал активності";
+"settingsviews_viewActivityLog" = "Журнал активності";
+"settingsviews_troubleshootingLogSectionFooter" = "Перегляньте та поділіться простим журналом англійською мовою за останні 12 годин. Він містить значення глюкози, але не дані облікового запису чи ідентифікатори пристроїв.";
 "settingsviews_appBannerVersion" = "Версія %@";
 "settingsviews_appInstalledSince" = "Встановлено";
 
 /// Advanced Settings, section title
 "developerSettings" = "Розширені налаштування";
-"showDeveloperSettings" = "Показати";
+"showDeveloperSettings" = "Показати розширені налаштування";
 "preferSensorCountdown" = "Надавати перевагу зворотному відліку сенсора";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Термін служби сенсора";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Визначає, чи показувати термін служби сенсора як минулий час або як зворотний відлік на iPhone та Apple Watch.";

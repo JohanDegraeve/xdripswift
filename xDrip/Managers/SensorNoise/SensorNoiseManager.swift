@@ -164,11 +164,26 @@ final class SensorNoiseManager {
             NotificationCenter.default.post(name: .sensorNoiseHistoryDidChange, object: sensorID)
         }
 
+        let displayNoiseState = ConstantsSensorNoise.displayState(
+            rawState: measurement.state,
+            shortTermNoise: measurement.shortTermNoise,
+            longTermNoise: measurement.longTermNoise,
+            sensitivity: UserDefaults.standard.sensorNoiseSensitivity
+        )
+
         trace(
             "sensor noise updated: short = %{public}@ mg/dL, long = %{public}@ mg/dL, short coverage = %{public}@, long coverage = %{public}@, state = %{public}@",
             log: log,
             category: ConstantsLog.categoryApplicationDataSensors,
             type: .info,
+            // The developer trace keeps its existing ten-minute calculation detail. The consumer
+            // store accepts this controlled aggregate but enforces a one-hour cadence across app
+            // relaunches, pairing the metric with the same sensitivity-aware status shown in the UI.
+            troubleshooting: .standard(.sensorNoise(
+                shortTermMgDl: measurement.shortTermNoise,
+                longTermMgDl: measurement.longTermNoise,
+                status: TroubleshootingSensorNoiseStatus(displayNoiseState)
+            )),
             measurement.shortTermNoise?.round(toDecimalPlaces: 2).description ?? "nil",
             measurement.longTermNoise?.round(toDecimalPlaces: 2).description ?? "nil",
             measurement.shortTermCoverage.round(toDecimalPlaces: 2).description,

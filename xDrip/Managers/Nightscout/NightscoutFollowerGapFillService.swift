@@ -79,6 +79,7 @@ final class NightscoutFollowerGapFillService: @unchecked Sendable {
             log: log,
             category: ConstantsLog.categoryNightscoutFollowManager,
             type: .info,
+            troubleshooting: .detailed(.integration(name: .nightscoutBackfill, activity: .started)),
             window.isInitial ? "initial" : "incremental",
             window.interval.start.toStringForTrace(timeStyle: .long, dateStyle: .long),
             window.interval.end.toStringForTrace(timeStyle: .long, dateStyle: .long),
@@ -92,7 +93,8 @@ final class NightscoutFollowerGapFillService: @unchecked Sendable {
                 "in Nightscout follower gap fill, completed with no gaps greater than 15 minutes; audit checkpoint advanced",
                 log: log,
                 category: ConstantsLog.categoryNightscoutFollowManager,
-                type: .info
+                type: .info,
+                troubleshooting: .detailed(.integration(name: .nightscoutBackfill, activity: .noData))
             )
             return
         }
@@ -245,6 +247,7 @@ final class NightscoutFollowerGapFillService: @unchecked Sendable {
             log: log,
             category: ConstantsLog.categoryNightscoutFollowManager,
             type: .info,
+            troubleshooting: .detailed(.integration(name: .nightscoutBackfill, activity: .succeeded(itemCount: result.readingsAdded))),
             intervals.count.description,
             result.documentsDownloaded.description,
             result.readingsAdded.description,
@@ -280,6 +283,7 @@ final class NightscoutFollowerGapFillService: @unchecked Sendable {
             log: log,
             category: ConstantsLog.categoryNightscoutFollowManager,
             type: .error,
+            troubleshooting: .detailed(.integration(name: .nightscoutBackfill, activity: .failed)),
             errorType,
             errorCode.description
         )

@@ -1462,7 +1462,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             uploadData(dataToUpload: bgReadingsDictionaryRepresentation, httpMethod: nil, path: nightscoutEntriesPath, completionHandler: {
                 // change timeStampLatestNightscoutUploadedBgReading
                 if let timeStampLastReadingToUpload = timeStampLastReadingToUpload {
-                    trace("in uploadBgReadingsToNightscout, in uploadBgReadingsToNightscout, upload succeeded, timeStampLatestNightscoutUploadedBgReading = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, timeStampLastReadingToUpload.formatted(date: .abbreviated, time: .standard))
+                    trace("in uploadBgReadingsToNightscout, in uploadBgReadingsToNightscout, upload succeeded, timeStampLatestNightscoutUploadedBgReading = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, troubleshooting: .detailed(.integration(name: .nightscout, activity: .succeeded(itemCount: bgReadingsToUpload.count))), timeStampLastReadingToUpload.formatted(date: .abbreviated, time: .standard))
                     
                     UserDefaults.standard.timeStampLatestNightscoutUploadedBgReading = timeStampLastReadingToUpload
                     
@@ -1601,7 +1601,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         
                         // error cases
                         if let error = error {
-                            trace("in uploadDataAndGetResponse, failed to upload, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+                            trace("in uploadDataAndGetResponse, failed to upload, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, troubleshooting: .detailed(.integration(name: .nightscout, activity: .failed)), error.localizedDescription)
                             
                             nightscoutResult = NightscoutResult.failed
                             
@@ -1640,7 +1640,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                                     }
                                 }
                                 
-                                trace("in uploadDataAndGetResponse, failed to upload, statuscode = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, response.statusCode.description)
+                                trace("in uploadDataAndGetResponse, failed to upload, statuscode = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, troubleshooting: .detailed(.integration(name: .nightscout, activity: .failed)), response.statusCode.description)
                                 
                                 nightscoutResult = NightscoutResult.failed
                                 

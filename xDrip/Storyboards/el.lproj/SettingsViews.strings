@@ -4,7 +4,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Συναγερμοί και ειδοποιήσεις";
 "settingsviews_sharingAndServicesSectionTitle" = "Κοινή χρήση και υπηρεσίες";
 "settingsviews_osAidLoopShareSectionTitle" = "Κοινή χρήση OS-AID";
-"settingsviews_issueReportSectionTitle" = "Αναφορά προβλήματος";
+"settingsviews_troubleshootingTitle" = "Αντιμετώπιση προβλημάτων";
+"settingsviews_activityLogSectionTitle" = "Αρχείο δραστηριότητας";
+"settingsviews_viewActivityLog" = "Αρχείο δραστηριότητας";
+"settingsviews_troubleshootingLogSectionFooter" = "Προβάλετε και κοινοποιήστε μια απλή καταγραφή στα Αγγλικά για τις προηγούμενες 12 ώρες. Περιλαμβάνει τιμές γλυκόζης, αλλά όχι στοιχεία λογαριασμού ή αναγνωριστικά συσκευών.";
 "settingsviews_appBannerVersion" = "Έκδοση %@";
 "settingsviews_appInstalledSince" = "Εγκαταστάθηκε";
 "settingsviews_showOnlineHelp" = "Ανοίξτε τη Ηλεκτρονική Βοήθεια;";
@@ -100,6 +103,7 @@
 "infoCalendarAccessRestricted" = "Δεν μπορείτε να δώσετε εξουσιοδότηση στο %@ για πρόσβαση στο ημερολόγιό σας. Αυτό οφείλεται πιθανώς σε ενεργούς περιορισμούς όπως γονικοί έλεγχοι που μπορεί να υπάρχουν.";
 "sectionTitleTrace" = "Αναφορά προβλημάτων";
 "sendTraceFile" = "Αποστολή αναφοράς προβλήματος";
+"settingsviews_issueReportTitle" = "Αναφορά προβλήματος";
 "describeProblem" = "Εξηγήστε γιατί πρέπει να στείλετε το αρχείο παρακολούθησης με όσο το δυνατόν περισσότερες λεπτομέρειες. Εάν έχετε ήδη αναφέρει το πρόβλημά στην ομάδα υποστήριξης του Facebook '%@', τότε αναφέρετε το facebook όνομά σας στο e-mail";
 "emailNotConfigured" = "Πρέπει να διαμορφώσετε έναν λογαριασμό e-mail στην iOS συσκευή σας.";
 "emailbodyText" = "Περιγραφή προβλήματος";
@@ -112,7 +116,7 @@
 "warningChangeFromMasterToFollower" = "Η εναλλαγή από κύριο σε ακόλουθο θα σταματήσει τον τρέχοντα αισθητήρα σας. Θέλετε να συνεχίσετε;";
 "nightscoutPort" = "Θύρα";
 "developerSettings" = "Ρυθμίσεις για προχωρημένους";
-"showDeveloperSettings" = "Εμφάνιση";
+"showDeveloperSettings" = "Εμφάνιση ρυθμίσεων για προχωρημένους";
 "preferSensorCountdown" = "Προτίμηση αντίστροφης μέτρησης αισθητήρα";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Διάρκεια ζωής αισθητήρα";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Ελέγχει αν η διάρκεια ζωής του αισθητήρα εμφανίζεται ως χρόνος που έχει παρέλθει ή ως αντίστροφη μέτρηση σε iPhone και Apple Watch.";

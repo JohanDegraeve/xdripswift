@@ -6,10 +6,15 @@
 //  Copyright © 2026 Johan Degraeve. All rights reserved.
 //
 
+import os
 import SwiftUI
 
 /// Builds the Medtrum account screen and keeps caregiver patient selection in Profile.
 enum MedtrumEasyViewFollowerSettingsScreen {
+    private static let log = OSLog(
+        subsystem: ConstantsLog.subSystem,
+        category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel
+    )
     static func make(actions: SelectedFollowerActions) -> SettingsScreen {
         SettingsScreen(
             title: FollowerDataSourceType.medtrumEasyView.description,
@@ -50,9 +55,26 @@ enum MedtrumEasyViewFollowerSettingsScreen {
                 placeholder: ConstantsSettingsPlaceholders.usernamePlaceholder
             ) { value in
                 guard value != UserDefaults.standard.medtrumEasyViewEmail else { return }
+                let removedPassword = UserDefaults.standard.medtrumEasyViewPassword != nil
                 UserDefaults.standard.medtrumEasyViewEmail = value
                 UserDefaults.standard.medtrumEasyViewPassword = nil
                 resetAccountState()
+                trace(
+                    "Medtrum EasyView username was changed",
+                    log: log,
+                    category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                    type: .info,
+                    troubleshooting: .standard(.configuration(.credentialChanged(source: .medtrumEasyView, field: .username, isSet: value != nil)))
+                )
+                if removedPassword {
+                    trace(
+                        "Medtrum EasyView password was removed after the username changed",
+                        log: log,
+                        category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                        type: .info,
+                        troubleshooting: .standard(.configuration(.credentialChanged(source: .medtrumEasyView, field: .password, isSet: false)))
+                    )
+                }
             },
             FollowerSettingsRows.textEntryRow(
                 id: "medtrum.account.password",
@@ -64,6 +86,13 @@ enum MedtrumEasyViewFollowerSettingsScreen {
                 guard value != UserDefaults.standard.medtrumEasyViewPassword else { return }
                 UserDefaults.standard.medtrumEasyViewPassword = value
                 resetAccountState()
+                trace(
+                    "Medtrum EasyView password was changed",
+                    log: log,
+                    category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                    type: .info,
+                    troubleshooting: .standard(.configuration(.credentialChanged(source: .medtrumEasyView, field: .password, isSet: value != nil)))
+                )
             }
         ]
     }
@@ -119,10 +148,20 @@ enum MedtrumEasyViewFollowerSettingsScreen {
                     action: { index in
                         guard connections.indices.contains(index) else { return }
                         let patient = connections[index]
+                        let aliasChanged = UserDefaults.standard.followerPatientName != patient.displayName
                         UserDefaults.standard.medtrumEasyViewSelectedPatientUid = patient.uid
                         UserDefaults.standard.followerPatientName = patient.displayName
                         UserDefaults.standard.medtrumEasyViewPreventLogin = false
                         UserDefaults.standard.timeStampOfLastFollowerConnection = nil
+                        if aliasChanged {
+                            trace(
+                                "patient selection changed the patient alias",
+                                log: log,
+                                category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                                type: .info,
+                                troubleshooting: .standard(.configuration(.patientAliasChanged(isSet: true)))
+                            )
+                        }
                     },
                     cancel: nil,
                     didSelectRow: nil

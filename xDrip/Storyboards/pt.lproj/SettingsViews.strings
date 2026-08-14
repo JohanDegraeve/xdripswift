@@ -4,7 +4,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alertas e notificações";
 "settingsviews_sharingAndServicesSectionTitle" = "Partilha e serviços";
 "settingsviews_osAidLoopShareSectionTitle" = "Partilha OS-AID";
-"settingsviews_issueReportSectionTitle" = "Relatório de problema";
+"settingsviews_troubleshootingTitle" = "Resolução de problemas";
+"settingsviews_activityLogSectionTitle" = "Registo de atividade";
+"settingsviews_viewActivityLog" = "Registo de atividade";
+"settingsviews_troubleshootingLogSectionFooter" = "Consulte e partilhe um registo em inglês simples das últimas 12 horas. Inclui valores de glicose, mas exclui dados da conta e identificadores de dispositivos.";
 "settingsviews_appBannerVersion" = "Versão %@";
 "settingsviews_appInstalledSince" = "Instalado";
 "settingsviews_showOnlineHelp" = "Abrir Ajuda Online";
@@ -95,6 +98,7 @@
 "infoCalendarAccessRestricted" = "Não pode autorizar %@ para aceder ao calendário. Possivelmente por restrições activas tais como controlo parental.";
 "sectionTitleTrace" = "Reportar Problema";
 "sendTraceFile" = "Enviar Relatório de Problema";
+"settingsviews_issueReportTitle" = "Relatório de Problema";
 "describeProblem" = "Explique porque precisa de enviar o ficheiro de rastreio com o máximo de informação possível. Se já reportou o problema no grupo de Facebook '%@', então mencione o seu nome utilizado no Facebook";
 "emailNotConfigured" = "Tem que configurar uma conta de e-mail no seu dispositivo iOS.";
 "emailbodyText" = "Descrição de Problema: ";
@@ -109,7 +113,7 @@
 "oslog" = "OSLog";
 "nslog" = "NSLog";
 "developerSettings" = "Definições avançadas";
-"showDeveloperSettings" = "Mostrar";
+"showDeveloperSettings" = "Mostrar definições avançadas";
 "preferSensorCountdown" = "Preferir contagem decrescente do sensor";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Vida útil do sensor";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Controla se a vida útil do sensor é apresentada como tempo decorrido ou como contagem decrescente no iPhone e Apple Watch.";

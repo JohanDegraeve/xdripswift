@@ -256,7 +256,7 @@ class CalendarManager: NSObject {
         // check that access to calendar is authorized by the user
         guard calendarAccessIsAuthorized else {
             UserDefaults.standard.calendarShareStatus = CalendarShareStatus.error.rawValue
-            trace("in createCalendarEvent, createCalendarEvent is enabled but access to calendar is not authorized", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
+            trace("in createCalendarEvent, createCalendarEvent is enabled but access to calendar is not authorized", log: log, category: ConstantsLog.categoryCalendarManager, type: .info, troubleshooting: .detailed(.integration(name: .calendar, activity: .permissionDenied)))
             return
         }
         
@@ -307,7 +307,7 @@ class CalendarManager: NSObject {
         let payload = CalendarSharePayload(reading: latestReadingToShare, historyReadings: historyReadings, sourceAlias: alias.isEmpty ? "Calendar Share" : alias)
         guard let notes = payload.encodedNotes() else {
             UserDefaults.standard.calendarShareStatus = CalendarShareStatus.error.rawValue
-            trace("in createCalendarEvent, failed to encode Calendar Share payload", log: log, category: ConstantsLog.categoryCalendarManager, type: .error)
+            trace("in createCalendarEvent, failed to encode Calendar Share payload", log: log, category: ConstantsLog.categoryCalendarManager, type: .error, troubleshooting: .detailed(.integration(name: .calendar, activity: .failed)))
             return
         }
         event.notes = notes
@@ -322,11 +322,12 @@ class CalendarManager: NSObject {
             timeStampLastProcessedReading = latestReadingToShare.timeStamp
             UserDefaults.standard.calendarShareLastUpload = Date()
             UserDefaults.standard.calendarShareStatus = CalendarShareStatus.active.rawValue
+            trace("in createCalendarEvent, calendar sharing succeeded", log: log, category: ConstantsLog.categoryCalendarManager, type: .debug, troubleshooting: .detailed(.integration(name: .calendar, activity: .succeeded(itemCount: readingsToShare.count))))
             
         } catch let error {
             
             UserDefaults.standard.calendarShareStatus = CalendarShareStatus.error.rawValue
-            trace("in createCalendarEvent, error while saving : %{public}@", log: log, category: ConstantsLog.categoryCalendarManager, type: .error, error.localizedDescription)
+            trace("in createCalendarEvent, error while saving : %{public}@", log: log, category: ConstantsLog.categoryCalendarManager, type: .error, troubleshooting: .detailed(.integration(name: .calendar, activity: .failed)), error.localizedDescription)
             
         }
 

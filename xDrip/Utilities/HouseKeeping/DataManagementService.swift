@@ -362,6 +362,7 @@ final class DataManagementService: @unchecked Sendable {
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
+            troubleshooting: .standard(.dataManagement(.deletionCompleted(itemCount: result.bgReadingCount + result.treatmentCount + result.deviceStatusCount + result.calibrationCount))),
             elapsedMilliseconds(since: startedAt),
             result.bgReadingCount.description,
             result.treatmentCount.description,

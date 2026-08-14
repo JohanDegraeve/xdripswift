@@ -200,6 +200,9 @@ struct SettingsNavigationView: View {
                 .navigationBarTitleDisplayMode(.large)
                 .onlineHelp(.dataManagement)
 
+        case .troubleshootingLog:
+            TroubleshootingLogView(coreDataManager: coreDataManager)
+
         case let .incomingBackup(request):
             DataManagementView(
                 coreDataManager: coreDataManager,
@@ -496,6 +499,7 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
     case alertsAndNotifications
     case sharingAndServices
     case dataManagement
+    case troubleshooting
     case about
     case advanced
 
@@ -511,6 +515,8 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
             return ConstantsSettingsIcons.sharingAndServicesSettingsIcon
         case .dataManagement:
             return "externaldrive.badge.timemachine"
+        case .troubleshooting:
+            return ConstantsSettingsIcons.troubleshootingSettingsIcon
         case .about:
             return ConstantsSettingsIcons.infoSettingsIcon
         case .advanced:
@@ -541,6 +547,10 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
             return SettingsViewGroupedSettingsViewModel.sharingAndServices()
         case .dataManagement:
             return SettingsViewDataManagementSettingsViewModel(coreDataManager: coreDataManager)
+        case .troubleshooting:
+            // Consumer troubleshooting remains visible in the root menu. Developer e-mail reports
+            // are intentionally exposed only by Show Advanced in the Advanced Settings section.
+            return SettingsViewTraceSettingsViewModel(rowGroup: .troubleshooting)
         case .about:
             return SettingsViewInfoViewModel()
         case .advanced:
@@ -954,6 +964,7 @@ enum SettingsListFactory {
                 coreDataManager: coreDataManager,
                 selectedFollowerActions: selectedFollowerActions
             )
+
             configure(viewModel: viewModel, presenter: presenter)
 
             if let dataSourceViewModel = viewModel as? SettingsViewDataSourceSettingsViewModel {

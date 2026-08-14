@@ -198,7 +198,7 @@ class NightscoutFollowManager: NSObject {
         
         // ceate endpoint to get latest entries
         guard let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightscoutUrl, count: count, minimumTimeStamp: timeStampOfFirstBgReadingToDowload, token: UserDefaults.standard.nightscoutToken) else {
-            trace("    Nightscout URL does not use a supported scheme, no download will be started", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error)
+            trace("    Nightscout URL does not use a supported scheme, no download will be started", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, troubleshooting: .standard(.follower(source: .nightscout, activity: .downloadFailed)))
             return
         }
         
@@ -220,7 +220,19 @@ class NightscoutFollowManager: NSObject {
                 var followGlucoseDataArray = [FollowerBgReading]()
                 let responseWasSuccessful = self.processDownloadResponse(data: data, urlResponse: response, error: error, followGlucoseDataArray: &followGlucoseDataArray)
                 
-                trace("    finished download,  %{public}@ readings", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info, followGlucoseDataArray.count.description)
+                // Offer this typed success only so TroubleshootingLogStore can close a previously
+                // recorded Nightscout failure. Healthy 15-second downloads are discarded centrally;
+                // the readings actually accepted by the app are recorded later with their own times.
+                trace(
+                    "    finished download,  %{public}@ readings",
+                    log: self.log,
+                    category: ConstantsLog.categoryNightscoutFollowManager,
+                    type: .info,
+                    troubleshooting: responseWasSuccessful
+                        ? .standard(.follower(source: .nightscout, activity: .downloadSucceeded(readingCount: followGlucoseDataArray.count)))
+                        : nil,
+                    followGlucoseDataArray.count.description
+                )
                 
                 // Dispatch to delegate on the main actor (use a local copy for the inout parameter)
                 let localCopy = followGlucoseDataArray
@@ -239,7 +251,7 @@ class NightscoutFollowManager: NSObject {
                 }
             })
             
-            trace("in download, calling task.resume", log: log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
+            trace("in download, calling task.resume", log: log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info, troubleshooting: .detailed(.follower(source: .nightscout, activity: .downloadStarted)))
             task.resume()
             
         }
@@ -326,7 +338,7 @@ class NightscoutFollowManager: NSObject {
 
         // if error log an error
         if let error = error {
-            trace("    failed to download, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, error.localizedDescription)
+            trace("    failed to download, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, troubleshooting: .standard(.follower(source: .nightscout, activity: .downloadFailed)), error.localizedDescription)
             return false
         }
         
@@ -389,7 +401,7 @@ class NightscoutFollowManager: NSObject {
                     }
                     
                 } else {
-                    trace("     urlResponse.statusCode  is not 200 value = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, urlResponse.statusCode.description)
+                    trace("     urlResponse.statusCode  is not 200 value = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, troubleshooting: .standard(.follower(source: .nightscout, activity: .downloadFailed)), urlResponse.statusCode.description)
                     return false
                 }
             } else {

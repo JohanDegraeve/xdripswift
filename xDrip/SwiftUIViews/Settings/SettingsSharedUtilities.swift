@@ -60,6 +60,7 @@ struct SettingsRoute: Hashable {
         case timeSchedule(TimeSchedule)
         case loopDelaySchedule
         case dataManagement(DataManagementFlow)
+        case troubleshootingLog
         case incomingBackup(IncomingBackupRequest)
         case custom(title: String, content: (@escaping () -> Void) -> AnyView)
     }
@@ -308,10 +309,11 @@ enum SettingsRowAction {
     case run(() -> Void)
     case showMessage(title: String, message: String?)
     case sendTraceEmail
+    case troubleshootingLog
 
     var prefersDisclosure: Bool {
         switch self {
-        case .textEntry, .selectionList, .settingsScreen, .dataManagement:
+        case .textEntry, .selectionList, .settingsScreen, .dataManagement, .troubleshootingLog:
             return true
         case .legacy, .run, .showMessage, .sendTraceEmail:
             return false
@@ -523,6 +525,10 @@ final class SettingsActionPresenter: ObservableObject {
             },
             cancel: nil
         )
+    }
+
+    func showTroubleshootingLog() {
+        router.show(.troubleshootingLog)
     }
 
     /// Applies the view model's refresh rule after a row action finishes.
@@ -1076,6 +1082,8 @@ private struct SettingsNativeRowView: View {
             presenter.showMessage(title: title, message: message)
         case .sendTraceEmail:
             presenter.requestTraceEmail()
+        case .troubleshootingLog:
+            presenter.showTroubleshootingLog()
         case nil:
             break
         }

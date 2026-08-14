@@ -55,7 +55,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarme und Mitteilungen";
 "settingsviews_sharingAndServicesSectionTitle" = "Teilen und Dienste";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID teilen";
-"settingsviews_issueReportSectionTitle" = "Problembericht";
+"settingsviews_troubleshootingTitle" = "Fehlerbehebung";
+"settingsviews_activityLogSectionTitle" = "Aktivitätsprotokoll";
+"settingsviews_viewActivityLog" = "Aktivitätsprotokoll";
+"settingsviews_troubleshootingLogSectionFooter" = "Zeige und teile ein leicht verständliches englisches Protokoll der letzten 12 Stunden. Es enthält Glukosewerte, aber keine Kontodaten oder Gerätekennungen.";
 "settingsviews_appBannerVersion" = "Version %@";
 "settingsviews_appInstalledSince" = "Installiert";
 
@@ -239,6 +242,7 @@
 
 /// in Settings, row title to send settings
 "sendTraceFile" = "Fehlerbericht senden";
+"settingsviews_issueReportTitle" = "Fehlerbericht";
 
 /// speak settings, where user can select the language
 "settingsviews_speakBgReadingslanguage" = "Sprache";
@@ -281,7 +285,7 @@
 
 /// Advanced Settings, section title
 "developerSettings" = "Erweiterte Einstellungen";
-"showDeveloperSettings" = "Anzeigen";
+"showDeveloperSettings" = "Erweiterte Einstellungen anzeigen";
 "preferSensorCountdown" = "Sensor-Countdown bevorzugen";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensorlaufzeit";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Legt fest, ob die Sensorlaufzeit auf iPhone und Apple Watch als verstrichene Zeit oder als Countdown angezeigt wird.";

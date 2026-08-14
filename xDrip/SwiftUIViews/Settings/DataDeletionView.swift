@@ -632,6 +632,7 @@ final class DataDeletionViewModel: ObservableObject {
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .error,
+            troubleshooting: .standard(.dataManagement(.operationFailed)),
             operation,
             error.localizedDescription
         )

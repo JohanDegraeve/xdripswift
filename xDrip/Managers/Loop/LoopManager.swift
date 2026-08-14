@@ -99,7 +99,7 @@ public class LoopManager: NSObject {
 
         }
 
-        trace("    in share, sharing data with selected OS-AID target",log: log, category: ConstantsLog.categoryLoopManager, type: .debug)
+        trace("    in share, sharing data with selected OS-AID target",log: log, category: ConstantsLog.categoryLoopManager, type: .debug, troubleshooting: .detailed(.integration(name: .osAid, activity: .started)))
 
         // get last readings with calculated value
         // reduce timeStampLatestLoopSharedBgReading with 30 minutes. Because maybe Loop wasn't running for a while and so missed one or more readings. By adding 30 minutes of readings, we fill up a gap of maximum 30 minutes in Loop
@@ -262,6 +262,7 @@ public class LoopManager: NSObject {
 
         // write readings to shared user defaults
         sharedUserDefaults.set(data, forKey: "latestReadings")
+        trace("    in share, stored readings for selected OS-AID target", log: log, category: ConstantsLog.categoryLoopManager, type: .debug, troubleshooting: .detailed(.integration(name: .osAid, activity: .succeeded(itemCount: dictionary.count))))
 
         // mirror exactly what we wrote so local deletions are reflected immediately
         UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary

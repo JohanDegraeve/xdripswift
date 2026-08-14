@@ -44,12 +44,28 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_osAidLoopShareSectionTitle", tableName: filename, bundle: Bundle.main, value: "OS-AID Share", comment: "settings section title for OS-AID sharing")
     }()
 
-    static let issueReportSectionTitle: String = {
-        return NSLocalizedString("settingsviews_issueReportSectionTitle", tableName: filename, bundle: Bundle.main, value: "Issue Report", comment: "settings section title for sending issue report logs")
+    static let troubleshootingTitle: String = {
+        return NSLocalizedString("settingsviews_troubleshootingTitle", tableName: filename, bundle: Bundle.main, value: "Troubleshooting", comment: "settings row and child screen title for troubleshooting")
     }()
 
     static let issueReportSectionFooter: String = {
         return NSLocalizedString("settingsviews_issueReportSectionFooter", tableName: filename, bundle: Bundle.main, value: "Do not send an Issue Report unless requested by an xDrip4iOS developer or your report will be automatically deleted.", comment: "settings footer warning users not to send issue reports unless requested")
+    }()
+
+    static let issueReportTitle: String = {
+        return NSLocalizedString("settingsviews_issueReportTitle", tableName: filename, bundle: Bundle.main, value: "Issue Report", comment: "advanced settings row and child screen title for developer issue reports")
+    }()
+
+    static let activityLogSectionTitle: String = {
+        NSLocalizedString("settingsviews_activityLogSectionTitle", tableName: filename, bundle: Bundle.main, value: "Activity Log", comment: "troubleshooting section title for the consumer activity log")
+    }()
+
+    static let viewActivityLog: String = {
+        NSLocalizedString("settingsviews_viewActivityLog", tableName: filename, bundle: Bundle.main, value: "Activity Log", comment: "root troubleshooting row title that opens the consumer activity log")
+    }()
+
+    static let troubleshootingLogSectionFooter: String = {
+        NSLocalizedString("settingsviews_troubleshootingLogSectionFooter", tableName: filename, bundle: Bundle.main, value: "View and share a plain-English record of the previous 12 hours. This log includes glucose values but excludes account details and device identifiers.", comment: "settings footer describing the consumer troubleshooting log")
     }()
 
     static func appBannerVersion(_ version: String) -> String {
@@ -1125,7 +1141,7 @@ class Texts_SettingsView {
     }()
     
     static let showDeveloperSettings: String = {
-        return NSLocalizedString("showDeveloperSettings", tableName: filename, bundle: Bundle.main, value: "Show", comment: "advanced settings, show them or hide them")
+        return NSLocalizedString("showDeveloperSettings", tableName: filename, bundle: Bundle.main, value: "Show Advanced", comment: "advanced settings row title that reveals the advanced options")
     }()
 
     static let preferSensorCountdown: String = {

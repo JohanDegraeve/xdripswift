@@ -4,7 +4,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Uyarılar ve Bildirimler";
 "settingsviews_sharingAndServicesSectionTitle" = "Paylaşım ve Servisler";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID Paylaşımı";
-"settingsviews_issueReportSectionTitle" = "Sorun Raporu";
+"settingsviews_troubleshootingTitle" = "Sorun Giderme";
+"settingsviews_activityLogSectionTitle" = "Etkinlik Günlüğü";
+"settingsviews_viewActivityLog" = "Etkinlik Günlüğü";
+"settingsviews_troubleshootingLogSectionFooter" = "Son 12 saatin sade İngilizce kaydını görüntüleyin ve paylaşın. Bu kayıt glikoz değerlerini içerir ancak hesap bilgilerini ve cihaz tanımlayıcılarını içermez.";
 "settingsviews_appBannerVersion" = "Sürüm %@";
 "settingsviews_appInstalledSince" = "Yüklendi";
 "settingsviews_showOnlineHelp" = "Çevrimiçi Yardım'ı aç";
@@ -94,6 +97,7 @@
 "infoCalendarAccessRestricted" = "Takviminize erişmesi için %@'a yetki veremezsiniz. Bu muhtemelen ebeveyn denetimlerinin yürürlükte olması gibi etkin kısıtlamalardan kaynaklanmaktadır.";
 "sectionTitleTrace" = "Sorun Raporlama";
 "sendTraceFile" = "Sorun Raporu Gönder";
+"settingsviews_issueReportTitle" = "Sorun Raporu";
 "describeProblem" = "İzleme dosyasını neden mümkün olduğunca ayrıntılı olarak göndermeniz gerektiğini açıklayın. Sorununuzu '%@' Facebook destek grubuna zaten bildirdiyseniz, e-postada facebook adınızı belirtin";
 "emailNotConfigured" = "iOS cihazınızda bir e-posta hesabı yapılandırmanız gerekir.";
 "emailbodyText" = "Sorun Açıklaması: ";
@@ -106,7 +110,7 @@
 "warningChangeFromMasterToFollower" = "Sahip'ten Takipciye geçmek mevcut sensörünüzü durduracaktır. Devam etmek istiyor musun?";
 "nightscoutPort" = "Port";
 "developerSettings" = "Gelişmiş Ayarlar";
-"showDeveloperSettings" = "Göster";
+"showDeveloperSettings" = "Gelişmiş ayarları göster";
 "preferSensorCountdown" = "Sensör geri sayımını tercih et";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensör kullanım süresi";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Sensör kullanım süresinin iPhone ve Apple Watch'ta geçen süre veya geri sayım olarak gösterilmesini belirler.";

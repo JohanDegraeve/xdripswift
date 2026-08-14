@@ -7,6 +7,7 @@
 //
 
 import Combine
+import os
 import SwiftUI
 
 /// Builds the CareLink account screen from the same native rows as the other followers.
@@ -59,6 +60,10 @@ private final class CareLinkSettingsSectionProvider: SettingsNativeSectionProvid
     private let section: CareLinkSettingsSection
     private var stateObserver: AnyCancellable?
     private var sectionReloadClosure: (() -> Void)?
+    private let log = OSLog(
+        subsystem: ConstantsLog.subSystem,
+        category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel
+    )
 
     init(_ section: CareLinkSettingsSection) {
         self.section = section
@@ -118,8 +123,25 @@ private final class CareLinkSettingsSectionProvider: SettingsNativeSectionProvid
                 placeholder: ConstantsSettingsPlaceholders.usernamePlaceholder
             ) { username in
                 guard username != UserDefaults.standard.careLinkUsername else { return }
+                let removedPassword = UserDefaults.standard.careLinkPassword != nil
                 UserDefaults.standard.careLinkUsername = username
                 UserDefaults.standard.careLinkPassword = nil
+                trace(
+                    "CareLink username was changed",
+                    log: self.log,
+                    category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                    type: .info,
+                    troubleshooting: .standard(.configuration(.credentialChanged(source: .careLink, field: .username, isSet: username != nil)))
+                )
+                if removedPassword {
+                    trace(
+                        "CareLink password was removed after the username changed",
+                        log: self.log,
+                        category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                        type: .info,
+                        troubleshooting: .standard(.configuration(.credentialChanged(source: .careLink, field: .password, isSet: false)))
+                    )
+                }
             },
             FollowerSettingsRows.textEntryRow(
                 id: "careLink.password",
@@ -130,6 +152,13 @@ private final class CareLinkSettingsSectionProvider: SettingsNativeSectionProvid
             ) { password in
                 guard password != UserDefaults.standard.careLinkPassword else { return }
                 UserDefaults.standard.careLinkPassword = password
+                trace(
+                    "CareLink password was changed",
+                    log: self.log,
+                    category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                    type: .info,
+                    troubleshooting: .standard(.configuration(.credentialChanged(source: .careLink, field: .password, isSet: password != nil)))
+                )
             },
             regionRow()
         ]

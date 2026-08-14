@@ -123,6 +123,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
                             log: self.log,
                             category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel,
                             type: .info,
+                            troubleshooting: .standard(.configuration(.liveActivityChanged(TroubleshootingLiveActivityMode(newLiveActivityType)))),
                             oldLiveActivityType.description,
                             newLiveActivityType.description
                         )
@@ -228,7 +229,15 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
                         
                         let newLiveActivityType = UserDefaults.standard.liveActivityType
                         
-                        trace("Live activity type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, oldLiveActivityType.description, newLiveActivityType.description)
+                        trace(
+                            "Live activity type was changed from '%{public}@' to '%{public}@'",
+                            log: self.log,
+                            category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel,
+                            type: .info,
+                            troubleshooting: .standard(.configuration(.liveActivityChanged(TroubleshootingLiveActivityMode(newLiveActivityType)))),
+                            oldLiveActivityType.description,
+                            newLiveActivityType.description
+                        )
                         
                     }
                     

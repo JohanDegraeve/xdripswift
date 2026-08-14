@@ -484,18 +484,30 @@ class BgReadingsAccessor: ObservableObject {
 
     }
 
-    /// deletes a bgReading using its objectID
-    func delete(bgReadingObjectID: NSManagedObjectID) {
+    /// Deletes a BG reading using its object ID.
+    ///
+    /// The Boolean result is intentionally based on the Core Data save, not merely on marking the
+    /// object as deleted in the context. User-facing callers use it to avoid claiming in the Activity
+    /// Log that a reading was removed when persistence actually failed.
+    ///
+    /// - Returns: `true` only when the object existed as a `BgReading` and the deletion was saved.
+    @discardableResult
+    func delete(bgReadingObjectID: NSManagedObjectID) -> Bool {
+        var deletionSaved = false
+
         coreDataManager.mainManagedObjectContext.performAndWait {
             do {
                 if let bgReading = try coreDataManager.mainManagedObjectContext.existingObject(with: bgReadingObjectID) as? BgReading {
                     coreDataManager.mainManagedObjectContext.delete(bgReading)
                     try coreDataManager.mainManagedObjectContext.save()
+                    deletionSaved = true
                 }
             } catch {
                 trace("in delete bgReadingObjectID, Unable to Save Changes, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)
             }
         }
+
+        return deletionSaved
     }
 
 

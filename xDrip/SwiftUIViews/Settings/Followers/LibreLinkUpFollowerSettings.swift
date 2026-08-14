@@ -6,10 +6,15 @@
 //  Copyright © 2026 Johan Degraeve. All rights reserved.
 //
 
+import os
 import SwiftUI
 
 /// Builds the shared LibreLinkUp account screen for the standard and Russia variants.
 enum LibreLinkUpFollowerSettingsScreen {
+    private static let log = OSLog(
+        subsystem: ConstantsLog.subSystem,
+        category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel
+    )
     static func make(
         source: FollowerDataSourceType,
         actions: SelectedFollowerActions
@@ -59,9 +64,26 @@ enum LibreLinkUpFollowerSettingsScreen {
                 placeholder: ConstantsSettingsPlaceholders.usernamePlaceholder
             ) { value in
                 guard value != UserDefaults.standard.libreLinkUpEmail else { return }
+                let removedPassword = UserDefaults.standard.libreLinkUpPassword != nil
                 UserDefaults.standard.libreLinkUpEmail = value
                 UserDefaults.standard.libreLinkUpPassword = nil
                 resetConnectionState()
+                trace(
+                    "LibreLinkUp username was changed",
+                    log: log,
+                    category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                    type: .info,
+                    troubleshooting: .standard(.configuration(.credentialChanged(source: TroubleshootingLogSource(source), field: .username, isSet: value != nil)))
+                )
+                if removedPassword {
+                    trace(
+                        "LibreLinkUp password was removed after the username changed",
+                        log: log,
+                        category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                        type: .info,
+                        troubleshooting: .standard(.configuration(.credentialChanged(source: TroubleshootingLogSource(source), field: .password, isSet: false)))
+                    )
+                }
             },
             FollowerSettingsRows.textEntryRow(
                 id: "libreLinkUp.account.password",
@@ -73,6 +95,13 @@ enum LibreLinkUpFollowerSettingsScreen {
                 guard value != UserDefaults.standard.libreLinkUpPassword else { return }
                 UserDefaults.standard.libreLinkUpPassword = value
                 resetConnectionState()
+                trace(
+                    "LibreLinkUp password was changed",
+                    log: log,
+                    category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                    type: .info,
+                    troubleshooting: .standard(.configuration(.credentialChanged(source: TroubleshootingLogSource(source), field: .password, isSet: value != nil)))
+                )
             }
         ]
     }

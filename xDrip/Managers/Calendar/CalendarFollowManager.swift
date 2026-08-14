@@ -109,7 +109,7 @@ class CalendarFollowManager: NSObject {
             return
         }
         
-        trace("in download", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
+        trace("in download", log: log, category: ConstantsLog.categoryCalendarManager, type: .info, troubleshooting: .detailed(.follower(source: .calendar, activity: .downloadStarted)))
         
         guard !UserDefaults.standard.isMaster else {
             trace("    not follower", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
@@ -123,7 +123,7 @@ class CalendarFollowManager: NSObject {
         
         guard calendarAccessIsAuthorized else {
             UserDefaults.standard.calendarFollowStatus = CalendarShareStatus.error.rawValue
-            trace("    calendar access is not authorized", log: log, category: ConstantsLog.categoryCalendarManager, type: .error)
+            trace("    calendar access is not authorized", log: log, category: ConstantsLog.categoryCalendarManager, type: .error, troubleshooting: .standard(.follower(source: .calendar, activity: .downloadFailed)))
             scheduleNewDownload()
             return
         }
@@ -132,7 +132,7 @@ class CalendarFollowManager: NSObject {
         
         guard let calendar = getCalendar() else {
             UserDefaults.standard.calendarFollowStatus = CalendarShareStatus.notConfigured.rawValue
-            trace("    no Calendar Follow calendar selected", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
+            trace("    no Calendar Follow calendar selected", log: log, category: ConstantsLog.categoryCalendarManager, type: .info, troubleshooting: .standard(.follower(source: .calendar, activity: .downloadFailed)))
             scheduleNewDownload()
             return
         }
@@ -142,20 +142,30 @@ class CalendarFollowManager: NSObject {
         
         guard let latestPayload = payloads.first else {
             UserDefaults.standard.calendarFollowStatus = CalendarShareStatus.noData.rawValue
-            trace("    no Calendar Share payload found", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
+            trace("    no Calendar Share payload found", log: log, category: ConstantsLog.categoryCalendarManager, type: .info, troubleshooting: .standard(.follower(source: .calendar, activity: .noReadings)))
             scheduleNewDownload()
             return
         }
         
         guard abs(latestPayload.followerBgReading.timeStamp.timeIntervalSinceNow) < 7 * 60 else {
             UserDefaults.standard.calendarFollowStatus = CalendarShareStatus.stale.rawValue
-            trace("    latest Calendar Share payload is stale", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
+            trace("    latest Calendar Share payload is stale", log: log, category: ConstantsLog.categoryCalendarManager, type: .info, troubleshooting: .standard(.follower(source: .calendar, activity: .downloadFailed)))
             scheduleNewDownload()
             return
         }
         
-        if !latestPayload.sourceAlias.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            UserDefaults.standard.followerPatientName = latestPayload.sourceAlias
+        let sourceAlias = latestPayload.sourceAlias.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !sourceAlias.isEmpty, UserDefaults.standard.followerPatientName != sourceAlias {
+            UserDefaults.standard.followerPatientName = sourceAlias
+            // Calendar payloads may carry a patient alias. The consumer log records the state change
+            // but deliberately excludes the alias, event notes and calendar identity.
+            trace(
+                "Calendar Share changed the patient alias",
+                log: log,
+                category: ConstantsLog.categoryCalendarManager,
+                type: .info,
+                troubleshooting: .standard(.configuration(.patientAliasChanged(isSet: true)))
+            )
         }
         
         UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
@@ -163,7 +173,7 @@ class CalendarFollowManager: NSObject {
         UserDefaults.standard.calendarFollowStatus = CalendarShareStatus.active.rawValue
         
         var followGlucoseDataArray = latestPayload.followerBgReadings
-        trace("    received %{public}@ Calendar Share reading(s), including history", log: log, category: ConstantsLog.categoryCalendarManager, type: .info, followGlucoseDataArray.count.description)
+        trace("    received %{public}@ Calendar Share reading(s), including history", log: log, category: ConstantsLog.categoryCalendarManager, type: .info, troubleshooting: .standard(.follower(source: .calendar, activity: .downloadSucceeded(readingCount: followGlucoseDataArray.count))), followGlucoseDataArray.count.description)
         followerDelegate?.followerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
         
         scheduleNewDownload()

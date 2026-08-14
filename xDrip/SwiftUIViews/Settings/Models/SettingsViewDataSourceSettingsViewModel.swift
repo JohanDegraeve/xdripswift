@@ -241,6 +241,7 @@ final class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModel
             log: log,
             category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
             type: .info,
+            troubleshooting: .standard(.configuration(.followerSourceChanged(TroubleshootingLogSource(newType)))),
             oldType.description,
             newType.description
         )
@@ -254,6 +255,13 @@ final class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModel
         }
         if newType == .calendar && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
             UserDefaults.standard.followerBackgroundKeepAliveType = .normal
+            trace(
+                "background keep-alive was automatically changed from Disabled to Normal for Calendar",
+                log: log,
+                category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                type: .info,
+                troubleshooting: .standard(.configuration(.keepAliveChanged(.normal)))
+            )
         }
     }
 
@@ -261,6 +269,15 @@ final class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModel
         let oldType = UserDefaults.standard.followerBackgroundKeepAliveType
         guard newType != oldType else { return }
         UserDefaults.standard.followerBackgroundKeepAliveType = newType
+        trace(
+            "background keep-alive was changed from '%{public}@' to '%{public}@'",
+            log: log,
+            category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+            type: .info,
+            troubleshooting: .standard(.configuration(.keepAliveChanged(TroubleshootingKeepAliveMode(newType)))),
+            oldType.description,
+            newType.description
+        )
 
         let message: String
         switch newType {
@@ -282,6 +299,7 @@ final class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModel
             log: log,
             category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
             type: .info,
+            troubleshooting: .standard(.configuration(.therapySourceChanged(TroubleshootingTherapySource(newType)))),
             oldType.description,
             newType.description
         )
@@ -289,7 +307,7 @@ final class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModel
 
     private func switchMasterFollower() -> SettingsSelectedRowAction {
         guard UserDefaults.standard.isMaster else {
-            return .callFunction { UserDefaults.standard.isMaster = true }
+            return .callFunction { [weak self] in self?.applyMode(isMaster: true) }
         }
 
         let dexcomUploadNeedsDisabling = validatedFollowerSource() == .dexcomShare
@@ -298,11 +316,11 @@ final class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModel
             SensorsAccessor(coreDataManager: $0).fetchActiveSensor() != nil
         } ?? false
 
-        let change = {
+        let change = { [weak self] in
             if dexcomUploadNeedsDisabling {
                 UserDefaults.standard.uploadReadingstoDexcomShare = false
             }
-            UserDefaults.standard.isMaster = false
+            self?.applyMode(isMaster: false)
         }
 
         if hasActiveSensor || dexcomUploadNeedsDisabling {
@@ -317,6 +335,21 @@ final class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModel
             )
         }
         return .callFunction(function: change)
+    }
+
+    /// Applies the mode and records only the resulting role. No source credentials, patient alias or
+    /// active-sensor details are allowed into the consumer log when this high-impact setting changes.
+    private func applyMode(isMaster: Bool) {
+        guard UserDefaults.standard.isMaster != isMaster else { return }
+        UserDefaults.standard.isMaster = isMaster
+        trace(
+            "app mode was changed to %{public}@",
+            log: log,
+            category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+            type: .info,
+            troubleshooting: .standard(.configuration(.modeChanged(isMaster: isMaster))),
+            isMaster ? "Master" : "Follower"
+        )
     }
 
     private func showMessage(title: String, message: String) {

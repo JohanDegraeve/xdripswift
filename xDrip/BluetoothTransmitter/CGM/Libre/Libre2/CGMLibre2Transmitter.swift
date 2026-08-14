@@ -118,6 +118,17 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         if NFCTagReaderSession.readingAvailable {
             // startScanning is getting called several times, but we must restrict launch of nfc scan to one single time, therefore check if libreNFC == nil
             if libreNFC == nil {
+                // One explicit Libre Connect/Add request creates one NFC session. Log that user-level
+                // milestone here, where the session is actually created, rather than in the repeated
+                // Bluetooth scanning callbacks that can occur while iOS changes radio state.
+                trace(
+                    "starting Libre NFC sensor scan",
+                    log: log,
+                    category: ConstantsLog.categoryCGMLibre2,
+                    type: .info,
+                    troubleshooting: .standard(.cgm(source: .libre2, activity: .nfcScanStarted))
+                )
+
                 // NFC session creation must be on main thread
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
@@ -128,6 +139,14 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
             }
             
         } else {
+            trace(
+                "Libre NFC sensor scanning is unavailable on this device",
+                log: log,
+                category: ConstantsLog.categoryCGMLibre2,
+                type: .error,
+                troubleshooting: .standard(.cgm(source: .libre2, activity: .nfcUnavailable))
+            )
+
             // delegate may touch UI/Core Data → ensure main thread
             DispatchQueue.main.async { [weak self] in
                 self?.bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.deviceMustSupportNFC)
@@ -450,22 +469,45 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         }
     }
     
-    func nfcScanResult(successful: Bool) {
-        if successful {
-            trace("received NFC scan result from NFC with result successful", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
-            
-            // only process if userdefaults needs changing to true to avoid triggering the observer unnecessarily
+    func nfcScanResult(_ result: LibreNFCScanResult) {
+        // Keep the Core NFC error and sensor payload in the developer trace. Only this closed result
+        // crosses into the shareable Activity Log, so cancellation and timeout remain distinct from
+        // an actual scan failure without exposing a sensor serial number or raw NFC response.
+        let activity: TroubleshootingCGMActivity
+        let developerResult: String
+        switch result {
+        case .succeeded:
+            activity = .nfcScanSucceeded
+            developerResult = "successful"
+        case .failed:
+            activity = .nfcScanFailed
+            developerResult = "failed"
+        case .cancelled:
+            activity = .nfcScanCancelled
+            developerResult = "cancelled"
+        case .timedOut:
+            activity = .nfcScanTimedOut
+            developerResult = "timed out"
+        }
+
+        trace(
+            "received NFC scan result from NFC with result %{public}@",
+            log: log,
+            category: ConstantsLog.categoryCGMLibre2,
+            type: result == .succeeded ? .info : .error,
+            troubleshooting: .standard(.cgm(source: .libre2, activity: activity)),
+            developerResult
+        )
+
+        if result == .succeeded {
+            // Avoid triggering the success observer more than once for the same scan.
             if !UserDefaults.standard.nfcScanSuccessful {
                 UserDefaults.standard.nfcScanSuccessful = true
             }
-            
-        } else {
-            trace("received NFC scan result from NFC with result unsuccessful", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
-            
-            // only process if userdefaults needs changing to true to avoid triggering the observer unnecessarily
-            if !UserDefaults.standard.nfcScanFailed {
-                UserDefaults.standard.nfcScanFailed = true
-            }
+        } else if !UserDefaults.standard.nfcScanFailed {
+            // The current UI offers the same retry sheet for failure, cancellation and timeout. The
+            // Activity Log has already retained the more accurate reason above.
+            UserDefaults.standard.nfcScanFailed = true
         }
     }
     

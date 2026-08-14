@@ -236,16 +236,33 @@ struct BgReadingsView: View {
         // get the timestamp so that we can match it to the main (unfiltered) array
         let timestampOfBgReadingToDelete = bgReadingToDelete.timeStamp
         
-        trace("deleting BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .info, bgReadingToDelete.calculatedValue.mgDlToMmolAndToString(mgDl: isMgDl), String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol), timestampOfBgReadingToDelete.description)
+        // Record the user-visible deletion only after Core Data confirms that it was saved. The
+        // developer message may use localized display text, while the attached Activity Log fact
+        // remains typed, unit-neutral and free from arbitrary trace arguments.
+        guard bgReadingsAccessor.delete(bgReadingObjectID: bgReadingToDelete.objectID) else {
+            trace("failed to delete BG reading with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .error, timestampOfBgReadingToDelete.description)
+            return
+        }
+
+        trace(
+            "deleted BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata",
+            log: log,
+            category: ConstantsLog.categoryBgReadingsView,
+            type: .info,
+            troubleshooting: .standard(.glucoseManagement(.deleted(
+                mgDl: bgReadingToDelete.finalValue,
+                measuredAt: timestampOfBgReadingToDelete
+            ))),
+            bgReadingToDelete.finalValue.mgDlToMmolAndToString(mgDl: isMgDl),
+            String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol),
+            timestampOfBgReadingToDelete.description
+        )
         
         // delete from the filtered BgReading array which will also force a refresh of the view
         filteredBgReadings.remove(atOffsets: offsets)
         
         // delete from the main BgReading array using the timestamp
         bgReadings.removeAll(where: { $0.timeStamp == timestampOfBgReadingToDelete })
-        
-        // delete the BgReading from coredata
-        bgReadingsAccessor.delete(bgReadingObjectID: bgReadingToDelete.objectID)
         
         // delete the BgReading from Nightscout (if it exists)
         nightscoutSyncManager.deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: timestampOfBgReadingToDelete)
@@ -262,10 +279,33 @@ struct BgReadingsView: View {
         // make a stable copy to avoid mutating the data set while iterating
         let bgReadingsToDelete = Array(selectedBgReadings)
 
+        var readingsThatCouldNotBeDeleted = Set<BgReadingSnapshot>()
+
         for bgReadingToDelete in bgReadingsToDelete {
             let timestampOfBgReadingToDelete = bgReadingToDelete.timeStamp
 
-            trace("multi-delete BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .info, bgReadingToDelete.calculatedValue.mgDlToMmolAndToString(mgDl: isMgDl), String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol), timestampOfBgReadingToDelete.description)
+            // Do not remove the row from the in-memory lists or claim success in either log until
+            // the underlying Core Data save succeeds. This keeps the view and Activity Log honest
+            // even if persistence fails part-way through a multi-selection.
+            guard bgReadingsAccessor.delete(bgReadingObjectID: bgReadingToDelete.objectID) else {
+                readingsThatCouldNotBeDeleted.insert(bgReadingToDelete)
+                trace("failed to multi-delete BG reading with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .error, timestampOfBgReadingToDelete.description)
+                continue
+            }
+
+            trace(
+                "multi-deleted BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata",
+                log: log,
+                category: ConstantsLog.categoryBgReadingsView,
+                type: .info,
+                troubleshooting: .standard(.glucoseManagement(.deleted(
+                    mgDl: bgReadingToDelete.finalValue,
+                    measuredAt: timestampOfBgReadingToDelete
+                ))),
+                bgReadingToDelete.finalValue.mgDlToMmolAndToString(mgDl: isMgDl),
+                String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol),
+                timestampOfBgReadingToDelete.description
+            )
 
             // remove from filtered array (if present)
             if let indexInFiltered = filteredBgReadings.firstIndex(where: { $0.timeStamp == timestampOfBgReadingToDelete }) {
@@ -275,18 +315,18 @@ struct BgReadingsView: View {
             // remove from main array
             bgReadings.removeAll(where: { $0.timeStamp == timestampOfBgReadingToDelete })
 
-            // delete from Core Data
-            bgReadingsAccessor.delete(bgReadingObjectID: bgReadingToDelete.objectID)
-
             // delete from Nightscout
             nightscoutSyncManager.deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: timestampOfBgReadingToDelete)
         }
         
-        notificationFeedback.notificationOccurred(.success)
+        notificationFeedback.notificationOccurred(readingsThatCouldNotBeDeleted.isEmpty ? .success : .error)
 
-        // clear selection and exit edit mode
-        selectedBgReadings.removeAll()
-        editMode?.wrappedValue = .inactive
+        // Keep only failed rows selected so the user can see which operations did not complete and
+        // retry them. Exit selection mode only when the complete request succeeded.
+        selectedBgReadings = readingsThatCouldNotBeDeleted
+        if readingsThatCouldNotBeDeleted.isEmpty {
+            editMode?.wrappedValue = .inactive
+        }
     }
     
     /// Returns the colour for the small dot shown beside each glucose reading.

@@ -8,6 +8,7 @@
 
 import Combine
 import Foundation
+import os
 import SwiftUI
 
 /// Small observable provider used by follower child sections whose rows depend on live state.
@@ -79,6 +80,10 @@ final class FollowerSettingsSectionProvider: SettingsNativeSectionProvider {
 }
 
 enum FollowerSettingsRows {
+    private static let log = OSLog(
+        subsystem: ConstantsLog.subSystem,
+        category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel
+    )
     static func accountToolbarActions(
         source: FollowerDataSourceType,
         logOut: @escaping () -> Void
@@ -208,9 +213,21 @@ enum FollowerSettingsRows {
                     actionTitle: Texts_Common.Ok,
                     cancelTitle: Texts_Common.Cancel,
                     action: { value in
-                        UserDefaults.standard.followerPatientName = value
+                        let alias = value
                             .trimmingCharacters(in: .whitespacesAndNewlines)
                             .toNilIfLength0()
+                        guard alias != UserDefaults.standard.followerPatientName else { return }
+                        UserDefaults.standard.followerPatientName = alias
+                        // The alias itself is private and may identify a patient. Record only whether
+                        // it was set or removed; never pass the entered text to trace or troubleshooting.
+                        trace(
+                            "patient alias was %{public}@",
+                            log: log,
+                            category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel,
+                            type: .info,
+                            troubleshooting: .standard(.configuration(.patientAliasChanged(isSet: alias != nil))),
+                            alias == nil ? "removed" : "changed"
+                        )
                     },
                     cancel: nil,
                     validator: nil

@@ -696,7 +696,8 @@ final class DataManagementViewModel: ObservableObject {
                     "in createBackup, presenting backup share sheet",
                     log: log,
                     category: ConstantsLog.categoryDataManagement,
-                    type: .info
+                    type: .info,
+                    troubleshooting: .standard(.dataManagement(.backupCreated))
                 )
                 finish()
             } catch {
@@ -812,6 +813,13 @@ final class DataManagementViewModel: ObservableObject {
                         restoredAccountCategories: accountCategories
                     )
                 }.value
+                trace(
+                    "in restoreBackup, restore completed",
+                    log: log,
+                    category: ConstantsLog.categoryDataManagement,
+                    type: .info,
+                    troubleshooting: .standard(.dataManagement(.backupRestored))
+                )
                 finish()
             } catch {
                 fail(error, operation: "restoreBackup")
@@ -866,6 +874,7 @@ final class DataManagementViewModel: ObservableObject {
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .error,
+            troubleshooting: .standard(.dataManagement(.operationFailed)),
             operation,
             description
         )

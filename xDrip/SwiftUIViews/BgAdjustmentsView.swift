@@ -26,6 +26,9 @@ struct BgAdjustmentsView: View {
     private struct ApplyFromOption {
         let title: String
         let timeInterval: TimeInterval
+        /// A controlled semantic value for the consumer Activity Log. Passing the selection avoids
+        /// reverse-engineering "3 hours" from a timestamp that may be anchored to a delayed reading.
+        let troubleshootingRange: TroubleshootingPostProcessingApplyRange
     }
 
     /// available manual historical apply windows in hours
@@ -651,15 +654,16 @@ struct BgAdjustmentsView: View {
     private func applyNowChanges() {
         let adjustmentPreview = currentAdjustmentPreview()
 
-        bgPostProcessingManager.applyPostProcessing(enableAdjustment: effectiveEnableAdjustment(), slope: adjustmentPreview?.slope, intercept: adjustmentPreview?.intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: selectedApplyFromTimeStamp(), isBasicAdjustment: false, enteredBgValue: currentAdjustedGlucoseValueInMgDl(), sourceCalculatedValue: bgReadings.last?.calculatedValue, enableSmoothing: enableSmoothing, useFiveMinuteReadings: effectiveUseFiveMinuteReadings(), smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm)
+        bgPostProcessingManager.applyPostProcessing(enableAdjustment: effectiveEnableAdjustment(), slope: adjustmentPreview?.slope, intercept: adjustmentPreview?.intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: selectedApplyFromTimeStamp(), isBasicAdjustment: false, enteredBgValue: currentAdjustedGlucoseValueInMgDl(), sourceCalculatedValue: bgReadings.last?.calculatedValue, enableSmoothing: enableSmoothing, useFiveMinuteReadings: effectiveUseFiveMinuteReadings(), smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm, troubleshootingApplyRange: .now)
         presentationMode.wrappedValue.dismiss()
     }
 
     private func applyHistoricalChanges() {
         let adjustmentPreview = currentAdjustmentPreview()
         let historicalApplyFromTimeStamp = selectedHistoricalApplyFromTimeStamp()
+        let troubleshootingApplyRange = availableApplyFromOptions()[selectedApplyFromPeriodIndex].troubleshootingRange
 
-        bgPostProcessingManager.applyPostProcessing(enableAdjustment: effectiveEnableAdjustment(), slope: adjustmentPreview?.slope, intercept: adjustmentPreview?.intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: historicalApplyFromTimeStamp, isBasicAdjustment: false, enteredBgValue: currentAdjustedGlucoseValueInMgDl(), sourceCalculatedValue: bgReadings.last?.calculatedValue, enableSmoothing: enableSmoothing, useFiveMinuteReadings: effectiveUseFiveMinuteReadings(), smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm, processingStartDateOverride: historicalApplyFromTimeStamp)
+        bgPostProcessingManager.applyPostProcessing(enableAdjustment: effectiveEnableAdjustment(), slope: adjustmentPreview?.slope, intercept: adjustmentPreview?.intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: historicalApplyFromTimeStamp, isBasicAdjustment: false, enteredBgValue: currentAdjustedGlucoseValueInMgDl(), sourceCalculatedValue: bgReadings.last?.calculatedValue, enableSmoothing: enableSmoothing, useFiveMinuteReadings: effectiveUseFiveMinuteReadings(), smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm, processingStartDateOverride: historicalApplyFromTimeStamp, troubleshootingApplyRange: troubleshootingApplyRange)
         presentationMode.wrappedValue.dismiss()
     }
 
@@ -759,11 +763,11 @@ struct BgAdjustmentsView: View {
     }
 
     private func availableApplyFromOptions() -> [ApplyFromOption] {
-        var applyFromOptions = [ApplyFromOption(title: Texts_HomeView.postProcessingNow, timeInterval: 0)]
+        var applyFromOptions = [ApplyFromOption(title: Texts_HomeView.postProcessingNow, timeInterval: 0, troubleshootingRange: .now)]
 
         for applyFromPeriodInHours in applyFromPeriodsInHours {
             let applyFromTimeInterval = Double(applyFromPeriodInHours) * 3600.0
-            applyFromOptions.append(ApplyFromOption(title: "-\(applyFromPeriodInHours)h", timeInterval: applyFromTimeInterval))
+            applyFromOptions.append(ApplyFromOption(title: "-\(applyFromPeriodInHours)h", timeInterval: applyFromTimeInterval, troubleshootingRange: .hoursAgo(applyFromPeriodInHours)))
         }
 
         return applyFromOptions

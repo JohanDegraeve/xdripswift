@@ -4,7 +4,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "警报和通知";
 "settingsviews_sharingAndServicesSectionTitle" = "共享和服务";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID 共享";
-"settingsviews_issueReportSectionTitle" = "问题报告";
+"settingsviews_troubleshootingTitle" = "故障排除";
+"settingsviews_activityLogSectionTitle" = "活动日志";
+"settingsviews_viewActivityLog" = "活动日志";
+"settingsviews_troubleshootingLogSectionFooter" = "查看并分享过去 12 小时的简明英文记录。该日志包含血糖值，但不包含账户详情或设备标识符。";
 "settingsviews_appBannerVersion" = "版本 %@";
 "settingsviews_appInstalledSince" = "安装于";
 "settingsviews_sectiontitleNotifications" = "常规";
@@ -132,6 +135,7 @@
 
 /// in Settings, row title to send settings
 "sendTraceFile" = "发送问题报告";
+"settingsviews_issueReportTitle" = "问题报告";
 
 /// nightscout settings, title of row
 "uploadSensorStartTime" = "Upload Sensor Start Time";
@@ -213,7 +217,7 @@
 
 /// Advanced Settings, section title
 "developerSettings" = "高级设置";
-"showDeveloperSettings" = "显示";
+"showDeveloperSettings" = "显示高级设置";
 "preferSensorCountdown" = "优先显示传感器倒计时";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "传感器使用寿命";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "控制在 iPhone 和 Apple Watch 上将传感器使用寿命显示为已用时间还是倒计时。";

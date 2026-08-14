@@ -80,6 +80,7 @@ final class HouseKeeper {
                     log: log,
                     category: ConstantsLog.categoryHouseKeeper,
                     type: .info,
+                    troubleshooting: .standard(.dataManagement(.cleanupCompleted(itemCount: counts.bgReadings + counts.treatments + counts.calibrations + loopCounts.deviceStatusCount + loopCounts.profileCount))),
                     Int(Date().timeIntervalSince(startedAt) * 1000).description,
                     counts.bgReadings.description,
                     counts.treatments.description,
@@ -93,6 +94,7 @@ final class HouseKeeper {
                     log: log,
                     category: ConstantsLog.categoryHouseKeeper,
                     type: .error,
+                    troubleshooting: .standard(.dataManagement(.operationFailed)),
                     String(describing: type(of: error))
                 )
             }

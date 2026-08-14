@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		4D7B00023014000200000001 /* CGMG5SensorSessionDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */; };
+		4D7A00023014000100000001 /* TroubleshootingLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7A00013014000100000001 /* TroubleshootingLog.swift */; };
+		4D7A00043014000100000001 /* TroubleshootingLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7A00033014000100000001 /* TroubleshootingLogView.swift */; };
+		4D7A00063014000100000001 /* TroubleshootingLogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7A00053014000100000001 /* TroubleshootingLogTests.swift */; };
 		07ECB18D91AE096E637D1393 /* AlertsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */; };
 		111352851C2F8F73108A3A62 /* CareLinkAccountState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F081BB1D5F106F950C4A8EA4 /* CareLinkAccountState.swift */; };
 		16A7F56E1D1ED24F03F2070F /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
@@ -872,6 +875,9 @@
 
 /* Begin PBXFileReference section */
 		4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG5SensorSessionDetectionTests.swift; sourceTree = "<group>"; };
+		4D7A00013014000100000001 /* TroubleshootingLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TroubleshootingLog.swift; sourceTree = "<group>"; };
+		4D7A00033014000100000001 /* TroubleshootingLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TroubleshootingLogView.swift; sourceTree = "<group>"; };
+		4D7A00053014000100000001 /* TroubleshootingLogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TroubleshootingLogTests.swift; sourceTree = "<group>"; };
 		102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertTypesSettingsView.swift; sourceTree = "<group>"; };
 		198D44C4260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Alerts.strings; sourceTree = "<group>"; };
 		198D44C5260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
@@ -2503,6 +2509,7 @@
 			isa = PBXGroup;
 			children = (
 				4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */,
+				4D7A00053014000100000001 /* TroubleshootingLogTests.swift */,
 				A50000040000000000000001 /* OnlineHelpTests.swift */,
 				FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */,
 				BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */,
@@ -2916,6 +2923,7 @@
 				E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */,
 				D9C75EA5D78E3497AC44D3C8 /* SettingsView.swift */,
 				CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */,
+				4D7A00033014000100000001 /* TroubleshootingLogView.swift */,
 				A30000000000000000000001 /* Followers */,
 				6E033988052CBCF93DBE169B /* Models */,
 			);
@@ -3315,6 +3323,7 @@
 				F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */,
 				47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */,
 				F8C5EBE622F38F0E00563B5F /* Trace.swift */,
+				4D7A00013014000100000001 /* TroubleshootingLog.swift */,
 				F8EA6CA821BBE3010082976B /* UniqueId.swift */,
 				F8FDFEA6260DE1A70047597D /* CustomColoredDisclosureIndicator */,
 				F8AF11F624B1E6D700AE5BA2 /* Errors */,
@@ -4253,6 +4262,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D7B00023014000200000001 /* CGMG5SensorSessionDetectionTests.swift in Sources */,
+				4D7A00063014000100000001 /* TroubleshootingLogTests.swift in Sources */,
 				A50000030000000000000001 /* OnlineHelpTests.swift in Sources */,
 				FBA100040000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift in Sources */,
 				BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */,
@@ -4269,6 +4279,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D7A00023014000100000001 /* TroubleshootingLog.swift in Sources */,
+				4D7A00043014000100000001 /* TroubleshootingLogView.swift in Sources */,
 				A50000010000000000000001 /* OnlineHelp.swift in Sources */,
 				FBA100020000000000000001 /* FollowerBackgroundKeepAliveManager.swift in Sources */,
 				BA0000020000000000000001 /* NightscoutFollowerGapFillService.swift in Sources */,

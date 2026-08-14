@@ -49,7 +49,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarmi in obvestila";
 "settingsviews_sharingAndServicesSectionTitle" = "Deljenje in storitve";
 "settingsviews_osAidLoopShareSectionTitle" = "Deljenje OS-AID";
-"settingsviews_issueReportSectionTitle" = "Poročilo o težavi";
+"settingsviews_troubleshootingTitle" = "Odpravljanje težav";
+"settingsviews_activityLogSectionTitle" = "Dnevnik dejavnosti";
+"settingsviews_viewActivityLog" = "Dnevnik dejavnosti";
+"settingsviews_troubleshootingLogSectionFooter" = "Oglejte si in delite preprost dnevnik v angleščini za zadnjih 12 ur. Vključuje vrednosti glukoze, ne pa podatkov o računu ali identifikatorjev naprav.";
 "settingsviews_appBannerVersion" = "Različica %@";
 "settingsviews_appInstalledSince" = "Nameščeno";
 
@@ -170,6 +173,7 @@
 
 /// in Settings, row title to send settings
 "sendTraceFile" = "Pošlji poročilo o težavi";
+"settingsviews_issueReportTitle" = "Poročilo o težavi";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
 
@@ -282,7 +286,7 @@
 
 /// Advanced Settings, section title
 "developerSettings" = "Napredne nastavitve";
-"showDeveloperSettings" = "Prikaži";
+"showDeveloperSettings" = "Prikaži napredne nastavitve";
 "preferSensorCountdown" = "Prednostno odštevanje senzorja";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Življenjska doba senzorja";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Določa, ali je življenjska doba senzorja v napravah iPhone in Apple Watch prikazana kot pretečeni čas ali kot odštevanje.";

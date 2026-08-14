@@ -121,6 +121,14 @@ class LibreLinkUpFollowManager: NSObject {
     // MARK: - public functions
 
     public func logIn() {
+        let source = TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType)
+        trace(
+            "user requested LibreLinkUp login",
+            log: log,
+            category: ConstantsLog.categoryLibreLinkUpFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: source, activity: .loginStarted))
+        )
         UserDefaults.standard.libreLinkUpManuallyLoggedOut = false
         UserDefaults.standard.libreLinkUpPreventLogin = false
         updateSessionState(.loggingIn)
@@ -128,6 +136,14 @@ class LibreLinkUpFollowManager: NSObject {
     }
 
     public func logOut() {
+        let source = TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType)
+        trace(
+            "LibreLinkUp logged out",
+            log: log,
+            category: ConstantsLog.categoryLibreLinkUpFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: source, activity: .loggedOut))
+        )
         UserDefaults.standard.libreLinkUpManuallyLoggedOut = true
         invalidateDownLoadTimerClosure?()
         invalidateDownLoadTimerClosure = nil
@@ -190,7 +206,7 @@ class LibreLinkUpFollowManager: NSObject {
     
     /// download recent readings from LibreView, send result to delegate, and schedule new download
     @objc public func download() {
-        trace("in download", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+        trace("in download", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, troubleshooting: .detailed(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .downloadStarted)))
         
         if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? .distantPast).timeIntervalSinceNow < -15 {
             trace("    setting nightscoutSyncRequired to true, this will also initiate a treatments/devicestatus sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
@@ -245,6 +261,7 @@ class LibreLinkUpFollowManager: NSObject {
                 try await self.checkLoginAndConnections()
                 if self.libreLinkUpToken != nil && self.libreLinkUpPatientId != nil {
                     self.updateSessionState(.loggedIn)
+                    trace("    in download, login and connection check succeeded", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .debug, troubleshooting: .detailed(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .loginSucceeded)))
                 }
                 
                 // this takes care of 3
@@ -282,7 +299,7 @@ class LibreLinkUpFollowManager: NSObject {
                     // make a quick check in case the graphResponse returns nil for both graphData and even the glucoseMeasurement attributes
                     // this can happen if somebody tries to read from a new account before they've even started uploading any sensor values to it
                     if glucoseMeasurementsArray.count > 0, glucoseMeasurementsArray[0] != nil {
-                        trace("    in download, %{public}@ BG values downloaded", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, glucoseMeasurementsArray.count.description)
+                        trace("    in download, %{public}@ BG values downloaded", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, troubleshooting: .standard(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .downloadSucceeded(readingCount: glucoseMeasurementsArray.count))), glucoseMeasurementsArray.count.description)
                         
                         // create an empty array of FollowerBgReading(s)
                         var followGlucoseDataArray = [FollowerBgReading]()
@@ -300,12 +317,12 @@ class LibreLinkUpFollowManager: NSObject {
                             }
                         }
                     } else {
-                        trace("    in download, no glucose values were downloaded. Nothing to process and send to the delegate.", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, glucoseMeasurementsArray.count.description)
+                        trace("    in download, no glucose values were downloaded. Nothing to process and send to the delegate.", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, troubleshooting: .standard(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .noReadings)), glucoseMeasurementsArray.count.description)
                     }
                 }
             } catch {
                 // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
-                trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, error.localizedDescription)
+                trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, troubleshooting: .standard(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .downloadFailed)), error.localizedDescription)
             }
             
             // rescheduling the timer must be done on the main actor
@@ -449,7 +466,7 @@ class LibreLinkUpFollowManager: NSObject {
                 self.updateSessionState(.loggedIn)
                 
             } catch LibreLinkUpFollowError.reAcceptNeeded {
-                trace("    in checkLoginAndConnections, login failed with status 4. New terms of use or privacy policy must be accepted first", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+                trace("    in checkLoginAndConnections, login failed with status 4. New terms of use or privacy policy must be accepted first", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, troubleshooting: .standard(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .loginFailed)))
                 
                 UserDefaults.standard.libreLinkUpReAcceptNeeded = true
                 
@@ -459,7 +476,7 @@ class LibreLinkUpFollowManager: NSObject {
                 
             } catch LibreLinkUpFollowError.invalidCredentials {
                 // we could just throw/cascade the same error back to the parent function and handle it there, but let's be redundant to make it clear what we're doing
-                trace("    in checkLoginAndConnections, requestLogin threw and error and exited before login due to previous bad credentials. This will be reset when the user updates their user/password.", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+                trace("    in checkLoginAndConnections, requestLogin threw and error and exited before login due to previous bad credentials. This will be reset when the user updates their user/password.", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, troubleshooting: .standard(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .loginFailed)))
                 
                 // make sure we don't try and login again until the user updates their account info
                 UserDefaults.standard.libreLinkUpPreventLogin = true
@@ -472,7 +489,7 @@ class LibreLinkUpFollowManager: NSObject {
                 
             } catch {
                 // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
-                trace("    in checkLoginAndConnections, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, error.localizedDescription)
+                trace("    in checkLoginAndConnections, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, troubleshooting: .standard(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .loginFailed)), error.localizedDescription)
             }
             
         } else {
@@ -495,7 +512,7 @@ class LibreLinkUpFollowManager: NSObject {
             throw LibreLinkUpFollowError.missingCredentials
         }
         
-        trace("    in requestLogin, running login request", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+        trace("    in requestLogin, running login request", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, troubleshooting: .detailed(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .loginStarted)))
         
         // create the authorization credentials
         guard let authCredentials = try? JSONSerialization.data(withJSONObject: [

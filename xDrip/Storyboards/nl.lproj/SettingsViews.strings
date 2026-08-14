@@ -8,7 +8,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarmen en meldingen";
 "settingsviews_sharingAndServicesSectionTitle" = "Delen en diensten";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID delen";
-"settingsviews_issueReportSectionTitle" = "Probleemrapport";
+"settingsviews_troubleshootingTitle" = "Probleemoplossing";
+"settingsviews_activityLogSectionTitle" = "Activiteitenlog";
+"settingsviews_viewActivityLog" = "Activiteitenlog";
+"settingsviews_troubleshootingLogSectionFooter" = "Bekijk en deel een eenvoudig Engelstalig logboek van de afgelopen 12 uur. Het bevat glucosewaarden, maar geen accountgegevens of apparaat-ID's.";
 "settingsviews_appBannerVersion" = "Versie %@";
 "settingsviews_appInstalledSince" = "Geïnstalleerd";
 "settingsviews_sectiontitleNotifications" = "Algemeen";
@@ -95,6 +98,7 @@
 "infoCalendarAccessRestricted" = "Geen toegang voor %@ tot je agenda. Dit komt waarschijnlijk door actieve beperkingen zoals Ouderlijk Toezicht.";
 "sectionTitleTrace" = "Probleemrapportage";
 "sendTraceFile" = "Verstuur Probleemrapportage";
+"settingsviews_issueReportTitle" = "Probleemrapportage";
 "describeProblem" = "Leg uit waarom je de log bestanden verstuurd met zoveel mogelijk details als mogelijk (in het Engels). Als je het probleem ook in de Facebook support groep '%@' hebt gerapporteerd, benoem dan ook je facebook naam in de e-mail.";
 "emailNotConfigured" = "Je moet een e-mail account configureren op je iOS apparaat.";
 "emailbodyText" = "Probleembeschrijving: ";
@@ -122,7 +126,7 @@
 
 /// Advanced Settings, section title
 "developerSettings" = "Geavanceerde instellingen";
-"showDeveloperSettings" = "Toon";
+"showDeveloperSettings" = "Toon geavanceerde instellingen";
 "preferSensorCountdown" = "Voorkeur voor aftellen sensor";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Levensduur sensor";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Bepaalt of de levensduur van de sensor als verstreken tijd of als aftelling wordt weergegeven op iPhone en Apple Watch.";

@@ -87,6 +87,13 @@ class MedtrumEasyViewFollowManager: NSObject {
     // MARK: - Public Functions
 
     public func logIn() {
+        trace(
+            "user requested Medtrum EasyView login",
+            log: log,
+            category: ConstantsLog.categoryMedtrumEasyViewFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: .medtrumEasyView, activity: .loginStarted))
+        )
         UserDefaults.standard.medtrumEasyViewManuallyLoggedOut = false
         UserDefaults.standard.medtrumEasyViewPreventLogin = false
         FollowerSessionState.shared.update(.loggingIn, for: .medtrumEasyView)
@@ -94,6 +101,13 @@ class MedtrumEasyViewFollowManager: NSObject {
     }
 
     public func logOut() {
+        trace(
+            "Medtrum EasyView logged out",
+            log: log,
+            category: ConstantsLog.categoryMedtrumEasyViewFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: .medtrumEasyView, activity: .loggedOut))
+        )
         UserDefaults.standard.medtrumEasyViewManuallyLoggedOut = true
         invalidateDownLoadTimerClosure?()
         invalidateDownLoadTimerClosure = nil
@@ -129,7 +143,7 @@ class MedtrumEasyViewFollowManager: NSObject {
 
     /// Download glucose data from Medtrum EasyView API
     @objc public func download() {
-        trace("in download", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
+        trace("in download", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, troubleshooting: .detailed(.follower(source: .medtrumEasyView, activity: .downloadStarted)))
 
         // Check if follower mode is active
         guard !UserDefaults.standard.isMaster else {
@@ -173,7 +187,7 @@ class MedtrumEasyViewFollowManager: NSObject {
                     self.medtrumUserId = loginResponse.uid
                     // need to cleanly unwrap because uid can technically be nil in a failed login response
                     if let uid = loginResponse.uid {
-                        trace("    login successful, userId = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, uid.description)
+                        trace("    login successful, userId = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, troubleshooting: .detailed(.follower(source: .medtrumEasyView, activity: .loginSucceeded)), uid.description)
                         FollowerSessionState.shared.update(.loggedIn, for: .medtrumEasyView)
                     }
 
@@ -217,7 +231,19 @@ class MedtrumEasyViewFollowManager: NSObject {
                                         
                                         // Set the Follower Patient Name in the app. In case that there are several connections
                                         // we'll set this in the View Controller once a patient has been chosen
+                                        let aliasChanged = UserDefaults.standard.followerPatientName != singlePatient.displayName
                                         UserDefaults.standard.followerPatientName = singlePatient.displayName
+                                        if aliasChanged {
+                                            // The developer trace retains the account detail above;
+                                            // the shareable log records only that the alias changed.
+                                            trace(
+                                                "automatic patient selection changed the patient alias",
+                                                log: self.log,
+                                                category: ConstantsLog.categoryMedtrumEasyViewFollowManager,
+                                                type: .info,
+                                                troubleshooting: .standard(.configuration(.patientAliasChanged(isSet: true)))
+                                            )
+                                        }
                                     }
                                 }
 
@@ -259,7 +285,7 @@ class MedtrumEasyViewFollowManager: NSObject {
                         let followGlucoseDataArray = self.processGlucoseData(monitorData)
 
                         if !followGlucoseDataArray.isEmpty {
-                            trace("    %{public}@ BG values processed", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, followGlucoseDataArray.count.description)
+                            trace("    %{public}@ BG values processed", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, troubleshooting: .standard(.follower(source: .medtrumEasyView, activity: .downloadSucceeded(readingCount: followGlucoseDataArray.count))), followGlucoseDataArray.count.description)
 
                             // Update last fetched timestamp to the most recent reading
                             // This ensures next fetch will only get newer data
@@ -278,7 +304,7 @@ class MedtrumEasyViewFollowManager: NSObject {
                                 }
                             }
                         } else {
-                            trace("    no glucose values were processed", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
+                            trace("    no glucose values were processed", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, troubleshooting: .standard(.follower(source: .medtrumEasyView, activity: .noReadings)))
                         }
                     }
                 }
@@ -293,7 +319,7 @@ class MedtrumEasyViewFollowManager: NSObject {
                 UserDefaults.standard.medtrumEasyViewSelectedPatientUid = 0
                 UserDefaults.standard.medtrumEasyViewConnectionsFetchFailed = false
             } catch MedtrumEasyViewFollowError.invalidCredentials {
-                trace("    invalid credentials, preventing further login attempts", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error)
+                trace("    invalid credentials, preventing further login attempts", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error, troubleshooting: .standard(.follower(source: .medtrumEasyView, activity: .loginFailed)))
                 UserDefaults.standard.medtrumEasyViewPreventLogin = true
                 UserDefaults.standard.timeStampOfLastFollowerConnection = .distantPast
                 self.medtrumUserId = nil
@@ -308,7 +334,7 @@ class MedtrumEasyViewFollowManager: NSObject {
                 trace("    login prevented by user (invalid credentials previously detected)", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
             } catch {
                 // Log the error that was thrown
-                trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error, error.localizedDescription)
+                trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error, troubleshooting: .standard(.follower(source: .medtrumEasyView, activity: .downloadFailed)), error.localizedDescription)
             }
 
             // Rescheduling the timer must be done on the main actor
@@ -341,7 +367,7 @@ class MedtrumEasyViewFollowManager: NSObject {
     /// - returns: Login response with user ID
     /// - throws: MedtrumEasyViewFollowError on failure
     private func requestLogin() async throws -> MedtrumEasyViewLoginResponse {
-        trace("in requestLogin", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
+        trace("in requestLogin", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, troubleshooting: .detailed(.follower(source: .medtrumEasyView, activity: .loginStarted)))
 
         // Check if login is prevented due to previous invalid credentials
         if UserDefaults.standard.medtrumEasyViewPreventLogin {

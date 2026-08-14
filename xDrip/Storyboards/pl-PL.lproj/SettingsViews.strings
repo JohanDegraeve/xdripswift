@@ -49,7 +49,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarmy i powiadomienia";
 "settingsviews_sharingAndServicesSectionTitle" = "Udostępnianie i usługi";
 "settingsviews_osAidLoopShareSectionTitle" = "Udostępnianie OS-AID";
-"settingsviews_issueReportSectionTitle" = "Raport problemu";
+"settingsviews_troubleshootingTitle" = "Rozwiązywanie problemów";
+"settingsviews_activityLogSectionTitle" = "Dziennik aktywności";
+"settingsviews_viewActivityLog" = "Dziennik aktywności";
+"settingsviews_troubleshootingLogSectionFooter" = "Wyświetl i udostępnij prosty dziennik w języku angielskim z ostatnich 12 godzin. Zawiera wartości glukozy, ale nie dane konta ani identyfikatory urządzeń.";
 "settingsviews_appBannerVersion" = "Wersja %@";
 "settingsviews_appInstalledSince" = "Zainstalowano";
 
@@ -170,6 +173,7 @@
 
 /// in Settings, row title to send settings
 "sendTraceFile" = "Wyślij raport problemu";
+"settingsviews_issueReportTitle" = "Raport problemu";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
 
@@ -282,7 +286,7 @@
 
 /// Advanced Settings, section title
 "developerSettings" = "Ustawienia zaawansowane";
-"showDeveloperSettings" = "Pokaż";
+"showDeveloperSettings" = "Pokaż ustawienia zaawansowane";
 "preferSensorCountdown" = "Preferuj odliczanie czasu sensora";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Czas działania sensora";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Określa, czy czas działania sensora jest wyświetlany jako czas, który upłynął, czy jako odliczanie na iPhonie i Apple Watch.";

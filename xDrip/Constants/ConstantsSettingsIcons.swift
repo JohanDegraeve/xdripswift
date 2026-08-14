@@ -14,6 +14,7 @@ enum ConstantsSettingsIcons {
     static let glucoseDisplaySettingsIcon = "chart.xyaxis.line"
     static let notificationsSettingsIcon = "bell.badge"
     static let sharingAndServicesSettingsIcon = "arrow.up.and.down.square"
+    static let troubleshootingSettingsIcon = "stethoscope"
     static let infoSettingsIcon = "info.circle"
     static let developerSettingsIcon = "gearshape.2"
     

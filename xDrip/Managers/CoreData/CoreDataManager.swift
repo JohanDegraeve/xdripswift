@@ -146,13 +146,21 @@ public final class CoreDataManager {
         ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeySaveChangesWhenAppTerminates, closure: {self.saveChangesAtTermination()})
         
         // when app goes to background, call saveChanges, just in case that somewhere in the code saveChanges is not called when needed
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeySaveChangesWhenAppGoesToBackground, closure: {self.saveChanges()})
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeySaveChangesWhenAppGoesToBackground, closure: { _ = self.saveChanges() })
         
     }
 
     // MARK: -
     
-    public func saveChanges() {
+    /// Saves pending main-context changes and schedules the existing private-context save.
+    ///
+    /// Most callers intentionally ignore the result. User-facing audit paths can use it to avoid
+    /// claiming that a treatment or reading change completed when the synchronous main save failed.
+    /// Private-context work remains asynchronous and independent, matching the existing behavior.
+    @discardableResult
+    public func saveChanges() -> Bool {
+
+        var mainContextSaveSucceeded = true
 
         mainManagedObjectContext.performAndWait {
             do {
@@ -160,6 +168,7 @@ public final class CoreDataManager {
                     try self.mainManagedObjectContext.save()
                 }
             } catch {
+                mainContextSaveSucceeded = false
                 trace("in savechanges,  Unable to Save Changes of Main Managed Object Context, error.localizedDescription  = %{public}@", log: log, category: ConstantsLog.categoryCoreDataManager, type: .info, error.localizedDescription)
                 
                 let error = error as NSError
@@ -191,7 +200,8 @@ public final class CoreDataManager {
             }
             
         }
-        
+
+        return mainContextSaveSucceeded
     }
     
     /// creates an NSManagedObjectContext with concurrencyType = privateQueueConcurrencyType and parent = mainManagedObjectContext

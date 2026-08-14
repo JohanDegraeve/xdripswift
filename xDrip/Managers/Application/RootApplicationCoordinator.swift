@@ -539,7 +539,7 @@ import AppIntents
             Task { await LiveActivityManager.shared.endAllActivities() }
             
             trace("*******************************************************************", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-            trace("*** Application will terminate, likely force-closed by the user ***", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            trace("*** Application will terminate, likely force-closed by the user ***", log: self.log, category: ConstantsLog.categoryRootView, type: .info, troubleshooting: .standard(.app(.terminated)))
             trace("*******************************************************************", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
         })
         
@@ -769,7 +769,49 @@ import AppIntents
         
         /// will be called by BluetoothPeripheralManager if cgmTransmitterType changed and/or webOOPEnabled value changed
         /// - function to be used in BluetoothPeripheralManager init function, and also immediately after having initiliazed BluetoothPeripheralManager (it will not get called from within BluetoothPeripheralManager because didSet function is not called from init
+        // The callback also runs once while the manager reconstructs the saved source at launch.
+        // Seed the comparison on that first invocation so the developer trace does not describe
+        // ordinary startup as a source change. The Activity Log records the more precise Add,
+        // Connect, Disconnect and Remove actions at their UI boundaries instead of duplicating them
+        // here under the ambiguous phrase "source changed".
+        var hasCapturedInitialTroubleshootingCGMSource = false
+        var previousTroubleshootingCGMSource: TroubleshootingLogSource?
         let cgmTransmitterInfoChanged = {
+            // A callback can occur inside BluetoothPeripheralManager.init, before Swift has assigned
+            // that finished manager to this coordinator. Do not seed the comparison with a false nil
+            // source in that window or the following explicit initialization call would look like a
+            // user selecting a CGM at every app launch.
+            if let bluetoothPeripheralManager = self.bluetoothPeripheralManager {
+                let currentTroubleshootingCGMSource = bluetoothPeripheralManager.getCGMTransmitter().map {
+                    TroubleshootingLogSource(
+                        directTransmitterType: $0.cgmTransmitterType(),
+                        detailedDescription: $0.cgmTransmitterType().detailedDescription()
+                    )
+                }
+
+                if hasCapturedInitialTroubleshootingCGMSource,
+                   currentTroubleshootingCGMSource != previousTroubleshootingCGMSource {
+                    if let source = currentTroubleshootingCGMSource {
+                        trace(
+                            "direct CGM source changed to %{public}@",
+                            log: self.log,
+                            category: ConstantsLog.categoryRootView,
+                            type: .info,
+                            source.name
+                        )
+                    } else {
+                        trace(
+                            "configured direct CGM was disconnected",
+                            log: self.log,
+                            category: ConstantsLog.categoryRootView,
+                            type: .info
+                        )
+                    }
+                }
+                previousTroubleshootingCGMSource = currentTroubleshootingCGMSource
+                hasCapturedInitialTroubleshootingCGMSource = true
+            }
+
             // if cgmTransmitter not nil then reassign calibrator and set UserDefaults.standard.transmitterTypeAsString
             if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {
                 // reassign calibrator, even if the type of calibrator would not change
@@ -1046,9 +1088,31 @@ import AppIntents
                             activeSensor.noiseHistoryIsComplete = false
                         }
                         
-                        if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
-                            trace("in processNewGlucoseData, new reading created, timestamp = %{public}@, calculatedValue = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, newReading.timeStamp.description(with: .current), newReading.calculatedValue.description.replacingOccurrences(of: ".", with: ","))
-                        }
+                        // Every accepted reading belongs in the consumer history, including one-minute
+                        // sources and backfills. The entry timestamp intentionally defaults to now,
+                        // because it describes when xDripswift accepted the value. The sensor's distinct
+                        // measurement time remains in the typed payload and is shown in every reading.
+                        // This preserves causality around connection and sensor lifecycle rows.
+                        trace(
+                            "in processNewGlucoseData, new reading created, timestamp = %{public}@, calculatedValue = %{public}@",
+                            log: self.log,
+                            category: ConstantsLog.categoryRootView,
+                            type: .debug,
+                            troubleshooting: .standard(
+                                // Persist the controlled CGM description with the reading. A generic
+                                // "direct sensor" label does not identify which acquisition path was
+                                // active, while the typed mapping still excludes transmitter IDs.
+                                .glucoseAccepted(
+                                    mgDl: newReading.calculatedValue,
+                                    source: TroubleshootingLogSource(
+                                        directTransmitterType: cgmTransmitter.cgmTransmitterType()
+                                    ),
+                                    measuredAt: newReading.timeStamp
+                                )
+                            ),
+                            newReading.timeStamp.description(with: .current),
+                            newReading.calculatedValue.description.replacingOccurrences(of: ".", with: ",")
+                        )
                         
                         // save the newly created bgreading permenantly in coredata
                         coreDataManager.saveChanges()
@@ -1072,7 +1136,7 @@ import AppIntents
                             loopManager.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.loopShareValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
                         }
                     } else {
-                        trace("in processNewGlucoseData, reading skipped, rawValue <= 0, looks like a faulty sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                        trace("in processNewGlucoseData, reading skipped, rawValue <= 0, looks like a faulty sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, troubleshooting: .standard(.sensor(.unusableReading)))
                     }
                 } else if let loopManager = loopManager, !LoopManager.medtrumNanoShareBlocked, LoopManager.loopDelay() > 0 && glucose.glucoseLevelRaw > 0 && abs(Date().timeIntervalSince(timeStampLastCalibrationForActiveSensor)) >  LoopManager.loopDelay() + TimeInterval(minutes: 5.5) {
                     // loopdelay > 0, LoopManager will use loopShareGoucoseData
@@ -1605,6 +1669,14 @@ import AppIntents
 
         coreDataManager.saveChanges()
         sensorNoiseManager?.update(activeSensor: activeSensor)
+
+        trace(
+            "calibration accepted",
+            log: self.log,
+            category: ConstantsLog.categoryRootView,
+            type: .debug,
+            troubleshooting: .standard(.calibrationAccepted(mgDl: valueAsDoubleConvertedToMgDl))
+        )
 
         if let nightscoutSyncManager = self.nightscoutSyncManager {
             nightscoutSyncManager.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
@@ -2147,6 +2219,16 @@ import AppIntents
         guard let coreDataManager = coreDataManager, let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() else { return }
 
         startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: startDate, sensorCode: sensorCode, coreDataManager: coreDataManager, sendToTransmitter: true)
+
+        // This is the confirmed user action from Sensor Management. Never include the optional
+        // sensor code or transmitter command payload in the shareable Activity Log.
+        trace(
+            "user started a sensor session from Sensor Management",
+            log: log,
+            category: ConstantsLog.categoryRootView,
+            type: .info,
+            troubleshooting: .standard(.sensor(.started))
+        )
         updateDataSourceInfo()
         updateLabelsAndChart(overrideApplicationState: false)
     }
@@ -2155,6 +2237,16 @@ import AppIntents
         guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() else { return }
 
         stopSensor(cGMTransmitter: cgmTransmitter, sendToTransmitter: true)
+
+        // A later transmitter acknowledgement may report the same stop. The store collapses that
+        // duplicate, while this entry guarantees the user's deliberate Stop action is recorded now.
+        trace(
+            "user stopped the sensor session from Sensor Management",
+            log: log,
+            category: ConstantsLog.categoryRootView,
+            type: .info,
+            troubleshooting: .standard(.sensor(.stopped))
+        )
         updateLabelsAndChart(overrideApplicationState: false)
     }
 
@@ -2365,7 +2457,7 @@ import AppIntents
 /// conform to CGMTransmitterDelegate
 extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
     func sensorStopDetected() {
-        trace("sensor stop detected", log: log, category: ConstantsLog.categoryRootView, type: .info)
+        trace("sensor stop detected", log: log, category: ConstantsLog.categoryRootView, type: .info, troubleshooting: .standard(.sensor(.stopped)))
         
         bgPostProcessingManager?.handleSourceContextChanged()
         
@@ -2376,7 +2468,7 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
     }
     
     func newSensorDetected(sensorStartDate: Date?) {
-        trace("new sensor detected", log: log, category: ConstantsLog.categoryRootView, type: .info)
+        trace("new sensor detected", log: log, category: ConstantsLog.categoryRootView, type: .info, troubleshooting: .standard(.sensor(.detected)))
         
         bgPostProcessingManager?.handleSourceContextChanged()
         
@@ -2393,7 +2485,7 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
     }
     
     func sensorNotDetected() {
-        trace("sensor not detected", log: log, category: ConstantsLog.categoryRootView, type: .info)
+        trace("sensor not detected", log: log, category: ConstantsLog.categoryRootView, type: .info, troubleshooting: .standard(.sensor(.notDetected)))
         
         createNotification(title: Texts_Common.warning, body: Texts_HomeView.sensorNotDetected, identifier: ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected, sound: nil)
     }
@@ -2425,7 +2517,8 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
             if secondsUntilWarmUpComplete > 0 && !isDexcomG7WithReceivedGlucose {
                 supressReadingIfSensorIsWarmingUp = true
                 
-                trace("in cgmTransmitterInfoReceived, sensor is still warming up. BG reading processing will remain suppressed for another %{public}@ minutes. (%{public}@ minutes warm-up required).", log: log, category: ConstantsLog.categoryRootView, type: .info, Int(secondsUntilWarmUpComplete/60).description, minimumWarmUpRequiredInMinutes.description)
+                let warmupMinutesRemaining = Int(secondsUntilWarmUpComplete / 60)
+                trace("in cgmTransmitterInfoReceived, sensor is still warming up. BG reading processing will remain suppressed for another %{public}@ minutes. (%{public}@ minutes warm-up required).", log: log, category: ConstantsLog.categoryRootView, type: .info, troubleshooting: .standard(.sensor(.warmingUp(minutesRemaining: warmupMinutesRemaining))), warmupMinutesRemaining.description, minimumWarmUpRequiredInMinutes.description)
             }
         }
         
@@ -2449,8 +2542,30 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
                 let gap = transmitterReadSuccessDisplay.nominalGapInSeconds
                 let fullExpected24h = Int(floor((24.0 * 3600.0) / Double(gap)))
                 let label: String = (transmitterReadSuccessDisplay.expected24h >= fullExpected24h) ? "24h" : String(format: "~%.0fh", hoursAvailable)
+                let windowHours = transmitterReadSuccessDisplay.expected24h >= fullExpected24h
+                    ? 24
+                    : Int(hoursAvailable.rounded())
+                let missedReadings = transmitterReadSuccessDisplay.expected24h - transmitterReadSuccessDisplay.actual24h
+                let roundedSuccess = Int(success24h.round(toDecimalPlaces: 2))
                 
-                trace("in cgmTransmitterInfoReceived, transmitter Read Success: %{public}@ percent over the last %{public}@. %{public}@ missed readings from %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, Int(success24h.round(toDecimalPlaces: 2)).description, label, (transmitterReadSuccessDisplay.expected24h - transmitterReadSuccessDisplay.actual24h).description, transmitterReadSuccessDisplay.expected24h.description)
+                trace(
+                    "in cgmTransmitterInfoReceived, transmitter Read Success: %{public}@ percent over the last %{public}@. %{public}@ missed readings from %{public}@",
+                    log: log,
+                    category: ConstantsLog.categoryRootView,
+                    type: .info,
+                    // Reuse the existing once-per-hour calculation. Only aggregate counts and the
+                    // bounded analysis window enter the shareable log; no transmitter identity does.
+                    troubleshooting: .standard(.transmitterReadSuccess(
+                        percent: roundedSuccess,
+                        missedReadings: missedReadings,
+                        expectedReadings: transmitterReadSuccessDisplay.expected24h,
+                        windowHours: windowHours
+                    )),
+                    roundedSuccess.description,
+                    label,
+                    missedReadings.description,
+                    transmitterReadSuccessDisplay.expected24h.description
+                )
                 
                 transmitterReadSuccessTimeStampOfLastLogCreated = .now
             } else {
@@ -2629,8 +2744,6 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 let isHistoricalGapFill = UserDefaults.standard.followerDataSourceType == .calendar && followGlucoseData.timeStamp <= checktimestamp && !existingReadingInSameSlot
 
                 if followGlucoseData.timeStamp > timeStampLastBgReading || isHistoricalGapFill {
-                    trace("in followerInfoReceived, creating new bgreading: value = %{public}@ %{public}@, timestamp =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info,  followGlucoseData.sgv.mgDlToMmol(mgDl: isMgDl).bgValueToString(mgDl: isMgDl), isMgDl ? Texts_Common.mgdl : Texts_Common.mmol, followGlucoseData.timeStamp.toStringForTrace(timeStyle: .long, dateStyle: .long))
-                    
                     var newReading: BgReading?
 
                     // create a new reading
@@ -2671,6 +2784,24 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                     }
 
                     if let newReading = newReading {
+                        // Record only after a manager has accepted and created the reading. The row
+                        // timestamp defaults to this actual acceptance time. `measuredAt` is retained
+                        // separately so a restored value can explain when the glucose was measured
+                        // without being sorted before the login or poll that retrieved it.
+                        trace(
+                            "in followerInfoReceived, created new bgreading: value = %{public}@ %{public}@, timestamp = %{public}@",
+                            log: self.log,
+                            category: ConstantsLog.categoryRootView,
+                            type: .info,
+                            troubleshooting: .standard(.glucoseAccepted(
+                                mgDl: followGlucoseData.sgv,
+                                source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType),
+                                measuredAt: followGlucoseData.timeStamp
+                            )),
+                            followGlucoseData.sgv.mgDlToMmol(mgDl: isMgDl).bgValueToString(mgDl: isMgDl),
+                            isMgDl ? Texts_Common.mgdl : Texts_Common.mmol,
+                            followGlucoseData.timeStamp.toStringForTrace(timeStyle: .long, dateStyle: .long)
+                        )
                         existingBgReadingsInIncomingRange.append(newReading)
                         existingBgReadingsInIncomingRange.sort { $0.timeStamp < $1.timeStamp }
                     }

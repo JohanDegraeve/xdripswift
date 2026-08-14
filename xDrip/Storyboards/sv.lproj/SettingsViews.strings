@@ -4,7 +4,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Larm och notiser";
 "settingsviews_sharingAndServicesSectionTitle" = "Delning och tjänster";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID-delning";
-"settingsviews_issueReportSectionTitle" = "Problemrapport";
+"settingsviews_troubleshootingTitle" = "Felsökning";
+"settingsviews_activityLogSectionTitle" = "Aktivitetslogg";
+"settingsviews_viewActivityLog" = "Aktivitetslogg";
+"settingsviews_troubleshootingLogSectionFooter" = "Visa och dela en lättläst logg på engelska från de senaste 12 timmarna. Den innehåller glukosvärden men inte kontouppgifter eller enhetsidentifierare.";
 "settingsviews_appBannerVersion" = "Version %@";
 "settingsviews_appInstalledSince" = "Installerad";
 "settingsviews_sectiontitleNotifications" = "Allmänt";
@@ -98,6 +101,7 @@
 "infoCalendarAccessRestricted" = "Du kan inte ge auktorisation till %@ att få tillgång till din kalender. Detta beror möjligtvis på inställda begränsningar i Skärmtidsinställningar.";
 "sectionTitleTrace" = "Problemrapportering";
 "sendTraceFile" = "Skicka problemrapport";
+"settingsviews_issueReportTitle" = "Problemrapport";
 "describeProblem" = "Förklara varför du behöver skicka rapporten så detaljerat som möjligt. Om du redan har rapporterat problemet på Facebook-gruppen '%@', så skriv även ned ditt Facebook-namn i mejlet";
 "emailNotConfigured" = "Du måste ställa in ett e-postkonto på din iOS-enhet.";
 "emailbodyText" = "Problembeskrivning: ";
@@ -110,7 +114,7 @@
 "warningChangeFromMasterToFollower" = "Byte från användare till följare kommer att stoppa nuvarande sensor. Vill du fortsätta?";
 "nightscoutPort" = "Port";
 "developerSettings" = "Avancerade inställningar";
-"showDeveloperSettings" = "Visa";
+"showDeveloperSettings" = "Visa avancerade inställningar";
 "preferSensorCountdown" = "Föredra nedräkning för sensor";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensorns livslängd";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Styr om sensorns livslängd visas som förfluten tid eller som en nedräkning på iPhone och Apple Watch.";

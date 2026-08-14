@@ -58,14 +58,39 @@ fileprivate func getDocumentsDirectory() -> URL {
 /// trace file currently in use, in case tracing needs to be stored on file
 fileprivate var traceFileName:URL?
 
-/// function to be used for logging, takes same parameters as os_log but in a next phase also NSLog can be added, or writing to disk to send later via e-mail ..
-/// - message : the text, same format as in os_log with %{private} and %{public} to either keep variables private or public , for NSLog, only 3 String formatters are suppored "@" for String, "d" for Int, "f" for double.
-/// - log : is the name of the category that will be used in OSLog
-/// - category is the same as used for creating the log (see class ConstantsLog), it's repeated here to use in NSLog
-/// - args : optional list of parameters that will be used. MAXIMUM 10 !
+/// Writes the existing developer trace and optionally offers a typed fact to the consumer log.
 ///
-/// Example
-func trace(_ message: StaticString, log:OSLog, category: String, type: OSLogType, _ args: CVarArg...) {
+/// The developer outputs retain their existing settings, formatting and rotation behavior. Consumer
+/// persistence is evaluated first and independently, so disabling OSLog, NSLog or trace files does not
+/// disable troubleshooting history. The consumer store may suppress routine or repeated operational
+/// facts that do not add support value.
+///
+/// - Parameters:
+///   - message: Developer format string. It may contain private operational data and is never copied
+///     into the consumer history.
+///   - log: OSLog category instance used by the developer output.
+///   - category: Category text retained in NSLog and trace-file output.
+///   - type: Developer log severity.
+///   - troubleshooting: Optional typed, consumer-safe fact. This is the only bridge to the consumer
+///     store; `message`, variadic arguments, URLs and `Error` values never cross that boundary.
+///   - args: Developer formatting arguments, with the existing maximum of ten.
+///
+/// Existing call sites need no changes. A call opts in only when it can construct a safe typed entry.
+func trace(
+    _ message: StaticString,
+    log: OSLog,
+    category: String,
+    type: OSLogType,
+    troubleshooting: TroubleshootingLogEntry? = nil,
+    _ args: CVarArg...
+) {
+
+    // A call site must explicitly supply a typed troubleshooting entry. Never derive consumer
+    // text from `message` or `args`: developer traces can contain URLs, identifiers, raw server
+    // responses and other information that is inappropriate for a public support post.
+    if let troubleshooting {
+        TroubleshootingLogStore.shared.record(troubleshooting)
+    }
 
     // initialize traceFileName if needed
     if traceFileName ==  nil {
@@ -274,6 +299,10 @@ class Trace {
     
     /// BluetoothPeripheralManager to use
     private static var bluetoothPeripheralManager: BluetoothPeripheralManager?
+
+    /// `initialize` may be called again as app services are rebuilt. Keep one clear process-start
+    /// marker rather than making a service restart look like a full app relaunch.
+    private static var didRecordTroubleshootingStart = false
     
     private static let paragraphSeperator = "\n===================================================\n"
     
@@ -316,6 +345,17 @@ class Trace {
     static func initialize(coreDataManager: CoreDataManager?) {
         
         self.coreDataManager = coreDataManager
+
+        if !didRecordTroubleshootingStart {
+            didRecordTroubleshootingStart = true
+            trace(
+                "application tracing initialized",
+                log: log,
+                category: ConstantsLog.debuglogging,
+                type: .info,
+                troubleshooting: .standard(.app(.started))
+            )
+        }
         
     }
     

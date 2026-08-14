@@ -673,6 +673,10 @@ final class NightscoutImportService: @unchecked Sendable {
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
+            // Historical imports are user-requested maintenance rather than live glucose status.
+            // Their supporting classification documents that distinction, but all retained entries
+            // are now visible because the Activity Log no longer has a detail filter.
+            troubleshooting: .detailed(.integration(name: .nightscoutImport, activity: .started)),
             checkpoint.options.period.rawValue.description,
             min(checkpoint.nextChunkIndex + 1, chunks.count).description,
             chunks.count.description,
@@ -730,6 +734,10 @@ final class NightscoutImportService: @unchecked Sendable {
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
+            troubleshooting: .detailed(.integration(
+                name: .nightscoutImport,
+                activity: .succeeded(itemCount: result.counts.bgReadingsAdded + result.counts.treatmentsAdded + result.counts.deviceStatusAdded)
+            )),
             Int(Date().timeIntervalSince(startedAt) * 1_000).description,
             result.counts.bgDocumentsDownloaded.description,
             result.counts.bgReadingsAdded.description,
@@ -757,6 +765,7 @@ final class NightscoutImportService: @unchecked Sendable {
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .error,
+            troubleshooting: .detailed(.integration(name: .nightscoutImport, activity: .failed)),
             intent,
             String(describing: Swift.type(of: error)),
             safeDescription

@@ -4,7 +4,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "التنبيهات والإشعارات";
 "settingsviews_sharingAndServicesSectionTitle" = "المشاركة والخدمات";
 "settingsviews_osAidLoopShareSectionTitle" = "مشاركة OS-AID";
-"settingsviews_issueReportSectionTitle" = "تقرير مشكلة";
+"settingsviews_troubleshootingTitle" = "استكشاف الأخطاء وإصلاحها";
+"settingsviews_activityLogSectionTitle" = "سجل النشاط";
+"settingsviews_viewActivityLog" = "سجل النشاط";
+"settingsviews_troubleshootingLogSectionFooter" = "اعرض وشارك سجلاً مبسطاً باللغة الإنجليزية للساعات الـ 12 الماضية. يتضمن هذا السجل قيم الجلوكوز، لكنه يستبعد تفاصيل الحساب ومعرّفات الأجهزة.";
 "settingsviews_appBannerVersion" = "الإصدار %@";
 "settingsviews_appInstalledSince" = "تم التثبيت";
 "settingsviews_sectiontitleNotifications" = "عام";
@@ -88,6 +91,7 @@
 "infoCalendarAccessRestricted" = "لا يمكنك منح إذن لـ %@ للوصول إلى التقويم الخاص بك. قد يكون هذا بسبب القيود النشطة مثل وجود أدوات الرقابة الأبوية.";
 "sectionTitleTrace" = "الإبلاغ عن المشاكل";
 "sendTraceFile" = "إرسال تقرير المشكلة";
+"settingsviews_issueReportTitle" = "تقرير المشكلة";
 "describeProblem" = "اشرح سبب حاجتك لإرسال ملف التتبع بأكبر قدر ممكن من التفاصيل. إذا كنت قد ذكرت بالفعل مشكلتك في مجموعة دعم الفيسبوك %@، اذكر اسم الفيسبوك الخاص بك في البريد الإلكتروني";
 "emailNotConfigured" = "يجب عليك تفعيل حساب البريد الإلكتروني على جهازك.";
 "emailbodyText" = "وصف المشكلة: ";
@@ -100,7 +104,7 @@
 "warningChangeFromMasterToFollower" = "سيؤدي التبديل من رئيسي إلى متابعة، إلى إيقاف الحساس الحالي. هل تريد الاستمرار ?";
 "nightscoutPort" = "المنفذ (اختياري)";
 "developerSettings" = "الإعدادات المتقدمة";
-"showDeveloperSettings" = "إظهار";
+"showDeveloperSettings" = "إظهار الإعدادات المتقدمة";
 "preferSensorCountdown" = "تفضيل العد التنازلي لعمر المستشعر";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "عمر المستشعر";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "يتحكم في عرض عمر المستشعر كوقت منقضٍ أو كعد تنازلي على iPhone وApple Watch.";

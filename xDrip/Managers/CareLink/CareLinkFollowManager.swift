@@ -206,6 +206,13 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
 
     /// Starts Medtronic's personal web login after both account fields have been configured.
     func logIn() {
+        trace(
+            "user requested CareLink login",
+            log: log,
+            category: ConstantsLog.categoryCareLinkFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: .careLink, activity: .loginStarted))
+        )
         Task { @MainActor [weak self] in
             guard let self else { return }
             if let invalidationTask { await invalidationTask.value }
@@ -261,6 +268,13 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
 
     /// Stops work, best-effort closes the web session and clears selection while retaining region.
     func logOut() {
+        trace(
+            "CareLink logged out",
+            log: log,
+            category: ConstantsLog.categoryCareLinkFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: .careLink, activity: .loggedOut))
+        )
         Task { @MainActor [weak self] in
             guard let self else { return }
             await invalidateSession(revokeRemotely: true)
@@ -362,6 +376,13 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             }
             loginIdentifier = nil
             lifecycleState = .authenticated
+            trace(
+                "CareLink login succeeded",
+                log: log,
+                category: ConstantsLog.categoryCareLinkFollowManager,
+                type: .info,
+                troubleshooting: .standard(.follower(source: .careLink, activity: .loginSucceeded))
+            )
             updateStateOnMain { $0.lastTokenRefreshAt = Date() }
             backgroundKeepAliveManager.start(for: .careLink)
             if startsInitialDownload {
@@ -379,6 +400,14 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             guard loginIdentifier == identifier else { return }
             loginIdentifier = nil
             lifecycleState = .awaitingLogin
+            trace(
+                "CareLink login failed: %{public}@",
+                log: log,
+                category: ConstantsLog.categoryCareLinkFollowManager,
+                type: .error,
+                troubleshooting: .standard(.follower(source: .careLink, activity: .loginFailed)),
+                error.localizedDescription
+            )
             updateStateOnMain {
                 $0.status = .error
                 $0.detail = error.localizedDescription
@@ -403,7 +432,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     private func performPoll(generation: Int) async {
         guard await pollIsCurrent(generation) else { return }
         let currentRegion = region
-        trace("CareLink poll started, region=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .info, currentRegion.rawValue)
+        trace("CareLink poll started, region=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .info, troubleshooting: .detailed(.follower(source: .careLink, activity: .downloadStarted)), currentRegion.rawValue)
         #if DEBUG
         do {
             // The explicit localhost launch hook drives the production manager pipeline without
@@ -539,6 +568,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                 log: log,
                 category: ConstantsLog.categoryCareLinkFollowManager,
                 type: .info,
+                troubleshooting: .standard(.follower(source: .careLink, activity: .downloadSucceeded(readingCount: parsed.readings.count))),
                 response.1.rawValue,
                 parsed.readings.count,
                 therapy.treatments.count,
@@ -558,11 +588,11 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             await scheduleNewDownload(generation: generation)
         } catch let error as CareLinkError {
             guard isActive, !Task.isCancelled else { return }
-            trace("CareLink poll failed: %{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .error, error.localizedDescription)
+            trace("CareLink poll failed: %{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .error, troubleshooting: .standard(.follower(source: .careLink, activity: .downloadFailed)), error.localizedDescription)
             await handle(error, generation: generation)
         } catch {
             guard !Task.isCancelled, await pollIsCurrent(generation) else { return }
-            trace("CareLink poll failed with unexpected error: %{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .error, error.localizedDescription)
+            trace("CareLink poll failed with unexpected error: %{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .error, troubleshooting: .standard(.follower(source: .careLink, activity: .downloadFailed)), error.localizedDescription)
             failureCount += 1
             await updateState(generation: generation) {
                 $0.status = .error
@@ -637,7 +667,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         guard pollIsCurrentOnMain(generation) else { return }
         guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
         cancelScheduledDownload()
-        trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryCareLinkFollowManager, type: .info)
+        trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryCareLinkFollowManager, type: .info, troubleshooting: .detailed(.follower(source: .careLink, activity: .retryScheduled)))
         let downloadTimer = Timer.scheduledTimer(
             timeInterval: CareLinkPollingPolicy.interval,
             target: self,

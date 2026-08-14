@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import OSLog
 
 @MainActor final class TreatmentEditorViewModel: ObservableObject {
     // MARK: - public static properties
@@ -28,6 +29,7 @@ import CoreData
     private let coreDataManager: CoreDataManager?
     private let treatmentToEditObjectID: NSManagedObjectID?
     private let initialTreatmentState: TreatmentEditorInitialState?
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataTreatments)
 
     // MARK: - initialization
 
@@ -207,7 +209,26 @@ import CoreData
 
             if treatmentChanged {
                 treatmentToEdit.uploaded = false
-                coreDataManager.saveChanges()
+                guard coreDataManager.saveChanges() else {
+                    trace("failed to save an edited treatment", log: log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error)
+                    return false
+                }
+
+                // A treatment edit is an explicit user-provoked data change. Keep the developer
+                // trace useful while attaching only the controlled type and treatment date to the
+                // shareable log; never include the amount, note, entered-by value or server ID.
+                trace(
+                    "edited %{public}@ treatment at %{public}@",
+                    log: log,
+                    category: ConstantsLog.categoryApplicationDataTreatments,
+                    type: .info,
+                    troubleshooting: .standard(.treatment(.edited(
+                        kind: TroubleshootingTreatmentKind(selectedType),
+                        treatmentAt: selectedDate
+                    ))),
+                    selectedType.asString(),
+                    selectedDate.description
+                )
                 setNightscoutSyncRequiredToTrue()
             }
         } else {
@@ -221,7 +242,23 @@ import CoreData
                 nsManagedObjectContext: coreDataManager.mainManagedObjectContext
             )
 
-            coreDataManager.saveChanges()
+            guard coreDataManager.saveChanges() else {
+                trace("failed to save a new treatment", log: log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error)
+                return false
+            }
+
+            trace(
+                "added %{public}@ treatment at %{public}@",
+                log: log,
+                category: ConstantsLog.categoryApplicationDataTreatments,
+                type: .info,
+                troubleshooting: .standard(.treatment(.added(
+                    kind: TroubleshootingTreatmentKind(selectedType),
+                    treatmentAt: selectedDate
+                ))),
+                selectedType.asString(),
+                selectedDate.description
+            )
             setNightscoutSyncRequiredToTrue()
         }
 
@@ -236,7 +273,23 @@ import CoreData
         treatmentToEdit.treatmentdeleted = true
         treatmentToEdit.uploaded = false
 
-        coreDataManager.saveChanges()
+        guard coreDataManager.saveChanges() else {
+            trace("failed to save a deleted treatment", log: log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error)
+            return false
+        }
+
+        trace(
+            "deleted %{public}@ treatment at %{public}@",
+            log: log,
+            category: ConstantsLog.categoryApplicationDataTreatments,
+            type: .info,
+            troubleshooting: .standard(.treatment(.deleted(
+                kind: TroubleshootingTreatmentKind(treatmentToEdit.treatmentType),
+                treatmentAt: treatmentToEdit.date
+            ))),
+            treatmentToEdit.treatmentType.asString(),
+            treatmentToEdit.date.description
+        )
         setNightscoutSyncRequiredToTrue()
 
         return true

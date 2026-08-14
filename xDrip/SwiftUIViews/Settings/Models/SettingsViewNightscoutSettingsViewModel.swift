@@ -131,6 +131,7 @@ class SettingsViewNightscoutSettingsViewModel {
                     log: self.log,
                     category: ConstantsLog.categoryNightscoutSettingsViewModel,
                     type: .info,
+                    troubleshooting: .standard(.configuration(.aidFollowerChanged(TroubleshootingAIDFollowerMode(newFollowType)))),
                     oldFollowType.description,
                     newFollowType.description
                 )
@@ -480,7 +481,15 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
                         
                         let newNightscoutFollowType = UserDefaults.standard.nightscoutFollowType
                         
-                        trace("Nightscout follower type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categoryNightscoutSettingsViewModel, type: .info, oldNightscoutFollowType.description, newNightscoutFollowType.description)
+                        trace(
+                            "Nightscout follower type was changed from '%{public}@' to '%{public}@'",
+                            log: self.log,
+                            category: ConstantsLog.categoryNightscoutSettingsViewModel,
+                            type: .info,
+                            troubleshooting: .standard(.configuration(.aidFollowerChanged(TroubleshootingAIDFollowerMode(newNightscoutFollowType)))),
+                            oldNightscoutFollowType.description,
+                            newNightscoutFollowType.description
+                        )
                     }
                 }, cancelHandler: nil, didSelectRowHandler: nil)
             

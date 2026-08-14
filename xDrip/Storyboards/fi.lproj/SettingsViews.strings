@@ -4,7 +4,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Hälytykset ja ilmoitukset";
 "settingsviews_sharingAndServicesSectionTitle" = "Jakaminen ja palvelut";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID-jakaminen";
-"settingsviews_issueReportSectionTitle" = "Ongelmaraportti";
+"settingsviews_troubleshootingTitle" = "Vianmääritys";
+"settingsviews_activityLogSectionTitle" = "Toimintaloki";
+"settingsviews_viewActivityLog" = "Toimintaloki";
+"settingsviews_troubleshootingLogSectionFooter" = "Näytä ja jaa selkokielinen englanninkielinen loki viimeisiltä 12 tunnilta. Loki sisältää glukoosiarvot, mutta ei tilitietoja tai laitetunnisteita.";
 "settingsviews_appBannerVersion" = "Versio %@";
 "settingsviews_appInstalledSince" = "Asennettu";
 "settingsviews_sectiontitleNotifications" = "Yleinen";
@@ -80,7 +83,8 @@
 "infoCalendarAccessDeniedByUser" = "Olet aiemmin kieltänyt pääsyn kalenteriin.\n\nOttaaksesi sen käyttöön, siirry laitteen asetuksiin, tietosuojaan, kalentereihin ja ota käyttöön.";
 "infoCalendarAccessRestricted" = "Et voi antaa %@:lle valtuutusta käyttää kalenteriasi. Tämä johtuu mahdollisesti aktiivisista rajoituksista, kuten vanhempien valvonnasta";
 "sectionTitleTrace" = "Ongelmien raportointi";
-"sendTraceFile" = "Lähetä ongelmaraportti";	
+"sendTraceFile" = "Lähetä ongelmaraportti";
+"settingsviews_issueReportTitle" = "Ongelmaraportti";
 "describeProblem" = "Selitä mahdollisimman yksityiskohtaisesti, miksi sinun on lähetettävä jäljitystiedosto. Jos olet jo ilmoittanut ongelmastasi Facebook-tukiryhmässä '%@', mainitse facebook-nimesi sähköpostissa";
 "emailNotConfigured" = "Sinun on määritettävä sähköpostitili iOS-laitteellasi.";
 "emailbodyText" = "Ongelman kuvaus: ";
@@ -106,7 +110,7 @@
 
 /// Advanced Settings, section title
 "developerSettings" = "Lisäasetukset";
-"showDeveloperSettings" = "Näytä";
+"showDeveloperSettings" = "Näytä lisäasetukset";
 "preferSensorCountdown" = "Suosi sensorin lähtölaskentaa";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensorin käyttöaika";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Määrittää, näytetäänkö sensorin käyttöaika kuluneena aikana vai lähtölaskentana iPhonessa ja Apple Watchissa.";

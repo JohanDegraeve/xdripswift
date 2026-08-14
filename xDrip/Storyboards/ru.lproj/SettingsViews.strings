@@ -4,7 +4,10 @@
 "settingsviews_alertsAndNotificationsSectionTitle" = "Оповещения и уведомления";
 "settingsviews_sharingAndServicesSectionTitle" = "Обмен и сервисы";
 "settingsviews_osAidLoopShareSectionTitle" = "Обмен OS-AID";
-"settingsviews_issueReportSectionTitle" = "Отчет о проблеме";
+"settingsviews_troubleshootingTitle" = "Устранение неполадок";
+"settingsviews_activityLogSectionTitle" = "Журнал активности";
+"settingsviews_viewActivityLog" = "Журнал активности";
+"settingsviews_troubleshootingLogSectionFooter" = "Просмотрите и поделитесь простым журналом на английском языке за последние 12 часов. Он содержит значения глюкозы, но не данные учётной записи или идентификаторы устройств.";
 "settingsviews_appBannerVersion" = "Версия %@";
 "settingsviews_appInstalledSince" = "Установлено";
 "settingsviews_showOnlineHelp" = "Открыть онлайн документацию";
@@ -100,6 +103,7 @@
 "infoCalendarAccessRestricted" = "Вы не можете разрешить %@ доступ к вашему календарю. Возможно, это связано с активными ограничениями, такими как родительский контроль.";
 "sectionTitleTrace" = "Сообщение о проблеме";
 "sendTraceFile" = "Отправить отчет о проблеме";
+"settingsviews_issueReportTitle" = "Отчет о проблеме";
 "describeProblem" = "Объясните, почему вам необходимо отправить файл трассировки, как можно более подробно. Если вы уже сообщили о своей проблеме в группе поддержки Facebook '%@', укажите свое имя в Facebook в письме.";
 "emailNotConfigured" = "Вы должны настроить учетную запись электронной почты на своем устройстве iOS.";
 "emailbodyText" = "Описание проблемы: ";
@@ -112,7 +116,7 @@
 "warningChangeFromMasterToFollower" = "Переключение с главного на подписчика удалит ваш текущий сенсор. Вы хотите продолжить?";
 "nightscoutPort" = "Порт";
 "developerSettings" = "Расширенные настройки";
-"showDeveloperSettings" = "Показать";
+"showDeveloperSettings" = "Показать расширенные настройки";
 "preferSensorCountdown" = "Предпочитать обратный отсчёт датчика";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Срок службы датчика";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Определяет, показывать срок службы датчика как прошедшее время или как обратный отсчёт на iPhone и Apple Watch.";

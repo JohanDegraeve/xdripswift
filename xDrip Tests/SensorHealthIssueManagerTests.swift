@@ -310,6 +310,23 @@ final class SensorHealthIssueManagerTests: XCTestCase {
         XCTAssertNil(manager.visibleIssue)
     }
 
+    func testPersistentNoiseDetectionDoesNotDependOnShowingSensorNoiseUI() {
+        defaults.showSensorNoise = false
+        let manager = makeManager()
+
+        manager.reportCalculatedState(
+            sensorID: "A",
+            sensorStartDate: start,
+            measurement: measurement(state: .veryHigh, longTermNoise: 20),
+            persistence: SensorNoisePersistenceAssessment(value: 20, coverage: 1),
+            sensitivity: .normal,
+            now: start.addingTimeInterval(.hours(12))
+        )
+
+        XCTAssertFalse(defaults.showSensorNoise)
+        XCTAssertEqual(manager.visibleIssue?.kind, .persistentNoise)
+    }
+
     func testPersistentNoiseIncludesThresholdBoundaryForEverySensitivity() {
         for (index, sensitivity) in SensorNoiseSensitivity.allCases.enumerated() {
             let manager = makeManager()
