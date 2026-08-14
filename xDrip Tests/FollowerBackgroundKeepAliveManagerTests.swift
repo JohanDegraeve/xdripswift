@@ -7,6 +7,7 @@
 //
 
 import AVFoundation
+import Combine
 import XCTest
 @testable import xdrip
 
@@ -518,6 +519,7 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
         XCTAssertNil(manager)
     }
 
+    @MainActor
     func testCareLinkRequiresCredentialsAndAuthenticatedSessionBeforeStartingSharedManager() async {
         let snapshot = StandardDefaultsSnapshot(keys: [
             .isMaster,
@@ -537,15 +539,16 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
         defaults.careLinkUsername = "care-partner@example.invalid"
         defaults.careLinkPassword = "password"
         let credentialsOnlyKeepAlive = RecordingFollowerBackgroundKeepAliveManager()
+        let credentialsOnlyState = CareLinkAccountState()
         var credentialsOnlyManager: CareLinkFollowManager? = CareLinkFollowManager(
             coreDataManager: coreDataManager,
             followerDelegate: delegate,
             backgroundKeepAliveManager: credentialsOnlyKeepAlive,
             client: CareLinkClient(tokenStore: CareLinkMemoryTokenStore()),
-            state: CareLinkAccountState(),
+            state: credentialsOnlyState,
             startsInitialDownload: false
         )
-        await waitUntil { credentialsOnlyKeepAlive.stoppedSources.count >= 2 }
+        await waitUntil { credentialsOnlyState.snapshot.status == .loginRequired }
         XCTAssertTrue(credentialsOnlyKeepAlive.startedSources.isEmpty)
         credentialsOnlyManager = nil
         XCTAssertNil(credentialsOnlyManager)
@@ -574,21 +577,31 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
         let authenticatedTokenStore = CareLinkMemoryTokenStore()
         authenticatedTokenStore.token = makeCareLinkTestToken()
         let authenticatedKeepAlive = RecordingFollowerBackgroundKeepAliveManager()
+        let authenticatedState = CareLinkAccountState()
+        var authenticatedStatuses = [CareLinkConnectionStatus]()
+        let authenticatedObserver = authenticatedState.$snapshot.sink {
+            authenticatedStatuses.append($0.status)
+        }
         var authenticatedManager: CareLinkFollowManager? = CareLinkFollowManager(
             coreDataManager: coreDataManager,
             followerDelegate: delegate,
             backgroundKeepAliveManager: authenticatedKeepAlive,
             client: CareLinkClient(tokenStore: authenticatedTokenStore),
-            state: CareLinkAccountState(),
+            state: authenticatedState,
             startsInitialDownload: false
         )
         await waitUntil { authenticatedKeepAlive.startedSources == [.careLink] }
         XCTAssertEqual(authenticatedKeepAlive.startedSources, [.careLink])
+        XCTAssertEqual(authenticatedState.snapshot.status, .connecting)
+        XCTAssertFalse(authenticatedStatuses.contains(.loginRequired))
         authenticatedManager = nil
         XCTAssertEqual(authenticatedKeepAlive.stoppedSources.last, .careLink)
         XCTAssertNil(authenticatedManager)
+        withExtendedLifetime(authenticatedObserver) {}
+        authenticatedObserver.cancel()
     }
 
+    @MainActor
     private func waitUntil(_ condition: @escaping () -> Bool) async {
         for _ in 0..<100 {
             if condition() { return }

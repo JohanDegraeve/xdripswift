@@ -34,7 +34,8 @@ actor CareLinkClient {
     }
 
     /// Reports authentication without returning the web token or cookies to UI code.
-    func hasToken() -> Bool { (try? tokenStore.load()) != nil }
+    /// A storage failure remains distinct from a confirmed missing session.
+    func hasToken() throws -> Bool { try tokenStore.load() != nil }
     func tokenRefreshDate() -> Date? { lastTokenRefreshAt }
     func authenticatedRegion() -> CareLinkRegion? { try? tokenStore.load()?.region }
 
@@ -534,7 +535,7 @@ actor CareLinkClient {
     func installDebugSimulatorSessionIfRequested(region: CareLinkRegion) async throws {
         guard Self.debugBaseURL != nil,
               ProcessInfo.processInfo.environment["CARELINK_SIMULATOR_AUTO_LOGIN"] == "1",
-              !hasToken() else { return }
+              try hasToken() == false else { return }
         let request = URLRequest(url: loginURL(region: region))
         let result = try await send(request)
         let headers = result.response.allHeaderFields.reduce(into: [String: String]()) { values, pair in

@@ -217,8 +217,18 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                 }
                 return
             }
-            guard !(await client.hasToken()) else {
-                reconcileLifecycle()
+            do {
+                let hasSession = try await client.hasToken()
+                guard !hasSession else {
+                    reconcileLifecycle()
+                    return
+                }
+            } catch {
+                lifecycleState = .inactive
+                updateStateOnMain {
+                    $0.status = .error
+                    $0.detail = error.localizedDescription
+                }
                 return
             }
             lifecycleGeneration += 1
@@ -698,11 +708,11 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                 if selected, UserDefaults.standard.careLinkSelectedPatientID != nil {
                     UserDefaults.standard.careLinkSelectedPatientID = nil
                 }
-                await client.clearLocalSession()
-                guard lifecycleGeneration == generation else { return }
                 if selected {
                     publishLoginRequired(detail: Texts_SettingsView.careLinkCredentialsRequired)
                 }
+                await client.clearLocalSession()
+                guard lifecycleGeneration == generation else { return }
                 return
             }
 
@@ -714,9 +724,25 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                 return
             }
 
+            updateStateOnMain {
+                $0.status = .connecting
+                $0.detail = nil
+                $0.region = self.region
+            }
             if let invalidationTask { await invalidationTask.value }
             guard lifecycleGeneration == generation, isActive, CareLinkLoginCredentials.stored() != nil else { return }
-            let hasSession = await client.hasToken()
+            let hasSession: Bool
+            do {
+                hasSession = try await client.hasToken()
+            } catch {
+                guard lifecycleGeneration == generation else { return }
+                lifecycleState = .inactive
+                updateStateOnMain {
+                    $0.status = .error
+                    $0.detail = error.localizedDescription
+                }
+                return
+            }
             guard lifecycleGeneration == generation else { return }
             lifecycleState = CareLinkLifecyclePolicy.state(isSelected: true, hasCredentials: true, hasSession: hasSession)
             if lifecycleState == .authenticated {

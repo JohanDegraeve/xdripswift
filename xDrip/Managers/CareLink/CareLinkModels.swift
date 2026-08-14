@@ -277,7 +277,7 @@ struct CareLinkTherapyPayload: Equatable {
 /// One immutable-at-publication view of the manager's account and polling state.
 /// `CareLinkAccountState` publishes this value on the main actor for SwiftUI and Settings.
 struct CareLinkStatusSnapshot: Equatable {
-    var status: CareLinkConnectionStatus = .loginRequired
+    var status: CareLinkConnectionStatus = .connecting
     var region: CareLinkRegion = .inferred
     var patients: [CareLinkPatient] = []
     var selectedPatientID: String?

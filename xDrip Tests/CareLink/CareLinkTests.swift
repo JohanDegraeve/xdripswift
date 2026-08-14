@@ -85,6 +85,24 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(CareLinkConnectionStatus.error.indicatorColor, ConstantsAppColors.urgent)
     }
 
+    func testNewStatusSnapshotStartsWhileTheStoredSessionIsBeingChecked() {
+        XCTAssertEqual(CareLinkStatusSnapshot().status, .connecting)
+        XCTAssertEqual(CareLinkAccountState().snapshot.status, .connecting)
+    }
+
+    func testStoredSessionCheckDistinguishesAnAbsentTokenFromAReadFailure() async throws {
+        let emptyClient = CareLinkClient(tokenStore: CareLinkMemoryTokenStore())
+        XCTAssertFalse(try await emptyClient.hasToken())
+
+        let failingClient = CareLinkClient(tokenStore: FailingCareLinkTokenStore())
+        do {
+            _ = try await failingClient.hasToken()
+            XCTFail("Expected the stored session check to preserve the read failure")
+        } catch {
+            XCTAssertTrue(error is FailingCareLinkTokenStore.Failure)
+        }
+    }
+
     func testWatchStatusCarriesCareLinkConnectionState() {
         var status = WatchStatus()
         status.followerDataSourceTypeRawValue = FollowerDataSourceType.careLink.rawValue
@@ -639,11 +657,14 @@ final class CareLinkTests: XCTestCase {
         var publicationCount = 0
         let observer = state.$snapshot.sink { _ in publicationCount += 1 }
 
-        state.update { $0.status = .loginRequired }
+        state.update { $0.status = .connecting }
         XCTAssertEqual(publicationCount, 1)
 
-        state.update { $0.status = .active }
+        state.update { $0.status = .loginRequired }
         XCTAssertEqual(publicationCount, 2)
+
+        state.update { $0.status = .active }
+        XCTAssertEqual(publicationCount, 3)
 
         withExtendedLifetime(observer) {}
         observer.cancel()
@@ -1297,4 +1318,14 @@ private final class CareLinkControllerSpy: CareLinkControlling {
 
 private struct CareLinkTestSendableBox<Value>: @unchecked Sendable {
     let value: Value
+}
+
+private final class FailingCareLinkTokenStore: CareLinkTokenStoring {
+    enum Failure: Error {
+        case unavailable
+    }
+
+    func load() throws -> CareLinkToken? { throw Failure.unavailable }
+    func save(_ token: CareLinkToken) throws {}
+    func clear() throws {}
 }
