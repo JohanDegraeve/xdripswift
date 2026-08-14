@@ -2684,13 +2684,15 @@ extension RootApplicationCoordinator: @preconcurrency UNUserNotificationCenterDe
 // MARK: - conform to FollowerDelegate protocol
 
 extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
-    func followerGapFillDidAddHistoricalReadings(startingAt startDate: Date) {
+    func followerGapFillDidMergeHistory(_ result: NightscoutFollowerGapFillResult) {
         guard !UserDefaults.standard.isMaster,
               UserDefaults.standard.followerDataSourceType == .nightscout
         else { return }
 
         statisticsManager?.invalidate()
-        if let bgPostProcessingManager {
+        if result.bgReadingsAdded > 0,
+           let startDate = result.bgProcessingStartDate,
+           let bgPostProcessingManager {
             _ = bgPostProcessingManager.processBgReadings(
                 processingStartDateOverride: startDate,
                 allowHistoricalDownstreamRewrite: false
@@ -2699,6 +2701,7 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
         rootHomeStateModel.invalidateCharts()
         updateMiniChart()
         updateStatistics(animate: false)
+        NotificationCenter.default.post(name: .nightscoutFollowerGapFillDidMergeHistory, object: nil)
     }
 
     func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading]) {

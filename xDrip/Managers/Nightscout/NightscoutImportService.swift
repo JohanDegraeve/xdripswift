@@ -162,6 +162,30 @@ struct NightscoutBgRangeMergeResult: Sendable {
     var readingsSkipped = 0
 }
 
+/// Summary from a focused treatment range merge used by automatic follower recovery.
+struct NightscoutTreatmentRangeMergeResult: Sendable {
+    var documentsDownloaded = 0
+    var documentsUnsupported = 0
+    var treatmentsAdded = 0
+    var treatmentsSkipped = 0
+}
+
+/// Summary from a focused device-status range merge used by automatic follower recovery.
+struct NightscoutDeviceStatusRangeMergeResult: Sendable {
+    var documentsDownloaded = 0
+    var documentsInvalid = 0
+    var statusesAdded = 0
+    var statusesSkipped = 0
+}
+
+/// Summary from the profile-history merge used by automatic follower recovery.
+struct NightscoutProfileRangeMergeResult: Sendable {
+    var documentsDownloaded = 0
+    var documentsInvalid = 0
+    var profilesAdded = 0
+    var profilesSkipped = 0
+}
+
 /// A lightweight update sent to the main-actor view model during network and Core Data work.
 struct NightscoutImportProgress: Sendable {
     let completedUnits: Int
@@ -516,6 +540,76 @@ final class NightscoutImportService: @unchecked Sendable {
         }
 
         return result
+    }
+
+    /// Downloads and merge-fills treatments across one bounded follower recovery window.
+    /// This does not read or mutate the manual historical-import checkpoint.
+    func mergeTreatments(in interval: DateInterval) async throws -> NightscoutTreatmentRangeMergeResult {
+        guard interval.start < interval.end else { return NightscoutTreatmentRangeMergeResult() }
+
+        let configuration = try currentConfiguration()
+        try await persistManagedObjectContexts()
+        var result = NightscoutTreatmentRangeMergeResult()
+
+        for chunk in Self.makeChunks(from: interval.start, to: interval.end) {
+            try Task.checkCancellation()
+            let documents = try await downloadTreatments(in: chunk, configuration: configuration)
+            let prepared = prepareTreatments(documents, in: chunk)
+            let applied = try await applyFollowerTreatments(prepared.records, in: chunk)
+            result.documentsDownloaded += documents.count
+            result.documentsUnsupported += prepared.unsupportedCount
+            result.treatmentsAdded += applied.added
+            result.treatmentsSkipped += applied.skipped
+        }
+
+        return result
+    }
+
+    /// Downloads and merge-fills every device-status document in a bounded follower window.
+    /// The live sync remains responsible for publishing the composed current status.
+    func mergeDeviceStatus(in interval: DateInterval) async throws -> NightscoutDeviceStatusRangeMergeResult {
+        guard interval.start < interval.end else { return NightscoutDeviceStatusRangeMergeResult() }
+
+        let configuration = try currentConfiguration()
+        try await persistManagedObjectContexts()
+        var result = NightscoutDeviceStatusRangeMergeResult()
+
+        for chunk in Self.makeChunks(from: interval.start, to: interval.end) {
+            try Task.checkCancellation()
+            let documents = try await downloadDeviceStatus(in: chunk, configuration: configuration)
+            let prepared = prepareDeviceStatus(documents, in: chunk)
+            let accessor = NightscoutDeviceStatusAccessor(coreDataManager: coreDataManager)
+            let applied = try await accessor.insertMissing(prepared.records)
+            try await persistManagedObjectContexts()
+            result.documentsDownloaded += documents.count
+            result.documentsInvalid += prepared.invalidCount
+            result.statusesAdded += applied.added
+            result.statusesSkipped += applied.skipped
+        }
+
+        return result
+    }
+
+    /// Imports profile changes inside the follower window plus the newest pre-window baseline.
+    /// Nightscout profile collections are normally small, so one collection request avoids
+    /// endpoint-specific range-query assumptions across Nightscout versions.
+    func mergeProfiles(in interval: DateInterval) async throws -> NightscoutProfileRangeMergeResult {
+        guard interval.start < interval.end else { return NightscoutProfileRangeMergeResult() }
+
+        let configuration = try currentConfiguration()
+        try await persistManagedObjectContexts()
+        let documents = try await downloadProfiles(configuration: configuration)
+        let prepared = prepareProfiles(documents, in: interval)
+        let accessor = NightscoutProfileAccessor(coreDataManager: coreDataManager)
+        let applied = try await accessor.insertMissing(prepared.profiles)
+        try await persistManagedObjectContexts()
+
+        return NightscoutProfileRangeMergeResult(
+            documentsDownloaded: documents.count,
+            documentsInvalid: prepared.invalidCount,
+            profilesAdded: applied.added,
+            profilesSkipped: applied.skipped
+        )
     }
 
     /// Creates exact 24-hour outer chunks. Inner safety subdivision happens only when a response is full.
@@ -942,6 +1036,28 @@ final class NightscoutImportService: @unchecked Sendable {
         )
     }
 
+    private func downloadProfiles(
+        configuration: NightscoutImportConfiguration
+    ) async throws -> [NightscoutProfileResponse] {
+        let data = try await request(
+            path: "/api/v1/profile",
+            queryItems: [],
+            configuration: configuration
+        )
+        do {
+            return try JSONDecoder().decode([NightscoutProfileResponse].self, from: data)
+        } catch {
+            trace(
+                "in Nightscout historical import, JSON decoding failed for profile history. error type = %{public}@",
+                log: log,
+                category: ConstantsLog.categoryDataManagement,
+                type: .error,
+                String(describing: Swift.type(of: error))
+            )
+            throw NightscoutImportError.invalidResponse
+        }
+    }
+
     /// A full response is treated as possibly truncated and split by time until both halves are below the cap.
     private func downloadCollection<Document: Decodable>(
         path: String,
@@ -1212,6 +1328,49 @@ final class NightscoutImportService: @unchecked Sendable {
         return (records.sorted { $0.createdAt < $1.createdAt }, invalidCount)
     }
 
+    private func prepareProfiles(
+        _ documents: [NightscoutProfileResponse],
+        in interval: DateInterval
+    ) -> (profiles: [NightscoutProfile], invalidCount: Int) {
+        var validProfiles = [NightscoutProfile]()
+        var invalidCount = 0
+        var identities = Set<String>()
+
+        for document in documents {
+            let profile = NightscoutProfile(from: document)
+            guard profile.startDate > .distantPast,
+                  profile.startDate.timeIntervalSinceReferenceDate.isFinite,
+                  profile.startDate < interval.end
+            else {
+                invalidCount += 1
+                continue
+            }
+            let identity = profile.id.isEmpty
+                ? "startDate-\(Int64(profile.startDate.timeIntervalSince1970 * 1_000))"
+                : profile.id
+            guard identities.insert(identity).inserted else {
+                invalidCount += 1
+                continue
+            }
+            validProfiles.append(profile)
+        }
+
+        return (Self.profilesForFollowerRecovery(validProfiles, in: interval), invalidCount)
+    }
+
+    /// Selects the active pre-window profile plus every profile change inside the half-open range.
+    static func profilesForFollowerRecovery(
+        _ profiles: [NightscoutProfile],
+        in interval: DateInterval
+    ) -> [NightscoutProfile] {
+        let ordered = profiles
+            .filter { $0.startDate > .distantPast && $0.startDate < interval.end }
+            .sorted { $0.startDate < $1.startDate }
+        let baseline = ordered.last { $0.startDate < interval.start }
+        let inWindow = ordered.filter { $0.startDate >= interval.start && $0.startDate < interval.end }
+        return (baseline.map { [$0] } ?? []) + inWindow
+    }
+
     private func expandTreatment(
         _ document: NightscoutTreatmentDocument,
         remoteID: String,
@@ -1329,6 +1488,60 @@ final class NightscoutImportService: @unchecked Sendable {
     ) async throws -> (added: Int, skipped: Int) {
         guard !records.isEmpty else { return (0, 0) }
         let context = coreDataManager.privateChildManagedObjectContext()
+        let result = try await context.perform {
+            let request: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
+            request.predicate = NSPredicate(
+                format: "date >= %@ AND date < %@",
+                interval.start as NSDate,
+                interval.end as NSDate
+            )
+            request.includesPropertyValues = true
+            let existing = try context.fetch(request)
+            var existingIDs = Set(existing.map(\.id).filter { !$0.isEmpty })
+            var fingerprints = Set(existing.map(Self.treatmentFingerprint))
+            var added = 0
+            var skipped = 0
+
+            for record in records {
+                try Task.checkCancellation()
+                let fingerprint = Self.treatmentFingerprint(record)
+                guard !existingIDs.contains(record.id), !fingerprints.contains(fingerprint) else {
+                    skipped += 1
+                    continue
+                }
+                let treatment = TreatmentEntry(
+                    id: record.id,
+                    date: record.date,
+                    value: record.value,
+                    valueSecondary: record.valueSecondary,
+                    treatmentType: record.type,
+                    uploaded: true,
+                    nightscoutEventType: record.nightscoutEventType,
+                    enteredBy: record.enteredBy,
+                    notes: record.notes,
+                    nsManagedObjectContext: context
+                )
+                treatment.treatmentdeleted = false
+                existingIDs.insert(record.id)
+                fingerprints.insert(fingerprint)
+                added += 1
+            }
+            try context.save()
+            return (added, skipped)
+        }
+        try await persistManagedObjectContexts()
+        return result
+    }
+
+    /// Follower recovery shares the main context used by live treatment sync. Serializing the
+    /// duplicate check and insertion on that context prevents startup recovery and the initial
+    /// live download from inserting the same Nightscout treatment concurrently.
+    private func applyFollowerTreatments(
+        _ records: [NightscoutImportedTreatment],
+        in interval: DateInterval
+    ) async throws -> (added: Int, skipped: Int) {
+        guard !records.isEmpty else { return (0, 0) }
+        let context = coreDataManager.mainManagedObjectContext
         let result = try await context.perform {
             let request: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
             request.predicate = NSPredicate(

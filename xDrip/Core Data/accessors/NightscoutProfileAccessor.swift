@@ -73,6 +73,46 @@ final class NightscoutProfileAccessor {
         }
     }
 
+    /// Inserts missing historical profiles without rewriting profiles already stored locally.
+    ///
+    /// The automatic follower recovery is merge-only. A profile is considered known by its
+    /// Nightscout identifier, or by its start date when the identifier is absent.
+    func insertMissing(_ profiles: [NightscoutProfile]) async throws -> (added: Int, skipped: Int) {
+        guard !profiles.isEmpty else { return (0, 0) }
+
+        let context = coreDataManager.privateManagedObjectContext
+        return try await context.perform {
+            let request: NSFetchRequest<NightscoutProfileEntry> = NightscoutProfileEntry.fetchRequest()
+            request.includesPropertyValues = true
+            let existing = try context.fetch(request)
+            var existingIDs = Set(existing.map(\.id).filter { !$0.isEmpty })
+            var existingStartMilliseconds = Set(existing.map { Int64($0.startDate.timeIntervalSince1970 * 1_000) })
+            var added = 0
+            var skipped = 0
+
+            for profile in profiles {
+                try Task.checkCancellation()
+                let startMilliseconds = Int64(profile.startDate.timeIntervalSince1970 * 1_000)
+                let matchesID = !profile.id.isEmpty && existingIDs.contains(profile.id)
+                guard !matchesID, !existingStartMilliseconds.contains(startMilliseconds) else {
+                    skipped += 1
+                    continue
+                }
+
+                let entry = NightscoutProfileEntry(context: context)
+                Self.apply(profile, to: entry, on: context)
+                existingIDs.insert(entry.id)
+                existingStartMilliseconds.insert(startMilliseconds)
+                added += 1
+            }
+
+            if context.hasChanges {
+                try context.save()
+            }
+            return (added, skipped)
+        }
+    }
+
     /// Returns the newest detached profile, including every normalized schedule.
     func latest() -> NightscoutProfileSnapshot? {
         let context = coreDataManager.privateManagedObjectContext

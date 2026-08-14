@@ -160,6 +160,10 @@ struct RootHomeView: View {
             }
             actions.refreshPumpAndLoopStatus()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .nightscoutFollowerGapFillDidMergeHistory)) { _ in
+            historicalDataCache.reset()
+            prepareHistoricalDataIfNeeded(at: endDate)
+        }
         // Home state already reads the current CareLink snapshot during refresh. Ignore each
         // subscription's replay so rebuilding this view cannot start a publish and rebuild loop.
         .onReceive(

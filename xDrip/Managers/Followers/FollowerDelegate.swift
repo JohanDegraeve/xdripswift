@@ -16,11 +16,11 @@ protocol FollowerDelegate:AnyObject {
     ///     - followGlucoseDataArray : array of FollowGlucoseData, can be empty array, first entry is the youngest
     func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading])
 
-    /// Reports that a follower added older readings directly to Core Data.
-    func followerGapFillDidAddHistoricalReadings(startingAt: Date)
+    /// Reports that Nightscout follower recovery merged historical data directly into Core Data.
+    func followerGapFillDidMergeHistory(_ result: NightscoutFollowerGapFillResult)
 
 }
 
 extension FollowerDelegate {
-    func followerGapFillDidAddHistoricalReadings(startingAt: Date) {}
+    func followerGapFillDidMergeHistory(_ result: NightscoutFollowerGapFillResult) {}
 }

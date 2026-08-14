@@ -490,6 +490,8 @@ extension UserDefaults {
         case nightscoutFollowerGapFillLastAuditEndDate = "nightscoutFollowerGapFillLastAuditEndDate"
         /// normalized Nightscout site associated with the follower gap-fill audit timestamp
         case nightscoutFollowerGapFillSite = "nightscoutFollowerGapFillSite"
+        /// versioned per-resource coverage for automatic Nightscout follower history recovery
+        case nightscoutFollowerGapFillCoverage = "nightscoutFollowerGapFillCoverageV2"
         /// timestamp latest calibration uploaded to Nightscout
         case timeStampLatestNSUploadedCalibrationToNightscout = "timeStampLatestUploadedCalibration"
 
@@ -2094,6 +2096,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.nightscoutFollowerGapFillSite.rawValue)
+        }
+    }
+
+    /// Versioned per-resource Nightscout follower recovery coverage.
+    var nightscoutFollowerGapFillCoverage: Data? {
+        get {
+            data(forKey: Key.nightscoutFollowerGapFillCoverage.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.nightscoutFollowerGapFillCoverage.rawValue)
         }
     }
 

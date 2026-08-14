@@ -120,6 +120,65 @@ final class NightscoutDeviceStatusAccessor {
         }
     }
 
+    /// Inserts only status documents that are not already stored.
+    ///
+    /// Follower history recovery uses the same private context as live status updates so the two
+    /// paths cannot race while deciding whether a Nightscout document is new. Unlike `upsert`,
+    /// persistence errors are propagated so a recovery checkpoint is never advanced after a
+    /// failed save.
+    func insertMissing(_ statuses: [NightscoutDeviceStatus]) async throws -> (added: Int, skipped: Int) {
+        let validStatuses = statuses.filter { $0.createdAt > .distantPast }
+        guard !validStatuses.isEmpty else { return (0, 0) }
+
+        let context = coreDataManager.privateManagedObjectContext
+        return try await context.perform {
+            let identifiers = validStatuses.map(Self.storageIdentifier)
+            let earliestDate = validStatuses.map(\.createdAt).min() ?? .distantPast
+            let latestDate = validStatuses.map(\.createdAt).max() ?? .distantFuture
+            let request: NSFetchRequest<NightscoutDeviceStatusEntry> = NightscoutDeviceStatusEntry.fetchRequest()
+            request.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
+                NSPredicate(format: "id IN %@", identifiers),
+                NSPredicate(
+                    format: "createdAt >= %@ AND createdAt <= %@",
+                    earliestDate as NSDate,
+                    latestDate as NSDate
+                )
+            ])
+            request.returnsObjectsAsFaults = false
+
+            let existing = try context.fetch(request)
+            var existingIdentifiers = Set(existing.map(\.id))
+            var existingCreatedAtMilliseconds = Set(
+                existing.map { Int64($0.createdAt.timeIntervalSince1970 * 1_000) }
+            )
+            var added = 0
+            var skipped = 0
+
+            for status in validStatuses {
+                try Task.checkCancellation()
+                let identifier = Self.storageIdentifier(status)
+                let createdAtMilliseconds = Int64(status.createdAt.timeIntervalSince1970 * 1_000)
+                guard !existingIdentifiers.contains(identifier),
+                      !existingCreatedAtMilliseconds.contains(createdAtMilliseconds)
+                else {
+                    skipped += 1
+                    continue
+                }
+
+                let entry = NightscoutDeviceStatusEntry(context: context)
+                Self.apply(status, to: entry)
+                existingIdentifiers.insert(identifier)
+                existingCreatedAtMilliseconds.insert(createdAtMilliseconds)
+                added += 1
+            }
+
+            if context.hasChanges {
+                try context.save()
+            }
+            return (added, skipped)
+        }
+    }
+
     /// Returns the newest detached status without exposing its managed object or context.
     func latest() -> NightscoutDeviceStatusSnapshot? {
         let context = coreDataManager.privateManagedObjectContext

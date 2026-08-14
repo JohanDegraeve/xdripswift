@@ -131,4 +131,160 @@ final class NightscoutFollowerGapFillTests: XCTestCase {
             [interval]
         )
     }
+
+    func testLegacyCheckpointMigratesAsGlucoseCoverageOnly() {
+        let legacyEnd = auditEnd.addingTimeInterval(-60 * 60)
+
+        let coverage = NightscoutFollowerGapFillService.migratedCoverage(
+            storedCoverage: nil,
+            legacyEnd: legacyEnd,
+            legacySite: site,
+            currentSite: site
+        )
+
+        XCTAssertEqual(coverage.site, site)
+        XCTAssertEqual(coverage.bgReadingsEnd, legacyEnd)
+        XCTAssertNil(coverage.treatmentsEnd)
+        XCTAssertNil(coverage.deviceStatusEnd)
+        XCTAssertNil(coverage.profilesEnd)
+    }
+
+    func testChangedSiteDoesNotMigrateLegacyCoverage() {
+        let coverage = NightscoutFollowerGapFillService.migratedCoverage(
+            storedCoverage: nil,
+            legacyEnd: auditEnd.addingTimeInterval(-60),
+            legacySite: "https://other.example.com",
+            currentSite: site
+        )
+
+        XCTAssertEqual(coverage, .init(site: site))
+    }
+
+    func testFreshCoveragePlansAllEnabledResourcesForSeventyTwoHours() {
+        let plan = NightscoutFollowerGapFillService.recoveryPlan(
+            endingAt: auditEnd,
+            site: site,
+            coverage: .init(site: site),
+            importsTreatments: true,
+            importsStatus: true
+        )
+
+        XCTAssertEqual(Set(plan.windows.keys), Set(NightscoutFollowerGapFillService.Resource.allCases))
+        for window in plan.windows.values {
+            XCTAssertTrue(window.isInitial)
+            XCTAssertEqual(window.interval.duration, 72 * 60 * 60, accuracy: 0.001)
+        }
+    }
+
+    func testExistingGlucoseCheckpointDoesNotSuppressInitialSparseRecovery() throws {
+        let recent = auditEnd.addingTimeInterval(-5 * 60)
+        let coverage = NightscoutFollowerGapFillService.CoverageState(
+            site: site,
+            bgReadingsEnd: recent
+        )
+
+        let plan = NightscoutFollowerGapFillService.recoveryPlan(
+            endingAt: auditEnd,
+            site: site,
+            coverage: coverage,
+            importsTreatments: true,
+            importsStatus: true
+        )
+
+        XCTAssertNil(plan.windows[.bgReadings])
+        XCTAssertEqual(try XCTUnwrap(plan.windows[.treatments]).interval.duration, 72 * 60 * 60, accuracy: 0.001)
+        XCTAssertEqual(try XCTUnwrap(plan.windows[.deviceStatus]).interval.duration, 72 * 60 * 60, accuracy: 0.001)
+        XCTAssertEqual(try XCTUnwrap(plan.windows[.profiles]).interval.duration, 72 * 60 * 60, accuracy: 0.001)
+    }
+
+    func testIncrementalSparseRecoveryUsesThirtyMinuteOverlap() {
+        let checkpoint = auditEnd.addingTimeInterval(-2 * 60 * 60)
+        let coverage = NightscoutFollowerGapFillService.CoverageState(
+            site: site,
+            bgReadingsEnd: checkpoint,
+            treatmentsEnd: checkpoint,
+            deviceStatusEnd: checkpoint,
+            profilesEnd: checkpoint
+        )
+
+        let plan = NightscoutFollowerGapFillService.recoveryPlan(
+            endingAt: auditEnd,
+            site: site,
+            coverage: coverage,
+            importsTreatments: true,
+            importsStatus: true
+        )
+
+        for window in plan.windows.values {
+            XCTAssertFalse(window.isInitial)
+            XCTAssertEqual(window.interval.start, checkpoint.addingTimeInterval(-30 * 60))
+            XCTAssertEqual(window.interval.end, auditEnd)
+        }
+    }
+
+    func testPolicyGatesSparseResources() {
+        let noTherapy = NightscoutFollowerGapFillService.recoveryPlan(
+            endingAt: auditEnd,
+            site: site,
+            coverage: .init(site: site),
+            importsTreatments: false,
+            importsStatus: false
+        )
+        let treatmentsOnly = NightscoutFollowerGapFillService.recoveryPlan(
+            endingAt: auditEnd,
+            site: site,
+            coverage: .init(site: site),
+            importsTreatments: true,
+            importsStatus: false
+        )
+
+        XCTAssertEqual(Set(noTherapy.windows.keys), [.bgReadings])
+        XCTAssertEqual(Set(treatmentsOnly.windows.keys), [.bgReadings, .treatments])
+    }
+
+    func testRecentSuccessfulEndpointsAreCoalesced() {
+        let recent = auditEnd.addingTimeInterval(-5 * 60)
+        let coverage = NightscoutFollowerGapFillService.CoverageState(
+            site: site,
+            bgReadingsEnd: recent,
+            treatmentsEnd: recent,
+            deviceStatusEnd: recent,
+            profilesEnd: recent
+        )
+
+        let plan = NightscoutFollowerGapFillService.recoveryPlan(
+            endingAt: auditEnd,
+            site: site,
+            coverage: coverage,
+            importsTreatments: true,
+            importsStatus: true
+        )
+
+        XCTAssertTrue(plan.isEmpty)
+    }
+
+    func testProfileRecoveryIncludesBaselineAndInWindowChanges() {
+        let start = auditEnd.addingTimeInterval(-72 * 60 * 60)
+        let interval = DateInterval(start: start, end: auditEnd)
+
+        func profile(id: String, startDate: Date) -> NightscoutProfile {
+            var profile = NightscoutProfile()
+            profile.id = id
+            profile.startDate = startDate
+            return profile
+        }
+
+        let old = profile(id: "old", startDate: start.addingTimeInterval(-48 * 60 * 60))
+        let baseline = profile(id: "baseline", startDate: start.addingTimeInterval(-60 * 60))
+        let firstChange = profile(id: "first", startDate: start.addingTimeInterval(60 * 60))
+        let secondChange = profile(id: "second", startDate: auditEnd.addingTimeInterval(-60 * 60))
+        let atEnd = profile(id: "end", startDate: auditEnd)
+
+        let selected = NightscoutImportService.profilesForFollowerRecovery(
+            [secondChange, old, atEnd, firstChange, baseline],
+            in: interval
+        )
+
+        XCTAssertEqual(selected.map(\.id), ["baseline", "first", "second"])
+    }
 }

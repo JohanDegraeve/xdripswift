@@ -43,8 +43,8 @@ class NightscoutFollowManager: NSObject {
     /// Keeps historical audit state and networking out of the live follower implementation.
     private lazy var followerGapFillService = NightscoutFollowerGapFillService(
         coreDataManager: coreDataManager,
-        onReadingsAdded: { [weak self] startDate in
-            self?.followerDelegate?.followerGapFillDidAddHistoricalReadings(startingAt: startDate)
+        onHistoryMerged: { [weak self] result in
+            self?.followerDelegate?.followerGapFillDidMergeHistory(result)
         }
     )
 
@@ -95,6 +95,9 @@ class NightscoutFollowManager: NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutToken.rawValue, options: .new, context: nil)
         // change value of nightscout enabled
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutEnabled.rawValue, options: .new, context: nil)
+        // therapy ownership and status mode decide which historical resources are eligible
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.therapyDataSourceType.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue, options: .new, context: nil)
 
         verifyUserDefaultsAndStartOrStopFollowMode()
     }
@@ -461,7 +464,7 @@ class NightscoutFollowManager: NSObject {
                 
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType, UserDefaults.Key.nightscoutUrl, UserDefaults.Key.nightscoutPort, UserDefaults.Key.nightscoutEnabled, UserDefaults.Key.nightscoutAPIKey, UserDefaults.Key.nightscoutToken :
+                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType, UserDefaults.Key.nightscoutUrl, UserDefaults.Key.nightscoutPort, UserDefaults.Key.nightscoutEnabled, UserDefaults.Key.nightscoutAPIKey, UserDefaults.Key.nightscoutToken, UserDefaults.Key.therapyDataSourceType, UserDefaults.Key.nightscoutFollowType:
                     
                     // change by user, should not be done within 200 ms
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
@@ -485,6 +488,8 @@ class NightscoutFollowManager: NSObject {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutAPIKey.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutToken.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutEnabled.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.therapyDataSourceType.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue)
         ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyCancelGapFill)
         invalidateDownLoadTimerClosure?()
         invalidateGapFillIntent()

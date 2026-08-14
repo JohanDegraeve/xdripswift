@@ -12,7 +12,7 @@ import Foundation
 
 /// Struct to hold internal Nightscout profile
 /// Initialize from a NightscoutProfileResponse
-struct NightscoutProfile: Codable {
+struct NightscoutProfile: Codable, Sendable {
     struct TimeValue: Codable, Hashable, Sendable {
         var timeAsSecondsFromMidnight: Int
         var value: Double
