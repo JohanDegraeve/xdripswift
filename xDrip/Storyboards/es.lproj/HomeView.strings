@@ -43,6 +43,7 @@
 "noSensorData" = "Sin datos";
 "noDataSourceConnected" = "Sin fuente de datos MGC conectada";
 "reconnectLibreDataSource" = "Desconectar y reconectar sensor Libre";
+"waitingForCGMConnection" = "Esperando la conexión del MGC...";
 "waitingForDataSource" = "MGC connectado. Esperando lecturas...";
 "hidingUrlForXSeconds" = "Ocultando URL durante %@s...";
 "nightscoutNotEnabled" = "Nightscout está deshabilitado";

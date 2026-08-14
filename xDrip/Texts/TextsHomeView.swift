@@ -744,6 +744,11 @@ enum Texts_HomeView {
     static let reconnectLibreDataSource: String = {
         return NSLocalizedString("reconnectLibreDataSource", tableName: filename, bundle: Bundle.main, value: "Disconnect and reconnect Libre sensor", comment: "ask the user to disconnect and reconnect the sensor")
     }()
+
+    // used when a CGM Transmitter is selected and waiting for its Bluetooth connection
+    static let waitingForCGMConnection: String = {
+        return NSLocalizedString("waitingForCGMConnection", tableName: filename, bundle: Bundle.main, value: "Waiting for CGM connection...", comment: "waiting for the selected CGM transmitter to connect")
+    }()
     
     // used when a CGM Transmitter is connected, but there is no active sensor data yet
     static let waitingForDataSource: String = {

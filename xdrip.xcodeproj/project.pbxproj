@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D7B00023014000200000001 /* CGMG5SensorSessionDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */; };
 		07ECB18D91AE096E637D1393 /* AlertsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */; };
 		111352851C2F8F73108A3A62 /* CareLinkAccountState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F081BB1D5F106F950C4A8EA4 /* CareLinkAccountState.swift */; };
 		16A7F56E1D1ED24F03F2070F /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
@@ -870,6 +871,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG5SensorSessionDetectionTests.swift; sourceTree = "<group>"; };
 		102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertTypesSettingsView.swift; sourceTree = "<group>"; };
 		198D44C4260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Alerts.strings; sourceTree = "<group>"; };
 		198D44C5260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
@@ -2500,6 +2502,7 @@
 		4F2600213002000200000001 /* xDrip Tests */ = {
 			isa = PBXGroup;
 			children = (
+				4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */,
 				A50000040000000000000001 /* OnlineHelpTests.swift */,
 				FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */,
 				BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */,
@@ -4249,6 +4252,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D7B00023014000200000001 /* CGMG5SensorSessionDetectionTests.swift in Sources */,
 				A50000030000000000000001 /* OnlineHelpTests.swift in Sources */,
 				FBA100040000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift in Sources */,
 				BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */,

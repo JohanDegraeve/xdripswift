@@ -164,6 +164,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// to temporary store the received SensorStartDate. Will be compared to sensorStartDate only after having received a glucoseRx message with a valid algorithm status
     private var receivedSensorStartDate: Date?
+
+    /// Prevents repeated glucose packets from reporting the same missing internal session while the delegate update is still pending.
+    private var lastReportedSensorStartDate: Date?
+
+    /// Core Data snapshot used for the first validated packet because app startup temporarily clears the UserDefaults mirror.
+    private var activeSensorStartDateAtInitialization: Date?
+
+    private static let sensorStartDateTolerance: TimeInterval = 15.0
     
     /// - used to send sensor start done by user via xDrip4iOS to Dexcom transmitter. For example, user may have started a sensor in the app, but it's not yet send to the transmitter.
     /// - tuple consisitng of startDate and dexcomCalibrationParameters. If startDate is nil, then there's no start sensor waiting to be sent to the transmitter.
@@ -196,11 +204,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - cGMG5TransmitterDelegate : a CGMG5TransmitterDelegate
     ///     - transmitterStartDate : transmitter start date, optional - actual transmitterStartDate is received from transmitter itself, and stored in coredata. The stored value iss given here as parameter in the initializer. Means  at app start up, it's read from core data and added here as parameter
     ///     - sensorStartDate : should be sensorStartDate of active sensor. If a different sensor start date is received from the transmitter, then we know a new senosr was started
+    ///     - activeSensorStartDate : start date of xDrip's active internal sensor at the time the transmitter is created
     ///     - calibrationToSendToTransmitter : used to send calibration done by user via xDrip4iOS to Dexcom transmitter. For example, user may have give a calibration in the app, but it's not yet send to the transmitter. This needs to be verified in CGMG5Transmitter, which is why it's given here as parameter - when initializing, assign last known calibration for the active sensor, even if it's already sent.
     ///     - webOOPEnabled : enabled or not, if nil then default false
     ///     - userOtherApp
     ///     - isAnubis: true or false. If true then we can take advantage of extra features
-    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, transmitterStartDate: Date?, sensorStartDate: Date?, calibrationToSendToTransmitter: Calibration?, firmware: String?, webOOPEnabled: Bool?, useOtherApp: Bool, isAnubis: Bool) {
+    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, transmitterStartDate: Date?, sensorStartDate: Date?, activeSensorStartDate: Date?, calibrationToSendToTransmitter: Calibration?, firmware: String?, webOOPEnabled: Bool?, useOtherApp: Bool, isAnubis: Bool) {
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DEXCOM" + transmitterID[transmitterID.index(transmitterID.startIndex, offsetBy: 4)..<transmitterID.endIndex])
         if let address = address {
@@ -233,6 +242,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // assign sensorStartDate
         self.sensorStartDate = sensorStartDate
+
+        // Preserve the Core Data state until the first validated Dexcom packet is reconciled.
+        self.activeSensorStartDateAtInitialization = activeSensorStartDate
         
         // initialize - CBUUID_Receive_Authentication.rawValue and CBUUID_Write_Control.rawValue will probably not be used in the superclass
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G5, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G5)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
@@ -1410,26 +1422,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             lastGlucoseInSensorDataRxReading = GlucoseData(timeStamp: timeStamp, glucoseLevelRaw: calculatedValue)
             okToRequestBackfill = true
             glucoseTxSent = true
-            var forceNewSensor = false
-            if let sensorStartDate = self.sensorStartDate, let activeSensorStartDate = UserDefaults.standard.activeSensorStartDate, activeSensorStartDate < sensorStartDate.addingTimeInterval(-15.0) || activeSensorStartDate > sensorStartDate.addingTimeInterval(15.0) {
-                forceNewSensor = true
-            }
             if let receivedSensorStartDate = receivedSensorStartDate {
-                if forceNewSensor || sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
-                    if let sensorStartDate = sensorStartDate {
-                        trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, currently known sensorStartDate = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
-                    } else {
-                        trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, current sensorStartDate is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-                    }
-                    trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, received sensorStartDate minus 15 seconds = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, receivedSensorStartDate.addingTimeInterval(-15.0).toStringForTrace(timeStyle: .long, dateStyle: .long))
-                    trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, seems that a new sensor is detected.", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-                    self.receivedSensorStartDate = receivedSensorStartDate
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else { return }
-                        self.cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: receivedSensorStartDate)
-                    }
-                }
-                sensorStartDate = receivedSensorStartDate
+                reconcileInternalSensorSession(with: receivedSensorStartDate)
             }
         case .SensorWarmup, .SessionStopped:
             lastGlucoseInSensorDataRxReading = nil
@@ -1439,25 +1433,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 }
                 sensorStartDate = nil
             } else if let receivedSensorStartDate = receivedSensorStartDate {
-                var forceNewSensor = false
-                if let sensorStartDate = self.sensorStartDate, let activeSensorStartDate = UserDefaults.standard.activeSensorStartDate, activeSensorStartDate < sensorStartDate.addingTimeInterval(-15.0) || activeSensorStartDate > sensorStartDate.addingTimeInterval(15.0) {
-                    forceNewSensor = true
-                }
-                if forceNewSensor || sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
-                    if let sensorStartDate = sensorStartDate {
-                        trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, currently known sensorStartDate = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
-                    } else {
-                        trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, current sensorStartDate is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-                    }
-                    trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, received sensorStartDate minus 15 seconds = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, receivedSensorStartDate.addingTimeInterval(-15.0).toStringForTrace(timeStyle: .long, dateStyle: .long))
-                    trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, seems a new sensor is detected.", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-                    self.receivedSensorStartDate = receivedSensorStartDate
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else { return }
-                        self.cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: receivedSensorStartDate)
-                    }
-                }
-                sensorStartDate = receivedSensorStartDate
+                reconcileInternalSensorSession(with: receivedSensorStartDate)
             }
         default:
             trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, algorithm state is %{public}@ so will not create lastGlucoseInSensorDataRxReading", log: log, category: ConstantsLog.categoryCGMG5, type: .info, algorithmStatus.description)
@@ -1466,6 +1442,42 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // don't send reading to delegate, will be done when transmitter disconnects, then we're sure we also received al necessary backfill data
 
+    }
+
+    /// Reconciles the Dexcom session with xDrip's internal Sensor after a glucose packet confirms an active or warming-up session.
+    private func reconcileInternalSensorSession(with receivedSensorStartDate: Date) {
+        // The persisted transmitter date can survive a deliberate disconnect, while xDrip's internal
+        // Sensor is stopped. The active internal date is therefore the source of truth for deciding
+        // whether the existing newSensorDetected workflow must recreate the local session.
+        let activeSensorStartDate = UserDefaults.standard.activeSensorStartDate ?? activeSensorStartDateAtInitialization
+        activeSensorStartDateAtInitialization = nil
+
+        if Self.shouldReportDetectedSensor(
+            activeSensorStartDate: activeSensorStartDate,
+            lastReportedSensorStartDate: lastReportedSensorStartDate,
+            receivedSensorStartDate: receivedSensorStartDate
+        ) {
+            trace("in reconcileInternalSensorSession, received Dexcom sensor session is missing or different in xDrip, reporting it as detected", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+            lastReportedSensorStartDate = receivedSensorStartDate
+
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: receivedSensorStartDate)
+            }
+        }
+
+        sensorStartDate = receivedSensorStartDate
+    }
+
+    static func shouldReportDetectedSensor(activeSensorStartDate: Date?, lastReportedSensorStartDate: Date?, receivedSensorStartDate: Date) -> Bool {
+        if let lastReportedSensorStartDate,
+           abs(lastReportedSensorStartDate.timeIntervalSince(receivedSensorStartDate)) <= sensorStartDateTolerance {
+            return false
+        }
+
+        guard let activeSensorStartDate else { return true }
+
+        return abs(activeSensorStartDate.timeIntervalSince(receivedSensorStartDate)) > sensorStartDateTolerance
     }
     
 

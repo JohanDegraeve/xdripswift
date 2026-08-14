@@ -649,6 +649,9 @@ final class RootHomeStateModel: ObservableObject {
         if isMaster, sensorState.title.isEmpty {
             if cgmTransmitter?.cgmTransmitterType().sensorType() == .Libre, activeSensor?.startDate != nil {
                 title = " ⚠️  " + Texts_HomeView.reconnectLibreDataSource
+            } else if let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter,
+                      bluetoothTransmitter.getConnectionStatus() != .connected {
+                title = " ⏳  " + Texts_HomeView.waitingForCGMConnection
             } else if cgmTransmitter != nil {
                 title = " ⏳  " + Texts_HomeView.waitingForDataSource
             } else {

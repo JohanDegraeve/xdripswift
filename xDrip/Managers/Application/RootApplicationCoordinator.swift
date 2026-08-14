@@ -814,6 +814,12 @@ import AppIntents
                 // BG adjustment is still allowed for the active master source.
                 self.bgPostProcessingManager?.refreshSourceContext()
             }
+
+            // Once presentation dependencies are ready, reflect transmitter selection immediately
+            // instead of waiting for the regular Home refresh timer or the first connection.
+            if self.rootTabStateModel?.dependencies != nil {
+                self.publishRootHomeState()
+            }
             
         }
         
