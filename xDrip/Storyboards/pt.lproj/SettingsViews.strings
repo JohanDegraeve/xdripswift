@@ -42,6 +42,7 @@
 "settingsviews_nonfixedtransmitter" = "Calibração multiponto";
 "settingsviews_labelNonFixed" = "Calibração Multi-ponto";
 "settingsviews_sectiontitlealerting" = "Alarme";
+"settingsviews_prefer_large_snooze_screen" = "Ecrã grande para silenciar";
 "settingsviews_row_alert_types" = "Tipos de Alarmes";
 "settingsviews_row_alerts" = "Alarmes";
 "settingsviews_volume_tests_section_title" = "Testar volume do alarme";

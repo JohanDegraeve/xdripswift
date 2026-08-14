@@ -41,6 +41,7 @@
 "settingsviews_labelCalibrationTitle" = "Sensor Kalibratie";
 "settingsviews_labelCalibrationType" = "Type kalibratie";
 "settingsviews_sectiontitlealerting" = "Alarmen";
+"settingsviews_prefer_large_snooze_screen" = "Groot sluimerscherm";
 "settingsviews_row_alert_types" = "Alarm Types";
 "settingsviews_row_alerts" = "Alarmen";
 "settingsviews_volume_tests_section_title" = "Alarmvolume testen";

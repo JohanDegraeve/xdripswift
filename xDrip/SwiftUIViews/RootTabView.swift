@@ -434,9 +434,23 @@ struct RootTabView: View {
                 }
             }
         }
+        .overlay {
+            // Alert-driven snooze sheets should remain visually distinct from the current screen.
+            if stateModel.pickerData != nil {
+                Color.black.opacity(0.65)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+            }
+        }
         .sheet(item: $stateModel.pickerData) { pickerData in
-            SnoozePickerView(pickerData: pickerData)
-                .colorScheme(.dark)
+            // Root-level requests are alerts; the preference changes their scale, not their actions.
+            if UserDefaults.standard.preferLargeSnoozeScreen {
+                LargeSnoozePickerView(pickerData: pickerData)
+                    .colorScheme(.dark)
+            } else {
+                StandardAlertSnoozePickerView(pickerData: pickerData)
+                    .colorScheme(.dark)
+            }
         }
     }
 

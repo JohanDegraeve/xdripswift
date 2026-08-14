@@ -35,6 +35,7 @@
 "settingsviews_nonfixedtransmitter" = "معايرة متعددة النقاط";
 "settingsviews_labelNonFixed" = "المعايرة متعددة النقاط";
 "settingsviews_sectiontitlealerting" = "التنبيهات";
+"settingsviews_prefer_large_snooze_screen" = "شاشة الغفوة الكبيرة";
 "settingsviews_row_alert_types" = "أنواع التنبيهات";
 "settingsviews_row_alerts" = "التنبيهات";
 "settingsviews_volume_tests_section_title" = "اختبار صوت التنبيه";

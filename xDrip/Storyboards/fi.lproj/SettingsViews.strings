@@ -28,6 +28,7 @@
 "settingsviews_nonfixedtransmitter" = "Monipistekalibrointi";
 "settingsviews_labelNonFixed" = "Monipistekalibrointi";
 "settingsviews_sectiontitlealerting" = "Hälytys";
+"settingsviews_prefer_large_snooze_screen" = "Suuri torkkunäyttö";
 "settingsviews_row_alert_types" = "Hälytystyypit";
 "settingsviews_row_alerts" = "Hälytykset";
 "settingsviews_volume_tests_section_title" = "Testaa hälytyksen äänenvoimakkuus";

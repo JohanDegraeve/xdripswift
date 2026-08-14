@@ -84,6 +84,7 @@
 "settingsviews_labelCalibrationTitle" = "Calibración de Sensor";
 "settingsviews_labelCalibrationType" = "Tipo de Calibración";
 "settingsviews_sectiontitlealerting" = "Alarmas";
+"settingsviews_prefer_large_snooze_screen" = "Pantalla grande para silenciar";
 "settingsviews_row_alert_types" = "Tipos de Alarmas";
 "settingsviews_row_alerts" = "Alarmas";
 "settingsviews_volume_tests_section_title" = "Comprobar volumen de alarma";

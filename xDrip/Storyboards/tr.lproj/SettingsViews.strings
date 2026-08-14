@@ -41,6 +41,7 @@
 "settingsviews_labelNonFixed" = "Çok Noktalı Kalibrasyon";
 "settingsviews_labelWebOOP" = "xDrip veya Verici algorithması";
 "settingsviews_sectiontitlealerting" = "Uyarılar";
+"settingsviews_prefer_large_snooze_screen" = "Büyük Erteleme Ekranı";
 "settingsviews_row_alert_types" = "Uyarı Türleri";
 "settingsviews_row_alerts" = "Uyarılar";
 "settingsviews_volume_tests_section_title" = "Alarm sesini test et";

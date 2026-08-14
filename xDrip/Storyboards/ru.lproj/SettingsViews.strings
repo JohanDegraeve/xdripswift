@@ -47,6 +47,7 @@
 "settingsviews_labelNonFixed" = "Многоточечная калибровка";
 "settingsviews_labelWebOOP" = "Калибровка xDrip или Трансмиттер";
 "settingsviews_sectiontitlealerting" = "Сигналы тревог";
+"settingsviews_prefer_large_snooze_screen" = "Большой экран отсрочки";
 "settingsviews_row_alert_types" = "Типы сигналов тревоги";
 "settingsviews_row_alerts" = "Уведомления";
 "settingsviews_volume_tests_section_title" = "Проверить громкость сигнала";

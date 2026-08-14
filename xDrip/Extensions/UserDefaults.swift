@@ -241,6 +241,8 @@ extension UserDefaults {
         case snoozeAllAlertsFromDate = "snoozeAllAlertsFromDate"
         /// for how long did the user snooze all alarms
         case snoozeAllAlertsUntilDate = "snoozeAllAlertsUntilDate"
+        /// whether alert-triggered snooze sheets should use the oversized presentation
+        case preferLargeSnoozeScreen = "preferLargeSnoozeScreen"
 
         // Housekeeper settings
 
@@ -1752,6 +1754,18 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.snoozeAllAlertsUntilDate.rawValue)
+        }
+    }
+
+    /// Whether alerts use the oversized snooze sheet. Missing values default to true
+    /// so existing installs retain the easy-to-hit alert presentation.
+    var preferLargeSnoozeScreen: Bool {
+        get {
+            guard object(forKey: Key.preferLargeSnoozeScreen.rawValue) != nil else { return true }
+            return bool(forKey: Key.preferLargeSnoozeScreen.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.preferLargeSnoozeScreen.rawValue)
         }
     }
 

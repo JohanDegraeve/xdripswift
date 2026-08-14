@@ -108,6 +108,7 @@
 "settingsviews_volume_tests_section_title" = "Test Alarm Volume";
 "settingsviews_alert_types_section_footer" = "Alarm Types define how alarms behave, including sound, vibration, snooze and mute override settings.";
 "settingsviews_alerts_section_footer" = "Alarms define when the app should notify you for glucose levels, missed readings and other conditions.";
+"settingsviews_prefer_large_snooze_screen" = "Large Snooze Screen";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
 "settingsviews_healthkit" = "Write to Apple Health";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";

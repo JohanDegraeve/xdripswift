@@ -169,6 +169,7 @@
 
 /// alerting settings, section title
 "settingsviews_sectiontitlealerting" = "Alarms";
+"settingsviews_prefer_large_snooze_screen" = "Великий екран відкладення";
 
 /// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
 "oslog" = "OSLog";

@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 /// Displays active alerts and controls individual or global snooze periods.
 ///
@@ -50,8 +51,17 @@ struct SnoozeView: View {
             }
         }
         .colorScheme(.dark)
+        .overlay {
+            // Keep the Snooze screen visually behind its duration picker.
+            if viewModel.pickerData != nil {
+                Color.black.opacity(0.65)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+            }
+        }
         .sheet(item: $viewModel.pickerData) { pickerData in
-            SnoozePickerView(pickerData: pickerData)
+            // Pickers opened from the Snooze screen use the normal in-app presentation.
+            StandardSnoozePickerView(pickerData: pickerData)
         }
         .onDisappear {
             UserDefaults.standard.updateSnoozeStatus.toggle()
@@ -314,8 +324,45 @@ struct SnoozePickerData: Identifiable {
     }
 }
 
-/// Dark, compact layout used only by the modal snooze picker.
+/// Visual scale and action treatment for normal selection and alert handling.
+private enum SnoozePickerPresentation {
+    case standard
+    case standardAlert
+    case largeAlert
+
+    var isAlert: Bool {
+        self != .standard
+    }
+
+    var isLarge: Bool {
+        self == .largeAlert
+    }
+
+    var iconSize: CGFloat {
+        isLarge ? 42 : 28
+    }
+
+    var iconWidth: CGFloat {
+        isLarge ? 54 : 40
+    }
+
+    var titleFont: Font {
+        isLarge ? .system(size: 44, weight: .bold) : .title2.weight(.bold)
+    }
+
+    var subtitleFont: Font {
+        isLarge ? .title2.weight(.semibold) : .body
+    }
+
+    var detents: Set<PresentationDetent> {
+        // The alert picker needs more room than the standard sheet without obscuring the whole app.
+        isLarge ? [.fraction(0.8)] : [.height(390)]
+    }
+}
+
+/// Shared dark shell that keeps both picker variants structurally identical.
 private struct SnoozePickerSheetLayout<Content: View>: View {
+    let presentation: SnoozePickerPresentation
     let title: String?
     let subtitle: String?
     let accentColor: Color
@@ -326,6 +373,7 @@ private struct SnoozePickerSheetLayout<Content: View>: View {
     let content: Content
 
     init(
+        presentation: SnoozePickerPresentation,
         title: String?,
         subtitle: String?,
         accentColor: Color,
@@ -335,6 +383,7 @@ private struct SnoozePickerSheetLayout<Content: View>: View {
         onConfirm: @escaping () -> Void,
         @ViewBuilder content: @escaping () -> Content
     ) {
+        self.presentation = presentation
         self.title = title
         self.subtitle = subtitle
         self.accentColor = accentColor
@@ -353,20 +402,21 @@ private struct SnoozePickerSheetLayout<Content: View>: View {
             VStack(spacing: 4) {
                 HStack(spacing: 14) {
                     Image(systemName: "speaker.wave.2")
-                        .font(.system(size: 28, weight: .semibold))
+                        .font(.system(size: presentation.iconSize, weight: .semibold))
                         .foregroundStyle(accentColor)
-                        .frame(width: 40)
+                        .frame(width: presentation.iconWidth)
 
-                    VStack(alignment: .leading, spacing: 3) {
+                    VStack(alignment: .leading, spacing: presentation.isLarge ? 6 : 3) {
                         if let title, !title.isEmpty {
                             Text(title)
-                                .font(.title2.weight(.bold))
+                                .font(presentation.titleFont)
                                 .foregroundStyle(ConstantsAppColors.primaryText)
+                                .minimumScaleFactor(0.75)
                         }
 
                         if let subtitle, !subtitle.isEmpty {
                             Text(subtitle)
-                                .font(.body)
+                                .font(presentation.subtitleFont)
                                 .foregroundStyle(ConstantsAppColors.secondaryText)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
@@ -379,22 +429,7 @@ private struct SnoozePickerSheetLayout<Content: View>: View {
                 content
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                HStack(spacing: 0) {
-                    Button(cancelTitle, action: onCancel)
-                        .font(.title3.weight(.bold))
-                        .buttonStyle(.borderedProminent)
-                        .tint(ConstantsAppColors.urgent)
-                        .foregroundStyle(.white)
-
-                    Spacer(minLength: 24)
-
-                    Button(confirmationTitle, action: onConfirm)
-                        .font(.title3.weight(.bold))
-                        .buttonStyle(.borderedProminent)
-                        .tint(ConstantsAppColors.normal)
-                        .foregroundStyle(.white)
-                }
-                .controlSize(.large)
+                actionButtons
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
@@ -403,30 +438,173 @@ private struct SnoozePickerSheetLayout<Content: View>: View {
         .colorScheme(.dark)
         .presentationDragIndicator(.visible)
     }
+
+    @ViewBuilder private var actionButtons: some View {
+        HStack(spacing: 0) {
+            if presentation.isAlert {
+                // Alert actions retain their red/green meaning at the selected presentation scale.
+                Button(cancelTitle, action: onCancel)
+                    .font(presentation.isLarge ? .title3.weight(.bold) : .body.weight(.semibold))
+                    .buttonStyle(.borderedProminent)
+                    .tint(ConstantsAppColors.urgent)
+                    .foregroundStyle(.white)
+
+                Spacer(minLength: 24)
+
+                Button(confirmationTitle, action: onConfirm)
+                    .font(presentation.isLarge ? .title3.weight(.bold) : .body.weight(.semibold))
+                    .buttonStyle(.borderedProminent)
+                    .tint(ConstantsAppColors.normal)
+                    .foregroundStyle(.white)
+            } else {
+                // In-app snoozing uses normal-sized buttons while preserving the same bottom layout.
+                Button(action: onCancel) {
+                    Text(cancelTitle)
+                        .font(.body.weight(.semibold))
+                }
+                .buttonStyle(.bordered)
+                .tint(ConstantsAppColors.toolbarNeutralAction)
+
+                Spacer(minLength: 24)
+
+                Button(action: onConfirm) {
+                    Text(confirmationTitle)
+                        .font(.body.weight(.semibold))
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .controlSize(presentation.isLarge ? .large : .regular)
+    }
 }
 
-/// Native wheel picker for one alert snooze duration.
-struct SnoozePickerView: View {
+/// UIKit-backed wheel used only where larger row heights are required for alarm handling.
+private struct LargeSnoozeWheelPicker: UIViewRepresentable {
+    let data: [String]
+    @Binding var selectedRow: Int
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    func makeUIView(context: Context) -> UIPickerView {
+        let pickerView = UIPickerView()
+        pickerView.backgroundColor = .clear
+        pickerView.dataSource = context.coordinator
+        pickerView.delegate = context.coordinator
+        pickerView.selectRow(selectedRow, inComponent: 0, animated: false)
+        return pickerView
+    }
+
+    func updateUIView(_ pickerView: UIPickerView, context: Context) {
+        context.coordinator.parent = self
+        pickerView.reloadAllComponents()
+
+        if pickerView.selectedRow(inComponent: 0) != selectedRow {
+            pickerView.selectRow(selectedRow, inComponent: 0, animated: false)
+        }
+    }
+
+    final class Coordinator: NSObject, UIPickerViewDataSource, UIPickerViewDelegate {
+        var parent: LargeSnoozeWheelPicker
+
+        init(_ parent: LargeSnoozeWheelPicker) {
+            self.parent = parent
+        }
+
+        func numberOfComponents(in pickerView: UIPickerView) -> Int {
+            1
+        }
+
+        func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+            parent.data.count
+        }
+
+        func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+            64
+        }
+
+        func pickerView(
+            _ pickerView: UIPickerView,
+            viewForRow row: Int,
+            forComponent component: Int,
+            reusing view: UIView?
+        ) -> UIView {
+            let label = (view as? UILabel) ?? UILabel()
+            label.backgroundColor = .clear
+            label.adjustsFontForContentSizeCategory = true
+            label.adjustsFontSizeToFitWidth = true
+            label.minimumScaleFactor = 0.7
+            label.font = UIFontMetrics(forTextStyle: .largeTitle).scaledFont(
+                for: UIFont.systemFont(ofSize: 42, weight: .bold),
+                maximumPointSize: 48
+            )
+            label.text = parent.data[row]
+            label.textAlignment = .center
+            label.textColor = .label
+            return label
+        }
+
+        func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+            parent.selectedRow = row
+        }
+    }
+}
+
+/// Shared snooze selection and callback handling with presentation-specific content.
+private struct SnoozePickerPresentationView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedRow: Int
+    @State private var actionWasHandled = false
 
     let pickerData: SnoozePickerData
+    let presentation: SnoozePickerPresentation
 
-    init(pickerData: SnoozePickerData) {
+    init(pickerData: SnoozePickerData, presentation: SnoozePickerPresentation) {
         self.pickerData = pickerData
+        self.presentation = presentation
         _selectedRow = State(initialValue: pickerData.pickerViewData.selectedRow)
     }
 
     var body: some View {
         SnoozePickerSheetLayout(
-            title: pickerData.pickerViewData.mainTitle,
-            subtitle: pickerData.pickerViewData.subTitle,
-            accentColor: pickerData.pickerViewData.priority == .high ? ConstantsAppColors.urgent : ConstantsAppColors.accent,
+            presentation: presentation,
+            // Both normal-scale variants keep the standard title hierarchy and neutral icon.
+            title: presentation.isLarge
+                ? pickerData.pickerViewData.mainTitle
+                : pickerData.pickerViewData.subTitle,
+            subtitle: presentation.isLarge
+                ? nil
+                : pickerData.pickerViewData.mainTitle,
+            accentColor: presentation.isLarge
+                ? pickerData.pickerViewData.priority == .high
+                    ? ConstantsAppColors.urgent
+                    : ConstantsAppColors.accent
+                : Color(.colorSecondary),
             cancelTitle: pickerData.pickerViewData.cancelTitle ?? Texts_Common.Cancel,
-            confirmationTitle: pickerData.pickerViewData.actionTitle ?? Texts_Alerts.snooze,
+            confirmationTitle: presentation.isAlert
+                ? pickerData.pickerViewData.actionTitle ?? Texts_Alerts.snooze
+                : Texts_Common.Ok,
             onCancel: cancel,
             onConfirm: confirm
         ) {
+            picker
+        }
+        .presentationDetents(presentation.detents)
+        .interactiveDismissDisabled(presentation.isLarge)
+        .onDisappear(perform: handleInteractiveDismissal)
+    }
+
+    @ViewBuilder private var picker: some View {
+        if presentation.isLarge {
+            // SwiftUI's wheel has a fixed row height, so the alarm variant uses native oversized rows.
+            LargeSnoozeWheelPicker(
+                data: pickerData.pickerViewData.data,
+                selectedRow: $selectedRow
+            )
+            .frame(maxWidth: .infinity, minHeight: 300)
+            .onChange(of: selectedRow, perform: selectionChanged)
+        } else {
             Picker("", selection: $selectedRow) {
                 ForEach(pickerData.pickerViewData.data.indices, id: \.self) { index in
                     Text(pickerData.pickerViewData.data[index])
@@ -434,26 +612,64 @@ struct SnoozePickerView: View {
                 }
             }
             .pickerStyle(.wheel)
-            .onChange(of: selectedRow) { selectedRow in
-                pickerData.pickerViewData.didSelectRowHandler?(selectedRow)
-            }
+            .onChange(of: selectedRow, perform: selectionChanged)
         }
-        .presentationDetents([.height(390)])
-        .interactiveDismissDisabled()
+    }
+
+    private func selectionChanged(_ selectedRow: Int) {
+        pickerData.pickerViewData.didSelectRowHandler?(selectedRow)
     }
 
     private func cancel() {
+        actionWasHandled = true
         pickerData.pickerViewData.cancelHandler?()
         finish()
     }
 
     private func confirm() {
+        actionWasHandled = true
         pickerData.pickerViewData.actionHandler(selectedRow)
         finish()
+    }
+
+    private func handleInteractiveDismissal() {
+        // Both normal-scale pickers are swipeable and treat dismissal exactly like Cancel.
+        guard !presentation.isLarge, !actionWasHandled else { return }
+
+        actionWasHandled = true
+        pickerData.pickerViewData.cancelHandler?()
+        UserDefaults.standard.updateSnoozeStatus.toggle()
     }
 
     private func finish() {
         UserDefaults.standard.updateSnoozeStatus.toggle()
         dismiss()
+    }
+}
+
+/// Normal-scale snooze picker used by controls inside the app.
+struct StandardSnoozePickerView: View {
+    let pickerData: SnoozePickerData
+
+    var body: some View {
+        SnoozePickerPresentationView(pickerData: pickerData, presentation: .standard)
+    }
+}
+
+/// Standard picker layout with the same red/green actions as the oversized alert view.
+struct StandardAlertSnoozePickerView: View {
+    let pickerData: SnoozePickerData
+
+    var body: some View {
+        SnoozePickerPresentationView(pickerData: pickerData, presentation: .standardAlert)
+    }
+}
+
+/// Oversized snooze picker used when an alert demands immediate attention.
+struct LargeSnoozePickerView: View {
+    let pickerData: SnoozePickerData
+
+    var body: some View {
+        SnoozePickerPresentationView(pickerData: pickerData, presentation: .largeAlert)
     }
 }

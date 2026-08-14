@@ -47,6 +47,7 @@
 "settingsviews_labelNonFixed" = "Βαθμονόμηση πολλαπλών σημείων";
 "settingsviews_labelWebOOP" = "xDrip ή αλγόριθμος πομπού";
 "settingsviews_sectiontitlealerting" = "Ειδοποιήσεις";
+"settingsviews_prefer_large_snooze_screen" = "Μεγάλη οθόνη αναβολής";
 "settingsviews_row_alert_types" = "Τύποι ειδοποιήσεων";
 "settingsviews_row_alerts" = "Ειδοποιήσεις";
 "settingsviews_volume_tests_section_title" = "Δοκιμή έντασης συναγερμού";

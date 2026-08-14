@@ -45,6 +45,7 @@
 "settingsviews_labelCalibrationType" = "Kalibreringstyp";
 
 "settingsviews_sectiontitlealerting" = "Larm";
+"settingsviews_prefer_large_snooze_screen" = "Stor snooze-skärm";
 "settingsviews_row_alert_types" = "Typ av larm";
 "settingsviews_row_alerts" = "Larm";
 "settingsviews_volume_tests_section_title" = "Testa larmvolym";

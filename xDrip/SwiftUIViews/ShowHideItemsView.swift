@@ -22,8 +22,7 @@ struct ShowHideItemsView: View {
     @State private var showTreatmentsOnChart = UserDefaults.standard.showTreatmentsOnChart
     @State private var showSensorNoise = UserDefaults.standard.showSensorNoise
     @State private var speakReadings = UserDefaults.standard.speakReadings
-    @State private var allowStandByHighContrast = UserDefaults.standard.allowStandByHighContrast
-    @State private var forceStandByBigNumbers = UserDefaults.standard.forceStandByBigNumbers
+    @AppStorage(UserDefaults.Key.preferLargeSnoozeScreen.rawValue) private var preferLargeSnoozeScreen = true
     
     // MARK: - private properties
     
@@ -65,23 +64,14 @@ struct ShowHideItemsView: View {
                             }
                     }
                     
-                    Section(header: Text(Texts_HomeView.showHideStandByModeTitle), footer: Text(Texts_HomeView.showHideStandByModeFooter)) {
-                        Toggle(Texts_SettingsView.allowStandByHighContrast, isOn: $allowStandByHighContrast)
-                            .onChange(of: allowStandByHighContrast) { newValue in
-                                UserDefaults.standard.allowStandByHighContrast = newValue
-                            }
-                        
-                        Toggle(Texts_SettingsView.forceStandByBigNumbers, isOn: $forceStandByBigNumbers)
-                            .onChange(of: forceStandByBigNumbers) { newValue in
-                                UserDefaults.standard.forceStandByBigNumbers = newValue
-                            }
-                    }
-                    
                     Section(header: Text(Texts_HomeView.showHideAdditionalItemsTitle)) {
                         Toggle(Texts_SettingsView.labelSpeakBgReadings, isOn: $speakReadings)
                             .onChange(of: speakReadings) { newValue in
                                 UserDefaults.standard.speakReadings = newValue
                             }
+
+                        // Uses the same stored preference as the full Alarms settings screen.
+                        Toggle(Texts_SettingsView.preferLargeSnoozeScreen, isOn: $preferLargeSnoozeScreen)
                     }
                 }
                 .tint(ConstantsAppColors.normal)

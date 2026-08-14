@@ -17,6 +17,7 @@
 "settingsviews_transmitterid_text_for_button" = "发射器ID";
 "settingsviews_givetransmitterid" = "输入发射器ID";
 "settingsviews_sectiontitlealerting" = "警报设置";
+"settingsviews_prefer_large_snooze_screen" = "大号延后报警界面";
 "settingsviews_row_alert_types" = "警报类型";
 "settingsviews_row_alerts" = "警报";
 "settingsviews_volume_tests_section_title" = "测试警报音量";

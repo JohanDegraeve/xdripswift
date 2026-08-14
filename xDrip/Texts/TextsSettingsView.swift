@@ -578,6 +578,10 @@ class Texts_SettingsView {
     static let alertsSectionFooter: String = {
         return NSLocalizedString("settingsviews_alerts_section_footer", tableName: filename, bundle: Bundle.main, value: "Alarms define when the app should notify you for glucose levels, missed readings and other conditions.", comment: "alerting settings, footer explaining alarms")
     }()
+
+    static let preferLargeSnoozeScreen: String = {
+        return NSLocalizedString("settingsviews_prefer_large_snooze_screen", tableName: filename, bundle: Bundle.main, value: "Large Snooze Screen", comment: "alarm setting that uses an oversized snooze picker when an alarm is raised")
+    }()
     
     // MARK: - Section Healthkit
     

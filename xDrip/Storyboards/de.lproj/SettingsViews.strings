@@ -175,6 +175,7 @@
 
 /// alerting settings, section title
 "settingsviews_sectiontitlealerting" = "Alarms";
+"settingsviews_prefer_large_snooze_screen" = "Großer Schlummerbildschirm";
 
 /// speak settings, where user can enable or disable speak readings
 "settingsviews_speakBgReadings" = "Glukose sprechen";

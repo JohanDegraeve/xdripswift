@@ -18,6 +18,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// Controls iOS notifications for flatline and temporary sensor issues.
     /// Home banners remain available. Terminal failures use the main Alerts screen setting.
     case sensorHealthNotifications = 4
+
+    /// Selects the oversized picker for snoozing an active alarm.
+    case preferLargeSnoozeScreen = 5
     
 }
 
@@ -71,7 +74,13 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
             ]
         case .alerts:
             return [
-                nativeSettingsRow(id: "alerts.alerts", index: Setting.alerts.rawValue, sectionID: sectionID)
+                nativeSettingsRow(id: "alerts.alerts", index: Setting.alerts.rawValue, sectionID: sectionID),
+                // Keep this presentation preference beside the Alarms destination it affects.
+                nativeSettingsRow(
+                    id: "alerts.preferLargeSnoozeScreen",
+                    index: Setting.preferLargeSnoozeScreen.rawValue,
+                    sectionID: sectionID
+                )
             ]
         case .sensorHealth:
             return [
@@ -113,12 +122,20 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
     }
 
     func settingsToggle(index: Int) -> SettingsToggleControl? {
-        guard Setting(rawValue: index) == .sensorHealthNotifications else { return nil }
-
-        return SettingsToggleControl(
-            isOn: { UserDefaults.standard.sensorHealthNotificationsEnabled },
-            setIsOn: { UserDefaults.standard.sensorHealthNotificationsEnabled = $0 }
-        )
+        switch Setting(rawValue: index) {
+        case .sensorHealthNotifications:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.sensorHealthNotificationsEnabled },
+                setIsOn: { UserDefaults.standard.sensorHealthNotificationsEnabled = $0 }
+            )
+        case .preferLargeSnoozeScreen:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.preferLargeSnoozeScreen },
+                setIsOn: { UserDefaults.standard.preferLargeSnoozeScreen = $0 }
+            )
+        default:
+            return nil
+        }
     }
     
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
@@ -130,6 +147,8 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
         case .alerts:
             return .performSegue(withIdentifier: SettingsSegueIdentifier.settingsToAlertSettings.rawValue, sender: nil)
         case .sensorHealthNotifications:
+            return .nothing
+        case .preferLargeSnoozeScreen:
             return .nothing
             
         case .volumeTestSoundPlayer:
@@ -197,6 +216,8 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
             return Texts_SettingsView.labelAlerts
         case .sensorHealthNotifications:
             return Texts_SettingsView.sensorHealthNotifications
+        case .preferLargeSnoozeScreen:
+            return Texts_SettingsView.preferLargeSnoozeScreen
             
         case .volumeTestSoundPlayer:
             return Texts_SettingsView.volumeTestSoundPlayer
@@ -217,7 +238,7 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
             
             return .disclosure
 
-        case .sensorHealthNotifications:
+        case .sensorHealthNotifications, .preferLargeSnoozeScreen:
             return .none
             
         case .volumeTestSoundPlayer, .volumeTestiOSSound:

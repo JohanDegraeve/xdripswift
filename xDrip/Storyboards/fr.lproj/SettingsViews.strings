@@ -33,6 +33,7 @@
 "settingsviews_transmitterid_text_for_button" = "Transmetteur ID";
 "settingsviews_givetransmitterid" = "Entrer Transmetteur ID";
 "settingsviews_sectiontitlealerting" = "Alarme";
+"settingsviews_prefer_large_snooze_screen" = "Grand écran de snooze";
 "settingsviews_row_alert_types" = "Types d'alarme";
 "settingsviews_row_alerts" = "Alarmes";
 "settingsviews_volume_tests_section_title" = "Tester le volume de l'alarme";
