@@ -601,10 +601,11 @@ struct RootHomeView: View {
 
     private var expandedIPadChart: some View {
         NavigationStack {
-            mainChart
-                .padding(20)
-                .background(ConstantsAppColors.background.ignoresSafeArea())
-                .navigationTitle(Texts_HomeView.showHideGlucoseChartTitle)
+            IPadExpandedLandscapeChartView(
+                coreDataManager: coreDataManager,
+                nightscoutSyncManager: nightscoutSyncManager
+            )
+                .navigationTitle(Texts_Common.statisticsAmbulatoryGlucoseProfile)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
@@ -951,6 +952,22 @@ struct RootHomeView: View {
 
         showOriginalBGReadingsOnly = false
         requestChartState(forceReset: false, showsLoading: false)
+    }
+}
+
+/// Owns the landscape analytics state for one expanded iPad chart presentation.
+private struct IPadExpandedLandscapeChartView: View {
+    @StateObject private var stateModel: LandscapeChartStateModel
+
+    init(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager) {
+        _stateModel = StateObject(wrappedValue: LandscapeChartStateModel(
+            coreDataManager: coreDataManager,
+            nightscoutSyncManager: nightscoutSyncManager
+        ))
+    }
+
+    var body: some View {
+        LandscapeChartView(stateModel: stateModel, presentation: .expandedIPad)
     }
 }
 

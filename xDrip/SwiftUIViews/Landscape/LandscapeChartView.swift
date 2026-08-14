@@ -8,6 +8,10 @@
 
 import SwiftUI
 
+private func validLandscapeDimension(_ value: CGFloat) -> CGFloat {
+    value.isFinite ? max(value, 0) : 0
+}
+
 /// Supported history periods for the landscape comparison baseline.
 enum LandscapeComparisonPeriod: Int, CaseIterable, Identifiable {
     case threeDays = 3
@@ -282,21 +286,58 @@ private extension StatisticsManager.LandscapeBaseline {
 /// Full-screen AGP comparison with selected-day glucose and range summary.
 struct LandscapeChartView: View {
 
+    enum Presentation: Equatable {
+        case standard
+        case expandedIPad
+    }
+
     @ObservedObject var stateModel: LandscapeChartStateModel
+    let presentation: Presentation
 
     private enum Layout {
         static let screenPadding: CGFloat = 6
         static let contentSpacing: CGFloat = 8
+        static let expandedContentSpacing: CGFloat = 22
+        static let expandedPanelHorizontalInset: CGFloat = 16
         static let chartColumnSpacing: CGFloat = 18
         static let agpColumnFraction = 0.65
         static let toolbarHeight: CGFloat = 48
+        static let expandedToolbarHeight: CGFloat = 64
+        static let expandedSummaryHeight: CGFloat = 72
+        static let expandedMinimumChartHeight: CGFloat = 360
+        static let expandedMaximumChartHeight: CGFloat = 640
+        static let expandedChartHeightFraction: CGFloat = 0.72
+    }
+
+    init(stateModel: LandscapeChartStateModel, presentation: Presentation = .standard) {
+        self.stateModel = stateModel
+        self.presentation = presentation
     }
 
     var body: some View {
-        VStack(spacing: Layout.contentSpacing) {
-            toolbar
+        Group {
+            switch presentation {
+            case .standard:
+                VStack(spacing: Layout.contentSpacing) {
+                    toolbar
 
-            chartContent
+                    chartContent
+                }
+            case .expandedIPad:
+                GeometryReader { geometry in
+                    VStack(spacing: Layout.expandedContentSpacing) {
+                        toolbar
+                            .padding(.horizontal, Layout.expandedPanelHorizontalInset)
+                        expandedSummary
+                            .padding(.horizontal, Layout.expandedPanelHorizontalInset)
+
+                        chartContent
+                            .frame(height: expandedChartHeight(for: geometry.size.height))
+
+                        Spacer(minLength: 0)
+                    }
+                }
+            }
         }
         .padding(Layout.screenPadding)
         .padding(.top, 2)
@@ -307,7 +348,9 @@ struct LandscapeChartView: View {
     @ViewBuilder private var chartContent: some View {
         if stateModel.showsAIDCharts {
             GeometryReader { geometry in
-                let availableWidth = geometry.size.width - Layout.chartColumnSpacing
+                let availableWidth = validLandscapeDimension(
+                    geometry.size.width - Layout.chartColumnSpacing
+                )
 
                 HStack(spacing: Layout.chartColumnSpacing) {
                     landscapeAGPColumn
@@ -325,8 +368,10 @@ struct LandscapeChartView: View {
 
     private var landscapeAGPColumn: some View {
         VStack(alignment: .leading, spacing: 0) {
-            comparisonPeriodMenu
-                .padding(.leading, 8)
+            if presentation == .standard {
+                comparisonPeriodMenu
+                    .padding(.leading, 8)
+            }
 
             landscapeAGPChart
         }
@@ -358,20 +403,117 @@ struct LandscapeChartView: View {
 
             LandscapeTIRBadge(
                 chartState: stateModel.chartState,
-                referenceDate: stateModel.displayedDate
+                referenceDate: stateModel.displayedDate,
+                isExpandedIPad: presentation == .expandedIPad
             )
         }
         .padding(.horizontal, 14)
-        .frame(height: Layout.toolbarHeight)
+        .frame(height: presentation == .expandedIPad ? Layout.expandedToolbarHeight : Layout.toolbarHeight)
         .background(ConstantsAppColors.homePanelBackground)
         .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius + 8, style: .continuous))
     }
 
-    private var comparisonPeriodMenu: some View {
+    private var expandedSummary: some View {
         HStack(spacing: 0) {
-            Text(Texts_Common.landscapeComparingWithLast)
+            VStack(spacing: 5) {
+                Text(Texts_Common.statisticsPeriod)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(ConstantsAppColors.secondaryText)
+
+                comparisonPeriodMenu
+            }
+            .frame(maxWidth: .infinity)
+
+            summaryDivider
+            summaryMetric(title: Texts_Common.statisticsAverageGlucose, value: averageGlucoseText)
+            summaryDivider
+            summaryMetric(title: Texts_Common.cvStatistics, value: cvText)
+        }
+        .padding(.horizontal, 18)
+        .frame(height: Layout.expandedSummaryHeight)
+        .background(ConstantsAppColors.homePanelBackground)
+        .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius + 8, style: .continuous))
+    }
+
+    private func summaryMetric(title: String, value: String) -> some View {
+        VStack(spacing: 5) {
+            Text(title)
+                .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(ConstantsAppColors.secondaryText)
-                .font(.body)
+                .lineLimit(1)
+
+            Text(value)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(ConstantsAppColors.primaryText)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var summaryDivider: some View {
+        Divider()
+            .frame(height: 38)
+            .overlay(ConstantsAppColors.tertiaryText.opacity(0.35))
+    }
+
+    private var dailyValuesMgDl: [Double] {
+        zip(stateModel.chartState.bgReadingDates, stateModel.chartState.bgReadingValues)
+            .filter { date, value in
+                value > 0 && Calendar.current.isDate(date, inSameDayAs: stateModel.displayedDate)
+            }
+            .map { $0.1 }
+    }
+
+    private var averageMgDl: Double? {
+        guard !dailyValuesMgDl.isEmpty else { return nil }
+
+        return dailyValuesMgDl.reduce(0, +) / Double(dailyValuesMgDl.count)
+    }
+
+    private var averageGlucoseText: String {
+        guard let averageMgDl else { return "-" }
+
+        let usesMgDl = stateModel.baseline.usesMgDl
+        let unit = usesMgDl ? Texts_Common.mgdl : Texts_Common.mmol
+
+        return "\(averageMgDl.mgDlToMmolAndToString(mgDl: usesMgDl)) \(unit)"
+    }
+
+    private var cvText: String {
+        guard let averageMgDl, averageMgDl > 0 else { return "-" }
+
+        let variance = dailyValuesMgDl.reduce(0) { partialResult, value in
+            partialResult + pow(value - averageMgDl, 2)
+        } / Double(dailyValuesMgDl.count)
+        let cv = sqrt(variance) / averageMgDl * 100
+
+        return GlucoseReportFormatting.percentage(cv)
+    }
+
+    private func expandedChartHeight(for availableHeight: CGFloat) -> CGFloat {
+        let validAvailableHeight = validLandscapeDimension(availableHeight)
+        let heightAfterHeader = max(
+            0,
+            validAvailableHeight
+                - Layout.expandedToolbarHeight
+                - Layout.expandedSummaryHeight
+                - (Layout.expandedContentSpacing * 2)
+        )
+        let preferredHeight = min(
+            Layout.expandedMaximumChartHeight,
+            max(Layout.expandedMinimumChartHeight, validAvailableHeight * Layout.expandedChartHeightFraction)
+        )
+
+        return min(preferredHeight, heightAfterHeader)
+    }
+
+    private var comparisonPeriodMenu: some View {
+        HStack(spacing: presentation == .expandedIPad ? 6 : 0) {
+            Text(Texts_Common.landscapeComparingWithLast)
+                .foregroundStyle(comparisonPeriodColor)
+                .font(comparisonPeriodFont)
 
             Menu {
                 ForEach(LandscapeComparisonPeriod.allCases) { period in
@@ -391,13 +533,26 @@ struct LandscapeChartView: View {
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.caption.weight(.semibold))
                 }
-                .foregroundStyle(ConstantsAppColors.secondaryText)
+                .font(comparisonPeriodFont)
+                .foregroundStyle(comparisonPeriodColor)
             }
             .buttonStyle(.plain)
 
         }
         .lineLimit(1)
         .minimumScaleFactor(0.8)
+    }
+
+    private var comparisonPeriodColor: Color {
+        presentation == .expandedIPad
+            ? ConstantsAppColors.primaryText
+            : ConstantsAppColors.secondaryText
+    }
+
+    private var comparisonPeriodFont: Font {
+        presentation == .expandedIPad
+            ? .system(size: 18, weight: .semibold)
+            : .body
     }
 
 }
@@ -454,7 +609,10 @@ private struct LandscapeLoopalyzerCharts: View {
                     points: snapshot.points,
                     insulinTreatmentMarkers: snapshot.insulinTreatmentMarkers,
                     carbTreatmentMarkers: snapshot.carbTreatmentMarkers,
-                    plotHeight: max(44, (geometry.size.height - Layout.chartChromeHeight) / 3),
+                    plotHeight: max(
+                        44,
+                        (validLandscapeDimension(geometry.size.height) - Layout.chartChromeHeight) / 3
+                    ),
                     chartSpacing: Layout.chartSpacing
                 )
             }
@@ -690,12 +848,13 @@ private struct LandscapeTIRBadge: View {
 
     let chartState: GlucoseChartState
     let referenceDate: Date
+    var isExpandedIPad = false
 
     @State private var rangeMode = RangeMode.timeInRange
 
     var body: some View {
-        HStack(spacing: 12) {
-            HStack(spacing: 0) {
+        HStack(spacing: isExpandedIPad ? 22 : 12) {
+            HStack(spacing: isExpandedIPad ? 12 : 0) {
                 percentageText(lowPercentage, ConstantsAppColors.statisticsLow)
                 separator
                 percentageText(inRangePercentage, ConstantsAppColors.statisticsInRange, weight: .bold)
@@ -704,7 +863,7 @@ private struct LandscapeTIRBadge: View {
             }
             .fixedSize(horizontal: true, vertical: false)
 
-            HStack(spacing: 0) {
+            HStack(spacing: isExpandedIPad ? 12 : 0) {
                 tirBar
 
                 Menu {
@@ -731,7 +890,7 @@ private struct LandscapeTIRBadge: View {
             }
             .fixedSize(horizontal: true, vertical: false)
         }
-        .frame(height: 40)
+        .frame(height: isExpandedIPad ? 48 : 40)
         .accessibilityLabel(rangeMode.title)
         .accessibilityValue("\(Texts_Common.lowStatistics) \(percentage(lowPercentage)), \(Texts_Common.inRangeStatistics) \(percentage(inRangePercentage)), \(Texts_Common.highStatistics) \(percentage(highPercentage))")
     }
@@ -754,7 +913,7 @@ private struct LandscapeTIRBadge: View {
             .background(Color.white.opacity(0.14))
             .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
         }
-        .frame(width: 160, height: 18)
+        .frame(width: isExpandedIPad ? 220 : 160, height: isExpandedIPad ? 22 : 18)
     }
 
     private var analysisPoints: [LandscapeGlucosePoint] {
@@ -801,7 +960,7 @@ private struct LandscapeTIRBadge: View {
     }
 
     private func segmentWidth(for percentage: Double, totalWidth: CGFloat) -> CGFloat {
-        totalWidth * CGFloat(max(0, min(100, percentage)) / 100)
+        validLandscapeDimension(totalWidth) * CGFloat(max(0, min(100, percentage)) / 100)
     }
 
     private func percentage(_ value: Double) -> String {
