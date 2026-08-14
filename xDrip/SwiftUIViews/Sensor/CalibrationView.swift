@@ -55,10 +55,7 @@ struct CalibrationView: View {
                     .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Button(action: openCalibrationHelp) {
-                        Image(systemName: "questionmark.circle")
-                    }
-                    .tint(ConstantsAppColors.toolbarAction)
+                    OnlineHelpButton(topic: .calibration)
 
                     Button(Texts_HomeView.calibrationButton, action: submitCalibration)
                         .tint(ConstantsAppColors.toolbarAction)
@@ -191,19 +188,6 @@ struct CalibrationView: View {
         return roundedValue.bgValueToString(mgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
     }
 
-    private func openCalibrationHelp() {
-        let urlString: String
-        if let languageCode = NSLocale.current.language.languageCode?.identifier,
-           languageCode != ConstantsHomeView.onlineHelpBaseLocale,
-           UserDefaults.standard.translateOnlineHelp {
-            urlString = ConstantsHomeView.calibrationHelpURLTranslated1 + languageCode + ConstantsHomeView.calibrationHelpURLTranslated2
-        } else {
-            urlString = ConstantsHomeView.calibrationHelpURL
-        }
-
-        guard let url = URL(string: urlString) else { return }
-        UIApplication.shared.open(url)
-    }
 }
 
 struct SensorManagementEnteredBgValue {

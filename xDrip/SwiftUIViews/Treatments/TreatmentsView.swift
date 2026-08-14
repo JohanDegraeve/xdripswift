@@ -110,7 +110,9 @@ struct TreatmentsListView: View {
             .navigationBarTitleDisplayMode(.large)
             .colorScheme(.dark)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    OnlineHelpButton(topic: .treatments)
+
                     Button(action: onAddTreatment) {
                         Image(systemName: "plus")
                     }

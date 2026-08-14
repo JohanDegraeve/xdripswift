@@ -12,7 +12,7 @@ import SwiftUI
 /// Builds the CareLink account screen from the same native rows as the other followers.
 enum CareLinkFollowerSettingsScreen {
     static func make() -> SettingsScreen {
-        SettingsScreen(title: FollowerDataSourceType.careLink.description, toolbarActions: toolbarActions, providers: {
+        SettingsScreen(title: FollowerDataSourceType.careLink.description, onlineHelpTopic: FollowerDataSourceType.careLink.onlineHelpTopic, toolbarActions: toolbarActions, providers: {
             CareLinkSettingsSection.allCases.map(CareLinkSettingsSectionProvider.init)
         })
     }

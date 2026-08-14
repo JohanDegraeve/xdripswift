@@ -179,6 +179,8 @@ struct BgReadingsView: View {
                     .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    OnlineHelpButton(topic: .glucoseReadings)
+
                     EditButton()
                         .tint(ConstantsAppColors.toolbarAction)
 

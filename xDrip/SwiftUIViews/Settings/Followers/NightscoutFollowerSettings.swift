@@ -13,7 +13,7 @@ enum NightscoutFollowerSettingsScreen {
     static func make() -> SettingsScreen {
         let monitor = FollowerServiceStatusMonitor(source: .nightscout)
 
-        return SettingsScreen(title: FollowerDataSourceType.nightscout.description, providers: {
+        return SettingsScreen(title: FollowerDataSourceType.nightscout.description, onlineHelpTopic: FollowerDataSourceType.nightscout.onlineHelpTopic, providers: {
             [
                 FollowerSettingsSectionProvider(title: { Texts_SettingsView.followerSectionConnection }, refreshEvery: 30) { _ in
                     let presentation = FollowerConnectionPresentation.resolve(source: .nightscout)

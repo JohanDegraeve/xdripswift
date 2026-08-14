@@ -12,7 +12,7 @@ import SwiftUI
 /// Owns all Calendar follower configuration, status and historical-reading rows.
 enum SharedCalendarFollowerSettingsScreen {
     static func make(refresh: @escaping () -> Void) -> SettingsScreen {
-        SettingsScreen(title: FollowerDataSourceType.calendar.description, providers: {
+        SettingsScreen(title: FollowerDataSourceType.calendar.description, onlineHelpTopic: FollowerDataSourceType.calendar.onlineHelpTopic, providers: {
             [
                 SharedCalendarSelectionProvider(),
                 FollowerSettingsSectionProvider(title: { Texts_SettingsView.followerSectionConnection }, refreshEvery: 30) { _ in

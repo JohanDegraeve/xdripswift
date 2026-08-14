@@ -40,6 +40,9 @@ struct SnoozeView: View {
                     }
                     .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    OnlineHelpButton(topic: .snooze)
+                }
             }
             .listStyle(.insetGrouped)
             .onAppear {

@@ -50,6 +50,10 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     private let presentSelectionListView: (BluetoothPeripheralSelectionList) -> Void
     private let presentReadSuccessView: (TransmitterReadSuccessDisplay, BluetoothPeripheralType) -> Void
 
+    var onlineHelpTopic: OnlineHelpTopic {
+        expectedBluetoothPeripheralType.onlineHelpTopic
+    }
+
     // MARK: - Working State
 
     private var transmitterIdTempValue: String?

@@ -145,6 +145,7 @@ struct SettingsSectionModel: Identifiable {
 
 struct SettingsScreen {
     let title: String
+    let onlineHelpTopic: OnlineHelpTopic?
     let toolbarActions: @MainActor () -> [SettingsToolbarAction]
     let makeSections: @MainActor (SettingsActionPresenter) -> [SettingsSectionModel]
 
@@ -153,10 +154,12 @@ struct SettingsScreen {
     /// mix of existing section providers for the child screen.
     init(
         title: String,
+        onlineHelpTopic: OnlineHelpTopic? = nil,
         toolbarActions: @escaping @MainActor () -> [SettingsToolbarAction] = { [] },
         makeSections: @escaping @MainActor (SettingsActionPresenter) -> [SettingsSectionModel]
     ) {
         self.title = title
+        self.onlineHelpTopic = onlineHelpTopic
         self.toolbarActions = toolbarActions
         self.makeSections = makeSections
     }
@@ -165,10 +168,11 @@ struct SettingsScreen {
     /// is just a title and a list of existing native section providers.
     init(
         title: String,
+        onlineHelpTopic: OnlineHelpTopic? = nil,
         toolbarActions: @escaping @MainActor () -> [SettingsToolbarAction] = { [] },
         providers: @escaping () -> [SettingsNativeSectionProvider]
     ) {
-        self.init(title: title, toolbarActions: toolbarActions) { presenter in
+        self.init(title: title, onlineHelpTopic: onlineHelpTopic, toolbarActions: toolbarActions) { presenter in
             SettingsListFactory.makeSections(providers: providers(), presenter: presenter)
         }
     }

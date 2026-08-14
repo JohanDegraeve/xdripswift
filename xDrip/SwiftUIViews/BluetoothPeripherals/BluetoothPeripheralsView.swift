@@ -200,7 +200,9 @@ struct BluetoothPeripheralsView: View {
         .navigationBarTitleDisplayMode(.large)
         .colorScheme(.dark)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                OnlineHelpButton(topic: .devices)
+
                 Button(action: showAddFlow) {
                     Image(systemName: "plus")
                 }
@@ -265,6 +267,7 @@ struct BluetoothPeripheralCategorySelectionView: View {
         .background(ConstantsUI.listBackGroundColor)
         .navigationTitle(Texts_BluetoothPeripheralsView.selectCategory)
         .navigationBarTitleDisplayMode(.large)
+        .onlineHelp(.devices)
         .colorScheme(.dark)
         .alert(item: $viewModel.pendingAlert) { alert in
             Alert(
@@ -321,6 +324,7 @@ struct BluetoothPeripheralTypeSelectionView: View {
         .background(ConstantsUI.listBackGroundColor)
         .navigationTitle(category.rawValue)
         .navigationBarTitleDisplayMode(.large)
+        .onlineHelp(category.onlineHelpTopic)
         .colorScheme(.dark)
     }
 

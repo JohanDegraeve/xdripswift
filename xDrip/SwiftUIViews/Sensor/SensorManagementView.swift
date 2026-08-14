@@ -183,6 +183,9 @@ struct SensorManagementView: View {
                     })
                     .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    OnlineHelpButton(topic: .sensorManagement)
+                }
             }
         }
         .colorScheme(.dark)

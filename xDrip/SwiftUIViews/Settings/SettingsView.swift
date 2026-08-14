@@ -150,6 +150,7 @@ struct SettingsNavigationView: View {
 
         case .alertTypes:
             NativeAlertTypesSettingsView(coreDataManager: coreDataManager, router: router)
+                .onlineHelp(.alertsAndNotifications)
 
         case let .alertTypeEditor(alertType, listViewModel):
             AlertTypeEditorView(
@@ -164,6 +165,7 @@ struct SettingsNavigationView: View {
 
         case .alerts:
             NativeAlertsSettingsView(coreDataManager: coreDataManager, router: router)
+                .onlineHelp(.alertsAndNotifications)
 
         case let .alertEditor(mode, listViewModel):
             AlertEntryEditorView(
@@ -180,7 +182,7 @@ struct SettingsNavigationView: View {
 
         case .m5Stack:
             SettingsScreenDestinationView(
-                settingsScreen: SettingsScreen(title: Texts_SettingsView.m5StackSettingsViewScreenTitle) { presenter in
+                settingsScreen: SettingsScreen(title: Texts_SettingsView.m5StackSettingsViewScreenTitle, onlineHelpTopic: .m5Stack) { presenter in
                     SettingsListFactory.makeM5StackSections(presenter: presenter)
                 },
                 presenter: presenter
@@ -196,6 +198,7 @@ struct SettingsNavigationView: View {
             DataManagementView(coreDataManager: coreDataManager, flow: flow)
                 .navigationTitle(flow.navigationTitle)
                 .navigationBarTitleDisplayMode(.large)
+                .onlineHelp(.dataManagement)
 
         case let .incomingBackup(request):
             DataManagementView(
@@ -206,6 +209,7 @@ struct SettingsNavigationView: View {
             )
                 .navigationTitle(DataManagementFlow.restore.navigationTitle)
                 .navigationBarTitleDisplayMode(.large)
+                .onlineHelp(.dataManagement)
 
         case let .custom(title, content):
             content(router.closeCurrentView)
@@ -240,7 +244,6 @@ private struct SettingsIPadPlaceholderView: View {
 /// Adds iPad navigation chrome around the unchanged Settings list. Row construction and styling
 /// remain shared with iPhone so the split view cannot introduce platform-specific value colors.
 private struct SettingsIPadSidebarView: View {
-    @Environment(\.openURL) private var openURL
     @ObservedObject var listModel: SettingsListModel
     @ObservedObject var presenter: SettingsActionPresenter
 
@@ -253,14 +256,11 @@ private struct SettingsIPadSidebarView: View {
 
                 Spacer()
 
-                Button(action: showOnlineHelp) {
-                    Image(systemName: "questionmark.circle")
-                        .font(.title3)
-                        .frame(width: 44, height: 44)
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(ConstantsAppColors.toolbarAction)
-                .accessibilityLabel(Texts_SettingsView.showOnlineHelp)
+                OnlineHelpButton(topic: .settings)
+                    .font(.title3)
+                    .frame(width: 44, height: 44)
+                    .buttonStyle(.plain)
+                    .foregroundStyle(ConstantsAppColors.toolbarAction)
             }
             .padding(.horizontal, 20)
             .padding(.top, 8)
@@ -274,11 +274,6 @@ private struct SettingsIPadSidebarView: View {
         .toolbar(.hidden, for: .navigationBar)
     }
 
-    private func showOnlineHelp() {
-        if let url = SettingsOnlineHelp.url() {
-            openURL(url)
-        }
-    }
 }
 
 /// Creates a fresh list model for one grouped child Settings screen.
@@ -286,11 +281,13 @@ private struct SettingsScreenDestinationView: View {
     @StateObject private var listModel: SettingsListModel
     @ObservedObject private var presenter: SettingsActionPresenter
     private let title: String
+    private let onlineHelpTopic: OnlineHelpTopic?
     private let toolbarActions: @MainActor () -> [SettingsToolbarAction]
 
     init(settingsScreen: SettingsScreen, presenter: SettingsActionPresenter) {
         self.presenter = presenter
         self.title = settingsScreen.title
+        self.onlineHelpTopic = settingsScreen.onlineHelpTopic
         self.toolbarActions = settingsScreen.toolbarActions
         _listModel = StateObject(wrappedValue: SettingsListModel(
             sections: settingsScreen.makeSections(presenter)
@@ -310,6 +307,10 @@ private struct SettingsScreenDestinationView: View {
         }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
+                if let onlineHelpTopic {
+                    OnlineHelpButton(topic: onlineHelpTopic)
+                }
+
                 ForEach(toolbarActions()) { action in
                     Button(action: action.action) {
                         Image(systemName: action.symbolName)
@@ -432,7 +433,6 @@ private struct SettingsTraceMailView: UIViewControllerRepresentable {
 
 /// Displays the root Settings sections supplied by `SettingsListModel`.
 struct SettingsView: View {
-    @Environment(\.openURL) private var openURL
     @ObservedObject var listModel: SettingsListModel
     @ObservedObject var presenter: SettingsActionPresenter
 
@@ -444,21 +444,7 @@ struct SettingsView: View {
             titleDisplayMode: .large,
             headerView: { AnyView(SettingsAppBannerView()) }
         )
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: showOnlineHelp) {
-                    Image(systemName: "questionmark.circle")
-                }
-                .tint(ConstantsAppColors.toolbarAction)
-                .accessibilityLabel(Texts_SettingsView.showOnlineHelp)
-            }
-        }
-    }
-
-    private func showOnlineHelp() {
-        if let url = SettingsOnlineHelp.url() {
-            openURL(url)
-        }
+        .onlineHelp(.settings)
     }
 }
 
@@ -563,20 +549,6 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
     }
 }
 
-private enum SettingsOnlineHelp {
-    static func url() -> URL? {
-        // get the 2 character language code for the App Locale, i.e. "en", "es", "nl", "fr"
-        // if the user has the app in a language other than English and they have the "auto translate" option selected, then load the help pages through Google Translate
-        // important to check that the URLs actually exist in ConstantsHomeView before trying to open them
-        if let languageCode = NSLocale.current.language.languageCode?.identifier, languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
-            return URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2)
-        } else {
-            // so the user is running the app in English or they don't want to translate so let's just load it directly
-            return URL(string: ConstantsHomeView.onlineHelpURL)
-        }
-    }
-}
-
 struct SettingsGroupedRow {
     let id: String
     let title: String
@@ -610,6 +582,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleHomeScreen,
+                            onlineHelpTopic: .glucoseDisplay,
                             providers: {
                                 [
                                     SettingsViewHomeScreenSettingsViewModel(rowGroup: .mainChart),
@@ -627,6 +600,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.glucoseRangesSectionTitle,
+                            onlineHelpTopic: .glucoseDisplay,
                             providers: { [SettingsViewHomeScreenSettingsViewModel(rowGroup: .glucoseRanges)] }
                         )
                     }
@@ -637,6 +611,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleStatistics,
+                            onlineHelpTopic: .glucoseDisplay,
                             providers: { [SettingsViewStatisticsSettingsViewModel()] }
                         )
                     }
@@ -675,6 +650,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleNotifications,
+                            onlineHelpTopic: .alertsAndNotifications,
                             providers: {
                                 [
                                     SettingsViewNotificationsSettingsViewModel(),
@@ -691,6 +667,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleAlerting,
+                            onlineHelpTopic: .alertsAndNotifications,
                             providers: {
                                 [
                                     SettingsViewAlertSettingsViewModel(rowGroup: .alertTypes),
@@ -722,6 +699,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleNightscout,
+                            onlineHelpTopic: .nightscoutService,
                             providers: {
                                 [
                                     SettingsViewNightscoutSettingsViewModel(rowGroup: .nightscout),
@@ -742,6 +720,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleDexcomShareUpload,
+                            onlineHelpTopic: .dexcomShareService,
                             providers: { [SettingsViewDexcomShareUploadSettingsViewModel()] }
                         )
                     }
@@ -755,6 +734,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleHealthKit,
+                            onlineHelpTopic: .appleHealth,
                             providers: { [SettingsViewHealthKitSettingsViewModel()] }
                         )
                     }
@@ -774,6 +754,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.calendarEventsSectionTitle,
+                            onlineHelpTopic: .calendarShare,
                             providers: {
                                 [
                                     SettingsViewCalendarEventsSettingsViewModel(rowGroup: .connection),
@@ -794,6 +775,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.contactImageSectionTitle,
+                            onlineHelpTopic: .contactImage,
                             providers: { [SettingsViewContactImageSettingsViewModel()] }
                         )
                     }
@@ -810,6 +792,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.osAidLoopShareSectionTitle,
+                            onlineHelpTopic: .osAidShare,
                             providers: {
                                 [
                                     SettingsViewDevelopmentSettingsViewModel(rowGroup: .osAidLoopShare),
@@ -828,6 +811,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleSpeak,
+                            onlineHelpTopic: .speakGlucose,
                             providers: { [SettingsViewSpeakSettingsViewModel()] }
                         )
                     }
@@ -836,7 +820,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     id: "sharingServices.m5Stack",
                     title: "M5Stack",
                     settingsScreen: {
-                        SettingsScreen(title: "M5Stack") { presenter in
+                        SettingsScreen(title: "M5Stack", onlineHelpTopic: .m5Stack) { presenter in
                             SettingsListFactory.makeM5StackSections(presenter: presenter)
                         }
                     }

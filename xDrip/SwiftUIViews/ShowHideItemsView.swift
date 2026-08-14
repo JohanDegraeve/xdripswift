@@ -95,6 +95,9 @@ struct ShowHideItemsView: View {
                     })
                     .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    OnlineHelpButton(topic: .quickShowHide)
+                }
             }
         }
         .colorScheme(.dark)

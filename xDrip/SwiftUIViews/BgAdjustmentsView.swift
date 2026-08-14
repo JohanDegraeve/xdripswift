@@ -107,7 +107,9 @@ struct BgAdjustmentsView: View {
                     })
                     .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
-
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    OnlineHelpButton(topic: .glucoseAdjustments)
+                }
             }
             .sheet(isPresented: $showingBasicAdjustmentInputSheet) {
                 BasicAdjustmentInputView(currentGlucoseValueString: displayBgString(for: bgReadings.last?.calculatedValue), glucoseAdjustmentValueString: inputGlucoseAdjustmentValueString(for: draftAdjustedGlucoseValue), unitString: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol, enteredGlucoseValue: $draftAdjustedGlucoseValue, onCancel: {

@@ -32,7 +32,9 @@ struct StatisticsView: View {
         .navigationTitle(Texts_Common.statisticsTitle)
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItemGroup(placement: .primaryAction) {
+                OnlineHelpButton(topic: .statistics)
+
                 Button {
                     isShowingReportGenerator = true
                 } label: {

@@ -14,6 +14,7 @@ enum DexcomShareFollowerSettingsScreen {
         let monitor = FollowerServiceStatusMonitor(source: .dexcomShare)
         return SettingsScreen(
             title: FollowerDataSourceType.dexcomShare.description,
+            onlineHelpTopic: FollowerDataSourceType.dexcomShare.onlineHelpTopic,
             toolbarActions: {
                 FollowerSettingsRows.accountToolbarActions(source: .dexcomShare, logOut: actions.logOut)
             },

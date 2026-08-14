@@ -332,6 +332,8 @@
 		A1000000000000000000000F /* CareLinkGlucoseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000F /* CareLinkGlucoseParser.swift */; };
 		A1A25654901902156A458396 /* CareLinkFollowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0FD9F50417D2E4B3ABA2D6 /* CareLinkFollowManager.swift */; };
 		A40000010000000000000001 /* FollowerSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40000020000000000000001 /* FollowerSettingsTests.swift */; };
+		A50000010000000000000001 /* OnlineHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50000020000000000000001 /* OnlineHelp.swift */; };
+		A50000030000000000000001 /* OnlineHelpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50000040000000000000001 /* OnlineHelpTests.swift */; };
 		BA0000010000000000000001 /* BackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000011 /* BackupModels.swift */; };
 		BA0000010000000000000002 /* BackupCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000012 /* BackupCrypto.swift */; };
 		BA0000010000000000000003 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000013 /* BackupService.swift */; };
@@ -1197,6 +1199,8 @@
 		A2000000000000000000000E /* CareLinkTherapyParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareLinkTherapyParser.swift; sourceTree = "<group>"; };
 		A2000000000000000000000F /* CareLinkGlucoseParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareLinkGlucoseParser.swift; sourceTree = "<group>"; };
 		A40000020000000000000001 /* FollowerSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerSettingsTests.swift; sourceTree = "<group>"; };
+		A50000020000000000000001 /* OnlineHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineHelp.swift; sourceTree = "<group>"; };
+		A50000040000000000000001 /* OnlineHelpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineHelpTests.swift; sourceTree = "<group>"; };
 		ABA4DE8668C9A16DFF21A411 /* CareLinkTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkTests.swift; sourceTree = "<group>"; };
 		B7A32F780DBE240AE91ECDBB /* CareLinkModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkModels.swift; sourceTree = "<group>"; };
 		BA0000010000000000000011 /* BackupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupModels.swift; sourceTree = "<group>"; };
@@ -2496,6 +2500,7 @@
 		4F2600213002000200000001 /* xDrip Tests */ = {
 			isa = PBXGroup;
 			children = (
+				A50000040000000000000001 /* OnlineHelpTests.swift */,
 				FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */,
 				BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */,
 				A40000020000000000000001 /* FollowerSettingsTests.swift */,
@@ -3302,6 +3307,7 @@
 			isa = PBXGroup;
 			children = (
 				BA0000010000000000000020 /* Backup */,
+				A50000020000000000000001 /* OnlineHelp.swift */,
 				F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */,
 				F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */,
 				47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */,
@@ -4243,6 +4249,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A50000030000000000000001 /* OnlineHelpTests.swift in Sources */,
 				FBA100040000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift in Sources */,
 				BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */,
 				4F2600023002000200000001 /* SensorHealthIssueManagerTests.swift in Sources */,
@@ -4258,6 +4265,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A50000010000000000000001 /* OnlineHelp.swift in Sources */,
 				FBA100020000000000000001 /* FollowerBackgroundKeepAliveManager.swift in Sources */,
 				BA0000020000000000000001 /* NightscoutFollowerGapFillService.swift in Sources */,
 				DAF100012E7A000100000001 /* DataFlowPolicy.swift in Sources */,

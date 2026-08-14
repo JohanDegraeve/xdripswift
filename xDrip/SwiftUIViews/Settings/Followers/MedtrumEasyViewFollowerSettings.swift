@@ -13,6 +13,7 @@ enum MedtrumEasyViewFollowerSettingsScreen {
     static func make(actions: SelectedFollowerActions) -> SettingsScreen {
         SettingsScreen(
             title: FollowerDataSourceType.medtrumEasyView.description,
+            onlineHelpTopic: FollowerDataSourceType.medtrumEasyView.onlineHelpTopic,
             toolbarActions: {
                 FollowerSettingsRows.accountToolbarActions(source: .medtrumEasyView, logOut: actions.logOut)
             },

@@ -96,6 +96,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 action: .settingsScreen {
                     SettingsScreen(
                         title: Texts_SettingsView.issueReportSectionTitle,
+                        onlineHelpTopic: .issueReporting,
                         providers: { [SettingsViewTraceSettingsViewModel(sectionTitleOverride: Texts_SettingsView.issueReportSectionTitle)] }
                     )
                 }

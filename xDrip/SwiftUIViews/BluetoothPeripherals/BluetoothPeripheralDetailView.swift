@@ -80,8 +80,10 @@ struct BluetoothPeripheralDetailView: View {
         .navigationBarTitleDisplayMode(.large)
         .colorScheme(.dark)
         .toolbar {
-            if state.canDeletePeripheral {
-                ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                OnlineHelpButton(topic: state.onlineHelpTopic)
+
+                if state.canDeletePeripheral {
                     Button(action: state.deleteButtonTapped) {
                         Image(systemName: "trash")
                     }

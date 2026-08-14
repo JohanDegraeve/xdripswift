@@ -19,6 +19,7 @@ enum LibreLinkUpFollowerSettingsScreen {
 
         return SettingsScreen(
             title: source.description,
+            onlineHelpTopic: source.onlineHelpTopic,
             toolbarActions: { FollowerSettingsRows.accountToolbarActions(source: source, logOut: actions.logOut) },
             providers: {
             [
