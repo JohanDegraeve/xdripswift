@@ -347,7 +347,7 @@ private enum SnoozePickerPresentation {
     }
 
     var titleFont: Font {
-        isLarge ? .system(size: 44, weight: .bold) : .title2.weight(.bold)
+        isLarge ? .system(size: 40, weight: .bold) : .title2.weight(.bold)
     }
 
     var subtitleFont: Font {
@@ -356,7 +356,7 @@ private enum SnoozePickerPresentation {
 
     var detents: Set<PresentationDetent> {
         // The alert picker needs more room than the standard sheet without obscuring the whole app.
-        isLarge ? [.fraction(0.8)] : [.height(390)]
+        isLarge ? [.fraction(0.7)] : [.height(390)]
     }
 }
 
@@ -443,16 +443,18 @@ private struct SnoozePickerSheetLayout<Content: View>: View {
         HStack(spacing: 0) {
             if presentation.isAlert {
                 // Alert actions retain their red/green meaning at the selected presentation scale.
-                Button(cancelTitle, action: onCancel)
-                    .font(presentation.isLarge ? .title3.weight(.bold) : .body.weight(.semibold))
+                Button(action: onCancel) {
+                    alertButtonLabel(cancelTitle)
+                }
                     .buttonStyle(.borderedProminent)
                     .tint(ConstantsAppColors.urgent)
                     .foregroundStyle(.white)
 
                 Spacer(minLength: 24)
 
-                Button(confirmationTitle, action: onConfirm)
-                    .font(presentation.isLarge ? .title3.weight(.bold) : .body.weight(.semibold))
+                Button(action: onConfirm) {
+                    alertButtonLabel(confirmationTitle)
+                }
                     .buttonStyle(.borderedProminent)
                     .tint(ConstantsAppColors.normal)
                     .foregroundStyle(.white)
@@ -474,7 +476,16 @@ private struct SnoozePickerSheetLayout<Content: View>: View {
                 .buttonStyle(.borderedProminent)
             }
         }
-        .controlSize(presentation.isLarge ? .large : .regular)
+        // The large variant remains prominent through its typography and colors without oversized controls.
+        .controlSize(.regular)
+    }
+
+    private func alertButtonLabel(_ title: String) -> some View {
+        Text(title)
+            .font(presentation.isLarge ? .title2.weight(.bold) : .body.weight(.semibold))
+            // Increase only the large alert's visible button and tap target without fixed sizing.
+            .padding(.horizontal, presentation.isLarge ? 10 : 0)
+            .padding(.vertical, presentation.isLarge ? 6 : 0)
     }
 }
 
@@ -521,7 +532,7 @@ private struct LargeSnoozeWheelPicker: UIViewRepresentable {
         }
 
         func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
-            64
+            56
         }
 
         func pickerView(
@@ -536,8 +547,8 @@ private struct LargeSnoozeWheelPicker: UIViewRepresentable {
             label.adjustsFontSizeToFitWidth = true
             label.minimumScaleFactor = 0.7
             label.font = UIFontMetrics(forTextStyle: .largeTitle).scaledFont(
-                for: UIFont.systemFont(ofSize: 42, weight: .bold),
-                maximumPointSize: 48
+                for: UIFont.systemFont(ofSize: 36, weight: .bold),
+                maximumPointSize: 42
             )
             label.text = parent.data[row]
             label.textAlignment = .center
@@ -571,7 +582,7 @@ private struct SnoozePickerPresentationView: View {
             presentation: presentation,
             // Both normal-scale variants keep the standard title hierarchy and neutral icon.
             title: presentation.isLarge
-                ? pickerData.pickerViewData.mainTitle
+                ? pickerData.pickerViewData.largePresentationTitle ?? pickerData.pickerViewData.mainTitle
                 : pickerData.pickerViewData.subTitle,
             subtitle: presentation.isLarge
                 ? nil
@@ -602,7 +613,7 @@ private struct SnoozePickerPresentationView: View {
                 data: pickerData.pickerViewData.data,
                 selectedRow: $selectedRow
             )
-            .frame(maxWidth: .infinity, minHeight: 300)
+            .frame(maxWidth: .infinity, minHeight: 250)
             .onChange(of: selectedRow, perform: selectionChanged)
         } else {
             Picker("", selection: $selectedRow) {

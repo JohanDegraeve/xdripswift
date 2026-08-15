@@ -573,6 +573,27 @@ public enum AlertKind: Int, CaseIterable {
             return Texts_Alerts.sensorTransmitterFailureAlertTitle
         }
     }
+
+    /// A concise, independently localized title for the large snooze presentation.
+    /// Other alert kinds already have compact titles and can keep their normal name.
+    func largeSnoozeTitle() -> String {
+        switch self {
+        case .low:
+            return Texts_Alerts.lowSnoozeTitle
+        case .high:
+            return Texts_Alerts.highSnoozeTitle
+        case .verylow:
+            return Texts_Alerts.veryLowSnoozeTitle
+        case .veryhigh:
+            return Texts_Alerts.veryHighSnoozeTitle
+        case .fastdrop:
+            return Texts_Alerts.fastDropSnoozeTitle
+        case .fastrise:
+            return Texts_Alerts.fastRiseSnoozeTitle
+        default:
+            return alertTitle()
+        }
+    }
     
     /// for UI, when value is requested, text should show also the unit (eg mgdl, mmol, minutes, days ...)
     /// What is this text ?

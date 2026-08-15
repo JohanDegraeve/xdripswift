@@ -1,4 +1,10 @@
 "alertsettingsview_screentitle" = "Alarmen";
+"alerts_snooze_high_title" = "Hoog";
+"alerts_snooze_very_high_title" = "Zeer hoog";
+"alerts_snooze_low_title" = "Laag";
+"alerts_snooze_very_low_title" = "Zeer laag";
+"alerts_snooze_fast_drop_title" = "Snelle daling";
+"alerts_snooze_fast_rise_title" = "Snelle stijging";
 "alertssettingsview_screentitle" = "Bewerk Alarm";
 "alerts_highalerttitle" = "Hoog Alarm";
 "alerts_veryhighalerttitle" = "Zeer Hoog Alarm";

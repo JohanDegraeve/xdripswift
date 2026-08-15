@@ -1,4 +1,10 @@
 "alertsettingsview_screentitle" = "Alarmes";
+"alerts_snooze_high_title" = "Valor alto";
+"alerts_snooze_very_high_title" = "Valor muito alto";
+"alerts_snooze_low_title" = "Valor baixo";
+"alerts_snooze_very_low_title" = "Valor muito baixo";
+"alerts_snooze_fast_drop_title" = "Descida rápida";
+"alerts_snooze_fast_rise_title" = "Subida rápida";
 "alertssettingsview_screentitle" = "Editar Alarme";
 "alerts_highalerttitle" = "Alarme Valor Alto";
 "alerts_veryhighalerttitle" = "Alarme Valor Muito Alto";

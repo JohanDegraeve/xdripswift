@@ -569,7 +569,7 @@ public class AlertManager: NSObject {
                                   // if cancelHandler supplied by caller not nil, then execute it
                                   cancelHandler?()
             
-                              }, didSelectRowHandler: nil)
+                              }, didSelectRowHandler: nil, largePresentationTitle: alertKind.largeSnoozeTitle())
     }
     
     /// - if it's a missed reading alert, then reschedule with a delay of snoozePeriodInMinutes, also with a repeat every snoozePeriodInMinutes

@@ -1,4 +1,10 @@
 "alertsettingsview_screentitle" = "Hälytykset";
+"alerts_snooze_high_title" = "Korkea";
+"alerts_snooze_very_high_title" = "Erittäin korkea";
+"alerts_snooze_low_title" = "Matala";
+"alerts_snooze_very_low_title" = "Erittäin matala";
+"alerts_snooze_fast_drop_title" = "Nopea pudotus";
+"alerts_snooze_fast_rise_title" = "Nopea nousu";
 "alertssettingsview_screentitle" = "Muokkaa hälytystä";
 "alerts_highalerttitle" = "Korkea hälytys";
 "alerts_veryhighalerttitle" = "Erittäin korkea hälytys";

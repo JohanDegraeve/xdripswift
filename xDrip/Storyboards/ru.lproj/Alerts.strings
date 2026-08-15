@@ -1,4 +1,10 @@
 "alertsettingsview_screentitle" = "Тревоги";
+"alerts_snooze_high_title" = "Высокий ур. ГК";
+"alerts_snooze_very_high_title" = "Очень выс. ур. ГК";
+"alerts_snooze_low_title" = "Низкий уров. ГК";
+"alerts_snooze_very_low_title" = "Очень низкий ур. ГК";
+"alerts_snooze_fast_drop_title" = "Быстрое снижение ГК";
+"alerts_snooze_fast_rise_title" = "Быстрый рост ГК";
 "alertssettingsview_screentitle" = "Редактировать тревоги";
 "alerts_highalerttitle" = "Высокий ур. ГК";
 "alerts_veryhighalerttitle" = "Очень выс. ур. ГК";

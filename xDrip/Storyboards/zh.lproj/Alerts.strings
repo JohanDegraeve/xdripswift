@@ -1,4 +1,10 @@
 "alertsettingsview_screentitle" = "警报";
+"alerts_snooze_high_title" = "高血糖";
+"alerts_snooze_very_high_title" = "非常高血糖";
+"alerts_snooze_low_title" = "低血糖";
+"alerts_snooze_very_low_title" = "极低血糖";
+"alerts_snooze_fast_drop_title" = "快速下降";
+"alerts_snooze_fast_rise_title" = "快速上升";
 "alertssettingsview_screentitle" = "编辑警报";
 "alerts_highalerttitle" = "高血糖警报";
 "alerts_veryhighalerttitle" = "非常高血糖警报";
