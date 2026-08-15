@@ -746,6 +746,9 @@ final class TroubleshootingLogStore {
     /// races between Bluetooth callbacks, network completions and UI lifecycle tracing.
     private var cachedEntries: [TroubleshootingLogEntry]?
     private var cachedByteCount = 0
+    /// A failed append or rewrite leaves the current-session cache useful but means the next
+    /// successful storage opportunity must replace the whole file rather than append to stale data.
+    private var persistenceNeedsRewrite = false
 
     /// The consumer history lives under Application Support rather than beside the e-mail trace
     /// attachments in Documents. This keeps the two retention policies and sharing paths independent.
@@ -820,13 +823,18 @@ final class TroubleshootingLogStore {
         // The cheap append path is safe only when policy accepted exactly the supplied entry. A
         // recovery can replace a generic success, and retention can remove older entries; both cases
         // require an atomic rewrite so the file remains identical to the in-memory history.
-        if !appendedEntryWithoutTransformation
+        let persistenceSucceeded: Bool
+        if persistenceNeedsRewrite
+            || !appendedEntryWithoutTransformation
             || encodedLine == nil
             || cachedByteCount + (encodedLine?.count ?? 0) > maximumFileSize {
-            rewriteOnQueue(pruned)
+            persistenceSucceeded = rewriteOnQueue(pruned)
         } else if let encodedLine {
-            appendOnQueue(encodedLine)
+            persistenceSucceeded = appendOnQueue(encodedLine)
+        } else {
+            persistenceSucceeded = false
         }
+        persistenceNeedsRewrite = !persistenceSucceeded
 
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: .troubleshootingLogDidChange, object: self)
@@ -875,16 +883,18 @@ final class TroubleshootingLogStore {
             || foundLegacyNullPadding
             || pruned.count != decodedEntries.count
             || data.count > maximumFileSize {
-            rewriteOnQueue(pruned)
+            persistenceNeedsRewrite = !rewriteOnQueue(pruned)
         }
     }
 
     private func pruneAndRewriteIfNeededOnQueue() {
         let entries = cachedEntries ?? []
         let pruned = prunedEntries(entries, referenceDate: now())
-        guard pruned != entries else { return }
-        cachedEntries = pruned
-        rewriteOnQueue(pruned)
+        if pruned != entries {
+            cachedEntries = pruned
+        }
+        guard persistenceNeedsRewrite || pruned != entries else { return }
+        persistenceNeedsRewrite = !rewriteOnQueue(pruned)
     }
 
     private func prunedEntries(
@@ -1308,7 +1318,8 @@ final class TroubleshootingLogStore {
         try? mutableDirectory.setResourceValues(values)
     }
 
-    private func appendOnQueue(_ data: Data) {
+    @discardableResult
+    private func appendOnQueue(_ data: Data) -> Bool {
         ensureParentDirectoryOnQueue()
         do {
             if !FileManager.default.fileExists(atPath: fileURL.path) {
@@ -1320,23 +1331,28 @@ final class TroubleshootingLogStore {
             try handle.write(contentsOf: data)
             cachedByteCount += data.count
             applyFileProtectionOnQueue()
+            return true
         } catch {
             // Never call trace here: doing so would recurse back into this store. The failure is
             // deliberately isolated from the glucose or networking operation that created the entry.
             debuglogging("failed to append troubleshooting log")
+            return false
         }
     }
 
-    private func rewriteOnQueue(_ entries: [TroubleshootingLogEntry]) {
+    @discardableResult
+    private func rewriteOnQueue(_ entries: [TroubleshootingLogEntry]) -> Bool {
         ensureParentDirectoryOnQueue()
         let data = entries.compactMap(encodeLine).reduce(into: Data()) { $0.append($1) }
         do {
             try data.write(to: fileURL, options: .atomic)
             cachedByteCount = data.count
             applyFileProtectionOnQueue()
+            return true
         } catch {
             // Keep the in-memory cache useful for the current session even if disk is unavailable.
             debuglogging("failed to rewrite troubleshooting log")
+            return false
         }
     }
 
@@ -1818,7 +1834,7 @@ struct TroubleshootingLogReportBuilder {
         case .fastrise: return "Fast rise"
         case .phonebatterylow: return "Phone battery"
         case .notlooping: return "Not looping"
-        case .sensorTransmitterFailure: return "Sensor or transmitter failure"
+        case .sensorTransmitterFailure: return "Sensor/Transmitter Failure"
         }
     }
 

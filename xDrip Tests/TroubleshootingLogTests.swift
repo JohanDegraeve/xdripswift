@@ -886,6 +886,27 @@ final class TroubleshootingLogTests: XCTestCase {
         XCTAssertEqual(store.snapshot().map(\.kind), [.app(.started)])
     }
 
+    func testStorageRecoveryRewritesEntriesRetainedDuringFailure() throws {
+        let fileURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("TroubleshootingLogTests-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: fileURL, withIntermediateDirectories: true)
+        defer { removeFixture(fileURL) }
+
+        // Using a directory as the file forces the first append to fail while the in-memory record
+        // remains available. Replacing it with a writable file simulates storage becoming available.
+        let store = TroubleshootingLogStore(fileURL: fileURL, now: { self.referenceDate })
+        store.record(.standard(.app(.started), timestamp: referenceDate))
+        XCTAssertEqual(store.snapshot().map(\.kind), [.app(.started)])
+
+        try FileManager.default.removeItem(at: fileURL)
+        try Data().write(to: fileURL, options: .atomic)
+        store.record(.standard(.app(.terminated), timestamp: referenceDate.addingTimeInterval(1)))
+        XCTAssertEqual(store.snapshot().map(\.kind), [.app(.terminated), .app(.started)])
+
+        let reloadedStore = TroubleshootingLogStore(fileURL: fileURL, now: { self.referenceDate })
+        XCTAssertEqual(reloadedStore.snapshot().map(\.kind), [.app(.terminated), .app(.started)])
+    }
+
     func testReportAlwaysIncludesEveryRetainedEntryAndCompleteExportHeader() {
         let entries = [
             TroubleshootingLogEntry.standard(.app(.started), timestamp: referenceDate),
