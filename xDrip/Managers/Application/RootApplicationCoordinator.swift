@@ -633,14 +633,19 @@ import AppIntents
         }
     }
     
-    /// sets AVAudioSession category to AVAudioSession.Category.playback with option mixWithOthers and
-    /// AVAudioSession.sharedInstance().setActive(true)
+    /// Sets the audio session category and activates it away from the main thread because activation
+    /// is a synchronous operation that can block while iOS negotiates the audio route.
     private func setupAVAudioSession() {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.mixWithOthers)
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch let error {
-            trace("in init, could not set AVAudioSession category to playback and mixwithOthers, error = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .error, error.localizedDescription)
+        let log = log
+
+        DispatchQueue.global(qos: .utility).async {
+            do {
+                let audioSession = AVAudioSession.sharedInstance()
+                try audioSession.setCategory(.playback, options: .mixWithOthers)
+                try audioSession.setActive(true)
+            } catch let error {
+                trace("in init, could not set AVAudioSession category to playback and mixwithOthers, error = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .error, error.localizedDescription)
+            }
         }
     }
     
