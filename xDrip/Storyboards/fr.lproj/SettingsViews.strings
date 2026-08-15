@@ -152,6 +152,7 @@
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Ecran d'accueil";
+"settingsviews_mainChartHours" = "Heures du graphique principal";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

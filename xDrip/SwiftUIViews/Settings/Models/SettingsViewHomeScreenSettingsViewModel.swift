@@ -45,6 +45,9 @@ fileprivate enum Setting:Int, CaseIterable {
 
     // show the active sensor lifetime as time remaining instead of time elapsed?
     case preferSensorCountdown = 11
+
+    // visible number of hours on the main Home chart
+    case mainChartHours = 12
     
 }
 
@@ -93,9 +96,31 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
             }
         )
 
+        var mainChartHoursRow = nativeSettingsRow(
+            id: "homeScreen.mainChartHours",
+            index: Setting.mainChartHours.rawValue,
+            sectionID: sectionID
+        )
+        mainChartHoursRow.accessory = .none
+        // Write the same preference used by RootHomeView so Settings and pinch zoom remain in sync.
+        mainChartHoursRow.control = .menu(
+            options: {
+                let selectedRange = RootHomeChartRange.closest(to: UserDefaults.standard.chartWidthInHours)
+                return RootHomeChartRange.allCases.map {
+                    SettingsMenuOption(title: $0.settingsTitle, isSelected: $0 == selectedRange)
+                }
+            },
+            selectOption: { index in
+                let ranges = RootHomeChartRange.allCases
+                guard ranges.indices.contains(index) else { return }
+                UserDefaults.standard.chartWidthInHours = ranges[index].rawValue
+            }
+        )
+
         let mainChartRows = [
             nativeSettingsRow(id: "homeScreen.showOriginalBGReadings", index: Setting.showOriginalBGReadings.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "homeScreen.showSensorNoise", index: Setting.showSensorNoise.rawValue, sectionID: sectionID)
+            nativeSettingsRow(id: "homeScreen.showSensorNoise", index: Setting.showSensorNoise.rawValue, sectionID: sectionID),
+            mainChartHoursRow
         ]
 
         let miniChartRows = [
@@ -174,7 +199,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
                 isOn: { UserDefaults.standard.preferSensorCountdown },
                 setIsOn: { UserDefaults.standard.preferSensorCountdown = $0 }
             )
-        case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .targetMarkValue, .lowMarkValue, .urgentLowMarkValue:
+        case .screenLockDimmingType, .mainChartHours, .urgentHighMarkValue, .highMarkValue, .targetMarkValue, .lowMarkValue, .urgentLowMarkValue:
             return nil
         }
     }
@@ -303,6 +328,10 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
             return SettingsSelectedRowAction.callFunction(function: {
                 UserDefaults.standard.preferSensorCountdown.toggle()
             })
+
+        case .mainChartHours:
+            // The native SwiftUI menu handles this row directly.
+            return .nothing
         }
     }
     
@@ -377,6 +406,9 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .showSensorNoise:
             return Texts_SettingsView.showSensorNoise
 
+        case .mainChartHours:
+            return Texts_SettingsView.mainChartHours
+
         case .preferSensorCountdown:
             return Texts_SettingsView.preferSensorCountdown
 
@@ -426,7 +458,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
             return SettingsAccessory.disclosure
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .showOriginalBGReadings, .showSensorNoise, .preferSensorCountdown:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .showOriginalBGReadings, .showSensorNoise, .preferSensorCountdown, .mainChartHours:
             return SettingsAccessory.none
             
         }
@@ -455,7 +487,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .screenLockDimmingType:
             return UserDefaults.standard.screenLockDimmingType.description
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .showOriginalBGReadings, .showSensorNoise, .preferSensorCountdown:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .showOriginalBGReadings, .showSensorNoise, .preferSensorCountdown, .mainChartHours:
             return nil
             
         }

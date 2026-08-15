@@ -117,6 +117,7 @@
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
+"settingsviews_mainChartHours" = "Timer på hoveddiagrammet";
  
 
 /////////////////////////////////////////////////////////////////////////////////////////////

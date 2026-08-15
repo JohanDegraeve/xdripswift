@@ -228,6 +228,7 @@
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
+"settingsviews_mainChartHours" = "主图表小时数";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

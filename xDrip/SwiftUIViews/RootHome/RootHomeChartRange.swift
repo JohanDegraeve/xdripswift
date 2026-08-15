@@ -24,6 +24,11 @@ enum RootHomeChartRange: Double, CaseIterable {
         .hours(-rawValue)
     }
 
+    /// Localized label shared by the Settings menus that expose the same ranges as pinch zoom.
+    var settingsTitle: String {
+        rawValue.formatted(.number.precision(.fractionLength(0))) + " " + Texts_Common.hours
+    }
+
     /// Baseline used by `GlucoseChartView` to keep glucose points readable as the visible range widens.
     var glucoseCircleDiameterScalingHours: Double {
         switch self {

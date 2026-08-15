@@ -123,6 +123,7 @@
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Домашний экран";
+"settingsviews_mainChartHours" = "Часы на основном графике";
 "settingsviews_sectionTitleHousekeeper" = "Управление данными";
 "settingsviews_housekeeperRetentionPeriod" = "Срок хранения";
 "settingsviews_housekeeperRetentionPeriodMessage" = "Сколько дней должны храниться данные? (минимум 90, максимум 365)\n\n(рекомендуется: 90 дней)";

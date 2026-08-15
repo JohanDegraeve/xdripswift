@@ -311,6 +311,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_homeScreenMainChartSectionFooter", tableName: filename, bundle: Bundle.main, value: "These options control how glucose data is displayed on the main chart.", comment: "home screen settings, footer explaining main chart display options")
     }()
 
+    static let mainChartHours: String = {
+        return NSLocalizedString("settingsviews_mainChartHours", tableName: filename, bundle: Bundle.main, value: "Main Chart Hours", comment: "home screen settings, visible number of hours on the main glucose chart")
+    }()
+
     static let homeScreenSensorLifetimeSectionTitle: String = {
         return NSLocalizedString("settingsviews_homeScreenSensorLifetimeSectionTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Lifetime", comment: "home screen settings, section title for sensor lifetime display options")
     }()

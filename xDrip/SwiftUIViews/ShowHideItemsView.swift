@@ -23,6 +23,7 @@ struct ShowHideItemsView: View {
     @State private var showSensorNoise = UserDefaults.standard.showSensorNoise
     @State private var speakReadings = UserDefaults.standard.speakReadings
     @AppStorage(UserDefaults.Key.preferLargeSnoozeScreen.rawValue) private var preferLargeSnoozeScreen = true
+    @AppStorage(UserDefaults.KeysCharts.chartWidthInHours.rawValue) private var chartWidthInHours = ConstantsGlucoseChart.defaultChartWidthInHours
     
     // MARK: - private properties
     
@@ -35,24 +36,12 @@ struct ShowHideItemsView: View {
         NavigationView {
             VStack {
                 List {
-                    Section(header: Text(Texts_HomeView.showHideHomeScreenTitle), footer: Text(Texts_HomeView.showHideHomeScreenFooter)) {
-                        Toggle(Texts_SettingsView.showMiniChart, isOn: $showMiniChart)
-                            .onChange(of: showMiniChart) { newValue in
-                                UserDefaults.standard.showMiniChart = newValue
-                            }
-                        
-                        Toggle(Texts_SettingsView.labelShowStatistics, isOn: $showStatistics)
-                            .onChange(of: showStatistics) { newValue in
-                                UserDefaults.standard.showStatistics = newValue
-                            }
-                    }
-                    
                     Section(header: Text(Texts_HomeView.showHideGlucoseChartTitle)) {
                         Toggle(Texts_SettingsView.showOriginalBGReadings, isOn: $showOriginalBGReadings)
                             .onChange(of: showOriginalBGReadings) { newValue in
                                 UserDefaults.standard.showOriginalBGReadings = newValue
                             }
-                        
+
                         Toggle(Texts_SettingsView.settingsviews_showTreatments, isOn: $showTreatmentsOnChart)
                             .onChange(of: showTreatmentsOnChart) { newValue in
                                 UserDefaults.standard.showTreatmentsOnChart = newValue
@@ -61,6 +50,28 @@ struct ShowHideItemsView: View {
                         Toggle(Texts_SettingsView.showSensorNoise, isOn: $showSensorNoise)
                             .onChange(of: showSensorNoise) { newValue in
                                 UserDefaults.standard.showSensorNoise = newValue
+                            }
+
+                        // Uses the main chart's existing preference, keeping this menu synchronized with pinch zoom.
+                        Picker(Texts_SettingsView.mainChartHours, selection: chartHoursSelection) {
+                            ForEach(RootHomeChartRange.allCases, id: \.rawValue) { range in
+                                Text(range.settingsTitle).tag(range.rawValue)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        // Override the surrounding navigation tint with the standard row-detail colour.
+                        .tint(ConstantsAppColors.rowDetailText)
+                    }
+
+                    Section(header: Text(Texts_HomeView.showHideHomeScreenTitle), footer: Text(Texts_HomeView.showHideHomeScreenFooter)) {
+                        Toggle(Texts_SettingsView.showMiniChart, isOn: $showMiniChart)
+                            .onChange(of: showMiniChart) { newValue in
+                                UserDefaults.standard.showMiniChart = newValue
+                            }
+
+                        Toggle(Texts_SettingsView.labelShowStatistics, isOn: $showStatistics)
+                            .onChange(of: showStatistics) { newValue in
+                                UserDefaults.standard.showStatistics = newValue
                             }
                     }
                     
@@ -74,7 +85,8 @@ struct ShowHideItemsView: View {
                         Toggle(Texts_SettingsView.preferLargeSnoozeScreen, isOn: $preferLargeSnoozeScreen)
                     }
                 }
-                .tint(ConstantsAppColors.normal)
+                // Keep the success-green colour scoped to switches so menu values do not inherit it.
+                .toggleStyle(SwitchToggleStyle(tint: ConstantsAppColors.normal))
             }
             .ipadReadableContentWidth(760)
             .navigationTitle(Texts_HomeView.showHideItemsTitle)
@@ -94,6 +106,14 @@ struct ShowHideItemsView: View {
     }
     
     // MARK: - private functions
+
+    /// Normalizes any older stored width to the nearest currently supported chart range.
+    private var chartHoursSelection: Binding<Double> {
+        Binding(
+            get: { RootHomeChartRange.closest(to: chartWidthInHours).rawValue },
+            set: { chartWidthInHours = $0 }
+        )
+    }
     
     /// returns a row view so that all rows are the same
     /// - parameters:

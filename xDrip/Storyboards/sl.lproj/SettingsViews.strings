@@ -297,6 +297,7 @@
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
+"settingsviews_mainChartHours" = "Ure glavnega grafikona";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

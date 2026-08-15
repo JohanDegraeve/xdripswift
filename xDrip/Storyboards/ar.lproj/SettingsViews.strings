@@ -111,6 +111,7 @@
 "nslog" = "NSتقرير";
 "oslog" = "OSتقرير";
 "settingsviews_sectiontitlehomescreen" = "الشاشة الرئيسية";
+"settingsviews_mainChartHours" = "ساعات الرسم البياني الرئيسي";
 "settingsviews_showClockWhenScreenIsLocked" = "ساعة شاشة القفل";
 "settingsviews_translateOnlineHelp" = "ترجمة الوثائق";
 "settingsviews_allowScreenRotation" = "تدوير المخطط";

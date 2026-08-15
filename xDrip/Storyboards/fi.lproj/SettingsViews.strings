@@ -12,6 +12,7 @@
 "settingsviews_appInstalledSince" = "Asennettu";
 "settingsviews_sectiontitleNotifications" = "Yleinen";
 "settingsviews_sectiontitlehomescreen" = "Kotinäyttö";
+"settingsviews_mainChartHours" = "Pääkaavion tunnit";
 "settingsviews_selectbgunit" = "Verensokeriyksikkö";
 "settingsviews_urgentLowValue" = "Erittäin matala lukema";
 "settingsviews_lowValue" = "Matala lukema";

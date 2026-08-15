@@ -121,6 +121,7 @@
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Hemskärm";
+"settingsviews_mainChartHours" = "Timmar i huvuddiagrammet";
  
 
 /////////////////////////////////////////////////////////////////////////////////////////////

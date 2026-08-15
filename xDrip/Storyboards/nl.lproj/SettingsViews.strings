@@ -137,6 +137,7 @@
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
+"settingsviews_mainChartHours" = "Uren in hoofdgrafiek";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

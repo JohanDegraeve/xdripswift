@@ -117,6 +117,7 @@
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Ana Ekran";
+"settingsviews_mainChartHours" = "Ana grafik saatleri";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

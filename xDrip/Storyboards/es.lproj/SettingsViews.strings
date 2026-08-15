@@ -124,6 +124,7 @@
 "settingsviews_allowScreenRotation" = "Rotación del gráfico";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Visualización del gráfico";
 "settingsviews_homeScreenMainChartSectionFooter" = "Estas opciones controlan cómo se muestran los datos de glucosa en el gráfico principal.";
+"settingsviews_mainChartHours" = "Horas del gráfico principal";
 "settingsviews_homeScreenScreenLockSectionTitle" = "Bloqueo de pantalla";
 "settingsviews_homeScreenScreenLockSectionFooter" = "Estas opciones controlan cómo se comporta la pantalla de Inicio cuando la app queda abierta o bloqueada.";
 "settingsviews_showMiniChart" = "Mostrar la mini-gráfica";

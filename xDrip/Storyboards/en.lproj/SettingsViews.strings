@@ -56,6 +56,7 @@
 "settingsviews_allowScreenRotation" = "Chart Rotation";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Chart Display";
 "settingsviews_homeScreenMainChartSectionFooter" = "These options control how glucose data is displayed on the main chart.";
+"settingsviews_mainChartHours" = "Main Chart Hours";
 "settingsviews_homeScreenScreenLockSectionTitle" = "Screen Lock";
 "settingsviews_homeScreenScreenLockSectionFooter" = "These options control how the Home screen behaves when the app is left open or locked.";
 "settingsviews_showClockWhenScreenIsLocked" = "Lock Screen Clock";
