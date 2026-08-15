@@ -30,14 +30,14 @@ final class CGMG5SensorSessionDetectionTests: XCTestCase {
         XCTAssertTrue(shouldReport(activeSensorStartDate: sensorStartDate.addingTimeInterval(-16)))
     }
 
-    func testDoesNotReportSameSessionTwiceWhileDelegateUpdateIsPending() {
-        XCTAssertFalse(shouldReport(activeSensorStartDate: nil, lastReportedSensorStartDate: sensorStartDate))
+    func testReportsSameTransmitterSessionAgainAfterInternalSensorIsStopped() {
+        XCTAssertTrue(shouldReport(activeSensorStartDate: nil))
+        XCTAssertTrue(shouldReport(activeSensorStartDate: nil))
     }
 
-    private func shouldReport(activeSensorStartDate: Date?, lastReportedSensorStartDate: Date? = nil) -> Bool {
+    private func shouldReport(activeSensorStartDate: Date?) -> Bool {
         CGMG5Transmitter.shouldReportDetectedSensor(
             activeSensorStartDate: activeSensorStartDate,
-            lastReportedSensorStartDate: lastReportedSensorStartDate,
             receivedSensorStartDate: sensorStartDate
         )
     }

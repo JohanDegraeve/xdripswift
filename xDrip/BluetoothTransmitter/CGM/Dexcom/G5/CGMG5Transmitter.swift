@@ -165,9 +165,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// to temporary store the received SensorStartDate. Will be compared to sensorStartDate only after having received a glucoseRx message with a valid algorithm status
     private var receivedSensorStartDate: Date?
 
-    /// Prevents repeated glucose packets from reporting the same missing internal session while the delegate update is still pending.
-    private var lastReportedSensorStartDate: Date?
-
     /// Core Data snapshot used for the first validated packet because app startup temporarily clears the UserDefaults mirror.
     private var activeSensorStartDateAtInitialization: Date?
 
@@ -1454,14 +1451,22 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
         if Self.shouldReportDetectedSensor(
             activeSensorStartDate: activeSensorStartDate,
-            lastReportedSensorStartDate: lastReportedSensorStartDate,
             receivedSensorStartDate: receivedSensorStartDate
         ) {
-            trace("in reconcileInternalSensorSession, received Dexcom sensor session is missing or different in xDrip, reporting it as detected", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-            lastReportedSensorStartDate = receivedSensorStartDate
-
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
+
+                // Several Bluetooth packets can be processed before the first queued delegate call
+                // creates the internal Sensor. Re-read the main-thread-owned mirror here so only the
+                // first queued callback reports the session. Unlike a transmitter-lifetime suppression
+                // flag, this still allows recovery if the user later stops the internal Sensor while
+                // the same transmitter session remains active.
+                guard Self.shouldReportDetectedSensor(
+                    activeSensorStartDate: UserDefaults.standard.activeSensorStartDate,
+                    receivedSensorStartDate: receivedSensorStartDate
+                ) else { return }
+
+                trace("in reconcileInternalSensorSession, received Dexcom sensor session is missing or different in xDrip, reporting it as detected", log: self.log, category: ConstantsLog.categoryCGMG5, type: .info)
                 self.cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: receivedSensorStartDate)
             }
         }
@@ -1469,12 +1474,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         sensorStartDate = receivedSensorStartDate
     }
 
-    static func shouldReportDetectedSensor(activeSensorStartDate: Date?, lastReportedSensorStartDate: Date?, receivedSensorStartDate: Date) -> Bool {
-        if let lastReportedSensorStartDate,
-           abs(lastReportedSensorStartDate.timeIntervalSince(receivedSensorStartDate)) <= sensorStartDateTolerance {
-            return false
-        }
-
+    static func shouldReportDetectedSensor(activeSensorStartDate: Date?, receivedSensorStartDate: Date) -> Bool {
         guard let activeSensorStartDate else { return true }
 
         return abs(activeSensorStartDate.timeIntervalSince(receivedSensorStartDate)) > sensorStartDateTolerance
