@@ -1292,6 +1292,33 @@ final class TroubleshootingLogTests: XCTestCase {
         }
     }
 
+    func testCalibrationActivityReportsTheSubmittedReadinessConditions() {
+        let readiness = TroubleshootingCalibrationReadiness(
+            calibrationValue: .bad,
+            stableTrend: .good,
+            sensorNoise: .caution,
+            overall: .bad
+        )
+        let entry = TroubleshootingLogEntry.standard(
+            .calibrationAccepted(mgDl: 55, readiness: readiness),
+            timestamp: referenceDate
+        )
+
+        XCTAssertEqual(
+            makeReport(entries: [entry]).message(for: entry),
+            "Calibration accepted: 55 mg/dL. Guidance was red " +
+                "(calibration value red, trend green, sensor noise orange)."
+        )
+    }
+
+    func testLegacyCalibrationActivityDecodesWithoutReadiness() throws {
+        let data = Data(#"{"calibrationAccepted":{"mgDl":100}}"#.utf8)
+
+        let kind = try JSONDecoder().decode(TroubleshootingLogKind.self, from: data)
+
+        XCTAssertEqual(kind, .calibrationAccepted(mgDl: 100, readiness: nil))
+    }
+
     func testEmptyReportExplainsThatNoHistoryExists() {
         XCTAssertTrue(makeReport(entries: []).reportText.contains(
             "No troubleshooting information was recorded during this period."

@@ -207,7 +207,8 @@
 "sensorManagementStatusActive" = "Sensor Active";
 "sensorManagementStarted" = "Started";
 "sensorManagementEnds" = "Ends";
-"sensorManagementCalibrationInRange" = "Nell’intervallo";
+"sensorManagementCalibrationValue" = "Valore di calibrazione";
+"sensorManagementCalibrationPending" = "In attesa...";
 "sensorManagementCalibrationStableTrend" = "Tendenza stabile";
 "sensorManagementCalibrationSlightlyLow" = "Leggermente basso";
 "sensorManagementCalibrationSlightlyHigh" = "Leggermente alto";

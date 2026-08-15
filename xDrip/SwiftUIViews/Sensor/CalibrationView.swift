@@ -18,7 +18,7 @@ struct CalibrationView: View {
     let currentBgDisplay: SensorManagementEnteredBgValue?
     let readiness: CalibrationReadiness
     let isMgDl: Bool
-    let onSubmitCalibration: (Double) -> String?
+    let onSubmitCalibration: (CalibrationSubmission) -> String?
     let onCalibrationSaved: () -> Void
 
     @State private var calibrationValue = ""
@@ -30,11 +30,9 @@ struct CalibrationView: View {
     var body: some View {
         NavigationView {
             Form {
-                readinessSection
-
                 Section(footer: calibrationEntryFooter) {
                     HStack {
-                        Text(Texts_BgReadings.calibrationValue)
+                        Text(Texts_HomeView.sensorManagementCalibrationValue)
                         Spacer()
                         TextField(currentBgDisplay?.rawValue ?? (isMgDl ? "---" : "-.-"), text: $calibrationValue)
                             .keyboardType(isMgDl ? .numberPad : .decimalPad)
@@ -45,6 +43,8 @@ struct CalibrationView: View {
                             .foregroundStyle(Color(.colorTertiary))
                     }
                 }
+
+                readinessSection
             }
             .navigationTitle(Texts_HomeView.calibrationButton)
             .toolbar {
@@ -78,24 +78,36 @@ struct CalibrationView: View {
     }
 
     private var readinessSection: some View {
-        Section(footer: Text(readiness.summary)) {
-            readinessRow(title: Texts_HomeView.sensorManagementCalibrationInRange, check: readiness.inRange)
+        Section {
             readinessRow(title: Texts_HomeView.sensorManagementCalibrationStableTrend, check: readiness.stableTrend)
             readinessRow(title: Texts_HomeView.sensorManagementNoiseTitle, check: readiness.sensorNoise)
+            readinessRow(
+                title: Texts_HomeView.sensorManagementCalibrationValue,
+                check: evaluatedReadiness?.calibrationValue
+            )
+        } footer: {
+            if let evaluatedReadiness {
+                Text(
+                    evaluatedReadiness.level == .bad
+                        ? "⚠️ \(evaluatedReadiness.summary)"
+                        : evaluatedReadiness.summary
+                )
+            }
         }
     }
 
-    private func readinessRow(title: String, check: CalibrationReadinessCheck) -> some View {
+    private func readinessRow(title: String, check: CalibrationReadinessCheck?) -> some View {
         HStack(spacing: 10) {
-            Image(systemName: check.level.systemImage)
-                .foregroundStyle(check.level.color)
+            Image(systemName: check?.level.systemImage ?? "ellipsis.circle.fill")
+                .foregroundStyle(check?.level.color ?? ConstantsAppColors.tertiaryText)
                 .frame(width: 22)
             Text(title)
             Spacer()
-            Text(check.detail)
-                .foregroundStyle(check.level.color)
+            Text(check?.detail ?? Texts_HomeView.sensorManagementCalibrationPending)
+                .foregroundStyle(check?.level.color ?? ConstantsAppColors.tertiaryText)
                 .multilineTextAlignment(.trailing)
         }
+        .listRowBackground(readinessSectionBackgroundColor)
     }
 
     private var calibrationEntryFooter: some View {
@@ -119,6 +131,26 @@ struct CalibrationView: View {
             enteredCalibrationValueInMgDl <= ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue
     }
 
+    /// The entered fingerstick provides the range check. Trend and noise continue to come from
+    /// the sensor's recent readings because a single fingerstick cannot establish either.
+    private var evaluatedReadiness: CalibrationReadinessEvaluation? {
+        guard isCalibrationValueInRange, let enteredCalibrationValueInMgDl else { return nil }
+        return readiness.evaluating(calibrationValueInMgDl: enteredCalibrationValueInMgDl)
+    }
+
+    private var readinessSectionBackgroundColor: Color {
+        guard let evaluatedReadiness else { return ConstantsUI.normalSectionBackgroundColor }
+
+        switch evaluatedReadiness.level {
+        case .good:
+            return ConstantsUI.activeRowBackgroundColor
+        case .caution:
+            return ConstantsUI.cautionSectionBackgroundColor
+        case .bad:
+            return ConstantsUI.warningSectionBackgroundColor
+        }
+    }
+
     private var largeCalibrationDifferenceWarning: String? {
         guard let currentBgDisplay, let enteredCalibrationValueInMgDl, isCalibrationValueInRange else { return nil }
         let differenceInMgDl = abs(enteredCalibrationValueInMgDl - currentBgDisplay.valueInMgDl)
@@ -140,35 +172,35 @@ struct CalibrationView: View {
     }
 
     private func executeCalibration(forcedLargeDelta: Bool = false) {
-        guard let value = calibrationValue.toDouble(), isCalibrationValueInRange else { return }
+        guard let value = calibrationValue.toDouble(), let evaluatedReadiness else { return }
 
         let currentBgDescription = currentBgDisplay?.displayValueWithUnit(isMgDl: isMgDl) ?? "-"
         let calibrationDescription = displayEnteredCalibrationValueWithUnit(value)
         if forcedLargeDelta, largeCalibrationDifferenceWarning != nil {
             trace(
-                "in submitCalibration, user forced calibration despite the large delta. current BG = %{public}@, calibration value = %{public}@",
+                "in submitCalibration, user forced calibration despite the large delta. current BG = %{public}@, calibration value = %{public}@, readiness: %{public}@",
                 log: log,
                 category: ConstantsLog.categoryApplicationDataCalibrations,
                 type: .info,
                 currentBgDescription,
-                calibrationDescription
+                calibrationDescription,
+                evaluatedReadiness.traceDescription
             )
         }
 
         trace(
-            "in submitCalibration, user calibrating. current BG = %{public}@, calibration value = %{public}@, readiness: in range = %{public}@, stable trend = %{public}@, sensor noise = %{public}@, warning = %{public}@",
+            "calibration guidance submitted. current BG = %{public}@, calibration value = %{public}@, readiness: %{public}@, large difference warning = %{public}@",
             log: log,
             category: ConstantsLog.categoryApplicationDataCalibrations,
             type: .info,
             currentBgDescription,
             calibrationDescription,
-            readiness.inRange.traceDescription,
-            readiness.stableTrend.traceDescription,
-            readiness.sensorNoise.traceDescription,
-            largeCalibrationDifferenceWarning ?? "none"
+            evaluatedReadiness.traceDescription,
+            largeCalibrationDifferenceWarning == nil ? "none" : "shown"
         )
 
-        if let errorMessage = onSubmitCalibration(value) {
+        let submission = CalibrationSubmission(enteredValue: value, readiness: evaluatedReadiness)
+        if let errorMessage = onSubmitCalibration(submission) {
             transientMessage = CalibrationViewMessage(title: Texts_Common.warning, message: errorMessage)
         } else {
             onCalibrationSaved()

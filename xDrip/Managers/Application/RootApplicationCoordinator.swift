@@ -325,8 +325,8 @@ import AppIntents
                     stopSensor: { [weak self] in
                         self?.stopSensorFromManagementView()
                     },
-                    submitCalibration: { [weak self] value in
-                        self?.submitCalibrationFromManagementView(value)
+                    submitCalibration: { [weak self] submission in
+                        self?.submitCalibrationFromManagementView(submission)
                     },
                     updateScreenLock: { [weak self] overrideCurrentState, nightMode in
                         self?.updateScreenLock(overrideCurrentState: overrideCurrentState, nightMode: nightMode) ?? false
@@ -1629,6 +1629,7 @@ import AppIntents
 
     private func submitCalibrationValue(
         _ valueAsDouble: Double,
+        readinessEvaluation: CalibrationReadinessEvaluation? = nil,
         calibrationsAccessor: CalibrationsAccessor,
         coreDataManager: CoreDataManager,
         bgReadingsAccessor: BgReadingsAccessor,
@@ -1636,9 +1637,16 @@ import AppIntents
         activeSensor: Sensor,
         deviceName: String?
     ) -> String? {
-        trace("calibration : value %{public}@ entered by user", log: self.log, category: ConstantsLog.categoryRootView, type: .info, valueAsDouble.description)
-
         let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        let readinessTrace = readinessEvaluation?.traceDescription ?? "not evaluated by calibration guidance"
+        trace(
+            "calibration processing started. value = %{public}@ mg/dL, readiness: %{public}@",
+            log: self.log,
+            category: ConstantsLog.categoryRootView,
+            type: .info,
+            valueAsDoubleConvertedToMgDl.description,
+            readinessTrace
+        )
 
         var latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true, includingSuppressed: true)
         var latestCalibrations = calibrationsAccessor.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
@@ -1670,12 +1678,19 @@ import AppIntents
         coreDataManager.saveChanges()
         sensorNoiseManager?.update(activeSensor: activeSensor)
 
+        // Record the exact immutable snapshot supplied by CalibrationView. Recomputing here after
+        // calibration could make the developer trace and Activity Log disagree with what the user saw.
         trace(
-            "calibration accepted",
+            "calibration accepted. value = %{public}@ mg/dL, readiness: %{public}@",
             log: self.log,
             category: ConstantsLog.categoryRootView,
             type: .debug,
-            troubleshooting: .standard(.calibrationAccepted(mgDl: valueAsDoubleConvertedToMgDl))
+            troubleshooting: .standard(.calibrationAccepted(
+                mgDl: valueAsDoubleConvertedToMgDl,
+                readiness: readinessEvaluation.map(TroubleshootingCalibrationReadiness.init)
+            )),
+            valueAsDoubleConvertedToMgDl.description,
+            readinessTrace
         )
 
         if let nightscoutSyncManager = self.nightscoutSyncManager {
@@ -2250,7 +2265,7 @@ import AppIntents
         updateLabelsAndChart(overrideApplicationState: false)
     }
 
-    private func submitCalibrationFromManagementView(_ valueAsDouble: Double) -> String? {
+    private func submitCalibrationFromManagementView(_ submission: CalibrationSubmission) -> String? {
         guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = self.coreDataManager, let bgReadingsAccessor = self.bgReadingsAccessor else {
             return Texts_HomeView.sensorManagementCalibrationUnavailable
         }
@@ -2272,7 +2287,8 @@ import AppIntents
         }
 
         return submitCalibrationValue(
-            valueAsDouble,
+            submission.enteredValue,
+            readinessEvaluation: submission.readiness,
             calibrationsAccessor: calibrationsAccessor,
             coreDataManager: coreDataManager,
             bgReadingsAccessor: bgReadingsAccessor,

@@ -441,8 +441,12 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorManagementCalibrationSafetyFooter", tableName: filename, bundle: Bundle.main, value: "Only calibrate if you understand how to do it safely.", comment: "safety text shown in the calibration entry screen")
     }()
 
-    static let sensorManagementCalibrationInRange: String = {
-        return NSLocalizedString("sensorManagementCalibrationInRange", tableName: filename, bundle: Bundle.main, value: "In range", comment: "calibration readiness row checking whether glucose is in a suitable range")
+    static let sensorManagementCalibrationValue: String = {
+        return NSLocalizedString("sensorManagementCalibrationValue", tableName: filename, bundle: Bundle.main, value: "Calibration Value", comment: "calibration readiness row title for the entered fingerstick value")
+    }()
+
+    static let sensorManagementCalibrationPending: String = {
+        return NSLocalizedString("sensorManagementCalibrationPending", tableName: filename, bundle: Bundle.main, value: "Pending...", comment: "calibration readiness detail before a valid fingerstick value is entered")
     }()
 
     static let sensorManagementCalibrationStableTrend: String = {

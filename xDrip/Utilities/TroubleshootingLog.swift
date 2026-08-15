@@ -524,6 +524,32 @@ enum TroubleshootingSensorNoiseStatus: String, Codable {
     }
 }
 
+/// Share-safe traffic-light result captured when the user submits a calibration.
+///
+/// The Activity Log stores controlled levels rather than localized UI details. This preserves the
+/// three conditions the user saw without allowing presentation text into the public support report.
+enum TroubleshootingCalibrationReadinessLevel: String, Codable, Equatable {
+    case good
+    case caution
+    case bad
+
+    var name: String {
+        switch self {
+        case .good: return "green"
+        case .caution: return "orange"
+        case .bad: return "red"
+        }
+    }
+}
+
+/// Complete readiness snapshot paired with an accepted calibration.
+struct TroubleshootingCalibrationReadiness: Codable, Equatable {
+    let calibrationValue: TroubleshootingCalibrationReadinessLevel
+    let stableTrend: TroubleshootingCalibrationReadinessLevel
+    let sensorNoise: TroubleshootingCalibrationReadinessLevel
+    let overall: TroubleshootingCalibrationReadinessLevel
+}
+
 /// A calculated or transmitter-reported condition that became a sensor-health episode.
 ///
 /// This is deliberately separate from the hourly `sensorNoise` measurement and configured alarm
@@ -631,8 +657,11 @@ enum TroubleshootingLogKind: Codable, Equatable {
     case sensorHealthAlert(TroubleshootingSensorHealthAlert)
     /// Hourly aggregate reception quality without transmitter identity or packet contents.
     case transmitterReadSuccess(percent: Int, missedReadings: Int, expectedReadings: Int, windowHours: Int)
-    /// An accepted calibration value; no calibration payload or transmitter details are retained.
-    case calibrationAccepted(mgDl: Double)
+    /// An accepted calibration value and the optional guidance snapshot shown at submission time.
+    ///
+    /// Readiness is optional so entries written by older builds and the legacy notification prompt
+    /// continue to decode without fabricating conditions the user was never shown.
+    case calibrationAccepted(mgDl: Double, readiness: TroubleshootingCalibrationReadiness?)
     /// The persisted alert enum value is safe and compact; user-authored notification text is not.
     case alert(kindRawValue: Int, activity: TroubleshootingAlertActivity)
     case integration(name: TroubleshootingIntegration, activity: TroubleshootingIntegrationActivity)
@@ -1659,8 +1688,12 @@ struct TroubleshootingLogReportBuilder {
             }
             return "Transmitter read success: \(percent)% over \(window) (\(missedReadings) of \(expectedReadings) reading\(expectedReadings == 1 ? "" : "s") missed)."
 
-        case let .calibrationAccepted(mgDl):
-            return "Calibration accepted: \(glucoseText(mgDl: mgDl))."
+        case let .calibrationAccepted(mgDl, readiness):
+            let accepted = "Calibration accepted: \(glucoseText(mgDl: mgDl))."
+            guard let readiness else { return accepted }
+            return accepted + " Guidance was \(readiness.overall.name) " +
+                "(calibration value \(readiness.calibrationValue.name), " +
+                "trend \(readiness.stableTrend.name), sensor noise \(readiness.sensorNoise.name))."
 
         case let .alert(kindRawValue, activity):
             let alertName = Self.alertName(rawValue: kindRawValue)

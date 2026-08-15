@@ -22,7 +22,7 @@ struct SensorManagementView: View {
     let sensorNoiseManager: SensorNoiseManager
     let onStartSensor: (Date, String?) -> Void
     let onStopSensor: () -> Void
-    let onSubmitCalibration: (Double) -> String?
+    let onSubmitCalibration: (CalibrationSubmission) -> String?
     let initiallyShowsCalibration: Bool
 
     @State private var refreshView = false

@@ -126,7 +126,8 @@
 "sensorManagementStatusActive" = "Sensor Active";
 "sensorManagementStarted" = "Started";
 "sensorManagementEnds" = "Ends";
-"sensorManagementCalibrationInRange" = "Binnen bereik";
+"sensorManagementCalibrationValue" = "Kalibratiewaarde";
+"sensorManagementCalibrationPending" = "In afwachting...";
 "sensorManagementCalibrationStableTrend" = "Stabiele trend";
 "sensorManagementCalibrationSlightlyLow" = "Enigszins laag";
 "sensorManagementCalibrationSlightlyHigh" = "Enigszins hoog";

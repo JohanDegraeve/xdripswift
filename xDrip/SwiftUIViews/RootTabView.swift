@@ -92,7 +92,7 @@ struct RootTabDependencies {
     let transmitterProvider: () -> CGMTransmitter?
     let startSensor: (Date, String?) -> Void
     let stopSensor: () -> Void
-    let submitCalibration: (Double) -> String?
+    let submitCalibration: (CalibrationSubmission) -> String?
     let updateScreenLock: (Bool, Bool) -> Bool
     let selectedFollowerActions: SelectedFollowerActions
 
@@ -282,7 +282,7 @@ struct RootTabDependencies {
         transmitterProvider: @escaping () -> CGMTransmitter?,
         startSensor: @escaping (Date, String?) -> Void,
         stopSensor: @escaping () -> Void,
-        submitCalibration: @escaping (Double) -> String?,
+        submitCalibration: @escaping (CalibrationSubmission) -> String?,
         updateScreenLock: @escaping (Bool, Bool) -> Bool,
         selectedFollowerActions: SelectedFollowerActions,
         sensorProvider: ActiveSensorProviding

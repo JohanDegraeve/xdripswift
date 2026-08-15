@@ -23,33 +23,26 @@ struct CalibrationReadinessEvaluator {
     ) -> CalibrationReadiness {
         guard hasActiveSensor else {
             let unavailable = CalibrationReadinessCheck(level: .caution, detail: Texts_HomeView.sensorManagementNoSensor)
-            return CalibrationReadiness(inRange: unavailable, stableTrend: unavailable, sensorNoise: unavailable)
+            return CalibrationReadiness(stableTrend: unavailable, sensorNoise: unavailable)
         }
 
         return CalibrationReadiness(
-            inRange: inRangeReadiness(latestReading: recentReadings.first),
             stableTrend: stableTrendReadiness(recentReadings: recentReadings),
             sensorNoise: sensorNoiseReadiness(noiseState: noiseState)
         )
     }
 
-    private func inRangeReadiness(latestReading: CalibrationReadinessReading?) -> CalibrationReadinessCheck {
-        guard let latestReading else {
-            return CalibrationReadinessCheck(level: .caution, detail: Texts_HomeView.sensorManagementCalibrationNoReading)
-        }
-
-        let value = latestReading.valueInMgDl
-
-        if value < CalibrationReadinessConstants.minimumInRangeValueInMgDl {
+    static func calibrationValueReadiness(valueInMgDl: Double) -> CalibrationReadinessCheck {
+        if valueInMgDl < CalibrationReadinessConstants.minimumInRangeValueInMgDl {
             return CalibrationReadinessCheck(level: .bad, detail: Texts_Common.lowStatistics)
         }
-        if value < CalibrationReadinessConstants.minimumGoodValueInMgDl {
+        if valueInMgDl < CalibrationReadinessConstants.minimumGoodValueInMgDl {
             return CalibrationReadinessCheck(level: .caution, detail: Texts_HomeView.sensorManagementCalibrationSlightlyLow)
         }
-        if value > CalibrationReadinessConstants.maximumInRangeValueInMgDl {
+        if valueInMgDl > CalibrationReadinessConstants.maximumInRangeValueInMgDl {
             return CalibrationReadinessCheck(level: .bad, detail: Texts_Common.highStatistics)
         }
-        if value > CalibrationReadinessConstants.maximumGoodValueInMgDl {
+        if valueInMgDl > CalibrationReadinessConstants.maximumGoodValueInMgDl {
             return CalibrationReadinessCheck(level: .caution, detail: Texts_HomeView.sensorManagementCalibrationSlightlyHigh)
         }
 
@@ -190,15 +183,71 @@ struct CalibrationReadinessCheck {
 }
 
 struct CalibrationReadiness {
-    let inRange: CalibrationReadinessCheck
     let stableTrend: CalibrationReadinessCheck
     let sensorNoise: CalibrationReadinessCheck
 
+    func evaluating(calibrationValueInMgDl: Double) -> CalibrationReadinessEvaluation {
+        CalibrationReadinessEvaluation(
+            calibrationValue: CalibrationReadinessEvaluator.calibrationValueReadiness(valueInMgDl: calibrationValueInMgDl),
+            stableTrend: stableTrend,
+            sensorNoise: sensorNoise
+        )
+    }
+}
+
+struct CalibrationReadinessEvaluation {
+    let calibrationValue: CalibrationReadinessCheck
+    let stableTrend: CalibrationReadinessCheck
+    let sensorNoise: CalibrationReadinessCheck
+
+    var level: CalibrationReadinessLevel {
+        let levels = [calibrationValue.level, stableTrend.level, sensorNoise.level]
+        if levels.contains(.bad) { return .bad }
+        if levels.contains(.caution) { return .caution }
+        return .good
+    }
+
     var summary: String {
-        let levels = [inRange.level, stableTrend.level, sensorNoise.level]
-        if levels.contains(.bad) { return Texts_HomeView.sensorManagementCalibrationReadinessBad }
-        if levels.contains(.caution) { return Texts_HomeView.sensorManagementCalibrationReadinessCaution }
-        return Texts_HomeView.sensorManagementCalibrationReadinessGood
+        switch level {
+        case .good:
+            return Texts_HomeView.sensorManagementCalibrationReadinessGood
+        case .caution:
+            return Texts_HomeView.sensorManagementCalibrationReadinessCaution
+        case .bad:
+            return Texts_HomeView.sensorManagementCalibrationReadinessBad
+        }
+    }
+
+    /// One stable developer-trace description shared by submission and acceptance logging.
+    var traceDescription: String {
+        "overall = \(level.traceValue), calibration value = \(calibrationValue.traceDescription), " +
+            "stable trend = \(stableTrend.traceDescription), sensor noise = \(sensorNoise.traceDescription)"
+    }
+}
+
+/// Carries the exact value and readiness state the user submitted across the view/coordinator boundary.
+/// Keeping them together prevents acceptance logging from recomputing conditions after calibration.
+struct CalibrationSubmission {
+    let enteredValue: Double
+    let readiness: CalibrationReadinessEvaluation
+}
+
+extension TroubleshootingCalibrationReadinessLevel {
+    init(_ level: CalibrationReadinessLevel) {
+        switch level {
+        case .good: self = .good
+        case .caution: self = .caution
+        case .bad: self = .bad
+        }
+    }
+}
+
+extension TroubleshootingCalibrationReadiness {
+    init(_ evaluation: CalibrationReadinessEvaluation) {
+        calibrationValue = TroubleshootingCalibrationReadinessLevel(evaluation.calibrationValue.level)
+        stableTrend = TroubleshootingCalibrationReadinessLevel(evaluation.stableTrend.level)
+        sensorNoise = TroubleshootingCalibrationReadinessLevel(evaluation.sensorNoise.level)
+        overall = TroubleshootingCalibrationReadinessLevel(evaluation.level)
     }
 }
 

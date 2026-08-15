@@ -326,6 +326,13 @@ struct TroubleshootingLogView: View {
             return .orange
         case .dataManagement(.operationFailed):
             return .orange
+        case let .calibrationAccepted(_, readiness):
+            switch readiness?.overall {
+            case .good: return ConstantsAppColors.normal
+            case .caution: return ConstantsAppColors.caution
+            case .bad: return ConstantsAppColors.urgent
+            case nil: return ConstantsAppColors.navigationTint
+            }
         default:
             return ConstantsAppColors.navigationTint
         }
