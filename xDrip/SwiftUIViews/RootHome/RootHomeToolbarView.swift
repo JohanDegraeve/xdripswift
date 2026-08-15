@@ -39,8 +39,7 @@ struct RootHomeToolbarView: View {
             sensorToolbarButton()
             postProcessingToolbarButton()
             toolbarButton(systemImage: "rectangle.3.group", label: "Show/Hide", action: actions.showHideItems)
-            toolbarButton(systemImage: state.isScreenLocked ? "lock.fill" : "lock", label: Texts_HomeView.lockButton, action: actions.toggleScreenLock)
-                .foregroundStyle(state.isScreenLocked ? ConstantsAppColors.toolbarLockedIcon : ConstantsAppColors.toolbarIcon)
+            screenLockToolbarButton()
         }
         .padding(.horizontal, Layout.horizontalPadding)
         .padding(.vertical, Layout.verticalPadding)
@@ -126,6 +125,39 @@ struct RootHomeToolbarView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                     shouldIgnoreNextPostProcessingTap = false
                 }
+            }
+    }
+
+    /// A tap toggles the full Clock Mode layout. A long press enables the existing silent
+    /// keep-awake lock without also firing the tap action when the gesture completes.
+    private func screenLockToolbarButton() -> some View {
+        Image(systemName: state.isScreenLocked ? "lock.fill" : "lock")
+            .font(.system(size: Layout.iconSize, weight: .regular))
+            .frame(width: Layout.buttonSize, height: Layout.buttonSize)
+            .contentShape(Rectangle())
+            .gesture(
+                LongPressGesture(minimumDuration: 0.5)
+                    .exclusively(before: TapGesture())
+                    .onEnded { result in
+                        switch result {
+                        case .first:
+                            actions.keepScreenAwake()
+                        case .second:
+                            actions.toggleScreenLock()
+                        }
+                    }
+            )
+            .foregroundStyle(
+                state.isScreenLocked && !state.usesScreenLockNightLayout
+                    ? ConstantsAppColors.toolbarLockedIcon
+                    : ConstantsAppColors.toolbarIcon
+            )
+            .frame(maxWidth: .infinity)
+            .accessibilityElement()
+            .accessibilityLabel(state.isScreenLocked ? Texts_HomeView.unlockButton : Texts_HomeView.lockButton)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction {
+                actions.toggleScreenLock()
             }
     }
 

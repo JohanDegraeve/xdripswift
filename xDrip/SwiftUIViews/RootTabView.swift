@@ -95,6 +95,13 @@ struct RootTabDependencies {
     let submitCalibration: (Double) -> String?
     let updateScreenLock: (Bool, Bool) -> Bool
     let selectedFollowerActions: SelectedFollowerActions
+
+    /// Cancels either screen-lock mode without accidentally enabling it when it is already off.
+    func cancelScreenLock() {
+        guard rootHomeStateModel.state.isScreenLocked else { return }
+
+        _ = updateScreenLock(false, true)
+    }
 }
 
 /// Publishes existing application services to the SwiftUI tab hierarchy.
@@ -355,7 +362,7 @@ struct RootTabView: View {
                 if let dependencies = stateModel.dependencies {
                     RootScreenLockOverlay(
                         stateModel: dependencies.rootHomeStateModel,
-                        unlock: { _ = dependencies.updateScreenLock(false, true) }
+                        unlock: dependencies.cancelScreenLock
                     )
                 }
 
@@ -381,6 +388,10 @@ struct RootTabView: View {
             updateSupportedOrientations(for: selectedTab)
         }
         .onChange(of: selectedTab) { selectedTab in
+            if selectedTab != .home {
+                stateModel.dependencies?.cancelScreenLock()
+            }
+
             updateSupportedOrientations(for: selectedTab)
         }
         .onChange(of: scenePhase) { scenePhase in
@@ -672,11 +683,18 @@ private struct RootHomeTabView: View {
             applicationCoordinator.homeDidBecomeVisible()
             updatePresentedViewOrientationLock()
         }
+        .onDisappear {
+            dependencies?.cancelScreenLock()
+        }
         .sheet(item: $presentedView) { presentedView in
             destinationView(presentedView)
                 .colorScheme(.dark)
         }
-        .onChange(of: presentedView?.id) { _ in
+        .onChange(of: presentedView?.id) { presentedViewID in
+            if presentedViewID != nil {
+                dependencies?.cancelScreenLock()
+            }
+
             updatePresentedViewOrientationLock()
         }
         .onChange(of: snoozeDismissalRequest) { _ in
@@ -819,7 +837,10 @@ private struct RootHomeTabView: View {
 
 // MARK: - Screen Lock
 
-/// Covers the complete tab hierarchy while the full night screen lock is active and owns tap-to-unlock.
+/// Covers the complete tab hierarchy while Clock Mode is active and owns tap-to-unlock.
+///
+/// Keeping the overlay mounted when visual dimming is disabled gives the transparent presentation
+/// exactly the same touch-to-unlock behavior as the visibly dimmed presentations.
 private struct RootScreenLockOverlay: View {
     @ObservedObject var stateModel: RootHomeStateModel
     let unlock: () -> Void
@@ -829,9 +850,9 @@ private struct RootScreenLockOverlay: View {
         let dimmingType = UserDefaults.standard.screenLockDimmingType
 
         if state.isScreenLocked,
-           state.usesScreenLockNightLayout,
-           dimmingType != .disabled {
+           state.usesScreenLockNightLayout {
             dimmingType.dimmingColor
+                .opacity(dimmingType == .disabled ? 0 : 1)
                 .ignoresSafeArea()
                 .contentShape(Rectangle())
                 .onTapGesture(perform: unlock)

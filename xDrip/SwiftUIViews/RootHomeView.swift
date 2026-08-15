@@ -22,6 +22,7 @@ struct RootHomeView: View {
         static let bottomRowSpacing: CGFloat = 3
         static let screenHorizontalMargin: CGFloat = 12
         static let glucoseStatusRowHeight: CGFloat = 120
+        static let nightLockReadoutHeightWidthRatio: CGFloat = 0.50
         static let ipadGlanceCardMinimumHorizontalPadding: CGFloat = 12
         static let ipadGlanceCardHorizontalPadding: CGFloat = 30
         static let ipadGlanceCardMinimumWidthForPadding: CGFloat = 360
@@ -129,7 +130,9 @@ struct RootHomeView: View {
         .onAppear {
             scrollCoordinator.resetToNow()
             chartYAxisResetRevision &+= 1
-            if UIDevice.current.userInterfaceIdiom != .pad {
+            if state.usesScreenLockNightLayout {
+                applyClockModeState(isEnabled: true)
+            } else if UIDevice.current.userInterfaceIdiom != .pad {
                 refreshChartRangeFromStoredSettings()
             }
             requestChartState(forceReset: true)
@@ -200,13 +203,21 @@ struct RootHomeView: View {
             prepareHistoricalDataIfNeeded(at: endDate)
         }
         .onChange(of: selectedRange) { newRange in
-            chartWidthInHours = newRange.rawValue
+            // Clock Mode temporarily uses three hours without replacing the user's stored range.
+            if !state.usesScreenLockNightLayout {
+                chartWidthInHours = newRange.rawValue
+            }
             scrollCoordinator.setVisibleTimeInterval(newRange.timeInterval)
             requestChartState(forceReset: true)
             prepareHistoricalDataIfNeeded(at: endDate)
         }
         .onChange(of: chartWidthInHours) { _ in
+            guard !state.usesScreenLockNightLayout else { return }
+
             refreshChartRangeFromStoredSettings()
+        }
+        .onChange(of: state.usesScreenLockNightLayout) { isEnabled in
+            applyClockModeState(isEnabled: isEnabled)
         }
         .onChange(of: miniChartHoursToShow) { _ in
             requestMiniChartState(forceReset: true)
@@ -232,7 +243,11 @@ struct RootHomeView: View {
 
     @ViewBuilder
     private func rootContent() -> some View {
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if state.usesScreenLockNightLayout {
+            GeometryReader { geometry in
+                nightLockContent(size: geometry.size)
+            }
+        } else if UIDevice.current.userInterfaceIdiom == .pad {
             GeometryReader { geometry in
                 Group {
                     if IPadLayoutClass.resolve(
@@ -255,6 +270,36 @@ struct RootHomeView: View {
         } else {
             phoneContent()
         }
+    }
+
+    /// Gives the two night-time readouts enough height for their oversized fonts to scale to the
+    /// complete content width. The chart remains flexible and receives all remaining space.
+    private func nightLockContent(size: CGSize) -> some View {
+        let contentWidth = max(size.width - (Layout.screenHorizontalMargin * 2), 0)
+
+        return VStack(spacing: Layout.sectionSpacing) {
+            homeHeader
+
+            VStack(spacing: Layout.rowSpacing) {
+                glucoseStatusRow(
+                    spacing: 0,
+                    height: contentWidth * Layout.nightLockReadoutHeightWidthRatio
+                )
+
+                mainChart
+                    .frame(maxHeight: .infinity)
+                    .layoutPriority(1)
+
+                if state.visibility.showsClock {
+                    RootHomeClockView(text: state.controls.clockText)
+                        .frame(height: contentWidth * Layout.nightLockReadoutHeightWidthRatio)
+                }
+            }
+            .frame(maxHeight: .infinity, alignment: .top)
+        }
+        .padding(.horizontal, Layout.screenHorizontalMargin)
+        .frame(width: size.width, height: size.height, alignment: .top)
+        .animation(.easeOut(duration: 0.22), value: sensorHealthIssueManager.visibleIssue?.id)
     }
 
     /// The original iPhone hierarchy remains isolated here so the tablet composition cannot alter
@@ -505,7 +550,10 @@ struct RootHomeView: View {
         glucoseStatusRow(spacing: 0)
     }
 
-    private func glucoseStatusRow(spacing: CGFloat) -> some View {
+    private func glucoseStatusRow(
+        spacing: CGFloat,
+        height: CGFloat = Layout.glucoseStatusRowHeight
+    ) -> some View {
         HStack(spacing: spacing) {
             if state.visibility.showsPump {
                 RootHomePumpView(state: pumpDisplayState)
@@ -514,12 +562,12 @@ struct RootHomeView: View {
 
             RootHomeGlucoseReadingView(
                 state: glucoseDisplayState,
-                isScreenLocked: state.isScreenLocked,
-                actions: actions
+                isScreenLocked: state.usesScreenLockNightLayout,
+                nightLockStatus: nightLockStatus
             )
             .frame(maxWidth: .infinity)
         }
-        .frame(height: Layout.glucoseStatusRowHeight)
+        .frame(height: height)
     }
 
     private var mainChart: some View {
@@ -537,6 +585,9 @@ struct RootHomeView: View {
                 requestChartState(forceReset: forceReset, showsLoading: showsLoading)
             }
         )
+        // Clock Mode is a current-status display. Prevent dragging, pinching and double-tapping
+        // the main chart until the user unlocks it.
+        .allowsHitTesting(!state.usesScreenLockNightLayout)
     }
 
     private func expandableMainChart(showsExpansionButton: Bool) -> some View {
@@ -836,6 +887,26 @@ struct RootHomeView: View {
 
     // MARK: - Actions
 
+    /// Applies every main-chart transition for Clock Mode in one place.
+    ///
+    /// When enabled:
+    /// 1. Select a temporary three-hour range without changing UserDefaults.
+    /// 2. Return the chart to `now()` and cancel any active scrolling or deceleration.
+    /// 3. Chart gestures are disabled declaratively by `mainChart` while the same mode is active.
+    ///
+    /// When disabled, the user's stored range and normal chart interaction are restored.
+    private func applyClockModeState(isEnabled: Bool) {
+        if isEnabled {
+            if selectedRange != .threeHours {
+                selectedRange = .threeHours
+            }
+
+            resetMainChartToNow()
+        } else {
+            refreshChartRangeFromStoredSettings()
+        }
+    }
+
     private func refreshChartRangeFromStoredSettings() {
         let range = RootHomeChartRange.closest(to: chartWidthInHours == 0 ? ConstantsGlucoseChart.defaultChartWidthInHours : chartWidthInHours)
 
@@ -846,6 +917,14 @@ struct RootHomeView: View {
         if range != selectedRange {
             selectedRange = range
         }
+    }
+
+    private var nightLockStatus: RootHomeLoopState? {
+        guard state.usesScreenLockNightLayout,
+              state.loop.statusSystemImage != nil || state.loop.showsActivityIndicator
+        else { return nil }
+
+        return state.loop
     }
 
     private func applyIPadChartRange(for size: CGSize) {
@@ -915,10 +994,14 @@ struct RootHomeView: View {
     }
 
     private func resetChartsToNow() {
+        resetMainChartToNow()
+        requestMiniChartState(forceReset: false, refreshCachedData: true)
+    }
+
+    private func resetMainChartToNow() {
         scrollCoordinator.resetToNow()
         chartYAxisResetRevision &+= 1
         requestChartState(forceReset: false, showsLoading: false, refreshCachedData: true)
-        requestMiniChartState(forceReset: false, refreshCachedData: true)
     }
 
     private func refreshMainChartForDataChange() {
