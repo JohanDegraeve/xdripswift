@@ -317,24 +317,24 @@ import AppIntents
                     nightscoutSyncManager: nightscoutSyncManager,
                     rootHomeStateModel: self.rootHomeStateModel,
                     rootHomeActions: self.makeRootHomeActions(),
-                    activeSensorProvider: { [weak self] in self?.activeSensor },
-                    transmitterProvider: { [weak self] in self?.bluetoothPeripheralManager?.getCGMTransmitter() },
-                    startSensor: { [weak self] startDate, sensorCode in
-                        self?.startSensorFromManagementView(startDate: startDate, sensorCode: sensorCode)
+                    activeSensorProvider: { [weak coordinator = self] in coordinator?.activeSensor },
+                    transmitterProvider: { [weak coordinator = self] in coordinator?.bluetoothPeripheralManager?.getCGMTransmitter() },
+                    startSensor: { [weak coordinator = self] startDate, sensorCode in
+                        coordinator?.startSensorFromManagementView(startDate: startDate, sensorCode: sensorCode)
                     },
-                    stopSensor: { [weak self] in
-                        self?.stopSensorFromManagementView()
+                    stopSensor: { [weak coordinator = self] in
+                        coordinator?.stopSensorFromManagementView()
                     },
-                    submitCalibration: { [weak self] submission in
-                        self?.submitCalibrationFromManagementView(submission)
+                    submitCalibration: { [weak coordinator = self] submission in
+                        coordinator?.submitCalibrationFromManagementView(submission)
                     },
-                    updateScreenLock: { [weak self] overrideCurrentState, nightMode in
-                        self?.updateScreenLock(overrideCurrentState: overrideCurrentState, nightMode: nightMode) ?? false
+                    updateScreenLock: { [weak coordinator = self] overrideCurrentState, nightMode in
+                        coordinator?.updateScreenLock(overrideCurrentState: overrideCurrentState, nightMode: nightMode) ?? false
                     },
                     selectedFollowerActions: SelectedFollowerActions(
-                        refresh: { [weak self] in self?.refreshSelectedFollower() },
-                        logIn: { [weak self] in self?.logInSelectedFollower() },
-                        logOut: { [weak self] in self?.logOutSelectedFollower() }
+                        refresh: { [weak coordinator = self] in coordinator?.refreshSelectedFollower() },
+                        logIn: { [weak coordinator = self] in coordinator?.logInSelectedFollower() },
+                        logOut: { [weak coordinator = self] in coordinator?.logOutSelectedFollower() }
                     ),
                     sensorProvider: self
                 )

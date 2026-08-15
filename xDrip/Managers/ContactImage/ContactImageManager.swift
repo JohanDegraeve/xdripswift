@@ -131,10 +131,10 @@ class ContactImageManager: NSObject {
                 contactImageView = ContactImageRenderer(bgValue: lastReading[0].finalValue, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : "", bgRangeDescription: lastReading[0].bgRangeDescription(), valueIsUpToDate: valueIsUpToDate, useHighContrastContactImage: UserDefaults.standard.useHighContrastContactImage, disableContactImage:  disableContactImage)
                 
                 // schedule an update in 5 min 15 seconds - if no new data is received until then, the empty value will get rendered into the contact (this update will be canceled if new data is received)
-                self.workItem = DispatchWorkItem { [weak self] in
-                    guard let self = self else { return }
-                    trace("in updateContact, no updates received for more than 5 minutes", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error)
-                    self.updateContact()
+                self.workItem = DispatchWorkItem { [weak manager = self] in
+                    guard let manager = manager else { return }
+                    trace("in updateContact, no updates received for more than 5 minutes", log: manager.log, category: ConstantsLog.categoryContactImageManager, type: .error)
+                    manager.updateContact()
                 }
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + (5 * 60) + 15, execute: self.workItem!)

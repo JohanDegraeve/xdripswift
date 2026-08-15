@@ -520,9 +520,9 @@ final class NightscoutImportViewModel: ObservableObject {
 
         importTask = Task {
             do {
-                let result = try await operation { [weak self] progress in
-                    Task { @MainActor [weak self] in
-                        self?.apply(progress)
+                let result = try await operation { [weak model = self] progress in
+                    Task { @MainActor [weak progressModel = model] in
+                        progressModel?.apply(progress)
                     }
                 }
                 importResult = result

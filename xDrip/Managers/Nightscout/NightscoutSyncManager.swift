@@ -743,8 +743,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                                             self.nightscoutSyncRequired = false
                                             // Schedule relaunch on main after short delay to avoid immediate recursion and allow UI/main-thread breathing room
                                             trace("in deleteTreatment, relaunching nightscoutsync (coalesced)", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                                                self?.syncWithNightscout()
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak manager = self] in
+                                                manager?.syncWithNightscout()
                                             }
                                         }
                                     }

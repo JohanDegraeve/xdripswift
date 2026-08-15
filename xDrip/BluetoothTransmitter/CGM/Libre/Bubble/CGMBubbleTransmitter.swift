@@ -330,9 +330,9 @@ class CGMBubbleTransmitter: BluetoothTransmitter, CGMTransmitter {
                                 self.lastGlucoseDate = Date()
                                 
                                 if let sensorState = sensorState {
-                                    DispatchQueue.main.async { [weak self] in
-                                        guard let self = self else { return }
-                                        self.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
+                                    DispatchQueue.main.async { [weak transmitter = self] in
+                                        guard let transmitter = transmitter else { return }
+                                        transmitter.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: transmitter)
                                     }
                                 }
                             }
