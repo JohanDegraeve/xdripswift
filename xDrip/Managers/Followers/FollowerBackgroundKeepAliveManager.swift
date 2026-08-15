@@ -89,6 +89,11 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     private let timerFactory: TimerFactory
     private let notificationCenter: NotificationCenter
 
+    /// Serializes every entry point that touches timer, lifecycle, source, closure, or audio state.
+    /// A recursive lock is required because `start` delegates to `refreshForSelectedMode`, while
+    /// synchronous KVO and test callbacks intentionally preserve their immediate behavior.
+    private let stateLock = NSRecursiveLock()
+
     /// The proven player used only for the existing Normal and Aggressive one-shot replays.
     private var oneShotAudioPlayer: FollowerBackgroundAudioPlaying?
 
@@ -231,6 +236,9 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     ///     after each keep-alive tick. Only Shared Calendar supplies this closure; network-backed
     ///     followers must pass `nil` so audio ticks remain independent of follower polling.
     func start(for source: FollowerBackgroundKeepAliveSource, backgroundRefresh: (() -> Void)?) {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+
         if activeSource == source {
             self.backgroundRefresh = backgroundRefresh
             return
@@ -253,6 +261,9 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     ///
     /// - Parameter source: The follower whose operational registration should be cleared.
     func stop(for source: FollowerBackgroundKeepAliveSource) {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+
         guard activeSource == source else { return }
         replaceKeepAliveTimer(with: nil)
         stopContinuousPlayback()
@@ -271,6 +282,9 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     /// reconfiguration path. Follower managers should report operational state through `start` and
     /// `stop` instead of calling this method when settings change.
     func refreshForSelectedMode() {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+
         replaceKeepAliveTimer(with: nil)
 
         let keepAliveType = selectedKeepAliveType()
@@ -311,6 +325,9 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     }
 
     deinit {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+
         UserDefaults.standard.removeObserver(
             self,
             forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue
@@ -334,6 +351,9 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     /// setting still permits silent audio. Shared Calendar's optional refresh runs only after the
     /// audio check. All other follower sources have no work attached to this lifecycle event.
     private func applicationDidEnterBackground() {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+
         applicationIsInBackground = true
         let keepAliveType = selectedKeepAliveType()
         guard let activeSource,
@@ -352,6 +372,9 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     /// stopped, replaced, or reset. Only the separate Continuous player is stopped and rewound so
     /// its indefinite loop cannot continue while the application is visible.
     private func applicationWillEnterForeground() {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+
         applicationIsInBackground = false
         keepAliveTimer?.suspend()
         // Preserve the proven one-shot player exactly. Only the dedicated Continuous player stops.
@@ -368,6 +391,9 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     ///   - interval: The established interval captured when this timer was created.
     ///   - generation: Identifies the currently installed timer and rejects a queued obsolete tick.
     private func keepAliveTimerFired(interval: Int, generation: Int) {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+
         // Revalidate both pieces of state on every tick. This makes a pending callback harmless if
         // its source stopped or the user selected disabled/heartbeat while it was queued.
         let keepAliveType = selectedKeepAliveType()
@@ -495,6 +521,9 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     ///
     /// - Parameter notification: The `AVAudioSession.interruptionNotification` to interpret.
     private func audioSessionWasInterrupted(_ notification: Notification) {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+
         guard let typeValue = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
               AVAudioSession.InterruptionType(rawValue: typeValue) == .ended,
               applicationIsInBackground,

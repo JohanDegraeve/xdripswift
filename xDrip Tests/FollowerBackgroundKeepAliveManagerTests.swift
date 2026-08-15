@@ -296,6 +296,49 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
         XCTAssertEqual(test.continuousAudioPlayer.playCount, 2)
     }
 
+    func testTimerAndInterruptionCallbacksSerializeAudioStateAccess() {
+        let applicationManager = FakeFollowerApplicationManager()
+        let oneShotPlayer = FakeFollowerAudioPlayer()
+        let continuousPlayer = SerialAccessProbeAudioPlayer()
+        let timerFactory = FakeFollowerTimerFactory()
+        let notificationCenter = NotificationCenter()
+        var playerFactoryCall = 0
+        let manager = FollowerBackgroundKeepAliveManager(
+            applicationManager: applicationManager,
+            selectedKeepAliveType: { .continuous },
+            audioPlayerFactory: { _ in
+                defer { playerFactoryCall += 1 }
+                return playerFactoryCall == 0 ? oneShotPlayer : continuousPlayer
+            },
+            timerFactory: timerFactory.makeTimer,
+            notificationCenter: notificationCenter
+        )
+        manager.start(for: .careLink)
+        applicationManager.enterBackground()
+        let timer = timerFactory.timers.last
+
+        let group = DispatchGroup()
+        for _ in 0..<20 {
+            group.enter()
+            DispatchQueue.global().async {
+                timer?.fire()
+                group.leave()
+            }
+            group.enter()
+            DispatchQueue.global().async {
+                notificationCenter.post(
+                    name: AVAudioSession.interruptionNotification,
+                    object: nil,
+                    userInfo: [AVAudioSessionInterruptionTypeKey: AVAudioSession.InterruptionType.ended.rawValue]
+                )
+                group.leave()
+            }
+        }
+
+        XCTAssertEqual(group.wait(timeout: .now() + 5), .success)
+        XCTAssertEqual(continuousPlayer.maximumConcurrentStateAccesses, 1)
+    }
+
     func testActualKeepAlivePreferenceObservationReconfiguresTheSharedManager() {
         let defaults = UserDefaults.standard
         let key = UserDefaults.Key.followerBackgroundKeepAliveType.rawValue
@@ -739,6 +782,35 @@ private final class FakeFollowerAudioPlayer: FollowerBackgroundAudioPlaying {
         stopCount += 1
         isPlaying = false
     }
+}
+
+/// Widens each `isPlaying` read enough for concurrent callback entry points to overlap. The shared
+/// manager must keep the observed maximum at one even when timer and interruption callbacks arrive
+/// simultaneously on different queues.
+private final class SerialAccessProbeAudioPlayer: FollowerBackgroundAudioPlaying {
+    var numberOfLoops = 0
+    var currentTime: TimeInterval = 0
+
+    private let monitor = NSLock()
+    private var activeStateAccesses = 0
+    private(set) var maximumConcurrentStateAccesses = 0
+
+    var isPlaying: Bool {
+        monitor.lock()
+        activeStateAccesses += 1
+        maximumConcurrentStateAccesses = max(maximumConcurrentStateAccesses, activeStateAccesses)
+        monitor.unlock()
+
+        Thread.sleep(forTimeInterval: 0.002)
+
+        monitor.lock()
+        activeStateAccesses -= 1
+        monitor.unlock()
+        return false
+    }
+
+    func play() -> Bool { true }
+    func stop() {}
 }
 
 private final class FakeFollowerTimer: FollowerBackgroundTimer {
