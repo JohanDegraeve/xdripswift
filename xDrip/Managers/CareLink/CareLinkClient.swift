@@ -344,7 +344,7 @@ actor CareLinkClient {
                 // Remove every older value with the returned name so request order cannot revive it.
                 let rotatedNames = Set(responseCookies.map(\.name))
                 let retainedCookies = old.cookies.filter { !rotatedNames.contains($0.name) }
-                let merged = Self.merge(retainedCookies, with: responseCookies)
+                let merged = Self.mergedCookies(retainedCookies, with: responseCookies)
                 guard let auth = responseCookies.last(where: { $0.name == Self.authCookieName })
                         .map({ CareLinkCookie(name: $0.name, value: $0.value, domain: $0.domain, path: $0.path, secure: $0.isSecure, expiresAt: $0.expiresDate) })
                         ?? merged.first(where: { $0.name == Self.authCookieName }),
@@ -387,10 +387,10 @@ actor CareLinkClient {
             return (data, http)
         } catch let error as CareLinkError { throw error }
         catch let error as URLError where error.code == .notConnectedToInternet || error.code == .cannotConnectToHost || error.code == .timedOut {
-            trace("CareLink transport failure url=%{public}@ error=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .error, request.url?.absoluteString ?? "<missing>", error.localizedDescription)
+            trace("CareLink transport failure url=%{public}@ error=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .error, Self.diagnosticURL(request.url), error.localizedDescription)
             throw CareLinkError.offline
         } catch {
-            trace("CareLink request failure url=%{public}@ error=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .error, request.url?.absoluteString ?? "<missing>", error.localizedDescription)
+            trace("CareLink request failure url=%{public}@ error=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .error, Self.diagnosticURL(request.url), error.localizedDescription)
             throw error
         }
     }
@@ -398,18 +398,18 @@ actor CareLinkClient {
     /// Keeps routine traces payload-free while retaining redacted protocol details at debug level.
     private func traceRequest(_ request: URLRequest) {
         let method = request.httpMethod ?? "GET"
-        let url = request.url?.absoluteString ?? "<missing>"
+        let url = Self.diagnosticURL(request.url)
         trace("CareLink request method=%{public}@ url=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .info, method, url)
 
         let headers = request.allHTTPHeaderFields?.map { key, value in
             "\(key)=\(["Authorization", "Cookie"].contains(where: { $0.caseInsensitiveCompare(key) == .orderedSame }) ? "<redacted>" : value)"
         }.sorted().joined(separator: "; ") ?? ""
-        let body = diagnosticBody(request.httpBody)
+        let body = Self.diagnosticBody(request.httpBody)
         trace("CareLink request debug headers=%{public}@ body=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .debug, headers, body)
     }
 
     private func traceResponse(data: Data, response: HTTPURLResponse, request: URLRequest) {
-        let url = request.url?.absoluteString ?? "<missing>"
+        let url = Self.diagnosticURL(request.url)
         trace("CareLink response status=%{public}d url=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: response.statusCode >= 400 ? .error : .info, response.statusCode, url)
 
         let headers = response.allHeaderFields.map { key, value in
@@ -427,13 +427,34 @@ actor CareLinkClient {
         )
     }
 
-    private func diagnosticBody(_ data: Data?) -> String {
+    /// Produces a stable endpoint description without query values or patient identifiers.
+    /// CareLink's Guardian route embeds the selected patient's username directly after `patients`.
+    /// That value is useful to the request but must never be copied into OSLog or support material.
+    static func diagnosticURL(_ url: URL?) -> String {
+        guard let url else { return "<missing>" }
+
+        let pathComponents = url.pathComponents.filter { $0 != "/" }
+        var redactedPathComponents = pathComponents
+        if let patientsIndex = redactedPathComponents.firstIndex(where: {
+            $0.caseInsensitiveCompare("patients") == .orderedSame
+        }), redactedPathComponents.indices.contains(patientsIndex + 1) {
+            redactedPathComponents[patientsIndex + 1] = "<redacted>"
+        }
+
+        var authority = url.host ?? "<missing-host>"
+        if let port = url.port {
+            authority += ":\(port)"
+        }
+        let scheme = url.scheme.map { "\($0)://" } ?? ""
+        let path = redactedPathComponents.isEmpty ? "" : "/" + redactedPathComponents.joined(separator: "/")
+        return scheme + authority + path
+    }
+
+    /// Request bodies can contain CareLink account and patient identifiers. Their size is enough
+    /// to diagnose the protocol shape in both Debug and Release builds.
+    static func diagnosticBody(_ data: Data?) -> String {
         guard let data, !data.isEmpty else { return "<empty>" }
-        #if DEBUG
-        return String(data: data, encoding: .utf8) ?? "<\(data.count) non-UTF8 bytes>"
-        #else
         return "<\(data.count) bytes>"
-        #endif
     }
 
     private func validate(_ response: HTTPURLResponse) throws {
@@ -515,8 +536,14 @@ actor CareLinkClient {
         }.map { "\($0.name)=\($0.value)" }.joined(separator: "; ")
     }
 
-    private static func merge(_ old: [CareLinkCookie], with new: [HTTPCookie]) -> [CareLinkCookie] {
-        var values = Dictionary(uniqueKeysWithValues: old.map { ("\($0.domain)|\($0.path)|\($0.name)", $0) })
+    /// Merges browser cookies without assuming persisted input is already unique. Browser stores,
+    /// legacy Keychain data, or a partially migrated session can contain the same cookie identity
+    /// more than once; dictionary assignment makes the newest value win instead of trapping.
+    static func mergedCookies(_ old: [CareLinkCookie], with new: [HTTPCookie]) -> [CareLinkCookie] {
+        var values = [String: CareLinkCookie]()
+        for value in old {
+            values["\(value.domain)|\(value.path)|\(value.name)"] = value
+        }
         for cookie in new {
             let value = CareLinkCookie(name: cookie.name, value: cookie.value, domain: cookie.domain, path: cookie.path, secure: cookie.isSecure, expiresAt: cookie.expiresDate)
             values["\(value.domain)|\(value.path)|\(value.name)"] = value

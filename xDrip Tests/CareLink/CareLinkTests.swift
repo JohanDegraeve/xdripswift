@@ -92,7 +92,8 @@ final class CareLinkTests: XCTestCase {
 
     func testStoredSessionCheckDistinguishesAnAbsentTokenFromAReadFailure() async throws {
         let emptyClient = CareLinkClient(tokenStore: CareLinkMemoryTokenStore())
-        XCTAssertFalse(try await emptyClient.hasToken())
+        let hasStoredToken = try await emptyClient.hasToken()
+        XCTAssertFalse(hasStoredToken)
 
         let failingClient = CareLinkClient(tokenStore: FailingCareLinkTokenStore())
         do {
@@ -101,6 +102,48 @@ final class CareLinkTests: XCTestCase {
         } catch {
             XCTAssertTrue(error is FailingCareLinkTokenStore.Failure)
         }
+    }
+
+    func testDiagnosticsRedactPatientScopedURLsQueriesAndRequestBodies() throws {
+        let url = try XCTUnwrap(URL(string: "https://carelink.minimed.eu/patient/m2m/connect/data/gc/patients/private-patient?token=private-query"))
+        let diagnosticURL = CareLinkClient.diagnosticURL(url)
+
+        XCTAssertFalse(diagnosticURL.contains("private-patient"))
+        XCTAssertFalse(diagnosticURL.contains("private-query"))
+        XCTAssertEqual(
+            diagnosticURL,
+            "https://carelink.minimed.eu/patient/m2m/connect/data/gc/patients/<redacted>"
+        )
+
+        let body = Data(#"{"username":"private-account","patientId":"private-patient"}"#.utf8)
+        let diagnosticBody = CareLinkClient.diagnosticBody(body)
+        XCTAssertEqual(diagnosticBody, "<\(body.count) bytes>")
+        XCTAssertFalse(diagnosticBody.contains("private-account"))
+        XCTAssertFalse(diagnosticBody.contains("private-patient"))
+    }
+
+    func testCookieMergeToleratesDuplicatePersistedIdentities() {
+        let first = CareLinkCookie(
+            name: "session",
+            value: "old",
+            domain: ".minimed.eu",
+            path: "/",
+            secure: true,
+            expiresAt: nil
+        )
+        let replacement = CareLinkCookie(
+            name: "session",
+            value: "new",
+            domain: ".minimed.eu",
+            path: "/",
+            secure: true,
+            expiresAt: nil
+        )
+
+        let merged = CareLinkClient.mergedCookies([first, replacement], with: [])
+
+        XCTAssertEqual(merged.count, 1)
+        XCTAssertEqual(merged.first?.value, "new")
     }
 
     func testWatchStatusCarriesCareLinkConnectionState() {
