@@ -110,6 +110,8 @@ struct TroubleshootingLogView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
+                OnlineHelpButton(topic: .activityLog)
+
                 Button(action: copyReport) {
                     Image(systemName: copied ? "checkmark" : "doc.on.doc")
                 }

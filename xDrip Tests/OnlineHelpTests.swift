@@ -17,6 +17,7 @@ final class OnlineHelpTests: XCTestCase {
             (.alertsAndNotifications, "use/alertsAndNotifications/"),
             (.dataManagement, "use/dataManagement/"),
             (.issueReporting, "troubleshoot/reportingIssues/"),
+            (.activityLog, "troubleshoot/activityLog/"),
             (.nightscoutService, "services/nightscout/"),
             (.dexcomShareService, "services/dexcomShare/"),
             (.appleHealth, "services/appleHealth/"),

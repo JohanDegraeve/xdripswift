@@ -67,6 +67,7 @@ enum OnlineHelpTopic: CaseIterable, Hashable {
     case alertsAndNotifications
     case dataManagement
     case issueReporting
+    case activityLog
 
     // Services configured from Settings
     case nightscoutService
@@ -122,6 +123,8 @@ enum OnlineHelpTopic: CaseIterable, Hashable {
             return "use/dataManagement/"
         case .issueReporting:
             return "troubleshoot/reportingIssues/"
+        case .activityLog:
+            return "troubleshoot/activityLog/"
         case .nightscoutService:
             return "services/nightscout/"
         case .dexcomShareService:
