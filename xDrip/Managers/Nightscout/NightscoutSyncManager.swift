@@ -912,17 +912,22 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             trace("in updateProfile, found a newer Nightscout profile online with date = %{public}@, old profile date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, newProfile.startDate.formatted(date: .abbreviated, time: .shortened), self.profile.startDate.formatted(date: .abbreviated, time: .shortened))
                         }
 
-                        self.profile = newProfile
-                        self.didUpdateProfileDuringLastSync = true
-
                         return true
                     }
 
                     if shouldPersistProfile {
-                        await self.nightscoutProfileAccessor.upsert(newProfile)
-                        // Store in userdefaults for quick access
-                        if let profileData = try? JSONEncoder().encode(newProfile) {
-                            UserDefaults.standard.nightscoutProfile = profileData
+                        guard await self.nightscoutProfileAccessor.upsert(newProfile) else { return }
+                        await MainActor.run {
+                            // Another overlapping response may have published an even newer profile
+                            // while Core Data was saving. Never move the live value backwards.
+                            guard newProfile.startDate > self.profile.startDate else { return }
+                            self.profile = newProfile
+                            self.didUpdateProfileDuringLastSync = true
+
+                            // Store in UserDefaults only after the durable history save succeeds.
+                            if let profileData = try? JSONEncoder().encode(newProfile) {
+                                UserDefaults.standard.nightscoutProfile = profileData
+                            }
                         }
                     }
                 }
@@ -1046,7 +1051,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 deviceStatus.sanitizingFutureDates()
 
                 let downloadedDeviceStatus = deviceStatus
-                let deviceStatusToPersist = await MainActor.run { () -> NightscoutDeviceStatus? in
+                let candidate = await MainActor.run { () -> (status: NightscoutDeviceStatus, storedStatus: NightscoutDeviceStatus, signatureChanged: Bool) in
                     var mergedDeviceStatus = downloadedDeviceStatus
                     var storedDeviceStatus = self.deviceStatus
                     storedDeviceStatus.sanitizingFutureDates()
@@ -1061,21 +1066,41 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     mergedDeviceStatus.sanitizingFutureDates()
                     
                     let signatureChanged = mergedDeviceStatus.hasPersistedChanges(comparedTo: storedDeviceStatus)
-                    
                     mergedDeviceStatus.lastCheckedDate = .now
                     mergedDeviceStatus.updatedDate = .now
-                    
-                    trace("in updateDeviceStatus, updated device status with createdAt = %{public}@. Last looping date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, mergedDeviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened), mergedDeviceStatus.lastLoopDate.formatted(date: .abbreviated, time: .shortened))
-                    trace("in updateDeviceStatus, deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, String(describing: mergedDeviceStatus))
-                    
-                    self.deviceStatus = mergedDeviceStatus
-                    self.didUpdateDeviceStatusDuringLastSync = signatureChanged
 
-                    return signatureChanged ? mergedDeviceStatus : nil
+                    return (mergedDeviceStatus, storedDeviceStatus, signatureChanged)
                 }
 
-                if let deviceStatusToPersist {
-                    await self.nightscoutDeviceStatusAccessor.upsert(deviceStatusToPersist)
+                if candidate.signatureChanged {
+                    guard await self.nightscoutDeviceStatusAccessor.upsert(candidate.status) else {
+                        await MainActor.run {
+                            var currentDeviceStatus = self.deviceStatus
+                            currentDeviceStatus.lastCheckedDate = .now
+                            self.deviceStatus = currentDeviceStatus
+                        }
+                        return
+                    }
+                }
+
+                await MainActor.run {
+                    // If another request published materially different status while this save was
+                    // in flight, leave that newer state in place. Its own successful transaction is
+                    // authoritative, and the next poll can reconsider this response if still useful.
+                    guard !self.deviceStatus.hasPersistedChanges(comparedTo: candidate.storedStatus) else {
+                        var currentDeviceStatus = self.deviceStatus
+                        currentDeviceStatus.lastCheckedDate = .now
+                        self.deviceStatus = currentDeviceStatus
+                        return
+                    }
+
+                    let mergedDeviceStatus = candidate.status
+
+                    trace("in updateDeviceStatus, updated device status with createdAt = %{public}@. Last looping date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, mergedDeviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened), mergedDeviceStatus.lastLoopDate.formatted(date: .abbreviated, time: .shortened))
+                    trace("in updateDeviceStatus, deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, String(describing: mergedDeviceStatus))
+
+                    self.deviceStatus = mergedDeviceStatus
+                    self.didUpdateDeviceStatusDuringLastSync = candidate.signatureChanged
                 }
             } catch {
                 trace("in updateDeviceStatus, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)

@@ -55,20 +55,24 @@ final class NightscoutProfileAccessor {
     /// old schedule with a revised Nightscout profile that happens to use the same identifier.
     ///
     /// Live profiles are stored directly on the private context because they are never edited by the UI.
-    func upsert(_ profile: NightscoutProfile) async {
-        guard profile.startDate > .distantPast || !profile.id.isEmpty else { return }
+    @discardableResult
+    func upsert(_ profile: NightscoutProfile) async -> Bool {
+        guard profile.startDate > .distantPast || !profile.id.isEmpty else { return false }
 
         let context = coreDataManager.privateManagedObjectContext
         let log = log
-        await context.perform {
+        return await context.perform {
             let entry = Self.existingEntry(for: profile, on: context) ?? NightscoutProfileEntry(context: context)
             Self.apply(profile, to: entry, on: context)
             do {
                 if context.hasChanges {
                     try context.save()
                 }
+                return true
             } catch {
+                context.rollback()
                 trace("in NightscoutProfileAccessor.upsert, error = %{public}@", log: log, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+                return false
             }
         }
     }

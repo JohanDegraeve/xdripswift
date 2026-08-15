@@ -69,8 +69,9 @@ final class NightscoutDeviceStatusAccessor {
     /// `createdAt` provides a deterministic fallback and keeps repeated imports idempotent.
     ///
     /// Live status is stored directly on the private context because it is never edited by the UI.
-    func upsert(_ status: NightscoutDeviceStatus) async {
-        _ = await upsert([status])
+    @discardableResult
+    func upsert(_ status: NightscoutDeviceStatus) async -> Bool {
+        await persist(statuses: [status]).succeeded
     }
 
     /// Stores a response-sized status history in one private-context transaction.
@@ -79,8 +80,14 @@ final class NightscoutDeviceStatusAccessor {
     /// make repeated overlapping follower responses idempotent.
     @discardableResult
     func upsert(_ statuses: [NightscoutDeviceStatus]) async -> Int {
+        await persist(statuses: statuses).insertedCount
+    }
+
+    /// Returns persistence success separately from the inserted count. A zero count is a valid
+    /// idempotent update, so live publication must not use it as an error signal.
+    private func persist(statuses: [NightscoutDeviceStatus]) async -> (insertedCount: Int, succeeded: Bool) {
         let validStatuses = statuses.filter { $0.createdAt > .distantPast || $0.lastLoopDate > .distantPast }
-        guard !validStatuses.isEmpty else { return 0 }
+        guard !validStatuses.isEmpty else { return (0, false) }
 
         let context = coreDataManager.privateManagedObjectContext
         let log = log
@@ -112,10 +119,11 @@ final class NightscoutDeviceStatusAccessor {
                 if context.hasChanges {
                     try context.save()
                 }
-                return insertedCount
+                return (insertedCount, true)
             } catch {
+                context.rollback()
                 trace("in NightscoutDeviceStatusAccessor.upsert, error = %{public}@", log: log, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
-                return 0
+                return (0, false)
             }
         }
     }
