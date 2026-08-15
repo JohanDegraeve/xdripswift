@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Combine
 
 /// Full-screen glucose value used by the locked landscape Home presentation.
 ///

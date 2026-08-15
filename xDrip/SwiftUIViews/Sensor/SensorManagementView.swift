@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Combine
 
 /// Sensor summary and the start, stop and calibration workflows opened from Home.
 ///

@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Foundation
+import WidgetKit
 
 extension XDripWatchComplication {
     // main complication view body

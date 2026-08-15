@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct AIDStatusView: View {
     // MARK: - environment objects

@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Foundation
+import WidgetKit
 
 extension XDripWidget {
     // main complication view body
@@ -50,4 +51,3 @@ extension XDripWidget {
         }
     }
 }
-
