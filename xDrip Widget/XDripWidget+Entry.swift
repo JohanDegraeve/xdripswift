@@ -37,6 +37,7 @@ extension XDripWidget.Entry {
         var allowStandByHighContrast: Bool
         var forceStandByBigNumbers: Bool
         var followerPatientName: String?
+        var keepAliveDisabledMessage: String?
         
         var deviceStatusCreatedAt: Date?
         var deviceStatusLastLoopDate: Date?
@@ -45,7 +46,7 @@ extension XDripWidget.Entry {
         var bgValueInMgDl: Double?
         var bgReadingDate: Date?
                 
-        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", followerPatientName: String?, deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?, allowStandByHighContrast: Bool? = true, forceStandByBigNumbers: Bool? = false) {
+        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", followerPatientName: String?, keepAliveDisabledMessage: String? = nil, deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?, allowStandByHighContrast: Bool? = true, forceStandByBigNumbers: Bool? = false) {
             self.bgReadingValues = bgReadingValues
             self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl ?? true
@@ -59,6 +60,7 @@ extension XDripWidget.Entry {
             self.allowStandByHighContrast = allowStandByHighContrast ?? true
             self.forceStandByBigNumbers = forceStandByBigNumbers ?? false
             self.followerPatientName = followerPatientName
+            self.keepAliveDisabledMessage = keepAliveDisabledMessage
             
             self.deviceStatusCreatedAt = deviceStatusCreatedAt
             self.deviceStatusLastLoopDate = deviceStatusLastLoopDate            

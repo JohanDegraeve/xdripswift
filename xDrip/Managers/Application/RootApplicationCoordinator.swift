@@ -2306,6 +2306,19 @@ import AppIntents
     /// check if the conditions are correct to start a live activity, update it, or end it
     /// also update the widget data stored in user defaults
     private func updateLiveActivityAndWidgets(forceRestart: Bool) {
+        let keepAliveDisabledMessage = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
+            ? "\(Texts_SettingsView.labelfollowerKeepAliveType) \(Texts_SettingsView.followerKeepAliveTypeDisabled)"
+            : ""
+
+        // Publish this independently from glucose so a Settings change can add or remove the
+        // warning even when there is no fresh reading payload to rebuild.
+        UserDefaults.storeInSharedUserDefaults(
+            value: keepAliveDisabledMessage,
+            forKey: WidgetSharedUserDefaultsModel.keepAliveDisabledMessageKey(
+                for: Bundle.main.mainAppBundleIdentifier
+            )
+        )
+
         if let bgReadingsAccessor = self.bgReadingsAccessor {
             
             let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
@@ -2407,13 +2420,18 @@ import AppIntents
                 // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
                 // the user's device - this allows several copies of the app to be installed without cross-contamination of widget data
                 if let widgetData = try? JSONEncoder().encode(widgetSharedUserDefaultsModel) {
-                    UserDefaults.storeInSharedUserDefaults(value: widgetData, forKey: "widgetSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)")
+                    UserDefaults.storeInSharedUserDefaults(
+                        value: widgetData,
+                        forKey: WidgetSharedUserDefaultsModel.widgetDataKey(
+                            for: Bundle.main.mainAppBundleIdentifier
+                        )
+                    )
                 }
             } else {
                 Task { await LiveActivityManager.shared.endAllActivities() }
             }
-            WidgetCenter.shared.reloadAllTimelines()
         }
+        WidgetCenter.shared.reloadAllTimelines()
     }
     
     /// store notification glucose chart images in the app container documents folder

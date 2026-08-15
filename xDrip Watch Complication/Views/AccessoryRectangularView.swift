@@ -13,29 +13,42 @@ extension XDripWatchComplication.EntryView {
     @ViewBuilder
     
     var accessoryRectangularView: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .center) {
-                HStack(alignment: .center, spacing: 4) {
-                    Text("\(entry.widgetState.bgValueStringInUserChosenUnit())\(entry.widgetState.trendArrow()) ")
-                        .font(.system(size: entry.widgetState.isSmallScreen() ? 20 : 24)).bold()
-                        .foregroundStyle(entry.widgetState.bgTextColor())
+        ZStack {
+            VStack(spacing: 0) {
+                HStack(alignment: .center) {
+                    HStack(alignment: .center, spacing: 4) {
+                        Text("\(entry.widgetState.bgValueStringInUserChosenUnit())\(entry.widgetState.trendArrow()) ")
+                            .font(.system(size: entry.widgetState.isSmallScreen() ? 20 : 24)).bold()
+                            .foregroundStyle(entry.widgetState.bgTextColor())
 
-                    Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
-                        .font(.system(size: entry.widgetState.isSmallScreen() ? 20 : 24)).fontWeight(.semibold)
+                        Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
+                            .font(.system(size: entry.widgetState.isSmallScreen() ? 20 : 24)).fontWeight(.semibold)
+                            .foregroundStyle(.colorPrimary)
+                            .lineLimit(1)
+                    }
+
+                    Spacer()
+
+                    Text("\(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
+                        .font(.system(size: entry.widgetState.isSmallScreen() ? 15 : 17))
                         .foregroundStyle(.colorPrimary)
-                        .lineLimit(1)
+                        .minimumScaleFactor(0.2)
                 }
+                .padding(0)
 
-                Spacer()
-
-                Text("\(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
-                    .font(.system(size: entry.widgetState.isSmallScreen() ? 15 : 17))
-                    .foregroundStyle(.colorPrimary)
-                    .minimumScaleFactor(0.2)
+                GlucoseChartCompactView(glucoseChartType: .watchAccessoryRectangular, bgReadingValues: entry.widgetState.bgReadingValues, bgReadingDates: entry.widgetState.bgReadingDates, isMgDl: entry.widgetState.isMgDl, urgentLowLimitInMgDl: entry.widgetState.urgentLowLimitInMgDl, lowLimitInMgDl: entry.widgetState.lowLimitInMgDl, highLimitInMgDl: entry.widgetState.highLimitInMgDl, urgentHighLimitInMgDl: entry.widgetState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: entry.widgetState.overrideChartHeight(), overrideChartWidth: entry.widgetState.overrideChartWidth(), highContrast: nil)
             }
-            .padding(0)
 
-            GlucoseChartCompactView(glucoseChartType: .watchAccessoryRectangular, bgReadingValues: entry.widgetState.bgReadingValues, bgReadingDates: entry.widgetState.bgReadingDates, isMgDl: entry.widgetState.isMgDl, urgentLowLimitInMgDl: entry.widgetState.urgentLowLimitInMgDl, lowLimitInMgDl: entry.widgetState.lowLimitInMgDl, highLimitInMgDl: entry.widgetState.highLimitInMgDl, urgentHighLimitInMgDl: entry.widgetState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: entry.widgetState.overrideChartHeight(), overrideChartWidth: entry.widgetState.overrideChartWidth(), highContrast: nil)
+            if entry.widgetState.keepAliveIsDisabled {
+                Text(Texts_WatchComplication.keepAliveDisabled)
+                    .font(.system(size: entry.widgetState.isSmallScreen() ? 11 : 12, weight: .semibold))
+                    .foregroundStyle(.colorPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .background(Color(white: 0.2).opacity(0.95), in: Capsule())
+            }
         }
         .widgetBackground(backgroundView: Color.clear)
     }
