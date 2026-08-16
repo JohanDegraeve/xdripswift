@@ -42,12 +42,7 @@ struct WatchStatus: WatchPayload {
     var secondsUntilHeartBeatDisconnectWarning: Int?
     var keepAliveIsDisabled: Bool = false
 
-    // use this to track the AID/looping status if sent
-    var deviceStatusAvailable: Bool?
-    var deviceStatusCreatedAt: Double?
-    var deviceStatusLastLoopDate: Double?
-    var deviceStatusIOB: Double?
-    var deviceStatusCOB: Double?
+    var aidStatus: AIDStatus?
 }
 
 /// current BG chart data used to manage watch views

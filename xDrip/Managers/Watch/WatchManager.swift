@@ -51,7 +51,7 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
     /// keep track of when we last forced a complication update from within the code
     private var lastForcedComplicationUpdateTimeStamp: Date = .distantPast
 
-    /// Sends CareLink connection transitions without waiting for the next glucose reading.
+    /// Sends CareLink connection and pump-status transitions without waiting for the next glucose reading.
     private var careLinkStatusObserver: AnyCancellable?
 
     /// for logging
@@ -80,7 +80,6 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutDeviceStatusWasUpdated.rawValue, options: .new, context: nil)
 
         careLinkStatusObserver = CareLinkAccountState.shared.$snapshot
-            .map(\.status)
             .removeDuplicates()
             .dropFirst()
             .receive(on: RunLoop.main)
@@ -253,15 +252,16 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
             status.timeStampOfLastFollowerConnection = timeStampOfLastFollowerConnection
         }
 
-        // add AID/loop status data
-        if !UserDefaults.standard.dataFlowPolicy.showsAIDData {
-            status.deviceStatusAvailable = false
+        // CareLink has no Nightscout device-status record, so both sources are normalized before
+        // crossing the Watch boundary rather than making the Watch understand either protocol.
+        if UserDefaults.standard.dataFlowPolicy.importsTherapyFromCareLink {
+            status.aidStatus = CareLinkAccountState.shared.snapshot.aidStatus
+        } else if !UserDefaults.standard.dataFlowPolicy.showsAIDData {
+            status.aidStatus = nil
         } else if UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil, nightscoutSyncManager.deviceStatus.createdAt != .distantPast {
-            status.deviceStatusAvailable = true
-            status.deviceStatusCreatedAt = nightscoutSyncManager.deviceStatus.createdAt.timeIntervalSince1970
-            status.deviceStatusLastLoopDate = nightscoutSyncManager.deviceStatus.lastLoopDate.timeIntervalSince1970
-            status.deviceStatusIOB = nightscoutSyncManager.deviceStatus.iob
-            status.deviceStatusCOB = nightscoutSyncManager.deviceStatus.cob
+            status.aidStatus = nightscoutSyncManager.deviceStatus.aidStatus
+        } else {
+            status.aidStatus = nil
         }
 
         return status

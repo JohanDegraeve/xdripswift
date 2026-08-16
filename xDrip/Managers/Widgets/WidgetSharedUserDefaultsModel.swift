@@ -33,8 +33,7 @@ struct WidgetSharedUserDefaultsModel: Codable {
     var dataSourceDescription: String
     var followerPatientName: String?
     
-    var deviceStatusCreatedAt: Date?
-    var deviceStatusLastLoopDate: Date?
+    var aidStatus: AIDStatus?
     
     var allowStandByHighContrast: Bool
     var forceStandByBigNumbers: Bool

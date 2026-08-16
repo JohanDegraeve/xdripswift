@@ -124,7 +124,7 @@ struct XDripWidgetLiveActivity_Previews: PreviewProvider {
     
     static let attributes = XDripWidgetAttributes()
     
-    static let contentState = XDripWidgetAttributes.ContentState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 5, deltaValueInUserUnit: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, liveActivityType: .large, dataSourceDescription: "Dexcom G6", deviceStatusCreatedAt: Date().addingTimeInterval(-300), deviceStatusLastLoopDate: Date().addingTimeInterval(-230))
+    static let contentState = XDripWidgetAttributes.ContentState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 5, deltaValueInUserUnit: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, liveActivityType: .large, dataSourceDescription: "Dexcom G6", aidStatus: AIDStatus(condition: .active, style: .loop, statusUpdatedAt: Date().addingTimeInterval(-300), lastActivityAt: Date().addingTimeInterval(-230), iob: 1.25, cob: 12, statusTitle: "Looping", staleStatusTitle: "No data"))
     
     static var previews: some View {
         attributes

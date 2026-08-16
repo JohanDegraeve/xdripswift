@@ -78,7 +78,7 @@ struct MainView: View {
                         watchState.requestWatchStateUpdate()
                     }
 
-                if watchState.deviceStatusIconImage() != nil {
+                if watchState.aidStatusIconImage() != nil {
                     MainViewAIDStatusView()
                         .padding([.leading,], 0)
                         .padding([.trailing], 10)
@@ -88,7 +88,7 @@ struct MainView: View {
                         .measureFixedRow(.aidStatus)
                 }
 
-                GlucoseChartView(glucoseChartType: watchState.deviceStatusIconImage() == nil ? .watchApp : .watchAppWithAIDStatus, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, agpBackgroundPoints: agpBackgroundPoints, agpBackgroundOpacityMultiplier: showsAGPBackground ? ConstantsGlucoseChartSwiftUI.agpOpacityMultiplierWatchApp : nil, explicitVisibleEndDate: chartRangeEndDate, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4, overrideChartHeight: chartHeight, overrideChartWidth: container.size.width, highContrast: nil)
+                GlucoseChartView(glucoseChartType: watchState.aidStatusIconImage() == nil ? .watchApp : .watchAppWithAIDStatus, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, agpBackgroundPoints: agpBackgroundPoints, agpBackgroundOpacityMultiplier: showsAGPBackground ? ConstantsGlucoseChartSwiftUI.agpOpacityMultiplierWatchApp : nil, explicitVisibleEndDate: chartRangeEndDate, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4, overrideChartHeight: chartHeight, overrideChartWidth: container.size.width, highContrast: nil)
                     // make the full chart rectangle respond to swipes, not only the visible chart marks
                     .contentShape(Rectangle())
                     .gesture(
@@ -142,7 +142,7 @@ struct MainView: View {
         // everything except the chart keeps its measured height
         // the chart then fills whatever height remains
         let fixedHeight = fixedRowHeights.values.reduce(0, +)
-        let visibleRowCount = watchState.deviceStatusIconImage() == nil ? 4 : 5
+        let visibleRowCount = watchState.aidStatusIconImage() == nil ? 4 : 5
         let spacingHeight = CGFloat(max(visibleRowCount - 1, 0)) * rowSpacing
 
         return max(containerHeight - fixedHeight - spacingHeight, minimumChartHeight)
@@ -246,10 +246,7 @@ struct ContentView_Previews: PreviewProvider {
         watchState.isMaster = false
         watchState.followerDataSourceType = .libreLinkUp
         watchState.followerBackgroundKeepAliveType = .heartbeat
-        watchState.deviceStatusIOB = 2.25
-        watchState.deviceStatusCOB = 24
-        watchState.deviceStatusCreatedAt = Date().addingTimeInterval(-180)
-        watchState.deviceStatusLastLoopDate = Date().addingTimeInterval(-125)
+        watchState.aidStatus = AIDStatus(condition: .active, style: .loop, statusUpdatedAt: Date().addingTimeInterval(-180), lastActivityAt: Date().addingTimeInterval(-125), iob: 2.25, cob: 24, statusTitle: "Looping", staleStatusTitle: "No data")
 
         return Group {
             MainView()

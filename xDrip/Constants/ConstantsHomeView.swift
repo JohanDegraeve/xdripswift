@@ -12,6 +12,109 @@ struct StatusSymbolPresentation: Equatable {
 }
 #endif
 
+enum AIDStatusCondition: String, Codable, Hashable {
+    case active
+    case checking
+    case suspended
+    case disconnected
+}
+
+enum AIDStatusStyle: String, Codable, Hashable {
+    case loop
+    case careLinkPump
+    case careLinkSmartGuard
+}
+
+/// Common AID state prevents Home, widgets and the Watch from interpreting the same source
+/// differently. It contains only semantic values and can therefore cross process boundaries.
+struct AIDStatus: Codable, Hashable {
+    let condition: AIDStatusCondition
+    let style: AIDStatusStyle
+    let statusUpdatedAt: Date?
+    let lastActivityAt: Date?
+    let iob: Double?
+    let cob: Double?
+    let statusTitle: String
+    let staleStatusTitle: String
+
+    func presentation(referenceDate: Date = .now) -> AIDStatusPresentation {
+        let hasFreshData = statusUpdatedAt.map {
+            $0 <= referenceDate.addingTimeInterval(ConstantsHomeView.aidStatusFutureTolerance)
+                && $0 > referenceDate.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes)
+        } ?? false
+
+        switch condition {
+        case .checking:
+            return AIDStatusPresentation(
+                title: statusTitle,
+                systemImage: style == .loop ? nil : ConstantsHomeView.careLinkSmartGuardSystemImage,
+                color: Color("colorSecondary"),
+                hasFreshData: false,
+                showsActivityAge: false,
+                showsActivityIndicator: true
+            )
+        case .suspended:
+            return AIDStatusPresentation(
+                title: statusTitle,
+                systemImage: ConstantsHomeView.careLinkSuspendedSystemImage,
+                color: .yellow,
+                hasFreshData: hasFreshData,
+                showsActivityAge: lastActivityAt != nil,
+                showsActivityIndicator: false
+            )
+        case .disconnected:
+            return AIDStatusPresentation(
+                title: statusTitle,
+                systemImage: ConstantsHomeView.careLinkDisconnectedSystemImage,
+                color: .red,
+                hasFreshData: hasFreshData,
+                showsActivityAge: lastActivityAt != nil,
+                showsActivityIndicator: false
+            )
+        case .active:
+            if style == .loop {
+                let loopState = LoopStatusState(
+                    deviceStatusCreatedAt: statusUpdatedAt,
+                    lastLoopDate: lastActivityAt,
+                    referenceDate: referenceDate
+                )
+                return AIDStatusPresentation(
+                    title: loopState.title,
+                    systemImage: loopState.systemImage,
+                    color: loopState.color,
+                    hasFreshData: hasFreshData,
+                    showsActivityAge: loopState.showsLoopAge,
+                    showsActivityIndicator: false
+                )
+            }
+
+            return AIDStatusPresentation(
+                title: hasFreshData ? statusTitle : staleStatusTitle,
+                systemImage: hasFreshData ? activeSystemImage : ConstantsHomeView.careLinkStaleSystemImage,
+                color: hasFreshData ? .green : .yellow,
+                hasFreshData: hasFreshData,
+                showsActivityAge: lastActivityAt != nil,
+                showsActivityIndicator: false
+            )
+        }
+    }
+
+    private var activeSystemImage: String {
+        style == .careLinkSmartGuard
+            ? ConstantsHomeView.careLinkSmartGuardSystemImage
+            : ConstantsHomeView.careLinkPumpSystemImage
+    }
+}
+
+struct AIDStatusPresentation {
+    let title: String
+    let systemImage: String?
+    let color: Color
+    let hasFreshData: Bool
+    let showsActivityAge: Bool
+    let showsActivityIndicator: Bool
+}
+
 enum LoopStatusState {
     case recent
     case aging
@@ -183,6 +286,9 @@ enum ConstantsHomeView {
     /// after how many seconds should the loop status be shown as having no current data to show
     static let loopShowNoDataAfterMinutes: TimeInterval = 60 * 17
 
+    /// Allows a small amount of clock skew in status timestamps supplied by remote systems.
+    static let aidStatusFutureTolerance: TimeInterval = 60
+
     /// symbol to show when the loop has run recently
     static let loopStatusRecentSystemImage = "circle"
 
@@ -194,6 +300,12 @@ enum ConstantsHomeView {
 
     /// symbol to show when device status is stale or missing
     static let loopStatusNoDataSystemImage = "circle.slash"
+
+    static let careLinkPumpSystemImage = "checkmark.circle.fill"
+    static let careLinkSmartGuardSystemImage = "shield.lefthalf.filled"
+    static let careLinkSuspendedSystemImage = "pause.circle.fill"
+    static let careLinkDisconnectedSystemImage = "exclamationmark.triangle.fill"
+    static let careLinkStaleSystemImage = "clock.badge.exclamationmark"
     
     /// opacity level for the background of the AID status banner
     static let AIDStatusBannerBackgroundOpacity = 0.1

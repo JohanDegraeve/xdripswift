@@ -41,8 +41,7 @@ public final class LiveActivityManager: ObservableObject {
         urgentHighLimitInMgDl: 0,
         liveActivityType: .normal,
         dataSourceDescription: "",
-        deviceStatusCreatedAt: .now,
-        deviceStatusLastLoopDate: .now
+        aidStatus: nil
     )
     
     // the start date of the event so when know track when to proactively end/restart the activity

@@ -331,6 +331,48 @@ struct CareLinkStatusSnapshot: Equatable {
     }
 }
 
+extension CareLinkStatusSnapshot {
+    /// CareLink has no Nightscout device-status record. Its server/pump update time is also the
+    /// freshness anchor because nominal glucose timestamps were observed ahead of server delivery.
+    var aidStatus: AIDStatus {
+        let observedAt = pump.observedAt ?? pump.lastDataUpdateAt
+        let condition: AIDStatusCondition
+
+        if status == .connecting && observedAt == nil {
+            condition = .checking
+        } else if pump.isSuspended == true {
+            condition = .suspended
+        } else if pump.isCommunicating == false || pump.isInRange == false {
+            condition = .disconnected
+        } else {
+            condition = .active
+        }
+
+        let activeTitle = pump.algorithmState.map {
+            $0.replacingOccurrences(of: "_", with: " ").capitalized
+        } ?? Texts_SettingsView.careLinkActive
+
+        let statusTitle: String
+        switch condition {
+        case .checking: statusTitle = Texts_Common.checking
+        case .suspended: statusTitle = Texts_SettingsView.careLinkSuspended
+        case .disconnected: statusTitle = Texts_SettingsView.careLinkDisconnected
+        case .active: statusTitle = activeTitle
+        }
+
+        return AIDStatus(
+            condition: condition,
+            style: pump.reportsActiveSmartGuard ? .careLinkSmartGuard : .careLinkPump,
+            statusUpdatedAt: observedAt,
+            lastActivityAt: observedAt,
+            iob: pump.activeInsulin,
+            cob: nil,
+            statusTitle: statusTitle,
+            staleStatusTitle: Texts_SettingsView.careLinkNoData
+        )
+    }
+}
+
 struct CareLinkAPIConfiguration: Equatable {
     let careLinkBaseURL: URL
 }

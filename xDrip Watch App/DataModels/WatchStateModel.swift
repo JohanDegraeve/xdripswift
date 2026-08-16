@@ -126,12 +126,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var requestingDataIconColor: Color = ConstantsAppleWatch.requestingDataIconColorInactive
     @Published var lastComplicationUpdateTimeStamp: Date = .distantPast
 
-    // use this to track the AID/looping status
-    @Published var deviceStatusIOB: Double = 0
-    @Published var deviceStatusCOB: Double = 0
-    @Published var deviceStatusCreatedAt: Date = .distantPast
-    @Published var deviceStatusLastLoopDate: Date = .distantPast
-    @Published var deviceStatusLastLoopDateTimeAgoString: String = ""
+    @Published var aidStatus: AIDStatus?
 
     // we use the following to record when the user has manually requested a state update on each view so that we can trigger the animation on just this view
     // this is to prevent the UI animating "pending animations" when we switch view tabs
@@ -446,36 +441,36 @@ final class WatchStateModel: NSObject, ObservableObject {
         return (minValue, maxValue, nilValue, Gradient(colors: colorArray))
     }
 
-    func deviceStatusColor() -> Color? {
-        guard deviceStatusCreatedAt != .distantPast else { return nil }
-
-        return loopStatusState().color
+    func aidStatusColor() -> Color? {
+        aidStatus?.presentation().color
     }
 
-    func deviceStatusIconImage() -> Image? {
-        guard deviceStatusCreatedAt != .distantPast else { return nil }
-
-        return Image(systemName: loopStatusState().systemImage)
+    func aidStatusIconImage() -> Image? {
+        guard let systemImage = aidStatus?.presentation().systemImage else { return nil }
+        return Image(systemName: systemImage)
     }
 
-    /// returns the minutes ago string of the last loop time
-    /// check if more than 1 hour has passed. If so, then the amount of text to show would be too much so return the shorter version
-    /// - Returns: string representation of last loop time as "(xm)"
-    func deviceStatusLastLoopMinsAgoString() -> String {
-        guard loopStatusState().showsLoopAge else { return "" }
-        guard deviceStatusLastLoopDate != .distantPast else { return "-m" }
+    func aidStatusIOBString() -> String {
+        guard let aidStatus, aidStatus.presentation().hasFreshData, let iob = aidStatus.iob else { return "-U" }
+        return "\(iob.round(toDecimalPlaces: 2).stringWithoutTrailingZeroes)U"
+    }
 
-        let diffComponents = Calendar.current.dateComponents([.hour], from: deviceStatusLastLoopDate, to: Date())
+    func aidStatusCOBString() -> String {
+        guard let aidStatus, aidStatus.presentation().hasFreshData, let cob = aidStatus.cob else { return "-g" }
+        return "\(cob.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes)g"
+    }
+
+    func aidStatusActivityAgeString() -> String {
+        guard let aidStatus, aidStatus.presentation().showsActivityAge else { return "" }
+        guard let lastActivityAt = aidStatus.lastActivityAt else { return "-m" }
+
+        let diffComponents = Calendar.current.dateComponents([.hour], from: lastActivityAt, to: Date())
 
         if let hours = diffComponents.hour, hours < 1 {
-            return "\(deviceStatusLastLoopDate.daysAndHoursAgo(appendAgo: false))"
+            return "\(lastActivityAt.daysAndHoursAgo(appendAgo: false))"
         } else {
             return "-m"
         }
-    }
-
-    private func loopStatusState() -> LoopStatusState {
-        LoopStatusState(deviceStatusCreatedAt: deviceStatusCreatedAt, lastLoopDate: deviceStatusLastLoopDate)
     }
 
     // MARK: - helper functions not related with the class structure
@@ -708,27 +703,13 @@ final class WatchStateModel: NSObject, ObservableObject {
         secondsUntilHeartBeatDisconnectWarning = dictionary["secondsUntilHeartBeatDisconnectWarning"] as? Int ?? 0
         keepAliveIsDisabled = dictionary["keepAliveIsDisabled"] as? Bool ?? false
 
-        let deviceStatusAvailable = dictionary["deviceStatusAvailable"] as? Bool
-
-        if deviceStatusAvailable == false {
-            deviceStatusLastLoopDate = .distantPast
-            deviceStatusCreatedAt = .distantPast
-            deviceStatusIOB = 0
-            deviceStatusCOB = 0
+        if let aidStatusDictionary = dictionary["aidStatus"] as? [String: Any],
+           let data = try? JSONSerialization.data(withJSONObject: aidStatusDictionary),
+           let decodedStatus = try? JSONDecoder().decode(AIDStatus.self, from: data) {
+            aidStatus = decodedStatus
         } else {
-            if let lastLoopDateAsDouble = dictionary["deviceStatusLastLoopDate"] as? Double {
-                deviceStatusLastLoopDate = Date(timeIntervalSince1970: lastLoopDateAsDouble)
-            }
-
-            if let deviceStatusCreatedAtAsDouble = dictionary["deviceStatusCreatedAt"] as? Double {
-                deviceStatusCreatedAt = Date(timeIntervalSince1970: deviceStatusCreatedAtAsDouble)
-            }
-
-            deviceStatusIOB = dictionary["deviceStatusIOB"] as? Double ?? deviceStatusIOB
-            deviceStatusCOB = dictionary["deviceStatusCOB"] as? Double ?? deviceStatusCOB
+            aidStatus = nil
         }
-
-        deviceStatusLastLoopDateTimeAgoString = deviceStatusLastLoopMinsAgoString()
 
         return true
     }

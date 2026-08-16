@@ -39,14 +39,13 @@ extension XDripWidget.Entry {
         var followerPatientName: String?
         var keepAliveDisabledMessage: String?
         
-        var deviceStatusCreatedAt: Date?
-        var deviceStatusLastLoopDate: Date?
+        var aidStatus: AIDStatus?
         
         var bgUnitString: String
         var bgValueInMgDl: Double?
         var bgReadingDate: Date?
                 
-        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", followerPatientName: String?, keepAliveDisabledMessage: String? = nil, deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?, allowStandByHighContrast: Bool? = true, forceStandByBigNumbers: Bool? = false) {
+        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", followerPatientName: String?, keepAliveDisabledMessage: String? = nil, aidStatus: AIDStatus? = nil, allowStandByHighContrast: Bool? = true, forceStandByBigNumbers: Bool? = false) {
             self.bgReadingValues = bgReadingValues
             self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl ?? true
@@ -62,8 +61,7 @@ extension XDripWidget.Entry {
             self.followerPatientName = followerPatientName
             self.keepAliveDisabledMessage = keepAliveDisabledMessage
             
-            self.deviceStatusCreatedAt = deviceStatusCreatedAt
-            self.deviceStatusLastLoopDate = deviceStatusLastLoopDate            
+            self.aidStatus = aidStatus
             
             self.bgValueInMgDl = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0] : nil
             self.bgReadingDate = (bgReadingDates?.count ?? 0) > 0 ? bgReadingDates?[0] : nil
@@ -230,19 +228,12 @@ extension XDripWidget.Entry {
         }
         
         func deviceStatusColor() -> Color? {
-            guard deviceStatusCreatedAt != nil else { return nil }
-
-            return loopStatusState().color
+            aidStatus?.presentation().color
         }
         
         func deviceStatusIconImage() -> Image? {
-            guard deviceStatusCreatedAt != nil else { return nil }
-
-            return Image(systemName: loopStatusState().systemImage)
-        }
-
-        private func loopStatusState() -> LoopStatusState {
-            LoopStatusState(deviceStatusCreatedAt: deviceStatusCreatedAt, lastLoopDate: deviceStatusLastLoopDate)
+            guard let systemImage = aidStatus?.presentation().systemImage else { return nil }
+            return Image(systemName: systemImage)
         }
     }
 }
@@ -251,6 +242,6 @@ extension XDripWidget.Entry {
 
 extension XDripWidget.Entry {
     static var placeholder: Self {
-        .init(date: .now, widgetState: WidgetState(bgReadingValues: ConstantsWidgetExtension.bgReadingValuesPlaceholderData, bgReadingDates: ConstantsWidgetExtension.bgReadingDatesPlaceholderData(), isMgDl: true, slopeOrdinal: 4, deltaValueInUserUnit: 0, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 90, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, dataSourceDescription: "Dexcom G6", followerPatientName: nil, deviceStatusCreatedAt: Date().addingTimeInterval(-200), deviceStatusLastLoopDate: Date().addingTimeInterval(-120)))
+        .init(date: .now, widgetState: WidgetState(bgReadingValues: ConstantsWidgetExtension.bgReadingValuesPlaceholderData, bgReadingDates: ConstantsWidgetExtension.bgReadingDatesPlaceholderData(), isMgDl: true, slopeOrdinal: 4, deltaValueInUserUnit: 0, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 90, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, dataSourceDescription: "Dexcom G6", followerPatientName: nil))
     }
 }

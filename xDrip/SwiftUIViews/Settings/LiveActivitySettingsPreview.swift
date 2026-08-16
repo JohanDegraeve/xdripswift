@@ -50,8 +50,7 @@ struct LiveActivitySettingsPreview: View {
             liveActivityType: liveActivityType,
             dataSourceDescription: "Libre 2",
             sensorNoiseStateRawValue: Int(SensorNoiseState.low.rawValue),
-            deviceStatusCreatedAt: .now,
-            deviceStatusLastLoopDate: .now
+            aidStatus: AIDStatus(condition: .active, style: .loop, statusUpdatedAt: .now, lastActivityAt: .now, iob: 1.25, cob: 12, statusTitle: "Looping", staleStatusTitle: "No data")
         )
     }
 

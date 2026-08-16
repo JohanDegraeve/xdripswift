@@ -466,90 +466,67 @@ final class RootHomeStateModel: ObservableObject {
     ) -> RootHomeLoopState {
         guard let deviceStatus else { return RootHomeLoopState() }
 
-        let hasBeenChecked = deviceStatus.lastCheckedDate != .distantPast
-        let hasRecentData = hasBeenChecked
-            && deviceStatus.createdAt <= referenceDate.addingTimeInterval(60)
-            && deviceStatus.createdAt > referenceDate.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes)
-        let uploaderBattery = hasRecentData && !UserDefaults.standard.isMaster ? deviceStatus.uploaderBatteryStatusStyle() : nil
-        let loopStatusState = LoopStatusState(deviceStatusCreatedAt: deviceStatus.createdAt, lastLoopDate: deviceStatus.lastLoopDate, referenceDate: referenceDate)
-        let statusTimeText = usesRelativeStatusTime
-            ? deviceStatus.lastLoopDate.daysAndHoursAgo()
-            : deviceStatus.lastLoopDate.formatted(date: .omitted, time: .shortened)
-        let hasLoopDate = deviceStatus.lastLoopDate != .distantPast
-        let statusTimeAgo = loopStatusState.showsLoopAge ? (hasLoopDate ? statusTimeText : "-m") : ""
+        let aidStatus = deviceStatus.aidStatus
+        let presentation = aidStatus.presentation(referenceDate: referenceDate)
+        let uploaderBattery = presentation.hasFreshData && !UserDefaults.standard.isMaster
+            ? deviceStatus.uploaderBatteryStatusStyle()
+            : nil
 
-        let iobText = hasRecentData ? deviceStatus.iob.map { "\($0.round(toDecimalPlaces: 2)) U" } ?? "- U" : "- U"
-
-        return RootHomeLoopState(
-            iob: RootHomeMetricState(title: "IOB", value: iobText, valueColor: defaultTextColor),
-            cob: RootHomeMetricState(title: "COB", value: hasRecentData ? "\(deviceStatus.cob?.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes ?? "-") g" : "- g", valueColor: defaultTextColor),
-            statusTitle: hasBeenChecked ? loopStatusState.title : Texts_Common.checking,
-            statusSystemImage: hasBeenChecked ? loopStatusState.systemImage : nil,
-            statusColor: hasBeenChecked ? loopStatusState.color : ConstantsAppColors.secondaryText,
-            statusTimeAgo: statusTimeAgo,
-            showsStatusTimeAgo: !statusTimeAgo.isEmpty,
-            showsActivityIndicator: !hasBeenChecked,
-            showsUploaderBattery: uploaderBattery != nil,
-            uploaderBatterySystemImage: uploaderBattery?.systemImage ?? "battery.75",
-            uploaderBatteryColor: uploaderBattery?.color ?? defaultTextColor
+        return rootHomeLoopState(
+            aidStatus: aidStatus,
+            referenceDate: referenceDate,
+            usesRelativeStatusTime: usesRelativeStatusTime,
+            defaultTextColor: defaultTextColor,
+            uploaderBattery: uploaderBattery
         )
     }
 
     /// Presents CareLink pump activity without pretending it is a Nightscout OS-AID loop record.
     func careLinkLoopState(snapshot: CareLinkStatusSnapshot, referenceDate: Date = .now) -> RootHomeLoopState {
-        let pump = snapshot.pump
-        let observedAt = pump.observedAt ?? pump.lastDataUpdateAt
-        let isRecent = observedAt.map {
-            $0 <= referenceDate.addingTimeInterval(60)
-                && $0 > referenceDate.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes)
-        } ?? false
-        let statusTitle: String
-        let statusColor: Color
-        let statusImage: String
+        rootHomeLoopState(aidStatus: snapshot.aidStatus, referenceDate: referenceDate)
+    }
 
-        if snapshot.status == .connecting && observedAt == nil {
-            statusImage = "shield.lefthalf.filled"
-        } else if pump.isSuspended == true {
-            statusImage = "pause.circle.fill"
-        } else if pump.isCommunicating == false || pump.isInRange == false {
-            statusImage = "exclamationmark.triangle.fill"
-        } else if isRecent {
-            statusImage = pump.reportsActiveSmartGuard ? "shield.lefthalf.filled" : "checkmark.circle.fill"
-        } else {
-            statusImage = "clock.badge.exclamationmark"
-        }
+    private func rootHomeLoopState(
+        aidStatus: AIDStatus,
+        referenceDate: Date,
+        usesRelativeStatusTime: Bool = true,
+        defaultTextColor: Color = ConstantsAppColors.primaryText,
+        uploaderBattery: (systemImage: String, color: Color)? = nil
+    ) -> RootHomeLoopState {
+        let presentation = aidStatus.presentation(referenceDate: referenceDate)
+        let statusTimeAgo: String
 
-        if snapshot.status == .connecting && observedAt == nil {
-            statusTitle = Texts_Common.checking
-            statusColor = ConstantsAppColors.secondaryText
-        } else if pump.isSuspended == true {
-            statusTitle = Texts_SettingsView.careLinkSuspended
-            statusColor = ConstantsAppColors.warning
-        } else if pump.isCommunicating == false || pump.isInRange == false {
-            statusTitle = Texts_SettingsView.careLinkDisconnected
-            statusColor = ConstantsAppColors.urgent
-        } else if isRecent {
-            statusTitle = pump.algorithmState.map(Self.readableCareLinkValue) ?? Texts_SettingsView.careLinkActive
-            statusColor = ConstantsAppColors.normal
+        if presentation.showsActivityAge, let lastActivityAt = aidStatus.lastActivityAt {
+            statusTimeAgo = usesRelativeStatusTime
+                ? lastActivityAt.daysAndHoursAgo()
+                : lastActivityAt.formatted(date: .omitted, time: .shortened)
+        } else if presentation.showsActivityAge {
+            statusTimeAgo = "-m"
         } else {
-            statusTitle = Texts_SettingsView.careLinkNoData
-            statusColor = ConstantsAppColors.warning
+            statusTimeAgo = ""
         }
 
         return RootHomeLoopState(
-            iob: RootHomeMetricState(title: "IOB", value: isRecent ? pump.activeInsulin.map { "\($0.round(toDecimalPlaces: 2)) U" } ?? "- U" : "- U"),
-            cob: RootHomeMetricState(title: "COB", value: "- g"),
-            statusTitle: statusTitle,
-            statusSystemImage: statusImage,
-            statusColor: statusColor,
-            statusTimeAgo: observedAt?.daysAndHoursAgo() ?? "",
-            showsStatusTimeAgo: observedAt != nil,
-            showsActivityIndicator: snapshot.status == .connecting
+            iob: RootHomeMetricState(
+                title: "IOB",
+                value: presentation.hasFreshData ? aidStatus.iob.map { "\($0.round(toDecimalPlaces: 2)) U" } ?? "- U" : "- U",
+                valueColor: defaultTextColor
+            ),
+            cob: RootHomeMetricState(
+                title: "COB",
+                value: presentation.hasFreshData ? "\(aidStatus.cob?.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes ?? "-") g" : "- g",
+                valueColor: defaultTextColor
+            ),
+            statusTitle: presentation.title,
+            statusSystemImage: presentation.systemImage,
+            statusColor: presentation.color,
+            statusTimeAgo: statusTimeAgo,
+            showsStatusTimeAgo: !statusTimeAgo.isEmpty,
+            showsActivityIndicator: presentation.showsActivityIndicator,
+            showsUploaderBattery: uploaderBattery != nil,
+            uploaderBatterySystemImage: uploaderBattery?.systemImage ?? "battery.75",
+            uploaderBatteryColor: uploaderBattery?.color ?? defaultTextColor
         )
-    }
-
-    private static func readableCareLinkValue(_ value: String) -> String {
-        value.replacingOccurrences(of: "_", with: " ").capitalized
     }
 
     private func cageText(_ siteChangeDate: Date?, referenceDate: Date, usesRelativeCageTime: Bool) -> String {

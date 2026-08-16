@@ -56,8 +56,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var followerPatientName: String?
         var sensorNoiseStateRawValue: Int?
         
-        var deviceStatusCreatedAt: Date?
-        var deviceStatusLastLoopDate: Date?
+        var aidStatus: AIDStatus?
 
         var bgUnitString: String {
             isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
@@ -71,7 +70,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             bgReadingDates.first
         }
 
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "", followerPatientName: String? = nil, sensorNoiseStateRawValue: Int? = nil, deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?) {
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "", followerPatientName: String? = nil, sensorNoiseStateRawValue: Int? = nil, aidStatus: AIDStatus?) {
             let readings = Array(zip(bgReadingValues, bgReadingDates))
             self.bgReadingFloats = readings.map { Float16($0.0) }
 
@@ -91,8 +90,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.followerPatientName = followerPatientName
             self.sensorNoiseStateRawValue = sensorNoiseStateRawValue
             
-            self.deviceStatusCreatedAt = deviceStatusCreatedAt
-            self.deviceStatusLastLoopDate = deviceStatusLastLoopDate
+            self.aidStatus = aidStatus
         }
 
         /// Reduces chart history until the encoded state fits safely below ActivityKit's payload limit.
@@ -248,19 +246,12 @@ struct XDripWidgetAttributes: ActivityAttributes {
         }
                 
         func deviceStatusColor() -> Color? {
-            guard deviceStatusCreatedAt != nil else { return nil }
-
-            return loopStatusState().color
+            aidStatus?.presentation().color
         }
         
         func deviceStatusIconImage() -> Image? {
-            guard deviceStatusCreatedAt != nil else { return nil }
-
-            return Image(systemName: loopStatusState().systemImage)
-        }
-
-        private func loopStatusState() -> LoopStatusState {
-            LoopStatusState(deviceStatusCreatedAt: deviceStatusCreatedAt, lastLoopDate: deviceStatusLastLoopDate)
+            guard let systemImage = aidStatus?.presentation().systemImage else { return nil }
+            return Image(systemName: systemImage)
         }
     }
 }

@@ -193,19 +193,19 @@ struct NightscoutDeviceStatus: Codable, Sendable {
     
     /// Uses the shared loop state for every color, title and icon presentation.
     func deviceStatusColor(referenceDate: Date = .now) -> Color {
-        loopStatusState(referenceDate: referenceDate).color
+        aidStatus.presentation(referenceDate: referenceDate).color
     }
     
     func deviceStatusBannerBackgroundColor(referenceDate: Date = .now) -> Color {
-        loopStatusState(referenceDate: referenceDate).color.opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
+        aidStatus.presentation(referenceDate: referenceDate).color.opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
     }
     
     func deviceStatusUIColor(referenceDate: Date = .now) -> UIColor {
-        loopStatusState(referenceDate: referenceDate).uiColor
+        UIColor(aidStatus.presentation(referenceDate: referenceDate).color)
     }
     
     func deviceStatusTitle(referenceDate: Date = .now) -> String {
-        loopStatusState(referenceDate: referenceDate).title
+        aidStatus.presentation(referenceDate: referenceDate).title
     }
 
     func deviceStatusIconImage() -> Image {
@@ -217,11 +217,8 @@ struct NightscoutDeviceStatus: Codable, Sendable {
     }
 
     func deviceStatusIconSystemName(referenceDate: Date = .now) -> String {
-        loopStatusState(referenceDate: referenceDate).systemImage
-    }
-
-    private func loopStatusState(referenceDate: Date = .now) -> LoopStatusState {
-        LoopStatusState(deviceStatusCreatedAt: createdAt, lastLoopDate: lastLoopDate, referenceDate: referenceDate)
+        aidStatus.presentation(referenceDate: referenceDate).systemImage
+            ?? ConstantsHomeView.loopStatusNoDataSystemImage
     }
     
     func pumpReservoirColor() -> Color? {
@@ -266,6 +263,21 @@ struct NightscoutDeviceStatus: Codable, Sendable {
             }
         }
         return nil
+    }
+}
+
+extension NightscoutDeviceStatus {
+    var aidStatus: AIDStatus {
+        AIDStatus(
+            condition: lastCheckedDate == .distantPast ? .checking : .active,
+            style: .loop,
+            statusUpdatedAt: createdAt == .distantPast ? nil : createdAt,
+            lastActivityAt: lastLoopDate == .distantPast ? nil : lastLoopDate,
+            iob: iob,
+            cob: cob,
+            statusTitle: lastCheckedDate == .distantPast ? Texts_Common.checking : "Looping",
+            staleStatusTitle: "No data"
+        )
     }
 }
 

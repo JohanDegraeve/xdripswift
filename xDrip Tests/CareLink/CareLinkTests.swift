@@ -85,6 +85,77 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(CareLinkConnectionStatus.error.indicatorColor, ConstantsAppColors.urgent)
     }
 
+    func testCareLinkAIDStatusUsesSharedSymbolAndColorRules() {
+        let checking = CareLinkStatusSnapshot().aidStatus.presentation(referenceDate: now)
+        XCTAssertEqual(checking.systemImage, ConstantsHomeView.careLinkSmartGuardSystemImage)
+        XCTAssertEqual(checking.color, Color("colorSecondary"))
+
+        var snapshot = CareLinkStatusSnapshot(status: .active)
+        snapshot.pump.observedAt = now
+        snapshot.pump.algorithmState = "AUTO_BASAL"
+        var presentation = snapshot.aidStatus.presentation(referenceDate: now)
+        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkSmartGuardSystemImage)
+        XCTAssertEqual(presentation.color, .green)
+
+        snapshot.pump.isSuspended = true
+        presentation = snapshot.aidStatus.presentation(referenceDate: now)
+        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkSuspendedSystemImage)
+        XCTAssertEqual(presentation.color, .yellow)
+
+        snapshot.pump.isSuspended = false
+        snapshot.pump.isCommunicating = false
+        presentation = snapshot.aidStatus.presentation(referenceDate: now)
+        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkDisconnectedSystemImage)
+        XCTAssertEqual(presentation.color, .red)
+
+        snapshot.pump.isCommunicating = true
+        snapshot.pump.observedAt = now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes - 1)
+        presentation = snapshot.aidStatus.presentation(referenceDate: now)
+        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkStaleSystemImage)
+        XCTAssertEqual(presentation.color, .yellow)
+        XCTAssertEqual(presentation.title, Texts_SettingsView.careLinkNoData)
+    }
+
+    func testCommonAIDStatusPreservesLoopFreshnessRules() {
+        var deviceStatus = NightscoutDeviceStatus()
+        deviceStatus.lastCheckedDate = now
+        deviceStatus.createdAt = now
+        deviceStatus.lastLoopDate = now
+
+        var presentation = deviceStatus.aidStatus.presentation(referenceDate: now)
+        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.loopStatusRecentSystemImage)
+        XCTAssertEqual(presentation.color, .green)
+
+        deviceStatus.lastLoopDate = now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes - 1)
+        presentation = deviceStatus.aidStatus.presentation(referenceDate: now)
+        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.loopStatusAcceptableSystemImage)
+        XCTAssertEqual(presentation.color, .yellow)
+
+        deviceStatus.lastLoopDate = now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes - 1)
+        presentation = deviceStatus.aidStatus.presentation(referenceDate: now)
+        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.loopStatusNotLoopingSystemImage)
+        XCTAssertEqual(presentation.color, .red)
+
+        deviceStatus.createdAt = now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes - 1)
+        presentation = deviceStatus.aidStatus.presentation(referenceDate: now)
+        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.loopStatusNoDataSystemImage)
+        XCTAssertEqual(presentation.color, .gray)
+    }
+
+    func testCareLinkAIDStatusUsesPumpUpdateTimestampAndOptionalMetrics() {
+        var snapshot = CareLinkStatusSnapshot(status: .active)
+        snapshot.pump.lastDataUpdateAt = now
+
+        XCTAssertEqual(snapshot.aidStatus.statusUpdatedAt, now)
+        XCTAssertEqual(snapshot.aidStatus.lastActivityAt, now)
+        XCTAssertNil(snapshot.aidStatus.iob)
+        XCTAssertNil(snapshot.aidStatus.cob)
+
+        let state = RootHomeStateModel().careLinkLoopState(snapshot: snapshot, referenceDate: now)
+        XCTAssertEqual(state.iob.value, "- U")
+        XCTAssertEqual(state.cob.value, "- g")
+    }
+
     func testNewStatusSnapshotStartsWhileTheStoredSessionIsBeingChecked() {
         XCTAssertEqual(CareLinkStatusSnapshot().status, .connecting)
         XCTAssertEqual(CareLinkAccountState().snapshot.status, .connecting)
@@ -153,6 +224,56 @@ final class CareLinkTests: XCTestCase {
 
         XCTAssertEqual(status.asDictionary?["followerDataSourceTypeRawValue"] as? Int, FollowerDataSourceType.careLink.rawValue)
         XCTAssertEqual(status.asDictionary?["followerConnectionStatusRawValue"] as? String, CareLinkConnectionStatus.connecting.rawValue)
+    }
+
+    func testCommonAIDStatusEncodesInWatchWidgetAndLiveActivityPayloads() throws {
+        var snapshot = CareLinkStatusSnapshot(status: .active)
+        snapshot.pump.observedAt = now
+        snapshot.pump.activeInsulin = 1.25
+        let aidStatus = snapshot.aidStatus
+
+        var watchStatus = WatchStatus()
+        watchStatus.aidStatus = aidStatus
+        let watchDictionary = try XCTUnwrap(watchStatus.asDictionary)
+        let watchAIDDictionary = try XCTUnwrap(watchDictionary["aidStatus"] as? [String: Any])
+        let watchAIDData = try JSONSerialization.data(withJSONObject: watchAIDDictionary)
+        XCTAssertEqual(try JSONDecoder().decode(AIDStatus.self, from: watchAIDData), aidStatus)
+
+        let widgetStatus = WidgetSharedUserDefaultsModel(
+            bgReadingValues: [],
+            bgReadingDatesAsDouble: [],
+            isMgDl: true,
+            slopeOrdinal: 0,
+            deltaValueInUserUnit: 0,
+            urgentLowLimitInMgDl: 60,
+            lowLimitInMgDl: 80,
+            highLimitInMgDl: 170,
+            urgentHighLimitInMgDl: 250,
+            dataSourceDescription: "CareLink",
+            followerPatientName: nil,
+            aidStatus: aidStatus,
+            allowStandByHighContrast: true,
+            forceStandByBigNumbers: false
+        )
+        let widgetData = try JSONEncoder().encode(widgetStatus)
+        XCTAssertEqual(try JSONDecoder().decode(WidgetSharedUserDefaultsModel.self, from: widgetData).aidStatus, aidStatus)
+
+        let liveActivityStatus = XDripWidgetAttributes.ContentState(
+            bgReadingValues: [110],
+            bgReadingDates: [now],
+            isMgDl: true,
+            slopeOrdinal: 4,
+            deltaValueInUserUnit: 0,
+            urgentLowLimitInMgDl: 60,
+            lowLimitInMgDl: 80,
+            highLimitInMgDl: 170,
+            urgentHighLimitInMgDl: 250,
+            liveActivityType: .normal,
+            dataSourceDescription: "CareLink",
+            aidStatus: aidStatus
+        )
+        let liveActivityData = try JSONEncoder().encode(liveActivityStatus)
+        XCTAssertEqual(try JSONDecoder().decode(XDripWidgetAttributes.ContentState.self, from: liveActivityData).aidStatus, aidStatus)
     }
 
     func testAuthenticationCompletionCanRunOnlyOnce() {
