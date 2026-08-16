@@ -54,6 +54,8 @@ enum CareLinkLifecyclePolicy {
 /// This implementation is written in Swift for xdripswift by porting over the general protocol
 /// workflows and payload behavior established by those projects.
 final class CareLinkFollowManager: NSObject, CareLinkControlling {
+    typealias PollingSchedulerFactory = (TimeInterval, @escaping () -> Void) -> FollowerBackgroundTimer
+
     // MARK: - Dependencies and lifecycle state
 
     private let coreDataManager: CoreDataManager
@@ -67,14 +69,19 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
     /// Allows wiring tests to reconcile authenticated state without starting follower networking.
     private let startsInitialDownload: Bool
+    /// Creates CareLink's local deadline scheduler. Injection keeps lifecycle tests deterministic.
+    private let pollingSchedulerFactory: PollingSchedulerFactory
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCareLinkFollowManager)
     private let keyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
-    /// Invalidates the one-shot download timer used outside heartbeat mode.
-    private var invalidateDownloadTimer: (() -> Void)?
+    /// One persistent scheduler checks the retained deadline outside heartbeat mode.
+    private var pollingScheduler: FollowerBackgroundTimer?
+    private var pollingSchedulerIsRunning = false
+    /// Shared deadline used by both the local scheduler and heartbeat-triggered download attempts.
+    private var nextPollAt: Date?
     /// A single in-flight poll prevents timer, foreground and heartbeat callbacks from overlapping.
     private var pollTask: Task<Void, Never>?
     private var pollIdentifier: UUID?
-    /// Prevents frequent coordinator callbacks from bypassing the Nightscout-matched cadence.
+    /// Prevents lifecycle and coordinator callbacks from starting requests too close together.
     private var lastPollStartedAt = Date.distantPast
     /// Retains one explicit Refresh request when a scheduled poll is already in progress.
     private var refreshRequestedWhilePolling = false
@@ -95,7 +102,10 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging,
         client: CareLinkClient = CareLinkClient(),
         state: CareLinkAccountState = .shared,
-        startsInitialDownload: Bool = true
+        startsInitialDownload: Bool = true,
+        pollingSchedulerFactory: @escaping PollingSchedulerFactory = { interval, eventHandler in
+            RepeatingTimer(timeInterval: interval, eventHandler: eventHandler)
+        }
     ) {
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
@@ -105,12 +115,14 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         self.therapyImporter = CareLinkTherapyImporter(coreDataManager: coreDataManager)
         self.backgroundKeepAliveManager = backgroundKeepAliveManager
         self.startsInitialDownload = startsInitialDownload
+        self.pollingSchedulerFactory = pollingSchedulerFactory
         super.init()
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.careLinkSelectedPatientID.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.careLinkUsername.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.careLinkPassword.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
         Task { @MainActor [weak self] in
             guard let self else { return }
             state.controller = self
@@ -150,7 +162,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         delegate?.followerInfoReceived(followGlucoseDataArray: &copy)
     }
 
-    /// Entry point shared by immediate startup, the one-shot timer and the coordinator heartbeat.
+    /// Entry point shared by immediate startup, the deadline scheduler and coordinator heartbeat.
     /// Calls are coalesced while a poll is already running.
     @objc func download() {
         dispatchPollRequest(force: false)
@@ -179,8 +191,12 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             if force { refreshRequestedWhilePolling = true }
             return
         }
-        guard force || Date().timeIntervalSince(lastPollStartedAt) >= CareLinkPollingPolicy.interval else { return }
-        lastPollStartedAt = Date()
+        let now = Date()
+        guard force || (
+            now.timeIntervalSince(lastPollStartedAt) >= ConstantsCareLink.minimumPollingInterval
+                && (nextPollAt.map { now >= $0 } ?? true)
+        ) else { return }
+        lastPollStartedAt = now
         let identifier = UUID()
         let generation = lifecycleGeneration
         pollIdentifier = identifier
@@ -247,13 +263,12 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     }
 
     /// Requests a fresh account and data transaction without changing the retained web session.
-    /// If a timer poll is active, exactly one follow-up transaction runs as soon as it finishes.
+    /// If a poll is active, exactly one follow-up transaction runs as soon as it finishes.
     func refresh() {
         Task { @MainActor [weak self] in
             guard let self,
                   CareLinkLifecyclePolicy.permitsPolling(lifecycleState),
                   isActive else { return }
-            cancelScheduledDownload()
             updateStateOnMain {
                 $0.status = .connecting
                 $0.detail = Texts_SettingsView.careLinkRefreshing
@@ -499,7 +514,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                         $0.detail = CareLinkError.patientIdentityMissing.localizedDescription
                     }
                 }
-                await scheduleNewDownload(generation: generation)
+                await scheduleNewDownload(latestReadingAt: nil, lastDataUpdateAt: nil, generation: generation)
                 return
             }
             guard let selectedID, let patient = account.patients.first(where: { $0.id == selectedID || $0.username == selectedID }) else {
@@ -508,7 +523,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                     $0.status = .selectPatient
                     $0.detail = CareLinkError.patientSelectionRequired.localizedDescription
                 }
-                await scheduleNewDownload(generation: generation)
+                await scheduleNewDownload(latestReadingAt: nil, lastDataUpdateAt: nil, generation: generation)
                 return
             }
             let response = try await client.fetchPatientData(region: currentRegion, patient: patient, username: account.metadata.accountName, accountRole: account.metadata.role, countryCode: account.metadata.countryCode, linkedPatientCount: account.patients.count)
@@ -585,7 +600,11 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                     Self.deliver(readings, to: self.followerDelegate)
                 }
             }
-            await scheduleNewDownload(generation: generation)
+            await scheduleNewDownload(
+                latestReadingAt: latest,
+                lastDataUpdateAt: therapy.pump.lastDataUpdateAt,
+                generation: generation
+            )
         } catch let error as CareLinkError {
             guard isActive, !Task.isCancelled else { return }
             trace("CareLink poll failed: %{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .error, troubleshooting: .standard(.follower(source: .careLink, activity: .downloadFailed)), error.localizedDescription)
@@ -638,7 +657,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                 $0.serviceReachable = true
                 $0.lastReadingAt = nil
             }
-            await scheduleNewDownload(generation: generation)
+            await scheduleNewDownload(latestReadingAt: nil, lastDataUpdateAt: nil, generation: generation)
         case let .unsupportedRole(metadata):
             await updateState(generation: generation) {
                 $0.status = .error
@@ -661,56 +680,83 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     /// Current bounded delay for transient network/server failures.
     private var backoff: TimeInterval { CareLinkPollingPolicy.backoff(failureCount: failureCount) }
 
-    /// Schedules the next download using the Nightscout follower's one-shot timer workflow.
+    /// Updates the retained deadline from CareLink's latest known data timestamps.
+    ///
+    /// The first timestamp-aligned implementation recreated a one-shot `Timer` after every poll.
+    /// Live background testing on 16 August 2026 showed one such timer disappear while unrelated
+    /// app work continued. Keeping one scheduler alive means an early, delayed or missed check does
+    /// not discard the only future opportunity; the next check still observes the same deadline.
     @MainActor
-    private func scheduleNewDownload(generation: Int) {
+    private func scheduleNewDownload(latestReadingAt: Date?, lastDataUpdateAt: Date?, generation: Int) {
         guard pollIsCurrentOnMain(generation) else { return }
-        guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
-        cancelScheduledDownload()
-        trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryCareLinkFollowManager, type: .info, troubleshooting: .detailed(.follower(source: .careLink, activity: .retryScheduled)))
-        let downloadTimer = Timer.scheduledTimer(
-            timeInterval: CareLinkPollingPolicy.interval,
-            target: self,
-            selector: #selector(self.download),
-            userInfo: nil,
-            repeats: false
+        let now = Date()
+        let nextPollAt = CareLinkPollingPolicy.nextPollDate(
+            latestReadingAt: latestReadingAt,
+            lastDataUpdateAt: lastDataUpdateAt,
+            now: now
         )
-        invalidateDownloadTimer = {
-            downloadTimer.invalidate()
+        self.nextPollAt = nextPollAt
+        startPollingSchedulerIfNeeded()
+        trace(
+            "CareLink next polling deadline in %{public}@ seconds",
+            log: log,
+            category: ConstantsLog.categoryCareLinkFollowManager,
+            type: .info,
+            troubleshooting: .detailed(.follower(source: .careLink, activity: .retryScheduled)),
+            Int(max(0, nextPollAt.timeIntervalSince(now))).description
+        )
+    }
+
+    /// Starts one persistent local scheduler; its checks never imply a CareLink request.
+    ///
+    /// `requestPoll` remains the sole network gate and compares `nextPollAt` before doing work. The
+    /// scheduler therefore checks locally every 20 seconds while normal CareLink traffic remains
+    /// aligned to the expected five-minute data updates. Heartbeat mode supplies its own wakeups.
+    @MainActor
+    private func startPollingSchedulerIfNeeded() {
+        guard CareLinkLifecyclePolicy.permitsPolling(lifecycleState), isActive else {
+            stopPollingScheduler()
+            return
         }
+        guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else {
+            stopPollingScheduler()
+            return
+        }
+        if pollingScheduler == nil {
+            pollingScheduler = pollingSchedulerFactory(ConstantsCareLink.schedulerCheckInterval) { [weak self] in
+                self?.download()
+            }
+        }
+        guard !pollingSchedulerIsRunning else { return }
+        pollingSchedulerIsRunning = true
+        pollingScheduler?.resume()
     }
 
     /// Retains CareLink's service-specific delay for errors and rate limits.
     @MainActor
     private func scheduleRetry(after interval: TimeInterval, generation: Int) {
-        guard pollIsCurrentOnMain(generation),
-              UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
-        cancelScheduledDownload()
-        let downloadTimer = Timer.scheduledTimer(
-            timeInterval: interval,
-            target: self,
-            selector: #selector(self.download),
-            userInfo: nil,
-            repeats: false
-        )
-        invalidateDownloadTimer = {
-            downloadTimer.invalidate()
-        }
+        guard pollIsCurrentOnMain(generation) else { return }
+        let nextPollAt = Date().addingTimeInterval(max(ConstantsCareLink.minimumPollingInterval, interval))
+        self.nextPollAt = nextPollAt
+        startPollingSchedulerIfNeeded()
     }
 
     @MainActor
-    private func cancelScheduledDownload() {
-        invalidateDownloadTimer?()
-        invalidateDownloadTimer = nil
+    private func stopPollingScheduler() {
+        guard pollingSchedulerIsRunning else { return }
+        pollingScheduler?.suspend()
+        pollingSchedulerIsRunning = false
     }
 
     /// Cancels both scheduled and active work so logout/source switching cannot receive a late poll.
     @MainActor
     private func stopPolling() {
-        cancelScheduledDownload()
+        stopPollingScheduler()
+        pollingScheduler = nil
         pollTask?.cancel()
         pollTask = nil
         pollIdentifier = nil
+        nextPollAt = nil
         lastPollStartedAt = .distantPast
         refreshRequestedWhilePolling = false
     }
@@ -777,6 +823,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             lifecycleState = CareLinkLifecyclePolicy.state(isSelected: true, hasCredentials: true, hasSession: hasSession)
             if lifecycleState == .authenticated {
                 backgroundKeepAliveManager.start(for: .careLink)
+                startPollingSchedulerIfNeeded()
                 if startsInitialDownload {
                     download()
                 }
@@ -884,16 +931,27 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             Task { @MainActor [weak self] in self?.reconcileLifecycle() }
         case .careLinkSelectedPatientID:
             refreshNow()
+        case .followerBackgroundKeepAliveType:
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                if UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
+                    stopPollingScheduler()
+                } else {
+                    startPollingSchedulerIfNeeded()
+                }
+            }
         default: break
         }
     }
 
     /// Removes KVO, timers and lifecycle closures owned by this manager.
     deinit {
-        for key in [UserDefaults.Key.isMaster, .followerDataSourceType, .careLinkSelectedPatientID, .careLinkUsername, .careLinkPassword] {
+        for key in [UserDefaults.Key.isMaster, .followerDataSourceType, .careLinkSelectedPatientID, .careLinkUsername, .careLinkPassword, .followerBackgroundKeepAliveType] {
             UserDefaults.standard.removeObserver(self, forKeyPath: key.rawValue)
         }
-        invalidateDownloadTimer?()
+        if pollingSchedulerIsRunning {
+            pollingScheduler?.suspend()
+        }
         pollTask?.cancel()
         let loginController = authController
         Task { @MainActor in loginController?.cancel() }

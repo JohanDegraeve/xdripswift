@@ -103,20 +103,51 @@ struct CareLinkLoginCredentials: Equatable {
 
 /// Central timing policy shared by the manager and deterministic scheduler tests.
 enum CareLinkPollingPolicy {
-    /// Matches the proven Nightscout follower's one-shot download cadence.
-    static let interval: TimeInterval = 15
-    /// Reading age is deliberately independent of request failures and backoff.
-    static let staleAfter: TimeInterval = 20 * 60
+    /// Calculates the next data request using the xDrip+ CareLink Follow strategy.
+    ///
+    /// Initial testing of the fixed request cadence triggered CareLink server throttling, so the
+    /// scheduler now follows the xDrip+ strategy and waits for the next expected sample.
+    /// CareLink can return a glucose value before its nominal five-minute timestamp, which was
+    /// observed during initial live testing. `lastMedicalDeviceDataUpdateServerTime` therefore
+    /// becomes the preferred anchor. The glucose timestamp is only the fallback and is clamped to
+    /// `now`, so a future nominal glucose time cannot postpone the next expected update. When the
+    /// chosen timestamp does not advance, the scheduler naturally moves to one-minute retries.
+    static func nextPollDate(latestReadingAt: Date?, lastDataUpdateAt: Date?, now: Date) -> Date {
+        let anchor = lastDataUpdateAt.map { min($0, now) }
+            ?? latestReadingAt.map { min($0, now) }
+
+        guard let anchor else {
+            return now.addingTimeInterval(ConstantsCareLink.missedDataPollingInterval)
+        }
+
+        let firstExpectedPoll = anchor.addingTimeInterval(
+            ConstantsCareLink.samplePeriod + ConstantsCareLink.pollingGracePeriod
+        )
+        let candidate: Date
+        if firstExpectedPoll > now {
+            candidate = firstExpectedPoll
+        } else {
+            let elapsed = now.timeIntervalSince(firstExpectedPoll)
+            let missedIntervals = floor(elapsed / ConstantsCareLink.missedDataPollingInterval) + 1
+            candidate = firstExpectedPoll.addingTimeInterval(
+                missedIntervals * ConstantsCareLink.missedDataPollingInterval
+            )
+        }
+        return max(candidate, now.addingTimeInterval(ConstantsCareLink.minimumPollingInterval))
+    }
 
     /// Evaluates reading age even when the most recent network request succeeded.
     static func isStale(lastReadingAt: Date?, now: Date) -> Bool {
         guard let lastReadingAt else { return true }
-        return now.timeIntervalSince(lastReadingAt) > staleAfter
+        return now.timeIntervalSince(lastReadingAt) > ConstantsCareLink.staleReadingAge
     }
 
     /// Bounds transient network/server backoff at five minutes so recovery remains automatic.
     static func backoff(failureCount: Int) -> TimeInterval {
-        min(15 * pow(2, Double(max(0, failureCount - 1))), 5 * 60)
+        min(
+            ConstantsCareLink.initialRetryBackoff * pow(2, Double(max(0, failureCount - 1))),
+            ConstantsCareLink.maximumRetryBackoff
+        )
     }
 }
 

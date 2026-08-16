@@ -437,7 +437,6 @@ final class CareLinkTests: XCTestCase {
         XCTAssertTrue(CareLinkAccountRole.isPatient("PATIENT_OUS"))
         XCTAssertFalse(CareLinkAccountRole.isPatient("CARE_PARTNER"))
         XCTAssertTrue(CareLinkAccountRole.isSupportedFollower("CARE_PARTNER_OUS"))
-        XCTAssertEqual(CareLinkPollingPolicy.interval, 15)
         XCTAssertTrue(CareLinkPollingPolicy.isStale(lastReadingAt: now.addingTimeInterval(-1201), now: now))
         XCTAssertEqual(CareLinkPollingPolicy.backoff(failureCount: 99), 300)
         XCTAssertEqual(CareLinkStatePolicy.status(for: .reconnectRequired), .loginRequired)
@@ -445,6 +444,50 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(CareLinkConnectionStatus.connecting.title, "Connecting...")
         XCTAssertEqual(CareLinkStatePolicy.status(for: .rateLimited(now)), .rateLimited)
         XCTAssertEqual(CareLinkStatePolicy.status(for: .noGlucoseData), .noData)
+    }
+
+    func testCareLinkPollingAnticipatesNextServerDataUpdate() {
+        let next = CareLinkPollingPolicy.nextPollDate(
+            latestReadingAt: now.addingTimeInterval(-60),
+            lastDataUpdateAt: now,
+            now: now
+        )
+        XCTAssertEqual(next, now.addingTimeInterval(330))
+    }
+
+    func testCareLinkPollingClampsFutureGlucoseTimestamp() {
+        let next = CareLinkPollingPolicy.nextPollDate(
+            latestReadingAt: now.addingTimeInterval(90),
+            lastDataUpdateAt: now.addingTimeInterval(-10),
+            now: now
+        )
+        XCTAssertEqual(next, now.addingTimeInterval(320))
+    }
+
+    func testCareLinkPollingClampsFutureGlucoseTimestampWithoutServerUpdate() {
+        let next = CareLinkPollingPolicy.nextPollDate(
+            latestReadingAt: now.addingTimeInterval(90),
+            lastDataUpdateAt: nil,
+            now: now
+        )
+        XCTAssertEqual(next, now.addingTimeInterval(330))
+    }
+
+    func testCareLinkPollingRetriesMissingDataEveryMinute() {
+        let anchor = now.addingTimeInterval(-400)
+        let next = CareLinkPollingPolicy.nextPollDate(
+            latestReadingAt: anchor,
+            lastDataUpdateAt: anchor,
+            now: now
+        )
+        XCTAssertEqual(next, now.addingTimeInterval(50))
+    }
+
+    func testCareLinkPollingWithoutTimestampsRetriesAfterOneMinute() {
+        XCTAssertEqual(
+            CareLinkPollingPolicy.nextPollDate(latestReadingAt: nil, lastDataUpdateAt: nil, now: now),
+            now.addingTimeInterval(60)
+        )
     }
 
     func testLoginCredentialsRequireBothStoredValues() throws {

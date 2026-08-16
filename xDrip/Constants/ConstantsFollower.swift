@@ -1,3 +1,5 @@
+import Foundation
+
 /// constants for follower mode
 enum ConstantsFollower {
     
@@ -33,4 +35,24 @@ enum ConstantsFollower {
     static let followerStatusAtlassianApiPath = "/api/v2/summary.json"
     /// status endpoint for Nightscout
     static let followerStatusNightscoutApiPath = "/api/v1/status.json"    
+}
+
+/// CareLink-specific follower timing.
+///
+/// These values follow xDrip+'s CareLink Follow scheduling strategy: anticipate the next
+/// five-minute sample, allow a 30-second upload grace period, retry missing data once per minute,
+/// and keep at least 20 seconds between requests. xDrip4iOS initially reused Nightscout's fixed
+/// 15-second polling cadence, but initial live testing produced a repeatable pattern consistent
+/// with CareLink server throttling, so CareLink now uses its source-specific reference strategy.
+/// Reference: NightscoutFoundation/xDrip, `cgm/carelinkfollow/CareLinkFollowService.java`.
+enum ConstantsCareLink {
+    static let samplePeriod: TimeInterval = 5 * 60
+    static let pollingGracePeriod: TimeInterval = 30
+    static let missedDataPollingInterval: TimeInterval = 60
+    static let minimumPollingInterval: TimeInterval = 20
+    /// A local deadline check only; CareLink is contacted only when `nextPollAt` is due.
+    static let schedulerCheckInterval = minimumPollingInterval
+    static let staleReadingAge: TimeInterval = 20 * 60
+    static let initialRetryBackoff: TimeInterval = 15
+    static let maximumRetryBackoff: TimeInterval = 5 * 60
 }

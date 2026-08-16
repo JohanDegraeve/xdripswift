@@ -569,13 +569,15 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
             .followerDataSourceType,
             .careLinkUsername,
             .careLinkPassword,
-            .careLinkSelectedPatientID
+            .careLinkSelectedPatientID,
+            .followerBackgroundKeepAliveType
         ])
         defer { snapshot.restore() }
 
         let defaults = UserDefaults.standard
         defaults.isMaster = false
         defaults.followerDataSourceType = .careLink
+        defaults.followerBackgroundKeepAliveType = .continuous
         let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
         let delegate = KeepAliveFollowerDelegateSpy()
 
@@ -621,6 +623,7 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
         authenticatedTokenStore.token = makeCareLinkTestToken()
         let authenticatedKeepAlive = RecordingFollowerBackgroundKeepAliveManager()
         let authenticatedState = CareLinkAccountState()
+        let authenticatedPollingSchedulerFactory = FakeFollowerTimerFactory()
         var authenticatedStatuses = [CareLinkConnectionStatus]()
         let authenticatedObserver = authenticatedState.$snapshot.sink {
             authenticatedStatuses.append($0.status)
@@ -631,14 +634,18 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
             backgroundKeepAliveManager: authenticatedKeepAlive,
             client: CareLinkClient(tokenStore: authenticatedTokenStore),
             state: authenticatedState,
-            startsInitialDownload: false
+            startsInitialDownload: false,
+            pollingSchedulerFactory: authenticatedPollingSchedulerFactory.makeTimer
         )
         await waitUntil { authenticatedKeepAlive.startedSources == [.careLink] }
         XCTAssertEqual(authenticatedKeepAlive.startedSources, [.careLink])
+        XCTAssertEqual(authenticatedPollingSchedulerFactory.timers.map(\.interval), [ConstantsCareLink.schedulerCheckInterval])
+        XCTAssertEqual(authenticatedPollingSchedulerFactory.timers.first?.resumeCount, 1)
         XCTAssertEqual(authenticatedState.snapshot.status, .connecting)
         XCTAssertFalse(authenticatedStatuses.contains(.loginRequired))
         authenticatedManager = nil
         XCTAssertEqual(authenticatedKeepAlive.stoppedSources.last, .careLink)
+        XCTAssertEqual(authenticatedPollingSchedulerFactory.timers.first?.suspendCount, 1)
         XCTAssertNil(authenticatedManager)
         withExtendedLifetime(authenticatedObserver) {}
         authenticatedObserver.cancel()
