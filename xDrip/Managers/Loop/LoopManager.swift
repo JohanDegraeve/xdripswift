@@ -9,6 +9,345 @@
 import Foundation
 import OSLog
 
+struct XDripCGMMetadataEnvelope: Codable, Equatable {
+    static let schemaVersion = 1
+    static let appGroupKey = "xDrip4iOSCGMMetadata"
+
+    let schemaVersion: Int
+    let generatedAt: Double
+    let producer: Producer?
+    let source: Source?
+    let sensor: SensorState?
+    let latestData: LatestData?
+    let transmitter: Transmitter?
+    let calibration: CalibrationState?
+
+    struct Producer: Codable, Equatable {
+        let appName: String?
+        let version: String?
+    }
+
+    struct Source: Codable, Equatable {
+        let mode: String
+        let kind: String?
+        let expectedReadingIntervalSeconds: Double?
+        let lastCommunicationAt: Double?
+    }
+
+    struct SensorState: Codable, Equatable {
+        let sessionIdentifier: String?
+        let state: String?
+        let type: String?
+        let model: String?
+        let serialNumber: String?
+        let startedAt: Double?
+        let warmupEndsAt: Double?
+        let expiresAt: Double?
+        let graceEndsAt: Double?
+    }
+
+    struct LatestData: Codable, Equatable {
+        let glucoseAt: Double?
+        let qualityCode: String?
+    }
+
+    struct Transmitter: Codable, Equatable {
+        let identifier: String?
+        let model: String?
+        let battery: Battery?
+    }
+
+    struct Battery: Codable, Equatable {
+        let value: Double
+        let representation: String
+        let unit: String
+        let observedAt: Double?
+    }
+
+    struct CalibrationState: Codable, Equatable {
+        let state: String
+        let lastCalibrationAt: Double?
+    }
+}
+
+struct XDripCGMMetadataContext {
+    let activeSensor: Sensor?
+    let transmitter: CGMTransmitter?
+    let sensorHealthIssue: SensorHealthIssue?
+    let hasInitialCalibration: Bool?
+    let lastCalibrationAt: Date?
+    let dexcomAlgorithmState: DexcomAlgorithmState?
+    let libreSensorState: LibreSensorState?
+}
+
+enum XDripCGMMetadataBuilder {
+    static func build(
+        context: XDripCGMMetadataContext,
+        latestSharedGlucoseAt: Date?,
+        lastCommunicationAt: Date?,
+        sensorStateOverride: String? = nil,
+        now: Date = Date()
+    ) -> XDripCGMMetadataEnvelope {
+        let defaults = UserDefaults.standard
+        let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
+            Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
+        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        let transmitterType = context.transmitter?.cgmTransmitterType()
+        let mode = defaults.isMaster ? "direct" : "follower"
+        let sourceKind = defaults.isMaster ? directSourceKind(transmitterType) : followerSourceKind(defaults.followerDataSourceType)
+        let expectedInterval = defaults.isMaster ? directExpectedInterval(transmitterType) : followerExpectedInterval(defaults.followerDataSourceType)
+        let startDate = context.activeSensor?.startDate ?? defaults.activeSensorStartDate
+        let model = defaults.activeSensorDescription ?? transmitterType?.detailedDescription()
+        let maxAgeInDays = context.transmitter?.maxSensorAgeInDays() ?? defaults.activeSensorMaxSensorAgeInDays
+        let warmupEnd = startDate.map { $0.addingTimeInterval(warmupDuration(transmitter: context.transmitter, defaults: defaults)) }
+
+        let finalEnd = startDate.flatMap { start in
+            maxAgeInDays.flatMap { $0 > 0 ? start.addingTimeInterval(.days($0)) : nil }
+        }
+        let usesDexcomGrace = transmitterType == .dexcomG7 && finalEnd != nil
+        let normalExpiration = usesDexcomGrace ? finalEnd?.addingTimeInterval(-.hours(12)) : finalEnd
+        let graceEnd = usesDexcomGrace ? finalEnd : nil
+        let terminalFailure = context.sensorHealthIssue?.severity == .terminal
+
+        let state: String? = {
+            if terminalFailure { return "failed" }
+            if let sensorStateOverride { return sensorStateOverride }
+            if let dexcomState = context.dexcomAlgorithmState {
+                switch dexcomState {
+                case .SessionStopped: return "stopped"
+                case .SensorWarmup: return "warmup"
+                case .SessionExpired, .expired: return "expired"
+                case .SensorFailedDuetoCountsAberration, .SensorFailedDuetoResidualAberration,
+                     .SessionFailedDueToUnrecoverableError, .SessionFailedDueToTransmitterError,
+                     .SensorFailedDueToProgressiveSensorDecline, .SensorFailedDueToHighCountsAberration,
+                     .SensorFailedDueToLowCountsAberration, .SensorFailedDueToRestart, .sensorFailed:
+                    return "failed"
+                default: break
+                }
+            }
+            if let libreState = context.libreSensorState {
+                switch libreState {
+                case .notYetStarted: return "not_started"
+                case .starting: return "warmup"
+                case .ready: break
+                case .expired: return "expired"
+                case .shutdown: return "stopped"
+                case .failure: return "failed"
+                case .unknown: break
+                }
+            }
+            guard startDate != nil else { return context.transmitter == nil && !defaults.isMaster ? nil : "not_started" }
+            if let warmupEnd, now < warmupEnd { return "warmup" }
+            if let graceEnd, let normalExpiration, now >= normalExpiration, now < graceEnd { return "grace" }
+            if let finalEnd, now >= finalEnd { return "expired" }
+            return "active"
+        }()
+
+        let qualityCode: String? = {
+            if let issue = context.sensorHealthIssue {
+                switch issue.reason {
+                case .persistentNoise: return "persistent_noise"
+                case .flatline: return "flatline"
+                case .dexcomExcessNoise: return "excess_noise"
+                case .dexcomTemporarySensorIssue, .dexcomQuestionMarks: return "temporary_sensor_issue"
+                case .dexcomSensorFailure, .libreSensorFailure, .dexcomTransmitterFailure, .dexcomTransmitterBatteryFailure:
+                    return "sensor_error"
+                }
+            }
+            switch context.dexcomAlgorithmState {
+            case .excessNoise: return "excess_noise"
+            case .TemporarySensorIssue, .questionMarks: return "temporary_sensor_issue"
+            case .SensorFailedDuetoCountsAberration, .SensorFailedDuetoResidualAberration,
+                 .SessionFailedDueToUnrecoverableError, .SessionFailedDueToTransmitterError,
+                 .SensorFailedDueToProgressiveSensorDecline, .SensorFailedDueToHighCountsAberration,
+                 .SensorFailedDueToLowCountsAberration, .SensorFailedDueToRestart, .sensorFailed:
+                return "sensor_error"
+            default: return latestSharedGlucoseAt == nil ? nil : "reliable"
+            }
+        }()
+
+        let calibration: XDripCGMMetadataEnvelope.CalibrationState? = {
+            guard defaults.isMaster, let transmitter = context.transmitter else { return nil }
+            let requiresAppCalibration = !transmitter.isWebOOPEnabled() && !transmitter.overruleIsWebOOPEnabled()
+            let state: String
+            switch context.dexcomAlgorithmState {
+            case .FirstofTwoBGsNeeded, .SecondofTwoBGsNeeded, .needsCalibration:
+                state = "required"
+            case .CalibrationError1, .CalibrationError2, .CalibrationLinearityFitFailure,
+                 .OutOfCalibrationDueToOutlier, .OutlierCalibrationRequest:
+                state = "error"
+            default:
+                if !requiresAppCalibration {
+                    state = "not_required"
+                } else if context.hasInitialCalibration == true {
+                    state = "current"
+                } else if let warmupEnd, now >= warmupEnd {
+                    state = "required"
+                } else {
+                    return nil
+                }
+            }
+            return .init(state: state, lastCalibrationAt: context.lastCalibrationAt?.timeIntervalSince1970)
+        }()
+
+        let battery: XDripCGMMetadataEnvelope.Battery? = {
+            guard let batteryInfo = defaults.transmitterBatteryInfo else { return nil }
+            switch batteryInfo {
+            case let .percentage(percentage):
+                return .init(value: Double(percentage), representation: "percentage", unit: "percent", observedAt: nil)
+            case let .DexcomG5(_, voltageB, _, _, _):
+                return .init(
+                    value: Double(voltageB * 10),
+                    representation: "voltage",
+                    unit: "millivolts",
+                    observedAt: defaults.timeStampOfLastBatteryReading?.timeIntervalSince1970
+                )
+            }
+        }()
+
+        let sensorType: String? = {
+            switch transmitterType?.sensorType() {
+            case .Dexcom: return "dexcom"
+            case .Libre: return "libre"
+            case .Medtrum: return "medtrum"
+            case nil:
+                let description = model?.lowercased() ?? ""
+                if description.contains("guardian") { return "guardian" }
+                if description.contains("dexcom") { return "dexcom" }
+                if description.contains("libre") { return "libre" }
+                if description.contains("medtrum") { return "medtrum" }
+                return nil
+            }
+        }()
+
+        let sessionIdentifier = context.activeSensor?.id ?? sessionIdentifier(
+            serial: defaults.activeSensorSerialNumber,
+            model: model,
+            startDate: startDate
+        )
+
+        let sensorMetadata: XDripCGMMetadataEnvelope.SensorState? = {
+            guard sessionIdentifier != nil || state != nil || sensorType != nil || model != nil ||
+                defaults.activeSensorSerialNumber != nil || startDate != nil || warmupEnd != nil ||
+                normalExpiration != nil || graceEnd != nil else { return nil }
+            return .init(
+                sessionIdentifier: sessionIdentifier,
+                state: state,
+                type: sensorType,
+                model: model,
+                serialNumber: defaults.activeSensorSerialNumber,
+                startedAt: startDate?.timeIntervalSince1970,
+                warmupEndsAt: warmupEnd?.timeIntervalSince1970,
+                expiresAt: normalExpiration?.timeIntervalSince1970,
+                graceEndsAt: graceEnd?.timeIntervalSince1970
+            )
+        }()
+        let latestData: XDripCGMMetadataEnvelope.LatestData? = {
+            guard latestSharedGlucoseAt != nil || qualityCode != nil else { return nil }
+            return .init(glucoseAt: latestSharedGlucoseAt?.timeIntervalSince1970, qualityCode: qualityCode)
+        }()
+        let transmitterMetadata: XDripCGMMetadataEnvelope.Transmitter? = {
+            let identifier = defaults.activeSensorTransmitterId
+            let transmitterModel = transmitterType?.detailedDescription()
+            guard identifier != nil || transmitterModel != nil || battery != nil else { return nil }
+            return .init(identifier: identifier, model: transmitterModel, battery: battery)
+        }()
+
+        return XDripCGMMetadataEnvelope(
+            schemaVersion: XDripCGMMetadataEnvelope.schemaVersion,
+            generatedAt: now.timeIntervalSince1970,
+            producer: .init(appName: appName, version: appVersion),
+            source: .init(
+                mode: mode,
+                kind: sourceKind,
+                expectedReadingIntervalSeconds: expectedInterval,
+                lastCommunicationAt: lastCommunicationAt?.timeIntervalSince1970
+            ),
+            sensor: sensorMetadata,
+            latestData: latestData,
+            transmitter: transmitterMetadata,
+            calibration: calibration
+        )
+    }
+
+    private static func directSourceKind(_ type: CGMTransmitterType?) -> String? {
+        switch type {
+        case .dexcom:
+            let identifier = UserDefaults.standard.activeSensorTransmitterId ?? ""
+            if identifier.hasPrefix("4") { return "dexcom_g5" }
+            if identifier.hasPrefix("5") || identifier.hasPrefix("C") { return "dexcom_one" }
+            if identifier.hasPrefix("8") { return "dexcom_g6" }
+            return "dexcom_g5_g6"
+        case .dexcomG7:
+            let identifier = UserDefaults.standard.activeSensorTransmitterId ?? ""
+            if identifier.hasPrefix("DX01") { return "dexcom_stelo" }
+            if identifier.hasPrefix("DX02") { return "dexcom_one_plus" }
+            return "dexcom_g7"
+        case .Libre2: return "libre_2"
+        case .miaomiao: return "libre_miaomiao"
+        case .Bubble: return "libre_bubble"
+        case .medtrumTouchCareNano: return "medtrum_nano"
+        case nil: return nil
+        }
+    }
+
+    private static func followerSourceKind(_ type: FollowerDataSourceType) -> String {
+        switch type {
+        case .nightscout: return "nightscout"
+        case .libreLinkUp: return "libre_link_up"
+        case .libreLinkUpRussia: return "libre_link_up_russia"
+        case .dexcomShare: return "dexcom_share"
+        case .medtrumEasyView: return "medtrum_easyview"
+        case .calendar: return "shared_calendar"
+        case .careLink: return "carelink"
+        }
+    }
+
+    private static func directExpectedInterval(_ type: CGMTransmitterType?) -> Double? {
+        switch type {
+        case .dexcom, .dexcomG7: return 300
+        case .Libre2, .miaomiao, .Bubble, .medtrumTouchCareNano: return 60
+        case nil: return nil
+        }
+    }
+
+    private static func followerExpectedInterval(_ type: FollowerDataSourceType) -> Double {
+        switch type {
+        case .libreLinkUp, .libreLinkUpRussia, .medtrumEasyView: return 60
+        case .nightscout, .dexcomShare, .calendar: return 300
+        case .careLink: return 300
+        }
+    }
+
+    private static func warmupDuration(transmitter: CGMTransmitter?, defaults: UserDefaults) -> TimeInterval {
+        if !defaults.isMaster,
+           defaults.followerDataSourceType == .libreLinkUp || defaults.followerDataSourceType == .libreLinkUpRussia {
+            return .minutes(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre)
+        }
+        switch transmitter?.cgmTransmitterType() {
+        case .dexcomG7:
+            return .minutes(ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG7)
+        case .dexcom:
+            return .minutes(transmitter?.isAnubisG6() == true
+                ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis
+                : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6)
+        case .Libre2, .miaomiao, .Bubble, .medtrumTouchCareNano:
+            return .minutes(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes)
+        case nil:
+            let description = defaults.activeSensorDescription?.lowercased() ?? ""
+            if description.contains("dexcom") { return .minutes(ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6) }
+            return .minutes(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes)
+        }
+    }
+
+    private static func sessionIdentifier(serial: String?, model: String?, startDate: Date?) -> String? {
+        guard serial != nil || model != nil || startDate != nil else { return nil }
+        return [serial, model, startDate.map { String(Int($0.timeIntervalSince1970)) }]
+            .compactMap { $0 }
+            .joined(separator: "|")
+    }
+}
+
 public class LoopManager: NSObject {
 
     // MARK: - private properties
@@ -21,6 +360,12 @@ public class LoopManager: NSObject {
 
     /// Whether the active Dexcom G6 transmitter is an Anubis.
     private let activeSensorIsAnubisProvider: () -> Bool
+
+    private let metadataContextProvider: () -> XDripCGMMetadataContext
+
+    private var lastSuccessfulSourceCommunication: Date?
+
+    private var explicitSensorState: String?
 
     // for trace,
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLoopManager)
@@ -35,12 +380,17 @@ public class LoopManager: NSObject {
 
     // MARK: - initializer
 
-    init(coreDataManager: CoreDataManager, activeSensorIsAnubisProvider: @escaping () -> Bool) {
+    init(
+        coreDataManager: CoreDataManager,
+        activeSensorIsAnubisProvider: @escaping () -> Bool,
+        metadataContextProvider: @escaping () -> XDripCGMMetadataContext
+    ) {
 
         // initialize non optional private properties
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.activeSensorIsAnubisProvider = activeSensorIsAnubisProvider
+        self.metadataContextProvider = metadataContextProvider
 
         // call super.init
         super.init()
@@ -95,6 +445,8 @@ public class LoopManager: NSObject {
             // if the last share data hasn't been set previously (could only happen on the first run) then just set it and return until next bg reading is processed. We won't normally ever get to here
             UserDefaults.standard.timeStampLatestLoopSharedBgReading = Date()
 
+            publishMetadata(sharedUserDefaults: sharedUserDefaults, latestSharedGlucoseAt: nil)
+
             return
 
         }
@@ -122,7 +474,7 @@ public class LoopManager: NSObject {
             // if no readings anymore, then no need to continue
             if glucoseData.count == 0 {
                 if loopShareType == .trio {
-                    shareTrioStatusOnlyIfAvailable(sharedUserDefaults: sharedUserDefaults)
+                    writeEmptyReadingsAndMetadata(sharedUserDefaults: sharedUserDefaults)
                 }
                 return
             }
@@ -130,7 +482,10 @@ public class LoopManager: NSObject {
         } else if lastReadings.count == 0 {
             // this is the case where loopdelay = 0 and lastReadings is empty
             if loopShareType == .trio {
-                shareTrioStatusOnlyIfAvailable(sharedUserDefaults: sharedUserDefaults)
+                publishMetadata(
+                    sharedUserDefaults: sharedUserDefaults,
+                    latestSharedGlucoseAt: latestPreviouslySharedGlucoseAt()
+                )
             }
             return
         }
@@ -230,7 +585,7 @@ public class LoopManager: NSObject {
         // If there are no readings to share, clear the shared container to avoid stale entries
         if dictionary.isEmpty {
             if loopShareType == .trio {
-                shareTrioStatusOnlyIfAvailable(sharedUserDefaults: sharedUserDefaults)
+                writeEmptyReadingsAndMetadata(sharedUserDefaults: sharedUserDefaults)
             } else {
                 sharedUserDefaults.removeObject(forKey: "latestReadings")
                 UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = nil
@@ -238,18 +593,9 @@ public class LoopManager: NSObject {
             return
         }
 
-        // Loop and iAPS expect "latestReadings" to contain a top-level array of
-        // reading dictionaries. Trio PR #1205 added an xDrip4iOS-specific rich
-        // shape under the same key:
-        // https://github.com/nightscout/Trio/pull/1205
-        //
-        // Keep the existing array for Loop/iAPS because they will fail the first
-        // JSON cast if we change the top-level type. Only the Trio app group gets
-        // the richer dictionary, with the existing readings moved under
-        // "recentReadings" and CGM lifecycle/status beside it.
-        let payload: Any = loopShareType == .trio ? trioLatestReadingsPayload(recentReadings: dictionary, includeWithoutCGM: true) : dictionary
-
-        guard let data = try? JSONSerialization.data(withJSONObject: payload) else {
+        // Every existing OS-AID consumer expects this key to contain a top-level
+        // array. Rich Trio metadata is published independently after this write.
+        guard let data = try? Self.encodeLegacyReadings(dictionary) else {
             return
         }
 
@@ -263,6 +609,13 @@ public class LoopManager: NSObject {
         // write readings to shared user defaults
         sharedUserDefaults.set(data, forKey: "latestReadings")
         trace("    in share, stored readings for selected OS-AID target", log: log, category: ConstantsLog.categoryLoopManager, type: .debug, troubleshooting: .detailed(.integration(name: .osAid, activity: .succeeded(itemCount: dictionary.count))))
+
+        if loopShareType == .trio {
+            publishMetadata(
+                sharedUserDefaults: sharedUserDefaults,
+                latestSharedGlucoseAt: sharedGlucoseDate(from: dictionary.first)
+            )
+        }
 
         // mirror exactly what we wrote so local deletions are reflected immediately
         UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary
@@ -300,9 +653,40 @@ public class LoopManager: NSObject {
 
         if let sharedUserDefaults = UserDefaults(suiteName: suiteName) {
             sharedUserDefaults.removeObject(forKey: "latestReadings")
+            sharedUserDefaults.removeObject(forKey: XDripCGMMetadataEnvelope.appGroupKey)
         }
 
         UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = nil
+    }
+
+    /// Publishes the current rich CGM snapshot without changing the legacy reading array.
+    /// Call this for source/status/battery updates that may arrive without glucose.
+    public func shareMetadata(
+        lastCommunicationAt: Date? = nil,
+        clearReadings: Bool = false,
+        sensorState: String? = nil,
+        clearSensorState: Bool = false
+    ) {
+        guard !Bundle.main.disableLoopShare,
+              UserDefaults.standard.loopShareType == .trio,
+              let sharedUserDefaults = UserDefaults(suiteName: UserDefaults.standard.loopShareType.sharedUserDefaultsSuiteName)
+        else { return }
+
+        if let lastCommunicationAt {
+            lastSuccessfulSourceCommunication = lastCommunicationAt
+        }
+        if clearSensorState {
+            explicitSensorState = nil
+        } else if let sensorState {
+            explicitSensorState = sensorState
+        }
+        if clearReadings {
+            writeLegacyReadings([], sharedUserDefaults: sharedUserDefaults)
+        }
+        publishMetadata(
+            sharedUserDefaults: sharedUserDefaults,
+            latestSharedGlucoseAt: clearReadings ? nil : latestPreviouslySharedGlucoseAt()
+        )
     }
 
     /// calculate loop delay to use dependent on the time of the day, based on UserDefaults loopDelaySchedule and loopDelayValueInMinutes
@@ -357,7 +741,48 @@ public class LoopManager: NSObject {
 
     }
 
+    /// Encodes the long-standing app-group contract used by Loop, iAPS, and Trio.
+    /// Keeping this pure makes it possible to guard the top-level array shape in tests.
+    static func encodeLegacyReadings(_ readings: [[String: Any]]) throws -> Data {
+        try JSONSerialization.data(withJSONObject: readings)
+    }
+
     // MARK: - private functions
+
+    private func publishMetadata(sharedUserDefaults: UserDefaults, latestSharedGlucoseAt: Date?) {
+        let defaults = UserDefaults.standard
+        let communicationAt = defaults.isMaster
+            ? lastSuccessfulSourceCommunication ?? latestSharedGlucoseAt
+            : lastSuccessfulSourceCommunication ?? defaults.timeStampOfLastFollowerConnection
+        let envelope = XDripCGMMetadataBuilder.build(
+            context: metadataContextProvider(),
+            latestSharedGlucoseAt: latestSharedGlucoseAt,
+            lastCommunicationAt: communicationAt,
+            sensorStateOverride: explicitSensorState
+        )
+        guard let data = try? JSONEncoder().encode(envelope) else { return }
+        sharedUserDefaults.set(data, forKey: XDripCGMMetadataEnvelope.appGroupKey)
+    }
+
+    private func writeEmptyReadingsAndMetadata(sharedUserDefaults: UserDefaults) {
+        writeLegacyReadings([], sharedUserDefaults: sharedUserDefaults)
+        publishMetadata(sharedUserDefaults: sharedUserDefaults, latestSharedGlucoseAt: nil)
+    }
+
+    private func writeLegacyReadings(_ readings: [[String: Any]], sharedUserDefaults: UserDefaults) {
+        guard let data = try? JSONSerialization.data(withJSONObject: readings) else { return }
+        sharedUserDefaults.set(data, forKey: "latestReadings")
+        UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = readings
+    }
+
+    private func latestPreviouslySharedGlucoseAt() -> Date? {
+        sharedGlucoseDate(from: UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary?.first)
+    }
+
+    private func sharedGlucoseDate(from reading: [String: Any]?) -> Date? {
+        guard let timestamp = reading?["DT"] as? String else { return nil }
+        return try? parseTimestamp(timestamp)
+    }
 
     /// The Trio app-group reader added in PR #1205 accepts a richer top-level
     /// dictionary under the existing "latestReadings" key, but it only consumes:
@@ -379,24 +804,6 @@ public class LoopManager: NSObject {
         }
 
         return includeWithoutCGM || payload["cgm"] != nil ? payload : [:]
-    }
-
-    /// During warmup, expiry or similar states there may be no fresh readings to
-    /// share. For Loop/iAPS we keep the existing behaviour and clear stale data.
-    /// For Trio, the PR #1205 app-group parser can still use an empty
-    /// "recentReadings" array plus "cgm" to show the sensor state on the home
-    /// bobble. If we also have no CGM lifecycle, clear as before.
-    private func shareTrioStatusOnlyIfAvailable(sharedUserDefaults: UserDefaults) {
-        let payload = trioLatestReadingsPayload(recentReadings: [], includeWithoutCGM: false)
-
-        guard !payload.isEmpty, let data = try? JSONSerialization.data(withJSONObject: payload) else {
-            sharedUserDefaults.removeObject(forKey: "latestReadings")
-            UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = nil
-            return
-        }
-
-        sharedUserDefaults.set(data, forKey: "latestReadings")
-        UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = []
     }
 
     /// Builds only the CGM keys that Trio currently reads from the app group.

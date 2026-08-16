@@ -530,6 +530,7 @@ import AppIntents
         // add tracing when app comes to foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyTraceAppGoesToForeground, closure: {
             trace("Application will enter foreground", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            self.loopManager?.shareMetadata()
             self.refreshSelectedFollower(fillNightscoutGaps: true)
         })
         
@@ -763,8 +764,39 @@ import AppIntents
                 coreDataManager: coreDataManager,
                 activeSensorIsAnubisProvider: { [weak self] in
                     self?.bluetoothPeripheralManager?.getCGMTransmitter()?.isAnubisG6() ?? false
+                },
+                metadataContextProvider: { [weak self] in
+                    let activeSensor = self?.activeSensor
+                    let transmitter = self?.bluetoothPeripheralManager?.getCGMTransmitter()
+                    let peripheral = (transmitter as? BluetoothTransmitter).flatMap {
+                        self?.bluetoothPeripheralManager?.getBluetoothPeripheral(for: $0)
+                    }
+                    let dexcomStatus = (peripheral as? DexcomG5)?.sensorStatus
+                        ?? (peripheral as? DexcomG7)?.sensorStatus
+                    let dexcomAlgorithmState = dexcomStatus.flatMap { status in
+                        DexcomAlgorithmState.allCases.first { $0.description == status }
+                    }
+                    let libreSensorState = (peripheral as? MiaoMiao)?.sensorState
+                        ?? (peripheral as? Bubble)?.sensorState
+                    let firstCalibration = activeSensor.flatMap {
+                        self?.calibrationsAccessor?.firstCalibrationForActiveSensor(withActivesensor: $0)
+                    }
+                    let lastCalibration = activeSensor.flatMap {
+                        self?.calibrationsAccessor?.lastCalibrationForActiveSensor(withActivesensor: $0)
+                    }
+                    return XDripCGMMetadataContext(
+                        activeSensor: activeSensor,
+                        transmitter: transmitter,
+                        sensorHealthIssue: self?.sensorHealthIssueManager.visibleIssue,
+                        hasInitialCalibration: activeSensor == nil ? nil : firstCalibration != nil,
+                        lastCalibrationAt: lastCalibration?.timeStamp,
+                        dexcomAlgorithmState: dexcomAlgorithmState,
+                        libreSensorState: libreSensorState
+                    )
                 }
             )
+            // Reconstruct the additive Trio snapshot from persisted producer state after Core Data startup.
+            loopManager?.shareMetadata()
         }
         
         // setup dexcomShareUploadManager
@@ -2203,6 +2235,7 @@ import AppIntents
         // assign activeSensor to newSensor
         activeSensor = newSensor
         sensorNoiseManager?.update(activeSensor: newSensor)
+        loopManager?.shareMetadata(clearReadings: true, clearSensorState: true)
     }
     
     private func stopSensor(cGMTransmitter: CGMTransmitter?, sendToTransmitter: Bool) {
@@ -2230,6 +2263,7 @@ import AppIntents
         
         // asign nil to activeSensor
         self.activeSensor = nil
+        loopManager?.shareMetadata(clearReadings: true, sensorState: "stopped")
         
         // now that the activeSensor object has been destroyed, update (hide) the data source info
         updateDataSourceInfo()
@@ -2525,7 +2559,9 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
     
     func sensorNotDetected() {
         trace("sensor not detected", log: log, category: ConstantsLog.categoryRootView, type: .info, troubleshooting: .standard(.sensor(.notDetected)))
-        
+
+        loopManager?.shareMetadata(clearReadings: true, sensorState: "not_started")
+
         createNotification(title: Texts_Common.warning, body: Texts_HomeView.sensorNotDetected, identifier: ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected, sound: nil)
     }
     
@@ -2538,6 +2574,10 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
         if let transmitterBatteryInfo = transmitterBatteryInfo {
             UserDefaults.standard.transmitterBatteryInfo = transmitterBatteryInfo
         }
+
+        // Sensor status and battery packets are authoritative source communication even
+        // when warmup or an error means no glucose can be stored.
+        loopManager?.shareMetadata(lastCommunicationAt: Date())
         
         // list readings
         for (index, glucose) in glucoseData.enumerated() {
@@ -2628,6 +2668,7 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
             sensorID: activeSensor?.id,
             sensorStartDate: activeSensor?.startDate
         )
+        loopManager?.shareMetadata(clearReadings: sensorHealthIssueManager.visibleIssue?.severity == .terminal)
     }
 }
 
@@ -2744,6 +2785,9 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
     }
 
     func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading]) {
+        // Successful follower transactions may contain no new glucose, but still refresh communication state.
+        loopManager?.shareMetadata(lastCommunicationAt: UserDefaults.standard.timeStampOfLastFollowerConnection ?? Date())
+
         if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor { //}, let followManager = (UserDefaults.standard.followerDataSourceType == .nightscout ? self.nightscoutFollowManager : self.libreLinkUpFollowManager) {
 
             let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
