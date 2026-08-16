@@ -7,114 +7,166 @@
 //
 
 import SwiftUI
-import Combine
 
-/// Full-screen glucose value used by the locked landscape Home presentation.
+/// Purpose-built iPhone landscape presentation used by full Clock Mode.
 ///
-/// It consumes the same formatted glucose state as portrait Home, so value age, delta, colors and
-/// stale-reading treatment remain consistent between orientations.
+/// Glucose remains the primary readout, while the optional clock receives enough width to be read
+/// at a distance. The compact status line preserves applicable Loop, AID and CareLink state without
+/// bringing the dense portrait Home hierarchy into the short landscape canvas.
 struct LandscapeValueView: View {
 
-    // MARK: - Properties
+    let state: RootHomeState
 
-    let glucoseState: RootHomeGlucoseState
-    @State private var currentDate = Date()
-
-    private let clockTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    private var showsClock: Bool { UserDefaults.standard.showClockWhenScreenIsLocked }
-
-    // MARK: - Body
+    private enum Layout {
+        static let glucoseWidthFraction = 0.58
+        static let horizontalPadding: CGFloat = 18
+        static let verticalPadding: CGFloat = 12
+        static let readoutColumnSpacing: CGFloat = 40
+        static let readoutStatusSpacing: CGFloat = 12
+        static let statusRowHeight: CGFloat = 64
+        static let statusRowColumnSpacing: CGFloat = 16
+        static let statusSpacing: CGFloat = 8
+        static let statusFontSize: CGFloat = 30
+        static let statusSymbolSize: CGFloat = 32
+        static let readoutFontSize: CGFloat = 500
+    }
 
     var body: some View {
         GeometryReader { geometry in
-            VStack(spacing: 0) {
-                if showsClock {
-                    clockView(availableHeight: geometry.size.height)
-                }
+            let contentWidth = max(geometry.size.width - (Layout.horizontalPadding * 2), 0)
+            let columnSpacing = state.visibility.showsClock
+                ? Layout.readoutColumnSpacing
+                : 0
+            let availableReadoutWidth = max(contentWidth - columnSpacing, 0)
 
-                glucoseContent(availableSize: geometry.size)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            VStack(spacing: Layout.readoutStatusSpacing) {
+                HStack(spacing: Layout.readoutColumnSpacing) {
+                    glucoseView
+                        .frame(
+                            width: state.visibility.showsClock
+                                ? availableReadoutWidth * Layout.glucoseWidthFraction
+                                : availableReadoutWidth
+                        )
+
+                    if state.visibility.showsClock {
+                        clockView
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+                .frame(maxHeight: .infinity)
+
+                statusRow
+                    .frame(height: Layout.statusRowHeight)
             }
-            .padding(.horizontal, 5)
-            .padding(.vertical, 5)
+            .padding(.horizontal, Layout.horizontalPadding)
+            .padding(.vertical, Layout.verticalPadding)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
         }
         .colorScheme(.dark)
-        .onReceive(clockTimer) { date in
-            guard showsClock else { return }
-
-            currentDate = date
-        }
     }
 
-    // MARK: - Views
-
-    /// Optional clock sized from the available landscape height.
-    private func clockView(availableHeight: CGFloat) -> some View {
-        Text(currentDate.formatted(date: .omitted, time: .shortened))
-            .font(.system(size: max(34, availableHeight * 0.16), weight: .heavy))
-            .foregroundStyle(ConstantsAppColors.clockText)
+    private var glucoseView: some View {
+        Text(state.glucose.valueText)
+            .font(.system(size: Layout.readoutFontSize, weight: .bold))
+            .foregroundStyle(state.glucose.valueColor)
+            .strikethrough(
+                state.glucose.valueHasStrikethrough,
+                color: state.glucose.valueColor
+            )
             .monospacedDigit()
             .lineLimit(1)
-            .minimumScaleFactor(0.2)
-            .frame(maxWidth: .infinity)
+            .minimumScaleFactor(0.01)
+            .allowsTightening(true)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    /// Glucose age, delta and main value scaled to the complete remaining area.
-    private func glucoseContent(availableSize: CGSize) -> some View {
-        VStack(spacing: -10) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                minutesView
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                deltaView
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .font(.system(size: topRowFontSize(availableHeight: availableSize.height)))
-            .lineLimit(1)
-            .minimumScaleFactor(0.25)
-
-            Text(glucoseState.valueText)
-                .font(.system(size: valueFontSize(availableSize: availableSize), weight: .regular))
-                .foregroundStyle(glucoseState.valueColor)
-                .strikethrough(glucoseState.valueHasStrikethrough, color: glucoseState.valueColor)
+    private var clockView: some View {
+        TimelineView(.periodic(from: .now, by: 60)) { context in
+            Text(context.date.formatted(date: .omitted, time: .shortened))
+                .font(.system(size: Layout.readoutFontSize, weight: .bold))
+                .foregroundStyle(ConstantsAppColors.clockText)
                 .monospacedDigit()
                 .lineLimit(1)
-                .minimumScaleFactor(0.08)
+                .minimumScaleFactor(0.01)
+                .allowsTightening(true)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var statusRow: some View {
+        HStack(spacing: Layout.statusRowColumnSpacing) {
+            minutesView
+                .frame(maxWidth: .infinity)
+
+            deltaView
+                .frame(maxWidth: .infinity)
+
+            Group {
+                if showsTherapyStatus {
+                    therapyStatusView
+                } else {
+                    Color.clear
+                        .accessibilityHidden(true)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .font(.system(size: Layout.statusFontSize, weight: .medium))
+        .lineLimit(1)
+        .minimumScaleFactor(0.65)
+        .allowsTightening(true)
     }
 
     private var minutesView: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 3) {
-            Text(glucoseState.minutesText)
-                .foregroundStyle(glucoseState.minutesColor)
+        HStack(alignment: .firstTextBaseline, spacing: 4) {
+            Text(state.glucose.minutesText)
+                .foregroundStyle(state.glucose.minutesColor)
                 .monospacedDigit()
 
-            Text(glucoseState.minutesAgoText)
+            Text(state.glucose.minutesAgoText)
                 .foregroundStyle(ConstantsAppColors.secondaryText)
         }
     }
 
     private var deltaView: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 3) {
-            Text(glucoseState.deltaText)
-                .foregroundStyle(glucoseState.deltaColor)
+        HStack(alignment: .firstTextBaseline, spacing: 4) {
+            Text(state.glucose.deltaText)
+                .foregroundStyle(state.glucose.deltaColor)
                 .monospacedDigit()
 
-            Text(glucoseState.deltaUnitText)
+            Text(state.glucose.deltaUnitText)
                 .foregroundStyle(ConstantsAppColors.secondaryText)
         }
     }
 
-    // MARK: - Sizing
+    private var therapyStatusView: some View {
+        HStack(spacing: Layout.statusSpacing) {
+            if state.loop.showsActivityIndicator {
+                ProgressView()
+                    .scaleEffect(0.85)
+                    .tint(ConstantsAppColors.primaryText)
+                    .frame(width: Layout.statusSymbolSize, height: Layout.statusSymbolSize)
+            } else if let statusSystemImage = state.loop.statusSystemImage {
+                Image(systemName: statusSystemImage)
+                    .font(.system(size: Layout.statusSymbolSize, weight: .black))
+                    .symbolRenderingMode(.monochrome)
+                    .foregroundStyle(state.loop.statusColor)
+            }
 
-    private func topRowFontSize(availableHeight: CGFloat) -> CGFloat {
-        showsClock ? max(22, availableHeight * 0.10) : max(28, availableHeight * 0.15)
+            Text(state.loop.statusTitle)
+                .foregroundStyle(ConstantsAppColors.primaryText)
+
+            if state.loop.showsStatusTimeAgo, !state.loop.statusTimeAgo.isEmpty {
+                Text(state.loop.statusTimeAgo)
+                    .foregroundStyle(ConstantsAppColors.secondaryText)
+                    .monospacedDigit()
+            }
+        }
     }
 
-    private func valueFontSize(availableSize: CGSize) -> CGFloat {
-        min(availableSize.height * (showsClock ? 0.72 : 0.82), availableSize.width * 0.46)
+    private var showsTherapyStatus: Bool {
+        state.loop.showsActivityIndicator || state.loop.statusSystemImage != nil
     }
 }

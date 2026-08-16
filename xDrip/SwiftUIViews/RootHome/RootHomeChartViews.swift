@@ -11,6 +11,7 @@ import SwiftUI
 /// Main interactive chart with loading state and the reading shown at the panned end date.
 struct RootHomeMainChartView: View {
     @Binding var selectedRange: RootHomeChartRange
+    let showsTreatments: Bool
     let chartState: GlucoseChartState
     let isLoading: Bool
     let scrollCoordinator: GlucoseChartScrollCoordinator
@@ -45,6 +46,7 @@ struct RootHomeMainChartView: View {
                     liveActivityType: nil,
                     hoursToShowScalingHours: selectedRange.rawValue,
                     glucoseCircleDiameterScalingHours: selectedRange.glucoseCircleDiameterScalingHours,
+                    showsTreatments: showsTreatments,
                     overrideChartHeight: geometry.size.height,
                     overrideChartWidth: geometry.size.width,
                     highContrast: nil,

@@ -23,6 +23,11 @@ struct RootHomeView: View {
         static let screenHorizontalMargin: CGFloat = 12
         static let glucoseStatusRowHeight: CGFloat = 120
         static let nightLockReadoutHeightWidthRatio: CGFloat = 0.50
+        static let ipadPortraitNightLockMaximumReadoutWidth: CGFloat = 545
+        static let ipadPortraitNightLockReadoutWidthHeightFraction: CGFloat = 0.44
+        static let ipadNightLockReadoutSpacing: CGFloat = 48
+        static let ipadNightLockReadoutHeightWidthRatio: CGFloat = 0.48
+        static let ipadNightLockMaximumReadoutHeight: CGFloat = 300
         static let ipadGlanceCardMinimumHorizontalPadding: CGFloat = 12
         static let ipadGlanceCardHorizontalPadding: CGFloat = 30
         static let ipadGlanceCardMinimumWidthForPadding: CGFloat = 360
@@ -203,7 +208,8 @@ struct RootHomeView: View {
             prepareHistoricalDataIfNeeded(at: endDate)
         }
         .onChange(of: selectedRange) { newRange in
-            // Clock Mode temporarily uses three hours without replacing the user's stored range.
+            // Clock Mode temporarily uses its presentation range without replacing the user's
+            // stored range.
             if !state.usesScreenLockNightLayout {
                 chartWidthInHours = newRange.rawValue
             }
@@ -246,6 +252,12 @@ struct RootHomeView: View {
         if state.usesScreenLockNightLayout {
             GeometryReader { geometry in
                 nightLockContent(size: geometry.size)
+                    .onAppear {
+                        applyClockModeRange(for: geometry.size)
+                    }
+                    .onChange(of: geometry.size) { newSize in
+                        applyClockModeRange(for: newSize)
+                    }
             }
         } else if UIDevice.current.userInterfaceIdiom == .pad {
             GeometryReader { geometry in
@@ -272,9 +284,24 @@ struct RootHomeView: View {
         }
     }
 
-    /// Gives the two night-time readouts enough height for their oversized fonts to scale to the
-    /// complete content width. The chart remains flexible and receives all remaining space.
+    /// Keeps the established iPhone Clock Mode hierarchy isolated while giving iPad a horizontal,
+    /// equal-width pair of large readouts above the chart.
+    @ViewBuilder
     private func nightLockContent(size: CGSize) -> some View {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            if size.width > size.height {
+                ipadLandscapeNightLockContent(size: size)
+            } else {
+                ipadPortraitNightLockContent(size: size)
+            }
+        } else {
+            phoneNightLockContent(size: size)
+        }
+    }
+
+    /// Gives the two iPhone night-time readouts enough height for their oversized fonts to scale to
+    /// the complete content width. The chart remains flexible and receives all remaining space.
+    private func phoneNightLockContent(size: CGSize) -> some View {
         let contentWidth = max(size.width - (Layout.screenHorizontalMargin * 2), 0)
 
         return VStack(spacing: Layout.sectionSpacing) {
@@ -286,7 +313,7 @@ struct RootHomeView: View {
                     height: contentWidth * Layout.nightLockReadoutHeightWidthRatio
                 )
 
-                mainChart
+                screenLockMainChart
                     .frame(maxHeight: .infinity)
                     .layoutPriority(1)
 
@@ -298,6 +325,90 @@ struct RootHomeView: View {
             .frame(maxHeight: .infinity, alignment: .top)
         }
         .padding(.horizontal, Layout.screenHorizontalMargin)
+        .frame(width: size.width, height: size.height, alignment: .top)
+        .animation(.easeOut(duration: 0.22), value: sensorHealthIssueManager.visibleIssue?.id)
+    }
+
+    /// iPad Clock Mode keeps the same readout components as iPhone, but places glucose and time in
+    /// balanced columns that remain readable from a distance. The chart receives all remaining
+    /// height and therefore continues to adapt to Stage Manager and split-view resizing.
+    private func ipadLandscapeNightLockContent(size: CGSize) -> some View {
+        let contentWidth = max(size.width - 40, 0)
+        let readoutWidth = max(
+            (contentWidth - Layout.ipadNightLockReadoutSpacing) / 2,
+            0
+        )
+        let readoutHeight = min(
+            readoutWidth * Layout.ipadNightLockReadoutHeightWidthRatio,
+            Layout.ipadNightLockMaximumReadoutHeight
+        )
+
+        return VStack(spacing: Layout.sectionSpacing) {
+            homeHeader
+
+            VStack(spacing: Layout.rowSpacing) {
+                HStack(spacing: Layout.ipadNightLockReadoutSpacing) {
+                    RootHomeGlucoseReadingView(
+                        state: glucoseDisplayState,
+                        isScreenLocked: true,
+                        nightLockStatus: nightLockStatus
+                    )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                    if state.visibility.showsClock {
+                        RootHomeClockView(text: state.controls.clockText)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                }
+                .frame(height: readoutHeight)
+
+                screenLockMainChart
+                    .frame(maxHeight: .infinity)
+                    .layoutPriority(1)
+            }
+            .frame(maxHeight: .infinity, alignment: .top)
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 12)
+        .frame(width: size.width, height: size.height, alignment: .top)
+        .animation(.easeOut(duration: 0.22), value: sensorHealthIssueManager.visibleIssue?.id)
+    }
+
+    /// Portrait keeps the iPhone ordering, but caps each oversized readout to preserve a useful
+    /// chart height on iPad and in resizable windows.
+    private func ipadPortraitNightLockContent(size: CGSize) -> some View {
+        let contentWidth = max(size.width - 40, 0)
+        let readoutWidth = min(
+            contentWidth,
+            Layout.ipadPortraitNightLockMaximumReadoutWidth,
+            size.height * Layout.ipadPortraitNightLockReadoutWidthHeightFraction
+        )
+        let readoutHeight = readoutWidth * Layout.nightLockReadoutHeightWidthRatio
+
+        return VStack(spacing: Layout.sectionSpacing) {
+            homeHeader
+
+            VStack(spacing: Layout.rowSpacing) {
+                RootHomeGlucoseReadingView(
+                    state: glucoseDisplayState,
+                    isScreenLocked: true,
+                    nightLockStatus: nightLockStatus
+                )
+                .frame(width: readoutWidth, height: readoutHeight)
+
+                screenLockMainChart
+                    .frame(maxHeight: .infinity)
+                    .layoutPriority(1)
+
+                if state.visibility.showsClock {
+                    RootHomeClockView(text: state.controls.clockText)
+                        .frame(width: readoutWidth, height: readoutHeight)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 12)
         .frame(width: size.width, height: size.height, alignment: .top)
         .animation(.easeOut(duration: 0.22), value: sensorHealthIssueManager.visibleIssue?.id)
     }
@@ -571,9 +682,29 @@ struct RootHomeView: View {
     }
 
     private var mainChart: some View {
+        configuredMainChart(
+            chartState: visibleChartState,
+            showsTreatments: true
+        )
+    }
+
+    /// Every full Clock Mode presentation uses the same treatment-free chart. The normal Home chart
+    /// remains preference-driven and returns immediately when the screen is unlocked.
+    private var screenLockMainChart: some View {
+        configuredMainChart(
+            chartState: visibleChartState,
+            showsTreatments: false
+        )
+    }
+
+    private func configuredMainChart(
+        chartState: GlucoseChartState,
+        showsTreatments: Bool
+    ) -> some View {
         RootHomeMainChartView(
             selectedRange: $selectedRange,
-            chartState: visibleChartState,
+            showsTreatments: showsTreatments,
+            chartState: chartState,
             isLoading: isLoadingChart,
             scrollCoordinator: scrollCoordinator,
             yAxisResetRevision: chartYAxisResetRevision,
@@ -890,7 +1021,8 @@ struct RootHomeView: View {
     /// Applies every main-chart transition for Clock Mode in one place.
     ///
     /// When enabled:
-    /// 1. Select a temporary three-hour range without changing UserDefaults.
+    /// 1. Select the established temporary three-hour range without changing UserDefaults. The
+    ///    active iPad landscape geometry overrides this with five hours.
     /// 2. Return the chart to `now()` and cancel any active scrolling or deceleration.
     /// 3. Chart gestures are disabled declaratively by `mainChart` while the same mode is active.
     ///
@@ -904,6 +1036,20 @@ struct RootHomeView: View {
             resetMainChartToNow()
         } else {
             refreshChartRangeFromStoredSettings()
+        }
+    }
+
+    /// Rotation and Stage Manager resizing can change Clock Mode presentation without toggling the
+    /// lock itself, so the temporary range follows the live iPad geometry.
+    private func applyClockModeRange(for size: CGSize) {
+        guard size.width > 0, size.height > 0 else { return }
+
+        let range: RootHomeChartRange = UIDevice.current.userInterfaceIdiom == .pad && size.width > size.height
+            ? .fiveHours
+            : .threeHours
+
+        if selectedRange != range {
+            selectedRange = range
         }
     }
 

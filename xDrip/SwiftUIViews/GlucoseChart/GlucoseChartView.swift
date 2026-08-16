@@ -69,6 +69,7 @@ struct GlucoseChartView: View {
     let liveActivityType: LiveActivityType
     let hoursToShow: Double
     let glucoseCircleDiameter: Double
+    let showsTreatments: Bool
     let chartHeight: Double
     let chartWidth: Double
     let showHighContrast: Bool
@@ -108,11 +109,12 @@ struct GlucoseChartView: View {
     ///   - liveActivityType: Live activity size variant. Defaults to `.normal` when nil.
     ///   - hoursToShowScalingHours: Overrides the chart type's default visible duration.
     ///   - glucoseCircleDiameterScalingHours: Optional baseline used to scale glucose/treatment symbol sizes for wider or narrower ranges.
+    ///   - showsTreatments: Whether treatment and basal marks should be rendered.
     ///   - overrideChartHeight: Optional explicit chart height.
     ///   - overrideChartWidth: Optional explicit chart width.
     ///   - highContrast: Optional high-contrast override for StandBy charts.
     ///   - chartState: Full SwiftUI chart state containing the visible range and all renderable chart series.
-    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, additionalBgReadingDataSets: [GlucoseChartDataSet]? = nil, backgroundBands: [GlucoseChartBackgroundBand]? = nil, agpBackgroundPoints: [GlucoseChartAGPPoint]? = nil, agpBackgroundOpacityMultiplier: Double? = nil, explicitVisibleEndDate: Date? = nil, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, overrideChartHeight: Double?, overrideChartWidth: Double?, highContrast: Bool?, chartState: GlucoseChartState? = nil) {
+    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, additionalBgReadingDataSets: [GlucoseChartDataSet]? = nil, backgroundBands: [GlucoseChartBackgroundBand]? = nil, agpBackgroundPoints: [GlucoseChartAGPPoint]? = nil, agpBackgroundOpacityMultiplier: Double? = nil, explicitVisibleEndDate: Date? = nil, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, showsTreatments: Bool = true, overrideChartHeight: Double?, overrideChartWidth: Double?, highContrast: Bool?, chartState: GlucoseChartState? = nil) {
 
         self.chartType = glucoseChartType
         self.isMgDl = isMgDl
@@ -124,6 +126,7 @@ struct GlucoseChartView: View {
         self.showHighContrast = highContrast ?? false
         self.overrideChartHeightWasPassed = overrideChartHeight != nil
         self.explicitVisibleEndDate = explicitVisibleEndDate
+        self.showsTreatments = showsTreatments
         // clamp the multiplier so callers can only reduce or keep the normal AGP opacity
         self.agpBackgroundOpacityMultiplier = min(max(agpBackgroundOpacityMultiplier ?? 1, 0), 1)
 
@@ -533,13 +536,18 @@ struct GlucoseChartView: View {
 
     var body: some View {
         let additionalValues = additionalBgReadingDataSets.flatMap { $0.bgReadingValues }
-        let visibleTreatmentPoints = chartState?.treatmentPoints.filter(from: visibleStartDate, to: visibleEndDate) ?? GlucoseChartTreatmentPoints()
+        let visibleTreatmentPoints = showsTreatments
+            ? chartState?.treatmentPoints.filter(from: visibleStartDate, to: visibleEndDate) ?? GlucoseChartTreatmentPoints()
+            : GlucoseChartTreatmentPoints()
         let visibleCalibrationPoints = chartState?.calibrationPoints.filter { $0.date >= visibleStartDate && $0.date <= visibleEndDate } ?? []
         let treatmentValues = visibleCalibrationPoints.map { $0.value } + visibleTreatmentPoints.allRenderableValues
         let allBgValues = bgReadingValues + additionalValues + treatmentValues
-        let showsBasalDomain = (chartState?.minimumChartValueInMgDl ?? ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl) < ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl
+        let effectiveMinimumChartValue = showsTreatments
+            ? chartState?.minimumChartValueInMgDl ?? ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl
+            : ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl
+        let showsBasalDomain = effectiveMinimumChartValue < ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl
         let lowerDomainPadding = showsBasalDomain ? ConstantsGlucoseChartSwiftUI.yAxisBasalDomainPaddingInMgDl : ConstantsGlucoseChartSwiftUI.yAxisDomainPaddingInMgDl
-        let minimumDomainValue = min((allBgValues.min() ?? 40), urgentLowLimitInMgDl, chartState?.minimumChartValueInMgDl ?? urgentLowLimitInMgDl)
+        let minimumDomainValue = min((allBgValues.min() ?? 40), urgentLowLimitInMgDl, effectiveMinimumChartValue)
         let maximumRenderableValue = max((allBgValues.max() ?? urgentHighLimitInMgDl), urgentHighLimitInMgDl)
         let calculatedYAxisContextMarks = mainChartYAxisContextMarks(maximumRenderableValue: maximumRenderableValue)
         let calculatedYAxisContextValues = calculatedYAxisContextMarks.labeledValues + calculatedYAxisContextMarks.gridOnlyValues

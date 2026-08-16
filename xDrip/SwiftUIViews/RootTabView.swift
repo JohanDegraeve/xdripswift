@@ -362,6 +362,7 @@ struct RootTabView: View {
                 if let dependencies = stateModel.dependencies {
                     RootScreenLockOverlay(
                         stateModel: dependencies.rootHomeStateModel,
+                        allowsTapToUnlock: !(isLandscape && UIDevice.current.userInterfaceIdiom != .pad),
                         unlock: dependencies.cancelScreenLock
                     )
                 }
@@ -840,9 +841,11 @@ private struct RootHomeTabView: View {
 /// Covers the complete tab hierarchy while Clock Mode is active and owns tap-to-unlock.
 ///
 /// Keeping the overlay mounted when visual dimming is disabled gives the transparent presentation
-/// exactly the same touch-to-unlock behavior as the visibly dimmed presentations.
+/// exactly the same touch handling as the visibly dimmed presentations. iPhone landscape absorbs
+/// touches without unlocking; rotating back to portrait restores the established tap-to-unlock.
 private struct RootScreenLockOverlay: View {
     @ObservedObject var stateModel: RootHomeStateModel
+    let allowsTapToUnlock: Bool
     let unlock: () -> Void
 
     var body: some View {
@@ -855,7 +858,11 @@ private struct RootScreenLockOverlay: View {
                 .opacity(dimmingType == .disabled ? 0 : 1)
                 .ignoresSafeArea()
                 .contentShape(Rectangle())
-                .onTapGesture(perform: unlock)
+                .onTapGesture {
+                    guard allowsTapToUnlock else { return }
+
+                    unlock()
+                }
         }
     }
 }
@@ -899,7 +906,7 @@ private struct RootHomeLandscapeView: View {
                 .transition(.move(edge: .top).combined(with: .opacity))
             }
 
-            if rootHomeStateModel.state.isScreenLocked {
+            if rootHomeStateModel.state.usesScreenLockNightLayout {
                 RootHomeLandscapeValueView(stateModel: rootHomeStateModel)
             } else {
                 RootHomeLandscapeChartView(
@@ -933,7 +940,7 @@ private struct RootHomeLandscapeValueView: View {
     @ObservedObject var stateModel: RootHomeStateModel
 
     var body: some View {
-        LandscapeValueView(glucoseState: stateModel.state.glucose)
+        LandscapeValueView(state: stateModel.state)
     }
 }
 
