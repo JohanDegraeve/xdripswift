@@ -339,7 +339,7 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
                 trace("sending foreground watch update", log: log, category: ConstantsLog.categoryWatchManager, type: .debug)
                 session.sendMessage(userInfo, replyHandler: nil, errorHandler: { [weak self] error in
                     guard let self = self else { return }
-                    trace("error sending watch update, error = %{public}@", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
+                    trace("error sending watch update, error = %{public}@", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, troubleshooting: .detailed(.integration(name: .watch, activity: .failed)), error.localizedDescription)
                 })
             } else {
                 if (lastForcedComplicationUpdateTimeStamp < .now.addingTimeInterval(-Double(UserDefaults.standard.forceComplicationUpdateInMinutes * 60)) && session.isComplicationEnabled) || forceComplicationUpdate {
@@ -384,7 +384,7 @@ extension WatchManager: WCSessionDelegate {
         completeSessionActivationRequest()
 
         if let error {
-            trace("watch session activation failed, error = %{public}@", log: log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
+            trace("watch session activation failed, error = %{public}@", log: log, category: ConstantsLog.categoryWatchManager, type: .error, troubleshooting: .detailed(.integration(name: .watch, activity: .failed)), error.localizedDescription)
             return
         }
 

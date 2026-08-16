@@ -347,6 +347,7 @@ extension LiveActivityManager {
             persistentContentState = updatedContentState
             
             await eventActivity?.update(ActivityContent(state: updatedContentState, staleDate: nil))
+            trace("in updateActivity, live activity updated", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .debug, troubleshooting: .detailed(.integration(name: .liveActivity, activity: .succeeded(itemCount: nil))))
         }
     }
     

@@ -263,7 +263,7 @@ class CalendarManager: NSObject {
         // check that there is a calendar (should be)
         guard let calendar = getCalendar() else {
             UserDefaults.standard.calendarShareStatus = CalendarShareStatus.notConfigured.rawValue
-            trace("in createCalendarEvent, there's no calendar", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
+            trace("in createCalendarEvent, there's no calendar", log: log, category: ConstantsLog.categoryCalendarManager, type: .info, troubleshooting: .detailed(.integration(name: .calendar, activity: .failed)))
             return
         }
         

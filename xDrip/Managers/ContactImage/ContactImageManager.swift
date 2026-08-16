@@ -97,7 +97,7 @@ class ContactImageManager: NSObject {
                         if granted {
                             self.updateContact() // try again now that we have permission
                         } else {
-                            trace("in updateContact, user denied contacts access (requestAccess)", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error)
+                            trace("in updateContact, user denied contacts access (requestAccess)", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, troubleshooting: .detailed(.integration(name: .contactImage, activity: .permissionDenied)))
                             if UserDefaults.standard.enableContactImage {
                                 UserDefaults.standard.enableContactImage = false
                             }
@@ -110,7 +110,7 @@ class ContactImageManager: NSObject {
             guard status == .authorized else {
                 // if it isn't, and the user has enabled the feature, then disable it
                 if UserDefaults.standard.enableContactImage {
-                    trace("in updateContact, access to contacts is not authorized so setting enableContactImage to false", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
+                    trace("in updateContact, access to contacts is not authorized so setting enableContactImage to false", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, troubleshooting: .detailed(.integration(name: .contactImage, activity: .permissionDenied)))
                     UserDefaults.standard.enableContactImage = false
                 }
                 return
@@ -144,7 +144,7 @@ class ContactImageManager: NSObject {
             }
 
             guard let contactImageData = MainActor.assumeIsolated({ contactImageView.pngData() }) else {
-                trace("in updateContact, failed to render contact image data", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error)
+                trace("in updateContact, failed to render contact image data", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, troubleshooting: .detailed(.integration(name: .contactImage, activity: .failed)))
                 return
             }
             
@@ -250,6 +250,7 @@ class ContactImageManager: NSObject {
         // now execute the saveRequest - to delete the existing contact
         do {
             try self.contactStore.execute(saveRequest)
+            trace("in executeSaveRequest, contact image updated", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .debug, troubleshooting: .detailed(.integration(name: .contactImage, activity: .succeeded(itemCount: nil))))
         } catch let error as NSError {
             var details: String?
             
@@ -267,9 +268,9 @@ class ContactImageManager: NSObject {
                     details = "Code \(error.code)"
                 }
             }
-            trace("in executeSaveRequest, failed to update/add/delete the contact - %{public}@: %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, details ?? "no details", error.localizedDescription)
+            trace("in executeSaveRequest, failed to update/add/delete the contact - %{public}@: %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, troubleshooting: .detailed(.integration(name: .contactImage, activity: .failed)), details ?? "no details", error.localizedDescription)
         } catch {
-            trace("in executeSaveRequest, failed to update/add/delete the contact: %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, error.localizedDescription)
+            trace("in executeSaveRequest, failed to update/add/delete the contact: %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, troubleshooting: .detailed(.integration(name: .contactImage, activity: .failed)), error.localizedDescription)
         }
     }
 }

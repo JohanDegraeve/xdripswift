@@ -86,12 +86,15 @@ public class HealthKitManager: NSObject {
         let authorizationStatus = healthStore.authorizationStatus(for: bloodGlucoseType)
         switch authorizationStatus {
         case .notDetermined, .sharingDenied:
+            if UserDefaults.standard.storeReadingsInHealthkit {
+                trace("HealthKit sharing is not authorized", log: log, category: ConstantsLog.categoryHealthKitManager, type: .info, troubleshooting: .detailed(.integration(name: .healthKit, activity: .permissionDenied)))
+            }
             UserDefaults.standard.storeReadingsInHealthkitAuthorized = false
             return false
         case .sharingAuthorized:
             break
         @unknown default:
-            trace("unknown authorizationstatus for healthkit - HealthKitManager.swift", log: log, category: ConstantsLog.categoryHealthKitManager, type: .error)
+            trace("unknown authorizationstatus for healthkit - HealthKitManager.swift", log: log, category: ConstantsLog.categoryHealthKitManager, type: .error, troubleshooting: .detailed(.integration(name: .healthKit, activity: .failed)))
             UserDefaults.standard.storeReadingsInHealthkitAuthorized = false
             return false
         }

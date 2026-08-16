@@ -617,7 +617,7 @@ final class TroubleshootingLogTests: XCTestCase {
         XCTAssertEqual(entries[0].timestamp, recordedTime)
     }
 
-    func testRoutineIntegrationSuccessIsStoredOnlyAsRecoveryAfterFailure() {
+    func testIntegrationKeepsHourlySuccessAndImmediateFailureRecovery() {
         let fixture = makeStore()
         defer { removeFixture(fixture.directory) }
 
@@ -640,11 +640,35 @@ final class TroubleshootingLogTests: XCTestCase {
 
         XCTAssertEqual(fixture.store.snapshot().map(\.kind), [
             .integration(name: .healthKit, activity: .recovered),
-            .integration(name: .healthKit, activity: .failed)
+            .integration(name: .healthKit, activity: .failed),
+            .integration(name: .healthKit, activity: .succeeded(itemCount: 1))
         ])
     }
 
-    func testAppleWatchTransferOutcomesAreNeverRetained() {
+    func testRoutineIntegrationSuccessIsLimitedToOnePerHour() {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+
+        fixture.store.record(.detailed(
+            .integration(name: .calendar, activity: .succeeded(itemCount: 1)),
+            timestamp: referenceDate
+        ))
+        fixture.store.record(.detailed(
+            .integration(name: .calendar, activity: .succeeded(itemCount: 2)),
+            timestamp: referenceDate.addingTimeInterval(30 * 60)
+        ))
+        fixture.store.record(.detailed(
+            .integration(name: .calendar, activity: .succeeded(itemCount: 3)),
+            timestamp: referenceDate.addingTimeInterval(60 * 60)
+        ))
+
+        XCTAssertEqual(fixture.store.snapshot().map(\.kind), [
+            .integration(name: .calendar, activity: .succeeded(itemCount: 3)),
+            .integration(name: .calendar, activity: .succeeded(itemCount: 1))
+        ])
+    }
+
+    func testAppleWatchFailureIsRetainedWithoutRoutineSuccessNoise() {
         let fixture = makeStore()
         defer { removeFixture(fixture.directory) }
 
@@ -652,12 +676,39 @@ final class TroubleshootingLogTests: XCTestCase {
             .integration(name: .watch, activity: .failed),
             timestamp: referenceDate
         ))
+
+        XCTAssertEqual(fixture.store.snapshot().map(\.kind), [
+            .integration(name: .watch, activity: .failed)
+        ])
+    }
+
+    func testAppleHealthPermissionMessageExplainsEnabledState() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+
         fixture.store.record(.detailed(
-            .integration(name: .watch, activity: .succeeded(itemCount: 1)),
-            timestamp: referenceDate.addingTimeInterval(1)
+            .integration(name: .healthKit, activity: .permissionDenied),
+            timestamp: referenceDate
         ))
 
-        XCTAssertTrue(fixture.store.snapshot().isEmpty)
+        let entry = try XCTUnwrap(fixture.store.snapshot().first)
+        XCTAssertEqual(
+            makeReport(entries: [entry]).message(for: entry),
+            "Apple Health is enabled, but permission has not been granted."
+        )
+    }
+
+    func testContactImageSuccessHasCustomerFacingMessage() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+
+        fixture.store.record(.detailed(
+            .integration(name: .contactImage, activity: .succeeded(itemCount: nil)),
+            timestamp: referenceDate
+        ))
+
+        let entry = try XCTUnwrap(fixture.store.snapshot().first)
+        XCTAssertEqual(makeReport(entries: [entry]).message(for: entry), "Contact Image updated successfully.")
     }
 
     func testReadingUsesRecordingTimeForOrderAndShowsMeasurementTimeInMessage() throws {

@@ -598,6 +598,7 @@ enum TroubleshootingIntegration: String, Codable {
     case watch
     case liveActivity
     case calendar
+    case contactImage
     case osAid
 
     var name: String {
@@ -609,6 +610,7 @@ enum TroubleshootingIntegration: String, Codable {
         case .watch: return "Apple Watch"
         case .liveActivity: return "Live Activity"
         case .calendar: return "Calendar sharing"
+        case .contactImage: return "Contact Image"
         case .osAid: return "OS-AID sharing"
         }
     }
@@ -957,6 +959,7 @@ final class TroubleshootingLogStore {
         var followerHealth = [TroubleshootingLogSource: OperationalHealthState]()
         var authenticationState = [TroubleshootingLogSource: AuthenticationState]()
         var integrationHealth = [TroubleshootingIntegration: OperationalHealthState]()
+        var lastIntegrationSuccessAt = [TroubleshootingIntegration: Date]()
         var bluetoothHealth = OperationalHealthState.healthy
         var pendingCGMConnection: TroubleshootingLogSource?
         var lastAppActivity: TroubleshootingAppActivity?
@@ -1198,11 +1201,6 @@ final class TroubleshootingLogStore {
                 }
 
             case let .integration(name, activity):
-                // Watch transfer callbacks are routine delivery mechanics, not useful evidence about
-                // glucose acquisition or app health. Ignore both newly offered and already persisted
-                // rows so transient Watch failures/recoveries cannot dominate the Activity Log.
-                guard name != .watch else { continue }
-
                 if name == .nightscoutBackfill {
                     // A gap check normally starts and finds nothing. Persisting both bookends on every
                     // launch hides the lifecycle and glucose facts the report is meant to explain.
@@ -1262,13 +1260,25 @@ final class TroubleshootingLogStore {
                 case .started, .noData:
                     continue
                 case .succeeded:
-                    guard integrationHealth[name] == .problem else { continue }
-                    result.append(entry.replacingKind(.integration(name: name, activity: .recovered)))
+                    if integrationHealth[name] == .problem {
+                        result.append(entry.replacingKind(.integration(name: name, activity: .recovered)))
+                    } else {
+                        // Healthy customer-facing integrations can update every reading. Retain one
+                        // success per hour as evidence that background work is alive, while failures
+                        // and recoveries below remain immediate and unthrottled.
+                        if let lastSuccess = lastIntegrationSuccessAt[name],
+                           entry.timestamp.timeIntervalSince(lastSuccess) < Self.hourlyDiagnosticInterval {
+                            continue
+                        }
+                        result.append(entry)
+                    }
                     integrationHealth[name] = .healthy
+                    lastIntegrationSuccessAt[name] = entry.timestamp
                 case .recovered:
                     guard integrationHealth[name] == .problem else { continue }
                     result.append(entry)
                     integrationHealth[name] = .healthy
+                    lastIntegrationSuccessAt[name] = entry.timestamp
                 case .failed, .permissionDenied:
                     guard integrationHealth[name] != .problem else { continue }
                     result.append(entry)
@@ -1732,7 +1742,11 @@ struct TroubleshootingLogReportBuilder {
                 return "\(name.name) updated successfully."
             case .failed: return "\(name.name) could not complete its update."
             case .noData: return "\(name.name) had no new information to update."
-            case .permissionDenied: return "\(name.name) does not have the required permission."
+            case .permissionDenied:
+                if name == .healthKit {
+                    return "Apple Health is enabled, but permission has not been granted."
+                }
+                return "\(name.name) does not have the required permission."
             case .restarted: return "\(name.name) restarted."
             case .ended: return "\(name.name) ended."
             case .recovered: return "\(name.name) recovered and is updating again."

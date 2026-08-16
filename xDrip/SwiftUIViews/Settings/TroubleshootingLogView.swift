@@ -274,6 +274,7 @@ struct TroubleshootingLogView: View {
             case .healthKit: return "heart.text.square.fill"
             case .liveActivity: return "iphone"
             case .calendar: return "calendar"
+            case .contactImage: return "person.crop.circle"
             case .osAid: return "arrow.left.arrow.right"
             case .watch: return "applewatch"
             }
