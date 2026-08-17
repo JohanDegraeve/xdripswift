@@ -171,6 +171,12 @@ struct RootHomeView: View {
         .onReceive(NotificationCenter.default.publisher(for: .nightscoutFollowerGapFillDidMergeHistory)) { _ in
             historicalDataCache.reset()
             prepareHistoricalDataIfNeeded(at: endDate)
+
+            // Normal live-data invalidation reloads only the recent chart-cache tail. Gap fill can
+            // insert readings or treatments anywhere in its 72-hour audit window, so discard both
+            // chart caches once after a successful merge to make every recovered point visible.
+            requestChartState(forceReset: true, showsLoading: false)
+            requestMiniChartState(forceReset: true)
         }
         // Home state already reads the current CareLink snapshot during refresh. Ignore each
         // subscription's replay so rebuilding this view cannot start a publish and rebuild loop.
