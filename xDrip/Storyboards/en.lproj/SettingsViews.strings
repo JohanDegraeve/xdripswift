@@ -9,7 +9,7 @@
 "settingsviews_activityLogSectionTitle" = "Activity Log";
 "settingsviews_viewActivityLog" = "Activity Log";
 "settingsviews_issueReportSectionFooter" = "Do not send an Issue Report unless requested by an xDrip4iOS developer or your report will be automatically deleted.";
-"settingsviews_troubleshootingLogSectionFooter" = "View and share a plain-English record of the previous 12 hours. This log includes glucose values but excludes account details and device identifiers.";
+"settingsviews_troubleshootingLogSectionFooter" = "View and share a plain-English record of the previous 24 hours. This log includes glucose values but excludes account details.";
 "settingsviews_appBannerVersion" = "Version %@";
 "settingsviews_appInstalledSince" = "Installed";
 "settingsviews_valueIsRequired" = "⚠️ Required";

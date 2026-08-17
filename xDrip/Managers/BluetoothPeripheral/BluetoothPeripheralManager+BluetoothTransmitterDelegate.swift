@@ -211,7 +211,16 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             
             if bluetoothPeripheral.blePeripheral.address == deviceAddressNewTransmitter {
                 
-                trace("in didConnect, transmitter address already known. Treating as existing device, continuing setup (no disconnect)", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
+                let namedDevice = TroubleshootingBluetoothDeviceName(deviceNameNewTransmitter)
+                trace(
+                    "in didConnect, transmitter address already known. Treating as existing device, continuing setup (no disconnect)",
+                    log: log,
+                    category: ConstantsLog.categoryBluetoothPeripheralManager,
+                    type: .info,
+                    troubleshooting: namedDevice.map {
+                        .standard(.bluetoothDevice(name: $0, activity: .reconnectedToExisting))
+                    }
+                )
 
                 // This is an already known BluetoothTransmitter. Do not disconnect, avoid creating a duplicate entry.
                 // Clear the temporary scanning transmitter so we do not go through the "new device" creation path below.
@@ -257,7 +266,16 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             
         }
         
-        trace("in didconnect to, created a new bluetoothperipheral", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
+        let namedDevice = TroubleshootingBluetoothDeviceName(deviceNameNewTransmitter)
+        trace(
+            "in didconnect to, created a new bluetoothperipheral",
+            log: log,
+            category: ConstantsLog.categoryBluetoothPeripheralManager,
+            type: .info,
+            troubleshooting: namedDevice.map {
+                .standard(.bluetoothDevice(name: $0, activity: .added))
+            }
+        )
         
         // add new bluetoothPeripheral and bluetoothTransmitter to array of bluetoothPeripherals and bluetoothTransmitters
         bluetoothTransmitters.insert(bluetoothTransmitter, at: insertInBluetoothPeripherals(bluetoothPeripheral: newBluetoothPeripheral))

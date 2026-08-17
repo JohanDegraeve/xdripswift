@@ -7,7 +7,7 @@
 "settingsviews_troubleshootingTitle" = "Fejlfinding";
 "settingsviews_activityLogSectionTitle" = "Aktivitetslog";
 "settingsviews_viewActivityLog" = "Aktivitetslog";
-"settingsviews_troubleshootingLogSectionFooter" = "Se og del en letforståelig engelsksproget log over de seneste 12 timer. Loggen indeholder glukoseværdier, men ikke kontooplysninger eller enheds-id'er.";
+"settingsviews_troubleshootingLogSectionFooter" = "Se og del en letforståelig engelsksproget log over de seneste 24 timer. Loggen indeholder glukoseværdier, men ikke kontooplysninger.";
 "settingsviews_appBannerVersion" = "Version %@";
 "settingsviews_appInstalledSince" = "Installeret";
 "settingsviews_showOnlineHelp" = "Open Online Help";

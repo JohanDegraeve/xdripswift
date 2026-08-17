@@ -7,7 +7,7 @@
 "settingsviews_troubleshootingTitle" = "Устранение неполадок";
 "settingsviews_activityLogSectionTitle" = "Журнал активности";
 "settingsviews_viewActivityLog" = "Журнал активности";
-"settingsviews_troubleshootingLogSectionFooter" = "Просмотрите и поделитесь простым журналом на английском языке за последние 12 часов. Он содержит значения глюкозы, но не данные учётной записи или идентификаторы устройств.";
+"settingsviews_troubleshootingLogSectionFooter" = "Просмотрите и поделитесь простым журналом на английском языке за последние 24 часа. Он содержит значения глюкозы, но не данные учётной записи.";
 "settingsviews_appBannerVersion" = "Версия %@";
 "settingsviews_appInstalledSince" = "Установлено";
 "settingsviews_showOnlineHelp" = "Открыть онлайн документацию";

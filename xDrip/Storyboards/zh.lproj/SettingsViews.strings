@@ -7,7 +7,7 @@
 "settingsviews_troubleshootingTitle" = "故障排除";
 "settingsviews_activityLogSectionTitle" = "活动日志";
 "settingsviews_viewActivityLog" = "活动日志";
-"settingsviews_troubleshootingLogSectionFooter" = "查看并分享过去 12 小时的简明英文记录。该日志包含血糖值，但不包含账户详情或设备标识符。";
+"settingsviews_troubleshootingLogSectionFooter" = "查看并分享过去 24 小时的简明英文记录。该日志包含血糖值，但不包含账户详情。";
 "settingsviews_appBannerVersion" = "版本 %@";
 "settingsviews_appInstalledSince" = "安装于";
 "settingsviews_sectiontitleNotifications" = "常规";

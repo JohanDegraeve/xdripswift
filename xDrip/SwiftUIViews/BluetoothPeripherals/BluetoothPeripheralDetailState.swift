@@ -684,6 +684,18 @@ private extension BluetoothPeripheralDetailState {
                         troubleshooting: .standard(.cgm(source: source, activity: .connectionRequested)),
                         source.name
                     )
+                } else if let namedDevice = TroubleshootingBluetoothDeviceName(bluetoothPeripheral.blePeripheral.name) {
+                    trace(
+                        "user requested a connection to Bluetooth device %{public}@",
+                        log: log,
+                        category: ConstantsLog.categoryBluetoothPeripheralViewController,
+                        type: .info,
+                        troubleshooting: .standard(.bluetoothDevice(
+                            name: namedDevice,
+                            activity: .connectionRequested
+                        )),
+                        namedDevice.value
+                    )
                 }
 
                 if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: true) {
@@ -745,28 +757,30 @@ private extension BluetoothPeripheralDetailState {
                 message: Texts_BluetoothPeripheralView.confirmDisconnectMessage,
                 primaryButtonTitle: Texts_BluetoothPeripheralView.disconnect,
                 primaryAction: { [weak self] in
-                    self?.disconnect(bluetoothPeripheral: bluetoothPeripheral)
+                    self?.disconnect(bluetoothPeripheral: bluetoothPeripheral, userInitiated: true)
                 },
                 secondaryButtonTitle: Texts_Common.Cancel
             )
         } else {
-            disconnect(bluetoothPeripheral: bluetoothPeripheral)
+            disconnect(bluetoothPeripheral: bluetoothPeripheral, userInitiated: false)
         }
     }
 
-    func disconnect(bluetoothPeripheral: BluetoothPeripheral) {
+    func disconnect(bluetoothPeripheral: BluetoothPeripheral, userInitiated: Bool) {
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else { return }
         let troubleshootingSource = TroubleshootingLogSource(
             bluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType(),
             transmitterID: bluetoothPeripheral.blePeripheral.transmitterId
         )
+        let namedDevice = TroubleshootingBluetoothDeviceName(bluetoothPeripheral.blePeripheral.name)
 
         bluetoothPeripheral.blePeripheral.shouldconnect = false
         coreDataManager.saveChanges()
 
-        // Log only after the user's persisted `shouldconnect` choice has been saved. A routine BLE
-        // disconnect between readings never reaches this UI action and therefore never creates this row.
-        if let troubleshootingSource {
+        // Log only after the user's persisted `shouldconnect` choice has been saved, and only when
+        // the user confirmed Disconnect. NFC/authentication failure cleanup also reaches this helper
+        // but must not be presented as something the user did.
+        if userInitiated, let troubleshootingSource {
             trace(
                 "user disconnected %{public}@",
                 log: log,
@@ -774,6 +788,15 @@ private extension BluetoothPeripheralDetailState {
                 type: .info,
                 troubleshooting: .standard(.cgm(source: troubleshootingSource, activity: .disconnected)),
                 troubleshootingSource.name
+            )
+        } else if userInitiated, let namedDevice {
+            trace(
+                "user disconnected Bluetooth device %{public}@",
+                log: log,
+                category: ConstantsLog.categoryBluetoothPeripheralViewController,
+                type: .info,
+                troubleshooting: .standard(.bluetoothDevice(name: namedDevice, activity: .disconnected)),
+                namedDevice.value
             )
         }
 
@@ -792,6 +815,7 @@ private extension BluetoothPeripheralDetailState {
             bluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType(),
             transmitterID: bluetoothPeripheral.blePeripheral.transmitterId
         )
+        let namedDevice = TroubleshootingBluetoothDeviceName(bluetoothPeripheral.blePeripheral.name)
 
         if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false), bluetoothTransmitter is CGMTransmitter {
             UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
@@ -800,9 +824,9 @@ private extension BluetoothPeripheralDetailState {
 
         bluetoothPeripheralManager.deleteBluetoothPeripheral(bluetoothPeripheral: bluetoothPeripheral)
 
-        // Deleting a configured CGM is a distinct user action from merely disconnecting it. Persist
-        // only the controlled CGM family; the device name, alias, address and transmitter ID remain
-        // available solely in the developer trace files.
+        // Deleting a configured CGM is a distinct user action from merely disconnecting it. CGMs use
+        // the controlled family name; other supported devices use the bounded display name requested
+        // for the user-facing log. Addresses, aliases, and transmitter IDs remain developer-only.
         if let troubleshootingSource {
             trace(
                 "user removed %{public}@",
@@ -811,6 +835,15 @@ private extension BluetoothPeripheralDetailState {
                 type: .info,
                 troubleshooting: .standard(.cgm(source: troubleshootingSource, activity: .removed)),
                 troubleshootingSource.name
+            )
+        } else if let namedDevice {
+            trace(
+                "user removed Bluetooth device %{public}@",
+                log: log,
+                category: ConstantsLog.categoryBluetoothPeripheralViewController,
+                type: .info,
+                troubleshooting: .standard(.bluetoothDevice(name: namedDevice, activity: .removed)),
+                namedDevice.value
             )
         }
         self.bluetoothPeripheral = nil

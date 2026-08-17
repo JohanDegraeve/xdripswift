@@ -150,6 +150,138 @@ final class TroubleshootingLogTests: XCTestCase {
         ])
     }
 
+    func testNamedBluetoothDiscoveryMilestonesAreRetainedWithoutRoutineConnectionChurn() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+
+        let addedName = try XCTUnwrap(TroubleshootingBluetoothDeviceName("  L3-HeartBeat\nDevice  "))
+        let existingName = try XCTUnwrap(TroubleshootingBluetoothDeviceName("DXCM12"))
+
+        fixture.store.record(.standard(
+            .bluetoothDevice(name: addedName, activity: .added),
+            timestamp: referenceDate
+        ))
+        fixture.store.record(.standard(
+            .bluetoothDevice(name: addedName, activity: .connected),
+            timestamp: referenceDate.addingTimeInterval(1)
+        ))
+        fixture.store.record(.detailed(
+            .bluetooth(.disconnected),
+            timestamp: referenceDate.addingTimeInterval(2)
+        ))
+        fixture.store.record(.standard(
+            .bluetoothDevice(name: existingName, activity: .reconnectedToExisting),
+            timestamp: referenceDate.addingTimeInterval(3)
+        ))
+
+        let entries = fixture.store.snapshot()
+        let report = makeReport(entries: entries)
+
+        XCTAssertEqual(entries.map(report.message(for:)), [
+            "Reconnected to existing Bluetooth device: DXCM12.",
+            "Added new Bluetooth device: L3-HeartBeat Device."
+        ])
+    }
+
+    func testNamedBluetoothRecoveryIsKeptOnlyAfterFailure() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+
+        let heartbeatName = try XCTUnwrap(TroubleshootingBluetoothDeviceName("L3-HeartBeat"))
+
+        fixture.store.record(.standard(
+            .bluetoothDevice(name: heartbeatName, activity: .connected),
+            timestamp: referenceDate
+        ))
+        fixture.store.record(.standard(
+            .bluetooth(.connectionFailed),
+            timestamp: referenceDate.addingTimeInterval(1)
+        ))
+        fixture.store.record(.standard(
+            .bluetoothDevice(name: heartbeatName, activity: .connected),
+            timestamp: referenceDate.addingTimeInterval(2)
+        ))
+        fixture.store.record(.standard(
+            .bluetoothDevice(name: heartbeatName, activity: .connected),
+            timestamp: referenceDate.addingTimeInterval(3)
+        ))
+
+        let entries = fixture.store.snapshot()
+        let report = makeReport(entries: entries)
+
+        XCTAssertEqual(entries.map(report.message(for:)), [
+            "Reconnected to existing Bluetooth device: L3-HeartBeat.",
+            "Bluetooth could not connect and will try again."
+        ])
+    }
+
+    func testNamedBluetoothUserLifecycleActionsAreRetainedWithOneConnectionOutcome() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+
+        let heartbeatName = try XCTUnwrap(TroubleshootingBluetoothDeviceName("L3-HeartBeat"))
+
+        fixture.store.record(.standard(
+            .bluetoothDevice(name: heartbeatName, activity: .connectionRequested),
+            timestamp: referenceDate
+        ))
+        fixture.store.record(.standard(
+            .bluetoothDevice(name: heartbeatName, activity: .connected),
+            timestamp: referenceDate.addingTimeInterval(1)
+        ))
+        // The next healthy radio cycle is automatic and must not create another row.
+        fixture.store.record(.standard(
+            .bluetoothDevice(name: heartbeatName, activity: .connected),
+            timestamp: referenceDate.addingTimeInterval(2)
+        ))
+        fixture.store.record(.standard(
+            .bluetoothDevice(name: heartbeatName, activity: .disconnected),
+            timestamp: referenceDate.addingTimeInterval(3)
+        ))
+        fixture.store.record(.standard(
+            .bluetoothDevice(name: heartbeatName, activity: .removed),
+            timestamp: referenceDate.addingTimeInterval(4)
+        ))
+
+        let entries = fixture.store.snapshot()
+        let report = makeReport(entries: entries)
+
+        XCTAssertEqual(entries.map(report.message(for:)), [
+            "Removed Bluetooth device: L3-HeartBeat.",
+            "Disconnected Bluetooth device: L3-HeartBeat.",
+            "Bluetooth connected to device: L3-HeartBeat.",
+            "Connection requested for Bluetooth device: L3-HeartBeat."
+        ])
+    }
+
+    func testNamedConnectionOutcomeMustMatchTheUserRequestedDevice() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+
+        let requestedName = try XCTUnwrap(TroubleshootingBluetoothDeviceName("L3-HeartBeat"))
+        let unrelatedName = try XCTUnwrap(TroubleshootingBluetoothDeviceName("M5Stack"))
+
+        fixture.store.record(.standard(
+            .bluetoothDevice(name: requestedName, activity: .connectionRequested),
+            timestamp: referenceDate
+        ))
+        fixture.store.record(.standard(
+            .bluetoothDevice(name: unrelatedName, activity: .connected),
+            timestamp: referenceDate.addingTimeInterval(1)
+        ))
+
+        XCTAssertEqual(fixture.store.snapshot().map(\.kind), [
+            .bluetoothDevice(name: requestedName, activity: .connectionRequested)
+        ])
+    }
+
+    func testBluetoothDeviceNameIsBoundedForSharedReports() throws {
+        let name = try XCTUnwrap(TroubleshootingBluetoothDeviceName(String(repeating: "A", count: 100)))
+
+        XCTAssertEqual(name.value.count, TroubleshootingBluetoothDeviceName.maximumLength)
+        XCTAssertNil(TroubleshootingBluetoothDeviceName(" \n\t "))
+    }
+
     func testManualSensorStartAndTransmitterAcknowledgementProduceOneStartRow() {
         let fixture = makeStore()
         defer { removeFixture(fixture.directory) }

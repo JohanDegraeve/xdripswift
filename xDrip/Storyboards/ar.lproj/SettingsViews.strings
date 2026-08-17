@@ -7,7 +7,7 @@
 "settingsviews_troubleshootingTitle" = "استكشاف الأخطاء وإصلاحها";
 "settingsviews_activityLogSectionTitle" = "سجل النشاط";
 "settingsviews_viewActivityLog" = "سجل النشاط";
-"settingsviews_troubleshootingLogSectionFooter" = "اعرض وشارك سجلاً مبسطاً باللغة الإنجليزية للساعات الـ 12 الماضية. يتضمن هذا السجل قيم الجلوكوز، لكنه يستبعد تفاصيل الحساب ومعرّفات الأجهزة.";
+"settingsviews_troubleshootingLogSectionFooter" = "اعرض وشارك سجلاً مبسطاً باللغة الإنجليزية للساعات الـ 24 الماضية. يتضمن هذا السجل قيم الجلوكوز، لكنه يستبعد تفاصيل الحساب.";
 "settingsviews_appBannerVersion" = "الإصدار %@";
 "settingsviews_appInstalledSince" = "تم التثبيت";
 "settingsviews_sectiontitleNotifications" = "عام";

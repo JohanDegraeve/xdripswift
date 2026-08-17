@@ -7,7 +7,7 @@
 "settingsviews_troubleshootingTitle" = "Vianmääritys";
 "settingsviews_activityLogSectionTitle" = "Toimintaloki";
 "settingsviews_viewActivityLog" = "Toimintaloki";
-"settingsviews_troubleshootingLogSectionFooter" = "Näytä ja jaa selkokielinen englanninkielinen loki viimeisiltä 12 tunnilta. Loki sisältää glukoosiarvot, mutta ei tilitietoja tai laitetunnisteita.";
+"settingsviews_troubleshootingLogSectionFooter" = "Näytä ja jaa selkokielinen englanninkielinen loki viimeisiltä 24 tunnilta. Loki sisältää glukoosiarvot, mutta ei tilitietoja.";
 "settingsviews_appBannerVersion" = "Versio %@";
 "settingsviews_appInstalledSince" = "Asennettu";
 "settingsviews_sectiontitleNotifications" = "Yleinen";

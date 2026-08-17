@@ -199,6 +199,42 @@ enum TroubleshootingBluetoothActivity: String, Codable {
     case pairingFailed
 }
 
+/// A user-initiated Bluetooth discovery outcome for one named device.
+///
+/// Unlike routine connection-state events, these milestones are emitted only when an Add scan
+/// either persists a genuinely new peripheral or resolves to a peripheral already stored by the
+/// app. The Bluetooth name is intentionally included because it is the only useful way for a user
+/// to confirm which device was selected. Normalize it before persistence so a peripheral cannot
+/// inject line breaks into a copied/shared report or create an unbounded troubleshooting record.
+struct TroubleshootingBluetoothDeviceName: Codable, Equatable {
+    static let maximumLength = 80
+
+    let value: String
+
+    init?(_ rawValue: String?) {
+        guard let rawValue else { return nil }
+
+        let singleLine = rawValue
+            .components(separatedBy: .whitespacesAndNewlines)
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+        let bounded = String(singleLine.prefix(Self.maximumLength))
+
+        guard !bounded.isEmpty else { return nil }
+        value = bounded
+    }
+}
+
+enum TroubleshootingBluetoothDeviceActivity: String, Codable {
+    case added
+    /// Internal healthy connection candidate. The store discards it unless it proves recovery.
+    case connected
+    case connectionRequested
+    case disconnected
+    case removed
+    case reconnectedToExisting
+}
+
 /// High-level actions and outcomes for the configured direct CGM.
 ///
 /// These cases intentionally describe only things the user asked the app to do, plus the single
@@ -629,14 +665,16 @@ enum TroubleshootingIntegrationActivity: Codable, Equatable {
 
 /// A deliberately small, typed description of information that is safe to show to an end user.
 ///
-/// This type does not accept raw trace text or arbitrary strings. That is the privacy boundary
-/// between the developer trace, which may contain identifiers and server responses, and the
-/// consumer report, which may be pasted into a public support conversation.
+/// This type does not accept raw trace text or unbounded strings. The one deliberate device-name
+/// payload is normalized and length-limited above. That typed boundary keeps developer messages,
+/// hardware addresses and server responses out of reports that may be shared publicly.
 enum TroubleshootingLogKind: Codable, Equatable {
     /// App lifecycle only; no scene, window or process diagnostics are retained.
     case app(TroubleshootingAppActivity)
     /// Bluetooth state without a peripheral name or identifier.
     case bluetooth(TroubleshootingBluetoothActivity)
+    /// A successful user-initiated Add scan, including the bounded Bluetooth advertising name.
+    case bluetoothDevice(name: TroubleshootingBluetoothDeviceName, activity: TroubleshootingBluetoothDeviceActivity)
     /// Follower activity with only a predefined source and optional reading count.
     case follower(source: TroubleshootingLogSource, activity: TroubleshootingFollowerActivity)
     /// An explicit direct-CGM action and its decisive outcome, without hardware identifiers.
@@ -961,6 +999,7 @@ final class TroubleshootingLogStore {
         var integrationHealth = [TroubleshootingIntegration: OperationalHealthState]()
         var lastIntegrationSuccessAt = [TroubleshootingIntegration: Date]()
         var bluetoothHealth = OperationalHealthState.healthy
+        var pendingBluetoothConnectionName: TroubleshootingBluetoothDeviceName?
         var pendingCGMConnection: TroubleshootingLogSource?
         var lastAppActivity: TroubleshootingAppActivity?
         var lastSensorActivity: TroubleshootingSensorActivity?
@@ -1021,6 +1060,39 @@ final class TroubleshootingLogStore {
                     // Every candidate that reaches the store is therefore a real prompt or outcome
                     // the user may have acted on, and must remain independently visible.
                     result.append(entry)
+                }
+
+            case let .bluetoothDevice(name, activity):
+                switch activity {
+                case .added, .reconnectedToExisting:
+                    // These are discrete outcomes of an explicit Add scan.
+                    result.append(entry)
+                case .connectionRequested:
+                    // A saved non-CGM device was explicitly enabled by the user. Retain the action
+                    // and let the next matching healthy connection provide its decisive outcome.
+                    result.append(entry)
+                    pendingBluetoothConnectionName = name
+                case .connected:
+                    // Every ordinary connection cycle may offer this named candidate. Retain it
+                    // only when it completes the user's matching Connect action or proves recovery
+                    // from a visible failure; all healthy heartbeat cycles remain suppressed.
+                    if pendingBluetoothConnectionName == name {
+                        result.append(entry)
+                        pendingBluetoothConnectionName = nil
+                        bluetoothHealth = .healthy
+                    } else if bluetoothHealth == .problem {
+                        result.append(entry.replacingKind(.bluetoothDevice(
+                            name: name,
+                            activity: .reconnectedToExisting
+                        )))
+                        bluetoothHealth = .healthy
+                    }
+                case .disconnected, .removed:
+                    // These candidates exist only at confirmed user-action boundaries in the UI.
+                    result.append(entry)
+                    if pendingBluetoothConnectionName == name {
+                        pendingBluetoothConnectionName = nil
+                    }
                 }
 
             case let .cgm(source, activity):
@@ -1605,6 +1677,16 @@ struct TroubleshootingLogReportBuilder {
             case .pairingRequested: return "The CGM transmitter requested Bluetooth pairing."
             case .pairingSucceeded: return "The CGM transmitter paired successfully."
             case .pairingFailed: return "The CGM transmitter did not complete Bluetooth pairing."
+            }
+
+        case let .bluetoothDevice(name, activity):
+            switch activity {
+            case .added: return "Added new Bluetooth device: \(name.value)."
+            case .connected: return "Bluetooth connected to device: \(name.value)."
+            case .connectionRequested: return "Connection requested for Bluetooth device: \(name.value)."
+            case .disconnected: return "Disconnected Bluetooth device: \(name.value)."
+            case .removed: return "Removed Bluetooth device: \(name.value)."
+            case .reconnectedToExisting: return "Reconnected to existing Bluetooth device: \(name.value)."
             }
 
         case let .cgm(source, activity):

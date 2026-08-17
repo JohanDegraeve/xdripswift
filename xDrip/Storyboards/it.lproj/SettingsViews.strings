@@ -52,7 +52,7 @@
 "settingsviews_troubleshootingTitle" = "Risoluzione dei problemi";
 "settingsviews_activityLogSectionTitle" = "Registro attività";
 "settingsviews_viewActivityLog" = "Registro attività";
-"settingsviews_troubleshootingLogSectionFooter" = "Visualizza e condividi un registro in inglese semplice delle ultime 12 ore. Include i valori glicemici, ma non i dati dell’account o gli identificativi dei dispositivi.";
+"settingsviews_troubleshootingLogSectionFooter" = "Visualizza e condividi un registro in inglese semplice delle ultime 24 ore. Include i valori glicemici, ma non i dati dell’account.";
 "settingsviews_appBannerVersion" = "Versione %@";
 "settingsviews_appInstalledSince" = "Installato";
 

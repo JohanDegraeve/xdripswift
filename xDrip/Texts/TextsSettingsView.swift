@@ -65,7 +65,7 @@ class Texts_SettingsView {
     }()
 
     static let troubleshootingLogSectionFooter: String = {
-        NSLocalizedString("settingsviews_troubleshootingLogSectionFooter", tableName: filename, bundle: Bundle.main, value: "View and share a plain-English record of the previous 12 hours. This log includes glucose values but excludes account details and device identifiers.", comment: "settings footer describing the consumer troubleshooting log")
+        NSLocalizedString("settingsviews_troubleshootingLogSectionFooter", tableName: filename, bundle: Bundle.main, value: "View and share a plain-English record of the previous 24 hours. This log includes glucose values but excludes account details.", comment: "settings footer describing the consumer troubleshooting log")
     }()
 
     static func appBannerVersion(_ version: String) -> String {

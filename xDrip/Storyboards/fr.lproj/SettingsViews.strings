@@ -7,7 +7,7 @@
 "settingsviews_troubleshootingTitle" = "Dépannage";
 "settingsviews_activityLogSectionTitle" = "Journal d’activité";
 "settingsviews_viewActivityLog" = "Journal d’activité";
-"settingsviews_troubleshootingLogSectionFooter" = "Consultez et partagez un journal en anglais simple couvrant les 12 dernières heures. Il contient les valeurs de glycémie, mais exclut les détails du compte et les identifiants d’appareil.";
+"settingsviews_troubleshootingLogSectionFooter" = "Consultez et partagez un journal en anglais simple couvrant les 24 dernières heures. Il contient les valeurs de glycémie, mais exclut les détails du compte.";
 "settingsviews_appBannerVersion" = "Version %@";
 "settingsviews_appInstalledSince" = "Installé";
 "settingsviews_sectiontitleNotifications" = "Géneral";

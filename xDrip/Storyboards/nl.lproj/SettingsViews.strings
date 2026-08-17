@@ -11,7 +11,7 @@
 "settingsviews_troubleshootingTitle" = "Probleemoplossing";
 "settingsviews_activityLogSectionTitle" = "Activiteitenlog";
 "settingsviews_viewActivityLog" = "Activiteitenlog";
-"settingsviews_troubleshootingLogSectionFooter" = "Bekijk en deel een eenvoudig Engelstalig logboek van de afgelopen 12 uur. Het bevat glucosewaarden, maar geen accountgegevens of apparaat-ID's.";
+"settingsviews_troubleshootingLogSectionFooter" = "Bekijk en deel een eenvoudig Engelstalig logboek van de afgelopen 24 uur. Het bevat glucosewaarden, maar geen accountgegevens.";
 "settingsviews_appBannerVersion" = "Versie %@";
 "settingsviews_appInstalledSince" = "Geïnstalleerd";
 "settingsviews_sectiontitleNotifications" = "Algemeen";

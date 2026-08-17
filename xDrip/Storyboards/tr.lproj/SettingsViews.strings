@@ -7,7 +7,7 @@
 "settingsviews_troubleshootingTitle" = "Sorun Giderme";
 "settingsviews_activityLogSectionTitle" = "Etkinlik Günlüğü";
 "settingsviews_viewActivityLog" = "Etkinlik Günlüğü";
-"settingsviews_troubleshootingLogSectionFooter" = "Son 12 saatin sade İngilizce kaydını görüntüleyin ve paylaşın. Bu kayıt glikoz değerlerini içerir ancak hesap bilgilerini ve cihaz tanımlayıcılarını içermez.";
+"settingsviews_troubleshootingLogSectionFooter" = "Son 24 saatin sade İngilizce kaydını görüntüleyin ve paylaşın. Bu kayıt glikoz değerlerini içerir ancak hesap bilgilerini içermez.";
 "settingsviews_appBannerVersion" = "Sürüm %@";
 "settingsviews_appInstalledSince" = "Yüklendi";
 "settingsviews_showOnlineHelp" = "Çevrimiçi Yardım'ı aç";

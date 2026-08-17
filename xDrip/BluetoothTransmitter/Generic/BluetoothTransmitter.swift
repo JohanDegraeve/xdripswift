@@ -700,6 +700,10 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                     detailedDescription: cgmTransmitter.cgmTransmitterType().detailedDescription()
                 )
                 troubleshooting = .standard(.cgm(source: source, activity: .connected))
+            } else if let namedDevice = TroubleshootingBluetoothDeviceName(deviceName) {
+                // Offer the Bluetooth name on every generic connection so the centralized store can
+                // attach it to a real recovery. Healthy heartbeat cycles are discarded there.
+                troubleshooting = .standard(.bluetoothDevice(name: namedDevice, activity: .connected))
             } else {
                 troubleshooting = .standard(.bluetooth(.connected))
             }

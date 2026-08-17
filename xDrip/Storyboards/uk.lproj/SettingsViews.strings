@@ -249,7 +249,7 @@
 "settingsviews_troubleshootingTitle" = "Усунення несправностей";
 "settingsviews_activityLogSectionTitle" = "Журнал активності";
 "settingsviews_viewActivityLog" = "Журнал активності";
-"settingsviews_troubleshootingLogSectionFooter" = "Перегляньте та поділіться простим журналом англійською мовою за останні 12 годин. Він містить значення глюкози, але не дані облікового запису чи ідентифікатори пристроїв.";
+"settingsviews_troubleshootingLogSectionFooter" = "Перегляньте та поділіться простим журналом англійською мовою за останні 24 години. Він містить значення глюкози, але не дані облікового запису.";
 "settingsviews_appBannerVersion" = "Версія %@";
 "settingsviews_appInstalledSince" = "Встановлено";
 

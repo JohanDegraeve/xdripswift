@@ -241,6 +241,7 @@ struct TroubleshootingLogView: View {
                  .pairingRequested, .pairingSucceeded:
                 return "antenna.radiowaves.left.and.right"
             }
+        case .bluetoothDevice: return "antenna.radiowaves.left.and.right"
         case .cgm: return "sensor.tag.radiowaves.forward.fill"
         case let .follower(_, activity):
             switch activity {

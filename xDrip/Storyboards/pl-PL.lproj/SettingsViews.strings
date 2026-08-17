@@ -52,7 +52,7 @@
 "settingsviews_troubleshootingTitle" = "Rozwiązywanie problemów";
 "settingsviews_activityLogSectionTitle" = "Dziennik aktywności";
 "settingsviews_viewActivityLog" = "Dziennik aktywności";
-"settingsviews_troubleshootingLogSectionFooter" = "Wyświetl i udostępnij prosty dziennik w języku angielskim z ostatnich 12 godzin. Zawiera wartości glukozy, ale nie dane konta ani identyfikatory urządzeń.";
+"settingsviews_troubleshootingLogSectionFooter" = "Wyświetl i udostępnij prosty dziennik w języku angielskim z ostatnich 24 godzin. Zawiera wartości glukozy, ale nie dane konta.";
 "settingsviews_appBannerVersion" = "Wersja %@";
 "settingsviews_appInstalledSince" = "Zainstalowano";
 

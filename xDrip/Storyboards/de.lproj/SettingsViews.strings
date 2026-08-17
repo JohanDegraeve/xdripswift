@@ -58,7 +58,7 @@
 "settingsviews_troubleshootingTitle" = "Fehlerbehebung";
 "settingsviews_activityLogSectionTitle" = "Aktivitätsprotokoll";
 "settingsviews_viewActivityLog" = "Aktivitätsprotokoll";
-"settingsviews_troubleshootingLogSectionFooter" = "Zeige und teile ein leicht verständliches englisches Protokoll der letzten 12 Stunden. Es enthält Glukosewerte, aber keine Kontodaten oder Gerätekennungen.";
+"settingsviews_troubleshootingLogSectionFooter" = "Zeige und teile ein leicht verständliches englisches Protokoll der letzten 24 Stunden. Es enthält Glukosewerte, aber keine Kontodaten.";
 "settingsviews_appBannerVersion" = "Version %@";
 "settingsviews_appInstalledSince" = "Installiert";
 

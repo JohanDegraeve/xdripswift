@@ -7,7 +7,7 @@
 "settingsviews_troubleshootingTitle" = "Resolução de problemas";
 "settingsviews_activityLogSectionTitle" = "Registo de atividade";
 "settingsviews_viewActivityLog" = "Registo de atividade";
-"settingsviews_troubleshootingLogSectionFooter" = "Consulte e partilhe um registo em inglês simples das últimas 12 horas. Inclui valores de glicose, mas exclui dados da conta e identificadores de dispositivos.";
+"settingsviews_troubleshootingLogSectionFooter" = "Consulte e partilhe um registo em inglês simples das últimas 24 horas. Inclui valores de glicose, mas exclui dados da conta.";
 "settingsviews_appBannerVersion" = "Versão %@";
 "settingsviews_appInstalledSince" = "Instalado";
 "settingsviews_showOnlineHelp" = "Abrir Ajuda Online";

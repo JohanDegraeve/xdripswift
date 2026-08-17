@@ -52,7 +52,7 @@
 "settingsviews_troubleshootingTitle" = "Odpravljanje težav";
 "settingsviews_activityLogSectionTitle" = "Dnevnik dejavnosti";
 "settingsviews_viewActivityLog" = "Dnevnik dejavnosti";
-"settingsviews_troubleshootingLogSectionFooter" = "Oglejte si in delite preprost dnevnik v angleščini za zadnjih 12 ur. Vključuje vrednosti glukoze, ne pa podatkov o računu ali identifikatorjev naprav.";
+"settingsviews_troubleshootingLogSectionFooter" = "Oglejte si in delite preprost dnevnik v angleščini za zadnjih 24 ur. Vključuje vrednosti glukoze, ne pa podatkov o računu.";
 "settingsviews_appBannerVersion" = "Različica %@";
 "settingsviews_appInstalledSince" = "Nameščeno";
 
