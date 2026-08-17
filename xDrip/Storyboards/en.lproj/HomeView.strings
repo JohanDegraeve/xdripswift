@@ -193,3 +193,5 @@
 "sensorHealthTestSensorFailure" = "Test Sensor Failure in 5 Seconds";
 "sensorHealthTestTransmitterFailure" = "Test Transmitter Failure in 5 Seconds";
 "noSensorCodeSelectedMessage" = "Starting a Dexcom G6 sensor with 0000 means no sensor code will be sent to the transmitter.\n\nThe Dexcom transmitter will require calibrations for this sensor session: two calibrations after warm-up, another 12 hours later, another 12 hours after that, then once every 24 hours until the sensor ends.\n\nThese calibration requests come from the Dexcom transmitter/no-code workflow. They are not caused by the %@ calibration reminder setting, and disabling that reminder will not stop required transmitter calibrations.";
+"connectingToCGM" = "Connecting to CGM...";
+"reconnectingToCGM" = "Reconnecting to CGM...";

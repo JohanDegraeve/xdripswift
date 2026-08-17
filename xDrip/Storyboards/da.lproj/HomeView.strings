@@ -121,3 +121,5 @@
 "sensorHealthSensorFailedGuidance" = "Sensorfejl rapporteret. Udskift sensoren.";
 "sensorHealthTransmitterFailedTitle" = "Senderfejl";
 "sensorHealthTransmitterFailedGuidance" = "Senderfejl rapporteret. Kontrollér eller udskift senderen.";
+"connectingToCGM" = "Forbinder til CGM...";
+"reconnectingToCGM" = "Genopretter forbindelse til CGM...";

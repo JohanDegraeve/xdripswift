@@ -121,3 +121,5 @@
 "sensorHealthSensorFailedGuidance" = "Αναφέρθηκε αποτυχία αισθητήρα. Αντικαταστήστε τον αισθητήρα.";
 "sensorHealthTransmitterFailedTitle" = "Αποτυχία πομπού";
 "sensorHealthTransmitterFailedGuidance" = "Αναφέρθηκε αποτυχία πομπού. Ελέγξτε ή αντικαταστήστε τον.";
+"connectingToCGM" = "Σύνδεση με το CGM...";
+"reconnectingToCGM" = "Επανασύνδεση με το CGM...";

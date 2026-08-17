@@ -26,10 +26,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
             guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
             
             // don't try to reconnect after disconnecting
-            m5Stack.blePeripheral.shouldconnect = false
-            
-            // store in core data
-            coreDataManager.saveChanges()
+            setConnectionEnabled(false, for: m5Stack)
             
             // disconnect
             disconnect(fromBluetoothPeripheral: m5Stack)
@@ -46,10 +43,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
         guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
         
         // don't try to reconnect after disconnecting
-        m5Stack.blePeripheral.shouldconnect = false
-        
-        // store in core data
-        coreDataManager.saveChanges()
+        setConnectionEnabled(false, for: m5Stack)
         
         // disconnect
         disconnect(fromBluetoothPeripheral: m5Stack)
@@ -80,8 +74,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
         guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
         
         // should not try to reconnect, wait till user decide to push the "always connect button"
-        m5Stack.blePeripheral.shouldconnect = false
-        coreDataManager.saveChanges()
+        setConnectionEnabled(false, for: m5Stack)
         
         // disconnect
         disconnect(fromBluetoothPeripheral: m5Stack)

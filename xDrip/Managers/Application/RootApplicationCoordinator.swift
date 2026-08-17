@@ -914,7 +914,9 @@ import AppIntents
             self.calendarFollowManager?.download()
             // In heartbeat mode this tick owns CareLink cadence instead of its internal timer.
             self.careLinkFollowManager?.download()
-        }, cgmTransmitterInfoChanged: cgmTransmitterInfoChanged)
+        }, cgmTransmitterInfoChanged: cgmTransmitterInfoChanged, connectionPresentationChanged: { [weak self] in
+            self?.publishRootHomeState()
+        })
         
         // to initialize UserDefaults.standard.transmitterTypeAsString
         cgmTransmitterInfoChanged()

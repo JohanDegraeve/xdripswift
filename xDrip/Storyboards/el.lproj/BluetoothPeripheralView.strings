@@ -102,3 +102,9 @@
 "readSuccess" = "Επιτυχία ανάγνωσης";
 /// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
 "readSuccessNow" = "Τώρα";
+"scanningForTransmitter" = "Αναζήτηση πομπού...";
+"connecting" = "Σύνδεση";
+"connectingToTransmitter" = "Connecting...";
+"reconnecting" = "Επανασύνδεση";
+"reconnectingToTransmitter" = "Επανασύνδεση με τον πομπό...";
+"waiting" = "Αναμονή...";

@@ -226,6 +226,16 @@ final class RootHomeStateModel: ObservableObject {
             ? careLinkSnapshot.pump.homeDeviceStatus(metadata: careLinkSnapshot.metadata, checkedAt: careLinkSnapshot.lastCheckAt)
             : nightscoutSyncManager?.deviceStatus as? NightscoutDeviceStatus
         let cgmTransmitter = bluetoothPeripheralManager?.getCGMTransmitter()
+        let cgmConnectionStatus: BluetoothPeripheralDisplayStatus?
+        if let cgmTransmitter = cgmTransmitter as? BluetoothTransmitter,
+           let cgmPeripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: cgmTransmitter) {
+            cgmConnectionStatus = BluetoothPeripheralDisplayStatus(
+                bluetoothTransmitter: cgmTransmitter,
+                bluetoothPeripheral: cgmPeripheral
+            )
+        } else {
+            cgmConnectionStatus = nil
+        }
 
         var newState = state
         newState.glucose = glucoseState(from: latestReadings)
@@ -235,7 +245,12 @@ final class RootHomeStateModel: ObservableObject {
             : loopState(deviceStatus: deviceStatus)
         newState.sensor = sensorState(activeSensor: activeSensor, cgmTransmitter: cgmTransmitter)
         newState.sensorNoise = sensorNoiseState(activeSensor: activeSensor)
-        newState.dataSource = dataSourceState(sensorState: newState.sensor, activeSensor: activeSensor, cgmTransmitter: cgmTransmitter)
+        newState.dataSource = dataSourceState(
+            sensorState: newState.sensor,
+            activeSensor: activeSensor,
+            cgmTransmitter: cgmTransmitter,
+            connectionStatus: cgmConnectionStatus
+        )
         newState.visibility = visibilityState(sensorState: newState.sensor, usesScreenLockNightLayout: usesScreenLockNightLayout)
         newState.controls = controlsState(alertManager: alertManager, bgPostProcessingManager: bgPostProcessingManager)
         newState.isScreenLocked = isScreenLocked
@@ -639,7 +654,12 @@ final class RootHomeStateModel: ObservableObject {
         )
     }
 
-    private func dataSourceState(sensorState: RootHomeSensorState, activeSensor: Sensor?, cgmTransmitter: CGMTransmitter?) -> RootHomeDataSourceState {
+    private func dataSourceState(
+        sensorState: RootHomeSensorState,
+        activeSensor: Sensor?,
+        cgmTransmitter: CGMTransmitter?,
+        connectionStatus: BluetoothPeripheralDisplayStatus?
+    ) -> RootHomeDataSourceState {
         let isMaster = UserDefaults.standard.isMaster
         var title = sensorState.title
         var detail = sensorState.maxAge
@@ -651,11 +671,17 @@ final class RootHomeStateModel: ObservableObject {
         if isMaster, sensorState.title.isEmpty {
             if cgmTransmitter?.cgmTransmitterType().sensorType() == .Libre, activeSensor?.startDate != nil {
                 title = " ⚠️  " + Texts_HomeView.reconnectLibreDataSource
-            } else if let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter,
-                      bluetoothTransmitter.getConnectionStatus() != .connected {
-                title = " ⏳  " + Texts_HomeView.waitingForCGMConnection
             } else if cgmTransmitter != nil {
-                title = " ⏳  " + Texts_HomeView.waitingForDataSource
+                switch connectionStatus {
+                case .some(.connected):
+                    title = " ⏳  " + Texts_HomeView.waitingForDataSource
+                case .some(.waitingForNextReading):
+                    title = " ⏳  " + Texts_BluetoothPeripheralView.waiting
+                case .some(.reconnecting):
+                    title = " ⏳  " + Texts_HomeView.reconnectingToCGM
+                case .some(.discovering), .some(.connecting), .some(.notScanning), .none:
+                    title = " ⏳  " + Texts_HomeView.connectingToCGM
+                }
             } else {
                 title = " ⚠️  " + Texts_HomeView.noDataSourceConnected
             }

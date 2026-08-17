@@ -158,3 +158,5 @@
 "sensorHealthSensorFailedGuidance" = "Falha do sensor comunicada. Substitua o sensor.";
 "sensorHealthTransmitterFailedTitle" = "Falha do transmissor";
 "sensorHealthTransmitterFailedGuidance" = "Falha do transmissor comunicada. Verifique-o ou substitua-o.";
+"connectingToCGM" = "A ligar ao CGM...";
+"reconnectingToCGM" = "A restabelecer ligação ao CGM...";

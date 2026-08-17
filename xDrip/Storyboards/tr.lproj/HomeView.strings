@@ -121,3 +121,5 @@
 "sensorHealthSensorFailedGuidance" = "Sensör arızası bildirildi. Sensörü değiştirin.";
 "sensorHealthTransmitterFailedTitle" = "Verici Arızası";
 "sensorHealthTransmitterFailedGuidance" = "Verici arızası bildirildi. Kontrol edin veya değiştirin.";
+"connectingToCGM" = "CGM'ye bağlanıyor...";
+"reconnectingToCGM" = "CGM'ye yeniden bağlanıyor...";

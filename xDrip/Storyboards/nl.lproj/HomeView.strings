@@ -160,3 +160,5 @@
 "sensorHealthSensorFailedGuidance" = "Sensorfout gemeld. Vervang de sensor.";
 "sensorHealthTransmitterFailedTitle" = "Zender defect";
 "sensorHealthTransmitterFailedGuidance" = "Zenderfout gemeld. Controleer of vervang de zender.";
+"connectingToCGM" = "Verbinden met CGM...";
+"reconnectingToCGM" = "Opnieuw verbinden met CGM...";

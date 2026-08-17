@@ -241,3 +241,5 @@
 "sensorHealthSensorFailedGuidance" = "Guasto del sensore segnalato. Sostituisci il sensore.";
 "sensorHealthTransmitterFailedTitle" = "Guasto del trasmettitore";
 "sensorHealthTransmitterFailedGuidance" = "Guasto del trasmettitore segnalato. Controllalo o sostituiscilo.";
+"connectingToCGM" = "Connessione al CGM...";
+"reconnectingToCGM" = "Riconnessione al CGM...";

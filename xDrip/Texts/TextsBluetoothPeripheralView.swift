@@ -131,6 +131,30 @@ class Texts_BluetoothPeripheralView {
     static let scanning: String = {
         return NSLocalizedString("scanning", tableName: filename, bundle: Bundle.main, value: "Scanning", comment: "text in status row, if scanning ongoing")
     }()
+
+    static let scanningForTransmitter: String = {
+        return NSLocalizedString("scanningForTransmitter", tableName: filename, bundle: Bundle.main, value: "Scanning for transmitter...", comment: "full status while discovering a new unknown Bluetooth transmitter")
+    }()
+
+    static let connecting: String = {
+        return NSLocalizedString("connecting", tableName: filename, bundle: Bundle.main, value: "Connecting", comment: "compact status before the first successful Bluetooth connection after activation")
+    }()
+
+    static let connectingToTransmitter: String = {
+        return NSLocalizedString("connectingToTransmitter", tableName: filename, bundle: Bundle.main, value: "Connecting...", comment: "full status before the first successful Bluetooth connection after activation")
+    }()
+
+    static let reconnecting: String = {
+        return NSLocalizedString("reconnecting", tableName: filename, bundle: Bundle.main, value: "Reconnecting", comment: "compact warning status for an unexpectedly disconnected continuously connected device")
+    }()
+
+    static let reconnectingToTransmitter: String = {
+        return NSLocalizedString("reconnectingToTransmitter", tableName: filename, bundle: Bundle.main, value: "Reconnecting to transmitter...", comment: "full warning status for an unexpectedly disconnected continuously connected device")
+    }()
+
+    static let waiting: String = {
+        return NSLocalizedString("waiting", tableName: filename, bundle: Bundle.main, value: "Waiting...", comment: "healthy status for an intermittent Dexcom device between normal Bluetooth advertisements; used in both full and compact presentations")
+    }()
     
     static let disconnect: String = {
         return NSLocalizedString("disconnect", tableName: filename, bundle: Bundle.main, value: "Disconnect", comment: "button text, to disconnect")

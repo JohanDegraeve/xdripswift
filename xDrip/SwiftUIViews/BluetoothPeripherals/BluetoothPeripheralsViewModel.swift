@@ -122,7 +122,7 @@ struct BluetoothPeripheralsRoute: Hashable {
                                     for: bluetoothPeripheral,
                                     createANewOneIfNecesssary: false
                                 ),
-                                isScanningForNewPeripheral: bluetoothPeripheral.blePeripheral.shouldconnect
+                                bluetoothPeripheral: bluetoothPeripheral
                             )
                         )
                     )
@@ -322,7 +322,9 @@ struct BluetoothPeripheralListRow: Identifiable {
         switch connectionStatus {
         case .connected:
             return true
-        case .scanning, .notScanning:
+        case .discovering, .connecting, .reconnecting, .waitingForNextReading:
+            return shouldConnect
+        case .notScanning:
             return false
         }
     }
@@ -343,21 +345,59 @@ struct BluetoothPeripheralListRow: Identifiable {
 
 }
 
-enum BluetoothPeripheralDisplayStatus {
+enum BluetoothPeripheralDisplayStatus: Equatable {
     case notScanning
-    case scanning
+    case discovering
+    case connecting
+    case reconnecting
+    case waitingForNextReading
     case connected
 
-    init(bluetoothTransmitter: BluetoothTransmitter?, isScanningForNewPeripheral: Bool = false) {
-        if bluetoothTransmitter?.getConnectionStatus() == .connected {
+    init(
+        bluetoothTransmitter: BluetoothTransmitter?,
+        bluetoothPeripheral: BluetoothPeripheral?,
+        isDiscoveringNewPeripheral: Bool = false
+    ) {
+        self.init(
+            isConnected: bluetoothTransmitter?.getConnectionStatus() == .connected,
+            isEnabled: bluetoothPeripheral?.blePeripheral.shouldconnect == true,
+            hasConnectedSinceActivation: bluetoothPeripheral?.blePeripheral.hasConnectedSinceActivation == true,
+            usesIntermittentConnection: bluetoothPeripheral?.bluetoothPeripheralType().usesIntermittentConnection == true,
+            isDiscoveringNewPeripheral: isDiscoveringNewPeripheral
+        )
+    }
+
+    /// Pure resolver used by every UI surface and by the state-matrix tests.
+    init(
+        isConnected: Bool,
+        isEnabled: Bool,
+        hasConnectedSinceActivation: Bool,
+        usesIntermittentConnection: Bool,
+        isDiscoveringNewPeripheral: Bool = false
+    ) {
+        if isConnected {
             self = .connected
-        } else if bluetoothTransmitter?.getConnectionStatus() == .connecting ||
-                    bluetoothTransmitter?.isScanning() == true ||
-                    isScanningForNewPeripheral {
-            self = .scanning
-        } else {
-            self = .notScanning
+            return
         }
+
+        if isDiscoveringNewPeripheral {
+            self = .discovering
+            return
+        }
+
+        guard isEnabled else {
+            self = .notScanning
+            return
+        }
+
+        guard hasConnectedSinceActivation else {
+            self = .connecting
+            return
+        }
+
+        self = usesIntermittentConnection
+            ? .waitingForNextReading
+            : .reconnecting
     }
 
     // Active rows are handled by BluetoothPeripheralListRow. This only orders
@@ -366,10 +406,55 @@ enum BluetoothPeripheralDisplayStatus {
         switch self {
         case .connected:
             return 1
-        case .scanning:
+        case .waitingForNextReading:
             return 2
-        case .notScanning:
+        case .discovering, .connecting, .reconnecting:
             return 3
+        case .notScanning:
+            return 4
+        }
+    }
+
+    var fullStatusText: String {
+        switch self {
+        case .notScanning:
+            return Texts_BluetoothPeripheralView.notTryingToConnect
+        case .discovering:
+            return Texts_BluetoothPeripheralView.scanningForTransmitter
+        case .connecting:
+            return Texts_BluetoothPeripheralView.connectingToTransmitter
+        case .reconnecting:
+            return Texts_BluetoothPeripheralView.reconnectingToTransmitter
+        case .waitingForNextReading:
+            return Texts_BluetoothPeripheralView.waiting
+        case .connected:
+            return Texts_BluetoothPeripheralView.connected
+        }
+    }
+
+    var compactStatusText: String {
+        switch self {
+        case .notScanning:
+            return Texts_BluetoothPeripheralView.notTryingToConnect
+        case .discovering:
+            return Texts_BluetoothPeripheralView.scanning
+        case .connecting:
+            return Texts_BluetoothPeripheralView.connecting
+        case .reconnecting:
+            return Texts_BluetoothPeripheralView.reconnecting
+        case .waitingForNextReading:
+            return Texts_BluetoothPeripheralView.waiting
+        case .connected:
+            return Texts_BluetoothPeripheralView.connected
+        }
+    }
+
+    var showsElapsedTime: Bool {
+        switch self {
+        case .discovering, .connecting, .reconnecting, .waitingForNextReading:
+            return true
+        case .notScanning, .connected:
+            return false
         }
     }
 }

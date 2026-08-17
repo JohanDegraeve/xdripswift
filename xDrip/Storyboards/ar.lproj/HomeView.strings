@@ -123,3 +123,5 @@
 "sensorHealthSensorFailedGuidance" = "تم الإبلاغ عن فشل المستشعر. استبدل المستشعر.";
 "sensorHealthTransmitterFailedTitle" = "فشل جهاز الإرسال";
 "sensorHealthTransmitterFailedGuidance" = "تم الإبلاغ عن فشل جهاز الإرسال. تحقّق منه أو استبدله.";
+"connectingToCGM" = "جارٍ الاتصال بجهاز CGM...";
+"reconnectingToCGM" = "جارٍ إعادة الاتصال بجهاز CGM...";

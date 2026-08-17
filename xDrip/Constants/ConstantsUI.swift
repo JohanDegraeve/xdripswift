@@ -15,6 +15,7 @@ enum ConstantsUI {
 
     /// Background color for active rows in SwiftUI grouped lists.
     static let activeRowBackgroundColor = Color.green.opacity(0.24)
+    static let connectingRowBackgroundColor = Color.yellow.opacity(0.20)
 
     /// Insets for the Bluetooth peripheral status banner row.
     static let bluetoothPeripheralStatusBannerRowInsets = EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16)

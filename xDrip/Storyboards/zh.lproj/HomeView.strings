@@ -174,3 +174,5 @@
 "sensorHealthSensorFailedGuidance" = "已报告传感器失效。请更换传感器。";
 "sensorHealthTransmitterFailedTitle" = "发射器故障";
 "sensorHealthTransmitterFailedGuidance" = "已报告发射器故障。请检查或更换。";
+"connectingToCGM" = "正在连接 CGM...";
+"reconnectingToCGM" = "正在重新连接 CGM...";

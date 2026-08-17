@@ -429,7 +429,9 @@ private extension BluetoothPeripheralDisplayStatus {
         switch self {
         case .notScanning:
             return Color(.colorTertiary)
-        case .scanning, .connected:
+        case .discovering, .connecting, .reconnecting:
+            return Color(.systemYellow)
+        case .waitingForNextReading, .connected:
             return .green
         }
     }
@@ -438,7 +440,7 @@ private extension BluetoothPeripheralDisplayStatus {
         switch self {
         case .notScanning:
             return false
-        case .scanning, .connected:
+        case .discovering, .connecting, .reconnecting, .waitingForNextReading, .connected:
             return true
         }
     }
@@ -447,7 +449,9 @@ private extension BluetoothPeripheralDisplayStatus {
         switch self {
         case .notScanning:
             return Color(.secondarySystemGroupedBackground)
-        case .scanning, .connected:
+        case .discovering, .connecting, .reconnecting:
+            return ConstantsUI.connectingRowBackgroundColor
+        case .waitingForNextReading, .connected:
             return ConstantsUI.activeRowBackgroundColor
         }
     }
@@ -456,20 +460,13 @@ private extension BluetoothPeripheralDisplayStatus {
         switch self {
         case .notScanning:
             return "antenna.radiowaves.left.and.right.slash"
-        case .scanning, .connected:
+        case .discovering, .connecting, .reconnecting, .waitingForNextReading, .connected:
             return "antenna.radiowaves.left.and.right"
         }
     }
 
     var statusText: String {
-        switch self {
-        case .notScanning:
-            return Texts_BluetoothPeripheralView.notTryingToConnect
-        case .scanning:
-            return Texts_BluetoothPeripheralView.tryingToConnect
-        case .connected:
-            return Texts_BluetoothPeripheralView.connected
-        }
+        compactStatusText
     }
 }
 

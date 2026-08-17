@@ -753,6 +753,14 @@ enum Texts_HomeView {
     static let waitingForCGMConnection: String = {
         return NSLocalizedString("waitingForCGMConnection", tableName: filename, bundle: Bundle.main, value: "Waiting for CGM connection...", comment: "waiting for the selected CGM transmitter to connect")
     }()
+
+    static let connectingToCGM: String = {
+        return NSLocalizedString("connectingToCGM", tableName: filename, bundle: Bundle.main, value: "Connecting to CGM...", comment: "first Bluetooth connection to the selected CGM after the user activates it")
+    }()
+
+    static let reconnectingToCGM: String = {
+        return NSLocalizedString("reconnectingToCGM", tableName: filename, bundle: Bundle.main, value: "Reconnecting to CGM...", comment: "an enabled continuously connected CGM unexpectedly lost its Bluetooth connection")
+    }()
     
     // used when a CGM Transmitter is connected, but there is no active sensor data yet
     static let waitingForDataSource: String = {

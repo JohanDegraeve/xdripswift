@@ -24,7 +24,6 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     @Published private(set) var sections: [BluetoothPeripheralDetailSection] = []
     @Published private(set) var connectButtonTitle = Texts_BluetoothPeripheralView.connect
     @Published private(set) var connectButtonIsEnabled = true
-    @Published private(set) var connectButtonStatusText = ""
     @Published private(set) var connectButtonIsStopAction = false
     @Published private(set) var connectButtonTintColor = BluetoothPeripheralConnectButtonTintColor.green
     @Published private(set) var statusFooterText: String?
@@ -164,7 +163,6 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
 
         connectButtonTitle = connectButtonState.title
         connectButtonIsEnabled = connectButtonState.isEnabled
-        connectButtonStatusText = connectButtonState.statusText
         connectButtonIsStopAction = connectButtonState.isStopAction
         connectButtonTintColor = connectButtonState.tintColor
         // Use a short footer message here. The full explanation is still shown by
@@ -435,8 +433,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
 
 private extension BluetoothPeripheralDetailState {
     func makeConnectButtonState() -> BluetoothPeripheralConnectButtonState {
-        guard let bluetoothPeripheralManager = bluetoothPeripheralManager as? BluetoothPeripheralManager else {
-            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.connect, isEnabled: false, statusText: "", tintColor: .disabledGray)
+        guard (bluetoothPeripheralManager as? BluetoothPeripheralManager) != nil else {
+            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.connect, isEnabled: false, tintColor: .disabledGray)
         }
 
         if let bluetoothPeripheral = bluetoothPeripheral {
@@ -444,44 +442,40 @@ private extension BluetoothPeripheralDetailState {
                 // Keep this as a stop action while the device is active.
                 // Dexcom can rapidly move between scanning and connected during each reading cycle.
                 if nfcScanNeeded {
-                    return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: true, statusText: Texts_BluetoothPeripheralView.nfcScanNeeded, isStopAction: true, tintColor: .red)
+                    return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: true, isStopAction: true, tintColor: .red)
                 }
 
-                let statusText = bluetoothPeripheralIsConnected(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager)
-                    ? Texts_BluetoothPeripheralView.connected
-                    : Texts_BluetoothPeripheralView.tryingToConnect
-
-                return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: true, statusText: statusText, isStopAction: true, tintColor: .red)
+                return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: true, isStopAction: true, tintColor: .red)
             }
 
             if activationIsBlockedForCurrentPeripheral() {
-                return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.connect, isEnabled: false, statusText: Texts_BluetoothPeripheralView.notTryingToConnect, tintColor: .disabledGray)
+                return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.connect, isEnabled: false, tintColor: .disabledGray)
             }
 
-            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.connect, isEnabled: true, statusText: Texts_BluetoothPeripheralView.notTryingToConnect)
+            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.connect, isEnabled: true)
         }
 
         if expectedBluetoothPeripheralType.needsTransmitterId(), transmitterIdTempValue == nil {
-            return BluetoothPeripheralConnectButtonState(title: Texts_SettingsView.labelTransmitterIdTextForButton, isEnabled: true, statusText: Texts_BluetoothPeripheralView.needsTransmitterId, tintColor: .blue)
+            return BluetoothPeripheralConnectButtonState(title: Texts_SettingsView.labelTransmitterIdTextForButton, isEnabled: true, tintColor: .blue)
         }
 
         if nfcScanNeeded {
-            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scanning, isEnabled: true, statusText: Texts_BluetoothPeripheralView.nfcScanNeeded, tintColor: .neutral)
+            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scanning, isEnabled: true, tintColor: .neutral)
         }
 
         if nfcScanSuccessful {
-            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: false, statusText: Texts_BluetoothPeripheralView.tryingToConnect, isStopAction: true, tintColor: .disabledGray)
+            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: false, isStopAction: true, tintColor: .disabledGray)
         }
 
         if activationIsBlockedForCurrentPeripheral() {
-            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scan, isEnabled: false, statusText: Texts_BluetoothPeripheralView.readyToScan, tintColor: .disabledGray)
+            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scan, isEnabled: false, tintColor: .disabledGray)
         }
 
         if !isScanning {
-            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scan, isEnabled: true, statusText: Texts_BluetoothPeripheralView.readyToScan)
+            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scan, isEnabled: true)
         }
 
-        return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scanning, isEnabled: false, statusText: Texts_BluetoothPeripheralView.scanning, tintColor: .disabledGray)
+        return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scanning, isEnabled: false, tintColor: .disabledGray)
     }
 
     func makeConnectionDisplayStatus() -> BluetoothPeripheralDisplayStatus {
@@ -493,25 +487,20 @@ private extension BluetoothPeripheralDetailState {
             bluetoothTransmitter = nil
         }
 
-        let isScanningForNewPeripheral = isScanning ||
-            bluetoothPeripheralManager?.isScanning() == true ||
-            bluetoothPeripheral?.blePeripheral.shouldconnect == true
-
         return BluetoothPeripheralDisplayStatus(
             bluetoothTransmitter: bluetoothTransmitter,
-            // A saved device that should connect is still active while waiting for the next Bluetooth cycle.
-            // The manager check also covers a new Libre scan after NFC starts BLE internally.
-            isScanningForNewPeripheral: isScanningForNewPeripheral
+            bluetoothPeripheral: bluetoothPeripheral,
+            isDiscoveringNewPeripheral: bluetoothPeripheral == nil && (
+                isScanning || bluetoothPeripheralManager?.isScanning() == true || nfcScanSuccessful
+            )
         )
     }
 
     /// Uses an explicit scan start when this screen initiated the wait, including after Libre NFC.
-    /// Otherwise, a saved reconnect is anchored to the device's last Bluetooth state change.
+    /// Otherwise, connecting, reconnecting, and healthy Dexcom waiting are anchored to the
+    /// device's last Bluetooth state change so the timer survives ordinary UI refreshes.
     func updateConnectionWaitStartedAt(for connectionStatus: BluetoothPeripheralDisplayStatus) {
-        let shouldShowElapsedTime = connectionStatus == .scanning &&
-            !nfcScanNeeded
-
-        guard shouldShowElapsedTime else {
+        guard connectionStatus.showsElapsedTime else {
             connectionWaitStartedAt = nil
             explicitlyStartedScanAt = nil
             return
@@ -666,8 +655,7 @@ private extension BluetoothPeripheralDetailState {
                     explicitlyStartedScanAt = Date()
                 }
 
-                bluetoothPeripheral.blePeripheral.shouldconnect = true
-                coreDataManager.saveChanges()
+                bluetoothPeripheralManager.setConnectionEnabled(true, for: bluetoothPeripheral)
 
                 // This row records the user's deliberate Connect action, not the transmitter's
                 // automatic scan/retry loop. The store will pair it with the next successful generic
@@ -774,8 +762,7 @@ private extension BluetoothPeripheralDetailState {
         )
         let namedDevice = TroubleshootingBluetoothDeviceName(bluetoothPeripheral.blePeripheral.name)
 
-        bluetoothPeripheral.blePeripheral.shouldconnect = false
-        coreDataManager.saveChanges()
+        bluetoothPeripheralManager.setConnectionEnabled(false, for: bluetoothPeripheral)
 
         // Log only after the user's persisted `shouldconnect` choice has been saved, and only when
         // the user confirmed Disconnect. NFC/authentication failure cleanup also reaches this helper
@@ -1474,14 +1461,12 @@ struct BluetoothPeripheralDetailSymbol {
 struct BluetoothPeripheralConnectButtonState {
     let title: String
     let isEnabled: Bool
-    let statusText: String
     let isStopAction: Bool
     let tintColor: BluetoothPeripheralConnectButtonTintColor
 
-    init(title: String, isEnabled: Bool, statusText: String, isStopAction: Bool = false, tintColor: BluetoothPeripheralConnectButtonTintColor = .green) {
+    init(title: String, isEnabled: Bool, isStopAction: Bool = false, tintColor: BluetoothPeripheralConnectButtonTintColor = .green) {
         self.title = title
         self.isEnabled = isEnabled
-        self.statusText = statusText
         self.isStopAction = isStopAction
         self.tintColor = tintColor
     }

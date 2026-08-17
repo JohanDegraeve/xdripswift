@@ -134,3 +134,5 @@
 "sensorHealthSensorFailedGuidance" = "Sensorfel rapporterat. Byt sensorn.";
 "sensorHealthTransmitterFailedTitle" = "Sändarfel";
 "sensorHealthTransmitterFailedGuidance" = "Sändarfel rapporterat. Kontrollera eller byt sändaren.";
+"connectingToCGM" = "Ansluter till CGM...";
+"reconnectingToCGM" = "Återansluter till CGM...";

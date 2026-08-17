@@ -37,6 +37,11 @@ class BluetoothPeripheralManager: NSObject {
     
     /// when xdrip connects to a BluetoothTransmitter that is also CGMTransmitter, then we'll call this function with the BluetoothTransmitter as argument. This function is defined by RootViewController, it will allow the RootViewController to set the CGMTransmitter, calibrator ...
     public var cgmTransmitterInfoChanged: () -> ()
+
+    /// Lightweight presentation refresh used for connection-state changes that do not change
+    /// transmitter configuration. In particular, routine Dexcom cycles must not run the heavier
+    /// `cgmTransmitterInfoChanged` workflow.
+    public var connectionPresentationChanged: () -> ()
     
     /// address of the last active cgmTransmitter
     ///
@@ -98,7 +103,7 @@ class BluetoothPeripheralManager: NSObject {
     /// - parameters:
     ///     - cgmTransmitterInfoChanged : to be called when currently used cgmTransmitter changes
     ///     - messageHandler : sends user-facing messages without giving the manager a view controller
-    init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate, messageHandler: @escaping (_ title: String, _ message: String) -> Void, heartBeatFunction: (() -> ())?, cgmTransmitterInfoChanged: @escaping () -> ()) {
+    init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate, messageHandler: @escaping (_ title: String, _ message: String) -> Void, heartBeatFunction: (() -> ())?, cgmTransmitterInfoChanged: @escaping () -> (), connectionPresentationChanged: @escaping () -> Void = {}) {
         
         // initialize properties
         self.coreDataManager = coreDataManager
@@ -107,6 +112,7 @@ class BluetoothPeripheralManager: NSObject {
         self.calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         self.cgmTransmitterDelegate = cgmTransmitterDelegate
         self.cgmTransmitterInfoChanged = cgmTransmitterInfoChanged
+        self.connectionPresentationChanged = connectionPresentationChanged
         self.bLEPeripheralAccessor = BLEPeripheralAccessor(coreDataManager: coreDataManager)
         self.messageHandler = messageHandler
         self.heartBeatFunction = heartBeatFunction
@@ -182,12 +188,7 @@ class BluetoothPeripheralManager: NSObject {
 
     /// disconnect from bluetoothPeripheral - and don't reconnect - set shouldconnect to false
     public func disconnect(fromBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral) {
-        
-        // device should not reconnect after disconnecting
-        bluetoothPeripheral.blePeripheral.shouldconnect = false
-        
-        // save in coredata
-        coreDataManager.saveChanges()
+        setConnectionEnabled(false, for: bluetoothPeripheral)
         
         if let bluetoothTransmitter = getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) {
             
@@ -195,6 +196,47 @@ class BluetoothPeripheralManager: NSObject {
             
         }
         
+    }
+
+    /// Changes the user's persisted connection choice. A new activation must prove one successful
+    /// connection before an intermittent Dexcom can be presented as normally waiting.
+    func setConnectionEnabled(_ enabled: Bool, for bluetoothPeripheral: BluetoothPeripheral) {
+        let blePeripheral = bluetoothPeripheral.blePeripheral
+        let activationChanged = blePeripheral.shouldconnect != enabled
+        let disabledStateNeedsCleanup = !enabled && blePeripheral.hasConnectedSinceActivation
+        guard activationChanged || disabledStateNeedsCleanup else { return }
+
+        blePeripheral.shouldconnect = enabled
+        blePeripheral.hasConnectedSinceActivation = false
+        coreDataManager.saveChanges()
+        connectionPresentationChanged()
+    }
+
+    /// Records the first successful connection for the current activation without resetting it on
+    /// later routine disconnects.
+    func recordSuccessfulConnection(for bluetoothPeripheral: BluetoothPeripheral) {
+        let blePeripheral = bluetoothPeripheral.blePeripheral
+
+        // A late Core Bluetooth callback can arrive after a user or follower-mode shutdown. It must
+        // not repopulate activation state for a device that is no longer enabled.
+        guard blePeripheral.shouldconnect else { return }
+
+        guard !blePeripheral.hasConnectedSinceActivation else {
+            connectionPresentationChanged()
+            return
+        }
+
+        blePeripheral.hasConnectedSinceActivation = true
+        coreDataManager.saveChanges()
+        connectionPresentationChanged()
+    }
+
+    /// Records a routine Core Bluetooth disconnect without changing activation success. This is
+    /// the boundary that keeps an intermittent Dexcom green between advertisements.
+    func recordDisconnection(for bluetoothPeripheral: BluetoothPeripheral) {
+        bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+        coreDataManager.saveChanges()
+        connectionPresentationChanged()
     }
 
     /// returns the bluetoothTransmitter for the bluetoothPeripheral

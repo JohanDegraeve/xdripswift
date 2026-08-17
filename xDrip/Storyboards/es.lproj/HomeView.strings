@@ -132,3 +132,5 @@
 "sensorHealthSensorFailedGuidance" = "Fallo del sensor detectado. Reemplaza el sensor.";
 "sensorHealthTransmitterFailedTitle" = "Fallo del transmisor";
 "sensorHealthTransmitterFailedGuidance" = "Fallo del transmisor detectado. Compruébalo o reemplázalo.";
+"connectingToCGM" = "Conectando al CGM...";
+"reconnectingToCGM" = "Reconectando al CGM...";

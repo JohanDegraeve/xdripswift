@@ -205,3 +205,5 @@
 "sensorHealthSensorFailedGuidance" = "Повідомлено про відмову сенсора. Замініть сенсор.";
 "sensorHealthTransmitterFailedTitle" = "Відмова передавача";
 "sensorHealthTransmitterFailedGuidance" = "Повідомлено про відмову передавача. Перевірте або замініть його.";
+"connectingToCGM" = "Підключення до CGM...";
+"reconnectingToCGM" = "Повторне підключення до CGM...";

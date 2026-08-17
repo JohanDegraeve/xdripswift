@@ -18,6 +18,10 @@ protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
     
     /// try to connect to the M5Stack
     func connect(to bluetoothPeripheral: BluetoothPeripheral)
+
+    /// Persists whether the app should maintain this peripheral and resets the current
+    /// activation's successful-connection marker when the choice changes.
+    func setConnectionEnabled(_ enabled: Bool, for bluetoothPeripheral: BluetoothPeripheral)
     
     /// returns the BluetoothTransmitter for the specified bluetoothPeripheral
     /// - parameters:

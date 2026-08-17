@@ -137,3 +137,5 @@
 "sensorHealthSensorFailedGuidance" = "Anturivika ilmoitettu. Vaihda anturi.";
 "sensorHealthTransmitterFailedTitle" = "Lähetinvika";
 "sensorHealthTransmitterFailedGuidance" = "Lähetinvika ilmoitettu. Tarkista tai vaihda lähetin.";
+"connectingToCGM" = "Yhdistetään CGM-laitteeseen...";
+"reconnectingToCGM" = "Yhdistetään uudelleen CGM-laitteeseen...";

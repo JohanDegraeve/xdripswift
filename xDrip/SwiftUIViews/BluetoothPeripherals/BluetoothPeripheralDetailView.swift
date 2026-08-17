@@ -146,7 +146,9 @@ private extension BluetoothPeripheralDisplayStatus {
         switch self {
         case .notScanning:
             return Color(.colorTertiary)
-        case .scanning, .connected:
+        case .discovering, .connecting, .reconnecting:
+            return Color(.systemYellow)
+        case .waitingForNextReading, .connected:
             return .green
         }
     }
@@ -155,7 +157,9 @@ private extension BluetoothPeripheralDisplayStatus {
         switch self {
         case .notScanning:
             return Color(.secondarySystemGroupedBackground)
-        case .scanning, .connected:
+        case .discovering, .connecting, .reconnecting:
+            return ConstantsUI.connectingRowBackgroundColor
+        case .waitingForNextReading, .connected:
             return ConstantsUI.activeRowBackgroundColor
         }
     }
@@ -164,7 +168,7 @@ private extension BluetoothPeripheralDisplayStatus {
         switch self {
         case .notScanning:
             return "antenna.radiowaves.left.and.right.slash"
-        case .scanning, .connected:
+        case .discovering, .connecting, .reconnecting, .waitingForNextReading, .connected:
             return "antenna.radiowaves.left.and.right"
         }
     }
@@ -198,7 +202,7 @@ private struct BluetoothPeripheralStatusBannerView: View {
                 .foregroundStyle(state.connectionStatus.tintColor)
                 .frame(width: 24)
 
-            Text(state.connectButtonStatusText)
+            Text(state.connectionStatus.fullStatusText)
                 .foregroundStyle(Color(.colorPrimary))
 
             Spacer()

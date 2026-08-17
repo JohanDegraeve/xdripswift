@@ -158,3 +158,5 @@
 "sensorHealthSensorFailedGuidance" = "Défaillance du capteur signalée. Remplacez le capteur.";
 "sensorHealthTransmitterFailedTitle" = "Défaillance du transmetteur";
 "sensorHealthTransmitterFailedGuidance" = "Défaillance du transmetteur signalée. Vérifiez-le ou remplacez-le.";
+"connectingToCGM" = "Connexion au CGM...";
+"reconnectingToCGM" = "Reconnexion au CGM...";

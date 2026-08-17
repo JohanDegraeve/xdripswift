@@ -212,6 +212,18 @@ enum BluetoothPeripheralType: String, CaseIterable {
         }
         
     }
+
+    /// Whether a disconnected Bluetooth state is expected between normal reading cycles.
+    /// These Dexcom integrations advertise briefly and reconnect for each reading instead of
+    /// maintaining the continuous connection expected from the other supported peripherals.
+    var usesIntermittentConnection: Bool {
+        switch self {
+        case .DexcomType, .DexcomG7Type, .DexcomG7HeartBeatType:
+            return true
+        default:
+            return false
+        }
+    }
     
     /// can we show the transmitter read sucess row?
     /// basically only show it for CGM transmitters and hide for heartbeat and M5Stack types

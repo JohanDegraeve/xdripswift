@@ -217,3 +217,5 @@
 "sensorHealthSensorFailedGuidance" = "Sporočena je odpoved senzorja. Zamenjajte senzor.";
 "sensorHealthTransmitterFailedTitle" = "Odpoved oddajnika";
 "sensorHealthTransmitterFailedGuidance" = "Sporočena je odpoved oddajnika. Preverite ga ali ga zamenjajte.";
+"connectingToCGM" = "Povezovanje s CGM...";
+"reconnectingToCGM" = "Ponovno povezovanje s CGM...";

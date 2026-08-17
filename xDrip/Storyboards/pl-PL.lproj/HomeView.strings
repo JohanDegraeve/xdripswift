@@ -217,3 +217,5 @@
 "sensorHealthSensorFailedGuidance" = "Zgłoszono awarię sensora. Wymień sensor.";
 "sensorHealthTransmitterFailedTitle" = "Awaria nadajnika";
 "sensorHealthTransmitterFailedGuidance" = "Zgłoszono awarię nadajnika. Sprawdź go lub wymień.";
+"connectingToCGM" = "Łączenie z CGM...";
+"reconnectingToCGM" = "Ponowne łączenie z CGM...";

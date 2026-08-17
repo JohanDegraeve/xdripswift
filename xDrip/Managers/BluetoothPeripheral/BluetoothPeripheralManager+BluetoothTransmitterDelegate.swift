@@ -174,6 +174,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
             if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
                 bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+                recordSuccessfulConnection(for: bluetoothPeripheral)
             }
             
             return
@@ -200,6 +201,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
             if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
                 bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+                recordSuccessfulConnection(for: bluetoothPeripheral)
             }
             
             return
@@ -231,6 +233,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
 
                 // Update the existing peripheral's last connection status change timestamp to now.
                 bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+                recordSuccessfulConnection(for: bluetoothPeripheral)
 
                 // Continue normal flow without creating a new BluetoothPeripheral and without disconnecting.
                 return
@@ -291,6 +294,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         
         // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
         newBluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+        recordSuccessfulConnection(for: newBluetoothPeripheral)
         
         // call sendSettings function
         newBluetoothPeripheral.sendSettings(to: bluetoothTransmitter)
@@ -336,12 +340,9 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         
         trace("in didDisconnectFrom", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .debug)
         
-        // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
         if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
-            bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+            recordDisconnection(for: bluetoothPeripheral)
         }
-
-        coreDataManager.saveChanges()
         
     }
     

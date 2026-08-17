@@ -111,3 +111,9 @@
 "readSuccess" = "Lukemien onnistuminen";
 /// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
 "readSuccessNow" = "Nyt";
+"scanningForTransmitter" = "Etsitään lähetintä...";
+"connecting" = "Yhdistetään";
+"connectingToTransmitter" = "Connecting...";
+"reconnecting" = "Yhdistetään uudelleen";
+"reconnectingToTransmitter" = "Yhdistetään uudelleen lähettimeen...";
+"waiting" = "Odotetaan...";
