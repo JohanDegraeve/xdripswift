@@ -57,8 +57,10 @@ struct RootHomeLoopView: View {
                 RootHomeInlineMetricView(metric: state.iob, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                RootHomeInlineMetricView(metric: state.cob, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
-                    .frame(width: Layout.inlineMetricWidth, alignment: .leading)
+                if state.showsCOB {
+                    RootHomeInlineMetricView(metric: state.cob, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
+                        .frame(width: Layout.inlineMetricWidth, alignment: .leading)
+                }
 
                 loopStatusView
                     .frame(maxWidth: .infinity, alignment: .trailing)

@@ -37,6 +37,16 @@ struct AIDStatus: Codable, Hashable {
     let statusTitle: String
     let staleStatusTitle: String
 
+    /// Whether this provider can publish a time-varying carbs-on-board value.
+    ///
+    /// CareLink supplies discrete meal entries but no active-carbohydrate amount or decay model.
+    /// Treating an entered meal as COB would leave the full grams visible indefinitely and would
+    /// therefore be clinically misleading. Nightscout AID status carries the COB calculated by
+    /// the configured loop algorithm and remains eligible for the compact Home and Watch metric.
+    var supportsCOB: Bool {
+        style == .loop
+    }
+
     func presentation(referenceDate: Date = .now) -> AIDStatusPresentation {
         let hasFreshData = statusUpdatedAt.map {
             $0 <= referenceDate.addingTimeInterval(ConstantsHomeView.aidStatusFutureTolerance)

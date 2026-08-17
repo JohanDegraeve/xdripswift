@@ -123,6 +123,7 @@ final class CareLinkTests: XCTestCase {
         deviceStatus.lastLoopDate = now
 
         var presentation = deviceStatus.aidStatus.presentation(referenceDate: now)
+        XCTAssertTrue(deviceStatus.aidStatus.supportsCOB)
         XCTAssertEqual(presentation.systemImage, ConstantsHomeView.loopStatusRecentSystemImage)
         XCTAssertEqual(presentation.color, .green)
 
@@ -150,10 +151,58 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(snapshot.aidStatus.lastActivityAt, now)
         XCTAssertNil(snapshot.aidStatus.iob)
         XCTAssertNil(snapshot.aidStatus.cob)
+        XCTAssertFalse(snapshot.aidStatus.supportsCOB)
 
         let state = RootHomeStateModel().careLinkLoopState(snapshot: snapshot, referenceDate: now)
         XCTAssertEqual(state.iob.value, "- U")
         XCTAssertEqual(state.cob.value, "- g")
+        XCTAssertFalse(state.showsCOB)
+    }
+
+    func testHistoricalCareLinkAIDStatusHidesCOBAfterDeviceStatusNormalization() throws {
+        let record = CareLinkTherapyRecord(
+            sourceIdentifier: "patient|AUTO_BASAL_DELIVERY|historical-cob",
+            date: now.addingTimeInterval(-300),
+            type: .AutomaticBasal,
+            value: 0.125,
+            durationMinutes: 5,
+            nightscoutEventType: "Temp Basal",
+            notes: nil
+        )
+        let deviceStatus = try XCTUnwrap(record.historicalPumpDeviceStatus(
+            metadata: CareLinkMetadata(deviceModel: "MMT-1886"),
+            checkedAt: now
+        ))
+        let stateModel = RootHomeStateModel()
+        let normalizedState = stateModel.loopState(deviceStatus: deviceStatus, referenceDate: record.date)
+
+        let historicalState = stateModel.historicalLoopState(
+            normalizedState,
+            aidAnalyticsSource: .careLink
+        )
+
+        XCTAssertTrue(historicalState.isHistorical)
+        XCTAssertFalse(historicalState.showsCOB)
+    }
+
+    func testHistoricalCareLinkAIDStatusHidesCOBWhenNoStatusRecordExists() {
+        let state = RootHomeStateModel().historicalLoopState(
+            RootHomeLoopState(),
+            aidAnalyticsSource: .careLink
+        )
+
+        XCTAssertTrue(state.isHistorical)
+        XCTAssertFalse(state.showsCOB)
+    }
+
+    func testHistoricalNightscoutLoopStatusKeepsCOB() {
+        let state = RootHomeStateModel().historicalLoopState(
+            RootHomeLoopState(),
+            aidAnalyticsSource: .nightscout(.loop)
+        )
+
+        XCTAssertTrue(state.isHistorical)
+        XCTAssertTrue(state.showsCOB)
     }
 
     func testNewStatusSnapshotStartsWhileTheStoredSessionIsBeingChecked() {
@@ -901,6 +950,8 @@ final class CareLinkTests: XCTestCase {
         XCTAssertTrue(policy.importsTreatmentsFromNightscout)
         XCTAssertTrue(policy.importsStatusFromNightscout)
         XCTAssertFalse(policy.importsTherapyFromCareLink)
+        XCTAssertEqual(policy.aidAnalyticsSource, .nightscout(.loop))
+        XCTAssertTrue(policy.supportsAIDEnhancedAnalytics)
     }
 
     func testNightscoutFollowerCannotCreateGlucoseUploadLoop() {
@@ -917,6 +968,8 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(policy.therapyDataSource, .nightscout)
         XCTAssertTrue(policy.importsTreatmentsFromNightscout)
         XCTAssertTrue(policy.showsAIDData)
+        XCTAssertEqual(policy.aidAnalyticsSource, .nightscout(.openAPS))
+        XCTAssertTrue(policy.supportsAIDEnhancedAnalytics)
     }
 
     func testCareLinkAutomaticOwnsGlucoseAndTherapyWhileNightscoutIsExportOnly() {
@@ -937,6 +990,8 @@ final class CareLinkTests: XCTestCase {
         XCTAssertTrue(policy.showsPumpData)
         XCTAssertFalse(policy.showsAIDData)
         XCTAssertTrue(policy.showsTherapyStatus)
+        XCTAssertEqual(policy.aidAnalyticsSource, .careLink)
+        XCTAssertTrue(policy.supportsAIDEnhancedAnalytics)
     }
 
     func testCareLinkGlucoseCanUseNightscoutTherapyInstead() {
@@ -951,6 +1006,64 @@ final class CareLinkTests: XCTestCase {
         XCTAssertFalse(policy.importsTherapyFromCareLink)
         XCTAssertTrue(policy.importsTreatmentsFromNightscout)
         XCTAssertTrue(policy.importsStatusFromNightscout)
+        XCTAssertEqual(policy.aidAnalyticsSource, .nightscout(.loop))
+    }
+
+    func testAIDAnalyticsUsesResolvedTherapyOwnershipInsteadOfRawSettings() {
+        let careLinkAutomatic = dataFlowPolicy(
+            isMaster: false,
+            followerSource: .careLink,
+            therapySelection: .automatic,
+            nightscoutFollowType: .openAPS
+        )
+        XCTAssertEqual(careLinkAutomatic.therapyDataSource, .careLink)
+        XCTAssertEqual(careLinkAutomatic.aidAnalyticsSource, .careLink)
+
+        let careLinkWithNightscoutTherapy = dataFlowPolicy(
+            isMaster: false,
+            followerSource: .careLink,
+            therapySelection: .nightscout,
+            nightscoutFollowType: .openAPS
+        )
+        XCTAssertEqual(careLinkWithNightscoutTherapy.therapyDataSource, .nightscout)
+        XCTAssertEqual(careLinkWithNightscoutTherapy.aidAnalyticsSource, .nightscout(.openAPS))
+
+        let noAIDFollowType = dataFlowPolicy(
+            isMaster: false,
+            followerSource: .dexcomShare,
+            therapySelection: .automatic,
+            nightscoutFollowType: .none
+        )
+        XCTAssertEqual(noAIDFollowType.therapyDataSource, .nightscout)
+        XCTAssertNil(noAIDFollowType.aidAnalyticsSource)
+        XCTAssertFalse(noAIDFollowType.supportsAIDEnhancedAnalytics)
+
+        let noTherapy = dataFlowPolicy(
+            isMaster: false,
+            followerSource: .careLink,
+            therapySelection: .none,
+            nightscoutFollowType: .loop
+        )
+        XCTAssertEqual(noTherapy.therapyDataSource, .none)
+        XCTAssertNil(noTherapy.aidAnalyticsSource)
+    }
+
+    func testAIDAnalyticsSourceOwnsOnlyItsNormalizedDeviceStatusRecords() {
+        XCTAssertFalse(AIDAnalyticsSource.careLink.supportsCOB)
+        XCTAssertFalse(AIDAnalyticsSource.careLink.supportsScheduledBasalAnalytics)
+        XCTAssertTrue(AIDAnalyticsSource.careLink.ownsDeviceStatus(with: "carelink://pump"))
+        XCTAssertTrue(AIDAnalyticsSource.careLink.ownsDeviceStatus(with: "carelink://pump-history"))
+        XCTAssertFalse(AIDAnalyticsSource.careLink.ownsDeviceStatus(with: "Trio"))
+        XCTAssertFalse(AIDAnalyticsSource.careLink.ownsDeviceStatus(with: nil))
+
+        let nightscout = AIDAnalyticsSource.nightscout(.loop)
+        XCTAssertTrue(nightscout.supportsCOB)
+        XCTAssertTrue(nightscout.supportsScheduledBasalAnalytics)
+        XCTAssertFalse(nightscout.ownsDeviceStatus(with: "carelink://pump"))
+        XCTAssertTrue(nightscout.ownsDeviceStatus(with: "loop://phone"))
+        // Compatible Nightscout servers may omit the device identifier. They still belong to the
+        // Nightscout import path and must not be discarded solely because identity is incomplete.
+        XCTAssertTrue(nightscout.ownsDeviceStatus(with: nil))
     }
 
     func testOtherFollowersCanCombineGlucoseWithNightscoutTherapy() {
@@ -984,6 +1097,8 @@ final class CareLinkTests: XCTestCase {
         XCTAssertFalse(policy.importsTherapyFromCareLink)
         XCTAssertTrue(policy.exportsTreatmentsToNightscout)
         XCTAssertFalse(policy.exportsGlucoseToNightscout)
+        XCTAssertNil(policy.aidAnalyticsSource)
+        XCTAssertFalse(policy.supportsAIDEnhancedAnalytics)
     }
 
     func testUnavailableCareLinkSelectionFallsBackWithoutBeingOffered() {
@@ -1022,6 +1137,8 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(explicit.therapyDataSource, .none)
         XCTAssertFalse(automatic.availableTherapyDataSources.contains(.nightscout))
         XCTAssertFalse(automatic.exportsTreatmentsToNightscout)
+        XCTAssertNil(automatic.aidAnalyticsSource)
+        XCTAssertNil(explicit.aidAnalyticsSource)
     }
 
     // MARK: - Client requests and session lifecycle

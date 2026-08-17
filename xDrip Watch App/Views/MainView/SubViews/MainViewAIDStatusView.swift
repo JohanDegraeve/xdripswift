@@ -25,12 +25,16 @@ struct MainViewAIDStatusView: View {
             
             Spacer()
             
-            Text(watchState.aidStatusCOBString())
-                .font(.system(size: textSize))
-                .fontWeight(.semibold)
-                .foregroundStyle(.colorPrimary)
-            
-            Spacer()
+            // CareLink sends meal entries but no active-carb/COB calculation. The shared semantic
+            // capability keeps the unavailable placeholder out of both Watch and iOS compact rows.
+            if watchState.aidStatus?.supportsCOB == true {
+                Text(watchState.aidStatusCOBString())
+                    .font(.system(size: textSize))
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.colorPrimary)
+
+                Spacer()
+            }
             
             HStack(alignment: .center, spacing: 5) {
                 Text(watchState.aidStatusActivityAgeString())

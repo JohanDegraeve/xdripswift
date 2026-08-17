@@ -366,6 +366,9 @@ extension CareLinkStatusSnapshot {
             statusUpdatedAt: observedAt,
             lastActivityAt: observedAt,
             iob: pump.activeInsulin,
+            // CareLink's periodic response provides active insulin and discrete MEAL markers, but
+            // not a remaining active-carbohydrate value. A meal amount cannot safely stand in for
+            // COB because the response provides no absorption/decay calculation for those grams.
             cob: nil,
             statusTitle: statusTitle,
             staleStatusTitle: Texts_SettingsView.careLinkNoData

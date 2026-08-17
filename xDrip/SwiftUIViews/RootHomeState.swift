@@ -58,6 +58,7 @@ struct RootHomePumpState {
 struct RootHomeLoopState {
     var iob = RootHomeMetricState(title: "IOB", value: "- U")
     var cob = RootHomeMetricState(title: "COB", value: "- g")
+    var showsCOB = true
     var statusTitle = "-"
     var statusSystemImage: String?
     var statusColor = ConstantsAppColors.secondaryText
@@ -486,6 +487,27 @@ final class RootHomeStateModel: ObservableObject {
         rootHomeLoopState(aidStatus: snapshot.aidStatus, referenceDate: referenceDate)
     }
 
+    /// Applies source capabilities after a status has been selected for the historical strip.
+    ///
+    /// Historical CareLink pump activity is stored in the shared Nightscout-shaped device-status
+    /// model. That normalized model presents itself as a Loop status and would otherwise restore
+    /// the COB field. The resolved analytics source remains authoritative because it describes
+    /// whether the provider supplies calculated active carbohydrates. Applying the capability to
+    /// the completed view state also covers historical ranges where no device-status record exists.
+    func historicalLoopState(
+        _ loopState: RootHomeLoopState,
+        aidAnalyticsSource: AIDAnalyticsSource?
+    ) -> RootHomeLoopState {
+        var loopState = loopState
+        loopState.isHistorical = true
+
+        if let aidAnalyticsSource {
+            loopState.showsCOB = loopState.showsCOB && aidAnalyticsSource.supportsCOB
+        }
+
+        return loopState
+    }
+
     private func rootHomeLoopState(
         aidStatus: AIDStatus,
         referenceDate: Date,
@@ -517,6 +539,9 @@ final class RootHomeStateModel: ObservableObject {
                 value: presentation.hasFreshData ? "\(aidStatus.cob?.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes ?? "-") g" : "- g",
                 valueColor: defaultTextColor
             ),
+            // CareLink exposes entered meal grams, not a decaying active-carb value. Keep the
+            // metric for Nightscout loops, whose device status contains algorithm-calculated COB.
+            showsCOB: aidStatus.supportsCOB,
             statusTitle: presentation.title,
             statusSystemImage: presentation.systemImage,
             statusColor: presentation.color,

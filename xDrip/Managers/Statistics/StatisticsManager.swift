@@ -61,6 +61,7 @@ public final class StatisticsManager: @unchecked Sendable {
         let date: Date
         let value: Double
         let type: TreatmentType
+        let enteredBy: String?
     }
 
     private struct BasalTreatmentSample {
@@ -93,8 +94,7 @@ public final class StatisticsManager: @unchecked Sendable {
         let period: GlucoseReportPeriod
         let aidPeriod: GlucoseReportAIDPeriod
         let usesMgDl: Bool
-        let nightscoutEnabled: Bool
-        let nightscoutFollowTypeRawValue: Int
+        let aidAnalyticsSource: AIDAnalyticsSource?
     }
 
     private let operationQueue: OperationQueue
@@ -182,7 +182,7 @@ public final class StatisticsManager: @unchecked Sendable {
     /// The 70% coverage threshold follows the same consensus target used by the report:
     /// https://doi.org/10.2337/dci19-0028
     func availableReportPeriods() async -> [GlucoseReportPeriod: Bool] {
-        await withCheckedContinuation { continuation in
+        return await withCheckedContinuation { continuation in
             operationQueue.addOperation { [weak self] in
                 guard let self else {
                     continuation.resume(returning: [:])
@@ -217,7 +217,12 @@ public final class StatisticsManager: @unchecked Sendable {
     /// This is intentionally separate from `calculateStatistics` so the home screen never needs to
     /// build AGP percentiles, daily bars, trend points, or device metadata.
     func reportAnalytics(for configuration: GlucoseReportConfiguration) async -> GlucoseReportAnalytics {
-        await withCheckedContinuation { continuation in
+        // Capture the complete policy decision once. The queued calculation, cache identity and
+        // provider-specific fetches must all describe the same configuration even if Settings are
+        // changed while this request is waiting on the serial statistics queue.
+        let aidAnalyticsSource = UserDefaults.standard.dataFlowPolicy.aidAnalyticsSource
+
+        return await withCheckedContinuation { continuation in
             operationQueue.addOperation { [weak self] in
                 guard let self else {
                     continuation.resume(returning: StatisticsManager.emptyReportAnalytics(for: configuration, periodEnd: Date()))
@@ -228,8 +233,7 @@ public final class StatisticsManager: @unchecked Sendable {
                     period: configuration.period,
                     aidPeriod: configuration.aidPeriod,
                     usesMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
-                    nightscoutEnabled: UserDefaults.standard.nightscoutEnabled,
-                    nightscoutFollowTypeRawValue: UserDefaults.standard.nightscoutFollowType.rawValue
+                    aidAnalyticsSource: aidAnalyticsSource
                 )
 
                 if let cached = self.reportAnalyticsCache[cacheKey] {
@@ -237,7 +241,10 @@ public final class StatisticsManager: @unchecked Sendable {
                     return
                 }
 
-                let analytics = self.makeReportAnalytics(for: configuration)
+                let analytics = self.makeReportAnalytics(
+                    for: configuration,
+                    aidAnalyticsSource: aidAnalyticsSource
+                )
                 self.reportAnalyticsCache[cacheKey] = analytics
                 continuation.resume(returning: analytics)
             }
@@ -526,7 +533,10 @@ public final class StatisticsManager: @unchecked Sendable {
         )
     }
 
-    private func makeReportAnalytics(for configuration: GlucoseReportConfiguration) -> GlucoseReportAnalytics {
+    private func makeReportAnalytics(
+        for configuration: GlucoseReportConfiguration,
+        aidAnalyticsSource: AIDAnalyticsSource?
+    ) -> GlucoseReportAnalytics {
         let periodEnd = Date()
         let periodStart = periodEnd.addingTimeInterval(-Double(configuration.period.rawValue) * 24 * 60 * 60)
         let samples = cachedSamples(fromDate: periodStart, toDate: periodEnd)
@@ -546,7 +556,8 @@ public final class StatisticsManager: @unchecked Sendable {
             fromDate: periodStart,
             toDate: periodEnd,
             samples: samples,
-            isIncluded: configuration.aidPeriod != .notIncluded
+            isIncluded: configuration.aidPeriod != .notIncluded,
+            source: aidAnalyticsSource
         )
 
         return GlucoseReportAnalytics(
@@ -567,7 +578,13 @@ public final class StatisticsManager: @unchecked Sendable {
             agpPoints: makeAGPPoints(samples: samples),
             dailyGlucoseProfiles: makeDailyGlucoseProfiles(samples: samples, periodEnd: periodEnd, dayCount: 7),
             dailySummaries: makeDailySummaries(samples: samples, periodEnd: periodEnd, periodDays: configuration.period.rawValue),
-            trendPoints: makeTrendPoints(samples: samples, fromDate: periodStart, toDate: periodEnd, period: configuration.period),
+            trendPoints: makeTrendPoints(
+                samples: samples,
+                fromDate: periodStart,
+                toDate: periodEnd,
+                period: configuration.period,
+                aidAnalyticsSource: aidAnalyticsSource
+            ),
             sensorCount: reportSensorSummary.count,
             averageSensorDuration: reportSensorSummary.averageDuration,
             calibrationCount: calibrationCount(fromDate: periodStart, toDate: periodEnd),
@@ -579,31 +596,66 @@ public final class StatisticsManager: @unchecked Sendable {
         )
     }
 
-    private func makeAIDAnalytics(fromDate: Date, toDate: Date, samples: [CGMSample], isIncluded: Bool) -> GlucoseReportAIDAnalytics? {
+    /// Builds only the metrics supported by the resolved analytics provider.
+    ///
+    /// Policy eligibility and data sufficiency are separate decisions: `source` proves that the
+    /// current configuration owns an AID-capable import path, while the status-count guard proves
+    /// that enough persisted history exists to publish a clinically meaningful extra report page.
+    private func makeAIDAnalytics(
+        fromDate: Date,
+        toDate: Date,
+        samples: [CGMSample],
+        isIncluded: Bool,
+        source: AIDAnalyticsSource?
+    ) -> GlucoseReportAIDAnalytics? {
         guard fromDate < toDate,
               isIncluded,
-              UserDefaults.standard.dataFlowPolicy.showsAIDData else {
+              let source else {
             return nil
         }
 
         let deviceStatusAccessor = NightscoutDeviceStatusAccessor(coreDataManager: coreDataManager)
         let profileAccessor = NightscoutProfileAccessor(coreDataManager: coreDataManager)
         let statuses = deviceStatusAccessor.fetch(fromDate: fromDate, toDate: toDate)
-            .filter { $0.createdAt >= fromDate && $0.createdAt <= toDate }
+            // CareLink and Nightscout normalize into the same store. Never let stale records from
+            // the previously selected provider contaminate the current clinical calculation.
+            .filter {
+                $0.createdAt >= fromDate
+                    && $0.createdAt <= toDate
+                    && source.ownsDeviceStatus(with: $0.device)
+            }
             .sorted { $0.createdAt < $1.createdAt }
 
         guard statuses.count >= 3 else { return nil }
 
-        let profiles = profileAccessor.fetch(fromDate: nil, toDate: toDate)
-            .sorted { $0.startDate < $1.startDate }
+        // CareLink does not import Nightscout profile documents. An empty profile list deliberately
+        // omits scheduled-basal/profile tables instead of borrowing another provider's history.
+        let profiles: [NightscoutProfileSnapshot]
+        switch source {
+        case .nightscout:
+            profiles = profileAccessor.fetch(fromDate: nil, toDate: toDate)
+                .sorted { $0.startDate < $1.startDate }
+        case .careLink:
+            profiles = []
+        }
         // Nightscout limits Loopalyzer reports to short periods because longer averaging flattens
         // meal responses. Summary tiles use the selected report period, while this chart keeps a
         // fixed 3-day average to avoid hiding meal and correction behaviour.
         let loopalyzerFromDate = max(fromDate, toDate.addingTimeInterval(-Double(GlucoseReportAIDPeriod.three.rawValue) * 24 * 60 * 60))
         let loopalyzerStatuses = statuses.filter { $0.createdAt >= loopalyzerFromDate }
         let loopalyzerSamples = samples.filter { $0.date >= loopalyzerFromDate }
-        let insulinTreatmentMarkers = loopalyzerTreatmentMarkers(fromDate: loopalyzerFromDate, toDate: toDate, treatmentType: .Insulin)
-        let carbTreatmentMarkers = loopalyzerTreatmentMarkers(fromDate: loopalyzerFromDate, toDate: toDate, treatmentType: .Carbs)
+        let insulinTreatmentMarkers = loopalyzerTreatmentMarkers(
+            fromDate: loopalyzerFromDate,
+            toDate: toDate,
+            treatmentType: .Insulin,
+            source: source
+        )
+        let carbTreatmentMarkers = loopalyzerTreatmentMarkers(
+            fromDate: loopalyzerFromDate,
+            toDate: toDate,
+            treatmentType: .Carbs,
+            source: source
+        )
         let intervals = aidStatusIntervals(from: statuses, periodEnd: toDate)
         let suspendedDuration = intervals.reduce(0) { duration, interval in
             interval.status.pumpIsSuspended == true ? duration + interval.duration : duration
@@ -611,13 +663,22 @@ public final class StatisticsManager: @unchecked Sendable {
         let statusDateRange = max(0, (statuses.last?.createdAt ?? toDate).timeIntervalSince(statuses.first?.createdAt ?? fromDate))
         let calculationDays = max(1, Int(ceil(statusDateRange / (24 * 60 * 60))))
         let loopingSuccessPercentage = loopingSuccessPercentage(from: intervals, fromDate: fromDate, toDate: toDate)
-        let averageTDD = averageDailyTDD(from: statuses)
-        let averageCarbsPerDay = averageCarbsPerDay(fromDate: fromDate, toDate: toDate)
+        let averageTDD = averageDailyTDD(
+            from: statuses,
+            source: source,
+            fromDate: fromDate,
+            toDate: toDate
+        )
+        let averageCarbsPerDay = averageCarbsPerDay(
+            fromDate: fromDate,
+            toDate: toDate,
+            source: source
+        )
         let latestStatus = statuses.last
 
         return GlucoseReportAIDAnalytics(
-            systemName: aidSystemName(from: latestStatus),
-            systemVersion: latestStatus?.appVersion,
+            systemName: aidSystemName(from: statuses, source: source),
+            systemVersion: source == .careLink ? nil : latestStatus?.appVersion,
             pumpManufacturer: latestStatus?.pumpManufacturer,
             pumpModel: latestStatus?.pumpModel,
             calculationDays: calculationDays,
@@ -630,6 +691,10 @@ public final class StatisticsManager: @unchecked Sendable {
             pumpSuspensionTime: suspendedDuration > 0 ? suspendedDuration : nil,
             latestReservoir: latestStatus?.pumpReservoir,
             latestPumpBatteryPercentage: latestStatus?.pumpBatteryPercent,
+            // Meal markers are useful for CareLink, but only Nightscout device status provides the
+            // algorithm's time-varying COB value used to draw an absorption/decay series.
+            supportsCOB: source.supportsCOB,
+            supportsScheduledBasalAnalytics: source.supportsScheduledBasalAnalytics,
             loopalyzerPoints: makeLoopalyzerPoints(statuses: loopalyzerStatuses, profiles: profiles, samples: loopalyzerSamples),
             insulinTreatmentMarkers: insulinTreatmentMarkers,
             carbTreatmentMarkers: carbTreatmentMarkers,
@@ -637,14 +702,18 @@ public final class StatisticsManager: @unchecked Sendable {
         )
     }
 
-    private func averageCarbsPerDay(fromDate: Date, toDate: Date) -> Double? {
+    private func averageCarbsPerDay(
+        fromDate: Date,
+        toDate: Date,
+        source: AIDAnalyticsSource
+    ) -> Double? {
         let intervalDays = max(toDate.timeIntervalSince(fromDate) / (24 * 60 * 60), 1)
         let context = coreDataManager.privateManagedObjectContext
         var totalCarbs = 0.0
 
         context.performAndWait {
             let request: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            var predicates: [NSPredicate] = [
                 NSPredicate(format: "date >= %@ AND date <= %@", fromDate as NSDate, toDate as NSDate),
                 NSPredicate(format: "treatmentType == %@", NSNumber(value: TreatmentType.Carbs.rawValue)),
                 NSCompoundPredicate(orPredicateWithSubpredicates: [
@@ -652,7 +721,9 @@ public final class StatisticsManager: @unchecked Sendable {
                     NSPredicate(format: "treatmentdeleted == nil")
                 ]),
                 NSPredicate(format: "value > 0 AND value < 1000")
-            ])
+            ]
+            predicates.append(treatmentSourcePredicate(for: source))
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
             request.returnsObjectsAsFaults = false
             request.includesPropertyValues = true
 
@@ -663,7 +734,27 @@ public final class StatisticsManager: @unchecked Sendable {
         return totalCarbs > 0 ? totalCarbs / intervalDays : nil
     }
 
-    private func averageDailyTDD(from statuses: [NightscoutDeviceStatusSnapshot]) -> Double? {
+    /// Calculates total daily delivered insulin using the authoritative shape for each provider.
+    ///
+    /// Nightscout AID clients publish an already-complete cumulative TDD in device status. CareLink
+    /// does not, so its equivalent is reconstructed only from CareLink-entered boluses and native
+    /// automatic-basal doses. Keeping these branches explicit avoids presenting bolus-only CareLink
+    /// totals or silently mixing treatments left by another configured provider.
+    private func averageDailyTDD(
+        from statuses: [NightscoutDeviceStatusSnapshot],
+        source: AIDAnalyticsSource,
+        fromDate: Date,
+        toDate: Date
+    ) -> Double? {
+        switch source {
+        case .nightscout:
+            return averageNightscoutDailyTDD(from: statuses)
+        case .careLink:
+            return averageCareLinkDailyTDD(fromDate: fromDate, toDate: toDate)
+        }
+    }
+
+    private func averageNightscoutDailyTDD(from statuses: [NightscoutDeviceStatusSnapshot]) -> Double? {
         // Trio's published TDD is the complete delivered total: bolus + temporary basal +
         // scheduled basal. The newest value for each day is therefore the daily value to average.
         // Source: https://github.com/nightscout/Trio/blob/main/Trio/Sources/APS/Storage/TDDStorage.swift
@@ -682,6 +773,38 @@ public final class StatisticsManager: @unchecked Sendable {
         }
 
         return average(dailyValues)
+    }
+
+    private func averageCareLinkDailyTDD(fromDate: Date, toDate: Date) -> Double? {
+        let context = coreDataManager.privateManagedObjectContext
+        var dailyTotals = [Date: Double]()
+
+        context.performAndWait {
+            let request: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSPredicate(format: "date >= %@ AND date <= %@", fromDate as NSDate, toDate as NSDate),
+                NSPredicate(
+                    format: "treatmentType IN %@",
+                    [TreatmentType.Insulin.rawValue, TreatmentType.AutomaticBasal.rawValue].map(NSNumber.init(value:))
+                ),
+                NSPredicate(format: "enteredBy == %@", "CareLink"),
+                NSCompoundPredicate(orPredicateWithSubpredicates: [
+                    NSPredicate(format: "treatmentdeleted == NO"),
+                    NSPredicate(format: "treatmentdeleted == nil")
+                ]),
+                NSPredicate(format: "value > 0 AND value < 300")
+            ])
+            request.returnsObjectsAsFaults = false
+            request.includesPropertyValues = true
+
+            guard let treatments = try? context.fetch(request) else { return }
+            dailyTotals = treatments.reduce(into: [:]) { totals, treatment in
+                totals[calendar.startOfDay(for: treatment.date), default: 0] += treatment.value
+            }
+        }
+
+        let plausibleTotals = dailyTotals.values.filter { $0 > 0 && $0 < 300 }
+        return average(Array(plausibleTotals))
     }
 
     /// Nightscout does not expose Trio's local LoopStatRecord objects, so completed loop
@@ -728,18 +851,30 @@ public final class StatisticsManager: @unchecked Sendable {
         }
     }
 
-    private func aidSystemName(from status: NightscoutDeviceStatusSnapshot?) -> String? {
-        guard let device = status?.device else { return nil }
+    /// Produces a clinical system label without inferring SmartGuard from CareLink connectivity.
+    /// A CareLink pump is called SmartGuard only when persisted history contains a proven automated
+    /// activity timestamp. Otherwise the accurate provider-level label remains CareLink.
+    private func aidSystemName(
+        from statuses: [NightscoutDeviceStatusSnapshot],
+        source: AIDAnalyticsSource
+    ) -> String? {
+        switch source {
+        case .careLink:
+            let hasSmartGuardEvidence = statuses.contains { $0.lastLoopDate > .distantPast }
+            return hasSmartGuardEvidence ? "MiniMed SmartGuard" : "CareLink"
+        case .nightscout:
+            guard let device = statuses.last?.device else { return nil }
 
-        switch device {
-        case let value where value.starts(with: "loop://"):
-            return "Loop"
-        case let value where value.starts(with: "openaps://"):
-            return "AAPS"
-        case "Trio", "iAPS":
-            return device
-        default:
-            return nil
+            switch device {
+            case let value where value.starts(with: "loop://"):
+                return "Loop"
+            case let value where value.starts(with: "openaps://"):
+                return "AAPS"
+            case "Trio", "iAPS":
+                return device
+            default:
+                return nil
+            }
         }
     }
 
@@ -856,14 +991,19 @@ public final class StatisticsManager: @unchecked Sendable {
         }
     }
 
-    private func loopalyzerTreatmentMarkers(fromDate: Date, toDate: Date, treatmentType: TreatmentType) -> [GlucoseReportLoopalyzerTreatmentMarker] {
+    private func loopalyzerTreatmentMarkers(
+        fromDate: Date,
+        toDate: Date,
+        treatmentType: TreatmentType,
+        source: AIDAnalyticsSource? = nil
+    ) -> [GlucoseReportLoopalyzerTreatmentMarker] {
         let context = coreDataManager.privateManagedObjectContext
         var markers = [GlucoseReportLoopalyzerTreatmentMarker]()
 
         context.performAndWait {
             let request: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
             request.sortDescriptors = [NSSortDescriptor(key: #keyPath(TreatmentEntry.date), ascending: true)]
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            var predicates: [NSPredicate] = [
                 NSPredicate(format: "date >= %@ AND date <= %@", fromDate as NSDate, toDate as NSDate),
                 NSPredicate(format: "treatmentType == %@", NSNumber(value: treatmentType.rawValue)),
                 // `treatmentdeleted` was historically optional in the Core Data model. Include
@@ -873,7 +1013,11 @@ public final class StatisticsManager: @unchecked Sendable {
                     NSPredicate(format: "treatmentdeleted == nil")
                 ]),
                 NSPredicate(format: "value > 0")
-            ])
+            ]
+            if let source {
+                predicates.append(treatmentSourcePredicate(for: source))
+            }
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
             request.returnsObjectsAsFaults = false
             request.includesPropertyValues = true
 
@@ -888,6 +1032,21 @@ public final class StatisticsManager: @unchecked Sendable {
         }
 
         return markers
+    }
+
+    /// Treatment history can outlive a Settings change, just like normalized device status.
+    /// CareLink has an explicit importer identity. Nightscout retains the established behavior of
+    /// including imported and manual records while excluding only records proven to be CareLink's.
+    private func treatmentSourcePredicate(for source: AIDAnalyticsSource) -> NSPredicate {
+        switch source {
+        case .careLink:
+            return NSPredicate(format: "enteredBy == %@", "CareLink")
+        case .nightscout:
+            return NSCompoundPredicate(orPredicateWithSubpredicates: [
+                NSPredicate(format: "enteredBy != %@", "CareLink"),
+                NSPredicate(format: "enteredBy == nil")
+            ])
+        }
     }
 
     private func basalTreatmentSamples(fromDate: Date, toDate: Date) -> [BasalTreatmentSample] {
@@ -1207,7 +1366,8 @@ public final class StatisticsManager: @unchecked Sendable {
         samples: [CGMSample],
         fromDate: Date,
         toDate: Date,
-        period: GlucoseReportPeriod
+        period: GlucoseReportPeriod,
+        aidAnalyticsSource: AIDAnalyticsSource?
     ) -> [GlucoseReportTrendPoint] {
         // Short analysis windows need finer buckets to show a useful trend. Longer windows retain
         // weekly averages so the plots remain clinically readable instead of becoming noisy.
@@ -1218,7 +1378,8 @@ public final class StatisticsManager: @unchecked Sendable {
         let treatmentTrendValues = treatmentTrendValues(
             fromDate: fromDate,
             toDate: toDate,
-            bucketDuration: bucket.duration
+            bucketDuration: bucket.duration,
+            source: aidAnalyticsSource
         )
 
         return grouped.keys.sorted().compactMap { bucketIndex -> GlucoseReportTrendPoint? in
@@ -1243,11 +1404,29 @@ public final class StatisticsManager: @unchecked Sendable {
     private func treatmentTrendValues(
         fromDate: Date,
         toDate: Date,
-        bucketDuration: TimeInterval
+        bucketDuration: TimeInterval,
+        source: AIDAnalyticsSource?
     ) -> (averageTDDPerDay: [Int: Double], averageCarbsPerDay: [Int: Double]) {
+        // TDD and carbohydrate trends are the lightweight AID enhancement used by Statistics.
+        // Do not infer eligibility merely because manual or stale treatments happen to exist.
+        guard let source else { return ([:], [:]) }
+
         let treatments = treatmentSamples(fromDate: fromDate, toDate: toDate)
-        let insulinTreatments = treatments.filter { $0.type == .Insulin && $0.value > 0 && $0.value < 300 }
-        let carbTreatments = treatments.filter { $0.type == .Carbs && $0.value > 0 && $0.value < 1000 }
+        let sourceTreatments = treatments.filter { treatment in
+            switch source {
+            case .careLink:
+                return treatment.enteredBy == "CareLink"
+            case .nightscout:
+                // Preserve existing Nightscout/manual treatment behavior while excluding CareLink
+                // records that can remain in Core Data after the authoritative source changes.
+                return treatment.enteredBy != "CareLink"
+            }
+        }
+        let insulinTreatments = sourceTreatments.filter {
+            let isDeliveredInsulin = $0.type == .Insulin || (source == .careLink && $0.type == .AutomaticBasal)
+            return isDeliveredInsulin && $0.value > 0 && $0.value < 300
+        }
+        let carbTreatments = sourceTreatments.filter { $0.type == .Carbs && $0.value > 0 && $0.value < 1000 }
         let intervalDays = max(toDate.timeIntervalSince(fromDate) / (24 * 60 * 60), 1)
 
         guard Double(insulinTreatments.count) / intervalDays >= 3 else {
@@ -1269,7 +1448,11 @@ public final class StatisticsManager: @unchecked Sendable {
             request.sortDescriptors = [NSSortDescriptor(key: #keyPath(TreatmentEntry.date), ascending: true)]
             request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 NSPredicate(format: "date >= %@ AND date <= %@", fromDate as NSDate, toDate as NSDate),
-                NSPredicate(format: "treatmentType IN %@", [TreatmentType.Insulin.rawValue, TreatmentType.Carbs.rawValue]),
+                NSPredicate(
+                    format: "treatmentType IN %@",
+                    [TreatmentType.Insulin.rawValue, TreatmentType.Carbs.rawValue, TreatmentType.AutomaticBasal.rawValue]
+                        .map(NSNumber.init(value:))
+                ),
                 NSCompoundPredicate(orPredicateWithSubpredicates: [
                     NSPredicate(format: "treatmentdeleted == NO"),
                     NSPredicate(format: "treatmentdeleted == nil")
@@ -1280,7 +1463,14 @@ public final class StatisticsManager: @unchecked Sendable {
             request.includesPropertyValues = true
 
             guard let treatments = try? context.fetch(request) else { return }
-            samples = treatments.map { TreatmentSample(date: $0.date, value: $0.value, type: $0.treatmentType) }
+            samples = treatments.map {
+                TreatmentSample(
+                    date: $0.date,
+                    value: $0.value,
+                    type: $0.treatmentType,
+                    enteredBy: $0.enteredBy
+                )
+            }
         }
 
         return samples

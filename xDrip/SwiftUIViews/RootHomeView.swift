@@ -959,10 +959,10 @@ struct RootHomeView: View {
     }
 
     private func historicalLoopState(_ loopState: RootHomeLoopState) -> RootHomeLoopState {
-        var loopState = loopState
-        loopState.isHistorical = true
-
-        return loopState
+        stateModel.historicalLoopState(
+            loopState,
+            aidAnalyticsSource: UserDefaults.standard.dataFlowPolicy.aidAnalyticsSource
+        )
     }
 
     private var miniChartState: GlucoseChartState {

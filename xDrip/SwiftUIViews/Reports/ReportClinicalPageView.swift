@@ -527,7 +527,9 @@ private struct GlucoseReportAIDSectionView: View {
                 insulinTreatmentMarkers: aidAnalytics.insulinTreatmentMarkers,
                 carbTreatmentMarkers: aidAnalytics.carbTreatmentMarkers,
                 usesMgDl: usesMgDl,
-                language: language
+                language: language,
+                supportsCOB: aidAnalytics.supportsCOB,
+                supportsScheduledBasalAnalytics: aidAnalytics.supportsScheduledBasalAnalytics
             )
 
             Text(language.text(.loopalyzerFootnote))
@@ -600,6 +602,8 @@ private struct GlucoseReportLoopalyzerChart: View {
     let carbTreatmentMarkers: [GlucoseReportLoopalyzerTreatmentMarker]
     let usesMgDl: Bool
     let language: GlucoseReportLanguage
+    let supportsCOB: Bool
+    let supportsScheduledBasalAnalytics: Bool
 
     private enum Layout {
         static let plotHeight: CGFloat = 50
@@ -611,12 +615,25 @@ private struct GlucoseReportLoopalyzerChart: View {
 
     var body: some View {
         VStack(spacing: 5) {
-            reportChart(title: language.text(.scheduledBasalProfile), yDomain: 0 ... basalUpperBound, basalProfile: true)
+            // Both basal charts depend on a scheduled profile. CareLink provides delivered
+            // automatic-basal amounts but no profile from which either chart can be calculated.
+            if supportsScheduledBasalAnalytics {
+                reportChart(title: language.text(.scheduledBasalProfile), yDomain: 0 ... basalUpperBound, basalProfile: true)
+            }
             reportChart(title: language.text(.averageGlucose), yDomain: glucoseDomain, glucose: true)
-            reportChart(title: language.text(.tempBasalDelta), yDomain: basalDeltaDomain, basalDelta: true)
+            if supportsScheduledBasalAnalytics {
+                reportChart(title: language.text(.tempBasalDelta), yDomain: basalDeltaDomain, basalDelta: true)
+            }
             reportChart(title: "IOB", yDomain: -1 ... iobUpperBound, iob: true)
-            reportChart(title: "COB", yDomain: 0 ... cobUpperBound, cob: true)
+            // CareLink contributes the vertical meal-entry markers but no decaying COB series.
+            // State that limitation in the clinical chart instead of presenting an empty COB plot
+            // as though zero or missing data were an algorithm result.
+            reportChart(title: carbChartTitle, yDomain: 0 ... cobUpperBound, cob: true)
         }
+    }
+
+    private var carbChartTitle: String {
+        supportsCOB ? "COB" : language.text(.careLinkCarbChartTitle)
     }
 
     private func reportChart(
@@ -779,7 +796,9 @@ private struct GlucoseReportLoopalyzerChart: View {
     private func chartTitle(_ title: String) -> some View {
         Text(title.uppercased())
             .font(.system(size: 7.5, weight: .semibold))
-        .foregroundStyle(GlucoseReportColors.secondaryText)
+            .foregroundStyle(GlucoseReportColors.secondaryText)
+            .lineLimit(1)
+            .minimumScaleFactor(0.65)
     }
 
     @ChartContentBuilder private func nighttimeBackground(yDomain: ClosedRange<Double>) -> some ChartContent {

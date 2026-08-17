@@ -120,7 +120,10 @@ final class GenerateReportViewModel: ObservableObject {
     }
 
     var aidReportIsAvailable: Bool {
-        UserDefaults.standard.dataFlowPolicy.showsAIDData
+        // Report eligibility is broader than the external Nightscout loop status used by Home,
+        // Watch and alerts. The policy also admits CareLink when it is the effective therapy owner.
+        // StatisticsManager then requires enough provider-owned history before adding the AID page.
+        UserDefaults.standard.dataFlowPolicy.supportsAIDEnhancedAnalytics
     }
 
     private var trimmedPasswordToOpen: String? {
