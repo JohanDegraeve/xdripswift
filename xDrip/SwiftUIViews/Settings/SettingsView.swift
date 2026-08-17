@@ -796,6 +796,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     // Releaser builds with Loop share disabled should not show this feature at all.
                     isVisible: !Bundle.main.disableLoopShare,
                     detail: {
+                        guard UserDefaults.standard.canConfigureOSAidSharing else {
+                            return Texts_Common.disabled
+                        }
                         let shareType = UserDefaults.standard.loopShareType
                         return shareType == .disabled ? nil : shareType.description
                     },

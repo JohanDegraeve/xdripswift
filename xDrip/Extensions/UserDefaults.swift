@@ -2873,10 +2873,31 @@ extension UserDefaults {
         }
     }
 
-    /// True when OS-AID Share is enabled and the current CGM source is Medtrum Nano.
+    /// Safety policy for the active direct or follower CGM source.
+    /// An unconfigured direct source remains allowed, matching the default for existing sources.
+    var activeOSAidSharingPolicy: OSAidSharingPolicy {
+        if isMaster {
+            return cgmTransmitterType?.osAidSharingPolicy ?? .allowed
+        }
+
+        return followerDataSourceType.osAidSharingPolicy
+    }
+
+    /// Whether the selected source may expose the OS-AID target controls.
+    var canConfigureOSAidSharing: Bool {
+        activeOSAidSharingPolicy != .blocked
+    }
+
+    /// Whether the current source and consent state permit an app-group publication.
+    var canPublishOSAidData: Bool {
+        guard loopShareType != .disabled else { return false }
+        return activeOSAidSharingPolicy.permitsSharing(hasExplicitConsent: loopShareMedtrumNano)
+    }
+
+    /// True when EasyView follower data is selected and its explicit OS-AID consent can be shown.
     var loopShareMedtrumNanoAvailable: Bool {
         return loopShareType != .disabled
-            && ((isMaster && cgmTransmitterType == .medtrumTouchCareNano) || (!isMaster && followerDataSourceType == .medtrumEasyView))
+            && activeOSAidSharingPolicy == .requiresExplicitConsent
     }
 
     /// Share Medtrum Nano glucose values with OS-AID app groups.

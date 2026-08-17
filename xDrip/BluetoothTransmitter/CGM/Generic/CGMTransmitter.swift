@@ -106,6 +106,17 @@ enum CGMTransmitterType:String, CaseIterable {
     /// Keep this raw value stable because it is persisted in UserDefaults.
     case medtrumTouchCareNano = "Medtrum Nano"
 
+    /// Direct Medtrum Nano glucose is already consumed by the connected pump and must not be
+    /// exported as an independent CGM source to another OS-AID system.
+    var osAidSharingPolicy: OSAidSharingPolicy {
+        switch self {
+        case .medtrumTouchCareNano:
+            return .blocked
+        default:
+            return .allowed
+        }
+    }
+
     /// what sensorType does this CGMTransmitter type support
     func sensorType() -> CGMSensorType {
         

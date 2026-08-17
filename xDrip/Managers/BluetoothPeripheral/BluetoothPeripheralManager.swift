@@ -51,11 +51,14 @@ class BluetoothPeripheralManager: NSObject {
                 
                 cgmTransmitterInfoChanged()
 
-                // share new address with loop, but not if loop share is disabled
+                // Share legacy transmitter connection details only when the active glucose source
+                // is permitted to publish to the selected OS-AID target.
                 if UserDefaults.standard.loopShareType != .disabled {
-
-                    setCGMTransmitterInSharedUserDefaults()
-
+                    if UserDefaults.standard.canPublishOSAidData {
+                        setCGMTransmitterInSharedUserDefaults()
+                    } else {
+                        clearCGMTransmitterInSharedUserDefaults()
+                    }
                 }
                 
             }
@@ -590,6 +593,18 @@ class BluetoothPeripheralManager: NSObject {
             
         }
         
+    }
+
+    /// Removes legacy xdrip-client-swift connection details when the active source cannot be used
+    /// as an OS-AID CGM source.
+    private func clearCGMTransmitterInSharedUserDefaults() {
+        guard let sharedUserDefaults = UserDefaults(suiteName: UserDefaults.standard.loopShareType.sharedUserDefaultsSuiteName) else {
+            return
+        }
+
+        sharedUserDefaults.removeObject(forKey: "cgmTransmitterDeviceAddress")
+        sharedUserDefaults.removeObject(forKey: "cgmTransmitter_CBUUID_Service")
+        sharedUserDefaults.removeObject(forKey: "cgmTransmitter_CBUUID_Receive")
     }
 
     /// when user changes M5Stack related settings, then the transmitter need to get that info, add observers

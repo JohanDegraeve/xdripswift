@@ -420,12 +420,11 @@ public class LoopManager: NSObject {
         // will return if loop share is disabled
         guard UserDefaults.standard.loopShareType != .disabled else { return }
 
-        // Medtrum Nano CGM data is not shared with OS-AID apps unless the user explicitly opts in.
-        // This is due to the sensor being pulled by European Health Agencies (March/April 2026) due to inaccurate results
-        // and fears over inaccurate dosing by AID systems.
-        // SPANISH: https://www.aemps.gob.es/informa/la-aemps-informa-del-cese-de-comercializacion-y-retirada-del-mercado-del-sensor-y-transmisor-del-sistema-de-monitorizacion-continua-de-glucosa-a8-touchcare/
-        guard !Self.medtrumNanoShareBlocked else {
-            clearSharedLoopReadings()
+        // Apply the active source policy before reading or writing the shared app group. Direct
+        // Medtrum Nano is always blocked; EasyView retains its explicit consent requirement.
+        guard Self.osAidSharingPermitted else {
+            glucoseData.removeAll()
+            clearBlockedSourceSharedData()
             return
         }
 
@@ -668,8 +667,7 @@ public class LoopManager: NSObject {
         clearSensorState: Bool = false
     ) {
         guard !Bundle.main.disableLoopShare,
-              UserDefaults.standard.loopShareType == .trio,
-              let sharedUserDefaults = UserDefaults(suiteName: UserDefaults.standard.loopShareType.sharedUserDefaultsSuiteName)
+              UserDefaults.standard.loopShareType == .trio
         else { return }
 
         if let lastCommunicationAt {
@@ -680,6 +678,17 @@ public class LoopManager: NSObject {
         } else if let sensorState {
             explicitSensorState = sensorState
         }
+
+        guard Self.osAidSharingPermitted else {
+            glucoseData.removeAll()
+            clearBlockedSourceSharedData()
+            return
+        }
+
+        guard let sharedUserDefaults = UserDefaults(suiteName: UserDefaults.standard.loopShareType.sharedUserDefaultsSuiteName) else {
+            return
+        }
+
         if clearReadings {
             writeLegacyReadings([], sharedUserDefaults: sharedUserDefaults)
         }
@@ -773,6 +782,21 @@ public class LoopManager: NSObject {
         guard let data = try? JSONSerialization.data(withJSONObject: readings) else { return }
         sharedUserDefaults.set(data, forKey: "latestReadings")
         UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = readings
+    }
+
+    /// Removes every legacy outward value that could let an OS-AID consumer use a source whose
+    /// policy is currently blocked or still awaiting consent.
+    private func clearBlockedSourceSharedData() {
+        clearSharedLoopReadings()
+
+        let suiteName = UserDefaults.standard.loopShareType.sharedUserDefaultsSuiteName
+        guard !suiteName.isEmpty, let sharedUserDefaults = UserDefaults(suiteName: suiteName) else {
+            return
+        }
+
+        sharedUserDefaults.removeObject(forKey: "cgmTransmitterDeviceAddress")
+        sharedUserDefaults.removeObject(forKey: "cgmTransmitter_CBUUID_Service")
+        sharedUserDefaults.removeObject(forKey: "cgmTransmitter_CBUUID_Receive")
     }
 
     private func latestPreviouslySharedGlucoseAt() -> Date? {
@@ -941,8 +965,8 @@ public class LoopManager: NSObject {
         return nil
     }
 
-    public static var medtrumNanoShareBlocked: Bool {
-        return UserDefaults.standard.loopShareMedtrumNanoAvailable && !UserDefaults.standard.loopShareMedtrumNano
+    static var osAidSharingPermitted: Bool {
+        UserDefaults.standard.canPublishOSAidData
     }
 
 }

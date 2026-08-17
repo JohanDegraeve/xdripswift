@@ -8,6 +8,27 @@
 
 import Foundation
 
+/// Declares whether glucose from a source may be published to an OS-AID app group.
+///
+/// Most sources are allowed. Sources that need a safety exception can either require the
+/// existing explicit Medtrum consent or be blocked completely.
+enum OSAidSharingPolicy: Equatable {
+    case allowed
+    case requiresExplicitConsent
+    case blocked
+
+    func permitsSharing(hasExplicitConsent: Bool) -> Bool {
+        switch self {
+        case .allowed:
+            return true
+        case .requiresExplicitConsent:
+            return hasExplicitConsent
+        case .blocked:
+            return false
+        }
+    }
+}
+
 /// To hide follower types at runtime, provide their stored raw values in the override file:
 /// IGNORE_FOLLOWER_TYPES = [1,2]
 private var disabledFollowerDataSources: Set<FollowerDataSourceType> {
@@ -79,6 +100,17 @@ public enum FollowerDataSourceType: Int, CaseIterable {
     /// Whether this data source is enabled for use (controlled by disabledFollowerDataSources).
     var isEnabled: Bool {
         !disabledFollowerDataSources.contains(self)
+    }
+
+    /// EasyView can represent a CGM-only follower use case, so retain its existing warned consent
+    /// path. All other follower sources remain allowed by default.
+    var osAidSharingPolicy: OSAidSharingPolicy {
+        switch self {
+        case .medtrumEasyView:
+            return .requiresExplicitConsent
+        default:
+            return .allowed
+        }
     }
     
     var description: String {

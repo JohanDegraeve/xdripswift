@@ -76,17 +76,19 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         let loopShareTypes = LoopShareType.allCases
         var loopShareTypeRow = nativeSettingsRow(id: "developer.loopShareType", index: Setting.loopShareType.rawValue, sectionID: sectionID)
         loopShareTypeRow.accessory = .none
-        loopShareTypeRow.control = .menu(
-            options: {
-                loopShareTypes.map {
-                    SettingsMenuOption(title: $0.description, isSelected: $0 == UserDefaults.standard.loopShareType)
+        if UserDefaults.standard.canConfigureOSAidSharing {
+            loopShareTypeRow.control = .menu(
+                options: {
+                    loopShareTypes.map {
+                        SettingsMenuOption(title: $0.description, isSelected: $0 == UserDefaults.standard.loopShareType)
+                    }
+                },
+                selectOption: { index in
+                    guard loopShareTypes.indices.contains(index) else { return }
+                    UserDefaults.standard.loopShareType = loopShareTypes[index]
                 }
-            },
-            selectOption: { index in
-                guard loopShareTypes.indices.contains(index) else { return }
-                UserDefaults.standard.loopShareType = loopShareTypes[index]
-            }
-        )
+            )
+        }
 
         let advancedRows = [
             nativeSettingsRow(id: "developer.showDeveloperSettings", index: Setting.showDeveloperSettings.rawValue, sectionID: sectionID),
@@ -119,7 +121,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
 
         let osAidLoopShareRows = [
             loopShareTypeRow,
-            nativeSettingsRow(id: "developer.loopDelay", index: Setting.loopDelay.rawValue, sectionID: sectionID, isVisible: UserDefaults.standard.loopShareType != .disabled),
+            nativeSettingsRow(id: "developer.loopDelay", index: Setting.loopDelay.rawValue, sectionID: sectionID, isVisible: UserDefaults.standard.canConfigureOSAidSharing && UserDefaults.standard.loopShareType != .disabled),
             nativeSettingsRow(id: "developer.loopShareMedtrumNano", index: Setting.loopShareMedtrumNano.rawValue, sectionID: sectionID, isVisible: UserDefaults.standard.loopShareMedtrumNanoAvailable),
             nativeSettingsRow(id: "developer.loopShareSmoothedData", index: Setting.loopShareSmoothedData.rawValue, sectionID: sectionID, isVisible: showLoopShareSmoothedDataRow)
         ]
@@ -240,7 +242,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             return nil
 
         case .loopShareType:
-            return UserDefaults.standard.loopShareType.description
+            return UserDefaults.standard.canConfigureOSAidSharing ? UserDefaults.standard.loopShareType.description : Texts_Common.disabled
             
         case .libreLinkUpVersion:
             return UserDefaults.standard.libreLinkUpVersion
@@ -462,6 +464,12 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
     }
     
     func isEnabled(index: Int) -> Bool {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        if setting == .loopShareType {
+            return UserDefaults.standard.canConfigureOSAidSharing
+        }
+
         return true
     }
 
@@ -501,9 +509,8 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
     }
 
     private var showLoopShareSmoothedDataRow: Bool {
-        return UserDefaults.standard.loopShareType != .disabled
+        return UserDefaults.standard.canPublishOSAidData
             && UserDefaults.standard.enableSmoothing
-            && !LoopManager.medtrumNanoShareBlocked
     }
     
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {

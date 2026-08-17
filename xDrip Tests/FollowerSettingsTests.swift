@@ -104,6 +104,149 @@ final class FollowerSettingsTests: XCTestCase {
         )
     }
 
+    func testOSAidSharingPoliciesAreSourceAware() {
+        XCTAssertEqual(CGMTransmitterType.medtrumTouchCareNano.osAidSharingPolicy, .blocked)
+        XCTAssertEqual(FollowerDataSourceType.medtrumEasyView.osAidSharingPolicy, .requiresExplicitConsent)
+
+        for transmitter in CGMTransmitterType.allCases where transmitter != .medtrumTouchCareNano {
+            XCTAssertEqual(transmitter.osAidSharingPolicy, .allowed)
+        }
+
+        for follower in FollowerDataSourceType.allCases where follower != .medtrumEasyView {
+            XCTAssertEqual(follower.osAidSharingPolicy, .allowed)
+        }
+    }
+
+    func testDirectMedtrumIsBlockedWithoutChangingStoredTarget() {
+        defaults.loopShareType = .trio
+        defaults.isMaster = true
+        defaults.cgmTransmitterTypeAsString = CGMTransmitterType.medtrumTouchCareNano.rawValue
+        defaults.enableSmoothing = true
+        defaults.loopShareSmoothedData = true
+
+        XCTAssertEqual(defaults.activeOSAidSharingPolicy, .blocked)
+        XCTAssertFalse(defaults.canConfigureOSAidSharing)
+        XCTAssertFalse(defaults.canPublishOSAidData)
+        XCTAssertEqual(defaults.loopShareType, .trio)
+    }
+
+    func testEasyViewRequiresConsentAndRetainsSmoothedOverride() {
+        defaults.loopShareType = .trio
+        defaults.isMaster = false
+        defaults.followerDataSourceType = .medtrumEasyView
+        defaults.enableSmoothing = true
+
+        XCTAssertEqual(defaults.activeOSAidSharingPolicy, .requiresExplicitConsent)
+        XCTAssertTrue(defaults.canConfigureOSAidSharing)
+        XCTAssertFalse(defaults.canPublishOSAidData)
+
+        defaults.loopShareMedtrumNano = true
+        defaults.loopShareSmoothedData = true
+
+        XCTAssertTrue(defaults.canPublishOSAidData)
+        XCTAssertTrue(defaults.loopShareSmoothedData)
+    }
+
+    func testUnconfiguredDirectAndOtherSourcesRemainAllowed() {
+        defaults.loopShareType = .loop
+        defaults.isMaster = true
+        defaults.cgmTransmitterTypeAsString = nil
+
+        XCTAssertEqual(defaults.activeOSAidSharingPolicy, .allowed)
+        XCTAssertTrue(defaults.canConfigureOSAidSharing)
+        XCTAssertTrue(defaults.canPublishOSAidData)
+
+        defaults.isMaster = false
+        for follower in FollowerDataSourceType.allCases where follower != .medtrumEasyView {
+            defaults.followerDataSourceType = follower
+            XCTAssertTrue(defaults.canPublishOSAidData, "Expected \(follower) to remain allowed")
+        }
+    }
+
+    @MainActor
+    func testDirectMedtrumDisablesOSAidRowsAndShowsDisabledDetail() {
+        withTemporaryStandardDefaults { standard in
+            standard.loopShareType = .trio
+            standard.isMaster = true
+            standard.cgmTransmitterTypeAsString = CGMTransmitterType.medtrumTouchCareNano.rawValue
+            standard.enableSmoothing = true
+
+            let rows = SettingsViewDevelopmentSettingsViewModel(rowGroup: .osAidLoopShare).settingsRows(sectionID: 0)
+            guard let targetRow = rows.first(where: { $0.id == "developer.loopShareType" }) else {
+                return XCTFail("OS-AID target row was missing")
+            }
+
+            XCTAssertEqual(targetRow.detail, Texts_Common.disabled)
+            XCTAssertFalse(targetRow.isEnabled)
+            XCTAssertNil(targetRow.control)
+            XCTAssertEqual(rows.first { $0.id == "developer.loopDelay" }?.isVisible, false)
+            XCTAssertEqual(rows.first { $0.id == "developer.loopShareMedtrumNano" }?.isVisible, false)
+            XCTAssertEqual(rows.first { $0.id == "developer.loopShareSmoothedData" }?.isVisible, false)
+        }
+    }
+
+    @MainActor
+    func testBlockedShareClearsPublishedAndDelayedData() throws {
+        try withTemporaryStandardDefaults { standard in
+            standard.loopShareType = .trio
+            standard.isMaster = true
+            standard.cgmTransmitterTypeAsString = CGMTransmitterType.medtrumTouchCareNano.rawValue
+
+            let suiteName = try XCTUnwrap(standard.loopShareType.sharedUserDefaultsSuiteName.toNilIfLength0())
+            let sharedDefaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+            let sharedKeys = [
+                "latestReadings",
+                XDripCGMMetadataEnvelope.appGroupKey,
+                "cgmTransmitterDeviceAddress",
+                "cgmTransmitter_CBUUID_Service",
+                "cgmTransmitter_CBUUID_Receive"
+            ]
+            let previousSharedValues = sharedKeys.map { ($0, sharedDefaults.object(forKey: $0)) }
+            defer {
+                for (key, value) in previousSharedValues {
+                    if let value {
+                        sharedDefaults.set(value, forKey: key)
+                    } else {
+                        sharedDefaults.removeObject(forKey: key)
+                    }
+                }
+            }
+
+            sharedDefaults.set(Data("readings".utf8), forKey: "latestReadings")
+            sharedDefaults.set(Data("metadata".utf8), forKey: XDripCGMMetadataEnvelope.appGroupKey)
+            sharedDefaults.set("address", forKey: "cgmTransmitterDeviceAddress")
+            sharedDefaults.set("service", forKey: "cgmTransmitter_CBUUID_Service")
+            sharedDefaults.set("receive", forKey: "cgmTransmitter_CBUUID_Receive")
+            standard.readingsStoredInSharedUserDefaultsAsDictionary = [["Value": 123.0]]
+
+            let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+            let loopManager = LoopManager(
+                coreDataManager: coreDataManager,
+                activeSensorIsAnubisProvider: { false },
+                metadataContextProvider: {
+                    XDripCGMMetadataContext(
+                        activeSensor: nil,
+                        transmitter: nil,
+                        sensorHealthIssue: nil,
+                        hasInitialCalibration: nil,
+                        lastCalibrationAt: nil,
+                        dexcomAlgorithmState: nil,
+                        libreSensorState: nil
+                    )
+                }
+            )
+            loopManager.glucoseData = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: 123)]
+
+            loopManager.share()
+
+            XCTAssertTrue(loopManager.glucoseData.isEmpty)
+            XCTAssertNil(standard.readingsStoredInSharedUserDefaultsAsDictionary)
+            for key in sharedKeys {
+                XCTAssertNil(sharedDefaults.object(forKey: key), "Expected \(key) to be removed")
+            }
+        }
+    }
+
     func testAutomaticBasalRenderingDefaultsToDeliveredDoses() {
         XCTAssertEqual(defaults.automaticBasalRenderingStyle, .deliveredDoses)
         defaults.automaticBasalRenderingStyle = .simulatedTempBasals
@@ -345,5 +488,31 @@ final class FollowerSettingsTests: XCTestCase {
     @MainActor
     private func screenRowIDs(_ screen: SettingsScreen) -> [String] {
         screenRows(screen).map(\.id)
+    }
+
+    private func withTemporaryStandardDefaults(_ body: (UserDefaults) throws -> Void) rethrows {
+        let standard = UserDefaults.standard
+        let keys: [UserDefaults.Key] = [
+            .isMaster,
+            .followerDataSourceType,
+            .transmitterTypeAsString,
+            .loopShareType,
+            .loopShareSmoothedData,
+            .loopShareMedtrumNano,
+            .enableSmoothing,
+            .readingsStoredInSharedUserDefaultsAsDictionary
+        ]
+        let previousValues = keys.map { ($0.rawValue, standard.object(forKey: $0.rawValue)) }
+        defer {
+            for (key, value) in previousValues {
+                if let value {
+                    standard.set(value, forKey: key)
+                } else {
+                    standard.removeObject(forKey: key)
+                }
+            }
+        }
+
+        try body(standard)
     }
 }
