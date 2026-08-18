@@ -378,8 +378,8 @@ struct SensorNoiseHistoryView: View {
                     x: .value("Time", point.date),
                     y: .value("Trend", point.value)
                 )
-                .lineStyle(StrokeStyle(lineWidth: 3.25, lineCap: .round, lineJoin: .round))
-                .foregroundStyle(Color.cyan.opacity(0.7))
+                .lineStyle(StrokeStyle(lineWidth: 3.75, lineCap: .round, lineJoin: .round))
+                .foregroundStyle(Color.cyan)
             }
 
             if let displayedPoint {
