@@ -10,11 +10,21 @@ import CoreData
 import Foundation
 import os
 
+protocol CareLinkTherapyImporting: AnyObject {
+    func importPumpStatuses(
+        _ pump: CareLinkPumpSnapshot,
+        treatments: [CareLinkTherapyRecord],
+        metadata: CareLinkMetadata,
+        checkedAt: Date
+    ) async -> Int
+    func importTreatments(_ records: [CareLinkTherapyRecord]) async -> Int
+}
+
 /// Persists native CareLink treatments in the app's existing treatment store.
 ///
 /// Imported records deliberately retain an empty Nightscout identifier and `uploaded == false`.
 /// This allows the normal Nightscout manager to export them without creating a second upload path.
-final class CareLinkTherapyImporter {
+final class CareLinkTherapyImporter: CareLinkTherapyImporting {
     private let coreDataManager: CoreDataManager
     private let deviceStatusAccessor: NightscoutDeviceStatusAccessor
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCareLinkFollowManager)

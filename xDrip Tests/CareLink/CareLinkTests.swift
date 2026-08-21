@@ -848,6 +848,136 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(delegate.received.map(\.sgv), [121])
     }
 
+    func testPendingTherapyBatchRetainsUniqueRecordsAndUsesNewestValues() {
+        let first = CareLinkTherapyRecord(
+            sourceIdentifier: "first",
+            date: now,
+            type: .Carbs,
+            value: 10,
+            durationMinutes: 0,
+            nightscoutEventType: "Carb Correction",
+            notes: nil
+        )
+        let oldShared = CareLinkTherapyRecord(
+            sourceIdentifier: "shared",
+            date: now.addingTimeInterval(1),
+            type: .Insulin,
+            value: 1,
+            durationMinutes: 0,
+            nightscoutEventType: "Bolus",
+            notes: nil
+        )
+        let newShared = CareLinkTherapyRecord(
+            sourceIdentifier: "shared",
+            date: now.addingTimeInterval(1),
+            type: .Insulin,
+            value: 2,
+            durationMinutes: 0,
+            nightscoutEventType: "Bolus",
+            notes: nil
+        )
+        var firstPump = CareLinkPumpSnapshot()
+        firstPump.activeInsulin = 1
+        var newestPump = CareLinkPumpSnapshot()
+        newestPump.activeInsulin = 2
+        var batch = CareLinkTherapyImportBatch(
+            generation: 4,
+            treatments: [first, oldShared],
+            pump: firstPump,
+            metadata: CareLinkMetadata(accountName: "old"),
+            checkedAt: now
+        )
+
+        batch.merge(CareLinkTherapyImportBatch(
+            generation: 4,
+            treatments: [newShared],
+            pump: newestPump,
+            metadata: CareLinkMetadata(accountName: "new"),
+            checkedAt: now.addingTimeInterval(5)
+        ))
+
+        XCTAssertEqual(batch.treatments.map { $0.sourceIdentifier }, ["first", "shared"])
+        XCTAssertEqual(batch.treatments.last?.value, 2)
+        XCTAssertEqual(batch.pump.activeInsulin, 2)
+        XCTAssertEqual(batch.metadata.accountName, "new")
+        XCTAssertEqual(batch.checkedAt, now.addingTimeInterval(5))
+    }
+
+    @MainActor
+    func testBlockedTherapyImportCannotBlockGlucoseOrAnotherPoll() async throws {
+        let defaultsSnapshot = CareLinkDefaultsSnapshot(keys: [
+            .isMaster,
+            .followerDataSourceType,
+            .followerBackgroundKeepAliveType,
+            .therapyDataSourceType,
+            .careLinkUsername,
+            .careLinkPassword,
+            .careLinkRegion,
+            .careLinkSelectedPatientID,
+        ])
+        let defaults = UserDefaults.standard
+        defaults.isMaster = false
+        defaults.followerDataSourceType = .careLink
+        defaults.followerBackgroundKeepAliveType = .heartbeat
+        defaults.therapyDataSourceType = .automatic
+        defaults.careLinkUsername = "patient1"
+        defaults.careLinkPassword = "password"
+        defaults.careLinkRegion = CareLinkRegion.outsideUnitedStates.rawValue
+        defaults.careLinkSelectedPatientID = nil
+
+        let delegate = FollowerDelegateSpy()
+        let state = CareLinkAccountState()
+        let importer = BlockingCareLinkTherapyImporter()
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        var manager: CareLinkFollowManager? = CareLinkFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: delegate,
+            backgroundKeepAliveManager: CareLinkNoOpKeepAliveManager(),
+            client: makeClient(),
+            state: state,
+            therapyImporter: importer,
+            pollingSchedulerFactory: { _, _ in CareLinkNoOpTimer() }
+        )
+        defer {
+            manager = nil
+            defaultsSnapshot.restore()
+            Task { await importer.releaseAll() }
+        }
+
+        let firstDeliveryCompleted = await waitUntil { delegate.deliveryCount == 1 }
+        XCTAssertTrue(firstDeliveryCompleted)
+        XCTAssertEqual(delegate.received.first?.sgv, 123)
+        let firstImportStarted = await waitUntil { await importer.treatmentCallCount == 1 }
+        XCTAssertTrue(firstImportStarted)
+
+        manager?.refreshNow()
+
+        // This is the smoking-gun assertion: the second response reaches the established follower
+        // delegate even though the first response's therapy persistence has not returned.
+        let secondDeliveryCompleted = await waitUntil { delegate.deliveryCount == 2 }
+        XCTAssertTrue(secondDeliveryCompleted)
+        let blockedTreatmentCallCount = await importer.treatmentCallCount
+        let blockedMaximumConcurrentImports = await importer.maximumConcurrentTreatmentImports
+        XCTAssertEqual(blockedTreatmentCallCount, 1)
+        XCTAssertEqual(blockedMaximumConcurrentImports, 1)
+
+        await importer.releaseNext()
+        let secondImportStarted = await waitUntil { await importer.treatmentCallCount == 2 }
+        XCTAssertTrue(secondImportStarted)
+        let firstImportPublished = await waitUntil { state.snapshot.lastTherapyImportAt != nil }
+        XCTAssertTrue(firstImportPublished)
+        let publishedImportDate = state.snapshot.lastTherapyImportAt
+
+        defaults.followerDataSourceType = .nightscout
+        await Task.yield()
+        await importer.releaseNext()
+        let bothImportsCompleted = await waitUntil { await importer.completedTreatmentImportCount == 2 }
+        XCTAssertTrue(bothImportsCompleted)
+        XCTAssertEqual(state.snapshot.lastTherapyImportAt, publishedImportDate)
+        let maximumConcurrentImports = await importer.maximumConcurrentTreatmentImports
+        XCTAssertEqual(maximumConcurrentImports, 1)
+    }
+
     func testLifecyclePolicyRequiresSelectionCredentialsAndSessionForPolling() {
         XCTAssertEqual(
             CareLinkLifecyclePolicy.state(isSelected: false, hasCredentials: true, hasSession: true),
@@ -1433,6 +1563,15 @@ final class CareLinkTests: XCTestCase {
         configuration.protocolClasses = [URLProtocolStub.self]
         return configuration
     }
+
+    @MainActor
+    private func waitUntil(_ condition: @escaping () async -> Bool) async -> Bool {
+        for _ in 0 ..< 200 {
+            if await condition() { return true }
+            try? await Task.sleep(nanoseconds: 10_000_000)
+        }
+        return false
+    }
 }
 
 // MARK: - Test doubles
@@ -1625,7 +1764,83 @@ private final class URLProtocolStub: URLProtocol {
 
 private final class FollowerDelegateSpy: FollowerDelegate {
     var received: [FollowerBgReading] = []
-    func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading]) { received = followGlucoseDataArray }
+    var deliveryCount = 0
+
+    func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading]) {
+        received = followGlucoseDataArray
+        deliveryCount += 1
+    }
+}
+
+private actor BlockingCareLinkTherapyImporter: CareLinkTherapyImporting {
+    private var continuations: [CheckedContinuation<Int, Never>] = []
+    private(set) var treatmentCallCount = 0
+    private(set) var completedTreatmentImportCount = 0
+    private(set) var maximumConcurrentTreatmentImports = 0
+    private var activeTreatmentImports = 0
+
+    func importTreatments(_ records: [CareLinkTherapyRecord]) async -> Int {
+        treatmentCallCount += 1
+        activeTreatmentImports += 1
+        maximumConcurrentTreatmentImports = max(maximumConcurrentTreatmentImports, activeTreatmentImports)
+        return await withCheckedContinuation { continuations.append($0) }
+    }
+
+    func importPumpStatuses(
+        _ pump: CareLinkPumpSnapshot,
+        treatments: [CareLinkTherapyRecord],
+        metadata: CareLinkMetadata,
+        checkedAt: Date
+    ) async -> Int { 1 }
+
+    func releaseNext() {
+        guard !continuations.isEmpty else { return }
+        activeTreatmentImports -= 1
+        completedTreatmentImportCount += 1
+        continuations.removeFirst().resume(returning: 1)
+    }
+
+    func releaseAll() {
+        while !continuations.isEmpty { releaseNext() }
+    }
+}
+
+private final class CareLinkNoOpKeepAliveManager: FollowerBackgroundKeepAliveManaging {
+    func start(for source: FollowerBackgroundKeepAliveSource, backgroundRefresh: (() -> Void)?) {}
+    func stop(for source: FollowerBackgroundKeepAliveSource) {}
+}
+
+private final class CareLinkNoOpTimer: FollowerBackgroundTimer {
+    func resume() {}
+    func suspend() {}
+}
+
+private final class CareLinkDefaultsSnapshot {
+    private let defaults = UserDefaults.standard
+    private let keys: [UserDefaults.Key]
+    private var values: [String: Any] = [:]
+    private var missingKeys = Set<String>()
+
+    init(keys: [UserDefaults.Key]) {
+        self.keys = keys
+        for key in keys {
+            if let value = defaults.object(forKey: key.rawValue) {
+                values[key.rawValue] = value
+            } else {
+                missingKeys.insert(key.rawValue)
+            }
+        }
+    }
+
+    func restore() {
+        for key in keys {
+            if missingKeys.contains(key.rawValue) {
+                defaults.removeObject(forKey: key.rawValue)
+            } else {
+                defaults.set(values[key.rawValue], forKey: key.rawValue)
+            }
+        }
+    }
 }
 
 private final class CareLinkControllerSpy: CareLinkControlling {

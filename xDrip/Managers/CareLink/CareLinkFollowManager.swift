@@ -32,6 +32,40 @@ enum CareLinkLifecyclePolicy {
     }
 }
 
+/// One duplicate-safe unit of deferred CareLink therapy persistence.
+///
+/// Each CareLink response contains overlapping history. Merging by the source identity retains an
+/// intermediate record even if a newer response arrives while the previous import is still active.
+struct CareLinkTherapyImportBatch {
+    let generation: Int
+    private(set) var recordsByIdentifier: [String: CareLinkTherapyRecord]
+    private(set) var pump: CareLinkPumpSnapshot
+    private(set) var metadata: CareLinkMetadata
+    private(set) var checkedAt: Date
+
+    init(generation: Int, treatments: [CareLinkTherapyRecord], pump: CareLinkPumpSnapshot, metadata: CareLinkMetadata, checkedAt: Date) {
+        self.generation = generation
+        self.recordsByIdentifier = Dictionary(treatments.map { ($0.sourceIdentifier, $0) }, uniquingKeysWith: { _, newest in newest })
+        self.pump = pump
+        self.metadata = metadata
+        self.checkedAt = checkedAt
+    }
+
+    var treatments: [CareLinkTherapyRecord] {
+        recordsByIdentifier.values.sorted {
+            $0.date == $1.date ? $0.sourceIdentifier < $1.sourceIdentifier : $0.date < $1.date
+        }
+    }
+
+    mutating func merge(_ newer: CareLinkTherapyImportBatch) {
+        guard generation == newer.generation else { return }
+        newer.recordsByIdentifier.forEach { recordsByIdentifier[$0.key] = $0.value }
+        pump = newer.pump
+        metadata = newer.metadata
+        checkedAt = newer.checkedAt
+    }
+}
+
 /// Bridges CareLink's asynchronous cloud API into the app's established follower pipeline.
 ///
 /// `RootApplicationCoordinator` retains one instance for the application lifetime. The manager
@@ -63,7 +97,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     private weak var followerDelegate: FollowerDelegate?
     private let client: CareLinkClient
     private let state: CareLinkAccountState
-    private let therapyImporter: CareLinkTherapyImporter
+    private let therapyImporter: CareLinkTherapyImporting
     /// The root-owned shared keep-alive engine; CareLink registers only after authentication and
     /// never connects an audio lifecycle event or replay tick to its polling API.
     private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
@@ -85,6 +119,10 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     private var lastPollStartedAt = Date.distantPast
     /// Retains one explicit Refresh request when a scheduled poll is already in progress.
     private var refreshRequestedWhilePolling = false
+    /// Therapy history is deliberately serialized outside the glucose polling transaction.
+    private var therapyImportTask: Task<Void, Never>?
+    private var therapyImportIdentifier: UUID?
+    private var pendingTherapyImport: CareLinkTherapyImportBatch?
     private var authController: CareLinkWebLoginViewController?
     /// Invalidates callbacks from a cancelled or superseded browser login.
     private var loginIdentifier: UUID?
@@ -102,6 +140,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging,
         client: CareLinkClient = CareLinkClient(),
         state: CareLinkAccountState = .shared,
+        therapyImporter: CareLinkTherapyImporting? = nil,
         startsInitialDownload: Bool = true,
         pollingSchedulerFactory: @escaping PollingSchedulerFactory = { interval, eventHandler in
             RepeatingTimer(timeInterval: interval, eventHandler: eventHandler)
@@ -112,7 +151,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         self.followerDelegate = followerDelegate
         self.client = client
         self.state = state
-        self.therapyImporter = CareLinkTherapyImporter(coreDataManager: coreDataManager)
+        self.therapyImporter = therapyImporter ?? CareLinkTherapyImporter(coreDataManager: coreDataManager)
         self.backgroundKeepAliveManager = backgroundKeepAliveManager
         self.startsInitialDownload = startsInitialDownload
         self.pollingSchedulerFactory = pollingSchedulerFactory
@@ -531,25 +570,11 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             let refreshedAt = await client.tokenRefreshDate()
             var parsed = try CareLinkGlucoseParser.readings(from: response.0)
             let therapy = try CareLinkTherapyParser.payload(from: response.0, patientID: patient.id)
-            let importsTherapy = UserDefaults.standard.dataFlowPolicy.importsTherapyFromCareLink
-            let importedCount = importsTherapy ? await therapyImporter.importTreatments(therapy.treatments) : 0
-            guard await pollIsCurrent(generation) else { return }
             parsed.metadata.accountName = account.metadata.accountName
             parsed.metadata.role = account.metadata.role
             parsed.metadata.countryCode = account.metadata.countryCode
             parsed.metadata.patientName = patient.displayName
             parsed.metadata.route = response.1
-            let importedPumpStatusCount: Int
-            if importsTherapy {
-                importedPumpStatusCount = await therapyImporter.importPumpStatuses(
-                    therapy.pump,
-                    treatments: therapy.treatments,
-                    metadata: parsed.metadata,
-                    checkedAt: Date()
-                )
-            } else {
-                importedPumpStatusCount = 0
-            }
             guard await pollIsCurrent(generation) else { return }
             let latest = parsed.readings.first?.timeStamp
             let hasGlucose = !parsed.readings.isEmpty
@@ -561,48 +586,14 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                 now: checkedAt
             )
             failureCount = 0
-            UserDefaults.standard.timeStampOfLastFollowerConnection = checkedAt
-            await updateState(generation: generation) { snapshot in
-                snapshot.status = connectionStatus
-                snapshot.metadata = parsed.metadata
-                snapshot.lastReadingAt = latest
-                snapshot.lastTokenRefreshAt = refreshedAt
-                snapshot.serviceReachable = true
-                snapshot.detail = CareLinkStatePolicy.detail(hasGlucose: hasGlucose, pump: therapy.pump)
-                snapshot.pump = therapy.pump
-                snapshot.importedTreatmentCount = importedCount
-                snapshot.lastTherapyImportAt = importsTherapy ? Date() : nil
-                snapshot.importedPumpStatusCount = importedPumpStatusCount
-                if importedPumpStatusCount > 0 {
-                    snapshot.lastPumpHistoryImportAt = Date()
-                }
-            }
-            // Glucose persistence and downstream behavior remain owned by the follower delegate.
-            trace(
-                "CareLink poll succeeded, route=%{public}@ readings=%{public}d therapy=%{public}d imported=%{public}d pump=%{public}@ status=%{public}@ communicating=%{public}@ inRange=%{public}@",
-                log: log,
-                category: ConstantsLog.categoryCareLinkFollowManager,
-                type: .info,
-                troubleshooting: .standard(.follower(source: .careLink, activity: .downloadSucceeded(readingCount: parsed.readings.count))),
-                response.1.rawValue,
-                parsed.readings.count,
-                therapy.treatments.count,
-                importedCount,
-                therapy.pump.observedAt == nil ? "absent" : "present",
-                connectionStatus.rawValue,
-                therapy.pump.isCommunicating.map { String(describing: $0) } ?? "unknown",
-                therapy.pump.isInRange.map { String(describing: $0) } ?? "unknown"
-            )
-            if !parsed.readings.isEmpty {
-                let readings = parsed.readings
-                await MainActor.run { [weak self] in
-                    guard let self, self.pollIsCurrentOnMain(generation) else { return }
-                    Self.deliver(readings, to: self.followerDelegate)
-                }
-            }
-            await scheduleNewDownload(
-                latestReadingAt: latest,
-                lastDataUpdateAt: therapy.pump.lastDataUpdateAt,
+            await publishSuccessfulPoll(
+                readings: parsed.readings,
+                metadata: parsed.metadata,
+                therapy: therapy,
+                route: response.1,
+                connectionStatus: connectionStatus,
+                refreshedAt: refreshedAt,
+                checkedAt: checkedAt,
                 generation: generation
             )
         } catch let error as CareLinkError {
@@ -620,6 +611,149 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             }
             await scheduleRetry(after: backoff, generation: generation)
         }
+    }
+
+    /// Completes the glucose transaction before starting persistence that is not required to show
+    /// the current reading or calculate the next request. Physical-device logs on 18 August 2026
+    /// showed valid CareLink responses waiting inside therapy import for up to 38 minutes; because
+    /// that work still owned `pollTask`, heartbeat wakeups could not start the next due request.
+    @MainActor
+    private func publishSuccessfulPoll(
+        readings: [FollowerBgReading],
+        metadata: CareLinkMetadata,
+        therapy: CareLinkTherapyPayload,
+        route: CareLinkDataRoute,
+        connectionStatus: CareLinkConnectionStatus,
+        refreshedAt: Date?,
+        checkedAt: Date,
+        generation: Int
+    ) {
+        guard pollIsCurrentOnMain(generation) else { return }
+        let hasGlucose = !readings.isEmpty
+        let latest = readings.first?.timeStamp
+        let importsTherapy = UserDefaults.standard.dataFlowPolicy.importsTherapyFromCareLink
+        UserDefaults.standard.timeStampOfLastFollowerConnection = checkedAt
+        state.update { snapshot in
+            snapshot.status = connectionStatus
+            snapshot.metadata = metadata
+            snapshot.lastReadingAt = latest
+            snapshot.lastTokenRefreshAt = refreshedAt
+            snapshot.serviceReachable = true
+            snapshot.detail = CareLinkStatePolicy.detail(hasGlucose: hasGlucose, pump: therapy.pump)
+            snapshot.pump = therapy.pump
+        }
+
+        // Glucose persistence and all established downstream behavior remain owned by the follower delegate.
+        if !readings.isEmpty {
+            Self.deliver(readings, to: followerDelegate)
+        }
+        trace(
+            "CareLink poll succeeded, route=%{public}@ readings=%{public}d therapy=%{public}d pump=%{public}@ status=%{public}@ communicating=%{public}@ inRange=%{public}@",
+            log: log,
+            category: ConstantsLog.categoryCareLinkFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: .careLink, activity: .downloadSucceeded(readingCount: readings.count))),
+            route.rawValue,
+            readings.count,
+            therapy.treatments.count,
+            therapy.pump.observedAt == nil ? "absent" : "present",
+            connectionStatus.rawValue,
+            therapy.pump.isCommunicating.map { String(describing: $0) } ?? "unknown",
+            therapy.pump.isInRange.map { String(describing: $0) } ?? "unknown"
+        )
+        scheduleNewDownload(
+            latestReadingAt: latest,
+            lastDataUpdateAt: therapy.pump.lastDataUpdateAt,
+            generation: generation
+        )
+        if importsTherapy {
+            enqueueTherapyImport(
+                CareLinkTherapyImportBatch(
+                    generation: generation,
+                    treatments: therapy.treatments,
+                    pump: therapy.pump,
+                    metadata: metadata,
+                    checkedAt: checkedAt
+                )
+            )
+        }
+    }
+
+    /// Coalesces overlapping response history while one Core Data transaction remains suspended.
+    /// Stable CareLink identifiers preserve every unique treatment and keep imports single-filed.
+    @MainActor
+    private func enqueueTherapyImport(_ batch: CareLinkTherapyImportBatch) {
+        if pendingTherapyImport?.generation == batch.generation {
+            pendingTherapyImport?.merge(batch)
+        } else {
+            pendingTherapyImport = batch
+        }
+        startTherapyImportIfNeeded()
+    }
+
+    @MainActor
+    private func startTherapyImportIfNeeded() {
+        guard therapyImportTask == nil, pendingTherapyImport != nil else { return }
+        let identifier = UUID()
+        therapyImportIdentifier = identifier
+        therapyImportTask = Task { [weak self] in
+            await self?.drainTherapyImports(identifier: identifier)
+        }
+    }
+
+    private func drainTherapyImports(identifier: UUID) async {
+        while !Task.isCancelled, let batch = await takePendingTherapyImport(identifier: identifier) {
+            guard await permitsTherapyImport(generation: batch.generation) else { continue }
+            let treatments = batch.treatments
+            let importedCount = await therapyImporter.importTreatments(treatments)
+            guard !Task.isCancelled else { break }
+            guard await permitsTherapyImport(generation: batch.generation) else { continue }
+            let importedPumpStatusCount = await therapyImporter.importPumpStatuses(
+                batch.pump,
+                treatments: treatments,
+                metadata: batch.metadata,
+                checkedAt: batch.checkedAt
+            )
+            await publishTherapyImportResult(
+                importedCount: importedCount,
+                importedPumpStatusCount: importedPumpStatusCount,
+                generation: batch.generation
+            )
+        }
+        await finishTherapyImports(identifier: identifier)
+    }
+
+    @MainActor
+    private func takePendingTherapyImport(identifier: UUID) -> CareLinkTherapyImportBatch? {
+        guard therapyImportIdentifier == identifier else { return nil }
+        defer { pendingTherapyImport = nil }
+        return pendingTherapyImport
+    }
+
+    @MainActor
+    private func permitsTherapyImport(generation: Int) -> Bool {
+        pollIsCurrentOnMain(generation) && UserDefaults.standard.dataFlowPolicy.importsTherapyFromCareLink
+    }
+
+    @MainActor
+    private func publishTherapyImportResult(importedCount: Int, importedPumpStatusCount: Int, generation: Int) {
+        guard permitsTherapyImport(generation: generation) else { return }
+        state.update { snapshot in
+            snapshot.importedTreatmentCount = importedCount
+            snapshot.lastTherapyImportAt = Date()
+            snapshot.importedPumpStatusCount = importedPumpStatusCount
+            if importedPumpStatusCount > 0 {
+                snapshot.lastPumpHistoryImportAt = Date()
+            }
+        }
+    }
+
+    @MainActor
+    private func finishTherapyImports(identifier: UUID) {
+        guard therapyImportIdentifier == identifier else { return }
+        therapyImportTask = nil
+        therapyImportIdentifier = nil
+        startTherapyImportIfNeeded()
     }
 
     /// Separates service reachability, reconnect requirements, rate limits and transient backoff.
@@ -759,6 +893,9 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         nextPollAt = nil
         lastPollStartedAt = .distantPast
         refreshRequestedWhilePolling = false
+        // An active Core Data operation remains serialized until it returns, but no queued work or
+        // result from the superseded lifecycle may be published afterward.
+        pendingTherapyImport = nil
     }
 
     // MARK: - Activation and background keep-alive
@@ -953,6 +1090,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             pollingScheduler?.suspend()
         }
         pollTask?.cancel()
+        therapyImportTask?.cancel()
         let loginController = authController
         Task { @MainActor in loginController?.cancel() }
         backgroundKeepAliveManager.stop(for: .careLink)
