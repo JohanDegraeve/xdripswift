@@ -11,29 +11,27 @@ import UIKit
 import WebKit
 import os
 
-/// Temporary non-persistent browser used to establish the personal CareLink session.
-/// WKWebView is required because ASWebAuthenticationSession does not return session cookies.
+/// Temporary non-persistent browser used for Medtronic's CarePartner OAuth authorization.
 @MainActor
-final class CareLinkWebLoginViewController: UIViewController, WKNavigationDelegate, WKHTTPCookieStoreObserver {
-    private let loginURL: URL
-    private let credentials: CareLinkLoginCredentials
+final class CareLinkWebLoginViewController: UIViewController, WKNavigationDelegate {
+    private let transaction: CareLinkAuthorizationTransaction
+    private let prefill: CareLinkLoginPrefill
     private let completion = CareLinkOneShot()
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCareLinkFollowManager)
-    private var continuation: CheckedContinuation<[HTTPCookie], Error>?
+    private var continuation: CheckedContinuation<URL, Error>?
     private var hostNavigationController: UINavigationController?
-    private var cookieInspectionInFlight = false
     private lazy var webView: WKWebView = {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .nonPersistent()
         let view = WKWebView(frame: .zero, configuration: configuration)
         view.navigationDelegate = self
-        view.customUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1"
+        view.customUserAgent = ConstantsCareLink.browserUserAgent
         return view
     }()
 
-    init(loginURL: URL, credentials: CareLinkLoginCredentials) {
-        self.loginURL = loginURL
-        self.credentials = credentials
+    init(transaction: CareLinkAuthorizationTransaction, prefill: CareLinkLoginPrefill) {
+        self.transaction = transaction
+        self.prefill = prefill
         super.init(nibName: nil, bundle: nil)
         title = Texts_SettingsView.careLinkLogIn
     }
@@ -53,7 +51,7 @@ final class CareLinkWebLoginViewController: UIViewController, WKNavigationDelega
     }
 
     /// Presents once and resumes exactly once if dismissal races a navigation callback.
-    func present(from presenter: UIViewController) async throws -> [HTTPCookie] {
+    func present(from presenter: UIViewController) async throws -> URL {
         try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
             navigationItem.leftBarButtonItem = UIBarButtonItem(
@@ -67,13 +65,12 @@ final class CareLinkWebLoginViewController: UIViewController, WKNavigationDelega
             navigation.sheetPresentationController?.detents = [.large()]
             navigation.sheetPresentationController?.prefersGrabberVisible = true
             hostNavigationController = navigation
-            webView.configuration.websiteDataStore.httpCookieStore.add(self)
             presenter.present(navigation, animated: true) { [weak self] in
                 guard let self else { return }
                 webView.load(URLRequest(
-                    url: loginURL,
+                    url: transaction.authorizationURL,
                     cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
-                    timeoutInterval: 60
+                    timeoutInterval: ConstantsCareLink.loginTimeout
                 ))
             }
         }
@@ -83,73 +80,46 @@ final class CareLinkWebLoginViewController: UIViewController, WKNavigationDelega
 
     func cancel() { finish(.failure(CareLinkError.cancelled)) }
 
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        inspectCookies(reason: "navigation started")
-    }
-
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         prefillCredentials()
-        inspectCookies(reason: "navigation finished")
-    }
-
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        inspectCookies(reason: "navigation failed")
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        if (error as? URLError)?.code != .cancelled {
-            inspectCookies(reason: "provisional navigation failed")
+        guard (error as? URLError)?.code != .cancelled else { return }
+        finish(.failure(error))
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        guard (error as? URLError)?.code != .cancelled else { return }
+        finish(.failure(error))
+    }
+
+    func webView(
+        _ webView: WKWebView,
+        decidePolicyFor navigationAction: WKNavigationAction,
+        decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+    ) {
+        guard let url = navigationAction.request.url,
+              CareLinkOAuthCallback.matches(url, redirectURI: transaction.configuration.redirectURI) else {
+            decisionHandler(.allow)
+            return
         }
+        // The custom CarePartner scheme belongs to Medtronic's app. Intercepting it before WebKit
+        // opens the URL lets the bundled app complete OAuth without registering that foreign scheme.
+        decisionHandler(.cancel)
+        finish(.success(url))
     }
 
-    /// Medtronic can set the final cookies after navigation through an asynchronous page request.
-    nonisolated func cookiesDidChange(in cookieStore: WKHTTPCookieStore) {
-        Task { @MainActor [weak self] in self?.inspectCookies(reason: "cookie store changed") }
-    }
-
-    /// Fills empty fields on Medtronic pages. The user still submits forms and completes MFA.
     private func prefillCredentials() {
-        guard CareLinkLoginPrefill.allows(webView.url) else { return }
-        webView.evaluateJavaScript(CareLinkLoginPrefill.script(credentials: credentials))
+        guard CareLinkLoginPrefillScript.allows(webView.url) else { return }
+        webView.evaluateJavaScript(CareLinkLoginPrefillScript.script(prefill: prefill))
     }
 
-    /// Completes only after both required session cookies exist and have not expired.
-    private func inspectCookies(reason: String) {
-        guard !cookieInspectionInFlight else { return }
-        cookieInspectionInFlight = true
-        webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { [weak self] cookies in
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-                cookieInspectionInFlight = false
-                let expiryValues = cookies.filter { $0.name == "c_token_valid_to" }
-                let newestExpiry = expiryValues.compactMap { CareLinkClient.parseExpiry($0.value) }.max()
-                let names = cookies.map { "\($0.name)@\($0.domain)" }.sorted().joined(separator: ",")
-                let rawExpiry = expiryValues.map(\.value).joined(separator: ",")
-                trace(
-                    "CareLink browser cookie check reason=%{public}@ url=%{public}@ cookies=%{public}@ validTo=%{public}@ parsedValidTo=%{public}@",
-                    log: log,
-                    category: ConstantsLog.categoryCareLinkFollowManager,
-                    type: .debug,
-                    reason,
-                    webView.url?.absoluteString ?? "<none>",
-                    names,
-                    rawExpiry,
-                    newestExpiry?.description ?? "<missing>"
-                )
-                guard let newestExpiry,
-                      newestExpiry > Date(),
-                      cookies.contains(where: { $0.name == "auth_tmp_token" }) else { return }
-                finish(.success(cookies))
-            }
-        }
-    }
-
-    private func finish(_ result: Result<[HTTPCookie], Error>) {
+    private func finish(_ result: Result<URL, Error>) {
         completion.run { [weak self] in
             guard let self else { return }
             let continuation = self.continuation
             self.continuation = nil
-            webView.configuration.websiteDataStore.httpCookieStore.remove(self)
             webView.stopLoading()
             trace(
                 "CareLink browser completing authentication",
@@ -164,7 +134,7 @@ final class CareLinkWebLoginViewController: UIViewController, WKNavigationDelega
 }
 
 /// Creates the page-local script used by the temporary login browser.
-enum CareLinkLoginPrefill {
+enum CareLinkLoginPrefillScript {
     static func allows(_ url: URL?) -> Bool {
         guard let host = url?.host?.lowercased() else { return false }
         #if DEBUG
@@ -174,11 +144,12 @@ enum CareLinkLoginPrefill {
             || host == "minimed.eu" || host.hasSuffix(".minimed.eu")
     }
 
-    static func script(credentials: CareLinkLoginCredentials) -> String {
-        guard let data = try? JSONSerialization.data(withJSONObject: [
-            "username": credentials.username,
-            "password": credentials.password
-        ]), let values = String(data: data, encoding: .utf8) else {
+    static func script(prefill: CareLinkLoginPrefill) -> String {
+        var object = [String: String]()
+        if let username = prefill.username { object["username"] = username }
+        if let password = prefill.password { object["password"] = password }
+        guard let data = try? JSONSerialization.data(withJSONObject: object),
+              let values = String(data: data, encoding: .utf8) else {
             return ""
         }
 
@@ -186,7 +157,7 @@ enum CareLinkLoginPrefill {
         (() => {
             const credentials = \(values)
             const setValue = (field, value) => {
-                if (!field || field.value) return
+                if (!field || field.value || !value) return
                 const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set
                 if (setter) setter.call(field, value)
                 else field.value = value
@@ -213,5 +184,13 @@ enum CareLinkLoginPrefill {
             window.setTimeout(() => observer.disconnect(), 15000)
         })()
         """
+    }
+}
+
+enum CareLinkOAuthCallback {
+    static func matches(_ url: URL, redirectURI: URL) -> Bool {
+        url.scheme?.caseInsensitiveCompare(redirectURI.scheme ?? "") == .orderedSame
+            && (url.host ?? "").caseInsensitiveCompare(redirectURI.host ?? "") == .orderedSame
+            && url.path == redirectURI.path
     }
 }

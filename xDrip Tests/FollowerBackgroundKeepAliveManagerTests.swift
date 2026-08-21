@@ -563,7 +563,7 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
     }
 
     @MainActor
-    func testCareLinkRequiresCredentialsAndAuthenticatedSessionBeforeStartingSharedManager() async {
+    func testCareLinkRequiresOAuthSessionButNotOptionalPrefillBeforeStartingSharedManager() async {
         let snapshot = StandardDefaultsSnapshot(keys: [
             .isMaster,
             .followerDataSourceType,
@@ -602,25 +602,6 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
         defaults.careLinkPassword = nil
         let orphanedTokenStore = CareLinkMemoryTokenStore()
         orphanedTokenStore.token = makeCareLinkTestToken()
-        let orphanedSessionKeepAlive = RecordingFollowerBackgroundKeepAliveManager()
-        var orphanedSessionManager: CareLinkFollowManager? = CareLinkFollowManager(
-            coreDataManager: coreDataManager,
-            followerDelegate: delegate,
-            backgroundKeepAliveManager: orphanedSessionKeepAlive,
-            client: CareLinkClient(tokenStore: orphanedTokenStore),
-            state: CareLinkAccountState(),
-            startsInitialDownload: false
-        )
-        await waitUntil { orphanedTokenStore.token == nil }
-        XCTAssertTrue(orphanedSessionKeepAlive.startedSources.isEmpty)
-        XCTAssertNil(orphanedTokenStore.token)
-        orphanedSessionManager = nil
-        XCTAssertNil(orphanedSessionManager)
-
-        defaults.careLinkUsername = "care-partner@example.invalid"
-        defaults.careLinkPassword = "password"
-        let authenticatedTokenStore = CareLinkMemoryTokenStore()
-        authenticatedTokenStore.token = makeCareLinkTestToken()
         let authenticatedKeepAlive = RecordingFollowerBackgroundKeepAliveManager()
         let authenticatedState = CareLinkAccountState()
         let authenticatedPollingSchedulerFactory = FakeFollowerTimerFactory()
@@ -632,7 +613,7 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
             coreDataManager: coreDataManager,
             followerDelegate: delegate,
             backgroundKeepAliveManager: authenticatedKeepAlive,
-            client: CareLinkClient(tokenStore: authenticatedTokenStore),
+            client: CareLinkClient(tokenStore: orphanedTokenStore),
             state: authenticatedState,
             startsInitialDownload: false,
             pollingSchedulerFactory: authenticatedPollingSchedulerFactory.makeTimer
@@ -643,6 +624,7 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
         XCTAssertEqual(authenticatedPollingSchedulerFactory.timers.first?.resumeCount, 1)
         XCTAssertEqual(authenticatedState.snapshot.status, .connecting)
         XCTAssertFalse(authenticatedStatuses.contains(.loginRequired))
+        XCTAssertNotNil(orphanedTokenStore.token)
         authenticatedManager = nil
         XCTAssertEqual(authenticatedKeepAlive.stoppedSources.last, .careLink)
         XCTAssertEqual(authenticatedPollingSchedulerFactory.timers.first?.suspendCount, 1)
@@ -662,10 +644,19 @@ final class FollowerBackgroundKeepAliveManagerTests: XCTestCase {
     private func makeCareLinkTestToken() -> CareLinkToken {
         CareLinkToken(
             accessToken: "test-token",
+            refreshToken: "test-refresh-token",
             expiresAt: Date().addingTimeInterval(3_600),
-            cookies: [],
             region: .outsideUnitedStates,
-            countryCode: "GB"
+            countryCode: "GB",
+            oauthConfiguration: CareLinkOAuthConfiguration(
+                authorizationEndpoint: URL(string: "https://carelink-login.minimed.eu/authorize")!,
+                tokenEndpoint: URL(string: "https://carelink-login.minimed.eu/oauth/token")!,
+                revocationEndpoint: URL(string: "https://carelink-login.minimed.eu/oauth/revoke")!,
+                clientID: "test-client",
+                scope: "profile openid offline_access",
+                redirectURI: URL(string: "com.medtronic.carepartner:/sso")!,
+                audience: "carepartner.patient.ous"
+            )
         )
     }
 

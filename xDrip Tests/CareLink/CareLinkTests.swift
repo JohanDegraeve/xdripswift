@@ -242,30 +242,6 @@ final class CareLinkTests: XCTestCase {
         XCTAssertFalse(diagnosticBody.contains("private-patient"))
     }
 
-    func testCookieMergeToleratesDuplicatePersistedIdentities() {
-        let first = CareLinkCookie(
-            name: "session",
-            value: "old",
-            domain: ".minimed.eu",
-            path: "/",
-            secure: true,
-            expiresAt: nil
-        )
-        let replacement = CareLinkCookie(
-            name: "session",
-            value: "new",
-            domain: ".minimed.eu",
-            path: "/",
-            secure: true,
-            expiresAt: nil
-        )
-
-        let merged = CareLinkClient.mergedCookies([first, replacement], with: [])
-
-        XCTAssertEqual(merged.count, 1)
-        XCTAssertEqual(merged.first?.value, "new")
-    }
-
     func testWatchStatusCarriesCareLinkConnectionState() {
         var status = WatchStatus()
         status.followerDataSourceTypeRawValue = FollowerDataSourceType.careLink.rawValue
@@ -328,49 +304,63 @@ final class CareLinkTests: XCTestCase {
     func testAuthenticationCompletionCanRunOnlyOnce() {
         let completion = CareLinkOneShot()
         var value = ""
-        XCTAssertTrue(completion.run { value = "cookies" })
+        XCTAssertTrue(completion.run { value = "callback" })
         XCTAssertFalse(completion.run { value = "dismissal" })
-        XCTAssertEqual(value, "cookies")
+        XCTAssertEqual(value, "callback")
     }
 
-    func testBrowserExpiryFormatsAndRefreshMargin() {
-        XCTAssertNotNil(CareLinkClient.parseExpiry("Tue Jan 1 00:00:00 UTC 2030"))
-        XCTAssertNotNil(CareLinkClient.parseExpiry("2030-01-01T00:00:00Z"))
-        XCTAssertNotNil(CareLinkClient.parseExpiry("2030-01-01T00%3A00%3A00UTC"))
+    func testOAuthRefreshMargin() {
         let token = credential(expiresAt: now.addingTimeInterval(601))
         XCTAssertFalse(token.needsRefresh(at: now))
         XCTAssertTrue(credential(expiresAt: now.addingTimeInterval(599)).needsRefresh(at: now))
     }
 
-    func testWebSessionInstallationRequiresBothCookiesAndPersistsRegion() async throws {
+    func testOAuthCallbackRequiresMatchingStateAndPersistsRotatingToken() async throws {
         let store = CareLinkMemoryTokenStore()
         let client = CareLinkClient(session: URLSession(configuration: stubConfiguration()), tokenStore: store, now: { self.now })
-        let cookies = [cookie("auth_tmp_token", "web-token"), cookie("c_token_valid_to", "2030-01-01T00:00:00Z"), cookie("unrelated_sso", "discard-me", domain: ".medtronic.com")]
-        let installed = try await client.installWebSession(cookies: cookies, region: .outsideUnitedStates, countryCode: "ES")
-        XCTAssertEqual(installed.accessToken, "web-token")
+        let transaction = authorizationTransaction()
+        let callback = try XCTUnwrap(URL(string: "com.medtronic.carepartner:/sso?code=one-time&state=state"))
+        let installed = try await client.installOAuthSession(callbackURL: callback, transaction: transaction, region: .outsideUnitedStates)
+        XCTAssertEqual(installed.accessToken, "rotated")
+        XCTAssertEqual(installed.refreshToken, "rotated-refresh")
         XCTAssertEqual(installed.region, .outsideUnitedStates)
-        XCTAssertEqual(installed.countryCode, "ES")
-        XCTAssertEqual(installed.cookies.count, 2)
         let authenticatedRegion = await client.authenticatedRegion()
         XCTAssertEqual(authenticatedRegion, .outsideUnitedStates)
 
         do {
-            _ = try await client.installWebSession(cookies: [cookies[0]], region: .outsideUnitedStates)
-            XCTFail("Expected both personal-session cookies")
+            let wrong = try XCTUnwrap(URL(string: "com.medtronic.carepartner:/sso?code=one-time&state=wrong"))
+            _ = try await client.installOAuthSession(callbackURL: wrong, transaction: transaction, region: .outsideUnitedStates)
+            XCTFail("Expected state validation")
         } catch {
             XCTAssertEqual(error as? CareLinkError, .invalidCallback)
         }
     }
 
-    func testLoginURLUsesPersonalHostAndCountry() async {
-        let client = CareLinkClient(tokenStore: CareLinkMemoryTokenStore())
-        let us = await client.loginURL(region: .unitedStates)
-        XCTAssertEqual(us.host, "carelink.minimed.com")
-        XCTAssertEqual(us.path, "/patient/sso/login")
-        XCTAssertTrue(us.query?.contains("country=us") == true)
-        let ous = await client.loginURL(region: .outsideUnitedStates)
-        XCTAssertEqual(ous.host, "carelink.minimed.eu")
-        XCTAssertNotEqual(URLComponents(url: ous, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "country" })?.value, "us")
+    func testOAuthCallbackMatchesOnlyTheDiscoveredRedirect() throws {
+        let redirect = try XCTUnwrap(URL(string: "com.medtronic.carepartner:/sso"))
+        XCTAssertTrue(CareLinkOAuthCallback.matches(
+            try XCTUnwrap(URL(string: "com.medtronic.carepartner:/sso?code=value&state=value")),
+            redirectURI: redirect
+        ))
+        XCTAssertFalse(CareLinkOAuthCallback.matches(
+            try XCTUnwrap(URL(string: "com.medtronic.carepartner:/other?code=value&state=value")),
+            redirectURI: redirect
+        ))
+        XCTAssertFalse(CareLinkOAuthCallback.matches(
+            try XCTUnwrap(URL(string: "https://carelink-login.minimed.eu/sso?code=value&state=value")),
+            redirectURI: redirect
+        ))
+    }
+
+    func testDiscoveredAuthorizationUsesRegionStateAndPKCE() async throws {
+        let client = CareLinkClient(session: URLSession(configuration: stubConfiguration()), tokenStore: CareLinkMemoryTokenStore())
+        let transaction = try await client.authorizationTransaction(region: .outsideUnitedStates)
+        let query = try XCTUnwrap(URLComponents(url: transaction.authorizationURL, resolvingAgainstBaseURL: false)?.queryItems)
+        XCTAssertEqual(transaction.authorizationURL.host, "carelink-login.minimed.eu")
+        XCTAssertEqual(query.first(where: { $0.name == "state" })?.value, transaction.state)
+        XCTAssertEqual(query.first(where: { $0.name == "code_challenge_method" })?.value, "S256")
+        XCTAssertNotNil(query.first(where: { $0.name == "code_challenge" })?.value)
+        XCTAssertTrue(transaction.configuration.scope.contains("offline_access"))
     }
 
     // MARK: - Glucose and therapy parsing
@@ -660,28 +650,28 @@ final class CareLinkTests: XCTestCase {
         )
     }
 
-    func testLoginCredentialsRequireBothStoredValues() throws {
+    func testLoginPrefillAllowsPartialStoredValues() throws {
         let suiteName = "CareLinkTests.credentials.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        XCTAssertNil(CareLinkLoginCredentials.stored(in: defaults))
+        XCTAssertEqual(CareLinkLoginPrefill.stored(in: defaults), CareLinkLoginPrefill(username: nil, password: nil))
         defaults.careLinkUsername = " person@example.com "
-        XCTAssertNil(CareLinkLoginCredentials.stored(in: defaults))
+        XCTAssertEqual(CareLinkLoginPrefill.stored(in: defaults).username, "person@example.com")
         defaults.careLinkPassword = "password with spaces"
         XCTAssertEqual(
-            CareLinkLoginCredentials.stored(in: defaults),
-            CareLinkLoginCredentials(username: "person@example.com", password: "password with spaces")
+            CareLinkLoginPrefill.stored(in: defaults),
+            CareLinkLoginPrefill(username: "person@example.com", password: "password with spaces")
         )
     }
 
     func testCredentialPrefillIsRestrictedToMedtronicPagesAndEscapesValues() {
-        XCTAssertTrue(CareLinkLoginPrefill.allows(URL(string: "https://carelink-login.minimed.eu/u/login")))
-        XCTAssertTrue(CareLinkLoginPrefill.allows(URL(string: "https://carelink.minimed.com/patient/sso/login")))
-        XCTAssertFalse(CareLinkLoginPrefill.allows(URL(string: "https://minimed.eu.example.com/login")))
-        XCTAssertFalse(CareLinkLoginPrefill.allows(URL(string: "https://example.com/login")))
+        XCTAssertTrue(CareLinkLoginPrefillScript.allows(URL(string: "https://carelink-login.minimed.eu/u/login")))
+        XCTAssertTrue(CareLinkLoginPrefillScript.allows(URL(string: "https://carelink.minimed.com/patient/sso/login")))
+        XCTAssertFalse(CareLinkLoginPrefillScript.allows(URL(string: "https://minimed.eu.example.com/login")))
+        XCTAssertFalse(CareLinkLoginPrefillScript.allows(URL(string: "https://example.com/login")))
 
-        let script = CareLinkLoginPrefill.script(credentials: CareLinkLoginCredentials(username: "person\"@example.com", password: "pass\\word"))
+        let script = CareLinkLoginPrefillScript.script(prefill: CareLinkLoginPrefill(username: "person\"@example.com", password: "pass\\word"))
         XCTAssertTrue(script.contains("person\\\"@example.com"))
         XCTAssertTrue(script.contains("pass\\\\word"))
         XCTAssertTrue(script.contains("MutationObserver"))
@@ -910,8 +900,6 @@ final class CareLinkTests: XCTestCase {
             .followerDataSourceType,
             .followerBackgroundKeepAliveType,
             .therapyDataSourceType,
-            .careLinkUsername,
-            .careLinkPassword,
             .careLinkRegion,
             .careLinkSelectedPatientID,
         ])
@@ -920,8 +908,6 @@ final class CareLinkTests: XCTestCase {
         defaults.followerDataSourceType = .careLink
         defaults.followerBackgroundKeepAliveType = .heartbeat
         defaults.therapyDataSourceType = .automatic
-        defaults.careLinkUsername = "patient1"
-        defaults.careLinkPassword = "password"
         defaults.careLinkRegion = CareLinkRegion.outsideUnitedStates.rawValue
         defaults.careLinkSelectedPatientID = nil
 
@@ -978,27 +964,22 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(maximumConcurrentImports, 1)
     }
 
-    func testLifecyclePolicyRequiresSelectionCredentialsAndSessionForPolling() {
+    func testLifecyclePolicyRequiresSelectionAndOAuthSessionForPolling() {
         XCTAssertEqual(
-            CareLinkLifecyclePolicy.state(isSelected: false, hasCredentials: true, hasSession: true),
+            CareLinkLifecyclePolicy.state(isSelected: false, hasSession: true),
             .inactive
         )
         XCTAssertEqual(
-            CareLinkLifecyclePolicy.state(isSelected: true, hasCredentials: false, hasSession: true),
-            .awaitingCredentials
-        )
-        XCTAssertEqual(
-            CareLinkLifecyclePolicy.state(isSelected: true, hasCredentials: true, hasSession: false),
+            CareLinkLifecyclePolicy.state(isSelected: true, hasSession: false),
             .awaitingLogin
         )
         XCTAssertEqual(
-            CareLinkLifecyclePolicy.state(isSelected: true, hasCredentials: true, hasSession: true),
+            CareLinkLifecyclePolicy.state(isSelected: true, hasSession: true),
             .authenticated
         )
         XCTAssertTrue(CareLinkLifecyclePolicy.permitsPolling(.authenticated))
         for state in [
             CareLinkLifecycleState.inactive,
-            .awaitingCredentials,
             .awaitingLogin,
             .invalidatingSession,
             .authenticating,
@@ -1273,7 +1254,7 @@ final class CareLinkTests: XCTestCase {
 
     // MARK: - Client requests and session lifecycle
 
-    func testPersonalAccountUsesBearerCookiesAndProfileFallback() async throws {
+    func testPersonalAccountUsesBearerWithoutBrowserCookiesAndProfileFallback() async throws {
         URLProtocolStub.omitUsername = true
         let client = makeClient()
         let result = try await client.userAndPatients(region: .outsideUnitedStates)
@@ -1282,7 +1263,7 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(result.patients.count, 1)
         let headers = try XCTUnwrap(URLProtocolStub.headers.last)
         XCTAssertEqual(headers["Authorization"], "Bearer valid")
-        XCTAssertTrue(headers["Cookie"]?.contains("auth_tmp_token=valid") == true)
+        XCTAssertNil(headers["Cookie"])
     }
 
     func testCarePartnerResolvesLinkedPatientsAndScopesPeriodicRequest() async throws {
@@ -1342,7 +1323,7 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(URLProtocolStub.usersMeCount, 2)
     }
 
-    func testRejectedReauthRetainsCredentialAndReturnsToLogin() async throws {
+    func testRejectedRefreshRetainsCredentialAndReturnsToLogin() async throws {
         URLProtocolStub.rejectRefresh = true
         let store = CareLinkMemoryTokenStore()
         let originalCredential = credential(expiresAt: now)
@@ -1354,6 +1335,23 @@ final class CareLinkTests: XCTestCase {
         } catch {
             XCTAssertEqual(error as? CareLinkError, .reconnectRequired)
             XCTAssertEqual(try store.load(), originalCredential)
+        }
+    }
+
+    func testTransientRefreshFailureRetainsRotatingCredentialWithoutRetry() async throws {
+        URLProtocolStub.failRefreshTransport = true
+        let store = CareLinkMemoryTokenStore()
+        let originalCredential = credential(expiresAt: now)
+        try store.save(originalCredential)
+        let client = CareLinkClient(session: URLSession(configuration: stubConfiguration()), tokenStore: store, now: { self.now })
+
+        do {
+            _ = try await client.userAndPatients(region: .outsideUnitedStates)
+            XCTFail("Expected a transient refresh failure")
+        } catch {
+            XCTAssertEqual(error as? CareLinkError, .offline)
+            XCTAssertEqual(try store.load(), originalCredential)
+            XCTAssertEqual(URLProtocolStub.refreshCount, 1)
         }
     }
 
@@ -1421,7 +1419,7 @@ final class CareLinkTests: XCTestCase {
         let client = CareLinkClient(session: URLSession(configuration: stubConfiguration()), tokenStore: store, now: { self.now })
         await client.revokeAndClear()
         XCTAssertNil(try store.load())
-        XCTAssertTrue(URLProtocolStub.paths.contains("/patient/sso/logout"))
+        XCTAssertTrue(URLProtocolStub.paths.contains("/oauth/revoke"))
     }
 
     func testLocalSessionClearRemovesOrphanWithoutNetworkRequest() async throws {
@@ -1446,7 +1444,7 @@ final class CareLinkTests: XCTestCase {
         _ = await (first, second)
 
         XCTAssertNil(try store.load())
-        XCTAssertEqual(URLProtocolStub.paths.filter { $0 == "/patient/sso/logout" }.count, 1)
+        XCTAssertEqual(URLProtocolStub.paths.filter { $0 == "/oauth/revoke" }.count, 1)
     }
 
     func testSlowLogoutCannotClearANewerSession() async throws {
@@ -1471,17 +1469,17 @@ final class CareLinkTests: XCTestCase {
     }
 
     func testTokenRefreshCannotRestoreASessionAfterLogout() async throws {
-        URLProtocolStub.reauthDelay = 0.2
+        URLProtocolStub.refreshDelay = 0.2
         let store = CareLinkMemoryTokenStore()
         try store.save(credential(expiresAt: now))
         let client = CareLinkClient(session: URLSession(configuration: stubConfiguration()), tokenStore: store, now: { self.now })
-        let reauthStarted = expectation(description: "Reauthentication started")
-        URLProtocolStub.expectReauth(reauthStarted)
+        let refreshStarted = expectation(description: "Token refresh started")
+        URLProtocolStub.expectRefresh(refreshStarted)
 
         let accountRequest = Task {
             try? await client.userAndPatients(region: .outsideUnitedStates)
         }
-        await fulfillment(of: [reauthStarted], timeout: 2)
+        await fulfillment(of: [refreshStarted], timeout: 2)
 
         await client.revokeAndClear()
         _ = await accountRequest.value
@@ -1490,23 +1488,23 @@ final class CareLinkTests: XCTestCase {
     }
 
     func testTokenRefreshCannotRestoreASessionAfterLocalClear() async throws {
-        URLProtocolStub.reauthDelay = 0.2
+        URLProtocolStub.refreshDelay = 0.2
         let store = CareLinkMemoryTokenStore()
         try store.save(credential(expiresAt: now))
         let client = CareLinkClient(session: URLSession(configuration: stubConfiguration()), tokenStore: store, now: { self.now })
-        let reauthStarted = expectation(description: "Reauthentication started")
-        URLProtocolStub.expectReauth(reauthStarted)
+        let refreshStarted = expectation(description: "Token refresh started")
+        URLProtocolStub.expectRefresh(refreshStarted)
 
         let accountRequest = Task {
             try? await client.userAndPatients(region: .outsideUnitedStates)
         }
-        await fulfillment(of: [reauthStarted], timeout: 2)
+        await fulfillment(of: [refreshStarted], timeout: 2)
 
         await client.clearLocalSession()
         _ = await accountRequest.value
 
         XCTAssertNil(try store.load())
-        XCTAssertFalse(URLProtocolStub.paths.contains("/patient/sso/logout"))
+        XCTAssertFalse(URLProtocolStub.paths.contains("/oauth/revoke"))
     }
 
     // MARK: - Helpers
@@ -1538,14 +1536,35 @@ final class CareLinkTests: XCTestCase {
     }
 
     private func credential(expiresAt: Date? = nil) -> CareLinkToken {
-        CareLinkToken(accessToken: "valid", expiresAt: expiresAt ?? now.addingTimeInterval(3600), cookies: [
-            CareLinkCookie(name: "auth_tmp_token", value: "valid", domain: ".minimed.eu", path: "/", secure: true, expiresAt: nil),
-            CareLinkCookie(name: "c_token_valid_to", value: "2030-01-01T00:00:00Z", domain: ".minimed.eu", path: "/", secure: true, expiresAt: nil)
-        ], region: .outsideUnitedStates, countryCode: "ES")
+        CareLinkToken(
+            accessToken: "valid",
+            refreshToken: "valid-refresh",
+            expiresAt: expiresAt ?? now.addingTimeInterval(3600),
+            region: .outsideUnitedStates,
+            countryCode: "ES",
+            oauthConfiguration: oauthConfiguration()
+        )
     }
 
-    private func cookie(_ name: String, _ value: String, domain: String = "carelink.minimed.eu") -> HTTPCookie {
-        HTTPCookie(properties: [.name: name, .value: value, .domain: domain, .path: "/", .secure: "TRUE"])!
+    private func oauthConfiguration() -> CareLinkOAuthConfiguration {
+        CareLinkOAuthConfiguration(
+            authorizationEndpoint: URL(string: "https://carelink-login.minimed.eu/authorize")!,
+            tokenEndpoint: URL(string: "https://carelink-login.minimed.eu/oauth/token")!,
+            revocationEndpoint: URL(string: "https://carelink-login.minimed.eu/oauth/revoke")!,
+            clientID: "client",
+            scope: "profile openid offline_access",
+            redirectURI: URL(string: "com.medtronic.carepartner:/sso")!,
+            audience: "carepartner.patient.ous"
+        )
+    }
+
+    private func authorizationTransaction() -> CareLinkAuthorizationTransaction {
+        CareLinkAuthorizationTransaction(
+            authorizationURL: URL(string: "https://carelink-login.minimed.eu/authorize")!,
+            configuration: oauthConfiguration(),
+            state: "state",
+            codeVerifier: "verifier"
+        )
     }
 
     private func patient() -> CareLinkPatient { CareLinkPatient(id: "one", username: "patient1", firstName: nil, lastName: nil) }
@@ -1585,13 +1604,14 @@ private final class URLProtocolStub: URLProtocol {
     static var usersMe401Count = 0
     static var usersMeCount = 0
     static var rejectRefresh = false
+    static var failRefreshTransport = false
     static var refreshCount = 0
     static var directPeriodicUnavailable = false
     static var emptyPersonalAccount = false
     static var pumpOnly = false
     static var logoutDelay: TimeInterval = 0
-    static var reauthDelay: TimeInterval = 0
-    static var reauthStartedExpectation: XCTestExpectation?
+    static var refreshDelay: TimeInterval = 0
+    static var refreshStartedExpectation: XCTestExpectation?
     static var linkedPatients: [[String: Any]] = [["username": "linked1", "firstName": "Linked", "lastName": "Patient"]]
     static var paths: [String] = []
     static var headers: [[String: String]] = []
@@ -1606,13 +1626,14 @@ private final class URLProtocolStub: URLProtocol {
         usersMe401Count = 0
         usersMeCount = 0
         rejectRefresh = false
+        failRefreshTransport = false
         refreshCount = 0
         directPeriodicUnavailable = false
         emptyPersonalAccount = false
         pumpOnly = false
         logoutDelay = 0
-        reauthDelay = 0
-        reauthStartedExpectation = nil
+        refreshDelay = 0
+        refreshStartedExpectation = nil
         linkedPatients = [["username": "linked1", "firstName": "Linked", "lastName": "Patient"]]
         paths = []
         headers = []
@@ -1629,9 +1650,9 @@ private final class URLProtocolStub: URLProtocol {
         return paths.contains(path)
     }
 
-    static func expectReauth(_ expectation: XCTestExpectation) {
+    static func expectRefresh(_ expectation: XCTestExpectation) {
         lock.lock()
-        reauthStartedExpectation = expectation
+        refreshStartedExpectation = expectation
         lock.unlock()
     }
 
@@ -1647,27 +1668,59 @@ private final class URLProtocolStub: URLProtocol {
         Self.lock.unlock()
         let path = url.path
 
-        if path == "/patient/sso/reauth" {
+        let formFields = Self.formFields(from: request)
+        if path == "/connect/carepartner/v13/discover/android/3.6" {
+            return respond(200, [
+                "CP": [
+                    ["region": "US", "UseSSOConfiguration": "Auth0SSOConfiguration", "Auth0SSOConfiguration": "https://carelink.minimed.com/oauth-config.json"],
+                    ["region": "EU", "UseSSOConfiguration": "Auth0SSOConfiguration", "Auth0SSOConfiguration": "https://carelink.minimed.eu/oauth-config.json"]
+                ]
+            ])
+        }
+        if path == "/oauth-config.json" {
+            let isUS = url.host?.hasSuffix(".com") == true
+            let suffix = isUS ? "com" : "eu"
+            return respond(200, [
+                "server": ["hostname": "carelink-login.minimed.\(suffix)", "port": 443, "prefix": ""],
+                "client": [
+                    "client_id": "client",
+                    "scope": "profile openid offline_access",
+                    "redirect_uri": "com.medtronic.carepartner:/sso",
+                    "audience": isUS ? "carepartner.patient.us" : "carepartner.patient.ous"
+                ],
+                "system_endpoints": [
+                    "authorization_endpoint_path": "/authorize",
+                    "token_endpoint_path": "/oauth/token",
+                    "token_revocation_endpoint_path": "/oauth/revoke"
+                ]
+            ])
+        }
+        if path == "/oauth/token" {
             Self.lock.lock()
             Self.refreshCount += 1
-            let reject = Self.rejectRefresh
-            let startedExpectation = Self.reauthStartedExpectation
-            Self.reauthStartedExpectation = nil
+            let reject = Self.rejectRefresh && formFields["grant_type"] == "refresh_token"
+            let failTransport = Self.failRefreshTransport && formFields["grant_type"] == "refresh_token"
+            let startedExpectation = Self.refreshStartedExpectation
+            Self.refreshStartedExpectation = nil
             Self.lock.unlock()
             startedExpectation?.fulfill()
-            if reject { return respond(401, [:]) }
+            if reject { return respond(400, ["error": "invalid_grant"]) }
+            if failTransport {
+                client?.urlProtocol(self, didFailWithError: URLError(.timedOut))
+                return
+            }
             Self.lock.lock()
-            let delay = Self.reauthDelay
+            let delay = Self.refreshDelay
             Self.lock.unlock()
             if delay > 0 {
                 DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
-                    self.respond(200, [:], headers: ["Set-Cookie": "auth_tmp_token=rotated; Path=/; HttpOnly"])
+                    self.respond(200, ["access_token": "rotated", "refresh_token": "rotated-refresh", "expires_in": 3600])
                 }
                 return
             }
-            return respond(200, [:], headers: ["Set-Cookie": "auth_tmp_token=rotated; Path=/; HttpOnly"])
+            return respond(200, ["access_token": "rotated", "refresh_token": "rotated-refresh", "expires_in": 3600])
         }
-        if path == "/patient/sso/logout" {
+        if path == "/oauth/revoke" {
             Self.lock.lock()
             let delay = Self.logoutDelay
             Self.lock.unlock()
@@ -1726,6 +1779,15 @@ private final class URLProtocolStub: URLProtocol {
             data.append(buffer, count: count)
         }
         return data
+    }
+
+    private static func formFields(from request: URLRequest) -> [String: String] {
+        guard let data = bodyData(from: request), let value = String(data: data, encoding: .utf8) else { return [:] }
+        var components = URLComponents()
+        components.percentEncodedQuery = value
+        return Dictionary(uniqueKeysWithValues: (components.queryItems ?? []).compactMap { item in
+            item.value.map { (item.name, $0) }
+        })
     }
 
     private func glucose(wrapped: Bool = false) {

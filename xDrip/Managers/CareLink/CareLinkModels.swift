@@ -10,7 +10,7 @@
 
 import Foundation
 
-// MARK: - Web session and region
+// MARK: - Authentication and region
 
 /// Thread-safe gate for UI and navigation callbacks that may discover login completion together.
 final class CareLinkOneShot {
@@ -49,7 +49,7 @@ enum CareLinkRegion: String, Codable, CaseIterable {
         }
     }
 
-    /// Browser sessions use the regional CareLink web host, not the mobile API host.
+    /// Account and legacy fallback routes use the regional CareLink web host.
     var webBaseURL: URL {
         URL(string: self == .unitedStates ? "https://carelink.minimed.com" : "https://carelink.minimed.eu")!
     }
@@ -83,21 +83,17 @@ enum CareLinkConnectionStatus: String, Codable {
     }
 }
 
-/// Supplies the account details required by the Medtronic-owned login page.
-struct CareLinkLoginCredentials: Equatable {
-    let username: String
-    let password: String
+/// Optional convenience values for Medtronic's page; OAuth never uses them in API requests.
+struct CareLinkLoginPrefill: Equatable {
+    let username: String?
+    let password: String?
 
-    static func stored(in defaults: UserDefaults = .standard) -> CareLinkLoginCredentials? {
-        guard let username = defaults.careLinkUsername?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !username.isEmpty,
-              let password = defaults.careLinkPassword,
-              !password.isEmpty
-        else {
-            return nil
-        }
-
-        return CareLinkLoginCredentials(username: username, password: password)
+    static func stored(in defaults: UserDefaults = .standard) -> CareLinkLoginPrefill {
+        let username = defaults.careLinkUsername?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return CareLinkLoginPrefill(
+            username: username?.isEmpty == false ? username : nil,
+            password: defaults.careLinkPassword?.isEmpty == false ? defaults.careLinkPassword : nil
+        )
     }
 }
 
@@ -380,28 +376,36 @@ struct CareLinkAPIConfiguration: Equatable {
     let careLinkBaseURL: URL
 }
 
-/// One browser cookie retained only because CareLink requires it when refreshing the web token.
-struct CareLinkCookie: Codable, Equatable {
-    let name: String
-    let value: String
-    let domain: String
-    let path: String
-    let secure: Bool
-    let expiresAt: Date?
+/// Public configuration selected from Medtronic's CarePartner discovery documents.
+struct CareLinkOAuthConfiguration: Codable, Equatable {
+    let authorizationEndpoint: URL
+    let tokenEndpoint: URL
+    let revocationEndpoint: URL
+    let clientID: String
+    let scope: String
+    let redirectURI: URL
+    let audience: String
 }
 
-/// Web-session credential captured after Medtronic completes login in `WKWebView`.
-/// This model excludes the account details used to pre-fill the login page and is persisted in Keychain.
+/// Secrets that exist only while one browser authorization is in progress.
+struct CareLinkAuthorizationTransaction: Equatable {
+    let authorizationURL: URL
+    let configuration: CareLinkOAuthConfiguration
+    let state: String
+    let codeVerifier: String
+}
+
+/// CarePartner OAuth credential persisted in Keychain for background token rotation.
 struct CareLinkToken: Codable, Equatable {
     var accessToken: String
+    var refreshToken: String
     var expiresAt: Date
-    var cookies: [CareLinkCookie]
     var region: CareLinkRegion
     var countryCode: String?
+    var oauthConfiguration: CareLinkOAuthConfiguration
 
-    /// Refreshes ten minutes early, matching the proven personal browser-session clients.
     func needsRefresh(at date: Date) -> Bool {
-        expiresAt.timeIntervalSince(date) < 10 * 60
+        expiresAt.timeIntervalSince(date) < ConstantsCareLink.oauthRefreshMargin
     }
 }
 

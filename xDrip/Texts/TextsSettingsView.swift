@@ -1467,8 +1467,8 @@ class Texts_SettingsView {
     }
 
     // CareLink follower
-    static let careLinkCredentialsFooter = NSLocalizedString("settingsviews_careLinkCredentialsFooter", tableName: filename, bundle: Bundle.main, value: "Username and password are required before Log In is available. Region selects the CareLink service that owns this account.", comment: "CareLink account settings footer")
-    static let careLinkCredentialsRequiredFooter = NSLocalizedString("settingsviews_careLinkCredentialsRequiredFooter", tableName: filename, bundle: Bundle.main, value: "Enter the CareLink username and password above to enable Log In.", comment: "CareLink connection settings footer")
+    static let careLinkCredentialsFooter = NSLocalizedString("settingsviews_careLinkCredentialsFooter", tableName: filename, bundle: Bundle.main, value: "Username and password are optional and only pre-fill Medtronic's login page. Region selects the CareLink service that owns this account. Use a dedicated follower account for each app or device to avoid another CarePartner login invalidating this session.", comment: "CareLink account settings footer")
+    static let careLinkCredentialsRequiredFooter = NSLocalizedString("settingsviews_careLinkCredentialsRequiredFooter", tableName: filename, bundle: Bundle.main, value: "Log in on Medtronic's page to connect CareLink.", comment: "CareLink connection settings footer")
     static let careLinkDevice = NSLocalizedString("settingsviews_careLinkDevice", tableName: filename, bundle: Bundle.main, value: "Device", comment: "CareLink settings section")
     static let careLinkTherapyDisplay = NSLocalizedString("settingsviews_careLinkTherapyDisplay", tableName: filename, bundle: Bundle.main, value: "Therapy Display", comment: "CareLink settings section")
     static let careLinkAutomaticBasal = NSLocalizedString("settingsviews_careLinkAutomaticBasal", tableName: filename, bundle: Bundle.main, value: "Automatic Basal", comment: "CareLink automatic basal chart style row")

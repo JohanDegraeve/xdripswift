@@ -17,12 +17,12 @@ protocol CareLinkTokenStoring: AnyObject {
     func clear() throws
 }
 
-/// Stores the complete CareLink web-session credential as one generic-password Keychain value.
+/// Stores the complete CarePartner OAuth credential as one generic-password Keychain value.
 final class CareLinkKeychainTokenStore: CareLinkTokenStoring {
     private let service: String
     private let legacyService: String?
-    private let account = "personal-web-session"
-    private let obsoleteAccount = "oauth-token"
+    private let account = "carepartner-oauth-session"
+    private let obsoleteAccounts = ["personal-web-session", "oauth-token"]
 
     convenience init() {
         self.init(
@@ -38,11 +38,14 @@ final class CareLinkKeychainTokenStore: CareLinkTokenStoring {
         self.legacyService = legacyService == service ? nil : legacyService
     }
 
-    /// Loads the canonical item and discards the incompatible OAuth beta item.
+    /// The web-session model produced repeatable reauthentication failures in tester logs. The
+    /// replacement intentionally performs a clean migration instead of retaining two refresh paths.
     func load() throws -> CareLinkToken? {
         if let token = try load(service: service) { return token }
-        try delete(service: service, account: obsoleteAccount)
-        if let legacyService { try delete(service: legacyService, account: obsoleteAccount) }
+        for account in obsoleteAccounts {
+            try delete(service: service, account: account)
+            if let legacyService { try delete(service: legacyService, account: account) }
+        }
         return nil
     }
 
@@ -80,10 +83,10 @@ final class CareLinkKeychainTokenStore: CareLinkTokenStoring {
     /// Deletes canonical and legacy items so explicit logout cannot leave usable credentials.
     func clear() throws {
         try delete(service: service)
-        try delete(service: service, account: obsoleteAccount)
+        for account in obsoleteAccounts { try delete(service: service, account: account) }
         if let legacyService {
             try delete(service: legacyService)
-            try delete(service: legacyService, account: obsoleteAccount)
+            for account in obsoleteAccounts { try delete(service: legacyService, account: account) }
         }
     }
 

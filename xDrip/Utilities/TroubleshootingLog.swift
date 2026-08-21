@@ -1711,7 +1711,10 @@ struct TroubleshootingLogReportBuilder {
             case .loginSucceeded: return "\(source.name) signed in successfully."
             case .loginFailed: return "\(source.name) could not sign in. Check the account settings."
             case .loggedOut: return "\(source.name) logged out."
-            case .sessionExpired: return "\(source.name) session expired and is signing in again."
+            case .sessionExpired:
+                return source == .careLink
+                    ? "CareLink session expired. Log in again."
+                    : "\(source.name) session expired and is signing in again."
             case let .downloadSucceeded(readingCount): return "\(source.name) returned \(readingCount) glucose reading\(readingCount == 1 ? "" : "s")."
             case .downloadFailed: return "\(source.name) could not retrieve glucose information."
             case .noReadings: return "\(source.name) returned no new glucose readings."

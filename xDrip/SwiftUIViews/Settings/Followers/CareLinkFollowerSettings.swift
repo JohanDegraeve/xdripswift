@@ -55,7 +55,7 @@ private enum CareLinkSettingsSection: CaseIterable {
     case activity
 }
 
-/// Observes the shared manager snapshot. Browser cookies and tokens never enter Settings.
+/// Observes the shared manager snapshot. OAuth credentials never enter Settings.
 private final class CareLinkSettingsSectionProvider: SettingsNativeSectionProvider {
     private let section: CareLinkSettingsSection
     private var stateObserver: AnyCancellable?
@@ -88,9 +88,7 @@ private final class CareLinkSettingsSectionProvider: SettingsNativeSectionProvid
         case .credentials:
             return Texts_SettingsView.careLinkCredentialsFooter
         case .connection:
-            return CareLinkLoginCredentials.stored() == nil
-                ? Texts_SettingsView.careLinkCredentialsRequiredFooter
-                : snapshot.detail
+            return snapshot.detail
         case .therapyDisplay:
             return Texts_SettingsView.careLinkAutomaticBasalFooter
         case .profile, .device, .activity:
@@ -199,7 +197,7 @@ private final class CareLinkSettingsSectionProvider: SettingsNativeSectionProvid
                 icon: SettingsIcon(symbolName: "rectangle.portrait.and.arrow.right", color: .accentColor),
                 titleColor: .accentColor,
                 accessory: .none,
-                isEnabled: CareLinkLoginCredentials.stored() != nil,
+                isEnabled: true,
                 action: .run { CareLinkAccountState.shared.logIn() }
             ))
         }

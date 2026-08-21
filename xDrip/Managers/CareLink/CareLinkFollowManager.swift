@@ -9,11 +9,9 @@
 import Foundation
 import os
 
-/// Authentication readiness is deliberately separate from follower selection. In particular, a
-/// Keychain item left by an earlier installation is not usable without a configured account.
+/// Authentication readiness is deliberately separate from follower selection.
 enum CareLinkLifecycleState: Equatable {
     case inactive
-    case awaitingCredentials
     case awaitingLogin
     case invalidatingSession
     case authenticating
@@ -21,9 +19,8 @@ enum CareLinkLifecycleState: Equatable {
 }
 
 enum CareLinkLifecyclePolicy {
-    static func state(isSelected: Bool, hasCredentials: Bool, hasSession: Bool) -> CareLinkLifecycleState {
+    static func state(isSelected: Bool, hasSession: Bool) -> CareLinkLifecycleState {
         guard isSelected else { return .inactive }
-        guard hasCredentials else { return .awaitingCredentials }
         return hasSession ? .authenticated : .awaitingLogin
     }
 
@@ -159,8 +156,6 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.careLinkSelectedPatientID.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.careLinkUsername.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.careLinkPassword.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
         Task { @MainActor [weak self] in
             guard let self else { return }
@@ -224,8 +219,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
 
     private func requestPoll(force: Bool) {
         guard CareLinkLifecyclePolicy.permitsPolling(lifecycleState),
-              isActive,
-              CareLinkLoginCredentials.stored() != nil else { return }
+              isActive else { return }
         if pollTask != nil {
             if force { refreshRequestedWhilePolling = true }
             return
@@ -259,7 +253,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
 
     // MARK: - Settings actions
 
-    /// Starts Medtronic's personal web login after both account fields have been configured.
+    /// Starts Medtronic's CarePartner OAuth login; stored fields are optional page prefill only.
     func logIn() {
         trace(
             "user requested CareLink login",
@@ -271,14 +265,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         Task { @MainActor [weak self] in
             guard let self else { return }
             if let invalidationTask { await invalidationTask.value }
-            guard isActive, let credentials = CareLinkLoginCredentials.stored() else {
-                lifecycleState = isActive ? .awaitingCredentials : .inactive
-                updateStateOnMain {
-                    $0.status = .loginRequired
-                    $0.detail = Texts_SettingsView.careLinkCredentialsRequired
-                }
-                return
-            }
+            guard isActive else { return }
             do {
                 let hasSession = try await client.hasToken()
                 guard !hasSession else {
@@ -297,11 +284,11 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             let generation = lifecycleGeneration
             lifecycleState = .authenticating
             let identifier = prepareLogin()
-            await beginLogin(identifier: identifier, generation: generation, credentials: credentials)
+            await beginLogin(identifier: identifier, generation: generation)
         }
     }
 
-    /// Requests a fresh account and data transaction without changing the retained web session.
+    /// Requests a fresh account and data transaction without changing the retained OAuth session.
     /// If a poll is active, exactly one follow-up transaction runs as soon as it finishes.
     func refresh() {
         Task { @MainActor [weak self] in
@@ -320,7 +307,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         }
     }
 
-    /// Stops work, best-effort closes the web session and clears selection while retaining region.
+    /// Stops work, best-effort revokes OAuth and clears selection while retaining region.
     func logOut() {
         trace(
             "CareLink logged out",
@@ -335,7 +322,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         }
     }
 
-    /// Moves to the other Medtronic environment. Web sessions are region-bound and cannot be reused.
+    /// Moves to the other Medtronic environment. OAuth sessions are region-bound and cannot be reused.
     func changeRegion() {
         setRegion(region == .unitedStates ? .outsideUnitedStates : .unitedStates)
     }
@@ -389,42 +376,30 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         authController = nil
     }
 
-    /// Loads CareLink login, pre-fills the configured account and installs the returned cookies.
+    /// Loads CarePartner login and exchanges its protected callback for rotating credentials.
     @MainActor
-    private func beginLogin(identifier: UUID, generation: Int, credentials: CareLinkLoginCredentials) async {
+    private func beginLogin(identifier: UUID, generation: Int) async {
         guard isActive,
               lifecycleGeneration == generation,
               lifecycleState == .authenticating,
-              loginIdentifier == identifier,
-              CareLinkLoginCredentials.stored() == credentials else { return }
-        guard CareLinkLoginCredentials.stored() != nil else {
-            loginIdentifier = nil
-            lifecycleState = .awaitingCredentials
-            updateStateOnMain {
-                $0.status = .loginRequired
-                $0.detail = Texts_SettingsView.careLinkCredentialsRequired
-            }
-            return
-        }
+              loginIdentifier == identifier else { return }
         let loginRegion = region
         updateStateOnMain {
             $0.status = .connecting
             $0.detail = nil
         }
         do {
-            let loginURL = await client.loginURL(region: loginRegion)
-            let cookies = try await authenticate(url: loginURL, credentials: credentials, identifier: identifier)
+            let transaction = try await client.authorizationTransaction(region: loginRegion)
+            let callback = try await authenticate(transaction: transaction, identifier: identifier)
             guard lifecycleGeneration == generation,
                   lifecycleState == .authenticating,
                   loginIdentifier == identifier,
-                  region == loginRegion,
-                  CareLinkLoginCredentials.stored() == credentials else { return }
-            _ = try await client.installWebSession(cookies: cookies, region: loginRegion, countryCode: CareLinkClient.resolvedCountryCode(region: loginRegion, accountCountry: nil))
+                  region == loginRegion else { return }
+            _ = try await client.installOAuthSession(callbackURL: callback, transaction: transaction, region: loginRegion)
             guard lifecycleGeneration == generation,
                   lifecycleState == .authenticating,
                   loginIdentifier == identifier,
-                  region == loginRegion,
-                  CareLinkLoginCredentials.stored() == credentials else {
+                  region == loginRegion else {
                 await client.clearLocalSession()
                 return
             }
@@ -469,12 +444,11 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         }
     }
 
-    /// Presents a temporary Medtronic-owned page and returns only its completed session cookies.
-    /// CAPTCHA and MFA remain Medtronic content. Only empty account fields are pre-filled.
+    /// CAPTCHA and MFA remain Medtronic content. Stored fields only prefill empty form controls.
     @MainActor
-    private func authenticate(url: URL, credentials: CareLinkLoginCredentials, identifier: UUID) async throws -> [HTTPCookie] {
+    private func authenticate(transaction: CareLinkAuthorizationTransaction, identifier: UUID) async throws -> URL {
         guard let presenter = CareLinkWebLoginViewController.topViewController() else { throw CareLinkError.invalidConfiguration }
-        let controller = CareLinkWebLoginViewController(loginURL: url, credentials: credentials)
+        let controller = CareLinkWebLoginViewController(transaction: transaction, prefill: .stored())
         authController = controller
         defer { if loginIdentifier == identifier { authController = nil } }
         return try await controller.present(from: presenter)
@@ -487,24 +461,6 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         guard await pollIsCurrent(generation) else { return }
         let currentRegion = region
         trace("CareLink poll started, region=%{public}@", log: log, category: ConstantsLog.categoryCareLinkFollowManager, type: .info, troubleshooting: .detailed(.follower(source: .careLink, activity: .downloadStarted)), currentRegion.rawValue)
-        #if DEBUG
-        do {
-            // The explicit localhost launch hook drives the production manager pipeline without
-            // adding a simulator credential or authentication bypass to release builds.
-            try await client.installDebugSimulatorSessionIfRequested(region: currentRegion)
-        } catch let error as CareLinkError {
-            await handle(error, generation: generation)
-            return
-        } catch {
-            guard await pollIsCurrent(generation) else { return }
-            await updateState(generation: generation) {
-                $0.status = .error
-                $0.detail = error.localizedDescription
-                $0.serviceReachable = false
-            }
-            return
-        }
-        #endif
         guard await pollIsCurrent(generation) else { return }
         if let authenticatedRegion = await client.authenticatedRegion(), authenticatedRegion != currentRegion {
             await handle(.regionMismatch(selected: currentRegion, authenticated: authenticatedRegion), generation: generation)
@@ -768,7 +724,20 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                 $0.serviceReachable = true
             }
             await scheduleRetry(after: max(1, until.timeIntervalSinceNow), generation: generation)
-        case .reconnectRequired, .regionMismatch, .notAuthenticated:
+        case .reconnectRequired:
+            trace(
+                "CareLink OAuth refresh token was rejected",
+                log: log,
+                category: ConstantsLog.categoryCareLinkFollowManager,
+                type: .error,
+                troubleshooting: .standard(.follower(source: .careLink, activity: .sessionExpired))
+            )
+            await transitionToAwaitingLogin(generation: generation)
+            await updateState(generation: generation) {
+                $0.status = .loginRequired
+                $0.detail = error.localizedDescription
+            }
+        case .regionMismatch, .notAuthenticated:
             await transitionToAwaitingLogin(generation: generation)
             await updateState(generation: generation) {
                 $0.status = .loginRequired
@@ -900,7 +869,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
 
     // MARK: - Activation and background keep-alive
 
-    /// Reconciles follower selection, configured account details and secure-session availability.
+    /// Reconciles follower selection and secure OAuth-session availability.
     @MainActor
     private func reconcileLifecycle() {
         lifecycleGeneration += 1
@@ -911,23 +880,6 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         Task { @MainActor [weak self] in
             guard let self else { return }
             let selected = isActive
-            let hasCredentials = CareLinkLoginCredentials.stored() != nil
-
-            if !hasCredentials {
-                cancelLogin()
-                stopPolling()
-                backgroundKeepAliveManager.stop(for: .careLink)
-                lifecycleState = selected ? .awaitingCredentials : .inactive
-                if selected, UserDefaults.standard.careLinkSelectedPatientID != nil {
-                    UserDefaults.standard.careLinkSelectedPatientID = nil
-                }
-                if selected {
-                    publishLoginRequired(detail: Texts_SettingsView.careLinkCredentialsRequired)
-                }
-                await client.clearLocalSession()
-                guard lifecycleGeneration == generation else { return }
-                return
-            }
 
             if !selected {
                 cancelLogin()
@@ -943,7 +895,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                 $0.region = self.region
             }
             if let invalidationTask { await invalidationTask.value }
-            guard lifecycleGeneration == generation, isActive, CareLinkLoginCredentials.stored() != nil else { return }
+            guard lifecycleGeneration == generation, isActive else { return }
             let hasSession: Bool
             do {
                 hasSession = try await client.hasToken()
@@ -957,7 +909,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
                 return
             }
             guard lifecycleGeneration == generation else { return }
-            lifecycleState = CareLinkLifecyclePolicy.state(isSelected: true, hasCredentials: true, hasSession: hasSession)
+            lifecycleState = CareLinkLifecyclePolicy.state(isSelected: true, hasSession: hasSession)
             if lifecycleState == .authenticated {
                 backgroundKeepAliveManager.start(for: .careLink)
                 startPollingSchedulerIfNeeded()
@@ -984,7 +936,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         if UserDefaults.standard.careLinkSelectedPatientID != nil {
             UserDefaults.standard.careLinkSelectedPatientID = nil
         }
-        publishLoginRequired(detail: CareLinkLoginCredentials.stored() == nil ? Texts_SettingsView.careLinkCredentialsRequired : nil)
+        publishLoginRequired(detail: nil)
 
         let task: Task<Void, Never>
         let identifier: UUID
@@ -1023,7 +975,6 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         lifecycleGeneration == generation
             && lifecycleState == .authenticated
             && isActive
-            && CareLinkLoginCredentials.stored() != nil
     }
 
     private func pollIsCurrent(_ generation: Int) async -> Bool {
@@ -1059,10 +1010,6 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         guard let keyPath, let key = UserDefaults.Key(rawValue: keyPath) else { return }
         switch key {
-        case .careLinkUsername, .careLinkPassword:
-            Task { @MainActor [weak self] in
-                await self?.invalidateSession(revokeRemotely: true)
-            }
         case .isMaster, .followerDataSourceType:
             guard keyValueObserverTimeKeeper.verifyKey(forKey: keyPath, withMinimumDelayMilliSeconds: 200) else { return }
             Task { @MainActor [weak self] in self?.reconcileLifecycle() }
@@ -1083,7 +1030,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
 
     /// Removes KVO, timers and lifecycle closures owned by this manager.
     deinit {
-        for key in [UserDefaults.Key.isMaster, .followerDataSourceType, .careLinkSelectedPatientID, .careLinkUsername, .careLinkPassword, .followerBackgroundKeepAliveType] {
+        for key in [UserDefaults.Key.isMaster, .followerDataSourceType, .careLinkSelectedPatientID, .followerBackgroundKeepAliveType] {
             UserDefaults.standard.removeObserver(self, forKeyPath: key.rawValue)
         }
         if pollingSchedulerIsRunning {

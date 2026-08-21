@@ -7,11 +7,13 @@
 //
 
 import Foundation
+import CryptoKit
+import Security
 import os
 
-/// Owns the CareLink web session, account lookup and glucose-route resolution.
+/// Owns the CarePartner OAuth session, account lookup and glucose-route resolution.
 ///
-/// Actor isolation serializes timer and heartbeat requests, including web-token refresh, so two
+/// Actor isolation serializes timer and heartbeat requests, including OAuth token refresh, so two
 /// callers cannot rotate the same session concurrently or overwrite a newly selected route.
 /// The persisted region is authoritative. Requests never probe the other CareLink environment.
 actor CareLinkClient {
@@ -33,7 +35,7 @@ actor CareLinkClient {
         self.now = now
     }
 
-    /// Reports authentication without returning the web token or cookies to UI code.
+    /// Reports authentication without returning OAuth credentials to UI code.
     /// A storage failure remains distinct from a confirmed missing session.
     func hasToken() throws -> Bool { try tokenStore.load() != nil }
     func tokenRefreshDate() -> Date? { lastTokenRefreshAt }
@@ -51,38 +53,52 @@ actor CareLinkClient {
         lastTokenRefreshAt = nil
     }
 
-    /// Creates the personal web-login URL for the selected region and best available country.
-    func loginURL(region: CareLinkRegion) -> URL {
-        let country = Self.resolvedCountryCode(region: region, accountCountry: nil).lowercased()
-        var components = URLComponents(url: configuration(region: region).careLinkBaseURL.appendingPathComponent("patient/sso/login"), resolvingAgainstBaseURL: false)!
-        components.queryItems = [
-            URLQueryItem(name: "country", value: country),
-            URLQueryItem(name: "lang", value: Locale.current.language.languageCode?.identifier ?? "en")
+    /// xDrip+ moved to the CarePartner mobile flow after browser sessions proved short-lived.
+    /// Reference: NightscoutFoundation/xDrip, `carelinkfollow/auth/CareLinkAuthenticator.java`.
+    /// Medtronic's live configuration advertises S256, so each browser transaction also uses
+    /// state and PKCE instead of copying the reference client's unprotected authorization URL.
+    func authorizationTransaction(region: CareLinkRegion) async throws -> CareLinkAuthorizationTransaction {
+        let oauth = try await discoverOAuthConfiguration(region: region)
+        let state = try Self.randomBase64URL(byteCount: 32)
+        let verifier = try Self.randomBase64URL(byteCount: 64)
+        let challenge = Self.base64URL(Data(SHA256.hash(data: Data(verifier.utf8))))
+        var components = URLComponents(url: oauth.authorizationEndpoint, resolvingAgainstBaseURL: false)
+        components?.queryItems = [
+            URLQueryItem(name: "client_id", value: oauth.clientID),
+            URLQueryItem(name: "response_type", value: ConstantsCareLink.oauthResponseType),
+            URLQueryItem(name: "scope", value: oauth.scope),
+            URLQueryItem(name: "redirect_uri", value: oauth.redirectURI.absoluteString),
+            URLQueryItem(name: "audience", value: oauth.audience),
+            URLQueryItem(name: "state", value: state),
+            URLQueryItem(name: "code_challenge", value: challenge),
+            URLQueryItem(name: "code_challenge_method", value: ConstantsCareLink.oauthCodeChallengeMethod)
         ]
-        return components.url!
+        guard let authorizationURL = components?.url else { throw CareLinkError.invalidConfiguration }
+        return CareLinkAuthorizationTransaction(authorizationURL: authorizationURL, configuration: oauth, state: state, codeVerifier: verifier)
     }
 
-    /// Validates the two required browser cookies before saving the session in Keychain.
+    /// Validates the browser callback and exchanges its one-time code before persisting anything.
     @discardableResult
-    func installWebSession(cookies: [HTTPCookie], region: CareLinkRegion, countryCode: String? = nil) throws -> CareLinkToken {
-        let expiryCandidates = cookies.filter { $0.name == Self.expiryCookieName }.compactMap { cookie in
-            Self.parseExpiry(cookie.value).map { (cookie, $0) }
-        }
-        guard let (expiryCookie, expiry) = expiryCandidates.max(by: { $0.1 < $1.1 }), expiry > now(),
-              let authCookie = cookies.last(where: {
-                  $0.name == Self.authCookieName && $0.domain == expiryCookie.domain
-              }) ?? cookies.last(where: { $0.name == Self.authCookieName }) else {
+    func installOAuthSession(callbackURL: URL, transaction: CareLinkAuthorizationTransaction, region: CareLinkRegion) async throws -> CareLinkToken {
+        guard CareLinkOAuthCallback.matches(callbackURL, redirectURI: transaction.configuration.redirectURI),
+              let components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false),
+              components.queryValue("state") == transaction.state,
+              components.queryValue("error") == nil,
+              let code = components.queryValue("code"), !code.isEmpty else {
             throw CareLinkError.invalidCallback
         }
-        // A login can leave expired cookies from an earlier redirect domain. Keep the newest
-        // credential pair once, while retaining unrelated CareLink cookies needed by reauth.
-        let normalizedCookies = cookies.filter {
-            $0.name != Self.authCookieName && $0.name != Self.expiryCookieName
-        } + [authCookie, expiryCookie]
-        let storedCookies = normalizedCookies.filter { Self.belongsToCareLink($0, region: region) }.map {
-            CareLinkCookie(name: $0.name, value: $0.value, domain: $0.domain, path: $0.path, secure: $0.isSecure, expiresAt: $0.expiresDate)
-        }
-        let token = CareLinkToken(accessToken: authCookie.value, expiresAt: expiry, cookies: storedCookies, region: region, countryCode: countryCode)
+        let response = try await oauthToken(
+            configuration: transaction.configuration,
+            fields: [
+                "client_id": transaction.configuration.clientID,
+                "code": code,
+                "grant_type": "authorization_code",
+                "redirect_uri": transaction.configuration.redirectURI.absoluteString,
+                "code_verifier": transaction.codeVerifier
+            ],
+            isRefresh: false
+        )
+        let token = try makeToken(response: response, old: nil, region: region, configuration: transaction.configuration)
         refreshTask?.cancel()
         refreshTask = nil
         refreshIdentifier = nil
@@ -106,7 +122,7 @@ actor CareLinkClient {
             throw CareLinkError.malformedResponse
         }
         let role = (user["role"] as? String ?? "").uppercased()
-        // Personal web responses frequently omit username and country from `/users/me`.
+        // CareLink responses can omit username and country from `/users/me`.
         if user["username"] == nil || user["country"] == nil {
             let profileData = try await authenticated(root.appendingPathComponent("patient/users/me/profile"))
             guard let profile = try JSONSerialization.jsonObject(with: profileData) as? [String: Any] else {
@@ -184,13 +200,20 @@ actor CareLinkClient {
         let credential = try? tokenStore.load()
         clearLocalSession()
         guard let credential else { return }
-        let logout = configuration(region: credential.region).careLinkBaseURL.appendingPathComponent("patient/sso/logout")
-        _ = try? await authorizedRequest(logout, credential: credential)
+        var request = URLRequest(url: credential.oauthConfiguration.revocationEndpoint)
+        request.httpMethod = "POST"
+        request.timeoutInterval = ConstantsCareLink.requestTimeout
+        request.setValue("application/x-www-form-urlencoded; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        request.httpBody = Self.formData([
+            "client_id": credential.oauthConfiguration.clientID,
+            "token": credential.refreshToken
+        ])
+        _ = try? await send(request)
     }
 
     func clearCachedConfiguration() { cachedRoute = nil }
 
-    /// Builds each route using the role-specific browser-session contract seen in production clients.
+    /// Builds each route using the role-specific CareLink contract seen in production clients.
     private func fetch(route: CareLinkDataRoute, region: CareLinkRegion, patient: CareLinkPatient, username: String?, requestRole: String, countryCode: String?) async throws -> Data {
         let webRoot = configuration(region: region).careLinkBaseURL
         let cloudRoot = cloudBaseURL(region: region)
@@ -200,11 +223,11 @@ actor CareLinkClient {
         case .periodic:
             let accountName = username ?? patient.username
             let endpoint = cloudRoot.appendingPathComponent("connect/carepartner/v13/display/message")
-            var bodies = [["username": accountName, "role": requestRole, "patientId": patient.username, "appVersion": "3.6.0"]]
+            var bodies = [["username": accountName, "role": requestRole, "patientId": patient.username, "appVersion": ConstantsCareLink.carePartnerAppVersion]]
             // Personal accounts have historically accepted both body shapes. A Care Partner
             // request must remain patient-scoped so a fallback can never select another link.
             if requestRole == "patient" {
-                bodies.append(["username": accountName, "role": requestRole, "appVersion": "3.6.0"])
+                bodies.append(["username": accountName, "role": requestRole, "appVersion": ConstantsCareLink.carePartnerAppVersion])
             }
             let currentResult = try await periodicPayload(endpoint: endpoint, bodies: bodies)
             if let data = currentResult.payload { return data }
@@ -285,7 +308,7 @@ actor CareLinkClient {
         return (nil, receivedSuccessfulResponse)
     }
 
-    /// Performs exactly one refresh-and-retry when a personal endpoint rejects the web token.
+    /// Performs exactly one refresh-and-retry when a CareLink endpoint rejects the access token.
     private func authenticated(_ url: URL, method: String = "GET", json: [String: String]? = nil) async throws -> Data {
         var credential = try await validToken()
         do { return try await authorizedRequest(url, method: method, json: json, credential: credential) }
@@ -295,18 +318,16 @@ actor CareLinkClient {
         }
     }
 
-    /// Applies both the Bearer token and retained browser cookies required by personal sessions.
+    /// CarePartner OAuth uses a Bearer token without browser-session cookies.
     private func authorizedRequest(_ url: URL, method: String = "GET", json: [String: String]? = nil, credential: CareLinkToken) async throws -> Data {
         var request = URLRequest(url: url)
         request.httpMethod = method
-        request.timeoutInterval = 30
+        request.timeoutInterval = ConstantsCareLink.requestTimeout
         request.setValue("Bearer \(credential.accessToken)", forHTTPHeaderField: "Authorization")
-        let cookie = Self.cookieHeader(credential.cookies, for: url)
-        if !cookie.isEmpty { request.setValue(cookie, forHTTPHeaderField: "Cookie") }
         request.setValue("application/json, text/plain, */*", forHTTPHeaderField: "Accept")
         request.setValue("en;q=0.9, *;q=0.8", forHTTPHeaderField: "Accept-Language")
-        request.setValue(Self.browserUserAgent, forHTTPHeaderField: "User-Agent")
-        request.setValue(Self.browserClientHint, forHTTPHeaderField: "Sec-Ch-Ua")
+        request.setValue(ConstantsCareLink.browserUserAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue(ConstantsCareLink.browserClientHint, forHTTPHeaderField: "Sec-Ch-Ua")
         if let json {
             request.httpBody = try JSONSerialization.data(withJSONObject: json)
             request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
@@ -319,7 +340,7 @@ actor CareLinkClient {
         return token.needsRefresh(at: now()) ? try await refresh(force: false) : token
     }
 
-    /// Coalesces `/patient/sso/reauth` and persists every cookie rotated by the response.
+    /// Coalesces refreshes and atomically persists each rotated refresh token.
     private func refresh(force: Bool) async throws -> CareLinkToken {
         if let refreshTask { return try await refreshTask.value }
         guard let old = try tokenStore.load() else { throw CareLinkError.notAuthenticated }
@@ -327,43 +348,23 @@ actor CareLinkClient {
         let generation = sessionGeneration
         let identifier = UUID()
         let task = Task<CareLinkToken, Error> {
-            var request = URLRequest(url: self.configuration(region: old.region).careLinkBaseURL.appendingPathComponent("patient/sso/reauth"))
-            request.httpMethod = "POST"
-            request.httpBody = Data()
-            request.timeoutInterval = 30
-            request.setValue("Bearer \(old.accessToken)", forHTTPHeaderField: "Authorization")
-            request.setValue(Self.cookieHeader(old.cookies, for: request.url!), forHTTPHeaderField: "Cookie")
-            request.setValue("application/json, text/plain, */*", forHTTPHeaderField: "Accept")
-            request.setValue(Self.browserUserAgent, forHTTPHeaderField: "User-Agent")
-            do {
-                let result = try await self.send(request)
-                let responseCookies = HTTPCookie.cookies(withResponseHeaderFields: result.response.allHeaderFields.reduce(into: [:]) { partial, pair in
-                    partial[String(describing: pair.key)] = String(describing: pair.value)
-                }, for: request.url!)
-                // A rotated credential can move from a parent cookie domain to a specific host.
-                // Remove every older value with the returned name so request order cannot revive it.
-                let rotatedNames = Set(responseCookies.map(\.name))
-                let retainedCookies = old.cookies.filter { !rotatedNames.contains($0.name) }
-                let merged = Self.mergedCookies(retainedCookies, with: responseCookies)
-                guard let auth = responseCookies.last(where: { $0.name == Self.authCookieName })
-                        .map({ CareLinkCookie(name: $0.name, value: $0.value, domain: $0.domain, path: $0.path, secure: $0.isSecure, expiresAt: $0.expiresDate) })
-                        ?? merged.first(where: { $0.name == Self.authCookieName }),
-                      let expiryCookie = merged.first(where: { $0.name == Self.expiryCookieName }),
-                      let expiry = Self.parseExpiry(expiryCookie.value), expiry > self.now() else {
-                    throw CareLinkError.reconnectRequired
-                }
-                let updated = CareLinkToken(accessToken: auth.value, expiresAt: expiry, cookies: merged, region: old.region, countryCode: old.countryCode)
-                try Task.checkCancellation()
-                guard self.sessionGeneration == generation else { throw CancellationError() }
-                try self.tokenStore.save(updated)
-                self.lastTokenRefreshAt = self.now()
-                return updated
-            } catch CareLinkError.http(400), CareLinkError.http(401), CareLinkError.http(403) {
-                // A dormant CareLink web session can become non-refreshable while the app sleeps.
-                // Keep the Keychain item until the user logs in again or logs out so a
-                // server rejection never silently turns into a local logout.
-                throw CareLinkError.reconnectRequired
-            }
+            // Do not automatically retry a rotating-token request after an ambiguous transport
+            // failure: the server may have consumed it even when the response never arrived.
+            let response = try await self.oauthToken(
+                configuration: old.oauthConfiguration,
+                fields: [
+                    "client_id": old.oauthConfiguration.clientID,
+                    "refresh_token": old.refreshToken,
+                    "grant_type": "refresh_token"
+                ],
+                isRefresh: true
+            )
+            let updated = try self.makeToken(response: response, old: old, region: old.region, configuration: old.oauthConfiguration)
+            try Task.checkCancellation()
+            guard self.sessionGeneration == generation else { throw CancellationError() }
+            try self.tokenStore.save(updated)
+            self.lastTokenRefreshAt = self.now()
+            return updated
         }
         refreshTask = task
         refreshIdentifier = identifier
@@ -376,7 +377,142 @@ actor CareLinkClient {
         return try await task.value
     }
 
-    /// Returns response metadata as well as data so refresh can capture rotated Set-Cookie values.
+    /// Keeps Medtronic's configuration dynamic while restricting every discovered HTTPS endpoint
+    /// to the selected region's CareLink domain, so discovery cannot authorize an arbitrary host.
+    private func discoverOAuthConfiguration(region: CareLinkRegion) async throws -> CareLinkOAuthConfiguration {
+        let discoveryData = try await send(URLRequest(url: ConstantsCareLink.carePartnerDiscoveryURL)).data
+        guard let discovery = try JSONSerialization.jsonObject(with: discoveryData) as? [String: Any],
+              let regions = discovery["CP"] as? [[String: Any]],
+              let selected = regions.first(where: {
+                  ($0["region"] as? String) == (region == .unitedStates
+                      ? ConstantsCareLink.carePartnerRegionUS
+                      : ConstantsCareLink.carePartnerRegionOutsideUS)
+              }),
+              let selector = selected["UseSSOConfiguration"] as? String,
+              let configurationText = selected[selector] as? String,
+              let configurationURL = URL(string: configurationText),
+              Self.isAllowedHTTPS(configurationURL, region: region) else {
+            throw CareLinkError.invalidConfiguration
+        }
+
+        let data = try await send(URLRequest(url: configurationURL)).data
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let server = root["server"] as? [String: Any],
+              let client = root["client"] as? [String: Any],
+              let endpoints = root["system_endpoints"] as? [String: Any],
+              let hostname = server["hostname"] as? String,
+              let clientID = client["client_id"] as? String, !clientID.isEmpty,
+              let scope = client["scope"] as? String, scope.split(separator: " ").contains("offline_access"),
+              let redirectText = client["redirect_uri"] as? String,
+              let redirectURI = URL(string: redirectText),
+              redirectURI.scheme == "com.medtronic.carepartner",
+              let audience = client["audience"] as? String,
+              let authorizationPath = endpoints["authorization_endpoint_path"] as? String,
+              let tokenPath = endpoints["token_endpoint_path"] as? String,
+              let revocationPath = endpoints["token_revocation_endpoint_path"] as? String else {
+            throw CareLinkError.invalidConfiguration
+        }
+        var base = URLComponents()
+        base.scheme = "https"
+        base.host = hostname
+        if let port = server["port"] as? Int, port != 443 { base.port = port }
+        let prefix = (server["prefix"] as? String ?? "").trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        guard let baseURL = base.url else { throw CareLinkError.invalidConfiguration }
+        func endpoint(_ path: String) -> URL {
+            [prefix, path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))]
+                .filter { !$0.isEmpty }
+                .reduce(baseURL) { $0.appendingPathComponent($1) }
+        }
+        let configuration = CareLinkOAuthConfiguration(
+            authorizationEndpoint: endpoint(authorizationPath),
+            tokenEndpoint: endpoint(tokenPath),
+            revocationEndpoint: endpoint(revocationPath),
+            clientID: clientID,
+            scope: scope,
+            redirectURI: redirectURI,
+            audience: audience
+        )
+        guard [configuration.authorizationEndpoint, configuration.tokenEndpoint, configuration.revocationEndpoint]
+            .allSatisfy({ Self.isAllowedHTTPS($0, region: region) }) else {
+            throw CareLinkError.invalidConfiguration
+        }
+        return configuration
+    }
+
+    private func oauthToken(configuration: CareLinkOAuthConfiguration, fields: [String: String], isRefresh: Bool) async throws -> [String: Any] {
+        var request = URLRequest(url: configuration.tokenEndpoint)
+        request.httpMethod = "POST"
+        request.timeoutInterval = ConstantsCareLink.requestTimeout
+        request.setValue("application/x-www-form-urlencoded; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        request.httpBody = Self.formData(fields)
+        do {
+            traceRequest(request)
+            let (data, response) = try await session.data(for: request)
+            guard let http = response as? HTTPURLResponse else { throw CareLinkError.malformedResponse }
+            traceResponse(data: data, response: http, request: request)
+            if isRefresh, [400, 401, 403].contains(http.statusCode) {
+                // Only an explicit grant rejection retires the session. Other server or transport
+                // failures retain the rotating credential so background polling can recover later.
+                let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+                if object?["error"] as? String == "invalid_grant" || http.statusCode == 403 {
+                    throw CareLinkError.reconnectRequired
+                }
+            }
+            try validate(http)
+            guard let object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                throw CareLinkError.malformedResponse
+            }
+            return object
+        } catch let error as CareLinkError { throw error }
+        catch let error as URLError where error.code == .notConnectedToInternet || error.code == .cannotConnectToHost || error.code == .timedOut {
+            throw CareLinkError.offline
+        }
+    }
+
+    private func makeToken(response: [String: Any], old: CareLinkToken?, region: CareLinkRegion, configuration: CareLinkOAuthConfiguration) throws -> CareLinkToken {
+        guard let accessToken = response["access_token"] as? String, !accessToken.isEmpty,
+              let refreshToken = response["refresh_token"] as? String, !refreshToken.isEmpty,
+              let expiresIn = (response["expires_in"] as? NSNumber)?.doubleValue, expiresIn > 0 else {
+            throw CareLinkError.malformedResponse
+        }
+        return CareLinkToken(
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            expiresAt: now().addingTimeInterval(expiresIn),
+            region: region,
+            countryCode: old?.countryCode,
+            oauthConfiguration: configuration
+        )
+    }
+
+    private static func formData(_ fields: [String: String]) -> Data {
+        var components = URLComponents()
+        components.queryItems = fields.sorted(by: { $0.key < $1.key }).map(URLQueryItem.init)
+        return Data((components.percentEncodedQuery ?? "").utf8)
+    }
+
+    private static func randomBase64URL(byteCount: Int) throws -> String {
+        var bytes = [UInt8](repeating: 0, count: byteCount)
+        guard SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes) == errSecSuccess else {
+            throw CareLinkError.invalidConfiguration
+        }
+        return base64URL(Data(bytes))
+    }
+
+    private static func base64URL(_ data: Data) -> String {
+        data.base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+    }
+
+    private static func isAllowedHTTPS(_ url: URL, region: CareLinkRegion) -> Bool {
+        guard url.scheme?.lowercased() == "https", let host = url.host?.lowercased() else { return false }
+        let suffix = region == .unitedStates ? ConstantsCareLink.allowedUSHostSuffix : ConstantsCareLink.allowedOutsideUSHostSuffix
+        return host == suffix || host.hasSuffix(".\(suffix)")
+    }
+
+    /// Returns response metadata as well as data for normal CareLink API requests.
     private func send(_ request: URLRequest) async throws -> (data: Data, response: HTTPURLResponse) {
         do {
             traceRequest(request)
@@ -502,91 +638,17 @@ actor CareLinkClient {
         return device
     }
 
-    static func parseExpiry(_ value: String) -> Date? {
-        var value = value.removingPercentEncoding ?? value
-        value = value.replacingOccurrences(of: "+", with: " ").trimmingCharacters(in: CharacterSet(charactersIn: "\"' "))
-        if let epoch = TimeInterval(value) {
-            return Date(timeIntervalSince1970: epoch > 100_000_000_000 ? epoch / 1000 : epoch)
-        }
-        let formats = ["EEE MMM d HH:mm:ss zzz yyyy", "yyyy-MM-dd'T'HH:mm:ssZ", "yyyy-MM-dd'T'HH:mm:ssz", "yyyy-MM-dd'T'HH:mm:ss.SSSZ", "yyyy-MM-dd'T'HH:mm:ss'Z'"]
-        for format in formats {
-            let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "en_US_POSIX")
-            formatter.timeZone = TimeZone(secondsFromGMT: 0)
-            formatter.dateFormat = format
-            formatter.isLenient = true
-            if let date = formatter.date(from: value) { return date }
-        }
-        return nil
-    }
-
-    /// Retains only cookies scoped to the selected CareLink environment. This excludes unrelated
-    /// identity-provider cookies created while Medtronic redirects between login pages.
-    private static func belongsToCareLink(_ cookie: HTTPCookie, region: CareLinkRegion) -> Bool {
-        if debugBaseURL != nil { return true }
-        let suffix = region == .unitedStates ? "minimed.com" : "minimed.eu"
-        return cookie.domain.trimmingCharacters(in: CharacterSet(charactersIn: ".")).lowercased().hasSuffix(suffix)
-    }
-
-    private static func cookieHeader(_ cookies: [CareLinkCookie], for url: URL) -> String {
-        let host = url.host?.lowercased() ?? ""
-        return cookies.filter { cookie in
-            let domain = cookie.domain.trimmingCharacters(in: CharacterSet(charactersIn: ".")).lowercased()
-            return host == domain || host.hasSuffix(".\(domain)")
-        }.map { "\($0.name)=\($0.value)" }.joined(separator: "; ")
-    }
-
-    /// Merges browser cookies without assuming persisted input is already unique. Browser stores,
-    /// legacy Keychain data, or a partially migrated session can contain the same cookie identity
-    /// more than once; dictionary assignment makes the newest value win instead of trapping.
-    static func mergedCookies(_ old: [CareLinkCookie], with new: [HTTPCookie]) -> [CareLinkCookie] {
-        var values = [String: CareLinkCookie]()
-        for value in old {
-            values["\(value.domain)|\(value.path)|\(value.name)"] = value
-        }
-        for cookie in new {
-            let value = CareLinkCookie(name: cookie.name, value: cookie.value, domain: cookie.domain, path: cookie.path, secure: cookie.isSecure, expiresAt: cookie.expiresDate)
-            values["\(value.domain)|\(value.path)|\(value.name)"] = value
-        }
-        return Array(values.values)
-    }
-
-    private static let authCookieName = "auth_tmp_token"
-    private static let expiryCookieName = "c_token_valid_to"
-    private static let browserUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1"
-    private static let browserClientHint = "\"Safari\";v=\"18\""
-
     #if DEBUG
-    /// Establishes the simulator's disposable web session when explicitly requested at launch.
-    /// This test hook never compiles into Release and avoids putting synthetic credentials in code.
-    func installDebugSimulatorSessionIfRequested(region: CareLinkRegion) async throws {
-        guard Self.debugBaseURL != nil,
-              ProcessInfo.processInfo.environment["CARELINK_SIMULATOR_AUTO_LOGIN"] == "1",
-              try hasToken() == false else { return }
-        let request = URLRequest(url: loginURL(region: region))
-        let result = try await send(request)
-        let headers = result.response.allHeaderFields.reduce(into: [String: String]()) { values, pair in
-            values[String(describing: pair.key)] = String(describing: pair.value)
-        }
-        // URLSession's cookie store preserves repeated Set-Cookie fields that may be collapsed in
-        // `allHeaderFields`. Merge both views so the loopback server follows real WebKit behavior.
-        let responseCookies = HTTPCookie.cookies(withResponseHeaderFields: headers, for: request.url!)
-        let storedCookies = session.configuration.httpCookieStorage?.cookies(for: request.url!) ?? []
-        var cookies = responseCookies + storedCookies
-        if let token = result.response.value(forHTTPHeaderField: "X-CareLink-Simulator-Token"),
-           let expiry = result.response.value(forHTTPHeaderField: "X-CareLink-Simulator-Expiry"),
-           let host = request.url?.host {
-            let common: [HTTPCookiePropertyKey: Any] = [.domain: host, .path: "/", .secure: "FALSE"]
-            cookies.append(HTTPCookie(properties: common.merging([.name: Self.authCookieName, .value: token]) { _, new in new })!)
-            cookies.append(HTTPCookie(properties: common.merging([.name: Self.expiryCookieName, .value: expiry]) { _, new in new })!)
-        }
-        _ = try installWebSession(cookies: cookies, region: region, countryCode: Self.resolvedCountryCode(region: region, accountCountry: nil))
-    }
-
     static var debugBaseURL: URL? {
         ProcessInfo.processInfo.environment["CARELINK_SIMULATOR_BASE_URL"].flatMap(URL.init(string:))
     }
     #else
     static let debugBaseURL: URL? = nil
     #endif
+}
+
+private extension URLComponents {
+    func queryValue(_ name: String) -> String? {
+        queryItems?.first(where: { $0.name == name })?.value
+    }
 }
