@@ -131,6 +131,11 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     }
 
     func start() {
+        // Match the EmaLink/OrangeLink device screens in RileyLinkKit by requesting one fresh
+        // battery value whenever this detail screen appears. There is deliberately no polling
+        // timer because the battery changes slowly and unsupported heartbeat devices stay silent.
+        updateGenericHeartbeatBatteryLevel()
+
         guard !didStart else {
             refresh()
             return
@@ -293,7 +298,44 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             ))
         }
 
+        // EmaLink and OrangeLink are configured through the generic heartbeat device type. Add
+        // their optional Battery Level row only after the connected device has returned a valid
+        // standard BLE percentage; all other users continue to see the existing section unchanged.
+        if let batteryLevel = genericHeartbeatBatteryLevel(),
+           let detail = BluetoothBatteryLevelPresentation.detail(for: batteryLevel) {
+            rows.append(row(
+                id: "battery-level",
+                title: Texts_BluetoothPeripheralsView.batteryLevel,
+                detail: detail,
+                detailSymbol: batterySymbol(percent: batteryLevel)
+            ))
+        }
+
         return rows
+    }
+
+    private func genericHeartbeatBatteryLevel() -> Int? {
+        genericHeartbeatTransmitter()?.batteryLevel
+    }
+
+    private func updateGenericHeartbeatBatteryLevel() {
+        genericHeartbeatTransmitter()?.updateBatteryLevel()
+    }
+
+    private func genericHeartbeatTransmitter() -> Libre3HeartBeatBluetoothTransmitter? {
+        // Resolve the already-active transmitter only. The detail screen must never create a
+        // heartbeat connection merely to discover whether an EmaLink or OrangeLink has a battery.
+        guard expectedBluetoothPeripheralType == .Libre3HeartBeatType,
+              let bluetoothPeripheral,
+              let transmitter = bluetoothPeripheralManager?.getBluetoothTransmitter(
+                  for: bluetoothPeripheral,
+                  createANewOneIfNecesssary: false
+              ) as? Libre3HeartBeatBluetoothTransmitter
+        else {
+            return nil
+        }
+
+        return transmitter
     }
 
     private func makeWebOOPSection() -> BluetoothPeripheralDetailSection? {
@@ -596,7 +638,10 @@ private extension BluetoothPeripheralDetailState {
     }
 
     func batterySymbol(percent: Int) -> BluetoothPeripheralDetailSymbol? {
-        guard percent > 0 else { return nil }
+        // Zero is a valid BLE Battery Level reported by devices such as EmaLink and OrangeLink,
+        // so it must use the existing empty red symbol rather than being treated as unavailable.
+        // Values outside the percentage range remain hidden instead of implying a battery state.
+        guard (0 ... 100).contains(percent) else { return nil }
 
         switch percent {
         case 0...10:
@@ -2415,6 +2460,13 @@ private extension BluetoothPeripheralDetailState {
 // MARK: - Generic Bluetooth Delegate
 
 extension BluetoothPeripheralDetailState: BluetoothTransmitterDelegate {
+    func didUpdateBatteryLevel(_: Int, bluetoothTransmitter _: BluetoothTransmitter) {
+        // Rebuild the visible rows when an EmaLink/OrangeLink battery read completes. The callback
+        // carries no persistent state because the active transmitter remains the single source of
+        // truth and releasing it automatically removes the optional row.
+        refreshOnMain()
+    }
+
     func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
         bluetoothPeripheralManager?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
         refreshOnMain()
@@ -2452,6 +2504,16 @@ extension BluetoothPeripheralDetailState: BluetoothTransmitterDelegate {
 
     func heartBeat() {
         bluetoothPeripheralManager?.heartBeat()
+    }
+}
+
+enum BluetoothBatteryLevelPresentation {
+    static func detail(for batteryLevel: Int?) -> String? {
+        // A missing or invalid value means the optional EmaLink/OrangeLink row stays completely
+        // invisible. A genuine 0% remains displayable and is not confused with missing data.
+        guard let batteryLevel, (0 ... 100).contains(batteryLevel) else { return nil }
+
+        return batteryLevel.description + " %"
     }
 }
 

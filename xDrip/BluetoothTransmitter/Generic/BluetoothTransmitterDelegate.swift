@@ -31,5 +31,18 @@ protocol BluetoothTransmitterDelegate: AnyObject {
 
     /// peripheral used as heartbeat, this is the heartbeat
     func heartBeat()
+
+    /// A Bluetooth transmitter received a valid battery percentage that can be presented by the UI.
+    ///
+    /// This is primarily used by generic heartbeat hardware such as EmaLink and OrangeLink. Those
+    /// devices may expose the standard BLE Battery Service, but battery reporting must remain
+    /// optional because most heartbeat devices do not provide it.
+    func didUpdateBatteryLevel(_ batteryLevel: Int, bluetoothTransmitter: BluetoothTransmitter)
     
+}
+
+extension BluetoothTransmitterDelegate {
+    /// Keep battery reporting optional so transmitters without EmaLink/OrangeLink-style battery
+    /// support do not need special handling and retain their existing behaviour.
+    func didUpdateBatteryLevel(_: Int, bluetoothTransmitter _: BluetoothTransmitter) {}
 }

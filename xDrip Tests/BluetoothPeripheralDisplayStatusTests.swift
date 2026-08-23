@@ -169,6 +169,32 @@ final class BluetoothPeripheralDisplayStatusTests: XCTestCase {
     }
 }
 
+final class StandardBluetoothBatteryLevelTests: XCTestCase {
+    func testParsesValidStandardBatteryPercentages() {
+        // EmaLink/OrangeLink-compatible Battery Service values include both boundary percentages.
+        XCTAssertEqual(StandardBluetoothBatteryLevel.percentage(from: Data([0])), 0)
+        XCTAssertEqual(StandardBluetoothBatteryLevel.percentage(from: Data([57])), 57)
+        XCTAssertEqual(StandardBluetoothBatteryLevel.percentage(from: Data([100])), 100)
+    }
+
+    func testRejectsMissingMalformedAndOutOfRangeBatteryValues() {
+        XCTAssertNil(StandardBluetoothBatteryLevel.percentage(from: nil))
+        XCTAssertNil(StandardBluetoothBatteryLevel.percentage(from: Data()))
+        XCTAssertNil(StandardBluetoothBatteryLevel.percentage(from: Data([50, 51])))
+        XCTAssertNil(StandardBluetoothBatteryLevel.percentage(from: Data([101])))
+    }
+
+    func testPresentationIsInvisibleUntilAValidLevelExists() {
+        // Absence stays invisible for normal heartbeat users, while a genuine empty battery must
+        // remain distinguishable from an unsupported EmaLink or OrangeLink battery service.
+        XCTAssertNil(BluetoothBatteryLevelPresentation.detail(for: nil))
+        XCTAssertNil(BluetoothBatteryLevelPresentation.detail(for: -1))
+        XCTAssertNil(BluetoothBatteryLevelPresentation.detail(for: 101))
+        XCTAssertEqual(BluetoothBatteryLevelPresentation.detail(for: 0), "0 %")
+        XCTAssertEqual(BluetoothBatteryLevelPresentation.detail(for: 57), "57 %")
+    }
+}
+
 private final class ConnectionStatusCGMDelegateStub: CGMTransmitterDelegate {
     func newSensorDetected(sensorStartDate: Date?) {}
     func sensorStopDetected() {}
