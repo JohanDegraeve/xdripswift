@@ -51,6 +51,8 @@
 "settingsviews_osAidLoopShareSectionTitle" = "Udostępnianie OS-AID";
 "settingsviews_troubleshootingTitle" = "Rozwiązywanie problemów";
 "settingsviews_activityLogSectionTitle" = "Dziennik aktywności";
+"settingsviews_activityLogFilterPlaceholder" = "Wpisz, aby filtrować…";
+"settingsviews_activityLogNoResults" = "Nie znaleziono wyników";
 "settingsviews_viewActivityLog" = "Dziennik aktywności";
 "settingsviews_troubleshootingLogSectionFooter" = "Wyświetl i udostępnij prosty dziennik w języku angielskim z ostatnich 24 godzin. Zawiera wartości glukozy, ale nie dane konta.";
 "settingsviews_appBannerVersion" = "Wersja %@";

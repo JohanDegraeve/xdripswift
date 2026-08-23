@@ -1603,6 +1603,20 @@ struct TroubleshootingLogReportBuilder {
     let generatedAt: Date
     let timeZone: TimeZone
 
+    /// Returns entries whose controlled, user-facing sentence contains the supplied text.
+    ///
+    /// Filtering the same sentence used by the row avoids exposing or searching developer-only
+    /// trace data. Whitespace-only input restores the complete list, and localized comparison makes
+    /// ordinary case differences behave as users expect from a search field.
+    func entries(matching filterText: String) -> [TroubleshootingLogEntry] {
+        let query = filterText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return entries }
+
+        return entries.filter { entry in
+            message(for: entry).localizedCaseInsensitiveContains(query)
+        }
+    }
+
     /// Builds export-only configuration context. The app version deliberately excludes its build number.
     ///
     /// This information is valuable to somebody interpreting a shared report but deliberately stays

@@ -59,15 +59,18 @@ final class TroubleshootingLogViewModel: ObservableObject {
 
 /// Consumer-facing view of the safe activity history.
 ///
-/// Every retained troubleshooting entry is visible. There is intentionally no detail filter: once
-/// an entry has crossed the store's usefulness and privacy boundaries, hiding it would make the
-/// screen less useful and could make the visible history disagree with Copy or Share. App and device
-/// information is deliberately export-only because it helps support staff interpret the report but
-/// takes valuable space without helping the person reading their own activity. Developer trace
-/// attachments remain on the parent Troubleshooting screen and are never read here.
+/// Every retained troubleshooting entry is available, with an optional presentation-only text
+/// filter over the same controlled sentence shown in each row. The typed query is applied only when
+/// the user submits Search so the keyboard can be dismissed before they read the results. Copy and
+/// Share deliberately retain the complete report so a temporary screen filter cannot silently
+/// produce incomplete support information. App and device information remains export-only, and
+/// developer trace attachments remain on the parent Troubleshooting screen and are never read here.
 struct TroubleshootingLogView: View {
     @StateObject private var viewModel: TroubleshootingLogViewModel
     @State private var copied = false
+    @State private var filterText = ""
+    @State private var appliedFilterText = ""
+    @FocusState private var filterFieldIsFocused: Bool
 
     init(
         store: TroubleshootingLogStore = .shared,
@@ -90,18 +93,29 @@ struct TroubleshootingLogView: View {
     }
 
     var body: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 16) {
-                if report.entries.isEmpty {
-                    emptyState
-                } else {
-                    ForEach(dayGroups) { group in
-                        daySection(group)
+        // Filtering formats every candidate through the same controlled report sentence. Capture the
+        // grouped result once per body update so an empty-state check does not repeat that work.
+        let visibleDayGroups = dayGroups
+
+        VStack(spacing: 0) {
+            filterField
+
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 16) {
+                    if report.entries.isEmpty {
+                        emptyState
+                    } else if visibleDayGroups.isEmpty {
+                        noResultsState
+                    } else {
+                        ForEach(visibleDayGroups) { group in
+                            daySection(group)
+                        }
                     }
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .scrollDismissesKeyboard(.interactively)
         }
         .background(ConstantsUI.listBackGroundColor.ignoresSafeArea())
         // The parent destination is already named Troubleshooting. Naming the viewer Activity Log
@@ -128,10 +142,47 @@ struct TroubleshootingLogView: View {
         .onAppear(perform: viewModel.reload)
     }
 
-    /// Single presentation source for every visible row and both export actions.
+    /// Lives outside the `ScrollView` so the user can always refine or clear the query, including
+    /// when the submitted text matches no entries. Editing does not repeatedly rebuild a covered
+    /// list; the keyboard Search action applies the completed query and then reveals the results.
+    private var filterField: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(Color(.colorSecondary))
+                .accessibilityHidden(true)
+
+            TextField(Texts_SettingsView.activityLogFilterPlaceholder, text: $filterText)
+                .textInputAutocapitalization(.never)
+                .disableAutocorrection(true)
+                .submitLabel(.search)
+                .focused($filterFieldIsFocused)
+                .onSubmit(applyFilter)
+                .onChange(of: filterText) { newValue in
+                    // Clearing the field has only one useful interpretation, so restore the complete
+                    // list immediately instead of requiring Search to submit an empty query.
+                    if newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        appliedFilterText = ""
+                    }
+                }
+        }
+        .padding(.horizontal, 12)
+        .frame(minHeight: 40)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .padding(.horizontal, 16)
+        .padding(.top, 12)
+    }
+
+    private func applyFilter() {
+        appliedFilterText = filterText.trimmingCharacters(in: .whitespacesAndNewlines)
+        filterFieldIsFocused = false
+    }
+
+    /// Single wording source for visible rows and both complete export actions.
     ///
-    /// `appInfo` is still supplied here even though the view never renders it: the report builder
-    /// places that context at the top of the plain text copied to the pasteboard or shared to support.
+    /// The filter derives matches from `message(for:)` without replacing this builder's full entry
+    /// list. `appInfo` is supplied even though it is export-only because Copy and Share place that
+    /// context at the top of the plain text sent to support.
     private var report: TroubleshootingLogReportBuilder {
         TroubleshootingLogReportBuilder(
             entries: viewModel.entries,
@@ -157,12 +208,29 @@ struct TroubleshootingLogView: View {
         .accessibilityElement(children: .combine)
     }
 
-    /// Groups the store's newest-first snapshot without changing its order inside each local day.
+    /// Distinguishes a valid search with no matches from an Activity Log that has no retained history.
+    /// Keep this intentionally brief and visually consistent with native unavailable-content states.
+    private var noResultsState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 34, weight: .light))
+                .foregroundStyle(Color(.colorTertiary))
+
+            Text(Texts_SettingsView.activityLogNoResults)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color(.colorSecondary))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 36)
+        .accessibilityElement(children: .combine)
+    }
+
+    /// Groups the newest-first visible entries without changing their order inside each local day.
     private var dayGroups: [TroubleshootingLogDayGroup] {
         var groups = [TroubleshootingLogDayGroup]()
         let calendar = Calendar.current
 
-        for entry in report.entries {
+        for entry in report.entries(matching: appliedFilterText) {
             let day = calendar.startOfDay(for: entry.timestamp)
             if groups.last?.day == day {
                 groups[groups.count - 1].entries.append(entry)

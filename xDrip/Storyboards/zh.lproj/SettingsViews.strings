@@ -6,6 +6,8 @@
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID 共享";
 "settingsviews_troubleshootingTitle" = "故障排除";
 "settingsviews_activityLogSectionTitle" = "活动日志";
+"settingsviews_activityLogFilterPlaceholder" = "输入内容以筛选…";
+"settingsviews_activityLogNoResults" = "未找到结果";
 "settingsviews_viewActivityLog" = "活动日志";
 "settingsviews_troubleshootingLogSectionFooter" = "查看并分享过去 24 小时的简明英文记录。该日志包含血糖值，但不包含账户详情。";
 "settingsviews_appBannerVersion" = "版本 %@";

@@ -60,6 +60,14 @@ class Texts_SettingsView {
         NSLocalizedString("settingsviews_activityLogSectionTitle", tableName: filename, bundle: Bundle.main, value: "Activity Log", comment: "troubleshooting section title for the consumer activity log")
     }()
 
+    static let activityLogFilterPlaceholder: String = {
+        NSLocalizedString("settingsviews_activityLogFilterPlaceholder", tableName: filename, bundle: Bundle.main, value: "Type to filter…", comment: "placeholder for filtering visible activity log entries")
+    }()
+
+    static let activityLogNoResults: String = {
+        NSLocalizedString("settingsviews_activityLogNoResults", tableName: filename, bundle: Bundle.main, value: "No results found", comment: "message shown when the activity log filter has no matching entries")
+    }()
+
     static let viewActivityLog: String = {
         NSLocalizedString("settingsviews_viewActivityLog", tableName: filename, bundle: Bundle.main, value: "Activity Log", comment: "root troubleshooting row title that opens the consumer activity log")
     }()

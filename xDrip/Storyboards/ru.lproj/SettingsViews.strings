@@ -6,6 +6,8 @@
 "settingsviews_osAidLoopShareSectionTitle" = "Обмен OS-AID";
 "settingsviews_troubleshootingTitle" = "Устранение неполадок";
 "settingsviews_activityLogSectionTitle" = "Журнал активности";
+"settingsviews_activityLogFilterPlaceholder" = "Введите текст для фильтрации…";
+"settingsviews_activityLogNoResults" = "Результаты не найдены";
 "settingsviews_viewActivityLog" = "Журнал активности";
 "settingsviews_troubleshootingLogSectionFooter" = "Просмотрите и поделитесь простым журналом на английском языке за последние 24 часа. Он содержит значения глюкозы, но не данные учётной записи.";
 "settingsviews_appBannerVersion" = "Версия %@";

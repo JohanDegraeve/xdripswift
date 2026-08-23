@@ -6,6 +6,8 @@
 "settingsviews_osAidLoopShareSectionTitle" = "Κοινή χρήση OS-AID";
 "settingsviews_troubleshootingTitle" = "Αντιμετώπιση προβλημάτων";
 "settingsviews_activityLogSectionTitle" = "Αρχείο δραστηριότητας";
+"settingsviews_activityLogFilterPlaceholder" = "Πληκτρολογήστε για φιλτράρισμα…";
+"settingsviews_activityLogNoResults" = "Δεν βρέθηκαν αποτελέσματα";
 "settingsviews_viewActivityLog" = "Αρχείο δραστηριότητας";
 "settingsviews_troubleshootingLogSectionFooter" = "Προβάλετε και κοινοποιήστε μια απλή καταγραφή στα Αγγλικά για τις προηγούμενες 24 ώρες. Περιλαμβάνει τιμές γλυκόζης, αλλά όχι στοιχεία λογαριασμού.";
 "settingsviews_appBannerVersion" = "Έκδοση %@";

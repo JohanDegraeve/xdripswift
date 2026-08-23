@@ -6,6 +6,8 @@
 "settingsviews_osAidLoopShareSectionTitle" = "Partilha OS-AID";
 "settingsviews_troubleshootingTitle" = "Resolução de problemas";
 "settingsviews_activityLogSectionTitle" = "Registo de atividade";
+"settingsviews_activityLogFilterPlaceholder" = "Escreva para filtrar…";
+"settingsviews_activityLogNoResults" = "Nenhum resultado encontrado";
 "settingsviews_viewActivityLog" = "Registo de atividade";
 "settingsviews_troubleshootingLogSectionFooter" = "Consulte e partilhe um registo em inglês simples das últimas 24 horas. Inclui valores de glicose, mas exclui dados da conta.";
 "settingsviews_appBannerVersion" = "Versão %@";

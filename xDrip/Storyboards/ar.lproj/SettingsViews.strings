@@ -6,6 +6,8 @@
 "settingsviews_osAidLoopShareSectionTitle" = "مشاركة OS-AID";
 "settingsviews_troubleshootingTitle" = "استكشاف الأخطاء وإصلاحها";
 "settingsviews_activityLogSectionTitle" = "سجل النشاط";
+"settingsviews_activityLogFilterPlaceholder" = "اكتب للتصفية…";
+"settingsviews_activityLogNoResults" = "لم يتم العثور على نتائج";
 "settingsviews_viewActivityLog" = "سجل النشاط";
 "settingsviews_troubleshootingLogSectionFooter" = "اعرض وشارك سجلاً مبسطاً باللغة الإنجليزية للساعات الـ 24 الماضية. يتضمن هذا السجل قيم الجلوكوز، لكنه يستبعد تفاصيل الحساب.";
 "settingsviews_appBannerVersion" = "الإصدار %@";

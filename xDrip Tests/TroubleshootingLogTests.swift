@@ -1508,6 +1508,28 @@ final class TroubleshootingLogTests: XCTestCase {
         ))
     }
 
+    func testActivityLogFilterMatchesRenderedMessagesAndRestoresFullListForBlankText() {
+        let entries: [TroubleshootingLogEntry] = [
+            .standard(.heartbeatReceived, timestamp: referenceDate),
+            .standard(.app(.started), timestamp: referenceDate.addingTimeInterval(-1)),
+            .standard(.glucoseAccepted(
+                mgDl: 123,
+                source: .careLink,
+                measuredAt: referenceDate.addingTimeInterval(-2)
+            ), timestamp: referenceDate.addingTimeInterval(-2))
+        ]
+        let report = makeReport(entries: entries)
+
+        XCTAssertEqual(report.entries(matching: "HEARTbeat").map(\.kind), [
+            .heartbeatReceived
+        ])
+        XCTAssertEqual(report.entries(matching: "123 mg/dL").map(\.kind), [
+            entries[2].kind
+        ])
+        XCTAssertEqual(report.entries(matching: "no match"), [])
+        XCTAssertEqual(report.entries(matching: "  \n "), entries)
+    }
+
     private var appInfo: TroubleshootingLogAppInfo {
         makeAppInfo()
     }

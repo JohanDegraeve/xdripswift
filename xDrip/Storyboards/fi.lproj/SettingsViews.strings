@@ -6,6 +6,8 @@
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID-jakaminen";
 "settingsviews_troubleshootingTitle" = "Vianmääritys";
 "settingsviews_activityLogSectionTitle" = "Toimintaloki";
+"settingsviews_activityLogFilterPlaceholder" = "Suodata kirjoittamalla…";
+"settingsviews_activityLogNoResults" = "Tuloksia ei löytynyt";
 "settingsviews_viewActivityLog" = "Toimintaloki";
 "settingsviews_troubleshootingLogSectionFooter" = "Näytä ja jaa selkokielinen englanninkielinen loki viimeisiltä 24 tunnilta. Loki sisältää glukoosiarvot, mutta ei tilitietoja.";
 "settingsviews_appBannerVersion" = "Versio %@";

@@ -248,6 +248,8 @@
 "settingsviews_osAidLoopShareSectionTitle" = "Обмін OS-AID";
 "settingsviews_troubleshootingTitle" = "Усунення несправностей";
 "settingsviews_activityLogSectionTitle" = "Журнал активності";
+"settingsviews_activityLogFilterPlaceholder" = "Введіть текст для фільтрування…";
+"settingsviews_activityLogNoResults" = "Результатів не знайдено";
 "settingsviews_viewActivityLog" = "Журнал активності";
 "settingsviews_troubleshootingLogSectionFooter" = "Перегляньте та поділіться простим журналом англійською мовою за останні 24 години. Він містить значення глюкози, але не дані облікового запису.";
 "settingsviews_appBannerVersion" = "Версія %@";

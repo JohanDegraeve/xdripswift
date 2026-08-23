@@ -7,6 +7,8 @@
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID Share";
 "settingsviews_troubleshootingTitle" = "Troubleshooting";
 "settingsviews_activityLogSectionTitle" = "Activity Log";
+"settingsviews_activityLogFilterPlaceholder" = "Type to filter…";
+"settingsviews_activityLogNoResults" = "No results found";
 "settingsviews_viewActivityLog" = "Activity Log";
 "settingsviews_issueReportSectionFooter" = "Do not send an Issue Report unless requested by an xDrip4iOS developer or your report will be automatically deleted.";
 "settingsviews_troubleshootingLogSectionFooter" = "View and share a plain-English record of the previous 24 hours. This log includes glucose values but excludes account details.";

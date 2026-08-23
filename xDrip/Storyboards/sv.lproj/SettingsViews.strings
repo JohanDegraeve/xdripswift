@@ -6,6 +6,8 @@
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID-delning";
 "settingsviews_troubleshootingTitle" = "Felsökning";
 "settingsviews_activityLogSectionTitle" = "Aktivitetslogg";
+"settingsviews_activityLogFilterPlaceholder" = "Skriv för att filtrera…";
+"settingsviews_activityLogNoResults" = "Inga resultat hittades";
 "settingsviews_viewActivityLog" = "Aktivitetslogg";
 "settingsviews_troubleshootingLogSectionFooter" = "Visa och dela en lättläst logg på engelska från de senaste 24 timmarna. Den innehåller glukosvärden men inte kontouppgifter.";
 "settingsviews_appBannerVersion" = "Version %@";

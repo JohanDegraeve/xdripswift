@@ -57,6 +57,8 @@
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID teilen";
 "settingsviews_troubleshootingTitle" = "Fehlerbehebung";
 "settingsviews_activityLogSectionTitle" = "Aktivitätsprotokoll";
+"settingsviews_activityLogFilterPlaceholder" = "Zum Filtern eingeben…";
+"settingsviews_activityLogNoResults" = "Keine Ergebnisse gefunden";
 "settingsviews_viewActivityLog" = "Aktivitätsprotokoll";
 "settingsviews_troubleshootingLogSectionFooter" = "Zeige und teile ein leicht verständliches englisches Protokoll der letzten 24 Stunden. Es enthält Glukosewerte, aber keine Kontodaten.";
 "settingsviews_appBannerVersion" = "Version %@";
