@@ -177,9 +177,9 @@
 "readSuccess" = "Successo letture";
 /// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
 "readSuccessNow" = "Ora";
-"scanningForTransmitter" = "Ricerca del trasmettitore...";
+"scanningForTransmitter" = "Ricerca...";
 "connecting" = "Connessione";
 "connectingToTransmitter" = "Connecting...";
 "reconnecting" = "Riconnessione";
-"reconnectingToTransmitter" = "Riconnessione al trasmettitore...";
+"reconnectingToTransmitter" = "Riconnessione...";
 "waiting" = "In attesa...";

@@ -133,7 +133,7 @@ class Texts_BluetoothPeripheralView {
     }()
 
     static let scanningForTransmitter: String = {
-        return NSLocalizedString("scanningForTransmitter", tableName: filename, bundle: Bundle.main, value: "Scanning for transmitter...", comment: "full status while discovering a new unknown Bluetooth transmitter")
+        return NSLocalizedString("scanningForTransmitter", tableName: filename, bundle: Bundle.main, value: "Scanning...", comment: "full status while discovering a new unknown Bluetooth transmitter")
     }()
 
     static let connecting: String = {
@@ -149,7 +149,7 @@ class Texts_BluetoothPeripheralView {
     }()
 
     static let reconnectingToTransmitter: String = {
-        return NSLocalizedString("reconnectingToTransmitter", tableName: filename, bundle: Bundle.main, value: "Reconnecting to transmitter...", comment: "full warning status for an unexpectedly disconnected continuously connected device")
+        return NSLocalizedString("reconnectingToTransmitter", tableName: filename, bundle: Bundle.main, value: "Reconnecting...", comment: "full warning status for an unexpectedly disconnected continuously connected device")
     }()
 
     static let waiting: String = {
