@@ -45,38 +45,19 @@ struct CareLinkPumpStatusView: View {
     }
 
     private var header: some View {
-        HStack(spacing: 10) {
+        AIDStatusBanner(
+            systemName: "Medtronic",
+            detail: deviceName,
+            statusTitle: statusTitle,
+            statusColor: statusColor,
+            backgroundColor: statusColor.opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
+        ) {
             Image(systemName: "cross.case.fill")
                 .font(.title2)
                 .foregroundStyle(ConstantsAppColors.primaryText)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Medtronic")
-                    .font(.title2.bold())
-                Text(deviceName)
-                    .font(.callout.bold())
-                    .foregroundStyle(ConstantsAppColors.secondaryText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.65)
-                    .allowsTightening(true)
-            }
-            Spacer()
+        } statusIcon: {
             Image(systemName: statusImage)
-                .font(.title3.bold())
-                .foregroundStyle(statusColor)
-            Text(statusTitle)
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(statusColor)
-                .lineLimit(1)
-                .minimumScaleFactor(0.65)
-                .allowsTightening(true)
-                .layoutPriority(1)
         }
-        .padding(.horizontal, 15)
-        .padding(.vertical, 12)
-        .background(statusColor.opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity))
-        .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius))
-        .padding(.horizontal, 18)
-        .padding(.vertical, 10)
     }
 
     private var therapySection: some View {

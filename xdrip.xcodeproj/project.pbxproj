@@ -219,6 +219,7 @@
 		47DE41B52B8693CB0041DA19 /* MainViewHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B42B8693CB0041DA19 /* MainViewHeaderView.swift */; };
 		47DE41B92B87B2680041DA19 /* ConstantsAppleWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B82B87B2680041DA19 /* ConstantsAppleWatch.swift */; };
 		47E3BEC72CD780E300B794A0 /* AIDStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47E3BEC62CD780D900B794A0 /* AIDStatusView.swift */; };
+		CA1E00050000000000000001 /* AIDStatusBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1E00060000000000000001 /* AIDStatusBanner.swift */; };
 		47E3DB372C769C9600DE1AF0 /* AlgorithmType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47E3DB362C769C9600DE1AF0 /* AlgorithmType.swift */; };
 		47E3DB3A2C77C0D700DE1AF0 /* CalibrationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47E3DB392C77C0D700DE1AF0 /* CalibrationType.swift */; };
 		47E91BBA2B9A43F20063181B /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
@@ -1087,6 +1088,7 @@
 		47DE41B42B8693CB0041DA19 /* MainViewHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewHeaderView.swift; sourceTree = "<group>"; };
 		47DE41B82B87B2680041DA19 /* ConstantsAppleWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsAppleWatch.swift; sourceTree = "<group>"; };
 		47E3BEC62CD780D900B794A0 /* AIDStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIDStatusView.swift; sourceTree = "<group>"; };
+		CA1E00060000000000000001 /* AIDStatusBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIDStatusBanner.swift; sourceTree = "<group>"; };
 		47E3DB362C769C9600DE1AF0 /* AlgorithmType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmType.swift; sourceTree = "<group>"; };
 		47E3DB392C77C0D700DE1AF0 /* CalibrationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationType.swift; sourceTree = "<group>"; };
 		47EBE8A32CFB8F9100BB09F5 /* MainViewAIDStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewAIDStatusView.swift; sourceTree = "<group>"; };
@@ -2894,6 +2896,7 @@
 		F866974D2867A94D00025441 /* SwiftUIViews */ = {
 			isa = PBXGroup;
 			children = (
+				CA1E00060000000000000001 /* AIDStatusBanner.swift */,
 				47E3BEC62CD780D900B794A0 /* AIDStatusView.swift */,
 				4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */,
 				4D20C0012FF1000100000001 /* RootHomeState.swift */,
@@ -4557,6 +4560,7 @@
 				F85FF39125288870004E6FF1 /* HouseKeeper.swift in Sources */,
 				F8CB59C42739D1CD00BA199E /* DexcomBackfillTxMessage.swift in Sources */,
 				47E3BEC72CD780E300B794A0 /* AIDStatusView.swift in Sources */,
+				CA1E00050000000000000001 /* AIDStatusBanner.swift in Sources */,
 				4C2000052F65000100000001 /* BluetoothPeripheralDetailState.swift in Sources */,
 				4C2000072F65000100000001 /* BluetoothPeripheralDetailView.swift in Sources */,
 				4C2000092F65000100000001 /* BluetoothPeripheralSettingsRow.swift in Sources */,

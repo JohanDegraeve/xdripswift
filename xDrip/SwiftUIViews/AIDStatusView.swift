@@ -61,43 +61,22 @@ struct AIDStatusView: View {
         NavigationStack {
             VStack {
                 // show a nice colourful header to represent the AID system being followed and the status.
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack(spacing: 8) {
+                AIDStatusBanner(
+                    systemName: deviceStatus.systemName() ?? "Status",
+                    detail: deviceStatus.appVersion?.components(separatedBy: "-").first,
+                    statusTitle: deviceStatus.deviceStatusTitle(),
+                    statusColor: deviceStatus.deviceStatusColor(),
+                    backgroundColor: deviceStatus.deviceStatusBannerBackgroundColor()
+                ) {
+                    Group {
                         if let systemIcon = deviceStatus.systemIcon() {
                             systemIcon.scaledToFit()
                         }
-                        
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(deviceStatus.systemName() ?? "Status")
-                                .font(.title2).bold()
-                                .id(refreshView) // places the refresh here as this text view will always be shown
-                            
-                            if let appVersion = deviceStatus.appVersion {
-                                Text(appVersion.components(separatedBy: "-").first ?? nilString)
-                                    .font(.callout).bold()
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.5)
-                                    .foregroundStyle(Color(.colorSecondary))
-                            }
-                        }
-                        
-                        Spacer()
-                        
-                        HStack {
-                            deviceStatus.deviceStatusIconImage()
-                                .font(.title3).bold()
-                                .foregroundStyle(deviceStatus.deviceStatusColor())
-                            
-                            Text(deviceStatus.deviceStatusTitle())
-                                .font(.title3).fontWeight(.semibold)
-                                .foregroundStyle(deviceStatus.deviceStatusColor())
-                        }
                     }
-                    .padding(EdgeInsets(top: 10, leading: 15, bottom: 10, trailing: 15))
-                    .background(deviceStatus.deviceStatusBannerBackgroundColor())
-                    .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius))
+                } statusIcon: {
+                    deviceStatus.deviceStatusIconImage()
                 }
-                .padding(EdgeInsets(top: 8, leading: 18, bottom: 10, trailing: 18))
+                .id(refreshView)
                 
                 // after the header, show a picker view to allow different list views to be displayed
                 Picker("Chose Status or Profile", selection: $pickerViewSelected) {
