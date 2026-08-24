@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Foundation
+import WidgetKit
 
 extension XDripWidget {
     // main complication view body
@@ -33,21 +34,46 @@ extension XDripWidget {
         var entry: Entry
         
         var body: some View {
+            ZStack {
+                switch widgetFamily {
+                case .systemSmall:
+                    systemSmallView
+                case .systemMedium:
+                    systemMediumView
+                case .systemLarge:
+                    systemLargeView
+                case .accessoryCircular:
+                    accessoryCircularView
+                case .accessoryRectangular:
+                    accessoryRectangularView
+                default:
+                    Text("No Data Available")
+                }
+
+                if showsKeepAliveDisabledMessage,
+                   let keepAliveDisabledMessage = entry.widgetState.keepAliveDisabledMessage {
+                    Text(keepAliveDisabledMessage)
+                        .font(.caption.bold())
+                        .foregroundStyle(.colorPrimary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color(white: 0.2).opacity(0.95), in: Capsule())
+                        .padding(.horizontal, 6)
+                }
+            }
+        }
+
+        private var showsKeepAliveDisabledMessage: Bool {
+            guard entry.widgetState.keepAliveDisabledMessage != nil else { return false }
+
             switch widgetFamily {
-            case .systemSmall:
-                systemSmallView
-            case .systemMedium:
-                systemMediumView
-            case .systemLarge:
-                systemLargeView
-            case .accessoryCircular:
-                accessoryCircularView
-            case .accessoryRectangular:
-                accessoryRectangularView
+            case .systemSmall, .systemMedium, .systemLarge:
+                return true
             default:
-                Text("No Data Available")
+                return false
             }
         }
     }
 }
-

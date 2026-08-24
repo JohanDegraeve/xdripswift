@@ -47,7 +47,7 @@
 "stopSensorConfirmation" = "Oletko varma, että haluat pysäyttää sensorin?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "jos sinulla ei ole koodia, käytä 0000, mutta muista, että et saa lukemia ennen kuin olet kalibroinut";
+"enterSensorCode" = "Jos et tiedä sensorin koodia, jätä tämä tyhjäksi käyttääksesi 0000. Jos painat OK ilman koodia, sensorikoodina käytetään 0000, tai nykyinen istunto vain otetaan käyttöön, jos se on jo alkanut.";
 
 /// status info : literally 'Sensor End'
 "sensorend" = "Sensori loppuu";
@@ -72,7 +72,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -85,3 +85,57 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "%@ jäljellä";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Sensorin kohina";
+"sensorManagementNoiseShortTerm" = "Viimeiset 30 minuuttia";
+"sensorManagementNoiseLongTerm" = "Viimeiset 4 tuntia";
+"sensorManagementNoiseCollecting" = "Kerätään tietoja";
+"sensorManagementNoiseLow" = "Matala";
+"sensorManagementNoiseElevated" = "Kohonnut";
+"sensorManagementNoiseVeryHigh" = "Erittäin korkea";
+"sensorManagementNoiseExtreme" = "Äärimmäinen";
+"sensorManagementNoiseFlatline" = "Sensori on todennäköisesti vikaantunut.";
+"sensorNoiseWarningExtremeTitle" = "Äärimmäinen sensorin kohina";
+"sensorNoiseWarningPersistentTitle" = "Jatkuva sensorin kohina";
+"sensorNoiseWarningFlatlineTitle" = "Sensorin signaali on tasainen";
+"sensorNoiseHistoryTitle" = "Kohinahistoria";
+"sensorNoiseHistoryCurrentTitle" = "Nykyiset mittaukset";
+"sensorNoiseHistoryChartTitle" = "Kohina ajan kuluessa";
+"sensorNoiseHistoryRangeTitle" = "Aikaväli";
+"sensorNoiseHistoryDayRange" = "1d";
+"sensorNoiseHistoryThreeDayRange" = "3 pv";
+"sensorNoiseHistoryWeekRange" = "7 pv";
+"sensorNoiseHistoryAllRange" = "Kaikki";
+"sensorNoiseHistoryShortCompact" = "30 min";
+"sensorNoiseHistoryLongCompact" = "4 t";
+"sensorNoiseHistoryLoading" = "Luodaan sensorihistoriaa";
+"sensorNoiseHistoryNoDataTitle" = "Kohinatietoja ei ole vielä riittävästi";
+"sensorNoiseHistoryNoDataMessage" = "Kaavio tulee näkyviin, kun sensorilukemia on kerätty riittävästi.";
+"sensorNoiseHistoryChartAccessibility" = "Sensorin kohinahistorian kaavio";
+"pumpBattery" = "Akku";
+"pumpReservoir" = "Säiliö";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Viimeisin";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Erittäin voimakas anturikohina";
+"sensorHealthPersistentNoiseGuidance" = "Erittäin voimakasta kohinaa 12 tunnin ajan. Harkitse anturin vaihtamista, jos se jatkuu.";
+"sensorHealthFlatlineTitle" = "Anturin signaali on tasainen";
+"sensorHealthFlatlineGuidance" = "Lukemat eivät ole muuttuneet 30 minuuttiin. Tämä tarkoittaa yleensä, että anturi on vioittunut/vanhentunut.";
+"sensorHealthTemporaryIssueTitle" = "Tilapäinen anturiongelma";
+"sensorHealthTemporaryIssueGuidance" = "Tilapäinen anturiongelma 3 tunnin ajan. Tarkista verensokerimittarilla ja noudata valmistajan ohjeita.";
+"sensorHealthSensorFailedTitle" = "Anturi vioittunut";
+"sensorHealthSensorFailedGuidance" = "Anturivika ilmoitettu. Vaihda anturi.";
+"sensorHealthTransmitterFailedTitle" = "Lähetinvika";
+"sensorHealthTransmitterFailedGuidance" = "Lähetinvika ilmoitettu. Tarkista tai vaihda lähetin.";
+"connectingToCGM" = "Yhdistetään CGM-laitteeseen...";
+"reconnectingToCGM" = "Yhdistetään uudelleen CGM-laitteeseen...";

@@ -257,7 +257,13 @@ class CGMBubbleTransmitter: BluetoothTransmitter, CGMTransmitter {
                     case .dataPacket, .dataPacket2, .decryptedDataPacket:
 
                         //no different processing for decryptedDataPacket, we look at the firmware version of the bubble and sensortype to determine if data is decrypted or not
-                        
+
+                        // every Bubble data packet starts with a 4-byte protocol header
+                        guard value.count >= 4 else {
+                            trace("    received data packet shorter than the Bubble header, ignoring", log: log, category: ConstantsLog.categoryCGMBubble, type: .error)
+                            return
+                        }
+
                         rxBuffer.append(value.suffix(from: 4))
                         
                         if rxBuffer.count >= 352 {
@@ -272,7 +278,7 @@ class CGMBubbleTransmitter: BluetoothTransmitter, CGMTransmitter {
                                 // if firmware < 2.6, libre2 and libreUS will decrypt fram local
                                 // after decryptFRAM, the libre2 and libreUS 344 will be libre1 344 data format
                                 // firmware >= 2.6, then bubble already decrypted the data, no need for decryption we already have the 344 bytes
-                                if libreSensorType == .libre2 || libreSensorType == .libre2C5 || libreSensorType == .libre2C6 || libreSensorType == .libre27F || libreSensorType == .libreUS || libreSensorType == .libreUSE6 {
+                                if libreSensorType.requiresLibre2Decryption {
                                     
                                     if let firmware = firmware?.toDouble(), firmware < 2.6 {
                                         
@@ -324,9 +330,9 @@ class CGMBubbleTransmitter: BluetoothTransmitter, CGMTransmitter {
                                 self.lastGlucoseDate = Date()
                                 
                                 if let sensorState = sensorState {
-                                    DispatchQueue.main.async { [weak self] in
-                                        guard let self = self else { return }
-                                        self.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
+                                    DispatchQueue.main.async { [weak transmitter = self] in
+                                        guard let transmitter = transmitter else { return }
+                                        transmitter.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: transmitter)
                                     }
                                 }
                             }
@@ -345,7 +351,7 @@ class CGMBubbleTransmitter: BluetoothTransmitter, CGMTransmitter {
                         
                         
                     case .patchInfo:
-                        if value.count >= 10 {
+                        if value.count >= 11 {
                             
                             patchInfo = value.subdata(in: 5 ..< 11).hexEncodedString().uppercased()
 

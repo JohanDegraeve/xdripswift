@@ -12,36 +12,40 @@ import SwiftUI
 struct MainViewAIDStatusView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
-    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
+    let isSmallScreen = ConstantsAppleWatch.isSmallScreen()
     
     var body: some View {
         let textSize: CGFloat = isSmallScreen ? 14 : 16
         
         HStack(alignment: .center, spacing: 0) {
-            Text("\(watchState.deviceStatusIOB.round(toDecimalPlaces: 2).stringWithoutTrailingZeroes)U")
+            Text(watchState.aidStatusIOBString())
                 .font(.system(size: textSize))
                 .fontWeight(.semibold)
                 .foregroundStyle(.colorPrimary)
             
             Spacer()
             
-            Text("\(watchState.deviceStatusCOB.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes)g")
-                .font(.system(size: textSize))
-                .fontWeight(.semibold)
-                .foregroundStyle(.colorPrimary)
-            
-            Spacer()
-            
-            HStack(alignment: .center, spacing: 5) {
-                watchState.deviceStatusIconImage()
-                    .font(.system(size: textSize))
-                    .fontWeight(.bold)
-                    .foregroundStyle(watchState.deviceStatusColor() ?? .colorSecondary)
-                
-                Text(watchState.deviceStatusLastLoopDateTimeAgoString)
+            // CareLink sends meal entries but no active-carb/COB calculation. The shared semantic
+            // capability keeps the unavailable placeholder out of both Watch and iOS compact rows.
+            if watchState.aidStatus?.supportsCOB == true {
+                Text(watchState.aidStatusCOBString())
                     .font(.system(size: textSize))
                     .fontWeight(.semibold)
                     .foregroundStyle(.colorPrimary)
+
+                Spacer()
+            }
+            
+            HStack(alignment: .center, spacing: 5) {
+                Text(watchState.aidStatusActivityAgeString())
+                    .font(.system(size: textSize))
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.colorPrimary)
+
+                watchState.aidStatusIconImage()
+                    .font(.system(size: textSize))
+                    .fontWeight(.bold)
+                    .foregroundStyle(watchState.aidStatusColor() ?? .colorSecondary)
             }
         }
         //        .padding(.leading, isSmallScreen ? 6 : 8)
@@ -56,10 +60,7 @@ struct MainViewAIDStatusView_Previews: PreviewProvider {
     static var previews: some View {
         let watchState = WatchStateModel()
         
-        watchState.deviceStatusIOB = 2.25
-        watchState.deviceStatusCOB = 24
-        watchState.deviceStatusCreatedAt = Date().addingTimeInterval(-180)
-        watchState.deviceStatusLastLoopDate = Date().addingTimeInterval(-125)
+        watchState.aidStatus = AIDStatus(condition: .active, style: .loop, statusUpdatedAt: Date().addingTimeInterval(-180), lastActivityAt: Date().addingTimeInterval(-125), iob: 2.25, cob: 24, statusTitle: "Looping", staleStatusTitle: "No data")
         
         return Group {
             MainViewAIDStatusView()

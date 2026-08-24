@@ -1,4 +1,10 @@
 "alertsettingsview_screentitle" = "Alarmas";
+"alerts_snooze_high_title" = "Glucemia alta";
+"alerts_snooze_very_high_title" = "Glucemia muy alta";
+"alerts_snooze_low_title" = "Glucemia baja";
+"alerts_snooze_very_low_title" = "Glucemia muy baja";
+"alerts_snooze_fast_drop_title" = "Bajada rápida";
+"alerts_snooze_fast_rise_title" = "Subida rápida";
 "alertssettingsview_screentitle" = "Editar Alarma";
 "alerts_highalerttitle" = "Alarma Glucemia Alta";
 "alerts_veryhighalerttitle" = "Alarma Glucemia Muy Alta";

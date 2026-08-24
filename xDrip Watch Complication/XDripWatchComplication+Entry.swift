@@ -32,13 +32,17 @@ extension XDripWatchComplication.Entry {
         var highLimitInMgDl: Double
         var urgentHighLimitInMgDl: Double
         var keepAliveIsDisabled: Bool
-        var liveDataIsEnabled: Bool
         
         var bgUnitString: String
         var bgValueInMgDl: Double?
         var bgReadingDate: Date?
+        var hasRecentReading: Bool {
+            guard let bgReadingDate else { return false }
+
+            return bgReadingDate > Date().addingTimeInterval(-60 * 20)
+        }
                 
-        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, keepAliveIsDisabled: Bool? = false, remainingComplicationUserInfoTransfers: Int? = 99, liveDataIsEnabled: Bool? = false) {
+        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, keepAliveIsDisabled: Bool? = false) {
             self.bgReadingValues = bgReadingValues
             self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl ?? true
@@ -49,7 +53,6 @@ extension XDripWatchComplication.Entry {
             self.highLimitInMgDl = highLimitInMgDl ?? 180
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl ?? 250
             self.keepAliveIsDisabled = keepAliveIsDisabled ?? false
-            self.liveDataIsEnabled = liveDataIsEnabled ?? false
             
             self.bgValueInMgDl = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0] : nil
             self.bgReadingDate = (bgReadingDates?.count ?? 0) > 0 ? bgReadingDates?[0] : nil
@@ -59,7 +62,7 @@ extension XDripWatchComplication.Entry {
         /// returns blood glucose value as a string in the user-defined measurement unit. Will check and display also high, low and error texts as required.
         /// - Returns: a String with the formatted value/unit or error text
         func bgValueStringInUserChosenUnit() -> String {
-            if let bgValueInMgDl = bgValueInMgDl {
+            if let bgValueInMgDl = bgValueInMgDl, hasRecentReading {
                 var returnValue: String
                 
                 if bgValueInMgDl >= 400 {
@@ -99,7 +102,7 @@ extension XDripWatchComplication.Entry {
         /// Blood glucose color dependant on the user defined limit values
         /// - Returns: a Color either red, yellow or green
         func bgTextColor() -> Color {
-            if let bgValueInMgDl = bgValueInMgDl {
+            if let bgValueInMgDl = bgValueInMgDl, hasRecentReading {
                 if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
                     return .red
                 } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
@@ -116,7 +119,7 @@ extension XDripWatchComplication.Entry {
         /// convert the optional delta change int (in mg/dL) to a formatted change value in the user chosen unit making sure all zero values are shown as a positive change to follow Nightscout convention
         /// - Returns: a string holding the formatted delta change value (i.e. +0.4 or -6)
         func deltaChangeStringInUserChosenUnit() -> String {
-            if let deltaValueInUserUnit = deltaValueInUserUnit {
+            if let deltaValueInUserUnit = deltaValueInUserUnit, hasRecentReading {
                 let deltaSign: String = deltaValueInUserUnit > 0 ? "+" : "" 
                 let deltaValueAsString = isMgDl ? deltaValueInUserUnit.mgDlToMmolAndToString(mgDl: isMgDl) : deltaValueInUserUnit.mmolToString()
                 
@@ -131,6 +134,8 @@ extension XDripWatchComplication.Entry {
         ///  returns a string holding the trend arrow
         /// - Returns: trend arrow string (i.e.  "↑")
         func trendArrow() -> String {
+            guard hasRecentReading else { return "" }
+
             switch slopeOrdinal {
             case 7:
                 return "\u{2193}\u{2193}" // ↓↓
@@ -154,6 +159,10 @@ extension XDripWatchComplication.Entry {
         /// used to return values and colors used by a SwiftUI gauge view
         /// - Returns: minValue/maxValue - used to define the limits of the gauge. nilValue - used if there is currently no data present (basically puts the gauge at the 50% mark). gaugeGradient - the color ranges used
         func gaugeModel() -> (minValue: Double, maxValue: Double, nilValue: Double, gaugeColor: Color, gaugeGradient: Gradient) {
+            guard hasRecentReading else {
+                return (0, 1, 0.5, .gray, Gradient(colors: [.gray]))
+            }
+
             
             var minValue: Double = lowLimitInMgDl
             var maxValue: Double = highLimitInMgDl
@@ -202,7 +211,7 @@ extension XDripWatchComplication.Entry {
         }
         
         func isSmallScreen() -> Bool {
-            return (WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen) ? true : false
+            return ConstantsAppleWatch.isSmallScreen()
         }
         
         func overrideChartHeight() -> Double {
@@ -224,6 +233,6 @@ extension XDripWatchComplication.Entry {
 
 extension XDripWatchComplication.Entry {
     static var placeholder: Self {
-        .init(date: .now, widgetState: WidgetState(bgReadingValues: ConstantsWatchComplication.bgReadingValuesPlaceholderData, bgReadingDates: ConstantsWatchComplication.bgReadingDatesPlaceholderData(), isMgDl: true, slopeOrdinal: 4, deltaValueInUserUnit: 0, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 90, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, keepAliveIsDisabled: false, liveDataIsEnabled: true))
+        .init(date: .now, widgetState: WidgetState(bgReadingValues: ConstantsWatchComplication.bgReadingValuesPlaceholderData, bgReadingDates: ConstantsWatchComplication.bgReadingDatesPlaceholderData(), isMgDl: true, slopeOrdinal: 4, deltaValueInUserUnit: 0, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 90, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, keepAliveIsDisabled: false))
     }
 }

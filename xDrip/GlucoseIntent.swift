@@ -29,7 +29,7 @@ struct GlucoseIntent: AppIntent {
         
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
-        let value = latestBgReading.calculatedValue.mgDlToMmol(mgDl: isMgDl)
+        let value = latestBgReading.finalValue.mgDlToMmol(mgDl: isMgDl)
         let valueString = value.bgValueToString(mgDl: isMgDl)
         
         let trendDescription: LocalizedStringResource = switch latestBgReading.slopeTrend() {
@@ -46,7 +46,7 @@ struct GlucoseIntent: AppIntent {
         var bgReadingDates: [Date] = []
         
         for bgReading in bgReadings {
-            bgReadingValues.append(bgReading.calculatedValue)
+            bgReadingValues.append(bgReading.finalValue)
             bgReadingDates.append(bgReading.timeStamp)
         }
         
@@ -86,12 +86,11 @@ struct GlucoseIntent: AppIntent {
 extension CoreDataManager {
     static func create(for modelName: String) async -> CoreDataManager {
         await withCheckedContinuation { continuation in
-            let sem = DispatchSemaphore(value: 0)
-            let manager = CoreDataManager(modelName: modelName) {
-                sem.signal()
+            // Suspend the intent until the store is ready without blocking the main actor that
+            // receives CoreDataManager's completion callback.
+            _ = CoreDataManager(modelName: modelName) { manager in
+                continuation.resume(returning: manager)
             }
-            sem.wait()
-            continuation.resume(returning: manager)
         }
     }
 }

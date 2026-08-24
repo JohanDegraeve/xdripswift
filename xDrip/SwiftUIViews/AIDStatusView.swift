@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct AIDStatusView: View {
     // MARK: - environment objects
@@ -57,45 +58,25 @@ struct AIDStatusView: View {
         let profile = nightscoutSyncManager.profile
         let deviceStatus = nightscoutSyncManager.deviceStatus
         
-        NavigationView {
+        NavigationStack {
             VStack {
                 // show a nice colourful header to represent the AID system being followed and the status.
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack(spacing: 8) {
+                AIDStatusBanner(
+                    systemName: deviceStatus.systemName() ?? "Status",
+                    detail: deviceStatus.appVersion?.components(separatedBy: "-").first,
+                    statusTitle: deviceStatus.deviceStatusTitle(),
+                    statusColor: deviceStatus.deviceStatusColor(),
+                    backgroundColor: deviceStatus.deviceStatusBannerBackgroundColor()
+                ) {
+                    Group {
                         if let systemIcon = deviceStatus.systemIcon() {
                             systemIcon.scaledToFit()
                         }
-                        
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(deviceStatus.systemName() ?? "Status")
-                                .font(.title2).bold()
-                                .id(refreshView) // places the refresh here as this text view will always be shown
-                            
-                            if let appVersion = deviceStatus.appVersion {
-                                Text(appVersion.components(separatedBy: "-").first ?? nilString)
-                                    .font(.callout).bold()
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.5)
-                                    .foregroundStyle(Color(.colorSecondary))
-                            }
-                        }
-                        
-                        Spacer()
-                        
-                        HStack {
-                            deviceStatus.deviceStatusIconImage()
-                                .font(.title3).bold()
-                                .foregroundStyle(deviceStatus.deviceStatusColor())
-                            
-                            Text(deviceStatus.deviceStatusTitle())
-                                .font(.title3).fontWeight(.semibold)
-                                .foregroundStyle(deviceStatus.deviceStatusColor())
-                        }
                     }
-                    .padding(EdgeInsets(top: 10, leading: 15, bottom: 10, trailing: 15))
-                    .background(deviceStatus.deviceStatusBannerBackgroundColor()).clipShape(RoundedRectangle(cornerRadius: 10))
+                } statusIcon: {
+                    deviceStatus.deviceStatusIconImage()
                 }
-                .padding(EdgeInsets(top: 8, leading: 18, bottom: 10, trailing: 18))
+                .id(refreshView)
                 
                 // after the header, show a picker view to allow different list views to be displayed
                 Picker("Chose Status or Profile", selection: $pickerViewSelected) {
@@ -227,7 +208,7 @@ struct AIDStatusView: View {
                             }
                             
                             HStack {
-                                Text("Battery")
+                                Text(Texts_HomeView.pumpBattery)
                                 
                                 Spacer()
                                 
@@ -241,14 +222,14 @@ struct AIDStatusView: View {
                             }
                             
                             if let pumpReservoir = deviceStatus.pumpReservoir, pumpReservoir == ConstantsNightscout.omniPodReservoirFlagNumber {
-                                row(title: "Reservoir", data: "50+ U")
+                                row(title: Texts_HomeView.pumpReservoir, data: "50+ U")
                                 
                             } else {
                                 if let pumpReservoir = deviceStatus.pumpReservoir {
                                     // show one decimal place if available when less than 10 units
-                                    row(title: "Reservoir", data: (pumpReservoir.round(toDecimalPlaces: pumpReservoir < ConstantsHomeView.pumpReservoirUrgent ? 1 : 0).stringWithoutTrailingZeroes) + " U")
+                                    row(title: Texts_HomeView.pumpReservoir, data: (pumpReservoir.round(toDecimalPlaces: pumpReservoir < ConstantsHomeView.pumpReservoirUrgent ? 1 : 0).stringWithoutTrailingZeroes) + " U")
                                 } else {
-                                    row(title: "Reservoir", data: nilString + " U")
+                                    row(title: Texts_HomeView.pumpReservoir, data: nilString + " U")
                                 }
                             }
                             
@@ -271,7 +252,7 @@ struct AIDStatusView: View {
                             }
                         }
                         
-                        // TODO: DEBUG
+                        // Diagnostic timestamps
                         Section(header: Text("Debug")) {
                             row(title: "Last Nightscout check", data: deviceStatus.lastCheckedDate.formatted(date: .omitted, time: .standard))
                             row(title: "Last device status update", data: deviceStatus.updatedDate.formatted(date: .omitted, time: .standard))
@@ -354,12 +335,17 @@ struct AIDStatusView: View {
                     }
                 }
             }
+            .ipadReadableContentWidth(920)
+            .background(ConstantsAppColors.groupedBackground.ignoresSafeArea())
             .navigationTitle("Follow Status")
+            .toolbarBackground(ConstantsAppColors.groupedBackground, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(Texts_Common.Cancel, action: {
                         self.presentationMode.wrappedValue.dismiss()
                     })
+                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
             }
             .onReceive(timer, perform: { _ in
@@ -381,9 +367,10 @@ struct AIDStatusView: View {
         // wrap the HStack in an AnyView so that it can be returned back to the caller
         let rowView = AnyView(HStack {
             Text(title)
+                .foregroundStyle(ConstantsAppColors.rowTitleText)
             Spacer()
             Text(data)
-                .foregroundStyle(Color(.colorSecondary))
+                .foregroundStyle(ConstantsAppColors.rowDetailText)
         })
         
         return rowView

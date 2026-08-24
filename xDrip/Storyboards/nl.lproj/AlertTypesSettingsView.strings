@@ -4,7 +4,7 @@
 "alerttypesettingsview_enabled" = "Ingeschakeld";
 "alerttypesettingsview_vibrate" = "Vibreren";
 "alerttypesettingsview_snoozevianotification" = "Sta Sluimeren Via Notificatie Toe";
-"alerttypesettingsview_defaultsnoozeperiod" = "Standaard Sluimer Tijd (minuten)";
+"alerttypesettingsview_defaultsnoozeperiod" = "Standaard Sluimer Tijd";
 "alerttypesettingsview_overridemute" = "Dempen negeren";
 "alerttypesettingsview_sound" = "Geluid";
 "alerttypesettingsview_defaultiossound" = "iOS Geluid";

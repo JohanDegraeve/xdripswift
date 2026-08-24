@@ -217,6 +217,52 @@ extension Array where Element: BgReading {
 
 }
 
+extension Array where Element == BgReadingSnapshot {
+    
+    /// - Filter out readings that are too close to each other
+    /// - BgReadings array must be sorted by timeStamp of the BgReading, ascending, ie most recent reading is at index 0
+    /// - parameters:
+    ///     - minimumTimeBetweenTwoReadingsInMinutes : filter out readings that are to close to each other in time, minimum difference in time between two readings = minimumTimeBetweenTwoReadingsInMinutes
+    ///     - timeStampLastProcessedBgReading : only readings younger than timeStampLastProcessedBgReading will be returned, if nil then this check is not done
+    ///     - lastConnectionStatusChangeTimeStamp : if lastConnectionStatusChangeTimeStamp > timeStampLastProcessedBgReading then the most recent reading will be returned, even if it's less than minimumTimeBetweenTwoReadingsInMinutes away from timeStampLastProcessedBgReading
+    /// - returns
+    ///     filtered array, with readings at least minimumTimeBetweenTwoReadingsInMinutes away from each other
+    func filter(minimumTimeBetweenTwoReadingsInMinutes: Double, lastConnectionStatusChangeTimeStamp: Date?, timeStampLastProcessedBgReading: Date?) -> [BgReadingSnapshot] {
+        var returnValue = [BgReadingSnapshot]()
+        
+        if let first = self.first {
+            if let timeStampLastProcessedBgReading = timeStampLastProcessedBgReading {
+                if first.timeStamp.timeIntervalSince(timeStampLastProcessedBgReading) > minimumTimeBetweenTwoReadingsInMinutes * 60.0 {
+                    returnValue.append(first)
+                } else if let lastConnectionStatusChangeTimeStamp = lastConnectionStatusChangeTimeStamp, lastConnectionStatusChangeTimeStamp.timeIntervalSince(timeStampLastProcessedBgReading) > 0 {
+                    returnValue.append(first)
+                }
+            } else {
+                returnValue.append(first)
+            }
+        }
+        
+        if returnValue.count > 0 {
+            var timeStampLastAddedReading = returnValue[0].timeStamp
+            
+            for reading in self {
+                if reading.id != returnValue[0].id {
+                    if let timeStampLastProcessedBgReading = timeStampLastProcessedBgReading, reading.timeStamp.timeIntervalSince(timeStampLastProcessedBgReading) < 0 {
+                        break
+                    }
+                    
+                    if reading.timeStamp.timeIntervalSince(timeStampLastAddedReading) < -minimumTimeBetweenTwoReadingsInMinutes * 60.0 && abs(timeStampLastAddedReading.timeIntervalSince(timeStampLastProcessedBgReading != nil ? timeStampLastProcessedBgReading! : Date(timeIntervalSince1970: 0))) > minimumTimeBetweenTwoReadingsInMinutes * 60.0 {
+                        returnValue.append(reading)
+                        timeStampLastAddedReading = reading.timeStamp
+                    }
+                }
+            }
+        }
+        
+        return returnValue
+    }
+}
+
 extension Array where Element: GlucoseData {
     
     /// returns true if the first howManyToCheck values in the  arrays have equal glucoseLevelRaw
@@ -284,4 +330,3 @@ extension Array where Element == Int {
     }
     
 }
-

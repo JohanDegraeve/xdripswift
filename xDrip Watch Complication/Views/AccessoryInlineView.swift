@@ -12,11 +12,10 @@ import SwiftUI
 extension XDripWatchComplication.EntryView {
     @ViewBuilder
     var accessoryInlineView: some View {
-        if !entry.widgetState.keepAliveIsDisabled && entry.widgetState.liveDataIsEnabled {
-            Text("\(entry.widgetState.bgValueStringInUserChosenUnit()) \(entry.widgetState.trendArrow())  \(entry.widgetState.deltaChangeStringInUserChosenUnit())")
+        if entry.widgetState.keepAliveIsDisabled {
+            Label(Texts_WatchComplication.keepAliveDisabled, systemImage: "exclamationmark.triangle.fill")
         } else {
-            Text("\(ConstantsHomeView.applicationName)")
+            Text("\(entry.widgetState.bgValueStringInUserChosenUnit()) \(entry.widgetState.trendArrow())  \(entry.widgetState.deltaChangeStringInUserChosenUnit())")
         }
     }
 }
-

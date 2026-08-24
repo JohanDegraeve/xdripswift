@@ -4,7 +4,7 @@
 "alerttypesettingsview_enabled" = "På";
 "alerttypesettingsview_vibrate" = "Vibrera";
 "alerttypesettingsview_snoozevianotification" = "Tillåt Snoozande via notis";
-"alerttypesettingsview_defaultsnoozeperiod" = "Standard Snooza-tid (minuter)";
+"alerttypesettingsview_defaultsnoozeperiod" = "Standard Snooza-tid";
 "alerttypesettingsview_overridemute" = "Åsidosätt tyst läge";
 "alerttypesettingsview_sound" = "Ljud";
 "alerttypesettingsview_defaultiossound" = "iOS-ljud";

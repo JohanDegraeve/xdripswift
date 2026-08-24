@@ -32,6 +32,8 @@ public struct TreatmentNSResponse {
     public let valueSecondary: Double?
     
     public let enteredBy: String?
+
+    public let notes: String?
     
 	/// Takes a NSDictionary from nightscout response and returns an array TreatmentNSResponse. Can be more than one, eg Nightscout treatment of type 'Snack Bolus' could contain an insulin value and a carbs value
     ///
@@ -44,31 +46,16 @@ public struct TreatmentNSResponse {
         var nightscoutDate: Date?
         
         if let createdAt = dictionary["created_at"] as? String {
-            
-            let dateFormatter = DateFormatter()
-            
-            // add the locale and timeZone properties as per dateFromISOString()
-            dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-            dateFormatter.timeZone = TimeZone(abbreviation: "GMT")
-            
             // let's check which date format is return by Nightscout and deal with it accordingly
             // if the date string contains a decimal point, then it must contain milliseconds
             // if we don't take this into account, .date(from: string) will be returned as nil if the milliseconds (.SSS) are missing
             if createdAt.contains(".") {
-                
                 // this is the way Loop, FreeAPS (Loop), OpenAPS and FreeAPS X store the created_at date/time
-                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-                
+                nightscoutDate = ISO8601DateFormatter.withFractionalSeconds.date(from: createdAt)
             } else {
-                
                 // and AndroidAPS stores it without milliseconds
-                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
-                
+                nightscoutDate = ISO8601DateFormatter.withoutFractionalSeconds.date(from: createdAt)
             }
-            
-            // assign the date to the optional nightscoutDate
-            nightscoutDate = dateFormatter.date(from: createdAt)
-            
         }
         
         // first check that _id exists and that created_at was successfully converted into a Date
@@ -82,50 +69,54 @@ public struct TreatmentNSResponse {
             
             if let carbs = dictionary["carbs"] as? Double {
                 
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Carbs, nightscoutEventType: nightscoutEventType, value: carbs, valueSecondary: nil, enteredBy: enteredBy))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Carbs, nightscoutEventType: nightscoutEventType, value: carbs, valueSecondary: nil, enteredBy: enteredBy, notes: nil))
                 
             }
             
             if let insulin = dictionary["insulin"] as? Double {
                 
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Insulin.idExtension(), createdAt: date, eventType: .Insulin, nightscoutEventType: nightscoutEventType, value: insulin, valueSecondary: nil, enteredBy: enteredBy))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Insulin.idExtension(), createdAt: date, eventType: .Insulin, nightscoutEventType: nightscoutEventType, value: insulin, valueSecondary: nil, enteredBy: enteredBy, notes: nil))
                 
             }
             
             if nightscoutEventType == "Exercise", let duration = dictionary["duration"] as? Double {
                     
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Exercise, nightscoutEventType: nightscoutEventType, value: duration, valueSecondary: nil, enteredBy: enteredBy))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Exercise, nightscoutEventType: nightscoutEventType, value: duration, valueSecondary: nil, enteredBy: enteredBy, notes: nil))
                 
             }
             
             if let glucose = dictionary["glucose"] as? Double, let units = dictionary["units"] as? String {
                 
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.BgCheck.idExtension(), createdAt: date, eventType: .BgCheck, nightscoutEventType: nightscoutEventType, value: units == "mg/dl" ? glucose : glucose.mmolToMgdl(), valueSecondary: nil, enteredBy: enteredBy))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.BgCheck.idExtension(), createdAt: date, eventType: .BgCheck, nightscoutEventType: nightscoutEventType, value: units == "mg/dl" ? glucose : glucose.mmolToMgdl(), valueSecondary: nil, enteredBy: enteredBy, notes: nil))
                 
             }
             
             if let rate = dictionary["rate"] as? Double, let duration = dictionary["duration"] as? Double {
                 
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Basal.idExtension(), createdAt: date, eventType: .Basal, nightscoutEventType: nightscoutEventType, value: rate, valueSecondary: duration, enteredBy: enteredBy))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Basal.idExtension(), createdAt: date, eventType: .Basal, nightscoutEventType: nightscoutEventType, value: rate, valueSecondary: duration, enteredBy: enteredBy, notes: nil))
                 
             }
             
             if nightscoutEventType == "Site Change" {
                     
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.SiteChange.idExtension(), createdAt: date, eventType: .SiteChange, nightscoutEventType: nightscoutEventType, value: 0, valueSecondary: nil, enteredBy: enteredBy))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.SiteChange.idExtension(), createdAt: date, eventType: .SiteChange, nightscoutEventType: nightscoutEventType, value: 0, valueSecondary: nil, enteredBy: enteredBy, notes: nil))
                 
             }
             
             if nightscoutEventType == "Sensor Start" {
                     
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.SensorStart.idExtension(), createdAt: date, eventType: .SensorStart, nightscoutEventType: nightscoutEventType, value: 0, valueSecondary: nil, enteredBy: enteredBy))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.SensorStart.idExtension(), createdAt: date, eventType: .SensorStart, nightscoutEventType: nightscoutEventType, value: 0, valueSecondary: nil, enteredBy: enteredBy, notes: nil))
                 
             }
             
             if nightscoutEventType == "Pump Battery Change" {
                     
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.PumpBatteryChange.idExtension(), createdAt: date, eventType: .PumpBatteryChange, nightscoutEventType: nightscoutEventType, value: 0, valueSecondary: nil, enteredBy: enteredBy))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.PumpBatteryChange.idExtension(), createdAt: date, eventType: .PumpBatteryChange, nightscoutEventType: nightscoutEventType, value: 0, valueSecondary: nil, enteredBy: enteredBy, notes: nil))
                 
+            }
+
+            if nightscoutEventType == ConstantsNightscout.noteEventType, let notes = dictionary["notes"] as? String, !notes.isEmpty {
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Note.idExtension(), createdAt: date, eventType: .Note, nightscoutEventType: nightscoutEventType, value: 0, valueSecondary: nil, enteredBy: enteredBy, notes: notes))
             }
             
 		}
@@ -142,7 +133,7 @@ public struct TreatmentNSResponse {
 		for element in array {
 			if let dictionary = element as? NSDictionary {
                 
-                responses = responses + TreatmentNSResponse.fromNightscout(dictionary: dictionary)
+                responses.append(contentsOf: TreatmentNSResponse.fromNightscout(dictionary: dictionary))
                 
 			}
 		}
@@ -169,7 +160,11 @@ public struct TreatmentNSResponse {
 	/// Compares this TreatmentNSResponse to a given TreatmentEntry
 	public func matchesTreatmentEntry(_ entry: TreatmentEntry) -> Bool {
         
-        return entry.date.toMillisecondsAsInt64() == self.createdAt.toMillisecondsAsInt64() && entry.treatmentType == self.eventType && entry.value == self.value
+        return entry.date.toMillisecondsAsInt64() == self.createdAt.toMillisecondsAsInt64()
+            && entry.treatmentType == self.eventType
+            && entry.value == self.value
+            && entry.valueSecondary == (self.valueSecondary ?? 0)
+            && entry.notes == self.notes
         
 	}
 	
@@ -178,7 +173,7 @@ public struct TreatmentNSResponse {
 	/// Be extra carefull when creating new TreatmentEntry, will create the new entry in CoreData but does not save in CoreData
 	public func asNewTreatmentEntry(nsManagedObjectContext: NSManagedObjectContext) -> TreatmentEntry? {
         
-        return TreatmentEntry(id: id, date: createdAt, value: value, valueSecondary: valueSecondary ?? 0, treatmentType: eventType, nightscoutEventType: nightscoutEventType, enteredBy: enteredBy, nsManagedObjectContext: nsManagedObjectContext)
+        return TreatmentEntry(id: id, date: createdAt, value: value, valueSecondary: valueSecondary ?? 0, treatmentType: eventType, nightscoutEventType: nightscoutEventType, enteredBy: enteredBy, notes: notes, nsManagedObjectContext: nsManagedObjectContext)
         
 	}
 	

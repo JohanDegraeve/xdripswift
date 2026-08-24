@@ -7,9 +7,19 @@ fileprivate let log = OSLog(subsystem: ConstantsLog.subSystem, category: Constan
 class LibreDataParser {
     
     // MARK: - private properties
-    
-    /// - per minute readings (trend) will be stored each time, as received rom Libre (meaning not smoothed)
-    /// - goal is to reuse them in next reading session, for the smoothing of new values
+
+    /// this used to store 70 previous values because the old upstream Libre smoothing path kept a much longer raw history to feed repeated smoothing
+    /// passes across multiple sessions
+    ///
+    /// now that smoothing has been removed from this upstream workflow, the remaining job is only to extend the next 16-value trend block after a
+    /// reconnect and to avoid false expired-sensor matches
+    ///
+    /// the existing matching logic documents that the maximum useful extension gap is 11 minutes, so 16 current values + 11 older values means 27
+    /// stored values is enough for the current workflow
+    private let amountOfPreviousRawValuesToStore = 27
+
+    /// per minute readings (trend) will be stored each time, as received rom Libre (meaning not smoothed)
+    /// the goal is to reuse them in the next reading session so gaps and overlap can be matched against the previous block before BgReadings are created
     private var previousRawValues = UserDefaults.standard.previousRawLibreValues {
         didSet {
             UserDefaults.standard.previousRawLibreValues = previousRawValues
@@ -116,15 +126,7 @@ class LibreDataParser {
         // now, if previousRawValues was not an empty list, trend is a longer list of values because it's been extended with a subrange of previousRawvalues
         // we re-assign previousRawValues to the current list in trend, for next usage
         // but we restricted it to maximum x most recent values, it makes no sense to store more
-        previousRawValues = Array(trend.map({$0.glucoseLevelRaw})[0..<(min(trend.count, ConstantsLibreSmoothing.amountOfPreviousReadingsToStore))])
-        
-        // smooth, if required
-        if UserDefaults.standard.smoothLibreValues {
-            
-            // apply Libre smoothing
-            LibreSmoothing.smooth(trend: &trend, repeatPerMinuteSmoothingSavitzkyGolay: ConstantsLibreSmoothing.libreSmoothingRepeatPerMinuteSmoothing, filterWidthPerMinuteValuesSavitzkyGolay: ConstantsLibreSmoothing.filterWidthPerMinuteValues, filterWidthPer5MinuteValuesSavitzkyGolay: ConstantsLibreSmoothing.filterWidthPer5MinuteValues, repeatPer5MinuteSmoothingSavitzkyGolay: ConstantsLibreSmoothing.repeatPer5MinuteSmoothing)
-            
-        }
+        previousRawValues = Array(trend.map({$0.glucoseLevelRaw})[0..<(min(trend.count, amountOfPreviousRawValuesToStore))])
         
         // if trend count would be 0 here then no reason to continue, should normally not be the case
         guard trend.count > 0 else {
@@ -138,36 +140,9 @@ class LibreDataParser {
         let timeInSecondsOfMostRecentHistoryValue = (dateOfMostRecentHistoryValue(sensorTimeInMinutes: sensorTimeInMinutes, nextHistoryBlock: indexHistory, date: ourTime).toMillisecondsAsDouble() - sensorStartTimeInMilliseconds) / 1000
 
         // now use rangeProcessor to get history measurements as array of GlucoseData
-        var history = rangeProcessor((libreSensorType == .libreProH ? 28:32), indexHistory, { index in
+        let history = rangeProcessor((libreSensorType == .libreProH ? 28:32), indexHistory, { index in
             return (max(0, timeInSecondsOfMostRecentHistoryValue - 900.0 * (Double)(index)))
         }, (libreSensorType == .libreProH ? 170:124))
-        
-        // smooth history one time, if required
-        if UserDefaults.standard.smoothLibreValues {
-            
-            // add the oldest trend value to the history, this will make the smoothing of the history values more correct
-            // otherwise we apply linear regression to the first element(s) in the history, which will give a less accurate result
-            // trend.last is the oldest measurement more recent than the most recent element in history, so we insert it at index 0
-            // and only if (trend.last timestamp + 10 minutes) > history.first timestamp
-            var trendAdded = false
-            if let firstHistory = history.first, let lastTrend = trend.last, lastTrend.timeStamp.timeIntervalSince(firstHistory.timeStamp) > 10.0 * 60.0  {
-                
-                history.insert(GlucoseData(timeStamp: lastTrend.timeStamp, glucoseLevelRaw: lastTrend.glucoseLevelRaw), at: 0)
-                
-                // need to remove it after applying the smoothing
-                trendAdded = true
-
-            }
-            
-            // smooth
-            LibreSmoothing.smooth(history: &history, filterWidthPer5MinuteSmoothingSavitzkyGolay: ConstantsLibreSmoothing.libreSmoothingFilterWidthPer15MinutesValues)
-            
-            // now remove the trend measurement that was inserted
-            if trendAdded {
-                history.remove(at: 0)
-            }
-            
-        }
         
         // add history to returnvalue
         returnValue = returnValue + history
@@ -231,7 +206,7 @@ class LibreDataParser {
                 // should never come here ?
                 trace("in libreDataProcessor, is libreUS but data is not decrypted - no further processing", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
                 
-            case .libre2, .libre2C5, .libre2C6, .libre27F:
+            case .libre2, .libre2C5, .libre2C6, .libre27F, .libre27FNonPlus:
                 
                 // should never come here ?
                 trace("in libreDataProcessor, is libre2 but data is not decrypted - no further processing", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
@@ -317,24 +292,37 @@ class LibreDataParser {
         // trace the sensor state
         if let sensorState = result.sensorState {
             trace("in handleGlucoseData, sensor state = %{public}@", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info, sensorState.description)
-            
-            if sensorState != .ready && sensorState != .expired {
-                
-                trace("    not processing data as sensor does not have the state ready or expired", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
-                
-                // initialize xDripError, to be used in calls to cgmTransmitterDelegate.errorOccurred and completionHandler
-                let xDripError = LibreError.sensorNotReady
-                
-                // call cgmTransmitterDelegate (this is actually the RootViewController passed in via the BluetoothTransmitter
-                cgmTransmitterDelegate?.errorOccurred(xDripError: xDripError)
-                
-                // call completionHandler, to inform caller about sensorState and xDripError
-                completionHandler(sensorState, xDripError)
-                
-                return
-                
+
+            if let sensorHealthEvent = sensorState.sensorHealthEvent {
+                cgmTransmitterDelegate?.sensorHealthEventOccurred(sensorHealthEvent)
             }
-            
+
+            switch sensorState {
+            case .ready:
+                break
+
+            case .failure:
+                completionHandler(sensorState, LibreError.sensorNotReady)
+                return
+
+            case .notYetStarted, .starting, .shutdown:
+                // These are expected lifecycle states. They suppress readings but are not failures.
+                completionHandler(sensorState, LibreError.sensorNotReady)
+                return
+
+            case .expired:
+                // Libre can continue supplying readings briefly after its nominal expiry.
+                break
+
+            case .unknown:
+                trace("    not processing data because the sensor state is unknown", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
+
+                let xDripError = LibreError.sensorNotReady
+                cgmTransmitterDelegate?.errorOccurred(xDripError: xDripError)
+                completionHandler(sensorState, xDripError)
+                return
+            }
+
         } else {
             trace("in handleGlucoseData, sensor state is unknown", log: log, category: ConstantsLog.categoryLibreDataParser, type: .info)
         }
@@ -479,6 +467,3 @@ class LibreDataParser {
     }
     
 }
-
-
-

@@ -54,29 +54,29 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var liveActivityType: LiveActivityType
         var dataSourceDescription: String
         var followerPatientName: String?
+        var sensorNoiseStateRawValue: Int?
         
-        var deviceStatusCreatedAt: Date?
-        var deviceStatusLastLoopDate: Date?
+        var aidStatus: AIDStatus?
 
         var bgUnitString: String {
             isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
         }
         /// the latest bg reading
         var bgValueInMgDl: Double? {
-            bgReadingValues[0]
+            bgReadingValues.first
         }
         /// the latest bg reading date
         var bgReadingDate: Date? {
-            bgReadingDates[0]
+            bgReadingDates.first
         }
 
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "", followerPatientName: String? = nil, deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?) {
-        
-            self.bgReadingFloats = bgReadingValues.map(Float16.init)
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "", followerPatientName: String? = nil, sensorNoiseStateRawValue: Int? = nil, aidStatus: AIDStatus?) {
+            let readings = Array(zip(bgReadingValues, bgReadingDates))
+            self.bgReadingFloats = readings.map { Float16($0.0) }
 
-            let firstDate = bgReadingDates.last ?? .now
+            let firstDate = readings.last?.1 ?? .now
             self.firstDate = firstDate
-            self.secondsSinceFirstDate = bgReadingDates.map { UInt16(truncatingIfNeeded: Int($0.timeIntervalSince(firstDate))) }
+            self.secondsSinceFirstDate = readings.map { UInt16(truncatingIfNeeded: Int($0.1.timeIntervalSince(firstDate))) }
             
             self.isMgDl = isMgDl
             self.slopeOrdinal = slopeOrdinal
@@ -88,9 +88,32 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.liveActivityType = liveActivityType
             self.dataSourceDescription = dataSourceDescription ?? ""
             self.followerPatientName = followerPatientName
+            self.sensorNoiseStateRawValue = sensorNoiseStateRawValue
             
-            self.deviceStatusCreatedAt = deviceStatusCreatedAt
-            self.deviceStatusLastLoopDate = deviceStatusLastLoopDate
+            self.aidStatus = aidStatus
+        }
+
+        /// Reduces chart history until the encoded state fits safely below ActivityKit's payload limit.
+        func limitedForActivityPayload(maximumEncodedBytes: Int) -> ContentState {
+            var limitedState = self
+            let maximumDescriptionCharacters = 80
+
+            limitedState.dataSourceDescription = String(limitedState.dataSourceDescription.prefix(maximumDescriptionCharacters))
+            if let followerPatientName = limitedState.followerPatientName {
+                limitedState.followerPatientName = String(followerPatientName.prefix(maximumDescriptionCharacters))
+            }
+
+            while limitedState.bgReadingFloats.count > 2 {
+                let encodedByteCount = (try? JSONEncoder().encode(limitedState).count) ?? Int.max
+                guard encodedByteCount > maximumEncodedBytes else { break }
+
+                // remove only the oldest chart point so payload limiting cannot alter the cadence
+                // of the remaining history or remove the current reading.
+                limitedState.bgReadingFloats.removeLast()
+                limitedState.secondsSinceFirstDate.removeLast()
+            }
+
+            return limitedState
         }
         
         /// returns blood glucose value as a string in the user-defined measurement unit. Will check and display also high, low and error texts as required.
@@ -204,37 +227,31 @@ struct XDripWidgetAttributes: ActivityAttributes {
                 return ""
             }
         }
-                
-        func deviceStatusColor() -> Color? {
-            if let lastLoopDate = deviceStatusLastLoopDate, let createdAt = deviceStatusCreatedAt {
-                if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-                    return .green
-                } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                    return .green
-                } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                    return .yellow
-                } else {
-                    return .red
-                }
-            } else {
+
+        func sensorNoiseIndicatorColor() -> Color? {
+            switch sensorNoiseStateRawValue {
+            case 0:
+                return Color(.systemGray)
+            case 1:
+                return .green
+            case 2:
+                return .yellow
+            case 3:
+                return .orange
+            case 4, 5:
+                return .red
+            default:
                 return nil
             }
         }
+                
+        func deviceStatusColor() -> Color? {
+            aidStatus?.presentation().color
+        }
         
         func deviceStatusIconImage() -> Image? {
-            if let lastLoopDate = deviceStatusLastLoopDate, let createdAt = deviceStatusCreatedAt {
-                if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-                    return Image(systemName: "checkmark.circle.fill")
-                } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                    return Image(systemName: "checkmark.circle")
-                } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                    return Image(systemName: "questionmark.circle")
-                } else {
-                    return Image(systemName: "exclamationmark.circle")
-                }
-            } else {
-                return nil
-            }
+            guard let systemImage = aidStatus?.presentation().systemImage else { return nil }
+            return Image(systemName: systemImage)
         }
     }
 }

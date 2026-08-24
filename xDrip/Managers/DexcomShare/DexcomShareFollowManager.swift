@@ -6,8 +6,6 @@
 //  Copyright © 2025 Johan Degraeve. All rights reserved.
 //
 
-import AudioToolbox
-import AVFoundation
 import Foundation
 import os
 
@@ -31,21 +29,16 @@ class DexcomShareFollowManager: NSObject {
     
     /// delegate to pass back glucosedata
     private(set) weak var followerDelegate: FollowerDelegate?
-    
-    /// AVAudioPlayer to use
-    private var audioPlayer: AVAudioPlayer?
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create playsoundtimer
-    private let applicationManagerKeyResumePlaySoundTimer = "DexcomShareFollowerManager-ResumePlaySoundTimer"
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate playsoundtimer
-    private let applicationManagerKeySuspendPlaySoundTimer = "DexcomShareFollowerManager-SuspendPlaySoundTimer"
+
+    /// The root-owned shared keep-alive engine; this follower reports operational state only and
+    /// does not own silent-audio playback, replay timing, or application lifecycle callbacks.
+    private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
+
+    /// Allows wiring tests to reconcile real manager state without starting follower networking.
+    private let startsInitialDownload: Bool
     
     /// closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
     private var invalidateDownLoadTimerClosure: (() -> Void)?
-    
-    /// timer for playsound
-    private var playSoundTimer: RepeatingTimer?
     
     private var dexcomShareSessionId: String?
     
@@ -58,7 +51,12 @@ class DexcomShareFollowManager: NSObject {
     /// - Parameters:
     ///     - coreDataManager: The CoreDataManager instance for BG reading storage.
     ///     - followerDelegate: The delegate to receive BG reading updates.
-    public init(coreDataManager: CoreDataManager, followerDelegate: FollowerDelegate) {
+    init(
+        coreDataManager: CoreDataManager,
+        followerDelegate: FollowerDelegate,
+        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging,
+        startsInitialDownload: Bool = true
+    ) {
         // clear failed login timestamp on init to always immediately allow a new login attempt
         UserDefaults.standard.dexcomShareLoginFailedTimestamp = nil
         
@@ -66,22 +64,13 @@ class DexcomShareFollowManager: NSObject {
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.followerDelegate = followerDelegate
+        self.backgroundKeepAliveManager = backgroundKeepAliveManager
+        self.startsInitialDownload = startsInitialDownload
         
         // initialize the sessionId
         self.dexcomShareSessionId = nil
         self.timeStampLastBgReading = nil
         trace("Session ID cleared on init", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug)
-        
-        // set up audioplayer
-        if let url = Bundle.main.url(forResource: ConstantsSuspensionPrevention.soundFileName, withExtension: "") {
-            // create audioplayer
-            do {
-                self.audioPlayer = try AVAudioPlayer(contentsOf: url)
-                
-            } catch {
-                trace("in init, exception while trying to create audoplayer, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .error, error.localizedDescription)
-            }
-        }
         
         // call super.init
         super.init()
@@ -95,7 +84,7 @@ class DexcomShareFollowManager: NSObject {
         self.verifyUserDefaultsAndStartOrStopFollowMode()
     }
     
-    /// Deinitializer. Removes observers, disables suspension prevention, and invalidates timers.
+    /// Deinitializer. Removes observers, stops background keep-alive, and invalidates timers.
     deinit {
         // remove UserDefaults observers to avoid KVO crashes
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue)
@@ -103,14 +92,43 @@ class DexcomShareFollowManager: NSObject {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomShareAccountName.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomSharePassword.rawValue)
         
-        // stop keep-alive helpers
-        self.disableSuspensionPrevention()
+        backgroundKeepAliveManager.stop(for: .dexcomShare)
         
         // invalidate any pending download timer
         self.invalidateDownLoadTimerClosure?()
     }
     
     // MARK: - public functions
+
+    public func logIn() {
+        trace(
+            "user requested Dexcom Share login",
+            log: log,
+            category: ConstantsLog.categoryDexcomShareFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: .dexcomShare, activity: .loginStarted))
+        )
+        UserDefaults.standard.dexcomShareManuallyLoggedOut = false
+        UserDefaults.standard.dexcomShareLoginFailedTimestamp = nil
+        FollowerSessionState.shared.update(.loggingIn, for: .dexcomShare)
+        verifyUserDefaultsAndStartOrStopFollowMode()
+    }
+
+    public func logOut() {
+        trace(
+            "Dexcom Share logged out",
+            log: log,
+            category: ConstantsLog.categoryDexcomShareFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: .dexcomShare, activity: .loggedOut))
+        )
+        UserDefaults.standard.dexcomShareManuallyLoggedOut = true
+        invalidateDownLoadTimerClosure?()
+        invalidateDownLoadTimerClosure = nil
+        backgroundKeepAliveManager.stop(for: .dexcomShare)
+        dexcomShareSessionId = nil
+        FollowerSessionState.shared.update(.loggedOut, for: .dexcomShare)
+    }
     
     /// Creates a BgReading object from a FollowerBgReading (Dexcom Share download).
     /// - Parameters
@@ -146,7 +164,7 @@ class DexcomShareFollowManager: NSObject {
         var calculatedValueSlope = 0.0
         
         // get last readings
-        let last2Readings = self.bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let last2Readings = self.bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false, includingSuppressed: true)
         
         // if more thant 2 readings, calculate slope and hie
         if last2Readings.count >= 2 {
@@ -160,7 +178,8 @@ class DexcomShareFollowManager: NSObject {
     
     /// Schedule new download with timer, when timer expires download() will be called
     private func scheduleNewDownload() {
-        guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
+        guard !UserDefaults.standard.dexcomShareManuallyLoggedOut,
+              UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
         
         // invalidate any previously scheduled download timer before creating a new one
         if let invalidateDownLoadTimerClosure = invalidateDownLoadTimerClosure {
@@ -181,7 +200,7 @@ class DexcomShareFollowManager: NSObject {
     
     /// Downloads recent readings from Dexcom Share, sends result to delegate, and schedules the next download.
     @objc public func download() {
-        trace("in download. Current session ID: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, String(describing: self.dexcomShareSessionId))
+        trace("in download. Current session ID: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .detailed(.follower(source: .dexcomShare, activity: .downloadStarted)), String(describing: self.dexcomShareSessionId))
         
         if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? .distantPast).timeIntervalSinceNow < -15 {
             trace("    setting nightscoutSyncRequired to true, this will also initiate a treatments/devicestatus sync", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug)
@@ -196,6 +215,10 @@ class DexcomShareFollowManager: NSObject {
             trace("    followerDataSourceType is not Dexcom Share", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug)
             return
         }
+        guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else {
+            FollowerSessionState.shared.update(.loggedOut, for: .dexcomShare)
+            return
+        }
         
         let username = UserDefaults.standard.dexcomShareAccountName
         let password = UserDefaults.standard.dexcomSharePassword
@@ -208,20 +231,22 @@ class DexcomShareFollowManager: NSObject {
             do {
                 // try and download, if it returns nil it's because we need to login
                 if (try? await self.downloadAndProcessEGVs(force: true)) == nil {
+                    FollowerSessionState.shared.update(.loggingIn, for: .dexcomShare)
                     try await self.login(username: username, password: password)
-                    _ = try await self.downloadAndProcessEGVs(force: true) // ignore returned array here; delegate call happens inside
+                    // The delegate receives the readings inside downloadAndProcessEGVs.
+                    _ = try await self.downloadAndProcessEGVs(force: true)
                 }
             } catch DexcomShareFollowError.sessionExpired {
                 // re-login once and retry on expired session
-                trace("    in download, session expired, re-logging in", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info)
+                trace("    in download, session expired, re-logging in", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info, troubleshooting: .standard(.follower(source: .dexcomShare, activity: .sessionExpired)))
                 do {
                     try await self.login(username: username, password: password)
                     _ = try await self.downloadAndProcessEGVs(force: true)
                 } catch {
-                    trace("    in download, session expired and re-login failed: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .error, error.localizedDescription)
+                    trace("    in download, session expired and re-login failed: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .error, troubleshooting: .standard(.follower(source: .dexcomShare, activity: .loginFailed)), error.localizedDescription)
                 }
             } catch {
-                trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .error, error.localizedDescription)
+                trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .error, troubleshooting: .standard(.follower(source: .dexcomShare, activity: .downloadFailed)), error.localizedDescription)
             }
             // rescheduling the timer must be done on the main actor
             // we do it here at the end of the function so that it is always rescheduled once a valid connection is established, irrespective of whether we get values.
@@ -239,14 +264,24 @@ class DexcomShareFollowManager: NSObject {
     ///     - password: Dexcom Share account password
     /// - Throws: DexcomShareFollowError if login fails for all regions
     private func login(username: String, password: String) async throws {
+        guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
+        trace(
+            "Dexcom Share login started",
+            log: log,
+            category: ConstantsLog.categoryDexcomShareFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: .dexcomShare, activity: .loginStarted))
+        )
+
         // If a region is already stored, try only that region
         let storedRegion = UserDefaults.standard.dexcomShareRegion
         if storedRegion != .none {
             do {
                 try await self.loginToRegion(region: storedRegion, username: username, password: password)
-                trace("    in login, login successful using stored region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, storedRegion.description)
+                trace("    in login, login successful using stored region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .detailed(.follower(source: .dexcomShare, activity: .loginSucceeded)), storedRegion.description)
                 return
             } catch {
+                guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
                 trace("    in login, login failed using stored region: %{public}@, trying again with the other regions. Error: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, storedRegion.description, error.localizedDescription)
             }
         } else {
@@ -259,26 +294,31 @@ class DexcomShareFollowManager: NSObject {
         // The stored region didn't work or there wasn't one stored, so try the other
         // regions (except the one we just tried) in order until one succeeds
         for region in DexcomShareRegion.allCases {
+            guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
             if region != .none && region != storedRegion {
-                trace("    in login, attempting login to region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, region.description)
+                trace("    in login, attempting login to region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .detailed(.follower(source: .dexcomShare, activity: .loginStarted)), region.description)
                 do {
                     try await self.loginToRegion(region: region, username: username, password: password)
                     // On success, store the working region and clear the timestamp
                     UserDefaults.standard.dexcomShareRegion = region
                     UserDefaults.standard.dexcomShareLoginFailedTimestamp = nil
-                    trace("    in login, login succeeded to region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, region.description)
+                    trace("    in login, login succeeded to region: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .detailed(.follower(source: .dexcomShare, activity: .loginSucceeded)), region.description)
                     return
                 } catch {
+                    guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
                     trace("    in login, login failed for region: %{public}@, error: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, region.description, error.localizedDescription)
                     lastError = error
                 }
             }
         }
         
+        guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
+
         // If all fail, clear the region and set loginFailedTimestamp
         UserDefaults.standard.dexcomShareRegion = .none
         UserDefaults.standard.dexcomShareLoginFailedTimestamp = Date()
-        trace("    in login, all region login attempts failed, setting loginFailedTimestamp. Error: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, lastError.localizedDescription)
+        FollowerSessionState.shared.update(.loggedOut, for: .dexcomShare)
+        trace("    in login, all region login attempts failed, setting loginFailedTimestamp. Error: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .standard(.follower(source: .dexcomShare, activity: .loginFailed)), lastError.localizedDescription)
         throw lastError
     }
     
@@ -321,6 +361,7 @@ class DexcomShareFollowManager: NSObject {
         loginRequest.httpBody = try JSONSerialization.data(withJSONObject: loginBody, options: [])
         
         let (loginData, loginResponse) = try await URLSession.shared.data(for: loginRequest)
+        guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { throw CancellationError() }
         let loginStatusCode = (loginResponse as? HTTPURLResponse)?.statusCode ?? 0
         
         if loginStatusCode >= 400 {
@@ -336,6 +377,7 @@ class DexcomShareFollowManager: NSObject {
         
         // we're now sucessfully logged in, so set the sessionId
         self.dexcomShareSessionId = sessionId
+        FollowerSessionState.shared.update(.loggedIn, for: .dexcomShare)
     }
     
     /// Downloads and processes EGVs (glucose values) from Dexcom Share.
@@ -356,7 +398,10 @@ class DexcomShareFollowManager: NSObject {
         var maxCount = 1
         
         // using the snapshot method for thread-safety
-        if let lastBgReading = bgReadingsAccessor.lastSnapshot(forSensor: nil) {
+        // Dexcom Share fetch sizing must use the latest stored source reading,
+        // not the latest visible downstream reading. This keeps the backfill
+        // window stable when faster follower readings are reduced to 5 minutes.
+        if let lastBgReading = bgReadingsAccessor.lastSnapshot(forSensor: nil, includingSuppressed: true) {
             let minutesSinceLastBgReading = Int((Date().timeIntervalSince1970 - lastBgReading.timeStamp.timeIntervalSince1970) / 60)
             
             if !force {
@@ -391,6 +436,7 @@ class DexcomShareFollowManager: NSObject {
             
             // if no data is returned, do nothing
             if glucoseMeasurementsArray.isEmpty {
+                trace("    in downloadAndProcessEGVs, no glucose values returned", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .standard(.follower(source: .dexcomShare, activity: .noReadings)))
                 return []
             }
             
@@ -412,12 +458,14 @@ class DexcomShareFollowManager: NSObject {
             let localCopy = followGlucoseDataArray
             await MainActor.run { [weak self] in
                 guard let self = self else { return }
+                guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { return }
                 // call delegate followerInfoReceived which will process the new readings
                 if let followerDelegate = self.followerDelegate {
                     var array = localCopy
                     followerDelegate.followerInfoReceived(followGlucoseDataArray: &array)
                 }
             }
+            trace("    in downloadAndProcessEGVs, download succeeded with %{public}d readings", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, troubleshooting: .standard(.follower(source: .dexcomShare, activity: .downloadSucceeded(readingCount: glucoseMeasurementsArray.count))), glucoseMeasurementsArray.count)
             return glucoseMeasurementsArray
         } catch let error as NSError where error.code == 401 {
             throw DexcomShareFollowError.invalidCredentials
@@ -454,13 +502,16 @@ class DexcomShareFollowManager: NSObject {
         request.httpBody = Data() // POST with empty body per community examples
         
         let (data, response) = try await URLSession.shared.data(for: request)
+        guard !UserDefaults.standard.dexcomShareManuallyLoggedOut else { return [] }
         if let http = response as? HTTPURLResponse, http.statusCode == 401 {
             self.dexcomShareSessionId = nil
+            FollowerSessionState.shared.update(.loggingIn, for: .dexcomShare)
             throw DexcomShareFollowError.sessionExpired
         }
         
         // store the current timestamp as a successful server connection
         UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
+        FollowerSessionState.shared.update(.loggedIn, for: .dexcomShare)
         
         do {
             return try JSONDecoder().decode([DexcomEGV].self, from: data)
@@ -469,81 +520,20 @@ class DexcomShareFollowManager: NSObject {
         }
     }
     
-    /// Disables suspension prevention by removing background/foreground closures and suspending timers
-    private func disableSuspensionPrevention() {
-        // stop the timer for now, might be already suspended but doesn't harm
-        if let playSoundTimer = playSoundTimer {
-            playSoundTimer.suspend()
-        }
-        
-        // no need anymore to resume the player when coming in foreground
-        ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: self.applicationManagerKeyResumePlaySoundTimer)
-        
-        // no need anymore to suspend the soundplayer when entering foreground, because it's not even resumed
-        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeySuspendPlaySoundTimer)
-    }
-    
-    /// Enables suspension prevention by launching a timer to play sound in the background if required
-    private func enableSuspensionPrevention() {
-        // if keep-alive is disabled or if using a heartbeat, then just return and do nothing
-        if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-            trace("not enabling suspension prevention as keep-alive type is: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, UserDefaults.standard.followerBackgroundKeepAliveType.description)
-            
-            return
-        }
-        
-        let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal ? ConstantsSuspensionPrevention.intervalNormal : ConstantsSuspensionPrevention.intervalAggressive
-        
-        // create playSoundTimer depending on the keep-alive type selected
-        self.playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: { [weak self] in
-            guard let self = self else { return }
-            // play the sound
-            trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info)
-            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info, interval.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
-                audioPlayer.play()
-            }
-        })
-        
-        // schedulePlaySoundTimer needs to be created when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: self.applicationManagerKeyResumePlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                if let playSoundTimer = self.playSoundTimer {
-                    playSoundTimer.resume()
-                }
-                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                    audioPlayer.play()
-                }
-            }
-        })
-        
-        // schedulePlaySoundTimer needs to be invalidated when app goes to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeySuspendPlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            if let playSoundTimer = self.playSoundTimer {
-                playSoundTimer.suspend()
-            }
-        })
-    }
-    
-    /// verifies UserDefaults and either starts or stops follower mode, including enabling/disabling suspension prevention and triggering the first download if applicable.
+    /// Verifies settings and either starts or stops follower mode and its background keep-alive registration.
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
-        if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .dexcomShare && UserDefaults.standard.dexcomShareAccountName != nil && UserDefaults.standard.dexcomSharePassword != nil {
-            // this will enable the suspension prevention sound playing if background keep-alive is needed
-            // (i.e. not disabled and not using a heartbeat)
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                self.enableSuspensionPrevention()
-            } else {
-                self.disableSuspensionPrevention()
-            }
+        if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .dexcomShare && UserDefaults.standard.dexcomShareAccountName != nil && UserDefaults.standard.dexcomSharePassword != nil && !UserDefaults.standard.dexcomShareManuallyLoggedOut {
+            FollowerSessionState.shared.update(.loggingIn, for: .dexcomShare)
+            backgroundKeepAliveManager.start(for: .dexcomShare)
+
+            guard startsInitialDownload else { return }
             
             // do initial download, this will also schedule future downloads
             self.download()
             
         } else {
-            // disable the suspension prevention
-            self.disableSuspensionPrevention()
+            FollowerSessionState.shared.update(.loggedOut, for: .dexcomShare)
+            backgroundKeepAliveManager.stop(for: .dexcomShare)
             
             // invalidate the downloadtimer
             if let invalidateDownLoadTimerClosure = invalidateDownLoadTimerClosure {
@@ -584,7 +574,14 @@ class DexcomShareFollowManager: NSObject {
         if let keyPath = keyPath {
             if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
                 switch keyPathEnum {
-                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType, UserDefaults.Key.dexcomShareAccountName, UserDefaults.Key.dexcomSharePassword:
+                case UserDefaults.Key.dexcomShareAccountName, UserDefaults.Key.dexcomSharePassword:
+                    trace("Dexcom Share credentials changed; logging out", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info)
+                    self.logOut()
+                    UserDefaults.standard.dexcomShareRegion = .none
+                    UserDefaults.standard.dexcomShareLoginFailedTimestamp = nil
+                    UserDefaults.standard.timeStampOfLastFollowerConnection = nil
+
+                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType:
                     trace("UserDefaults key changed: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, keyPathEnum.rawValue)
                     // change by user, should not be done within 200 ms
                     if self.keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {

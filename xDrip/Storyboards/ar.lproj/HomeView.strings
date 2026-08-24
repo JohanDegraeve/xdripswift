@@ -36,7 +36,7 @@
 "screenlocktitle" = "تم تفعيل قفل الشاشة";
 "screenlockinfo" = "سيؤدي هذا إلى إبقاء الشاشة في حالة نشاط حتى تنتقل إلى تطبيق آخر أو تنقر فوق إلغاء القفل.\r\n\nيوصى بإبقاء الهاتف متصلاً بالشاحن لمنع استنزاف البطارية.";
 "stopSensorConfirmation" = "هل أنت متأكد أنك تريد إيقاف الحساس؟";
-"enterSensorCode" = "إذا لم يكن لديك رمز الحساس ، فاستخدم 0000 ولكن كن على علم بأنك لن تحصل على قراءات حتى تقوم بالمعايرة";
+"enterSensorCode" = "إذا كنت لا تعرف رمز الحساس، اتركه فارغًا لاستخدام 0000. الضغط على OK بدون رمز سيستخدم 0000 كرمز للحساس، أو سيقوم فقط بالتقاط الجلسة الحالية إذا كانت قد بدأت بالفعل.";
 
 /// status info : literally 'Sensor End'
 "sensorend" = "ينتهي الحساس";
@@ -61,7 +61,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -71,3 +71,57 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "متبقي %@";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "ضوضاء المستشعر";
+"sensorManagementNoiseShortTerm" = "آخر 30 دقيقة";
+"sensorManagementNoiseLongTerm" = "آخر 4 ساعات";
+"sensorManagementNoiseCollecting" = "جارٍ جمع البيانات";
+"sensorManagementNoiseLow" = "منخفضة";
+"sensorManagementNoiseElevated" = "مرتفعة";
+"sensorManagementNoiseVeryHigh" = "مرتفعة جدًا";
+"sensorManagementNoiseExtreme" = "شديدة";
+"sensorManagementNoiseFlatline" = "من المحتمل أن المستشعر قد فشل.";
+"sensorNoiseWarningExtremeTitle" = "ضوضاء شديدة في المستشعر";
+"sensorNoiseWarningPersistentTitle" = "ضوضاء مستمرة في المستشعر";
+"sensorNoiseWarningFlatlineTitle" = "إشارة المستشعر ثابتة";
+"sensorNoiseHistoryTitle" = "سجل ضوضاء المستشعر";
+"sensorNoiseHistoryCurrentTitle" = "القياسات الحالية";
+"sensorNoiseHistoryChartTitle" = "الضوضاء بمرور الوقت";
+"sensorNoiseHistoryRangeTitle" = "النطاق الزمني";
+"sensorNoiseHistoryDayRange" = "1d";
+"sensorNoiseHistoryThreeDayRange" = "3 أ";
+"sensorNoiseHistoryWeekRange" = "7 أ";
+"sensorNoiseHistoryAllRange" = "الكل";
+"sensorNoiseHistoryShortCompact" = "30 د";
+"sensorNoiseHistoryLongCompact" = "4 س";
+"sensorNoiseHistoryLoading" = "جارٍ إنشاء سجل المستشعر";
+"sensorNoiseHistoryNoDataTitle" = "لا توجد بيانات ضوضاء كافية بعد";
+"sensorNoiseHistoryNoDataMessage" = "سيظهر المخطط بعد جمع عدد كافٍ من قراءات المستشعر.";
+"sensorNoiseHistoryChartAccessibility" = "مخطط سجل ضوضاء المستشعر";
+"pumpBattery" = "البطارية";
+"pumpReservoir" = "الخزان";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "الأخيرة";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "تشويش المستشعر مرتفع جدًا";
+"sensorHealthPersistentNoiseGuidance" = "تشويش مرتفع جدًا لمدة 12 ساعة. فكّر في استبدال المستشعر إذا استمر.";
+"sensorHealthFlatlineTitle" = "إشارة المستشعر ثابتة";
+"sensorHealthFlatlineGuidance" = "لم تتغير القراءات منذ 30 دقيقة. يشير هذا عادةً إلى تعطل/انتهاء صلاحية المستشعر.";
+"sensorHealthTemporaryIssueTitle" = "مشكلة مؤقتة في المستشعر";
+"sensorHealthTemporaryIssueGuidance" = "مشكلة مؤقتة في المستشعر منذ 3 ساعات. تحقق بجهاز قياس السكر واتبع إرشادات الشركة المصنّعة.";
+"sensorHealthSensorFailedTitle" = "فشل المستشعر";
+"sensorHealthSensorFailedGuidance" = "تم الإبلاغ عن فشل المستشعر. استبدل المستشعر.";
+"sensorHealthTransmitterFailedTitle" = "فشل جهاز الإرسال";
+"sensorHealthTransmitterFailedGuidance" = "تم الإبلاغ عن فشل جهاز الإرسال. تحقّق منه أو استبدله.";
+"connectingToCGM" = "جارٍ الاتصال بجهاز CGM...";
+"reconnectingToCGM" = "جارٍ إعادة الاتصال بجهاز CGM...";

@@ -13,6 +13,14 @@
 "battery" = "Bateria";
 "needsTransmitterId" = "Em falta ID do Transmissor";
 "scan" = "Pesquisar";
+"medtrumNanoPumpScanNoticeTitle" = "Ligação à bomba Medtrum Nano";
+"medtrumNanoPumpScanNoticeMessage" = "Esta opção liga-se à bomba Medtrum Nano, não diretamente ao transmissor Nano CGM.\n\nAntes de pesquisar, certifique-se de que a EasyPatch está em execução, ligada à bomba e a receber valores atuais do CGM.\n\nA EasyPatch deve permanecer em execução e continuar a receber valores permanentemente.";
+"libre2ScanNoticeTitle" = "Bluetooth da aplicação Libre";
+"libre2ScanNoticeMessage" = "Antes de pesquisar, desative a permissão de Bluetooth da aplicação Libre nas definições do iPhone.\n\nA permissão de Bluetooth da aplicação Libre deve permanecer sempre desativada. Caso contrário, a aplicação Libre poderá assumir a ligação ao sensor e impedir esta aplicação de receber valores.";
+"dexcomG6ScanNoticeTitle" = "Ligação da aplicação Dexcom";
+"dexcomG6ScanNoticeMessage" = "Antes de pesquisar, force o encerramento da aplicação Dexcom ou desative a respetiva permissão de Bluetooth.\n\nA aplicação Dexcom não pode estar ligada ao transmissor enquanto esta aplicação pesquisa ou recebe valores.";
+"dexcomG7ScanNoticeTitle" = "Aplicação Dexcom G7 necessária";
+"dexcomG7ScanNoticeMessage" = "Antes de pesquisar, certifique-se de que a aplicação Dexcom G7 está em execução em segundo plano, ligada ao sensor e a receber valores atuais de glicose.\n\nA aplicação Dexcom G7 deve permanecer em execução e continuar a receber valores permanentemente.";
 "readyToScan" = "Pronto a Pesquisar";
 "scanning" = "A Pesquisar";
 "disconnect" = "Desconectar";
@@ -35,8 +43,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Use With Other App";
-
+"useOtherDexcomApp" = "Modo de coexistência";
+"useOtherDexcomAppCoexistenceFooter" = "O modo de coexistência permite-nos funcionar com outra app, como Dexcom ou CamAPS. Essa app deve continuar em execução em segundo plano.";
+"useOtherDexcomAppPrimaryFooter" = "O modo principal liga-se como app principal e controla a ligação.";
+"runningInCoexistenceMode" = "A funcionar em modo de coexistência";
+"runningInPrimaryMode" = "A funcionar em modo principal";
 /// cell text, sensor start time
 "sensorStartDate" = "Sensor Started";
 
@@ -69,3 +80,33 @@
 
 /// sensor warm-up text
 "warmingUpUntil" = "Warming up until";
+
+/// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
+"readSuccessLast24Hours" = "Últimas 24 horas";
+/// Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings
+"readSuccessReadingsReceived" = "%d de %d leituras recebidas";
+/// Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated
+"readSuccessCadenceFooter" = "As leituras esperadas baseiam-se na cadência observada do transmissor para %@.";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for good read success
+"readSuccessLegendGood" = "Bom";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success
+"readSuccessLegendLow" = "Baixo";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for poor read success
+"readSuccessLegendPoor" = "Fraco";
+/// Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available
+"readSuccessLegendNoData" = "Sem dados";
+/// Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings
+"readSuccessNoReadingsExpected" = "Nenhuma leitura esperada";
+/// Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket
+"readSuccessTimelineAccessibility" = "%0.1f por cento, %d de %d leituras";
+
+/// Bluetooth peripheral screen. Row title and screen title for read success information
+"readSuccess" = "Sucesso de leitura";
+/// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
+"readSuccessNow" = "Agora";
+"scanningForTransmitter" = "A procurar...";
+"connecting" = "A ligar";
+"connectingToTransmitter" = "Connecting...";
+"reconnecting" = "A restabelecer ligação";
+"reconnectingToTransmitter" = "A restabelecer ligação...";
+"waiting" = "A aguardar...";

@@ -4,7 +4,7 @@
 "alerttypesettingsview_enabled" = "Käytössä";
 "alerttypesettingsview_vibrate" = "Väristys";
 "alerttypesettingsview_snoozevianotification" = "Torkku notifikaation kautta";
-"alerttypesettingsview_defaultsnoozeperiod" = "Oletus torkkujakso (min)";
+"alerttypesettingsview_defaultsnoozeperiod" = "Oletus torkkujakso";
 "alerttypesettingsview_overridemute" = "Ohita mykistys";
 "alerttypesettingsview_sound" = "Ääni";
 "alerttypesettingsview_defaultiossound" = "iOS äänet";

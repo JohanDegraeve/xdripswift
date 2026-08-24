@@ -9,4 +9,8 @@ enum ConstantsCalibrationAlgorithms {
     static let maximumBgReadingCalculatedValue = 400.0
     static let maximumBgReadingCalculatedValueLimit = 600.0
     static let bgReadingErrorValue = 38.0
+
+    // recommended maximum difference between current glucose and a single calibration step
+    // especially relevant for Dexcom native calibrations to avoid rejection
+    static let maximumRecommendedCalibrationDifferenceInMgDl = 30.0
 }

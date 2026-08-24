@@ -136,6 +136,8 @@
 
 /// literal translation needed
 "common_days" = "days";
+"common_landscape_comparingWithLast" = "Porównanie z ostatnimi:";
+"common_landscape_comparisonDays" = "%d dni";
 
 /// the word average
 "common_statistics_average" = "Average";

@@ -5,6 +5,7 @@
 
 /// timestamp of glucose reading
 "timestamp" = "Timestamp";
+"backfilledAtFooterFormat" = "Preenchido retroativamente %@";
 
 /// glucose reading
 "glucoseReadingTitle" = "Glucose Reading";
@@ -38,3 +39,8 @@
 
 /// the slope arrow of the glucose reading
 "slopeArrow" = "Slope arrow";
+
+"glucoseRange" = "Intervalo de glicose";
+"bgRangeUrgent" = "Urgente";
+"bgRangeNotUrgent" = "Não urgente";
+"bgRangeInRange" = "No intervalo";

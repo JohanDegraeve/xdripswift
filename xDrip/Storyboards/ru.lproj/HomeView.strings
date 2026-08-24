@@ -36,7 +36,7 @@
 "success" = "Успешно";
 "failed" = "Не успешно";
 "dexcomBatteryTooLow" = "Батарея трансмиттера слишком разряжена!";
-"enterSensorCode" = "если у вас нет кода датчика, используйте 0000, но имейте в виду, что вы не получите показания, пока не откалибруете";
+"enterSensorCode" = "Если вы не знаете код сенсора, оставьте поле пустым, чтобы использовать 0000. Нажатие OK без кода использует 0000 как код сенсора или просто захватит текущую сессию, если она уже начата.";
 "stopSensorConfirmation" = "Вы уверены, что хотите остановить датчик?";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -69,3 +69,57 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "Осталось %@";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Шум сенсора";
+"sensorManagementNoiseShortTerm" = "Последние 30 минут";
+"sensorManagementNoiseLongTerm" = "Последние 4 часа";
+"sensorManagementNoiseCollecting" = "Сбор данных";
+"sensorManagementNoiseLow" = "Низкий";
+"sensorManagementNoiseElevated" = "Повышенный";
+"sensorManagementNoiseVeryHigh" = "Очень высокий";
+"sensorManagementNoiseExtreme" = "Экстремальный";
+"sensorManagementNoiseFlatline" = "Сенсор, вероятно, вышел из строя.";
+"sensorNoiseWarningExtremeTitle" = "Экстремальный шум сенсора";
+"sensorNoiseWarningPersistentTitle" = "Постоянный шум сенсора";
+"sensorNoiseWarningFlatlineTitle" = "Сигнал сенсора плоский";
+"sensorNoiseHistoryTitle" = "История шума";
+"sensorNoiseHistoryCurrentTitle" = "Текущие измерения";
+"sensorNoiseHistoryChartTitle" = "Шум во времени";
+"sensorNoiseHistoryRangeTitle" = "Период";
+"sensorNoiseHistoryDayRange" = "1d";
+"sensorNoiseHistoryThreeDayRange" = "3 дн.";
+"sensorNoiseHistoryWeekRange" = "7 дн.";
+"sensorNoiseHistoryAllRange" = "Всё";
+"sensorNoiseHistoryShortCompact" = "30 мин";
+"sensorNoiseHistoryLongCompact" = "4 ч";
+"sensorNoiseHistoryLoading" = "Создание истории сенсора";
+"sensorNoiseHistoryNoDataTitle" = "Пока недостаточно данных о шуме";
+"sensorNoiseHistoryNoDataMessage" = "График появится после накопления достаточного количества показаний сенсора.";
+"sensorNoiseHistoryChartAccessibility" = "График истории шума сенсора";
+"pumpBattery" = "Батарея";
+"pumpReservoir" = "Резервуар";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Последняя";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Очень высокий шум сенсора";
+"sensorHealthPersistentNoiseGuidance" = "Очень высокий шум в течение 12 часов. Если он сохраняется, рассмотрите замену сенсора.";
+"sensorHealthFlatlineTitle" = "Сигнал сенсора не меняется";
+"sensorHealthFlatlineGuidance" = "Показания не менялись 30 минут. Обычно это означает, что сенсор неисправен/истёк.";
+"sensorHealthTemporaryIssueTitle" = "Временная проблема с сенсором";
+"sensorHealthTemporaryIssueGuidance" = "Временная проблема с сенсором в течение 3 часов. Проверьте глюкометром и следуйте рекомендациям производителя.";
+"sensorHealthSensorFailedTitle" = "Отказ сенсора";
+"sensorHealthSensorFailedGuidance" = "Сообщается об отказе сенсора. Замените сенсор.";
+"sensorHealthTransmitterFailedTitle" = "Отказ передатчика";
+"sensorHealthTransmitterFailedGuidance" = "Сообщается об отказе передатчика. Проверьте или замените его.";
+"connectingToCGM" = "Подключение к CGM...";
+"reconnectingToCGM" = "Переподключение к CGM...";

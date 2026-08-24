@@ -16,7 +16,7 @@
 "transmitterbatterylevel" = "发射器电量";
 "ago" = "之前";
 "licenseinfo" = "该程序是免费软件基金会发布的通用公共许可证条款下可使用的免费软件.包括第三版以及后续的新版本.这个程序的设计是希望会有用，但不做任何保证. 登录 http://www.gnu.org/licenses/gpl.txt 可获取更多详细信息 ";
-"transmitterinfo" = "首先进入设置选择你的发射器类型，并输入发射器ID.根据发射器类型, 返回主页扫描发射器.德康G5无需点击开始扫描.";
+"transmitterinfo" = "首先进入设置选择你的发射器类型，并输入发射器ID.根据发射器类型, 返回主页扫描发射器.";
 "info" = "信息";
 "startsensorbeforecalibration" = "探头未启动结束之前，无法输入校准值.";
 "theremustbeareadingbeforecalibration" = "在输入指血之前，必须测两次血糖. 当输入一个指血值时，会要求你再次输入另外一个.";
@@ -83,7 +83,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code use 0000 but be aware that you will need to manually calibrate before you get readings.";
+"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -112,7 +112,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -122,3 +122,57 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "剩余 %@";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "传感器噪声";
+"sensorManagementNoiseShortTerm" = "最近 30 分钟";
+"sensorManagementNoiseLongTerm" = "最近 4 小时";
+"sensorManagementNoiseCollecting" = "正在收集数据";
+"sensorManagementNoiseLow" = "低";
+"sensorManagementNoiseElevated" = "偏高";
+"sensorManagementNoiseVeryHigh" = "非常高";
+"sensorManagementNoiseExtreme" = "极高";
+"sensorManagementNoiseFlatline" = "传感器可能已经失效。";
+"sensorNoiseWarningExtremeTitle" = "传感器噪声极高";
+"sensorNoiseWarningPersistentTitle" = "传感器持续噪声";
+"sensorNoiseWarningFlatlineTitle" = "传感器信号持平";
+"sensorNoiseHistoryTitle" = "噪声历史";
+"sensorNoiseHistoryCurrentTitle" = "当前测量";
+"sensorNoiseHistoryChartTitle" = "噪声变化";
+"sensorNoiseHistoryRangeTitle" = "时间范围";
+"sensorNoiseHistoryDayRange" = "1d";
+"sensorNoiseHistoryThreeDayRange" = "3 天";
+"sensorNoiseHistoryWeekRange" = "7 天";
+"sensorNoiseHistoryAllRange" = "全部";
+"sensorNoiseHistoryShortCompact" = "30 分钟";
+"sensorNoiseHistoryLongCompact" = "4 小时";
+"sensorNoiseHistoryLoading" = "正在生成传感器历史";
+"sensorNoiseHistoryNoDataTitle" = "噪声数据尚不足";
+"sensorNoiseHistoryNoDataMessage" = "收集到足够的传感器读数后将显示图表。";
+"sensorNoiseHistoryChartAccessibility" = "传感器噪声历史图表";
+"pumpBattery" = "电池";
+"pumpReservoir" = "储药器";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "最近一次";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "传感器噪声非常高";
+"sensorHealthPersistentNoiseGuidance" = "噪声已持续非常高 12 小时。如果继续，请考虑更换传感器。";
+"sensorHealthFlatlineTitle" = "传感器信号无变化";
+"sensorHealthFlatlineGuidance" = "读数已 30 分钟无变化。这通常表示传感器已失效/到期。";
+"sensorHealthTemporaryIssueTitle" = "临时传感器问题";
+"sensorHealthTemporaryIssueGuidance" = "临时传感器问题已持续 3 小时。请用血糖仪检查并遵循制造商指导。";
+"sensorHealthSensorFailedTitle" = "传感器失效";
+"sensorHealthSensorFailedGuidance" = "已报告传感器失效。请更换传感器。";
+"sensorHealthTransmitterFailedTitle" = "发射器故障";
+"sensorHealthTransmitterFailedGuidance" = "已报告发射器故障。请检查或更换。";
+"connectingToCGM" = "正在连接 CGM...";
+"reconnectingToCGM" = "正在重新连接 CGM...";

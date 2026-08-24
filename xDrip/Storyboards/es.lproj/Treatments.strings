@@ -26,3 +26,4 @@
 
 /// warn about trying to set a future bg value
 "treatments_cannotStoreFutureBGCheck" = "You cannot store a BG Check in the future.\n\nIt will be stored at the actual time.";
+"treatments_automaticBasal" = "Basal automática";

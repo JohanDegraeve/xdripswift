@@ -58,14 +58,39 @@ fileprivate func getDocumentsDirectory() -> URL {
 /// trace file currently in use, in case tracing needs to be stored on file
 fileprivate var traceFileName:URL?
 
-/// function to be used for logging, takes same parameters as os_log but in a next phase also NSLog can be added, or writing to disk to send later via e-mail ..
-/// - message : the text, same format as in os_log with %{private} and %{public} to either keep variables private or public , for NSLog, only 3 String formatters are suppored "@" for String, "d" for Int, "f" for double.
-/// - log : is the name of the category that will be used in OSLog
-/// - category is the same as used for creating the log (see class ConstantsLog), it's repeated here to use in NSLog
-/// - args : optional list of parameters that will be used. MAXIMUM 10 !
+/// Writes the existing developer trace and optionally offers a typed fact to the consumer log.
 ///
-/// Example
-func trace(_ message: StaticString, log:OSLog, category: String, type: OSLogType, _ args: CVarArg...) {
+/// The developer outputs retain their existing settings, formatting and rotation behavior. Consumer
+/// persistence is evaluated first and independently, so disabling OSLog, NSLog or trace files does not
+/// disable troubleshooting history. The consumer store may suppress routine or repeated operational
+/// facts that do not add support value.
+///
+/// - Parameters:
+///   - message: Developer format string. It may contain private operational data and is never copied
+///     into the consumer history.
+///   - log: OSLog category instance used by the developer output.
+///   - category: Category text retained in NSLog and trace-file output.
+///   - type: Developer log severity.
+///   - troubleshooting: Optional typed, consumer-safe fact. This is the only bridge to the consumer
+///     store; `message`, variadic arguments, URLs and `Error` values never cross that boundary.
+///   - args: Developer formatting arguments, with the existing maximum of ten.
+///
+/// Existing call sites need no changes. A call opts in only when it can construct a safe typed entry.
+func trace(
+    _ message: StaticString,
+    log: OSLog,
+    category: String,
+    type: OSLogType,
+    troubleshooting: TroubleshootingLogEntry? = nil,
+    _ args: CVarArg...
+) {
+
+    // A call site must explicitly supply a typed troubleshooting entry. Never derive consumer
+    // text from `message` or `args`: developer traces can contain URLs, identifiers, raw server
+    // responses and other information that is inappropriate for a public support post.
+    if let troubleshooting {
+        TroubleshootingLogStore.shared.record(troubleshooting)
+    }
 
     // initialize traceFileName if needed
     if traceFileName ==  nil {
@@ -274,6 +299,10 @@ class Trace {
     
     /// BluetoothPeripheralManager to use
     private static var bluetoothPeripheralManager: BluetoothPeripheralManager?
+
+    /// `initialize` may be called again as app services are rebuilt. Keep one clear process-start
+    /// marker rather than making a service restart look like a full app relaunch.
+    private static var didRecordTroubleshootingStart = false
     
     private static let paragraphSeperator = "\n===================================================\n"
     
@@ -281,7 +310,8 @@ class Trace {
         
         if let path = Bundle.main.path(forResource: "Info", ofType: "plist") {
             
-            if let createdDate = try! FileManager.default.attributesOfItem(atPath: path)[.creationDate] as? Date {
+            if let attributes = try? FileManager.default.attributesOfItem(atPath: path),
+               let createdDate = attributes[.creationDate] as? Date {
                 
                 return createdDate
                 
@@ -289,7 +319,7 @@ class Trace {
             
         }
         
-        return Date() // Should never execute
+        return Date() // file metadata may be unavailable
         
     }
     
@@ -297,7 +327,8 @@ class Trace {
         
         if let documentsFolder = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last {
             
-            if let installDate = try! FileManager.default.attributesOfItem(atPath: documentsFolder.path)[.creationDate] as? Date {
+            if let attributes = try? FileManager.default.attributesOfItem(atPath: documentsFolder.path),
+               let installDate = attributes[.creationDate] as? Date {
                 
                 return installDate
                 
@@ -305,7 +336,7 @@ class Trace {
             
         }
         
-        return Date() // Should never execute
+        return Date() // file metadata may be unavailable
         
     }
     
@@ -314,6 +345,17 @@ class Trace {
     static func initialize(coreDataManager: CoreDataManager?) {
         
         self.coreDataManager = coreDataManager
+
+        if !didRecordTroubleshootingStart {
+            didRecordTroubleshootingStart = true
+            trace(
+                "application tracing initialized",
+                log: log,
+                category: ConstantsLog.debuglogging,
+                type: .info,
+                troubleshooting: .standard(.app(.started))
+            )
+        }
         
     }
     
@@ -409,7 +451,7 @@ class Trace {
         traceInfo.appendStringAndNewLine("    Show statistics: " + UserDefaults.standard.showStatistics.description)
         traceInfo.appendStringAndNewLine("    Statistics days: " + UserDefaults.standard.daysToUseStatistics.description)
         traceInfo.appendStringAndNewLine("    Time in Range type: " + UserDefaults.standard.timeInRangeType.description)
-        traceInfo.appendStringAndNewLine("    Show HbA1c in mmols/mol: " + UserDefaults.standard.useIFCCA1C.description)
+        traceInfo.appendStringAndNewLine("    HbA1c to mmols/mol: " + UserDefaults.standard.useIFCCA1C.description)
           
         traceInfo.appendStringAndNewLine("\nNightscout settings:")
         traceInfo.appendStringAndNewLine("    Nightscout enabled: " + UserDefaults.standard.nightscoutEnabled.description)
@@ -445,17 +487,6 @@ class Trace {
             traceInfo.appendStringAndNewLine("    Speak interval: " + UserDefaults.standard.speakInterval.description + " minutes")
         }
         
-        traceInfo.appendStringAndNewLine("\nApple Watch settings:")
-        traceInfo.appendStringAndNewLine("    Show values in complications: " + UserDefaults.standard.showDataInWatchComplications.description)
-        if let agreementDate = UserDefaults.standard.watchComplicationUserAgreementDate {
-            traceInfo.appendStringAndNewLine("    User agreement date: " + agreementDate.toStringForTrace(timeStyle: .short, dateStyle: .medium) + " (" + agreementDate.daysAndHoursAgo(appendAgo: true, forTrace: true) + ")")
-            if let remainingComplicationUserInfoTransfers = UserDefaults.standard.remainingComplicationUserInfoTransfers {
-                traceInfo.appendStringAndNewLine("    Remaining complication updates: " + remainingComplicationUserInfoTransfers.description + " / 50")
-            }
-        } else {
-            traceInfo.appendStringAndNewLine("    User agreement date: nil")
-        }
-                                             
         traceInfo.appendStringAndNewLine("\nCalendar events settings:")
         traceInfo.appendStringAndNewLine("    Create calendar events: " + UserDefaults.standard.createCalendarEvent.description)
         if UserDefaults.standard.createCalendarEvent {
@@ -484,7 +515,6 @@ class Trace {
         traceInfo.appendStringAndNewLine("    OS log enabled: " + UserDefaults.standard.OSLogEnabled.description)
         traceInfo.appendStringAndNewLine("    Suppress unlock payload: " + UserDefaults.standard.suppressUnLockPayLoad.description)
         traceInfo.appendStringAndNewLine("    OS-AID share type: " + UserDefaults.standard.loopShareType.description)
-        traceInfo.appendStringAndNewLine("    OS-AID share every 5 mins?: " + UserDefaults.standard.shareToLoopOnceEvery5Minutes.description)
         traceInfo.appendStringAndNewLine("    LibreLinkUp version: " + (UserDefaults.standard.libreLinkUpVersion?.description ?? "nil"))
         traceInfo.appendStringAndNewLine("    CAGE max hours: " + UserDefaults.standard.CAGEMaxHours.description + " (default: " + ConstantsHomeView.CAGEDefaultMaxHours.description + ")")
         traceInfo.appendStringAndNewLine("    StandBy night mode enabled: " + UserDefaults.standard.allowStandByHighContrast.description)
@@ -613,7 +643,6 @@ class Trace {
                         if blePeripheral.libre2 != nil {
                             
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("    Smooth Libre readings: " + UserDefaults.standard.smoothLibreValues.description)
                             
                         }
                         
@@ -645,7 +674,15 @@ class Trace {
                             
                             traceInfo.appendStringAndNewLine("        15-day G7: " + (blePeripheral.name.startsWith("DXCM") ? UserDefaults.standard.is15DayDexcomG7.description : "n/a (not a G7)"))
                         }
-                        
+
+                    case .MedtrumTouchCareNanoType:
+                        if let medtrumNano = blePeripheral.medtrumTouchCareNano {
+
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            if let firmware = medtrumNano.firmware {
+                                traceInfo.appendStringAndNewLine("        Firmware: " + firmware)
+                            }
+                        }
                     }
                 }
                 

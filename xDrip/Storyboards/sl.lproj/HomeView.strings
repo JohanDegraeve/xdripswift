@@ -126,7 +126,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code use 0000 but be aware that you will need to manually calibrate before you get readings.";
+"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -155,7 +155,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -165,3 +165,57 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "Preostalo %@";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Šum senzorja";
+"sensorManagementNoiseShortTerm" = "Zadnjih 30 minut";
+"sensorManagementNoiseLongTerm" = "Zadnje 4 ure";
+"sensorManagementNoiseCollecting" = "Zbiranje podatkov";
+"sensorManagementNoiseLow" = "Nizek";
+"sensorManagementNoiseElevated" = "Povišan";
+"sensorManagementNoiseVeryHigh" = "Zelo visok";
+"sensorManagementNoiseExtreme" = "Ekstremen";
+"sensorManagementNoiseFlatline" = "Senzor je verjetno odpovedal.";
+"sensorNoiseWarningExtremeTitle" = "Ekstremen šum senzorja";
+"sensorNoiseWarningPersistentTitle" = "Vztrajen šum senzorja";
+"sensorNoiseWarningFlatlineTitle" = "Signal senzorja je raven";
+"sensorNoiseHistoryTitle" = "Zgodovina šuma";
+"sensorNoiseHistoryCurrentTitle" = "Trenutne meritve";
+"sensorNoiseHistoryChartTitle" = "Šum skozi čas";
+"sensorNoiseHistoryRangeTitle" = "Časovni obseg";
+"sensorNoiseHistoryDayRange" = "1d";
+"sensorNoiseHistoryThreeDayRange" = "3d";
+"sensorNoiseHistoryWeekRange" = "7d";
+"sensorNoiseHistoryAllRange" = "Vse";
+"sensorNoiseHistoryShortCompact" = "30 min";
+"sensorNoiseHistoryLongCompact" = "4 h";
+"sensorNoiseHistoryLoading" = "Ustvarjanje zgodovine senzorja";
+"sensorNoiseHistoryNoDataTitle" = "Podatkov o šumu še ni dovolj";
+"sensorNoiseHistoryNoDataMessage" = "Graf se bo prikazal, ko bo zbranih dovolj odčitkov senzorja.";
+"sensorNoiseHistoryChartAccessibility" = "Graf zgodovine šuma senzorja";
+"pumpBattery" = "Baterija";
+"pumpReservoir" = "Rezervoar";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Zadnja";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Zelo visok šum senzorja";
+"sensorHealthPersistentNoiseGuidance" = "Zelo visok šum že 12 ur. Če se nadaljuje, razmislite o zamenjavi senzorja.";
+"sensorHealthFlatlineTitle" = "Signal senzorja je raven";
+"sensorHealthFlatlineGuidance" = "Odčitki se 30 minut niso spremenili. To običajno pomeni, da je senzor odpovedal/potekel.";
+"sensorHealthTemporaryIssueTitle" = "Začasna težava s senzorjem";
+"sensorHealthTemporaryIssueGuidance" = "Začasna težava s senzorjem že 3 ure. Preverite z merilnikom in upoštevajte navodila proizvajalca.";
+"sensorHealthSensorFailedTitle" = "Senzor je odpovedal";
+"sensorHealthSensorFailedGuidance" = "Sporočena je odpoved senzorja. Zamenjajte senzor.";
+"sensorHealthTransmitterFailedTitle" = "Odpoved oddajnika";
+"sensorHealthTransmitterFailedGuidance" = "Sporočena je odpoved oddajnika. Preverite ga ali ga zamenjajte.";
+"connectingToCGM" = "Povezovanje s CGM...";
+"reconnectingToCGM" = "Ponovno povezovanje s CGM...";

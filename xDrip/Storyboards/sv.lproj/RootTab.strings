@@ -1,0 +1,5 @@
+/* Root tab titles. */
+"rootTab.home" = "Hem";
+"rootTab.treatments" = "Treatments";
+"rootTab.devices" = "Enheter";
+"rootTab.settings" = "Inställningar";

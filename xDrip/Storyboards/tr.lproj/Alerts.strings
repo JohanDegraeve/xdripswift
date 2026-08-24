@@ -1,4 +1,10 @@
 "alertsettingsview_screentitle" = "Uyarılar";
+"alerts_snooze_high_title" = "Yüksek";
+"alerts_snooze_very_high_title" = "Çok Yüksek";
+"alerts_snooze_low_title" = "Düşük";
+"alerts_snooze_very_low_title" = "Çok Düşük";
+"alerts_snooze_fast_drop_title" = "Hızlı Düşme";
+"alerts_snooze_fast_rise_title" = "Hızlı Yükselme";
 "alertssettingsview_screentitle" = "Uyarı Düzenle";
 "alerts_highalerttitle" = "Yüksek Uyarı";
 "alerts_veryhighalerttitle" = "Çok Yüksek Uyarı";

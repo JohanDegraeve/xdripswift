@@ -12,8 +12,8 @@ import Foundation
 
 /// Struct to hold internal Nightscout profile
 /// Initialize from a NightscoutProfileResponse
-struct NightscoutProfile: Codable {
-    struct TimeValue: Codable, Hashable {
+struct NightscoutProfile: Codable, Sendable {
+    struct TimeValue: Codable, Hashable, Sendable {
         var timeAsSecondsFromMidnight: Int
         var value: Double
         
@@ -28,9 +28,12 @@ struct NightscoutProfile: Codable {
     var basal: [TimeValue]?
     var carbratio: [TimeValue]?
     var sensitivity: [TimeValue]?
+    var targetLow: [TimeValue]?
+    var targetHigh: [TimeValue]?
     var timezone: String?
     var dia: Double?
     var isMgDl: Bool?
+    var id: String = ""
     var startDate: Date = .distantPast
     var createdAt: Date = .distantPast
     var profileName: String?
@@ -51,10 +54,13 @@ extension NightscoutProfile {
         
         // Parse startDate
         let startDateString = response.startDate
-        self.startDate = ISO8601DateFormatter.withFractionalSeconds.date(from: startDateString) ?? ISO8601DateFormatter().date(from: startDateString) ?? .distantPast
+        self.startDate = ISO8601DateFormatter.withFractionalSeconds.date(from: startDateString) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: startDateString) ?? .distantPast
+        self.createdAt = self.startDate
+        self.id = response.id
         self.profileName = response.defaultProfile
         self.enteredBy = response.enteredBy
         self.updatedDate = .now
+        self.lastCheckedDate = .now
         
         // Use the first profile in the store (usually "Default")
         if let profile = response.store[response.defaultProfile] ?? response.store.first?.value {
@@ -64,6 +70,8 @@ extension NightscoutProfile {
             self.basal = profile.basal.map { TimeValue(timeAsSecondsFromMidnight: $0.timeAsSeconds, value: $0.value) }
             self.carbratio = profile.carbratio.map { TimeValue(timeAsSecondsFromMidnight: $0.timeAsSeconds, value: $0.value) }
             self.sensitivity = profile.sens.map { TimeValue(timeAsSecondsFromMidnight: $0.timeAsSeconds, value: $0.value) }
+            self.targetLow = profile.targetLow.map { TimeValue(timeAsSecondsFromMidnight: $0.timeAsSeconds, value: $0.value) }
+            self.targetHigh = profile.targetHigh.map { TimeValue(timeAsSecondsFromMidnight: $0.timeAsSeconds, value: $0.value) }
         }
     }
 }

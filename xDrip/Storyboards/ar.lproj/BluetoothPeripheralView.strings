@@ -13,6 +13,14 @@
 "battery" = "البطارية";
 "needsTransmitterId" = "رمز الهوية لجهاز الإرسال مفقود";
 "scan" = "بدء البحث";
+"medtrumNanoPumpScanNoticeTitle" = "الاتصال بمضخة Medtrum Nano";
+"medtrumNanoPumpScanNoticeMessage" = "يتصل هذا الخيار بمضخة Medtrum Nano، وليس مباشرةً بجهاز إرسال Nano CGM.\n\nقبل بدء البحث، تأكد من أن EasyPatch قيد التشغيل ومتصل بالمضخة ويستقبل قيم CGM الحالية.\n\nيجب أن يظل EasyPatch قيد التشغيل وأن يستمر في استقبال القيم في جميع الأوقات.";
+"libre2ScanNoticeTitle" = "Bluetooth لتطبيق Libre";
+"libre2ScanNoticeMessage" = "قبل بدء البحث، عطّل إذن Bluetooth لتطبيق Libre من إعدادات iPhone.\n\nيجب أن يظل إذن Bluetooth لتطبيق Libre معطلاً في جميع الأوقات. وإلا فقد يستحوذ تطبيق Libre على اتصال المستشعر ويمنع هذا التطبيق من استقبال القيم.";
+"dexcomG6ScanNoticeTitle" = "اتصال تطبيق Dexcom";
+"dexcomG6ScanNoticeMessage" = "قبل بدء البحث، أغلق تطبيق Dexcom إغلاقًا إجباريًا أو عطّل إذن Bluetooth الخاص به.\n\nيجب ألا يكون تطبيق Dexcom متصلاً بجهاز الإرسال أثناء بحث هذا التطبيق أو استقباله للقيم.";
+"dexcomG7ScanNoticeTitle" = "تطبيق Dexcom G7 مطلوب";
+"dexcomG7ScanNoticeMessage" = "قبل بدء البحث، تأكد من أن تطبيق Dexcom G7 يعمل في الخلفية ومتصل بالمستشعر ويستقبل قيم الجلوكوز الحالية.\n\nيجب أن يظل تطبيق Dexcom G7 قيد التشغيل وأن يستمر في استقبال القيم في جميع الأوقات.";
 "readyToScan" = "جاهز للبحث";
 "scanning" = "يتم البحث";
 "disconnect" = "قطع الاتصال";
@@ -27,7 +35,11 @@
 "transmitterResultResult" = "نتيجة إعادة تعيين جهاز الإرسال";
 "bootLoader" = "محمل الإقلاع";
 "cannotActiveCGMInFollowerMode" = "لا يمكنك تفعيل نظام متابعة سكر الدم المستمرة CGM في وضع المتابعة";
-"useOtherDexcomApp" = "قم بمتابعة تطبيق Dexcom";
+"useOtherDexcomApp" = "وضع التعايش";
+"useOtherDexcomAppCoexistenceFooter" = "يتيح لنا وضع التعايش العمل مع تطبيق آخر، مثل Dexcom أو CamAPS. يجب أن يظل ذلك التطبيق قيد التشغيل في الخلفية.";
+"useOtherDexcomAppPrimaryFooter" = "يتصل الوضع الأساسي كتطبيق رئيسي ويتحكم في الاتصال.";
+"runningInCoexistenceMode" = "يعمل في وضع التعايش";
+"runningInPrimaryMode" = "يعمل في الوضع الأساسي";
 "confirmDisconnectTitle" = "تأكيد قطع الاتصال";
 "confirmDisconnectMessage" = "انقر فوق \"قطع الاتصال\" لتأكيد رغبتك حقًا في قطع الاتصال بجهاز الإرسال.";
 "sensorStartDate" = "بداية الحساس";
@@ -66,3 +78,33 @@
 
 /// Tell the user the scan was successful and to just wait now for connection
 "nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+
+/// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
+"readSuccessLast24Hours" = "آخر 24 ساعة";
+/// Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings
+"readSuccessReadingsReceived" = "تم استلام %d من %d قراءات";
+/// Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated
+"readSuccessCadenceFooter" = "تستند القراءات المتوقعة إلى إيقاع جهاز الإرسال المرصود لـ %@.";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for good read success
+"readSuccessLegendGood" = "جيد";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success
+"readSuccessLegendLow" = "منخفض";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for poor read success
+"readSuccessLegendPoor" = "ضعيف";
+/// Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available
+"readSuccessLegendNoData" = "لا توجد بيانات";
+/// Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings
+"readSuccessNoReadingsExpected" = "لا توجد قراءات متوقعة";
+/// Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket
+"readSuccessTimelineAccessibility" = "%0.1f بالمئة، %d من %d قراءات";
+
+/// Bluetooth peripheral screen. Row title and screen title for read success information
+"readSuccess" = "نجاح القراءة";
+/// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
+"readSuccessNow" = "الآن";
+"scanningForTransmitter" = "جارٍ البحث...";
+"connecting" = "جارٍ الاتصال";
+"connectingToTransmitter" = "Connecting...";
+"reconnecting" = "جارٍ إعادة الاتصال";
+"reconnectingToTransmitter" = "جارٍ إعادة الاتصال...";
+"waiting" = "انتظار...";

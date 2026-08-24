@@ -12,7 +12,16 @@ import SwiftUI
 extension XDripWatchComplication.EntryView {
     @ViewBuilder
     var accessoryCornerView: some View {
-        if !entry.widgetState.keepAliveIsDisabled && entry.widgetState.liveDataIsEnabled {
+        if entry.widgetState.keepAliveIsDisabled {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 20))
+                .foregroundStyle(.colorPrimary)
+                .widgetCurvesContent()
+                .widgetLabel {
+                    Text(Texts_WatchComplication.keepAliveDisabled)
+                }
+                .widgetBackground(backgroundView: Color.clear)
+        } else {
             Text("\(entry.widgetState.bgValueStringInUserChosenUnit())\(entry.widgetState.trendArrow())")
                 .font(.system(size: 20))
                 .foregroundColor(entry.widgetState.bgTextColor())
@@ -38,14 +47,6 @@ extension XDripWatchComplication.EntryView {
                     .gaugeStyle(LinearCapacityGaugeStyle()) // Doesn't do anything
                 }
                 .widgetBackground(backgroundView: Color.clear)
-        } else {
-            Text(" ")
-                .font(.system(size: 20))
-                .minimumScaleFactor(0.2)
-                .widgetCurvesContent()
-                .widgetLabel("\(ConstantsHomeView.applicationName)")
-                .widgetBackground(backgroundView: Color.clear)
         }
     }
 }
-

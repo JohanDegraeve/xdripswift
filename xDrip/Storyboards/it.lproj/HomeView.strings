@@ -126,7 +126,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code use 0000 but be aware that you will need to manually calibrate before you get readings.";
+"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -155,7 +155,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -165,3 +165,81 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "%@ rimanenti";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Rumore del sensore";
+"sensorManagementNoiseShortTerm" = "Ultimi 30 minuti";
+"sensorManagementNoiseLongTerm" = "Ultime 4 ore";
+"sensorManagementNoiseCollecting" = "Raccolta dati";
+"sensorManagementNoiseLow" = "Basso";
+"sensorManagementNoiseElevated" = "Elevato";
+"sensorManagementNoiseVeryHigh" = "Molto alto";
+"sensorManagementNoiseExtreme" = "Estremo";
+"sensorManagementNoiseFlatline" = "Il sensore probabilmente ha smesso di funzionare.";
+"sensorNoiseWarningExtremeTitle" = "Rumore estremo del sensore";
+"sensorNoiseWarningPersistentTitle" = "Rumore persistente del sensore";
+"sensorNoiseWarningFlatlineTitle" = "Il segnale del sensore è piatto";
+"sensorNoiseHistoryTitle" = "Cronologia del rumore";
+"sensorNoiseHistoryCurrentTitle" = "Misurazioni attuali";
+"sensorNoiseHistoryChartTitle" = "Rumore nel tempo";
+"sensorNoiseHistoryRangeTitle" = "Intervallo di tempo";
+"sensorNoiseHistoryDayRange" = "1d";
+"sensorNoiseHistoryThreeDayRange" = "3 g";
+"sensorNoiseHistoryWeekRange" = "7 g";
+"sensorNoiseHistoryAllRange" = "Tutto";
+"sensorNoiseHistoryShortCompact" = "30 min";
+"sensorNoiseHistoryLongCompact" = "4 h";
+"sensorNoiseHistoryLoading" = "Creazione della cronologia del sensore";
+"sensorNoiseHistoryNoDataTitle" = "Dati sul rumore ancora insufficienti";
+"sensorNoiseHistoryNoDataMessage" = "Il grafico apparirà dopo la raccolta di un numero sufficiente di letture del sensore.";
+"sensorNoiseHistoryChartAccessibility" = "Grafico della cronologia del rumore del sensore";
+"pumpBattery" = "Batteria";
+"pumpReservoir" = "Serbatoio";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Ultima";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";
+"sensorManagementCalibrationValue" = "Valore di calibrazione";
+"sensorManagementCalibrationPending" = "In attesa...";
+"sensorManagementCalibrationStableTrend" = "Tendenza stabile";
+"sensorManagementCalibrationSlightlyLow" = "Leggermente basso";
+"sensorManagementCalibrationSlightlyHigh" = "Leggermente alto";
+"sensorManagementCalibrationNoReading" = "Nessuna lettura";
+"sensorManagementCalibrationGood" = "Buono";
+"sensorManagementCalibrationNoTrend" = "Nessuna tendenza";
+"sensorManagementCalibrationStale" = "Obsoleta";
+"sensorManagementCalibrationStable" = "Stabile";
+"sensorManagementCalibrationFallingFast" = "In rapido calo";
+"sensorManagementCalibrationFalling" = "In calo";
+"sensorManagementCalibrationRisingFast" = "In rapido aumento";
+"sensorManagementCalibrationRising" = "In aumento";
+"sensorManagementCalibrationFlatline" = "Linea piatta";
+"sensorManagementCalibrationBG" = "Glicemia";
+"sensorManagementCalibrationRaw" = "Grezzo";
+"sensorManagementCalibrationSlope" = "Pendenza";
+"sensorManagementCalibrationIntercept" = "Intercetta";
+"sensorManagementCalibrationReadinessBad" = "È improbabile che la calibrazione sia accurata in questo momento. Attendi.";
+"sensorManagementCalibrationReadinessCaution" = "La calibrazione potrebbe essere meno affidabile. Potrebbe essere meglio attendere.";
+"sensorManagementCalibrationReadinessGood" = "Ora è un buon momento per calibrare.";
+"sensorManagementCalibrationSafetyFooter" = "Calibra solo se sai come farlo in sicurezza.";
+"sensorManagementLargeCalibrationDifferenceWarningFormat" = "È possibile che questa calibrazione non funzioni. Cerca di limitare ogni variazione della calibrazione a un massimo di %@ alla volta.";
+"sensorHealthPersistentNoiseTitle" = "Rumore del sensore molto alto";
+"sensorHealthPersistentNoiseGuidance" = "Rumore molto alto da 12 ore. Valuta di sostituire il sensore se continua.";
+"sensorHealthFlatlineTitle" = "Il segnale del sensore è piatto";
+"sensorHealthFlatlineGuidance" = "Letture invariate da 30 minuti. Di solito indica che il sensore è guasto/scaduto.";
+"sensorHealthTemporaryIssueTitle" = "Problema temporaneo del sensore";
+"sensorHealthTemporaryIssueGuidance" = "Problema temporaneo del sensore da 3 ore. Controlla con un glucometro e segui le indicazioni del produttore.";
+"sensorHealthSensorFailedTitle" = "Sensore guasto";
+"sensorHealthSensorFailedGuidance" = "Guasto del sensore segnalato. Sostituisci il sensore.";
+"sensorHealthTransmitterFailedTitle" = "Guasto del trasmettitore";
+"sensorHealthTransmitterFailedGuidance" = "Guasto del trasmettitore segnalato. Controllalo o sostituiscilo.";
+"connectingToCGM" = "Connessione al CGM...";
+"reconnectingToCGM" = "Riconnessione al CGM...";

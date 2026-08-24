@@ -1,4 +1,10 @@
 "alertsettingsview_screentitle" = "Alarms";
+"alerts_snooze_high_title" = "High";
+"alerts_snooze_very_high_title" = "Very High";
+"alerts_snooze_low_title" = "Low";
+"alerts_snooze_very_low_title" = "Very Low";
+"alerts_snooze_fast_drop_title" = "Fast Drop";
+"alerts_snooze_fast_rise_title" = "Fast Rise";
 "alertssettingsview_screentitle" = "Edit Alarm";
 "alerts_highalerttitle" = "High Alarm";
 "alerts_veryhighalerttitle" = "Very High Alarm";
@@ -7,6 +13,8 @@
 "alerts_snooze" = "Snooze";
 "alerts_select_snooze_time" = "Select Snooze Time";
 "alerts_missedreadingalerttitle" = "Missed Readings";
+"alerts_notloopingalerttitle" = "Not Looping";
+"alerts_sensortransmitterfailure" = "Sensor/Transmitter Failure";
 "alerts_calibrationneeded" = "Calibration Reminder";
 "alerts_batterylow" = "Transmitter Battery Low";
 "alertstart" = "Apply from";

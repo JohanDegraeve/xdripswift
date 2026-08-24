@@ -1,8 +1,27 @@
+import Combine
 import Foundation
 import os
 import UIKit
 
 public class NightscoutSyncManager: NSObject, ObservableObject {
+    
+    private struct NightscoutDeleteEntriesResponse: Decodable {
+        let deletedEntriesCount: Int?
+
+        private enum CodingKeys: String, CodingKey {
+            case deletedEntriesCount = "n"
+        }
+    }
+
+    /// Plain snapshot used by queued historical BG replacement.
+    ///
+    /// Replacement may wait for an active delete/upload cycle and split a large payload into several
+    /// requests. Managed objects may change or fault during that delay, so the queued work receives
+    /// the exact timestamp and Nightscout dictionary captured at scheduling time.
+    private struct BgReadingReplacementPayload {
+        let timeStamp: Date
+        let dictionaryRepresentationForNightscoutUpload: [String: Any]
+    }
     
     // MARK: - public properties
     
@@ -10,7 +29,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     var profile = NightscoutProfile()
     
     /// holds and persists the nightscout device status data
-    var deviceStatus = NightscoutDeviceStatus()
+    @Published var deviceStatus = NightscoutDeviceStatus()
     
     // MARK: - private properties
     
@@ -19,6 +38,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     /// path for readings and calibrations
     private let nightscoutEntriesPath = "/api/v1/entries"
+    private let nightscoutEntriesJsonPath = "/api/v1/entries.json"
     
     /// path for treatments
     private let nightscoutTreatmentPath = "/api/v1/treatments"
@@ -46,6 +66,12 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     /// TreatmentEntryAccessor
     private let treatmentEntryAccessor: TreatmentEntryAccessor
+
+    /// NightscoutDeviceStatusAccessor
+    private let nightscoutDeviceStatusAccessor: NightscoutDeviceStatusAccessor
+
+    /// NightscoutProfileAccessor
+    private let nightscoutProfileAccessor: NightscoutProfileAccessor
     
     /// reference to coreDataManager
     private let coreDataManager: CoreDataManager
@@ -76,6 +102,21 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     private var pendingForegroundSync: Bool = false
     private var lastBackgroundFollowerRefreshAt: Date = .distantPast
     private let backgroundFollowerRefreshCooldown: TimeInterval = 60
+
+    /// BG overwrite requests must run strictly in sequence.
+    /// Historical apply can delete and re-add a large range, while live post
+    /// processing may also request narrow replacements. If those requests are
+    /// allowed to overlap, a later delete can remove data that an earlier task
+    /// has only just re-uploaded.
+    private var bgReadingsReplacementTask: Task<Void, Never>?
+    private var bgReadingsReplacementTaskIdentifier: String?
+    private var bgReadingsReplacementBlocksDirectLiveUpload = false
+    private var pendingDirectBgUploadAfterReplacement = false
+    private var pendingDirectBgUploadLastConnectionStatusChangeTimeStamp: Date?
+
+    /// The LibreLinkUp sensor start currently being posted to Nightscout.
+    /// This closes the short window between starting the request and persisting its success.
+    private var libreLinkUpSensorStartUploadInFlight: Date?
     
     /// - when was the sync of treatments with Nightscout started.
     /// - if nil then there's no sync running
@@ -122,6 +163,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         self.messageHandler = messageHandler
         self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
         self.treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
+        self.nightscoutDeviceStatusAccessor = NightscoutDeviceStatusAccessor(coreDataManager: coreDataManager)
+        self.nightscoutProfileAccessor = NightscoutProfileAccessor(coreDataManager: coreDataManager)
         
         super.init()
 
@@ -133,8 +176,10 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             self.profile = nightscoutProfile
         }
         
-        deviceStatus.lastCheckedDate = .distantPast
-        deviceStatus.updatedDate = .distantPast
+        var initialDeviceStatus = NightscoutDeviceStatus()
+        initialDeviceStatus.lastCheckedDate = .distantPast
+        initialDeviceStatus.updatedDate = .distantPast
+        deviceStatus = initialDeviceStatus
         
         // add observers for nightscout settings which may require testing and/or start upload
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutAPIKey.rawValue, options: .new, context: nil)
@@ -147,6 +192,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutSyncRequired.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerUploadDataToNightscout.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.therapyDataSourceType.rawValue, options: .new, context: nil)
     }
     
     deinit {
@@ -161,10 +207,73 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutSyncRequired.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerUploadDataToNightscout.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.therapyDataSourceType.rawValue)
         NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - public functions
+
+    public func shouldAllowNightscoutBgWrites() -> Bool {
+        UserDefaults.standard.dataFlowPolicy.exportsGlucoseToNightscout
+    }
+    
+    public func shouldAllowNightscoutBgPostProcessingWrites() -> Bool {
+        UserDefaults.standard.dataFlowPolicy.exportsGlucoseToNightscout
+    }
+
+    public func replacePostProcessingNotesInNightscout(notesToDelete: [TreatmentEntry], noteToUpload: TreatmentEntry) {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { [weak self] in
+                self?.replacePostProcessingNotesInNightscout(notesToDelete: notesToDelete, noteToUpload: noteToUpload)
+            }
+            return
+        }
+
+        guard UserDefaults.standard.nightscoutEnabled,
+              UserDefaults.standard.nightscoutUrl != nil,
+              UserDefaults.standard.nightscoutAPIKey != nil || UserDefaults.standard.nightscoutToken != nil,
+              shouldAllowNightscoutBgWrites(),
+              shouldAllowNightscoutBgPostProcessingWrites()
+        else { return }
+
+        var remainingNotesToDelete = notesToDelete
+
+        func uploadNewNote() {
+            uploadTreatmentsToNightscout(treatmentsToUpload: [noteToUpload]) { nightscoutResult in
+                if !nightscoutResult.successFull() {
+                    UserDefaults.standard.nightscoutSyncRequired = true
+                }
+            }
+        }
+
+        func deleteNextNote() {
+            guard let noteToDelete = remainingNotesToDelete.first else {
+                uploadNewNote()
+                return
+            }
+
+            remainingNotesToDelete.removeFirst()
+
+            guard noteToDelete.id != TreatmentEntry.EmptyId && noteToDelete.id.count > 0 else {
+                noteToDelete.uploaded = true
+                coreDataManager.saveChanges()
+                deleteNextNote()
+                return
+            }
+
+            deleteTreatmentAtNightscout(treatmentToDelete: noteToDelete) { nightscoutResult in
+                DispatchQueue.main.async {
+                    if !nightscoutResult.successFull() {
+                        UserDefaults.standard.nightscoutSyncRequired = true
+                    }
+
+                    deleteNextNote()
+                }
+            }
+        }
+
+        deleteNextNote()
+    }
     
     /// Public wrapper to allow external sync requests (e.g. after new BG reading)
     /// will always be forced to enact
@@ -178,18 +287,23 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     public func uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date?) {
         // check that Nightscout is enabled
         // and nightscoutURL exists
-        guard UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil else { return }
+        guard UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil else {
+            trace("in uploadLatestBgReadings, returning because Nightscout is disabled or URL is missing", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+            return
+        }
         
         // check and exit without uploading BG values if any of the following conditions are true:
         // - follower mode but the follower source is also Nightscout
         // - follower mode but upload follower data to Nightscout if false
         // - master mode but upload master to Nightscout is false
-        if (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout) || (!UserDefaults.standard.isMaster && !UserDefaults.standard.followerUploadDataToNightscout) || (UserDefaults.standard.isMaster && !UserDefaults.standard.masterUploadDataToNightscout) {
+        if !shouldAllowNightscoutBgWrites() {
+            trace("in uploadLatestBgReadings, returning because BG writes are not allowed. isMaster = %{public}@, masterUploadDataToNightscout = %{public}@, followerDataSourceType = %{public}@, followerUploadDataToNightscout = %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, UserDefaults.standard.isMaster.description, UserDefaults.standard.masterUploadDataToNightscout.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerUploadDataToNightscout.description)
             return
         }
         
         // check that either the API_SECRET or Token exists, if both are nil then return
         if UserDefaults.standard.nightscoutAPIKey == nil && UserDefaults.standard.nightscoutToken == nil {
+            trace("in uploadLatestBgReadings, returning because neither API secret nor token is configured", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
             return
         }
         
@@ -197,10 +311,13 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         if UserDefaults.standard.nightscoutUseSchedule {
             if let schedule = UserDefaults.standard.nightscoutSchedule {
                 if !schedule.indicatesOn(forWhen: Date()) {
+                    trace("in uploadLatestBgReadings, returning because the Nightscout upload schedule is currently off", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
                     return
                 }
             }
         }
+
+        trace("in uploadLatestBgReadings, proceeding with direct BG upload evaluation", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
         
         let minimumInterval = lastSyncHadChanges ? ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds : idleNightscoutSyncInterval
         if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -minimumInterval {
@@ -210,18 +327,41 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             UserDefaults.standard.nightscoutSyncRequired = true
         }
         
-        // upload readings
-        uploadBgReadingsToNightscout(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
+        // Manual historical replacement deletes an explicit Nightscout window,
+        // so direct live upload must wait until that full-window rewrite is
+        // finished. Automatic smoothing tail replacement does not own the newest
+        // live reading and must not stall the normal live upload path in the
+        // background.
+        if bgReadingsReplacementTaskIdentifier != nil && bgReadingsReplacementBlocksDirectLiveUpload {
+            trace("in uploadLatestBgReadings, pending BG replacement task detected, queuing direct BG upload until replacement completes", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+
+            pendingDirectBgUploadAfterReplacement = true
+
+            if let lastConnectionStatusChangeTimeStamp = lastConnectionStatusChangeTimeStamp {
+                pendingDirectBgUploadLastConnectionStatusChangeTimeStamp = lastConnectionStatusChangeTimeStamp
+            }
+
+        } else {
+            uploadBgReadingsToNightscout(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
+        }
         
         // upload calibrations
         uploadCalibrationsToNightscout()
         
-        // upload activeSensor if needed
-        if UserDefaults.standard.uploadSensorStartTimeToNS, let activeSensor = sensorsAccessor.fetchActiveSensor() {
-            if !activeSensor.uploadedToNS {
-                trace("n uploadLatestBgReadings, activeSensor not yet uploaded to NS", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
-                
+        // upload the active sensor if needed
+        if UserDefaults.standard.uploadSensorStartTimeToNS {
+            if UserDefaults.standard.isMaster,
+               let activeSensor = sensorsAccessor.fetchActiveSensor(),
+               !activeSensor.uploadedToNS {
+                trace("in uploadLatestBgReadings, activeSensor not yet uploaded to NS", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+
                 uploadActiveSensorToNightscout(sensor: activeSensor)
+            } else if !UserDefaults.standard.isMaster,
+                      UserDefaults.standard.followerDataSourceType == .libreLinkUp || UserDefaults.standard.followerDataSourceType == .libreLinkUpRussia,
+                      let sensorStartDate = UserDefaults.standard.activeSensorStartDate,
+                      UserDefaults.standard.libreLinkUpSensorStartDateUploadedToNS != sensorStartDate,
+                      libreLinkUpSensorStartUploadInFlight != sensorStartDate {
+                uploadLibreLinkUpSensorStartToNightscout(startDate: sensorStartDate)
             }
         }
         
@@ -234,24 +374,122 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         }
     }
     
-    /// tries to delete any entries from Nightscout that are within 1 second either side of the timestamp that is passed (this should normally just be a single entry/reading)
+    /// tries to delete any entries from Nightscout that fall in the default reading window around the timestamp that is passed
     /// - parameters:
     ///     - timeStampOfBgReadingToDelete : the timestamp of the BG reading that we want to try and remove
     public func deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: Date) {
-        // create a query that finds entries between 1 second before, and 1 second after, the timestamp
-        let queries = [URLQueryItem(name: "find[dateString][$gte]", value: String(timeStampOfBgReadingToDelete.addingTimeInterval(-1).ISOStringFromDate())), URLQueryItem(name: "find[dateString][$lte]", value: String(timeStampOfBgReadingToDelete.addingTimeInterval(+1).ISOStringFromDate()))]
-        
-        // send a DELETE http request with the queryItems
+        // Historical replacement uses the same master BG write gate as direct upload.
+        guard UserDefaults.standard.nightscoutEnabled,
+              UserDefaults.standard.nightscoutUrl != nil,
+              shouldAllowNightscoutBgWrites(),
+              shouldAllowNightscoutBgPostProcessingWrites()
+        else { return }
+
         Task {
-            do {
-                let _ = try await nightscoutRequest(path: nightscoutEntriesPath,queryItems: queries,httpMethod: "DELETE",responseType: Data.self)
-                // This is maybe redundant as Nightscout returns a successful result even if no entries were actually found/deleted
-                trace("in deleteBgReadingFromNightscout, deleting BG reading/entry with timestamp %{public}@ from Nightscout", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, timeStampOfBgReadingToDelete.description)
-            } catch {
-                trace("in deleteBgReadingFromNightscout, failed to delete BG reading/entry with timestamp %{public}@ from Nightscout: %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, timeStampOfBgReadingToDelete.description, error.localizedDescription)
+            let defaultHalfWindowInSeconds = ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes * 60.0 / 2.0
+            await deleteBgReadingEntriesAtNightscout(fromTimeStamp: timeStampOfBgReadingToDelete.addingTimeInterval(-defaultHalfWindowInSeconds), toTimeStamp: timeStampOfBgReadingToDelete.addingTimeInterval(defaultHalfWindowInSeconds))
+        }
+    }
+    
+    public func replaceBgReadingsInNightscout(bgReadings: [BgReading], deleteFromTimeStamp: Date? = nil, deleteToTimeStamp: Date? = nil) {
+        // Use the same BG write gate as the direct upload path.
+        // If master BG upload is disabled, no adjusted, smoothed or rewritten
+        // BG values should be sent to Nightscout either.
+        guard UserDefaults.standard.nightscoutEnabled,
+              UserDefaults.standard.nightscoutUrl != nil,
+              shouldAllowNightscoutBgWrites(),
+              shouldAllowNightscoutBgPostProcessingWrites()
+        else { return }
+        
+        // Build plain payload snapshots before the queued async work starts.
+        // The historical replacement path may need to delete first,
+        // wait for an earlier replacement task, and then split a large upload
+        // into several Nightscout requests. Keeping managed objects alive across
+        // that whole delayed path caused crashes when the dictionary payload was
+        // rebuilt later on.
+        let dateFormatter = Date.ISODateFormatter()
+        let bgReadingsToReplace = bgReadings.sorted(by: { $0.timeStamp < $1.timeStamp }).map {
+            BgReadingReplacementPayload(timeStamp: $0.timeStamp, dictionaryRepresentationForNightscoutUpload: $0.dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: dateFormatter))
+        }
+        guard bgReadingsToReplace.count > 0 else { return }
+
+        let newestTimeStamp = bgReadingsToReplace.last?.timeStamp
+        let previousReplacementTask = bgReadingsReplacementTask
+        let replacementTaskIdentifier = UUID().uuidString
+
+        bgReadingsReplacementTaskIdentifier = replacementTaskIdentifier
+        bgReadingsReplacementBlocksDirectLiveUpload = bgReadingsReplacementBlocksDirectLiveUpload || (deleteFromTimeStamp != nil && deleteToTimeStamp != nil)
+
+        bgReadingsReplacementTask = Task { @MainActor [weak self] in
+            _ = await previousReplacementTask?.result
+
+            guard let self = self else { return }
+            // The user can turn off master Nightscout BG upload while a replacement task is queued.
+            // Re-check the write permission after waiting so the delayed task
+            // does not continue deleting and re-uploading BG values anyway.
+            guard self.shouldAllowNightscoutBgWrites() else {
+                if self.bgReadingsReplacementTaskIdentifier == replacementTaskIdentifier {
+                    self.bgReadingsReplacementTask = nil
+                    self.bgReadingsReplacementTaskIdentifier = nil
+                    self.bgReadingsReplacementBlocksDirectLiveUpload = false
+                    self.pendingDirectBgUploadAfterReplacement = false
+                    self.pendingDirectBgUploadLastConnectionStatusChangeTimeStamp = nil
+                }
+                return
+            }
+
+            // Historical overwrite uses one explicit time window.
+            // Normal live replacement uses per-reading windows so only the affected slots are replaced.
+            if let deleteFromTimeStamp = deleteFromTimeStamp, let deleteToTimeStamp = deleteToTimeStamp {
+                let defaultHalfWindowInSeconds = ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes * 60.0 / 2.0
+                await self.deleteBgReadingEntriesAtNightscout(fromTimeStamp: deleteFromTimeStamp.addingTimeInterval(-defaultHalfWindowInSeconds), toTimeStamp: deleteToTimeStamp.addingTimeInterval(defaultHalfWindowInSeconds))
+            } else {
+                for (index, bgReading) in bgReadingsToReplace.enumerated() {
+                    let previousTimeStamp = index > 0 ? bgReadingsToReplace[index - 1].timeStamp : nil
+                    let nextTimeStamp = index + 1 < bgReadingsToReplace.count ? bgReadingsToReplace[index + 1].timeStamp : nil
+                    await self.deleteBgReadingEntriesAroundBgReadingAtNightscout(bgReadingTimeStamp: bgReading.timeStamp, previousTimeStamp: previousTimeStamp, nextTimeStamp: nextTimeStamp)
+                }
+            }
+
+            let uploadSucceeded = await self.uploadBgReadingsReplacementChunksToNightscout(bgReadings: bgReadingsToReplace)
+
+            if uploadSucceeded, let newestTimeStamp = newestTimeStamp {
+                let currentTimeStampLatestNightscoutUploadedBgReading = UserDefaults.standard.timeStampLatestNightscoutUploadedBgReading ?? .distantPast
+                let minimiumTimeBetweenTwoReadingsInMinutes = UserDefaults.standard.storeFrequentReadingsInNightscout ? ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutesFrequentUploads : ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes
+                let replacementHandoffTimeStamp = newestTimeStamp.addingTimeInterval(-minimiumTimeBetweenTwoReadingsInMinutes * 60.0)
+
+                // A historical overwrite can finish only a few seconds before the next live reading.
+                // If the latest uploaded Nightscout timestamp is moved all the
+                // way to the newest overwritten reading, the next live cycle can
+                // think that the new reading is still inside the normal upload
+                // cadence and skip it completely.
+                //
+                // Move the Nightscout handoff back by one upload cadence so the
+                // next truly new reading is still allowed through, while the
+                // overwritten reading itself remains too close to be uploaded
+                // again in the normal direct path.
+                if replacementHandoffTimeStamp > currentTimeStampLatestNightscoutUploadedBgReading {
+                    UserDefaults.standard.timeStampLatestNightscoutUploadedBgReading = replacementHandoffTimeStamp
+                }
+            }
+
+            guard self.bgReadingsReplacementTaskIdentifier == replacementTaskIdentifier else { return }
+
+            self.bgReadingsReplacementTask = nil
+            self.bgReadingsReplacementTaskIdentifier = nil
+            self.bgReadingsReplacementBlocksDirectLiveUpload = false
+
+            if self.pendingDirectBgUploadAfterReplacement {
+                let pendingDirectBgUploadLastConnectionStatusChangeTimeStamp = self.pendingDirectBgUploadLastConnectionStatusChangeTimeStamp
+
+                self.pendingDirectBgUploadAfterReplacement = false
+                self.pendingDirectBgUploadLastConnectionStatusChangeTimeStamp = nil
+
+                trace("in replaceBgReadingsInNightscout, replacement finished, continuing with queued direct BG upload", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+
+                self.uploadBgReadingsToNightscout(lastConnectionStatusChangeTimeStamp: pendingDirectBgUploadLastConnectionStatusChangeTimeStamp)
             }
         }
-        
     }
     
     // MARK: - overriden functions
@@ -263,8 +501,10 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 switch keyPathEnum {
                 case UserDefaults.Key.nightscoutUrl, UserDefaults.Key.nightscoutAPIKey, UserDefaults.Key.nightscoutToken, UserDefaults.Key.nightscoutPort:
                     // Reset deviceStatus and profile to empty when Nightscout connection settings change
-                    deviceStatus = NightscoutDeviceStatus()
-                    profile = NightscoutProfile()
+                    DispatchQueue.main.async {
+                        self.deviceStatus = NightscoutDeviceStatus()
+                        self.profile = NightscoutProfile()
+                    }
                     // apikey or nightscout api key change is triggered by user, should not be done within 200 ms
                     if keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
                         // if master is set (or if we're in follower mode other than Nightscout and we want to upload to Nightscout), siteURL exists and either API_SECRET or a token is entered, then test credentials
@@ -316,9 +556,12 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         }
                     }
                     
-                case UserDefaults.Key.nightscoutFollowType:
+                case UserDefaults.Key.nightscoutFollowType, UserDefaults.Key.therapyDataSourceType:
                     // nillify the deviceStatus to force a new sync/parse using the new model selected
-                    deviceStatus = NightscoutDeviceStatus()
+                    DispatchQueue.main.async {
+                        self.deviceStatus = NightscoutDeviceStatus()
+                        self.profile = NightscoutProfile()
+                    }
                     
                     DispatchQueue.main.async { [weak self] in
                         self?.syncWithNightscout()
@@ -335,6 +578,14 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     /// synchronize all treatments and other information with Nightscout
     private func syncWithNightscout(overrideAppState: Bool = false) {
+        // Keep UIKit state checks and sync bookkeeping on the main thread.
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { [weak self] in
+                self?.syncWithNightscout(overrideAppState: overrideAppState)
+            }
+            return
+        }
+
         if UIApplication.shared.applicationState == .background && !overrideAppState {
             trace("in syncWithNightscout, aborted because app is backgrounded and not overriden", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
             performBackgroundFollowerRefreshIfNeeded()
@@ -348,17 +599,10 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         if let last = lastActualSyncTime, Date().timeIntervalSince(last) < ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
             return
         }
-        
+
         // Only update lastActualSyncTime after a real sync is about to start
         lastActualSyncTime = Date()
-        
-        // Ensure Core Data main-context objects are always accessed on the main thread
-        if !Thread.isMainThread {
-            DispatchQueue.main.async { [weak self] in
-                self?.syncWithNightscout()
-            }
-            return
-        }
+
         // check that Nightscout is enabled
         // and nightscoutURL exists
         guard UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil else { return }
@@ -499,8 +743,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                                             self.nightscoutSyncRequired = false
                                             // Schedule relaunch on main after short delay to avoid immediate recursion and allow UI/main-thread breathing room
                                             trace("in deleteTreatment, relaunching nightscoutsync (coalesced)", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                                                self?.syncWithNightscout()
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak manager = self] in
+                                                manager?.syncWithNightscout()
                                             }
                                         }
                                     }
@@ -521,6 +765,58 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 // force the flag back to false to prevent the sync from stalling
                 UserDefaults.standard.nightscoutSyncRequired = false
             }
+        }
+    }
+    
+    @MainActor private func deleteBgReadingEntriesAroundBgReadingAtNightscout(bgReadingTimeStamp: Date, previousTimeStamp: Date?, nextTimeStamp: Date?) async {
+        let lowerBoundTimeStamp: Date
+        let upperBoundTimeStamp: Date
+        let defaultHalfWindowInSeconds = ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes * 60.0 / 2.0
+        
+        if let previousTimeStamp = previousTimeStamp {
+            lowerBoundTimeStamp = Date(timeIntervalSince1970: (previousTimeStamp.timeIntervalSince1970 + bgReadingTimeStamp.timeIntervalSince1970) / 2.0)
+        } else {
+            lowerBoundTimeStamp = bgReadingTimeStamp.addingTimeInterval(-defaultHalfWindowInSeconds)
+        }
+        
+        if let nextTimeStamp = nextTimeStamp {
+            upperBoundTimeStamp = Date(timeIntervalSince1970: (bgReadingTimeStamp.timeIntervalSince1970 + nextTimeStamp.timeIntervalSince1970) / 2.0)
+        } else {
+            upperBoundTimeStamp = bgReadingTimeStamp.addingTimeInterval(defaultHalfWindowInSeconds)
+        }
+        
+        await deleteBgReadingEntriesAtNightscout(fromTimeStamp: lowerBoundTimeStamp, toTimeStamp: upperBoundTimeStamp)
+    }
+    
+    @MainActor private func deleteBgReadingEntriesAtNightscout(fromTimeStamp: Date, toTimeStamp: Date) async {
+        let typedQueries = [
+            URLQueryItem(name: "find[type]", value: "sgv"),
+            URLQueryItem(name: "find[date][$gte]", value: String(fromTimeStamp.toMillisecondsAsInt64())),
+            URLQueryItem(name: "find[date][$lte]", value: String(toTimeStamp.toMillisecondsAsInt64()))
+        ]
+        
+        let untypedQueries = [
+            URLQueryItem(name: "find[date][$gte]", value: String(fromTimeStamp.toMillisecondsAsInt64())),
+            URLQueryItem(name: "find[date][$lte]", value: String(toTimeStamp.toMillisecondsAsInt64()))
+        ]
+        
+        do {
+            let typedResponse = try await nightscoutRequest(path: nightscoutEntriesJsonPath, queryItems: typedQueries, httpMethod: "DELETE", responseType: NightscoutDeleteEntriesResponse.self)
+            
+            if let deletedEntriesCount = typedResponse?.deletedEntriesCount, deletedEntriesCount > 0 {
+                trace("in deleteBgReadingEntriesAtNightscout, deleted %{public}@ matching SGV entries in range %{public}@ to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deletedEntriesCount.description, fromTimeStamp.description, toTimeStamp.description)
+                return
+            }
+            
+            let untypedResponse = try await nightscoutRequest(path: nightscoutEntriesJsonPath, queryItems: untypedQueries, httpMethod: "DELETE", responseType: NightscoutDeleteEntriesResponse.self)
+            
+            if let deletedEntriesCount = untypedResponse?.deletedEntriesCount, deletedEntriesCount > 0 {
+                trace("in deleteBgReadingEntriesAtNightscout, deleted %{public}@ matching entries in range %{public}@ to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deletedEntriesCount.description, fromTimeStamp.description, toTimeStamp.description)
+            } else {
+                trace("in deleteBgReadingEntriesAtNightscout, no matching entries found in range %{public}@ to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, fromTimeStamp.description, toTimeStamp.description)
+            }
+        } catch {
+            trace("in deleteBgReadingEntriesAtNightscout, failed to delete entries in range %{public}@ to %{public}@: %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, fromTimeStamp.description, toTimeStamp.description, error.localizedDescription)
         }
     }
     
@@ -567,7 +863,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
 
     /// Allows follower-mode downloads while backgrounded so Loop data stays fresh when BLE wakes the app.
     private func performBackgroundFollowerRefreshIfNeeded() {
-        guard UserDefaults.standard.nightscoutFollowType != .none else { return }
+        guard UserDefaults.standard.dataFlowPolicy.importsStatusFromNightscout else { return }
         let now = Date()
         if now.timeIntervalSince(lastBackgroundFollowerRefreshAt) < backgroundFollowerRefreshCooldown {
             return
@@ -580,8 +876,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     /// check if a new profile update is required, see if the downloaded response is newer than the stored one and then import it if necessary
     private func updateProfile() {
-        // if the user doesn't want to follow any type of AID system, just do nothing and return
-        guard UserDefaults.standard.nightscoutFollowType != .none else { return }
+        // Only the authoritative therapy service may publish profile and pump state.
+        guard UserDefaults.standard.dataFlowPolicy.importsStatusFromNightscout else { return }
         
         guard UserDefaults.standard.nightscoutUrl != nil else {
             trace("in updateProfile, nightscoutURL is nil", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
@@ -604,21 +900,34 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         Task {
             do {
                 let profileResponses: [NightscoutProfileResponse]? = try await nightscoutRequest(path: nightscoutProfilePath, responseType: [NightscoutProfileResponse].self)
+                guard UserDefaults.standard.dataFlowPolicy.importsStatusFromNightscout else { return }
                 if let profileResponse = profileResponses?.first {
                     let newProfile = NightscoutProfile(from: profileResponse)
-                    if newProfile.startDate > profile.startDate {
-                        if profile.startDate == .distantPast {
-                            trace("in updateProfile, no profile is stored yet. Importing Nightscout profile with date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, profile.startDate.formatted(date: .abbreviated, time: .shortened))
+                    let shouldPersistProfile = await MainActor.run { () -> Bool in
+                        guard newProfile.startDate > self.profile.startDate else { return false }
+
+                        if self.profile.startDate == .distantPast {
+                            trace("in updateProfile, no profile is stored yet. Importing Nightscout profile with date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, self.profile.startDate.formatted(date: .abbreviated, time: .shortened))
                         } else {
-                            trace("in updateProfile, found a newer Nightscout profile online with date = %{public}@, old profile date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, newProfile.startDate.formatted(date: .abbreviated, time: .shortened), profile.startDate.formatted(date: .abbreviated, time: .shortened))
+                            trace("in updateProfile, found a newer Nightscout profile online with date = %{public}@, old profile date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, newProfile.startDate.formatted(date: .abbreviated, time: .shortened), self.profile.startDate.formatted(date: .abbreviated, time: .shortened))
                         }
-                        self.profile = newProfile
-                        // Store in userdefaults for quick access
-                        if let profileData = try? JSONEncoder().encode(newProfile) {
-                            UserDefaults.standard.nightscoutProfile = profileData
-                        }
+
+                        return true
+                    }
+
+                    if shouldPersistProfile {
+                        guard await self.nightscoutProfileAccessor.upsert(newProfile) else { return }
                         await MainActor.run {
+                            // Another overlapping response may have published an even newer profile
+                            // while Core Data was saving. Never move the live value backwards.
+                            guard newProfile.startDate > self.profile.startDate else { return }
+                            self.profile = newProfile
                             self.didUpdateProfileDuringLastSync = true
+
+                            // Store in UserDefaults only after the durable history save succeeds.
+                            if let profileData = try? JSONEncoder().encode(newProfile) {
+                                UserDefaults.standard.nightscoutProfile = profileData
+                            }
                         }
                     }
                 }
@@ -630,54 +939,70 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     /// check if a new deviceStatus update is required, see if the downloaded response is newer than the stored one and then import it if necessary
     private func updateDeviceStatus() {
-        guard UserDefaults.standard.nightscoutFollowType != .none else { return }
+        guard UserDefaults.standard.dataFlowPolicy.importsStatusFromNightscout else { return }
         guard UserDefaults.standard.nightscoutUrl != nil else {
             trace("in updateDeviceStatus, nightscoutURL is nil", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
             return
         }
         let currentDate = Date().addingTimeInterval(20)
-        if deviceStatus.createdAt > currentDate || deviceStatus.updatedDate > currentDate || deviceStatus.lastLoopDate > currentDate {
-            deviceStatus.createdAt = .distantPast
-            deviceStatus.updatedDate = .distantPast
-            deviceStatus.lastLoopDate = .distantPast
+        var currentDeviceStatus = deviceStatus
+        if currentDeviceStatus.createdAt > currentDate || currentDeviceStatus.updatedDate > currentDate || currentDeviceStatus.lastLoopDate > currentDate {
+            currentDeviceStatus.createdAt = .distantPast
+            currentDeviceStatus.updatedDate = .distantPast
+            currentDeviceStatus.lastLoopDate = .distantPast
+            let resetDeviceStatus = currentDeviceStatus
+            DispatchQueue.main.async {
+                self.deviceStatus = resetDeviceStatus
+            }
         }
-        let previousDeviceStatusSignature = (createdAt: deviceStatus.createdAt, lastLoopDate: deviceStatus.lastLoopDate, id: deviceStatus.id)
         Task {
             do {
                 let unifiedResponses: [NightscoutDeviceStatusResponse]? = try await nightscoutRequest(path: nightscoutDeviceStatusPath, responseType: [NightscoutDeviceStatusResponse].self)
+                guard UserDefaults.standard.dataFlowPolicy.importsStatusFromNightscout else { return }
                 guard let unifiedResponses = unifiedResponses, let latest = unifiedResponses.sorted(by: { ($0.createdAt ?? "") > ($1.createdAt ?? "") }).first else {
                     trace("in updateDeviceStatus, no valid device status found in Nightscout response", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
                     return
                 }
                 var deviceStatus = NightscoutDeviceStatus(from: latest)
+                let deviceStatusesByCreatedAt = unifiedResponses
+                    .map { NightscoutDeviceStatus(from: $0) }
+                    .sorted { $0.createdAt > $1.createdAt }
+                
+                // The newest Nightscout devicestatus row is not always the richest row. Fill any
+                // missing display values from nearby rows before publishing, so a heartbeat-style
+                // update does not briefly clear pump, IOB/COB or detailed AID fields.
+                deviceStatusesByCreatedAt.forEach { fallbackDeviceStatus in
+                    deviceStatus.fillMissingDisplayValues(from: fallbackDeviceStatus)
+                }
+                
                 // --- Aggregate for most recent temp basal rate/duration, uploader battery, and pump battery from all entries (all systems) ---
                 // 1. Temp basal rate/duration
                 let tempBasalCandidates = unifiedResponses.compactMap { resp -> (rate: Double, duration: Int, date: Date)? in
                     // Trio: use openAPS.enacted only (not suggested)
                     if resp.device == "Trio", let enacted = resp.openAPS?.enacted,
                        let rate = enacted.rate, let duration = enacted.duration, let ts = enacted.timestamp,
-                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter().date(from: ts)
+                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: ts)
                     {
                         return (rate, duration, date)
                     }
                     // iAPS: use openAPS.suggested or enacted
                     if resp.device == "iAPS", let aps = resp.openAPS?.suggested ?? resp.openAPS?.enacted,
                        let rate = aps.rate, let duration = aps.duration, let ts = aps.timestamp,
-                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter().date(from: ts)
+                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: ts)
                     {
                         return (rate, duration, date)
                     }
                     // OpenAPS/AAPS: use openAPS.suggested or enacted
                     if let device = resp.device, device.starts(with: "openaps://") || device == "AAPS", let aps = resp.openAPS?.suggested ?? resp.openAPS?.enacted,
                        let rate = aps.rate, let duration = aps.duration, let ts = aps.timestamp,
-                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter().date(from: ts)
+                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: ts)
                     {
                         return (rate, duration, date)
                     }
                     // Loop: use loop.enacted
                     if let enacted = resp.loop?.enacted,
                        let rate = enacted.rate, let duration = enacted.duration, let ts = enacted.timestamp,
-                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter().date(from: ts)
+                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: ts)
                     {
                         return (rate, duration, date)
                     }
@@ -691,7 +1016,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 // 2. Uploader battery (always from uploader.battery)
                 let uploaderBatteryCandidates = unifiedResponses.compactMap { resp -> (percent: Int, date: Date)? in
                     if let percent = resp.uploader?.battery, let ts = resp.uploader?.timestamp,
-                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter().date(from: ts)
+                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: ts)
                     {
                         return (percent, date)
                     }
@@ -704,7 +1029,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 // 3. Pump battery (always from pump.battery.percent)
                 let pumpBatteryCandidates = unifiedResponses.compactMap { resp -> (percent: Int, date: Date)? in
                     if let percent = resp.pump?.battery?.percent, let clock = resp.pump?.clock,
-                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: clock) ?? ISO8601DateFormatter().date(from: clock)
+                       let date = ISO8601DateFormatter.withFractionalSeconds.date(from: clock) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: clock)
                     {
                         return (percent, date)
                     }
@@ -713,19 +1038,107 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 if let mostRecent = pumpBatteryCandidates.sorted(by: { $0.date > $1.date }).first {
                     deviceStatus.pumpBatteryPercent = mostRecent.percent
                 }
-                let signatureChanged = deviceStatus.createdAt != previousDeviceStatusSignature.createdAt || deviceStatus.lastLoopDate != previousDeviceStatusSignature.lastLoopDate || deviceStatus.id != previousDeviceStatusSignature.id
-                self.deviceStatus = deviceStatus
-                self.deviceStatus.lastCheckedDate = .now
-                self.deviceStatus.updatedDate = .now
-                trace("in updateDeviceStatus, updated device status with createdAt = %{public}@. Last looping date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, self.deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened), self.deviceStatus.lastLoopDate.formatted(date: .abbreviated, time: .shortened))
-                trace("in updateDeviceStatus, deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, String(describing: self.deviceStatus))
+
+                // Nightscout can briefly return a fresh device-status document whose embedded
+                // loop/openAPS timestamp is older than a nearby document. The status row should
+                // follow the most recent valid loop timestamp, not regress just because `created_at`
+                // advanced on a heartbeat/status-only update.
+                let mostRecentLoopDate = unifiedResponses
+                    .flatMap { loopDates(from: $0) }
+                    .filter { $0 <= Date().addingTimeInterval(20) }
+                    .max() ?? .distantPast
+                deviceStatus.lastLoopDate = max(deviceStatus.lastLoopDate, mostRecentLoopDate)
+                deviceStatus.sanitizingFutureDates()
+
+                let downloadedDeviceStatus = deviceStatus
+                let candidate = await MainActor.run { () -> (status: NightscoutDeviceStatus, storedStatus: NightscoutDeviceStatus, signatureChanged: Bool) in
+                    var mergedDeviceStatus = downloadedDeviceStatus
+                    var storedDeviceStatus = self.deviceStatus
+                    storedDeviceStatus.sanitizingFutureDates()
+                    
+                    // Merge against the currently published value at publish time, not the value
+                    // captured before the async request started. This keeps overlapping Nightscout
+                    // requests from overwriting fresh complete data with an older partial response.
+                    if storedDeviceStatus.createdAt > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+                        mergedDeviceStatus.fillMissingDisplayValues(from: storedDeviceStatus)
+                    }
+                    mergedDeviceStatus.lastLoopDate = max(mergedDeviceStatus.lastLoopDate, storedDeviceStatus.lastLoopDate)
+                    mergedDeviceStatus.sanitizingFutureDates()
+                    
+                    let signatureChanged = mergedDeviceStatus.hasPersistedChanges(comparedTo: storedDeviceStatus)
+                    mergedDeviceStatus.lastCheckedDate = .now
+                    mergedDeviceStatus.updatedDate = .now
+
+                    return (mergedDeviceStatus, storedDeviceStatus, signatureChanged)
+                }
+
+                if candidate.signatureChanged {
+                    guard await self.nightscoutDeviceStatusAccessor.upsert(candidate.status) else {
+                        await MainActor.run {
+                            var currentDeviceStatus = self.deviceStatus
+                            currentDeviceStatus.lastCheckedDate = .now
+                            self.deviceStatus = currentDeviceStatus
+                        }
+                        return
+                    }
+                }
+
                 await MainActor.run {
-                    self.didUpdateDeviceStatusDuringLastSync = signatureChanged
+                    // If another request published materially different status while this save was
+                    // in flight, leave that newer state in place. Its own successful transaction is
+                    // authoritative, and the next poll can reconsider this response if still useful.
+                    guard !self.deviceStatus.hasPersistedChanges(comparedTo: candidate.storedStatus) else {
+                        var currentDeviceStatus = self.deviceStatus
+                        currentDeviceStatus.lastCheckedDate = .now
+                        self.deviceStatus = currentDeviceStatus
+                        return
+                    }
+
+                    let mergedDeviceStatus = candidate.status
+
+                    trace("in updateDeviceStatus, updated device status with createdAt = %{public}@. Last looping date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, mergedDeviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened), mergedDeviceStatus.lastLoopDate.formatted(date: .abbreviated, time: .shortened))
+                    trace("in updateDeviceStatus, deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, String(describing: mergedDeviceStatus))
+
+                    self.deviceStatus = mergedDeviceStatus
+                    self.didUpdateDeviceStatusDuringLastSync = candidate.signatureChanged
                 }
             } catch {
-                self.deviceStatus.lastCheckedDate = .now
                 trace("in updateDeviceStatus, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+                await MainActor.run {
+                    var currentDeviceStatus = self.deviceStatus
+                    currentDeviceStatus.lastCheckedDate = .now
+                    self.deviceStatus = currentDeviceStatus
+                }
             }
+        }
+
+        func loopDates(from response: NightscoutDeviceStatusResponse) -> [Date] {
+            var dates = [
+                response.openAPS?.enacted?.timestamp,
+                response.loop?.enacted?.timestamp,
+                response.loop?.timestamp
+            ]
+
+            if let suggested = response.openAPS?.suggested, shouldUseSuggestedAsLoopDate(response: response, suggested: suggested) {
+                dates.append(suggested.timestamp)
+            }
+
+            return dates.compactMap { date(from: $0) }
+        }
+
+        func shouldUseSuggestedAsLoopDate(response: NightscoutDeviceStatusResponse, suggested: NightscoutDeviceStatusResponse.OpenAPS.APSuggestion) -> Bool {
+            switch response.device {
+            case "Trio", "iAPS":
+                return suggested.wasReceived
+            default:
+                return true
+            }
+        }
+
+        func date(from string: String?) -> Date? {
+            guard let string = string else { return nil }
+
+            return ISO8601DateFormatter.withFractionalSeconds.date(from: string) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: string)
         }
     }
     
@@ -736,14 +1149,22 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     ///     - completionHandler : handler that will be called with the result TreatmentNSResponse array
     ///     - treatmentsToSync : main goal of the function is not to upload, but to download. However the response will be used to verify if it has any of the treatments that has no id yet and also to verify if existing treatments have changed
     private func getLatestTreatmentsNSResponses(treatmentsToSync: [TreatmentEntry], completionHandler: @escaping (_ result: NightscoutResult) -> Void) {
+        // Nightscout may remain enabled as an export destination while CareLink owns therapy data.
+        // In that mode, skipping the GET prevents exported CareLink treatments from immediately
+        // returning through a second authoritative import path.
+        guard UserDefaults.standard.dataFlowPolicy.importsTreatmentsFromNightscout else {
+            completionHandler(.success(0))
+            return
+        }
+
         // query for treatments older than maxHoursTreatmentsToDownload
         let queries = [URLQueryItem(name: "find[created_at][$gte]", value: String(Date(timeIntervalSinceNow: TimeInterval(hours: -ConstantsNightscout.maxHoursTreatmentsToDownload)).ISOStringFromDate()))]
         
-        /// treatments that are locally stored (and not marked as deleted), and that are not in the list of downloaded treatments will be locally deleted
-        /// - only for latest treatments less than maxHoursTreatmentsToDownload old
-        var didFindTreatmentInDownload = [Bool](repeating: false, count: treatmentsToSync.count)
-        
         performHTTPRequest(path: nightscoutTreatmentPath, queries: queries, httpMethod: nil) { (data: Data?, nightscoutResult: NightscoutResult) in
+            guard UserDefaults.standard.dataFlowPolicy.importsTreatmentsFromNightscout else {
+                completionHandler(.success(0))
+                return
+            }
             
             guard nightscoutResult.successFull() else {
                 trace("in getLatestTreatmentsNSResponses, result is not success", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error)
@@ -782,42 +1203,23 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             trace("in getLatestTreatmentsNSResponses, %{public}@ treatmentEntries found in response which were not yet marked as uploaded", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountMarkedAsUploaded.description)
                         }
                         
-                        let amountOfUpdatedTreatments = self.checkIfChangedAtNightscout(forTreatmentEntries: treatmentsToSync, inTreatmentNSResponses: treatmentNSResponses, didFindTreatmentInDownload: &didFindTreatmentInDownload)
+                        let amountOfUpdatedTreatments = self.checkIfChangedAtNightscout(forTreatmentEntries: treatmentsToSync, inTreatmentNSResponses: treatmentNSResponses)
                         
                         if amountOfUpdatedTreatments > 0 {
                             trace("in getLatestTreatmentsNSResponses, %{public}@ treatmentEntries found that were updated at NS and updated locally", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfUpdatedTreatments.description)
                         }
                         
-                        // now for each treatmentEntry, less than maxHoursTreatmentsToDownload, check if it was found in the NS response
-                        //    if not, it means it's been deleted at NS, also do the local deletion
-                        //    only treatments that were successfully uploaded before
-                        
-                        // to  keep track of amount of locally deleted treatmentEntries
-                        var amountOfLocallyDeletedTreatments = 0
-                        
-                        for (index, entry) in treatmentsToSync.enumerated() {
-                            if abs(entry.date.timeIntervalSinceNow) < ConstantsNightscout.maxHoursTreatmentsToDownload * 3600.0 {
-                                if !didFindTreatmentInDownload[index] && !entry.treatmentdeleted && entry.uploaded {
-                                    entry.treatmentdeleted = true
-                                    amountOfLocallyDeletedTreatments = amountOfLocallyDeletedTreatments + 1
-                                }
-                            }
-                        }
-                        
-                        if amountOfLocallyDeletedTreatments > 0 {
-                            trace("in getLatestTreatmentsNSResponses, %{public}@ treatmentEntries that were not found anymore at NS and deleted locally", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfLocallyDeletedTreatments.description)
-                        }
-                        
-                        // Moved summary log here, after amountOfLocallyDeletedTreatments is computed
-                        let totalActivity = amountOfNewTreatments + amountMarkedAsUploaded + amountOfUpdatedTreatments + amountOfLocallyDeletedTreatments
+                        // A bulk treatment download is not authoritative enough to infer remote deletion.
+                        // Keep explicit local deletes only. Otherwise a truncated or delayed Nightscout response can hide valid local treatments.
+                        let totalActivity = amountOfNewTreatments + amountMarkedAsUploaded + amountOfUpdatedTreatments
                         if totalActivity > 0 {
-                            trace("in getLatestTreatmentsNSResponses, Nightscout sync summary: new = %{public}@, markedUploaded = %{public}@, updated = %{public}@, deleted = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfNewTreatments.description, amountMarkedAsUploaded.description, amountOfUpdatedTreatments.description, amountOfLocallyDeletedTreatments.description)
+                            trace("in getLatestTreatmentsNSResponses, Nightscout sync summary: new = %{public}@, markedUploaded = %{public}@, updated = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfNewTreatments.description, amountMarkedAsUploaded.description, amountOfUpdatedTreatments.description)
                         }
                         
                         self.coreDataManager.saveChanges()
                         
                         // call completion handler with success, if amount and/or amountOfNewTreatments > 0 then it's success with localchanges
-                        completionHandler(.success(amountOfUpdatedTreatments + amountOfNewTreatments + amountOfLocallyDeletedTreatments))
+                        completionHandler(.success(amountOfUpdatedTreatments + amountOfNewTreatments))
                     }
                     
                 } else {
@@ -850,6 +1252,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             throw NSError(domain: "Nightscout", code: 1, userInfo: [NSLocalizedDescriptionKey: "Nightscout URL not set"])
         }
         var urlComponents = URLComponents(string: baseUrl + path)
+        if UserDefaults.standard.nightscoutPort != 0 {
+            urlComponents?.port = UserDefaults.standard.nightscoutPort
+        }
         if let queryItems = queryItems {
             urlComponents?.queryItems = queryItems
         }
@@ -877,6 +1282,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         guard let httpResponse = response as? HTTPURLResponse, (200 ... 299).contains(httpResponse.statusCode) else {
             throw NSError(domain: "Nightscout", code: 3, userInfo: [NSLocalizedDescriptionKey: "Nightscout request failed"])
         }
+        markNightscoutConnectionSucceeded()
         
         if let responseType = responseType {
             // Special case: if T is Data, just return the raw data
@@ -981,11 +1387,59 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             }
         })
     }
+
+    /// Upload the server-provided LibreLinkUp sensor start to Nightscout.
+    ///
+    /// Follower readings deliberately have no local `Sensor` object, so this mirrors the
+    /// master-mode upload while using the LibreLinkUp timestamp held in UserDefaults.
+    private func uploadLibreLinkUpSensorStartToNightscout(startDate: Date) {
+        trace("in uploadLibreLinkUpSensorStartToNightscout, preparing to upload follower sensor start", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+
+        libreLinkUpSensorStartUploadInFlight = startDate
+
+        let dataToUpload = [
+            // A deterministic identifier makes a retry idempotent if Nightscout accepted the
+            // request but its response was lost before the local success marker was stored.
+            "_id": libreLinkUpSensorStartNightscoutIdentifier(startDate: startDate),
+            "eventType": "Sensor Start",
+            "created_at": startDate.ISOStringFromDate(),
+            "enteredBy": ConstantsHomeView.applicationName
+        ]
+
+        uploadDataAndGetResponse(dataToUpload: dataToUpload, httpMethod: nil, path: nightscoutTreatmentPath) { _, nightscoutResult in
+            DispatchQueue.main.async {
+                self.libreLinkUpSensorStartUploadInFlight = nil
+
+                guard nightscoutResult.successFull() else {
+                    trace("in uploadLibreLinkUpSensorStartToNightscout, follower sensor start upload failed", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error)
+                    return
+                }
+
+                UserDefaults.standard.libreLinkUpSensorStartDateUploadedToNS = startDate
+                trace("in uploadLibreLinkUpSensorStartToNightscout, follower sensor start uploaded to NS", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+            }
+        }
+    }
+
+    /// Build a stable 24-character identifier in the same shape as locally created
+    /// Nightscout object identifiers. The prefix namespaces the millisecond timestamp
+    /// to LibreLinkUp sensor starts without including the sensor serial number.
+    private func libreLinkUpSensorStartNightscoutIdentifier(startDate: Date) -> String {
+        let timestampInMilliseconds = Int64(startDate.timeIntervalSince1970 * 1000)
+        let timestampComponent = UInt64(bitPattern: timestampInMilliseconds) & 0x0000FFFFFFFFFFFF
+
+        return String(format: "6c6c75000000%012llx", timestampComponent)
+    }
     
     /// upload latest readings to nightscout
     /// - parameters:
     ///     - lastConnectionStatusChangeTimeStamp : if there's not been a disconnect in the last 5 minutes, then the latest reading will be uploaded only if the time difference with the latest but one reading is at least 5 minutes.
     private func uploadBgReadingsToNightscout(lastConnectionStatusChangeTimeStamp: Date?) {
+        // The queued direct upload handoff can call into this function after the
+        // original public guard already ran. Check again here so turning off the
+        // master Nightscout BG upload switch immediately stops all BG writes.
+        guard shouldAllowNightscoutBgWrites() else { return }
+
         // get readings to upload, limit to x days, x = ConstantsNightscout.maxBgReadingsDaysToUpload
         var timeStamp = Date(timeIntervalSinceNow: TimeInterval(-ConstantsNightscout.maxBgReadingsDaysToUpload))
         
@@ -995,14 +1449,17 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             }
         }
         
-        // add 10 seconds because if Libre with smoothing is used, sometimes the older values reappear but with a slightly different timestamp
-        // this caused readings being uploaded to NS with just a few seconds difference
-        timeStamp = timeStamp.addingTimeInterval(10.0)
-        
         let minimiumTimeBetweenTwoReadingsInMinutes = UserDefaults.standard.storeFrequentReadingsInNightscout ? ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutesFrequentUploads : ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes
         
         // get latest readings, filter : minimiumTimeBetweenTwoReadingsInMinutes beteen two readings, except for the first if a dis/reconnect occured since the latest reading
-        var bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false).filter(minimumTimeBetweenTwoReadingsInMinutes: minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: timeStamp)
+        // Historical records imported from this same Nightscout site are local read-only copies.
+        // Excluding their namespaced IDs prevents a download/upload feedback loop when the normal
+        // uploader cursor is older than the newly imported range.
+        let uploadCandidates = bgReadingsAccessor
+            .getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+            .filter { !NightscoutImportService.isImportedBgReadingID($0.id) }
+        let filteredBgReadingsToUpload = uploadCandidates.filter(minimumTimeBetweenTwoReadingsInMinutes: minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: timeStamp)
+        var bgReadingsToUpload = Array(filteredBgReadingsToUpload.reversed())
         
         if bgReadingsToUpload.count > 0 {
             trace("in uploadBgReadingsToNightscout, number of readings to upload : %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, bgReadingsToUpload.count.description)
@@ -1016,19 +1473,21 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             }
             
             // limit the amount of readings to upload to avoid passing this limit
-            // we start with the oldest readings
+            // start with the oldest readings so the upload timestamp can move forward safely
             bgReadingsToUpload = Array(bgReadingsToUpload.prefix(ConstantsNightscout.maxReadingsToUpload))
             
             // map readings to dictionaryRepresentation
-            let bgReadingsDictionaryRepresentation = bgReadingsToUpload.map { $0.dictionaryRepresentationForNightscoutUpload() }
+            let dateFormatter = Date.ISODateFormatter()
+            let bgReadingsDictionaryRepresentation = bgReadingsToUpload.map { $0.dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: dateFormatter) }
             
-            // store the timestamp of the last reading to upload, here in the main thread, because we use a bgReading for it, which is retrieved in the main mangedObjectContext
-            let timeStampLastReadingToUpload = bgReadingsToUpload.first?.timeStamp
+            // store the timestamp of the newest reading in this uploaded batch
+            // the array is sorted oldest first at this point
+            let timeStampLastReadingToUpload = bgReadingsToUpload.last?.timeStamp
             
             uploadData(dataToUpload: bgReadingsDictionaryRepresentation, httpMethod: nil, path: nightscoutEntriesPath, completionHandler: {
                 // change timeStampLatestNightscoutUploadedBgReading
                 if let timeStampLastReadingToUpload = timeStampLastReadingToUpload {
-                    trace("in uploadBgReadingsToNightscout, in uploadBgReadingsToNightscout, upload succeeded, timeStampLatestNightscoutUploadedBgReading = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, timeStampLastReadingToUpload.formatted(date: .abbreviated, time: .standard))
+                    trace("in uploadBgReadingsToNightscout, in uploadBgReadingsToNightscout, upload succeeded, timeStampLatestNightscoutUploadedBgReading = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, troubleshooting: .detailed(.integration(name: .nightscout, activity: .succeeded(itemCount: bgReadingsToUpload.count))), timeStampLastReadingToUpload.formatted(date: .abbreviated, time: .standard))
                     
                     UserDefaults.standard.timeStampLatestNightscoutUploadedBgReading = timeStampLastReadingToUpload
                     
@@ -1061,6 +1520,35 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 completionHandler()
             }
         }
+    }
+
+    private func uploadDataAsync(dataToUpload: Any, httpMethod: String?, path: String) async -> Bool {
+        await withCheckedContinuation { continuation in
+            uploadDataAndGetResponse(dataToUpload: dataToUpload, httpMethod: httpMethod, path: path) { _, nightscoutResult in
+                continuation.resume(returning: nightscoutResult.successFull())
+            }
+        }
+    }
+
+    private func uploadBgReadingsReplacementChunksToNightscout(bgReadings: [BgReadingReplacementPayload]) async -> Bool {
+        guard bgReadings.count > 0 else { return true }
+
+        for chunkStartIndex in stride(from: 0, to: bgReadings.count, by: ConstantsNightscout.maxReadingsToUpload) {
+            let chunkEndIndex = min(chunkStartIndex + ConstantsNightscout.maxReadingsToUpload, bgReadings.count)
+            let bgReadingsChunk = Array(bgReadings[chunkStartIndex..<chunkEndIndex])
+            let bgReadingsDictionaryRepresentation = bgReadingsChunk.map { $0.dictionaryRepresentationForNightscoutUpload }
+
+            trace("in uploadBgReadingsReplacementChunksToNightscout, uploading BG replacement chunk %{public}@-%{public}@ of %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, (chunkStartIndex + 1).description, chunkEndIndex.description, bgReadings.count.description)
+
+            let uploadSucceeded = await uploadDataAsync(dataToUpload: bgReadingsDictionaryRepresentation, httpMethod: "POST", path: nightscoutEntriesPath)
+
+            if !uploadSucceeded {
+                trace("in uploadBgReadingsReplacementChunksToNightscout, BG replacement upload failed for chunk %{public}@-%{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, (chunkStartIndex + 1).description, chunkEndIndex.description)
+                return false
+            }
+        }
+
+        return true
     }
     
     /// common functionality to upload data to nightscout and get response
@@ -1138,7 +1626,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         
                         // error cases
                         if let error = error {
-                            trace("in uploadDataAndGetResponse, failed to upload, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+                            trace("in uploadDataAndGetResponse, failed to upload, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, troubleshooting: .detailed(.integration(name: .nightscout, activity: .failed)), error.localizedDescription)
                             
                             nightscoutResult = NightscoutResult.failed
                             
@@ -1161,6 +1649,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                                                     if code == 66 {
                                                         trace("in uploadDataAndGetResponse, found code = 66, considering the upload as successful", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error)
                                                         
+                                                        self.markNightscoutConnectionSucceeded()
                                                         nightscoutResult = NightscoutResult.success(0)
                                                         
                                                         return
@@ -1176,7 +1665,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                                     }
                                 }
                                 
-                                trace("in uploadDataAndGetResponse, failed to upload, statuscode = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, response.statusCode.description)
+                                trace("in uploadDataAndGetResponse, failed to upload, statuscode = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, troubleshooting: .detailed(.integration(name: .nightscout, activity: .failed)), response.statusCode.description)
                                 
                                 nightscoutResult = NightscoutResult.failed
                                 
@@ -1191,6 +1680,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         }
                         
                         // successful cases
+                        self.markNightscoutConnectionSucceeded()
                         nightscoutResult = NightscoutResult.success(0)
                     })
                     
@@ -1213,6 +1703,14 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             completionHandler(nil, NightscoutResult.failed)
         }
     }
+
+    /// Stores the time of the last confirmed Nightscout server response. The
+    /// Settings UI uses this same timestamp for the connection indicator, so
+    /// master-mode uploads/downloads should update it just like follower-mode
+    /// downloads and the manual Test Connection action do.
+    private func markNightscoutConnectionSucceeded() {
+        UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
+    }
     
     /// Upload treatments to nightscout, receives the JSON response with the asigned id's and sets the id's in Coredata.
     /// - parameters:
@@ -1230,7 +1728,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         trace("in uploadTreatmentsToNightscout, number of treatments to upload : %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, treatmentsToUpload.count.description)
         
         // map treatments to dictionaryRepresentation
-        let treatmentsDictionaryRepresentation = treatmentsToUpload.map { $0.dictionaryRepresentationForNightscoutUpload() }
+        let dateFormatter = Date.ISODateFormatter()
+        let treatmentsDictionaryRepresentation = treatmentsToUpload.map { $0.dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: dateFormatter) }
         
         // The responsedata will contain, in serialized json, the treatments ids assigned by the server.
         uploadDataAndGetResponse(dataToUpload: treatmentsDictionaryRepresentation, httpMethod: nil, path: nightscoutTreatmentPath) { (responseData: Data?, result: NightscoutResult) in
@@ -1403,7 +1902,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             for otherTreatmentEntry in otherTreatmentEntries {
                 // no need to add treatmentToDelete.
                 if otherTreatmentEntry.id != treatmentToDelete.id {
-                    // if there was already another treatmentEntry, then add it; otherwise create one
+                    // Add another treatment entry when one already exists. Otherwise create it.
                     if treatmentToUpdateAsDictionary != nil {
                         treatmentToUpdateAsDictionary?[otherTreatmentEntry.treatmentType.nightscoutFieldname()] = otherTreatmentEntry.value
                     } else {
@@ -1479,29 +1978,35 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// - returns:amount of locally updated treatmentEntries
     ///
     /// - !! does not save to coredata
-    /// - while the function iterates through treatmentEntries, didFindTreatmentInDownload will be updated and corresponding value will be set to true if a treatment is found at NS
-    private func checkIfChangedAtNightscout(forTreatmentEntries treatmentEntries: [TreatmentEntry], inTreatmentNSResponses treatmentNSResponses: [TreatmentNSResponse], didFindTreatmentInDownload: inout [Bool]) -> Int {
+    private func checkIfChangedAtNightscout(forTreatmentEntries treatmentEntries: [TreatmentEntry], inTreatmentNSResponses treatmentNSResponses: [TreatmentNSResponse]) -> Int {
         // used to trace how many new treatmenEntries are locally updated
         var amountOfUpdatedTreatmentEntries = 0
         
         // iterate through treatmentEntries
-        for (index, treatmentEntry) in treatmentEntries.enumerated() {
+        for treatmentEntry in treatmentEntries {
             // only handle treatmentEntries that are already uploaded
             if treatmentEntry.uploaded && treatmentEntry.id != TreatmentEntry.EmptyId {
                 for treatmentNSResponse in treatmentNSResponses {
                     // iterate through treatmentEntries
                     // find matching id
                     if treatmentNSResponse.id == treatmentEntry.id {
-                        // found the treatment in NS response, set didFindTreatmentInDownload to true for that treatment
-                        didFindTreatmentInDownload[index] = true
-                        
                         var treatmentUpdated = false
                         
+                        if treatmentEntry.treatmentdeleted {
+                            treatmentUpdated = true
+                            treatmentEntry.treatmentdeleted = false
+                        }
+
                         // check value, type and date. If NS has any difference, then update locally
                         
                         if treatmentNSResponse.value != treatmentEntry.value {
                             treatmentUpdated = true
                             treatmentEntry.value = treatmentNSResponse.value
+                        }
+
+                        if (treatmentNSResponse.valueSecondary ?? 0) != treatmentEntry.valueSecondary {
+                            treatmentUpdated = true
+                            treatmentEntry.valueSecondary = treatmentNSResponse.valueSecondary ?? 0
                         }
                         
                         if treatmentNSResponse.eventType != treatmentEntry.treatmentType {
@@ -1512,6 +2017,16 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         if treatmentNSResponse.createdAt.toMillisecondsAsInt64() != treatmentEntry.date.toMillisecondsAsInt64() {
                             treatmentUpdated = true
                             treatmentEntry.date = treatmentNSResponse.createdAt
+                        }
+
+                        if treatmentNSResponse.enteredBy != treatmentEntry.enteredBy {
+                            treatmentUpdated = true
+                            treatmentEntry.enteredBy = treatmentNSResponse.enteredBy
+                        }
+
+                        if treatmentNSResponse.notes != treatmentEntry.notes {
+                            treatmentUpdated = true
+                            treatmentEntry.notes = treatmentNSResponse.notes
                         }
                         
                         if treatmentUpdated {

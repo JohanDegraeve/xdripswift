@@ -7,30 +7,21 @@
 //
 
 import Foundation
-import UIKit
 
 /// constants for statistics view
 enum ConstantsStatistics {
+
+    /// shared axis label size for charts in the SwiftUI statistics view
+    static let chartAxisLabelFontSize: CGFloat = 12
+
+    /// fixed trailing axis column keeps the AGP and metric trend plot areas horizontally aligned
+    static let chartYAxisLabelWidth: CGFloat = 28
+
+    /// total space reserved between the trailing plot edge and the edge of its Statistics card
+    static let chartTrailingAxisWidth: CGFloat = 32
     
     /// animation speed when drawing the pie chart
     static let pieChartAnimationSpeed = 0.3
-    
-    /// label colors for the statistics
-    static let labelLowColor = UIColor.systemRed
-    static let labelInRangeColor = UIColor.systemGreen
-    static let labelHighColor = UIColor.systemYellow
-    
-    /// pie slice color for low
-    static let pieChartLowSliceColor = UIColor.systemRed
-    
-    /// pie slice color for in range
-    static let pieChartInRangeSliceColor = UIColor.init(red: 0.0, green: 0.6, blue: 0.0, alpha: 1)
-    
-    /// color for in range but darkened
-    static let pieChartInRangeSliceColorDarkened = UIColor.init(red: 0.0, green: 0.3, blue: 0.0, alpha: 1)
-    
-    /// pie slice color for high
-    static let pieChartHighSliceColor = UIColor.systemYellow
     
     /// contstants to define the standardised "Time in Range" (TIR) values in case the user prefers to use them
     /// published values from here: https://care.diabetesjournals.org/content/42/8/1593
@@ -45,9 +36,6 @@ enum ConstantsStatistics {
     static let standardisedHighValueForTITRInMgDl = 140.0
     static let standardisedLowValueForTITRInMmol = 3.9
     static let standardisedHighValueForTITRInMmol = 7.8
-    
-    /// highlight color when changing between TIR modes
-    static let highlightColorTitles: UIColor = .white
     
     /// minimum filter time in minutes (used for Libre 2 readings)
     static let minimumFilterTimeBetweenReadings: Double = 4.5
@@ -70,4 +58,3 @@ enum ConstantsStatistics {
     static let tirChartYAxisMinimumOffset = 10.0
     
 }
-

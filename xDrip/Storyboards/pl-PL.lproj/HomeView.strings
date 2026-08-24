@@ -126,7 +126,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code use 0000 but be aware that you will need to manually calibrate before you get readings.";
+"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -155,7 +155,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -165,3 +165,57 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "Pozostało %@";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Szum sensora";
+"sensorManagementNoiseShortTerm" = "Ostatnie 30 minut";
+"sensorManagementNoiseLongTerm" = "Ostatnie 4 godziny";
+"sensorManagementNoiseCollecting" = "Zbieranie danych";
+"sensorManagementNoiseLow" = "Niski";
+"sensorManagementNoiseElevated" = "Podwyższony";
+"sensorManagementNoiseVeryHigh" = "Bardzo wysoki";
+"sensorManagementNoiseExtreme" = "Ekstremalny";
+"sensorManagementNoiseFlatline" = "Sensor prawdopodobnie uległ awarii.";
+"sensorNoiseWarningExtremeTitle" = "Ekstremalny szum sensora";
+"sensorNoiseWarningPersistentTitle" = "Utrzymujący się szum sensora";
+"sensorNoiseWarningFlatlineTitle" = "Sygnał sensora jest płaski";
+"sensorNoiseHistoryTitle" = "Historia szumu";
+"sensorNoiseHistoryCurrentTitle" = "Bieżące pomiary";
+"sensorNoiseHistoryChartTitle" = "Szum w czasie";
+"sensorNoiseHistoryRangeTitle" = "Zakres czasu";
+"sensorNoiseHistoryDayRange" = "1d";
+"sensorNoiseHistoryThreeDayRange" = "3 dni";
+"sensorNoiseHistoryWeekRange" = "7 dni";
+"sensorNoiseHistoryAllRange" = "Wszystko";
+"sensorNoiseHistoryShortCompact" = "30 min";
+"sensorNoiseHistoryLongCompact" = "4 godz.";
+"sensorNoiseHistoryLoading" = "Tworzenie historii sensora";
+"sensorNoiseHistoryNoDataTitle" = "Za mało danych o szumie";
+"sensorNoiseHistoryNoDataMessage" = "Wykres pojawi się po zebraniu wystarczającej liczby odczytów sensora.";
+"sensorNoiseHistoryChartAccessibility" = "Wykres historii szumu sensora";
+"pumpBattery" = "Bateria";
+"pumpReservoir" = "Zbiornik";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Ostatnia";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Bardzo wysoki szum sensora";
+"sensorHealthPersistentNoiseGuidance" = "Bardzo wysoki szum od 12 godzin. Rozważ wymianę sensora, jeśli problem nie ustąpi.";
+"sensorHealthFlatlineTitle" = "Sygnał sensora jest płaski";
+"sensorHealthFlatlineGuidance" = "Odczyty nie zmieniły się od 30 minut. Zwykle oznacza to awarię/wygaśnięcie sensora.";
+"sensorHealthTemporaryIssueTitle" = "Tymczasowy problem z sensorem";
+"sensorHealthTemporaryIssueGuidance" = "Tymczasowy problem z sensorem od 3 godzin. Sprawdź glukometrem i postępuj zgodnie z zaleceniami producenta.";
+"sensorHealthSensorFailedTitle" = "Awaria sensora";
+"sensorHealthSensorFailedGuidance" = "Zgłoszono awarię sensora. Wymień sensor.";
+"sensorHealthTransmitterFailedTitle" = "Awaria nadajnika";
+"sensorHealthTransmitterFailedGuidance" = "Zgłoszono awarię nadajnika. Sprawdź go lub wymień.";
+"connectingToCGM" = "Łączenie z CGM...";
+"reconnectingToCGM" = "Ponowne łączenie z CGM...";

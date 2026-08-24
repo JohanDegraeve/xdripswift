@@ -1,8 +1,6 @@
 import Foundation
 import os
 
-// sourcre https://github.com/gui-dos/DiaBLE
-
 public enum LibreSensorType: String {
     
     // Libre 1
@@ -17,6 +15,8 @@ public enum LibreSensorType: String {
     case libre2C6 = "C6" // EU Libre 2 Plus (May 2024)
     
     case libre27F = "7F" // EU Libre 2 Plus (May 2025)
+
+    case libre27FNonPlus = "7F30" // EU Libre 2 (May 2025), source: https://github.com/gui-dos/DiaBLE
     
     case libreUS = "E5"
     
@@ -45,6 +45,9 @@ public enum LibreSensorType: String {
             
         case .libre27F:
             return "Libre 2 Plus EU 7F"
+
+        case .libre27FNonPlus:
+            return "Libre 2 EU 7F"
             
         case .libreUS:
             return "Libre US"
@@ -57,6 +60,28 @@ public enum LibreSensorType: String {
 
         }
         
+    }
+
+    /// True when the sensor's FRAM uses the Libre 2 encryption handled by PreLibre2.
+    var requiresLibre2Decryption: Bool {
+        switch self {
+        case .libre2, .libre2C5, .libre2C6, .libre27F, .libre27FNonPlus, .libreUS, .libreUSE6:
+            return true
+
+        case .libre1, .libre1A2, .libreProH:
+            return false
+        }
+    }
+
+    /// The newer 7F Libre 2 sensors advertise their MAC address instead of ABBOTT plus the serial number.
+    var usesMacAddressAsBluetoothName: Bool {
+        switch self {
+        case .libre27F, .libre27FNonPlus:
+            return true
+
+        default:
+            return false
+        }
     }
     
     /// decrypts for libre2 and libreUs,
@@ -71,7 +96,7 @@ public enum LibreSensorType: String {
         }
         
         // decrypt if libre2 or libreUS
-        if self == .libre2 || self == .libre2C5 || self == .libre2C6 || self == .libre27F || self == .libreUS || self == .libreUSE6 {
+        if requiresLibre2Decryption {
             
             var libreData = rxBuffer.subdata(in: headerLength..<(rxBufferEnd + 1))
 
@@ -116,46 +141,54 @@ public enum LibreSensorType: String {
 
     }
 
-    /// - reads the first byte in patchInfo and dependent on that value, returns type of sensor
+    /// - reads the sensor type from patchInfo and returns the matching Libre type
     /// - if patchInfo = nil, then returnvalue is Libre1
     /// - if first byte is unknown, then returns nil
     static func type(patchInfo: String?) -> LibreSensorType? {
         
         guard let patchInfo = patchInfo else {return .libre1}
         
-        guard patchInfo.count > 1 else {return nil}
+        guard let patchInfoBytes = Data(hexadecimalString: patchInfo), let sensorType = patchInfoBytes.first else {return nil}
         
-        let firstTwoChars = patchInfo[0..<2].uppercased()
-        
-        switch firstTwoChars {
+        switch sensorType {
             
-        case "DF":
+        case 0xDF:
             return .libre1
             
-        case "A2":
+        case 0xA2:
             return .libre1A2
             
-        case "9D":
+        case 0x9D:
             return .libre2
             
-        case "C5":
+        case 0xC5:
             return .libre2C5 // new Libre 2 EU type (May 2023)
             
-        case "C6":
+        case 0xC6:
             return .libre2C6 // new Libre 2 Plus EU type (May 2024)
             
-        case "7F":
-            return .libre27F // new Libre 2 Plus EU type (May 2025)
+        case 0x7F:
+            // The low nibble of the third patch-info byte differentiates the two 7F sensors.
+            // 7F 0E 30 01 is Libre 2 and 7F 0E 31 01 is Libre 2 Plus. Both use the same
+            // Libre 2 encryption and MAC-address BLE discovery. See:
+            // https://github.com/JohanDegraeve/xdripswift/issues/714
+            // https://github.com/JohanDegraeve/xdripswift/pull/720
+            guard patchInfoBytes.count >= 3 else {
+                // Preserve the previous Plus classification if incomplete patch info is received.
+                return .libre27F
+            }
+
+            return patchInfoBytes[2] & 0x0F == 0 ? .libre27FNonPlus : .libre27F
             
-        case "E5":
+        case 0xE5:
             return .libreUS
             
-        case "E6":
+        case 0xE6:
             return .libreUSE6
             
-        case "70":
+        case 0x70:
             return .libreProH
-            
+
         default:
             return nil
             
@@ -174,7 +207,7 @@ public enum LibreSensorType: String {
         case .libre1A2:
             return 14.5
 
-        case .libre2, .libre2C5:
+        case .libre2, .libre2C5, .libre27FNonPlus:
             return 14.5
             
         case .libre2C6, .libre27F:
@@ -193,5 +226,3 @@ public enum LibreSensorType: String {
 
     
 }
-
-

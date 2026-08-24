@@ -14,6 +14,8 @@
 "common_minute" = "мин";
 "common_day" = "день";
 "common_days" = "дней";
+"common_landscape_comparingWithLast" = "Сравнение с последними:";
+"common_landscape_comparisonDays" = "%d дней";
 "common_today" = "Сегодня";
 "common_week" = "неделя";
 "common_hourshort" = "ч";

@@ -2,14 +2,19 @@
 /// title of the cell where transmitter battery level is shown in detailed screen
 "batteryLevel" = "Batteriestand";
 
+"heartbeatDeviceFooter" = "Ein Heartbeat-Gerät liefert keine Glukosewerte. Es nutzt Bluetooth-Aktivität, um die App im Hintergrund zu wecken, damit Follower-Aktualisierungen, Alarme, Badges und Benachrichtigungen weiterlaufen können.";
+"m5StackDeviceFooter" = "M5Stack-Geräte sind kleine ESP32-basierte externe Displays. Sie können Glukosewerte anzeigen, die xDrip4iOS per Bluetooth sendet.";
+"noBluetoothPeripheralsConfigured" = "Keine Bluetooth-Geräte eingerichtet";
+
 /// when clicking add button in screen with list of bluetoothperipherals, title of pop up where user  needs to select bluetooth peripheral category
-"selectCategory" = "Gerät wählen";
+"selectCategory" = "Typ wählen";
 
 /// When adding a new cgm transmitter, but the user has another one already which is either connected or trying to connect
 "noMultipleActiveCGMsAllowed" = "Sie haben bereits einen Sensor verbunden.\n\nPrüfen Sie Ihre anderen CGM-Sensoren und klicken Sie auf 'Stop Scannen', 'Trennen' oder löschen Sie einfach.";
+"noMultipleActiveCGMsAllowedFooter" = "Sie haben bereits ein CGM verbunden.";
 
 /// when clicking add button in screen with list of bluetoothperipherals, after having selected the category, a new pop up appears, this is the title of pop up where user  needs to select bluetooth peripheral type
 "selectType" = "Transmitter wählen";
 
 /// when Bluetooth Peripheral list is shown, title of the view
-"screenTitle" = "Bluetooth";
+"screenTitle" = "Geräte";

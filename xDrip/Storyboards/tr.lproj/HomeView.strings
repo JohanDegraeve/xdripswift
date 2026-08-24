@@ -36,7 +36,7 @@
 "success" = "Başarı";
 "failed" = "Başarısız oldu";
 "dexcomBatteryTooLow" = "Verici pili çok düşük!";
-"enterSensorCode" = "sensör kodunuz yoksa 0000 kullanın, ancak kalibre edene kadar okuma almayacağınızı unutmayın.";
+"enterSensorCode" = "Sensör kodunu bilmiyorsanız 0000 kullanmak için bunu boş bırakın. Kod girmeden OK düğmesine basarsanız sensör kodu olarak 0000 kullanılır veya zaten başlamışsa mevcut oturum yakalanır.";
 "stopSensorConfirmation" = "Sensörü durdurmak istediğinizden emin misiniz?";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -69,3 +69,57 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "%@ kaldı";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Sensör gürültüsü";
+"sensorManagementNoiseShortTerm" = "Son 30 dakika";
+"sensorManagementNoiseLongTerm" = "Son 4 saat";
+"sensorManagementNoiseCollecting" = "Veriler toplanıyor";
+"sensorManagementNoiseLow" = "Düşük";
+"sensorManagementNoiseElevated" = "Artmış";
+"sensorManagementNoiseVeryHigh" = "Çok yüksek";
+"sensorManagementNoiseExtreme" = "Aşırı";
+"sensorManagementNoiseFlatline" = "Sensör büyük olasılıkla arızalandı.";
+"sensorNoiseWarningExtremeTitle" = "Aşırı sensör gürültüsü";
+"sensorNoiseWarningPersistentTitle" = "Kalıcı sensör gürültüsü";
+"sensorNoiseWarningFlatlineTitle" = "Sensör sinyali düz";
+"sensorNoiseHistoryTitle" = "Gürültü geçmişi";
+"sensorNoiseHistoryCurrentTitle" = "Mevcut ölçümler";
+"sensorNoiseHistoryChartTitle" = "Zaman içinde gürültü";
+"sensorNoiseHistoryRangeTitle" = "Zaman aralığı";
+"sensorNoiseHistoryDayRange" = "1d";
+"sensorNoiseHistoryThreeDayRange" = "3 gün";
+"sensorNoiseHistoryWeekRange" = "7 gün";
+"sensorNoiseHistoryAllRange" = "Tümü";
+"sensorNoiseHistoryShortCompact" = "30 dk";
+"sensorNoiseHistoryLongCompact" = "4 sa";
+"sensorNoiseHistoryLoading" = "Sensör geçmişi oluşturuluyor";
+"sensorNoiseHistoryNoDataTitle" = "Henüz yeterli gürültü verisi yok";
+"sensorNoiseHistoryNoDataMessage" = "Yeterli sensör okuması toplandıktan sonra grafik görünecektir.";
+"sensorNoiseHistoryChartAccessibility" = "Sensör gürültüsü geçmişi grafiği";
+"pumpBattery" = "Pil";
+"pumpReservoir" = "Rezervuar";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Son";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Çok Yüksek Sensör Gürültüsü";
+"sensorHealthPersistentNoiseGuidance" = "12 saattir çok yüksek gürültü. Devam ederse sensörü değiştirmeyi düşünün.";
+"sensorHealthFlatlineTitle" = "Sensör Sinyali Sabit";
+"sensorHealthFlatlineGuidance" = "Okumalar 30 dakikadır değişmedi. Bu genellikle sensörün arızalandığını/süresinin dolduğunu gösterir.";
+"sensorHealthTemporaryIssueTitle" = "Geçici Sensör Sorunu";
+"sensorHealthTemporaryIssueGuidance" = "3 saattir geçici sensör sorunu. Ölçüm cihazıyla kontrol edin ve üreticinin talimatlarını izleyin.";
+"sensorHealthSensorFailedTitle" = "Sensör Arızası";
+"sensorHealthSensorFailedGuidance" = "Sensör arızası bildirildi. Sensörü değiştirin.";
+"sensorHealthTransmitterFailedTitle" = "Verici Arızası";
+"sensorHealthTransmitterFailedGuidance" = "Verici arızası bildirildi. Kontrol edin veya değiştirin.";
+"connectingToCGM" = "CGM'ye bağlanıyor...";
+"reconnectingToCGM" = "CGM'ye yeniden bağlanıyor...";

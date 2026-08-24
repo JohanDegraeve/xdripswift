@@ -6,6 +6,12 @@
 
 /// an alentry is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule
 "alertvalue" = "Value";
+"alerts_snooze_high_title" = "Alta";
+"alerts_snooze_very_high_title" = "Molto alta";
+"alerts_snooze_low_title" = "Bassa";
+"alerts_snooze_very_low_title" = "Molto bassa";
+"alerts_snooze_fast_drop_title" = "Discesa rapida";
+"alerts_snooze_fast_rise_title" = "Salita rapida";
 
 /// When very low alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert
 "alerts_lowalerttitle" = "Low Alarm";

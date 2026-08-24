@@ -22,59 +22,23 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// bubble
     case BubbleType = "Nano/Bubble/Bubble Mini"
     
-    /// Dexcom
-    case DexcomType = "Dexcom G5/G6/ONE"
+    /// 2026-08-13: G5 remains supported for existing devices, but is no longer
+    /// advertised as an option when adding a new Dexcom transmitter.
+    case DexcomType = "Dexcom G6/ONE"
     
-    /// Dexcom G7
-    case DexcomG7Type = "Dexcom G7/ONE+/Stelo"
+    /// Dexcom G7, Dexcom G7 heartbeat
+    case DexcomG7Type, DexcomG7HeartBeatType = "Dexcom G7/ONE+/Stelo"
     
     /// to use a Libre (such as L2 US/CA/AUS or Libre 3/Libre 3 Plus) or just any generic heartbeat device as heartbeat
-    case Libre3HeartBeatType = "Libre/Generic HeartBeat"
-    
-    /// DexcomG7 heartbeat
-    case DexcomG7HeartBeatType = "Dexcom G7/ONE+/Stelo HeartBeat"
+    case Libre3HeartBeatType = "Libre/Generic"
     
     /// omnipod heartbeat
-    case OmniPodHeartBeatType = "OmniPod HeartBeat"
+    case OmniPodHeartBeatType = "OmniPod"
 
-    /// - returns: the BluetoothPeripheralViewModel. If nil then there's no specific settings for the tpe of bluetoothPeripheral
-    func viewModel() -> BluetoothPeripheralViewModel? {
-        
-        switch self {
-            
-        case .M5StackType:
-            return M5StackBluetoothPeripheralViewModel()
-            
-        case .M5StickCType:
-            return M5StickCBluetoothPeripheralViewModel()
-            
-        case .DexcomType:
-            return DexcomG5BluetoothPeripheralViewModel()
-            
-        case .BubbleType:
-            return BubbleBluetoothPeripheralViewModel()
-            
-        case .MiaoMiaoType:
-            return MiaoMiaoBluetoothPeripheralViewModel()
-            
-        case .Libre2Type:
-            return Libre2BluetoothPeripheralViewModel()
-            
-        case .Libre3HeartBeatType:
-            return Libre3HeartBeatBluetoothPeripheralViewModel()
-            
-        case .DexcomG7HeartBeatType:
-            return DexcomG7HeartBeatBluetoothPeripheralViewModel()
-            
-        case .OmniPodHeartBeatType:
-            return OmniPodHeartBeatBluetoothPeripheralViewModel()
+    /// Medtrum TouchCare Nano Pump with integrated CGM data relayed by the pump BLE session.
+    /// Keep this raw value stable because it is persisted with Bluetooth peripheral records.
+    case MedtrumTouchCareNanoType = "Medtrum Nano"
 
-        case .DexcomG7Type:
-            return DexcomG7BluetoothPeripheralViewModel()
-        }
-
-    }
-    
     func createNewBluetoothPeripheral(withAddress address: String, withName name: String, nsManagedObjectContext: NSManagedObjectContext) -> BluetoothPeripheral {
         
         switch self {
@@ -114,6 +78,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .DexcomG7Type:
             return DexcomG7(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
 
+        case .MedtrumTouchCareNanoType:
+            return MedtrumTouchCareNano(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+
         }
 
     }
@@ -126,7 +93,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .M5StackType, .M5StickCType:
             return .M5Stack
             
-        case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type:
+        case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type, .MedtrumTouchCareNanoType:
             return .CGM
 
         case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
@@ -245,6 +212,18 @@ enum BluetoothPeripheralType: String, CaseIterable {
         }
         
     }
+
+    /// Whether a disconnected Bluetooth state is expected between normal reading cycles.
+    /// These Dexcom integrations advertise briefly and reconnect for each reading instead of
+    /// maintaining the continuous connection expected from the other supported peripherals.
+    var usesIntermittentConnection: Bool {
+        switch self {
+        case .DexcomType, .DexcomG7Type, .DexcomG7HeartBeatType:
+            return true
+        default:
+            return false
+        }
+    }
     
     /// can we show the transmitter read sucess row?
     /// basically only show it for CGM transmitters and hide for heartbeat and M5Stack types
@@ -257,5 +236,3 @@ enum BluetoothPeripheralType: String, CaseIterable {
         }
     }
 }
-
-

@@ -9,6 +9,12 @@
 import Foundation
 import SwiftUI
 
+#if canImport(WatchKit)
+import WatchKit
+#elseif canImport(UIKit)
+import UIKit
+#endif
+
 enum ConstantsAppleWatch {
     
     /// an array holding the different "chart hour to show" options when swiping left/right
@@ -34,5 +40,30 @@ enum ConstantsAppleWatch {
     
     /// SFSymbol name as a string for the "requesting data" symbol
     static let requestingDataIconSFSymbolName: String = "circle.fill"
+    
+    static func screenWidth() -> Double {
+        #if canImport(WatchKit)
+        return WKInterfaceDevice.current().screenBounds.size.width
+        #elseif canImport(UIKit)
+        return UIScreen.main.bounds.size.width
+        #else
+        return 0
+        #endif
+    }
+
+    // return the physical screen height so the watch app can size layouts across different watch models
+    static func screenHeight() -> Double {
+        #if canImport(WatchKit)
+        return WKInterfaceDevice.current().screenBounds.size.height
+        #elseif canImport(UIKit)
+        return UIScreen.main.bounds.size.height
+        #else
+        return 0
+        #endif
+    }
+    
+    static func isSmallScreen() -> Bool {
+        return screenWidth() < pixelWidthLimitForSmallScreen
+    }
     
 }

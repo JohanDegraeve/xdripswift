@@ -4,7 +4,7 @@
 "alerttypesettingsview_enabled" = "Включено";
 "alerttypesettingsview_vibrate" = "Вибрация";
 "alerttypesettingsview_snoozevianotification" = "Разрешить повтор через уведомление";
-"alerttypesettingsview_defaultsnoozeperiod" = "Время повтора по умолчанию (мин)";
+"alerttypesettingsview_defaultsnoozeperiod" = "Время повтора по умолчанию";
 "alerttypesettingsview_overridemute" = "Отменить отключение звука";
 "alerttypesettingsview_sound" = "Звук";
 "alerttypesettingsview_defaultiossound" = "Звук iOS";
@@ -14,4 +14,3 @@
 "alertTypeNoSound" = "Нет звука";
 "alerttypenamealreadyexistsmessages" = "Тип тревоги с таким именем уже существует. Используйте другое имя";
 "confirmdeletionalerttype" = "Удалить тип тревоги: ";
-

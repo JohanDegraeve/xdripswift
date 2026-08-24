@@ -13,6 +13,14 @@
 "battery" = "Pil";
 "needsTransmitterId" = "Verici Kimliği Eksik";
 "scan" = "Tara";
+"medtrumNanoPumpScanNoticeTitle" = "Medtrum Nano Pompa Bağlantısı";
+"medtrumNanoPumpScanNoticeMessage" = "Bu seçenek doğrudan Nano CGM vericisine değil, Medtrum Nano pompaya bağlanır.\n\nTaramadan önce EasyPatch'in çalıştığından, pompaya bağlı olduğundan ve güncel CGM değerlerini aldığından emin olun.\n\nEasyPatch her zaman çalışır durumda kalmalı ve değerleri almaya devam etmelidir.";
+"libre2ScanNoticeTitle" = "Libre Uygulaması Bluetooth";
+"libre2ScanNoticeMessage" = "Taramadan önce iPhone ayarlarından Libre uygulamasının Bluetooth iznini devre dışı bırakın.\n\nLibre uygulamasının Bluetooth izni her zaman devre dışı kalmalıdır. Aksi takdirde Libre uygulaması sensör bağlantısını devralabilir ve bu uygulamanın değer almasını durdurabilir.";
+"dexcomG6ScanNoticeTitle" = "Dexcom Uygulaması Bağlantısı";
+"dexcomG6ScanNoticeMessage" = "Taramadan önce Dexcom uygulamasını zorla kapatın veya Bluetooth iznini devre dışı bırakın.\n\nBu uygulama tarama yaparken veya değer alırken Dexcom uygulaması vericiye bağlı olmamalıdır.";
+"dexcomG7ScanNoticeTitle" = "Dexcom G7 Uygulaması Gerekli";
+"dexcomG7ScanNoticeMessage" = "Taramadan önce Dexcom G7 uygulamasının arka planda çalıştığından, sensöre bağlı olduğundan ve güncel glikoz değerlerini aldığından emin olun.\n\nDexcom G7 uygulaması her zaman çalışır durumda kalmalı ve değerleri almaya devam etmelidir.";
 "readyToScan" = "Taramaya Hazır";
 "scanning" = "Tarıyor";
 "disconnect" = "Bağlantıyı kes";
@@ -31,7 +39,11 @@
 "confirmDisconnectMessage" = "Verici bağlantısını gerçekten kesmek istediğinizi onaylamak için 'Bağlantıyı Kes'i tıklayın.";
 "transmittterStartDate" = "Vericiyi Başlatın";
 "sensorStartDate" = "Sensörü Başlat";
-"useOtherDexcomApp" = "Dexcom-app uygulamasını takip et";
+"useOtherDexcomApp" = "Birlikte çalışma modu";
+"useOtherDexcomAppCoexistenceFooter" = "Birlikte çalışma modu, Dexcom veya CamAPS gibi başka bir uygulamayla çalışmamızı sağlar. Bu uygulama arka planda çalışmaya devam etmelidir.";
+"useOtherDexcomAppPrimaryFooter" = "Birincil mod ana uygulama olarak bağlanır ve bağlantıyı kontrol eder.";
+"runningInCoexistenceMode" = "Birlikte çalışma modunda çalışıyor";
+"runningInPrimaryMode" = "Birincil modda çalışıyor";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -66,3 +78,33 @@
 
 /// Tell the user the scan was successful and to just wait now for connection
 "nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+
+/// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
+"readSuccessLast24Hours" = "Son 24 Saat";
+/// Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings
+"readSuccessReadingsReceived" = "%d / %d okuma alındı";
+/// Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated
+"readSuccessCadenceFooter" = "Beklenen okumalar, %@ için gözlenen verici aralığına dayanır.";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for good read success
+"readSuccessLegendGood" = "İyi";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success
+"readSuccessLegendLow" = "Düşük";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for poor read success
+"readSuccessLegendPoor" = "Kötü";
+/// Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available
+"readSuccessLegendNoData" = "Veri yok";
+/// Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings
+"readSuccessNoReadingsExpected" = "Beklenen okuma yok";
+/// Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket
+"readSuccessTimelineAccessibility" = "%0.1f yüzde, %d / %d okuma";
+
+/// Bluetooth peripheral screen. Row title and screen title for read success information
+"readSuccess" = "Okuma Başarısı";
+/// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
+"readSuccessNow" = "Şimdi";
+"scanningForTransmitter" = "Aranıyor...";
+"connecting" = "Bağlanıyor";
+"connectingToTransmitter" = "Connecting...";
+"reconnecting" = "Yeniden bağlanıyor";
+"reconnectingToTransmitter" = "Yeniden bağlanıyor...";
+"waiting" = "Bekleniyor...";

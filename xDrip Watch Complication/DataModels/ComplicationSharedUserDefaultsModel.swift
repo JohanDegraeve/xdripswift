@@ -20,5 +20,4 @@ struct ComplicationSharedUserDefaultsModel: Codable {
     var highLimitInMgDl: Double
     var urgentHighLimitInMgDl: Double
     var keepAliveIsDisabled: Bool
-    var liveDataIsEnabled: Bool
 }

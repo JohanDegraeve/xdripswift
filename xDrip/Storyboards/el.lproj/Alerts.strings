@@ -1,4 +1,10 @@
 "alertsettingsview_screentitle" = "Ειδοποιήσεις";
+"alerts_snooze_high_title" = "Υψηλή γλυκόζη";
+"alerts_snooze_very_high_title" = "Πολύ υψηλή γλυκόζη";
+"alerts_snooze_low_title" = "Χαμηλή γλυκόζη";
+"alerts_snooze_very_low_title" = "Πολύ χαμηλή γλυκόζη";
+"alerts_snooze_fast_drop_title" = "Η γλυκόζη πέφτει γρήγορα";
+"alerts_snooze_fast_rise_title" = "Η γλυκόζη αυξάνεται γρήγορα";
 "alertssettingsview_screentitle" = "Επεξεργασία ειδοποίησης";
 "alerts_highalerttitle" = "Υψηλή γλυκόζη";
 "alerts_veryhighalerttitle" = "Πολύ υψηλή γλυκόζη";

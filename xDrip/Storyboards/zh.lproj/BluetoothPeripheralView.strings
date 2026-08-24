@@ -74,6 +74,14 @@
 
 /// text in button to start scanning
 "scan" = "Scan";
+"medtrumNanoPumpScanNoticeTitle" = "连接 Medtrum Nano 胰岛素泵";
+"medtrumNanoPumpScanNoticeMessage" = "此选项连接 Medtrum Nano 胰岛素泵，而不是直接连接 Nano CGM 发射器。\n\n扫描前，请确保 EasyPatch 正在运行、已连接到胰岛素泵并正在接收当前 CGM 数值。\n\nEasyPatch 必须始终保持运行并持续接收数值。";
+"libre2ScanNoticeTitle" = "Libre 应用的蓝牙权限";
+"libre2ScanNoticeMessage" = "扫描前，请在 iPhone 设置中停用 Libre 应用的蓝牙权限。\n\nLibre 应用的蓝牙权限必须始终保持停用。否则，Libre 应用可能会接管传感器连接，导致此应用无法接收数值。";
+"dexcomG6ScanNoticeTitle" = "Dexcom 应用连接";
+"dexcomG6ScanNoticeMessage" = "扫描前，请强制关闭 Dexcom 应用或停用其蓝牙权限。\n\n此应用扫描或接收数值时，Dexcom 应用不得连接到发射器。";
+"dexcomG7ScanNoticeTitle" = "需要 Dexcom G7 应用";
+"dexcomG7ScanNoticeMessage" = "扫描前，请确保 Dexcom G7 应用正在后台运行、已连接到传感器并正在接收当前血糖值。\n\nDexcom G7 应用必须始终保持运行并持续接收数值。";
 
 /// cell text, where the disconnection timestamp is shown
 "disConnectedAt" = "Disconnected At";
@@ -95,7 +103,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Use With Other App";
+"useOtherDexcomApp" = "共存模式";
+"useOtherDexcomAppCoexistenceFooter" = "共存模式允许我们与其他应用（例如 Dexcom 或 CamAPS）配合使用。该应用必须持续在后台运行。";
+"useOtherDexcomAppPrimaryFooter" = "主模式作为主应用连接并控制连接。";
+"runningInCoexistenceMode" = "正在共存模式下运行";
+"runningInPrimaryMode" = "正在主模式下运行";
 
 /// Disconnect transmitter, title
 "confirmDisconnectTitle" = "Confirm Disconnect";
@@ -142,3 +154,33 @@
 
 /// Tell the user the scan was successful and to just wait now for connection
 "nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+
+/// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
+"readSuccessLast24Hours" = "过去 24 小时";
+/// Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings
+"readSuccessReadingsReceived" = "已收到 %d / %d 条读数";
+/// Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated
+"readSuccessCadenceFooter" = "预期读数基于 %@ 观察到的发送器间隔。";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for good read success
+"readSuccessLegendGood" = "良好";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success
+"readSuccessLegendLow" = "偏低";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for poor read success
+"readSuccessLegendPoor" = "较差";
+/// Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available
+"readSuccessLegendNoData" = "无数据";
+/// Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings
+"readSuccessNoReadingsExpected" = "无预期读数";
+/// Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket
+"readSuccessTimelineAccessibility" = "%0.1f%%，%d / %d 条读数";
+
+/// Bluetooth peripheral screen. Row title and screen title for read success information
+"readSuccess" = "读取成功率";
+/// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
+"readSuccessNow" = "现在";
+"scanningForTransmitter" = "正在搜索...";
+"connecting" = "正在连接";
+"connectingToTransmitter" = "Connecting...";
+"reconnecting" = "正在重新连接";
+"reconnectingToTransmitter" = "正在重新连接...";
+"waiting" = "等待中...";

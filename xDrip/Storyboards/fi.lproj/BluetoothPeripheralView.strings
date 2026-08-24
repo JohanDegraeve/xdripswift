@@ -13,6 +13,14 @@
 "battery" = "Akku";
 "needsTransmitterId" = "Lähettimen tunnus puuttuu";
 "scan" = "Skannaa";
+"medtrumNanoPumpScanNoticeTitle" = "Yhteys Medtrum Nano -pumppuun";
+"medtrumNanoPumpScanNoticeMessage" = "Tämä valinta muodostaa yhteyden Medtrum Nano -pumppuun, ei suoraan Nano CGM -lähettimeen.\n\nVarmista ennen skannausta, että EasyPatch on käynnissä, yhdistetty pumppuun ja vastaanottaa ajantasaisia CGM-arvoja.\n\nEasyPatchin on pysyttävä käynnissä ja vastaanotettava arvoja jatkuvasti.";
+"libre2ScanNoticeTitle" = "Libre-sovelluksen Bluetooth";
+"libre2ScanNoticeMessage" = "Poista ennen skannausta Libre-sovelluksen Bluetooth-oikeus käytöstä iPhonen asetuksissa.\n\nLibre-sovelluksen Bluetooth-oikeuden on pysyttävä aina poissa käytöstä. Muuten Libre-sovellus voi ottaa anturiyhteyden haltuunsa ja estää tätä sovellusta vastaanottamasta arvoja.";
+"dexcomG6ScanNoticeTitle" = "Dexcom-sovelluksen yhteys";
+"dexcomG6ScanNoticeMessage" = "Pakota Dexcom-sovellus sulkeutumaan ennen skannausta tai poista sen Bluetooth-oikeus käytöstä.\n\nDexcom-sovellus ei saa olla yhdistettynä lähettimeen, kun tämä sovellus skannaa tai vastaanottaa arvoja.";
+"dexcomG7ScanNoticeTitle" = "Dexcom G7 -sovellus vaaditaan";
+"dexcomG7ScanNoticeMessage" = "Varmista ennen skannausta, että Dexcom G7 -sovellus on käynnissä taustalla, yhdistetty anturiin ja vastaanottaa ajantasaisia glukoosiarvoja.\n\nDexcom G7 -sovelluksen on pysyttävä käynnissä ja vastaanotettava arvoja jatkuvasti.";
 "readyToScan" = "Valmis skannaamaan";
 "scanning" = "Skannaamassa";
 "disconnect" = "Katkaise";
@@ -29,8 +37,11 @@
 "cannotActiveCGMInFollowerMode" = "Et voi aktivoida CGM:ää seuraaja-tilassa";
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Lue Dexcom-sovelluksesta";
-
+"useOtherDexcomApp" = "Rinnakkaiskäyttötila";
+"useOtherDexcomAppCoexistenceFooter" = "Rinnakkaiskäyttötila sallii meidän toimia toisen sovelluksen, kuten Dexcomin tai CamAPSin, kanssa. Sovelluksen on pysyttävä käynnissä taustalla.";
+"useOtherDexcomAppPrimaryFooter" = "Ensisijainen tila yhdistää pääsovelluksena ja hallitsee yhteyttä.";
+"runningInCoexistenceMode" = "Käytössä rinnakkaiskäyttötilassa";
+"runningInPrimaryMode" = "Käytössä ensisijaisessa tilassa";
 /// Disconnect transmitter, title
 "confirmDisconnectTitle" = "Vahvista yhteyden katkaisu";
 
@@ -76,3 +87,33 @@
 
 /// Tell the user the scan was successful and to just wait now for connection
 "nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+
+/// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
+"readSuccessLast24Hours" = "Viimeiset 24 tuntia";
+/// Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings
+"readSuccessReadingsReceived" = "%d/%d lukemaa vastaanotettu";
+/// Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated
+"readSuccessCadenceFooter" = "Odotetut lukemat perustuvat lähettimen havaittuun rytmiin: %@.";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for good read success
+"readSuccessLegendGood" = "Hyvä";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success
+"readSuccessLegendLow" = "Matala";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for poor read success
+"readSuccessLegendPoor" = "Huono";
+/// Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available
+"readSuccessLegendNoData" = "Ei tietoja";
+/// Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings
+"readSuccessNoReadingsExpected" = "Ei odotettuja lukemia";
+/// Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket
+"readSuccessTimelineAccessibility" = "%0.1f prosenttia, %d/%d lukemaa";
+
+/// Bluetooth peripheral screen. Row title and screen title for read success information
+"readSuccess" = "Lukemien onnistuminen";
+/// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
+"readSuccessNow" = "Nyt";
+"scanningForTransmitter" = "Etsitään...";
+"connecting" = "Yhdistetään";
+"connectingToTransmitter" = "Connecting...";
+"reconnecting" = "Yhdistetään uudelleen";
+"reconnectingToTransmitter" = "Yhdistetään uudelleen...";
+"waiting" = "Odotetaan...";

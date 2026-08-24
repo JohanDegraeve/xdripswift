@@ -20,6 +20,10 @@ enum ConstantsNotifications {
         static let fastRiseAlert = "fastRiseAlert"
         /// phone battery low
         static let phoneBatteryLow = "phoneBatteryLow"
+        /// not looping
+        static let notLoopingAlert = "notLoopingAlert"
+        /// manufacturer-reported terminal sensor or transmitter failure
+        static let sensorTransmitterFailure = "sensorTransmitterFailure"
     }
     
     /// identifiers for calibration requests
@@ -33,6 +37,11 @@ enum ConstantsNotifications {
     enum NotificationIdentifierForBgReading {
         /// bgreading notification
         static let bgReadingNotificationRequest = "bgReadingNotificationRequest"
+    }
+    
+    enum NotificationIdentifierForBgPostProcessing {
+        /// bg post processing update notification
+        static let bgPostProcessingDidUpdate = "bgPostProcessingDidUpdate"
     }
     
     enum NotificationIdentifierForSensorNotDetected {

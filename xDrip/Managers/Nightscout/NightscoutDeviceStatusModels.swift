@@ -12,7 +12,7 @@ import SwiftUI
 
 /// Struct to hold internal DeviceStatus
 /// Initialize from a NightscoutDeviceStatusResponse
-struct NightscoutDeviceStatus: Codable {
+struct NightscoutDeviceStatus: Codable, Sendable {
     var updatedDate: Date = .distantPast
     var lastCheckedDate: Date = .distantPast
     
@@ -140,41 +140,8 @@ struct NightscoutDeviceStatus: Codable {
     // as the minimum deployment target is iOS16.2, we need to provide a nice option for people running it
     // even if nearly all users will be running iOS18
     func batteryImage(percent: Int?) -> (image: Image, color: Color)? {
-        if let percent {
-            switch percent {
-            case 0...10:
-                if #available(iOS 17.0, *) {
-                    return (Image(systemName: "battery.0percent"), Color(.systemRed))
-                } else {
-                    return (Image(systemName: "minus.plus.batteryblock.slash"), Color(.systemRed))
-                }
-            case 11...25:
-                if #available(iOS 17.0, *) {
-                    return (Image(systemName: "battery.25percent"), Color(.systemYellow))
-                } else {
-                    return (Image(systemName: "minus.plus.batteryblock"), Color(.systemYellow))
-                }
-            case 26...65:
-                if #available(iOS 17.0, *) {
-                    return (Image(systemName: "battery.50percent"), Color(.colorSecondary))
-                } else {
-                    return (Image(systemName: "minus.plus.batteryblock"), Color(.colorSecondary))
-                }
-            case 66...90:
-                if #available(iOS 17.0, *) {
-                    return (Image(systemName: "battery.75percent"), Color(.colorSecondary))
-                } else {
-                    return (Image(systemName: "minus.plus.batteryblock.fill"), Color(.colorSecondary))
-                }
-            default:
-                if #available(iOS 17.0, *) {
-                    return (Image(systemName: "battery.100percent"), Color(.colorSecondary))
-                } else {
-                    return (Image(systemName: "minus.plus.batteryblock.fill"), Color(.colorSecondary))
-                }
-            }
-        }
-        return nil
+        guard let indicator = ConstantsHomeView.batteryIndicator(percent: percent) else { return nil }
+        return (Image(systemName: indicator.systemImage), indicator.color)
     }
     
     func uploaderBatteryImageRVCStatusView() -> (batteryImageSystemName: String, batteryImageColor: UIColor)? {
@@ -190,6 +157,28 @@ struct NightscoutDeviceStatus: Codable {
         }
         return nil
     }
+
+    /// SwiftUI style for the low uploader-battery warning shown on compact status views.
+    func uploaderBatteryStatusStyle() -> (systemImage: String, color: Color)? {
+        guard let uploaderBatteryPercent, uploaderIsCharging == false else { return nil }
+
+        switch uploaderBatteryPercent {
+        case 0...10:
+            if #available(iOS 17.0, *) {
+                return ("battery.0percent", ConstantsAppColors.urgent)
+            } else {
+                return ("minus.plus.batteryblock.slash", ConstantsAppColors.urgent)
+            }
+        case 11...25:
+            if #available(iOS 17.0, *) {
+                return ("battery.25percent", ConstantsAppColors.warning)
+            } else {
+                return ("minus.plus.batteryblock", ConstantsAppColors.warning)
+            }
+        default:
+            return nil
+        }
+    }
     
     func uploaderBatteryChargingImage() -> (image: Image, color: Color)? {
         if let uploaderIsCharging {
@@ -202,76 +191,34 @@ struct NightscoutDeviceStatus: Codable {
         return nil
     }
     
-    func deviceStatusColor() -> Color {
-        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return .green
-        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return .green
-        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return .yellow
-        } else {
-            return .red
-        }
+    /// Uses the shared loop state for every color, title and icon presentation.
+    func deviceStatusColor(referenceDate: Date = .now) -> Color {
+        aidStatus.presentation(referenceDate: referenceDate).color
     }
     
-    func deviceStatusBannerBackgroundColor() -> Color {
-        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return Color(red: 0, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
-        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return Color(red: 0, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
-        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return Color(red: 1, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
-        } else {
-            return Color(red: 1, green: 0, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
-        }
+    func deviceStatusBannerBackgroundColor(referenceDate: Date = .now) -> Color {
+        aidStatus.presentation(referenceDate: referenceDate).color.opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
     }
     
-    func deviceStatusUIColor() -> UIColor {
-        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return .systemGreen
-        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return .systemGreen
-        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return .systemYellow
-        } else {
-            return .systemRed
-        }
+    func deviceStatusUIColor(referenceDate: Date = .now) -> UIColor {
+        UIColor(aidStatus.presentation(referenceDate: referenceDate).color)
     }
     
-    func deviceStatusTitle() -> String {
-        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return "Looping"
-        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return "Looping"
-        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return "Not looping"
-        } else {
-            return "Error/No data"
-        }
+    func deviceStatusTitle(referenceDate: Date = .now) -> String {
+        aidStatus.presentation(referenceDate: referenceDate).title
     }
-    
+
     func deviceStatusIconImage() -> Image {
-        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return Image(systemName: "checkmark.circle.fill")
-        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return Image(systemName: "checkmark.circle")
-        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return Image(systemName: "questionmark.circle")
-        } else {
-            return Image(systemName: "exclamationmark.circle")
-        }
+        Image(systemName: deviceStatusIconSystemName())
     }
-    
+
     func deviceStatusIconUIImage() -> UIImage {
-        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return UIImage(systemName: "checkmark.circle.fill") ?? UIImage()
-        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return UIImage(systemName: "checkmark.circle") ?? UIImage()
-        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return UIImage(systemName: "questionmark.circle") ?? UIImage()
-        } else {
-            return UIImage(systemName: "exclamationmark.circle") ?? UIImage()
-        }
+        UIImage(systemName: deviceStatusIconSystemName()) ?? UIImage()
+    }
+
+    func deviceStatusIconSystemName(referenceDate: Date = .now) -> String {
+        aidStatus.presentation(referenceDate: referenceDate).systemImage
+            ?? ConstantsHomeView.loopStatusNoDataSystemImage
     }
     
     func pumpReservoirColor() -> Color? {
@@ -319,9 +266,188 @@ struct NightscoutDeviceStatus: Codable {
     }
 }
 
+extension NightscoutDeviceStatus {
+    var aidStatus: AIDStatus {
+        AIDStatus(
+            condition: lastCheckedDate == .distantPast ? .checking : .active,
+            style: .loop,
+            statusUpdatedAt: createdAt == .distantPast ? nil : createdAt,
+            lastActivityAt: lastLoopDate == .distantPast ? nil : lastLoopDate,
+            iob: iob,
+            cob: cob,
+            statusTitle: lastCheckedDate == .distantPast ? Texts_Common.checking : "Looping",
+            staleStatusTitle: "No data"
+        )
+    }
+}
+
 // MARK: Internal NightscoutDeviceStatus initializer
 
 extension NightscoutDeviceStatus {
+    private struct PersistenceSignature: Equatable {
+        let id: String
+        let createdAt: Date
+        let lastLoopDate: Date
+        let timestamp: Date?
+        let device: String?
+        let appVersion: String?
+        let activeProfile: String?
+        let iob: Double?
+        let cob: Double?
+        let eventualBG: Double?
+        let currentTarget: Double?
+        let isf: Double?
+        let insulinReq: Double?
+        let bolusVolume: Double?
+        let rate: Double?
+        let duration: Int?
+        let reason: String?
+        let sensitivityRatio: Double?
+        let tdd: Double?
+        let error: String?
+        let overrideActive: Bool?
+        let overrideName: String?
+        let overrideMinValue: Double?
+        let overrideMaxValue: Double?
+        let overrideMultiplier: Double?
+        let pumpBatteryPercent: Int?
+        let pumpReservoir: Double?
+        let pumpIsBolusing: Bool?
+        let pumpIsSuspended: Bool?
+        let pumpStatus: String?
+        let pumpStatusTimestamp: Date?
+        let pumpManufacturer: String?
+        let pumpModel: String?
+        let uploaderBatteryPercent: Int?
+        let uploaderIsCharging: Bool?
+    }
+
+    /// Returns whether any normalized field stored for history differs from another status.
+    ///
+    /// Poll timestamps are deliberately excluded: they change on every request and would create a
+    /// write every cycle even when Nightscout returned the same status. Raw compatibility fields
+    /// such as `mills`, pump clocks and pump IDs are also excluded because they are not part of the
+    /// persisted reporting model.
+    func hasPersistedChanges(comparedTo other: NightscoutDeviceStatus) -> Bool {
+        persistenceSignature != other.persistenceSignature
+    }
+
+    private var persistenceSignature: PersistenceSignature {
+        PersistenceSignature(
+            id: id,
+            createdAt: createdAt,
+            lastLoopDate: lastLoopDate,
+            timestamp: timestamp,
+            device: device,
+            appVersion: appVersion,
+            activeProfile: activeProfile,
+            iob: iob,
+            cob: cob,
+            eventualBG: eventualBG,
+            currentTarget: currentTarget,
+            isf: isf,
+            insulinReq: insulinReq,
+            bolusVolume: bolusVolume,
+            rate: rate,
+            duration: duration,
+            reason: reason,
+            sensitivityRatio: sensitivityRatio,
+            tdd: tdd,
+            error: error,
+            overrideActive: overrideActive,
+            overrideName: overrideName,
+            overrideMinValue: overrideMinValue,
+            overrideMaxValue: overrideMaxValue,
+            overrideMultiplier: overrideMultiplier,
+            pumpBatteryPercent: pumpBatteryPercent,
+            pumpReservoir: pumpReservoir,
+            pumpIsBolusing: pumpIsBolusing,
+            pumpIsSuspended: pumpIsSuspended,
+            pumpStatus: pumpStatus,
+            pumpStatusTimestamp: pumpStatusTimestamp,
+            pumpManufacturer: pumpManufacturer,
+            pumpModel: pumpModel,
+            uploaderBatteryPercent: uploaderBatteryPercent,
+            uploaderIsCharging: uploaderIsCharging
+        )
+    }
+
+    /// Fill missing display values from another device status response.
+    ///
+    /// Nightscout can return a newest devicestatus document that is more like a heartbeat than a
+    /// complete AID/pump status payload. The old root view effectively tolerated this because it
+    /// refreshed from a long-lived manager object. SwiftUI observes full value publishes, so a
+    /// partial response must not wipe values that are still valid in a nearby response.
+    mutating func fillMissingDisplayValues(from fallback: NightscoutDeviceStatus) {
+        if device == nil { device = fallback.device }
+        if appVersion == nil { appVersion = fallback.appVersion }
+        
+        if activeProfile == nil { activeProfile = fallback.activeProfile }
+        if baseBasalRate == nil { baseBasalRate = fallback.baseBasalRate }
+        if bolusVolume == nil { bolusVolume = fallback.bolusVolume }
+        if cob == nil { cob = fallback.cob }
+        if currentTarget == nil { currentTarget = fallback.currentTarget }
+        if duration == nil { duration = fallback.duration }
+        if eventualBG == nil { eventualBG = fallback.eventualBG }
+        if iob == nil { iob = fallback.iob }
+        if isf == nil { isf = fallback.isf }
+        if insulinReq == nil { insulinReq = fallback.insulinReq }
+        if rate == nil { rate = fallback.rate }
+        if reason == nil { reason = fallback.reason }
+        if sensitivityRatio == nil { sensitivityRatio = fallback.sensitivityRatio }
+        if tdd == nil { tdd = fallback.tdd }
+        if timestamp == nil { timestamp = fallback.timestamp }
+        if error == nil { error = fallback.error }
+        
+        if overrideActive == nil { overrideActive = fallback.overrideActive }
+        if overrideName == nil { overrideName = fallback.overrideName }
+        if overrideMaxValue == nil { overrideMaxValue = fallback.overrideMaxValue }
+        if overrideMinValue == nil { overrideMinValue = fallback.overrideMinValue }
+        if overrideMultiplier == nil { overrideMultiplier = fallback.overrideMultiplier }
+        
+        if pumpBatteryPercent == nil { pumpBatteryPercent = fallback.pumpBatteryPercent }
+        if pumpClock == nil { pumpClock = fallback.pumpClock }
+        if pumpID == nil { pumpID = fallback.pumpID }
+        if pumpIsBolusing == nil { pumpIsBolusing = fallback.pumpIsBolusing }
+        if pumpIsSuspended == nil { pumpIsSuspended = fallback.pumpIsSuspended }
+        if pumpStatus == nil { pumpStatus = fallback.pumpStatus }
+        if pumpStatusTimestamp == nil { pumpStatusTimestamp = fallback.pumpStatusTimestamp }
+        if pumpManufacturer == nil { pumpManufacturer = fallback.pumpManufacturer }
+        if pumpModel == nil { pumpModel = fallback.pumpModel }
+        if pumpReservoir == nil { pumpReservoir = fallback.pumpReservoir }
+        
+        if uploaderBatteryPercent == nil { uploaderBatteryPercent = fallback.uploaderBatteryPercent }
+        if uploaderIsCharging == nil { uploaderIsCharging = fallback.uploaderIsCharging }
+        
+        if lastLoopDate == .distantPast {
+            lastLoopDate = fallback.lastLoopDate
+        }
+    }
+
+    /// Builds one display record from the newest status and recent older partial statuses.
+    ///
+    /// Some followers publish basal history more often than the complete pump telemetry snapshot.
+    /// Forward-filling only missing fields keeps the selected record's rate and timestamps while
+    /// retaining the latest previously observed reservoir, battery and active insulin values.
+    static func composingDisplayValues(fromNewestFirst statuses: [NightscoutDeviceStatus]) -> NightscoutDeviceStatus? {
+        guard var result = statuses.first else { return nil }
+
+        for fallback in statuses.dropFirst() {
+            result.fillMissingDisplayValues(from: fallback)
+        }
+
+        return result
+    }
+
+    mutating func sanitizingFutureDates(referenceDate: Date = Date(), futureTolerance: TimeInterval = 20) {
+        let maximumAllowedDate = referenceDate.addingTimeInterval(futureTolerance)
+        if createdAt > maximumAllowedDate { createdAt = .distantPast }
+        if updatedDate > maximumAllowedDate { updatedDate = .distantPast }
+        if lastCheckedDate > maximumAllowedDate { lastCheckedDate = .distantPast }
+        if lastLoopDate > maximumAllowedDate { lastLoopDate = .distantPast }
+        if let timestamp, timestamp > maximumAllowedDate { self.timestamp = nil }
+    }
+    
     /// Initialize from a unified NightscoutDeviceStatusResponse
     init(from unified: NightscoutDeviceStatusResponse) {
         self.init()
@@ -329,7 +455,7 @@ extension NightscoutDeviceStatus {
         // Parse createdAt
         if let createdAtStr = unified.createdAt {
             self.createdAt = ISO8601DateFormatter.withFractionalSeconds.date(from: createdAtStr)
-                ?? ISO8601DateFormatter().date(from: createdAtStr)
+                ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: createdAtStr)
                 ?? .distantPast
         }
         
@@ -363,21 +489,20 @@ extension NightscoutDeviceStatus {
                 self.reason = aps.reason
                 self.sensitivityRatio = aps.sensitivityRatio
                 self.tdd = aps.tdd
-                let apsTimestampDate: Date? = aps.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter().date(from: $0) }
+                let apsTimestampDate: Date? = aps.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: $0) }
                 self.timestamp = apsTimestampDate
-                if let apsTimestampDate = apsTimestampDate { lastLoopDates.append(apsTimestampDate) }
                 if let cobValue = aps.cob { cobCandidates.append((cobValue, apsTimestampDate)) }
                 if let iobValue = aps.iob { iobCandidates.append((iobValue, apsTimestampDate)) }
             }
             // Also consider enacted/suggested timestamps for lastLoopDate
             if let enactedTimestampString = enacted?.timestamp {
-                let enactedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: enactedTimestampString) ?? ISO8601DateFormatter().date(from: enactedTimestampString)
+                let enactedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: enactedTimestampString) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: enactedTimestampString)
                 if let enactedTimestampDate = enactedTimestampDate { lastLoopDates.append(enactedTimestampDate) }
                 if let cobValue = enacted?.cob { cobCandidates.append((cobValue, enactedTimestampDate)) }
                 if let iobValue = enacted?.iob { iobCandidates.append((iobValue, enactedTimestampDate)) }
             }
-            if let suggestedTimestampString = suggested?.timestamp {
-                let suggestedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: suggestedTimestampString) ?? ISO8601DateFormatter().date(from: suggestedTimestampString)
+            if let suggestedTimestampString = suggested?.timestamp, useSuggestedAsEnacted() || suggested?.wasReceived == true {
+                let suggestedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: suggestedTimestampString) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: suggestedTimestampString)
                 if let suggestedTimestampDate = suggestedTimestampDate { lastLoopDates.append(suggestedTimestampDate) }
                 if let cobValue = suggested?.cob { cobCandidates.append((cobValue, suggestedTimestampDate)) }
                 if let iobValue = suggested?.iob { iobCandidates.append((iobValue, suggestedTimestampDate)) }
@@ -390,11 +515,11 @@ extension NightscoutDeviceStatus {
             self.insulinReq = loop.recommendedBolus ?? insulinReq
             self.eventualBG = loop.predicted?.values?.last ?? eventualBG
             if let cobValue = loop.cob?.cob {
-                let cobTimestampDate = loop.cob?.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter().date(from: $0) }
+                let cobTimestampDate = loop.cob?.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: $0) }
                 cobCandidates.append((cobValue, cobTimestampDate))
             }
             if let iobValue = loop.iob?.iob {
-                let iobTimestampDate = loop.iob?.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter().date(from: $0) }
+                let iobTimestampDate = loop.iob?.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: $0) }
                 iobCandidates.append((iobValue, iobTimestampDate))
             }
             if let enacted = loop.enacted {
@@ -402,12 +527,12 @@ extension NightscoutDeviceStatus {
                 self.duration = enacted.duration ?? duration
                 self.rate = enacted.rate ?? rate
                 if let enactedTimestampString = enacted.timestamp {
-                    let enactedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: enactedTimestampString) ?? ISO8601DateFormatter().date(from: enactedTimestampString)
+                    let enactedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: enactedTimestampString) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: enactedTimestampString)
                     if let enactedTimestampDate = enactedTimestampDate { lastLoopDates.append(enactedTimestampDate) }
                 }
             }
             if let loopTimestampString = loop.timestamp {
-                let loopTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: loopTimestampString) ?? ISO8601DateFormatter().date(from: loopTimestampString)
+                let loopTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: loopTimestampString) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: loopTimestampString)
                 if let loopTimestampDate = loopTimestampDate { lastLoopDates.append(loopTimestampDate) }
             }
         }
@@ -477,14 +602,14 @@ extension NightscoutDeviceStatus {
             // Pump battery: always from pump.battery.percent (never from uploader.battery)
             self.pumpBatteryPercent = pump.battery?.percent ?? pumpBatteryPercent
             if let clock = pump.clock {
-                self.pumpClock = ISO8601DateFormatter.withFractionalSeconds.date(from: clock) ?? ISO8601DateFormatter().date(from: clock)
+                self.pumpClock = ISO8601DateFormatter.withFractionalSeconds.date(from: clock) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: clock)
             }
             self.pumpID = pump.pumpID ?? pumpID
             self.pumpIsBolusing = pump.bolusing ?? pump.status?.bolusing ?? pumpIsBolusing
             self.pumpIsSuspended = pump.suspended ?? pump.status?.suspended ?? pumpIsSuspended
             self.pumpStatus = pump.reservoir_display_override ?? pump.status?.status ?? pumpStatus
             if let ts = pump.status?.timestamp {
-                self.pumpStatusTimestamp = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter().date(from: ts)
+                self.pumpStatusTimestamp = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter.withoutFractionalSeconds.date(from: ts)
             }
             // For Omnipod/Dash, if reservoir value being returned is nil,
             // set to omniPodReservoirFlagNumber so that the UI will display "50+"
@@ -583,6 +708,10 @@ struct NightscoutDeviceStatusResponse: Codable {
             let timestamp: String?
             let units: Double?
             let variableSens: Double?
+
+            var wasReceived: Bool {
+                received ?? recieved ?? false
+            }
 
             private enum CodingKeys: String, CodingKey {
                 case cob = "COB"
@@ -716,12 +845,20 @@ struct NightscoutDeviceStatusResponse: Codable {
     }
 }
 
-// MARK: - ISO8601DateFormatter with fractional seconds
+// MARK: - ISO8601 date formatters
 
 extension ISO8601DateFormatter {
     static let withFractionalSeconds: ISO8601DateFormatter = {
         let dateFormatter = ISO8601DateFormatter()
         dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        return dateFormatter
+    }()
+
+    static let withoutFractionalSeconds: ISO8601DateFormatter = {
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime]
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         return dateFormatter
     }()
 }

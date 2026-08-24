@@ -86,3 +86,17 @@ public enum LibreSensorState {
         }
     }
 }
+
+extension LibreSensorState {
+    /// Only mapped manufacturer states participate in sensor-health episodes.
+    var sensorHealthEvent: CGMSensorHealthEvent? {
+        switch self {
+        case .ready, .expired:
+            return .recovered(source: .libre)
+        case .failure:
+            return .terminal(source: .libre, reason: .libreSensorFailure)
+        case .notYetStarted, .starting, .shutdown, .unknown:
+            return nil
+        }
+    }
+}

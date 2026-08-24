@@ -27,6 +27,12 @@ enum ConstantsNightscout {
     
     /// the text used by Nightscout for the "unit" json attribute for BG Checks stored in mmol/l
     static let mmolNightscoutUnitString = "mmol"
+
+    /// Nightscout treatment event type used for free-form notes
+    static let noteEventType = "Note"
+
+    /// Stable prefix used to identify post-processing notes created by this app.
+    static let postProcessingNotePrefix = "[\(ConstantsHomeView.applicationName) Post-Processing]"
     
     /// how many seconds should we force the app to wait between treatment sync attempts
     static let minimiumTimeBetweenTwoTreatmentSyncsInSeconds: Double = 10

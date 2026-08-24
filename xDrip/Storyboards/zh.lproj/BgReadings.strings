@@ -5,6 +5,7 @@
 
 /// timestamp of glucose reading
 "timestamp" = "Timestamp";
+"backfilledAtFooterFormat" = "回填 %@";
 
 /// glucose reading
 "glucoseReadingTitle" = "Glucose Reading";
@@ -38,3 +39,8 @@
 
 /// the slope arrow of the glucose reading
 "slopeArrow" = "Slope arrow";
+
+"glucoseRange" = "葡萄糖范围";
+"bgRangeUrgent" = "紧急";
+"bgRangeNotUrgent" = "非紧急";
+"bgRangeInRange" = "范围内";

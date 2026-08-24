@@ -11,6 +11,14 @@ class Texts_BluetoothPeripheralView {
     static let status: String = {
         return NSLocalizedString("status", tableName: filename, bundle: Bundle.main, value: "Status:", comment: "when Bluetooth Peripheral is shown, title of the cell with the status")
     }()
+
+    static let runningInCoexistenceMode: String = {
+        return NSLocalizedString("runningInCoexistenceMode", tableName: filename, bundle: Bundle.main, value: "Running in Coexistence mode", comment: "Dexcom bluetooth status footer. Another app authenticates with the transmitter.")
+    }()
+
+    static let runningInPrimaryMode: String = {
+        return NSLocalizedString("runningInPrimaryMode", tableName: filename, bundle: Bundle.main, value: "Running in Primary mode", comment: "Dexcom bluetooth status footer. This app controls the transmitter connection.")
+    }()
     
     static let connected: String = {
         return NSLocalizedString("connected", tableName: filename, bundle: Bundle.main, value: "Connected", comment: "when Bluetooth Peripheral is shown, connection status, connected")
@@ -49,7 +57,7 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let battery: String = {
-        return NSLocalizedString("Battery", tableName: filename, bundle: Bundle.main, value: "Battery:", comment: "BluetoothPeripheral view, section title with battery info")
+        return NSLocalizedString("battery", tableName: filename, bundle: Bundle.main, value: "Battery", comment: "BluetoothPeripheral view, section title with battery info")
     }()
     
     static let needsTransmitterId: String = {
@@ -59,6 +67,62 @@ class Texts_BluetoothPeripheralView {
     static let scan: String = {
         return NSLocalizedString("scan", tableName: filename, bundle: Bundle.main, value: "Scan", comment: "text in button to start scanning")
     }()
+
+    static let medtrumNanoPumpScanNoticeTitle: String = {
+        return NSLocalizedString("medtrumNanoPumpScanNoticeTitle", tableName: filename, bundle: Bundle.main, value: "Medtrum Nano Pump Connection", comment: "title of the notice shown before scanning for a Medtrum Nano Pump")
+    }()
+
+    static let medtrumNanoPumpScanNoticeMessage: String = {
+        return NSLocalizedString(
+            "medtrumNanoPumpScanNoticeMessage",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "This option connects to the Medtrum Nano Pump, not directly to the Nano CGM transmitter.\n\nBefore scanning, make sure EasyPatch is running, connected to the pump, and receiving current CGM values.\n\nEasyPatch must remain running and continue receiving values at all times.",
+            comment: "notice shown before scanning for a Medtrum Nano Pump, explaining that the CGM connection is relayed by the pump and requires EasyPatch"
+        )
+    }()
+
+    static let libre2ScanNoticeTitle: String = {
+        return NSLocalizedString("libre2ScanNoticeTitle", tableName: filename, bundle: Bundle.main, value: "Libre App Bluetooth", comment: "title of the notice shown before scanning for a Libre 2 sensor")
+    }()
+
+    static let libre2ScanNoticeMessage: String = {
+        return NSLocalizedString(
+            "libre2ScanNoticeMessage",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Before scanning, disable Bluetooth permission for the Libre app in your iPhone settings.\n\nBluetooth permission for the Libre app must remain disabled at all times. Otherwise, the Libre app may take over the sensor connection and stop this app from receiving values.",
+            comment: "notice shown before scanning for a Libre 2 sensor, explaining that Bluetooth permission for the Libre app must remain disabled"
+        )
+    }()
+
+    static let dexcomG6ScanNoticeTitle: String = {
+        return NSLocalizedString("dexcomG6ScanNoticeTitle", tableName: filename, bundle: Bundle.main, value: "Dexcom App Connection", comment: "title of the notice shown before scanning for a Dexcom G6 or ONE transmitter")
+    }()
+
+    static let dexcomG6ScanNoticeMessage: String = {
+        return NSLocalizedString(
+            "dexcomG6ScanNoticeMessage",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Before scanning, force-close the Dexcom app or disable Bluetooth permission for it.\n\nThe Dexcom app must not be connected to the transmitter while this app is scanning or receiving values.",
+            comment: "notice shown before scanning for a Dexcom G6 or ONE transmitter, explaining how to avoid a competing Dexcom app connection"
+        )
+    }()
+
+    static let dexcomG7ScanNoticeTitle: String = {
+        return NSLocalizedString("dexcomG7ScanNoticeTitle", tableName: filename, bundle: Bundle.main, value: "Dexcom G7 App Required", comment: "title of the notice shown before scanning for a Dexcom G7 sensor")
+    }()
+
+    static let dexcomG7ScanNoticeMessage: String = {
+        return NSLocalizedString(
+            "dexcomG7ScanNoticeMessage",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Before scanning, make sure the Dexcom G7 app is running in the background, connected to the sensor, and receiving current glucose values.\n\nThe Dexcom G7 app must remain running and continue receiving values at all times.",
+            comment: "notice shown before scanning for a Dexcom G7 sensor, explaining that the Dexcom G7 app must remain running and receiving values"
+        )
+    }()
     
     static let readyToScan: String = {
         return NSLocalizedString("readyToScan", tableName: filename, bundle: Bundle.main, value: "Ready to Scan", comment: "text in status row, if ready to start scanning")
@@ -66,6 +130,30 @@ class Texts_BluetoothPeripheralView {
     
     static let scanning: String = {
         return NSLocalizedString("scanning", tableName: filename, bundle: Bundle.main, value: "Scanning", comment: "text in status row, if scanning ongoing")
+    }()
+
+    static let scanningForTransmitter: String = {
+        return NSLocalizedString("scanningForTransmitter", tableName: filename, bundle: Bundle.main, value: "Scanning...", comment: "full status while discovering a new unknown Bluetooth transmitter")
+    }()
+
+    static let connecting: String = {
+        return NSLocalizedString("connecting", tableName: filename, bundle: Bundle.main, value: "Connecting", comment: "compact status before the first successful Bluetooth connection after activation")
+    }()
+
+    static let connectingToTransmitter: String = {
+        return NSLocalizedString("connectingToTransmitter", tableName: filename, bundle: Bundle.main, value: "Connecting...", comment: "full status before the first successful Bluetooth connection after activation")
+    }()
+
+    static let reconnecting: String = {
+        return NSLocalizedString("reconnecting", tableName: filename, bundle: Bundle.main, value: "Reconnecting", comment: "compact warning status for an unexpectedly disconnected continuously connected device")
+    }()
+
+    static let reconnectingToTransmitter: String = {
+        return NSLocalizedString("reconnectingToTransmitter", tableName: filename, bundle: Bundle.main, value: "Reconnecting...", comment: "full warning status for an unexpectedly disconnected continuously connected device")
+    }()
+
+    static let waiting: String = {
+        return NSLocalizedString("waiting", tableName: filename, bundle: Bundle.main, value: "Waiting...", comment: "healthy status for an intermittent Dexcom device between normal Bluetooth advertisements; used in both full and compact presentations")
     }()
     
     static let disconnect: String = {
@@ -137,7 +225,15 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let useOtherDexcomApp: String = {
-        return NSLocalizedString("useOtherDexcomApp", tableName: filename, bundle: Bundle.main, value: "Use With Other App", comment: "Dexcom bluetooth screen. Is another app used in parallel or not")
+        return NSLocalizedString("useOtherDexcomApp", tableName: filename, bundle: Bundle.main, value: "Coexistence Mode", comment: "Dexcom bluetooth screen. Toggle title. When enabled, another app such as Dexcom or CamAPS authenticates with the transmitter while this app receives alongside it.")
+    }()
+
+    static let useOtherDexcomAppCoexistenceFooter: String = {
+        return NSLocalizedString("useOtherDexcomAppCoexistenceFooter", tableName: filename, bundle: Bundle.main, value: "Coexistence mode allows us to work with another app such as the Dexcom or CamAPS apps. That app must keep running in the background.", comment: "Dexcom bluetooth screen. Footer explaining coexistence mode.")
+    }()
+
+    static let useOtherDexcomAppPrimaryFooter: String = {
+        return NSLocalizedString("useOtherDexcomAppPrimaryFooter", tableName: filename, bundle: Bundle.main, value: "Primary mode connects as the main app and controls the connection.", comment: "Dexcom bluetooth screen. Footer explaining primary mode.")
     }()
     
     static let useOtherDexcomAppMessageEnabled: String = {
@@ -197,7 +293,7 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let maxSensorAgeInDaysOverridenAnubisMessage = {
-        return String(format: NSLocalizedString("maxSensorAgeInDaysOverridenAnubisMessage", tableName: filename, bundle: Bundle.main, value: "\nIf using an Anubis transmitter, you can enter here the maximum number of days for the sensor lifetime (maximum %@)\n\nNote that this is only a visual reminder. It will not end the sensor session when reached.\n\nEnter 0 to use the default of %@ days", comment: "user can override the maximum sensor days if using an anubis transmitter"), ConstantsDexcomG5.maxSensorAgeInDaysOverridenAnubisMaximum.stringWithoutTrailingZeroes, ConstantsDexcomG5.maxSensorAgeInDays.stringWithoutTrailingZeroes)
+        return String(format: NSLocalizedString("maxSensorAgeInDaysOverridenAnubisMessage", tableName: filename, bundle: Bundle.main, value: "If using an Anubis transmitter, you can enter here the maximum number of days for the sensor lifetime (maximum %@)\n\nNote that this is only a visual reminder. It will not end the sensor session when reached.\n\nEnter 0 to use the default of %@ days", comment: "user can override the maximum sensor days if using an anubis transmitter"), ConstantsDexcomG5.maxSensorAgeInDaysOverridenAnubisMaximum.stringWithoutTrailingZeroes, ConstantsDexcomG5.maxSensorAgeInDays.stringWithoutTrailingZeroes)
     }()
     
     static let isAnubis: String = {
@@ -207,4 +303,44 @@ class Texts_BluetoothPeripheralView {
     static let readSuccess: String = {
         return NSLocalizedString("readSuccess", tableName: filename, bundle: Bundle.main, value: "Read Success", comment: "Bluetooth peripheral screen. row title for the read success line")
     }()
+
+    static let readSuccessLast24Hours: String = {
+        return NSLocalizedString("readSuccessLast24Hours", tableName: filename, bundle: Bundle.main, value: "Last 24 Hours", comment: "Bluetooth peripheral Read Success screen. Section title for the hourly read success timeline")
+    }()
+
+    static let readSuccessNow: String = {
+        return NSLocalizedString("readSuccessNow", tableName: filename, bundle: Bundle.main, value: "Now", comment: "Bluetooth peripheral Read Success screen. Timeline axis label for the current time")
+    }()
+
+    static func readSuccessReadingsReceived(actual: Int, expected: Int) -> String {
+        return String(format: NSLocalizedString("readSuccessReadingsReceived", tableName: filename, bundle: Bundle.main, value: "%d of %d readings received", comment: "Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings"), actual, expected)
+    }
+
+    static func readSuccessCadenceFooter(bluetoothPeripheralType: String) -> String {
+        return String(format: NSLocalizedString("readSuccessCadenceFooter", tableName: filename, bundle: Bundle.main, value: "Expected readings are based on the observed transmitter cadence for %@.", comment: "Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated. Placeholder is the transmitter type"), bluetoothPeripheralType)
+    }
+
+    static let readSuccessLegendGood: String = {
+        return NSLocalizedString("readSuccessLegendGood", tableName: filename, bundle: Bundle.main, value: "Good", comment: "Bluetooth peripheral Read Success screen. Timeline legend label for good read success")
+    }()
+
+    static let readSuccessLegendLow: String = {
+        return NSLocalizedString("readSuccessLegendLow", tableName: filename, bundle: Bundle.main, value: "Low", comment: "Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success")
+    }()
+
+    static let readSuccessLegendPoor: String = {
+        return NSLocalizedString("readSuccessLegendPoor", tableName: filename, bundle: Bundle.main, value: "Poor", comment: "Bluetooth peripheral Read Success screen. Timeline legend label for poor read success")
+    }()
+
+    static let readSuccessLegendNoData: String = {
+        return NSLocalizedString("readSuccessLegendNoData", tableName: filename, bundle: Bundle.main, value: "No data", comment: "Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available")
+    }()
+
+    static let readSuccessNoReadingsExpected: String = {
+        return NSLocalizedString("readSuccessNoReadingsExpected", tableName: filename, bundle: Bundle.main, value: "No readings expected", comment: "Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings")
+    }()
+
+    static func readSuccessTimelineAccessibility(success: Double, actual: Int, expected: Int) -> String {
+        return String(format: NSLocalizedString("readSuccessTimelineAccessibility", tableName: filename, bundle: Bundle.main, value: "%0.1f percent, %d of %d readings", comment: "Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket"), success, actual, expected)
+    }
 }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 // MARK: ScreenLockDimmingType Enum
 
@@ -45,8 +46,8 @@ public enum ScreenLockDimmingType: Int, CaseIterable {
         
     }
     
-    /// returns the UIColor for the dimming type selected (this in turn comes from the constants file for Home View)
-    var dimmingColor: UIColor {
+    /// returns the SwiftUI Color for the selected dimming type
+    var dimmingColor: Color {
         
         switch self {
             

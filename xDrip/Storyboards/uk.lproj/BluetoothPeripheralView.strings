@@ -68,6 +68,14 @@
 
 /// text in button to start scanning
 "scan" = "Scan";
+"medtrumNanoPumpScanNoticeTitle" = "Підключення до помпи Medtrum Nano";
+"medtrumNanoPumpScanNoticeMessage" = "Ця опція підключається до помпи Medtrum Nano, а не безпосередньо до передавача Nano CGM.\n\nПеред скануванням переконайтеся, що EasyPatch запущено, підключено до помпи й отримує актуальні значення CGM.\n\nEasyPatch має постійно працювати й продовжувати отримувати значення.";
+"libre2ScanNoticeTitle" = "Bluetooth застосунку Libre";
+"libre2ScanNoticeMessage" = "Перед скануванням вимкніть дозвіл Bluetooth для застосунку Libre в налаштуваннях iPhone.\n\nДозвіл Bluetooth для застосунку Libre має завжди залишатися вимкненим. Інакше застосунок Libre може перехопити підключення до сенсора й завадити цьому застосунку отримувати значення.";
+"dexcomG6ScanNoticeTitle" = "Підключення застосунку Dexcom";
+"dexcomG6ScanNoticeMessage" = "Перед скануванням примусово закрийте застосунок Dexcom або вимкніть для нього дозвіл Bluetooth.\n\nЗастосунок Dexcom не повинен бути підключений до передавача, поки цей застосунок сканує або отримує значення.";
+"dexcomG7ScanNoticeTitle" = "Потрібен застосунок Dexcom G7";
+"dexcomG7ScanNoticeMessage" = "Перед скануванням переконайтеся, що застосунок Dexcom G7 працює у фоновому режимі, підключений до сенсора й отримує актуальні значення глюкози.\n\nЗастосунок Dexcom G7 має постійно працювати й продовжувати отримувати значення.";
 
 /// cell text, where user can select to reset a transmitter at next connect. Only for Dexcom
 "resetRequired" = "Reset Transmitter";
@@ -94,7 +102,11 @@
 "serialNumber" = "Serial Number";
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Use With Other App";
+"useOtherDexcomApp" = "Режим співіснування";
+"useOtherDexcomAppCoexistenceFooter" = "Режим співіснування дозволяє нам працювати з іншою програмою, наприклад Dexcom або CamAPS. Ця програма має продовжувати працювати у фоновому режимі.";
+"useOtherDexcomAppPrimaryFooter" = "Основний режим підключається як головна програма та керує з'єднанням.";
+"runningInCoexistenceMode" = "Працює в режимі співіснування";
+"runningInPrimaryMode" = "Працює в основному режимі";
 
 /// To give result about transitter result in notification body
 "transmitterResultResult" = "Transmitter Reset Result";
@@ -138,3 +150,33 @@
 
 /// Tell the user the scan was successful and to just wait now for connection
 "nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+
+/// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
+"readSuccessLast24Hours" = "Останні 24 години";
+/// Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings
+"readSuccessReadingsReceived" = "Отримано %d з %d показань";
+/// Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated
+"readSuccessCadenceFooter" = "Очікувані показання базуються на спостережуваній частоті передавача для %@.";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for good read success
+"readSuccessLegendGood" = "Добре";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success
+"readSuccessLegendLow" = "Низько";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for poor read success
+"readSuccessLegendPoor" = "Погано";
+/// Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available
+"readSuccessLegendNoData" = "Немає даних";
+/// Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings
+"readSuccessNoReadingsExpected" = "Показання не очікувалися";
+/// Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket
+"readSuccessTimelineAccessibility" = "%0.1f відсотка, %d з %d показань";
+
+/// Bluetooth peripheral screen. Row title and screen title for read success information
+"readSuccess" = "Успішність зчитування";
+/// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
+"readSuccessNow" = "Зараз";
+"scanningForTransmitter" = "Пошук...";
+"connecting" = "Підключення";
+"connectingToTransmitter" = "Connecting...";
+"reconnecting" = "Повторне підключення";
+"reconnectingToTransmitter" = "Повторне підключення...";
+"waiting" = "Очікування...";

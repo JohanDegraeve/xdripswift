@@ -20,9 +20,48 @@ class Texts_Alerts {
     static let veryLowAlertTitle: String = {
         return NSLocalizedString("alerts_verylowalerttitle", tableName: filename, bundle: Bundle.main, value: "Very Low Alarm", comment: "When very low alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert")
     }()
+
+    // Concise titles used only by the large snooze presentation.
+    static let highSnoozeTitle: String = {
+        return NSLocalizedString("alerts_snooze_high_title", tableName: filename, bundle: Bundle.main, value: "High", comment: "Concise high alarm title shown in the large snooze screen")
+    }()
+
+    static let veryHighSnoozeTitle: String = {
+        return NSLocalizedString("alerts_snooze_very_high_title", tableName: filename, bundle: Bundle.main, value: "Very High", comment: "Concise very high alarm title shown in the large snooze screen")
+    }()
+
+    static let lowSnoozeTitle: String = {
+        return NSLocalizedString("alerts_snooze_low_title", tableName: filename, bundle: Bundle.main, value: "Low", comment: "Concise low alarm title shown in the large snooze screen")
+    }()
+
+    static let veryLowSnoozeTitle: String = {
+        return NSLocalizedString("alerts_snooze_very_low_title", tableName: filename, bundle: Bundle.main, value: "Very Low", comment: "Concise very low alarm title shown in the large snooze screen")
+    }()
+
+    static let fastDropSnoozeTitle: String = {
+        return NSLocalizedString("alerts_snooze_fast_drop_title", tableName: filename, bundle: Bundle.main, value: "Fast Drop", comment: "Concise fast drop alarm title shown in the large snooze screen")
+    }()
+
+    static let fastRiseSnoozeTitle: String = {
+        return NSLocalizedString("alerts_snooze_fast_rise_title", tableName: filename, bundle: Bundle.main, value: "Fast Rise", comment: "Concise fast rise alarm title shown in the large snooze screen")
+    }()
     
     static let missedReadingAlertTitle: String = {
         return NSLocalizedString("alerts_missedreadingalerttitle", tableName: filename, bundle: Bundle.main, value: "Missed Readings", comment: "When Missed reading alert happens, this is the title of the alert notification, also in alert settings list, for the name of the alert")
+    }()
+
+    static let notLoopingAlertTitle: String = {
+        return NSLocalizedString("alerts_notloopingalerttitle", tableName: filename, bundle: Bundle.main, value: "Not Looping", comment: "When the OS-AID loop has not completed a recent cycle, this is the title of the alert notification and the alert settings list title")
+    }()
+
+    static let sensorTransmitterFailureAlertTitle: String = {
+        return NSLocalizedString(
+            "alerts_sensortransmitterfailure",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Sensor/Transmitter Failure",
+            comment: "Alarm settings title for a terminal failure reported by the active sensor or transmitter"
+        )
     }()
     
     static let calibrationNeededAlertTitle: String = {

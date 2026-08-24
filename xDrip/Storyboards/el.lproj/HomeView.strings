@@ -36,7 +36,7 @@
 "success" = "Επιτυχία";
 "failed" = "Απέτυχε";
 "dexcomBatteryTooLow" = "Η μπαταρία του πομπού είναι πολύ χαμηλή!";
-"enterSensorCode" = "εάν δεν έχετε κωδικό αισθητήρα χρησιμοποιήστε 0000, αλλά να γνωρίζετε ότι δεν θα λάβετε μετρήσεις μέχρι να βαθμονομήσετε";
+"enterSensorCode" = "Αν δεν γνωρίζετε τον κωδικό του αισθητήρα, αφήστε το κενό για να χρησιμοποιηθεί το 0000. Αν πατήσετε OK χωρίς κωδικό, θα χρησιμοποιηθεί το 0000 ως κωδικός αισθητήρα ή θα καταγραφεί η τρέχουσα συνεδρία αν έχει ήδη ξεκινήσει.";
 "stopSensorConfirmation" = "Είστε βέβαιοι ότι θέλετε να σταματήσετε τον αισθητήρα;";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -69,3 +69,57 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "Απομένουν %@";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Θόρυβος αισθητήρα";
+"sensorManagementNoiseShortTerm" = "Τελευταία 30 λεπτά";
+"sensorManagementNoiseLongTerm" = "Τελευταίες 4 ώρες";
+"sensorManagementNoiseCollecting" = "Συλλογή δεδομένων";
+"sensorManagementNoiseLow" = "Χαμηλός";
+"sensorManagementNoiseElevated" = "Αυξημένος";
+"sensorManagementNoiseVeryHigh" = "Πολύ υψηλός";
+"sensorManagementNoiseExtreme" = "Ακραίος";
+"sensorManagementNoiseFlatline" = "Ο αισθητήρας πιθανότατα απέτυχε.";
+"sensorNoiseWarningExtremeTitle" = "Ακραίος θόρυβος αισθητήρα";
+"sensorNoiseWarningPersistentTitle" = "Επίμονος θόρυβος αισθητήρα";
+"sensorNoiseWarningFlatlineTitle" = "Το σήμα του αισθητήρα είναι επίπεδο";
+"sensorNoiseHistoryTitle" = "Ιστορικό θορύβου";
+"sensorNoiseHistoryCurrentTitle" = "Τρέχουσες μετρήσεις";
+"sensorNoiseHistoryChartTitle" = "Θόρυβος με την πάροδο του χρόνου";
+"sensorNoiseHistoryRangeTitle" = "Χρονικό εύρος";
+"sensorNoiseHistoryDayRange" = "1d";
+"sensorNoiseHistoryThreeDayRange" = "3 ημ.";
+"sensorNoiseHistoryWeekRange" = "7 ημ.";
+"sensorNoiseHistoryAllRange" = "Όλα";
+"sensorNoiseHistoryShortCompact" = "30 λεπ.";
+"sensorNoiseHistoryLongCompact" = "4 ώρ.";
+"sensorNoiseHistoryLoading" = "Δημιουργία ιστορικού αισθητήρα";
+"sensorNoiseHistoryNoDataTitle" = "Δεν υπάρχουν ακόμη αρκετά δεδομένα θορύβου";
+"sensorNoiseHistoryNoDataMessage" = "Το γράφημα θα εμφανιστεί αφού συλλεχθούν αρκετές ενδείξεις αισθητήρα.";
+"sensorNoiseHistoryChartAccessibility" = "Γράφημα ιστορικού θορύβου αισθητήρα";
+"pumpBattery" = "Μπαταρία";
+"pumpReservoir" = "Δεξαμενή";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Τελευταία";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Πολύ υψηλός θόρυβος αισθητήρα";
+"sensorHealthPersistentNoiseGuidance" = "Πολύ υψηλός θόρυβος για 12 ώρες. Εξετάστε την αντικατάσταση του αισθητήρα αν συνεχιστεί.";
+"sensorHealthFlatlineTitle" = "Το σήμα του αισθητήρα είναι επίπεδο";
+"sensorHealthFlatlineGuidance" = "Οι μετρήσεις δεν άλλαξαν για 30 λεπτά. Αυτό συνήθως σημαίνει ότι ο αισθητήρας απέτυχε/έληξε.";
+"sensorHealthTemporaryIssueTitle" = "Προσωρινό πρόβλημα αισθητήρα";
+"sensorHealthTemporaryIssueGuidance" = "Προσωρινό πρόβλημα αισθητήρα για 3 ώρες. Ελέγξτε με μετρητή και ακολουθήστε τις οδηγίες του κατασκευαστή.";
+"sensorHealthSensorFailedTitle" = "Αποτυχία αισθητήρα";
+"sensorHealthSensorFailedGuidance" = "Αναφέρθηκε αποτυχία αισθητήρα. Αντικαταστήστε τον αισθητήρα.";
+"sensorHealthTransmitterFailedTitle" = "Αποτυχία πομπού";
+"sensorHealthTransmitterFailedGuidance" = "Αναφέρθηκε αποτυχία πομπού. Ελέγξτε ή αντικαταστήστε τον.";
+"connectingToCGM" = "Σύνδεση με το CGM...";
+"reconnectingToCGM" = "Επανασύνδεση με το CGM...";

@@ -5,6 +5,7 @@
 
 /// timestamp of glucose reading
 "timestamp" = "Timestamp";
+"backfilledAtFooterFormat" = "Efterfyldt %@";
 
 /// glucose reading
 "glucoseReadingTitle" = "Glucose Reading";
@@ -38,3 +39,8 @@
 
 /// the slope arrow of the glucose reading
 "slopeArrow" = "Slope arrow";
+
+"glucoseRange" = "Glukoseområde";
+"bgRangeUrgent" = "Akut";
+"bgRangeNotUrgent" = "Ikke akut";
+"bgRangeInRange" = "I område";

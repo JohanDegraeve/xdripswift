@@ -9,44 +9,80 @@
 import Foundation
 import SwiftUI
 
+#if canImport(WatchKit)
+import WatchKit
+#elseif canImport(UIKit)
+import UIKit
+#endif
+
 struct MainViewDataSourceView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
-    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
+    let isSmallScreen = {
+        #if canImport(WatchKit)
+        return WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen
+        #elseif canImport(UIKit)
+        return UIScreen.main.bounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen
+        #else
+        return false
+        #endif
+    }()
     
     var body: some View {
         VStack(spacing: 2) {
             let textSize: CGFloat = isSmallScreen ? 12 : 14
             
             if (watchState.activeSensorDescription != "" || watchState.sensorAgeInMinutes > 0) || !watchState.isMaster {
-                ProgressView(value: Float(watchState.activeSensorProgress().progress))
-                    .tint(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
-                    .scaleEffect(x: 1, y: 0.3, anchor: .center)
+                sensorLifetimeProgressView
                 
                 HStack(alignment: .center) {
                     if !watchState.isMaster {
                         HStack(alignment: .center, spacing: isSmallScreen ? 2 : 4) {
-                            watchState.getFollowerConnectionNetworkStatus().image
-                                .font(.system(size: textSize))
-                                .foregroundStyle(watchState.getFollowerConnectionNetworkStatus().color)
+                            Circle()
+                                .fill(watchState.followerConnectionIndicatorColor())
+                                .frame(width: 8, height: 8)
+                                .overlay {
+                                    Circle()
+                                        .stroke(watchState.followerConnectionIndicatorColor().opacity(0.35), lineWidth: 3)
+                                }
                             
                             watchState.followerBackgroundKeepAliveType.keepAliveImage
                                 .font(.system(size: textSize))
                                 .foregroundStyle(watchState.getFollowerBackgroundKeepAliveColor())
                             
-                            Text(watchState.followerDataSourceType.fullDescription)
+                            Text(watchState.followerDataSourceType.shortDescription)
                                 .font(.system(size: textSize)).fontWeight(.semibold)
                                 .minimumScaleFactor(0.2)
+                                .allowsTightening(true)
+                                .lineLimit(1)
                         }
+                        .layoutPriority(1)
                     } else {
-                        Text(watchState.activeSensorDescription)
-                            .font(.system(size: textSize)).fontWeight(.semibold)
+                        HStack(alignment: .center, spacing: isSmallScreen ? 2 : 4) {
+                            if let sensorNoiseIndicatorColor = watchState.sensorNoiseIndicatorColor() {
+                                Circle()
+                                    .fill(sensorNoiseIndicatorColor)
+                                    .frame(width: 8, height: 8)
+                                    .overlay {
+                                        Circle()
+                                            .stroke(sensorNoiseIndicatorColor.opacity(0.35), lineWidth: 3)
+                                    }
+                                    .accessibilityLabel(watchState.sensorNoiseIndicatorAccessibilityLabel())
+                            }
+
+                            Text(watchState.activeSensorDescription)
+                                .font(.system(size: textSize)).fontWeight(.semibold)
+                                .minimumScaleFactor(0.2)
+                                .allowsTightening(true)
+                                .lineLimit(1)
+                        }
+                        .layoutPriority(1)
                     }
                     
                     Spacer()
                     
                     if watchState.sensorAgeInMinutes > 0 {
-                        Text(watchState.sensorAgeInMinutes.minutesToDaysAndHours())
+                        Text(watchState.activeSensorLifetimeText())
                             .font(.system(size: textSize))
                             .foregroundStyle(watchState.activeSensorProgress().textColor)
                     }
@@ -66,6 +102,18 @@ struct MainViewDataSourceView: View {
                 .padding([.leading, .trailing], 10)
             }
         }
+    }
+
+    private var sensorLifetimeProgressView: some View {
+        // use the latest Watch state directly so status and countdown changes
+        // update the progress bar without animation
+        ProgressView(value: watchState.activeSensorProgress().progress)
+            .progressViewStyle(.linear)
+            .tint(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
+            .frame(maxWidth: .infinity)
+            .frame(height: 5)
+            .scaleEffect(x: 1, y: 0.3, anchor: .center)
+            .padding(.vertical, 2)
     }
 }
 

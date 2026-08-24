@@ -5,8 +5,6 @@
 //  Copyright © 2025 xDrip4iOS. All rights reserved.
 //
 
-import AudioToolbox
-import AVFoundation
 import Foundation
 import os
 
@@ -33,20 +31,15 @@ class MedtrumEasyViewFollowManager: NSObject {
     /// Delegate to pass back glucose data
     private(set) weak var followerDelegate: FollowerDelegate?
 
-    /// AVAudioPlayer to use for background keep-alive
-    private var audioPlayer: AVAudioPlayer?
+    /// The root-owned shared keep-alive engine; this follower reports operational state only and
+    /// does not own silent-audio playback, replay timing, or application lifecycle callbacks.
+    private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
 
-    /// Constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create playsoundtimer
-    private let applicationManagerKeyResumePlaySoundTimer = "MedtrumEasyViewFollowManager-ResumePlaySoundTimer"
-
-    /// Constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate playsoundtimer
-    private let applicationManagerKeySuspendPlaySoundTimer = "MedtrumEasyViewFollowManager-SuspendPlaySoundTimer"
+    /// Allows wiring tests to reconcile real manager state without starting follower networking.
+    private let startsInitialDownload: Bool
 
     /// Closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
     private var invalidateDownLoadTimerClosure: (() -> Void)?
-
-    /// Timer for playsound (background keep-alive)
-    private var playSoundTimer: RepeatingTimer?
 
     /// User ID from login response (cached in memory)
     private var medtrumUserId: Int?
@@ -57,24 +50,21 @@ class MedtrumEasyViewFollowManager: NSObject {
     // MARK: - Initializer
 
     /// Initializer
-    public init(coreDataManager: CoreDataManager, followerDelegate: FollowerDelegate) {
+    init(
+        coreDataManager: CoreDataManager,
+        followerDelegate: FollowerDelegate,
+        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging,
+        startsInitialDownload: Bool = true
+    ) {
         // Initialize non optional private properties
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.followerDelegate = followerDelegate
+        self.backgroundKeepAliveManager = backgroundKeepAliveManager
+        self.startsInitialDownload = startsInitialDownload
 
         // Initialize user ID as nil
         self.medtrumUserId = nil
-
-        // Set up audioplayer for background keep-alive
-        if let url = Bundle.main.url(forResource: ConstantsSuspensionPrevention.soundFileName, withExtension: "") {
-            // Create audioplayer
-            do {
-                self.audioPlayer = try AVAudioPlayer(contentsOf: url)
-            } catch {
-                trace("in init, exception while trying to create audioplayer, error = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error, error.localizedDescription)
-            }
-        }
 
         // Call super.init
         super.init()
@@ -95,6 +85,37 @@ class MedtrumEasyViewFollowManager: NSObject {
     }
 
     // MARK: - Public Functions
+
+    public func logIn() {
+        trace(
+            "user requested Medtrum EasyView login",
+            log: log,
+            category: ConstantsLog.categoryMedtrumEasyViewFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: .medtrumEasyView, activity: .loginStarted))
+        )
+        UserDefaults.standard.medtrumEasyViewManuallyLoggedOut = false
+        UserDefaults.standard.medtrumEasyViewPreventLogin = false
+        FollowerSessionState.shared.update(.loggingIn, for: .medtrumEasyView)
+        verifyUserDefaultsAndStartOrStopFollowMode()
+    }
+
+    public func logOut() {
+        trace(
+            "Medtrum EasyView logged out",
+            log: log,
+            category: ConstantsLog.categoryMedtrumEasyViewFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: .medtrumEasyView, activity: .loggedOut))
+        )
+        UserDefaults.standard.medtrumEasyViewManuallyLoggedOut = true
+        invalidateDownLoadTimerClosure?()
+        invalidateDownLoadTimerClosure = nil
+        backgroundKeepAliveManager.stop(for: .medtrumEasyView)
+        medtrumUserId = nil
+        lastFetchedTimestamp = nil
+        FollowerSessionState.shared.update(.loggedOut, for: .medtrumEasyView)
+    }
 
     /// Creates a BgReading for reading downloaded from Medtrum EasyView
     /// - parameters:
@@ -122,7 +143,7 @@ class MedtrumEasyViewFollowManager: NSObject {
 
     /// Download glucose data from Medtrum EasyView API
     @objc public func download() {
-        trace("in download", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
+        trace("in download", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, troubleshooting: .detailed(.follower(source: .medtrumEasyView, activity: .downloadStarted)))
 
         // Check if follower mode is active
         guard !UserDefaults.standard.isMaster else {
@@ -133,6 +154,10 @@ class MedtrumEasyViewFollowManager: NSObject {
         // Check if Medtrum EasyView is selected as data source
         guard UserDefaults.standard.followerDataSourceType == .medtrumEasyView else {
             trace("    followerDataSourceType is not medtrumEasyView", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
+            return
+        }
+        guard !UserDefaults.standard.medtrumEasyViewManuallyLoggedOut else {
+            FollowerSessionState.shared.update(.loggedOut, for: .medtrumEasyView)
             return
         }
 
@@ -156,11 +181,14 @@ class MedtrumEasyViewFollowManager: NSObject {
 
                 // Step 1: Login if needed
                 if self.medtrumUserId == nil {
+                    FollowerSessionState.shared.update(.loggingIn, for: .medtrumEasyView)
                     let loginResponse = try await self.requestLogin()
+                    guard !UserDefaults.standard.medtrumEasyViewManuallyLoggedOut else { return }
                     self.medtrumUserId = loginResponse.uid
                     // need to cleanly unwrap because uid can technically be nil in a failed login response
                     if let uid = loginResponse.uid {
-                        trace("    login successful, userId = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, uid.description)
+                        trace("    login successful, userId = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, troubleshooting: .detailed(.follower(source: .medtrumEasyView, activity: .loginSucceeded)), uid.description)
+                        FollowerSessionState.shared.update(.loggedIn, for: .medtrumEasyView)
                     }
 
                     // Cache user type
@@ -203,7 +231,19 @@ class MedtrumEasyViewFollowManager: NSObject {
                                         
                                         // Set the Follower Patient Name in the app. In case that there are several connections
                                         // we'll set this in the View Controller once a patient has been chosen
+                                        let aliasChanged = UserDefaults.standard.followerPatientName != singlePatient.displayName
                                         UserDefaults.standard.followerPatientName = singlePatient.displayName
+                                        if aliasChanged {
+                                            // The developer trace retains the account detail above;
+                                            // the shareable log records only that the alias changed.
+                                            trace(
+                                                "automatic patient selection changed the patient alias",
+                                                log: self.log,
+                                                category: ConstantsLog.categoryMedtrumEasyViewFollowManager,
+                                                type: .info,
+                                                troubleshooting: .standard(.configuration(.patientAliasChanged(isSet: true)))
+                                            )
+                                        }
                                     }
                                 }
 
@@ -215,6 +255,11 @@ class MedtrumEasyViewFollowManager: NSObject {
                             }
                         }
                     }
+                }
+
+                if self.medtrumUserId != nil {
+                    guard !UserDefaults.standard.medtrumEasyViewManuallyLoggedOut else { return }
+                    FollowerSessionState.shared.update(.loggedIn, for: .medtrumEasyView)
                 }
 
                 // Step 2: Fetch monitor data
@@ -231,6 +276,7 @@ class MedtrumEasyViewFollowManager: NSObject {
                     selectedPatientUid : self.medtrumUserId
                 if let userId = userIdToFetch {
                     let monitorResponse = try await self.requestMonitorStatus(userId: userId)
+                    guard !UserDefaults.standard.medtrumEasyViewManuallyLoggedOut else { return }
 
                     if let monitorData = monitorResponse.data {
                         trace("    monitor data downloaded successfully", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
@@ -239,7 +285,7 @@ class MedtrumEasyViewFollowManager: NSObject {
                         let followGlucoseDataArray = self.processGlucoseData(monitorData)
 
                         if !followGlucoseDataArray.isEmpty {
-                            trace("    %{public}@ BG values processed", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, followGlucoseDataArray.count.description)
+                            trace("    %{public}@ BG values processed", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, troubleshooting: .standard(.follower(source: .medtrumEasyView, activity: .downloadSucceeded(readingCount: followGlucoseDataArray.count))), followGlucoseDataArray.count.description)
 
                             // Update last fetched timestamp to the most recent reading
                             // This ensures next fetch will only get newer data
@@ -258,13 +304,14 @@ class MedtrumEasyViewFollowManager: NSObject {
                                 }
                             }
                         } else {
-                            trace("    no glucose values were processed", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
+                            trace("    no glucose values were processed", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, troubleshooting: .standard(.follower(source: .medtrumEasyView, activity: .noReadings)))
                         }
                     }
                 }
             } catch MedtrumEasyViewFollowError.sessionExpired {
                 trace("    session expired, will re-login on next download", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
                 self.medtrumUserId = nil
+                FollowerSessionState.shared.update(.loggingIn, for: .medtrumEasyView)
                 self.lastFetchedTimestamp = nil  // Reset to fetch fresh data after re-login
                 // Clear cached user type and connections
                 UserDefaults.standard.medtrumEasyViewUserType = nil
@@ -272,10 +319,11 @@ class MedtrumEasyViewFollowManager: NSObject {
                 UserDefaults.standard.medtrumEasyViewSelectedPatientUid = 0
                 UserDefaults.standard.medtrumEasyViewConnectionsFetchFailed = false
             } catch MedtrumEasyViewFollowError.invalidCredentials {
-                trace("    invalid credentials, preventing further login attempts", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error)
+                trace("    invalid credentials, preventing further login attempts", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error, troubleshooting: .standard(.follower(source: .medtrumEasyView, activity: .loginFailed)))
                 UserDefaults.standard.medtrumEasyViewPreventLogin = true
                 UserDefaults.standard.timeStampOfLastFollowerConnection = .distantPast
                 self.medtrumUserId = nil
+                FollowerSessionState.shared.update(.loggedOut, for: .medtrumEasyView)
                 // Clear cached user type and connections
                 UserDefaults.standard.medtrumEasyViewUserType = nil
                 UserDefaults.standard.medtrumEasyViewCachedConnections = nil
@@ -286,7 +334,7 @@ class MedtrumEasyViewFollowManager: NSObject {
                 trace("    login prevented by user (invalid credentials previously detected)", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
             } catch {
                 // Log the error that was thrown
-                trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error, error.localizedDescription)
+                trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error, troubleshooting: .standard(.follower(source: .medtrumEasyView, activity: .downloadFailed)), error.localizedDescription)
             }
 
             // Rescheduling the timer must be done on the main actor
@@ -304,7 +352,7 @@ class MedtrumEasyViewFollowManager: NSObject {
         var hideSlope = true
         var calculatedValueSlope = 0.0
 
-        let last2Readings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let last2Readings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false, includingSuppressed: true)
 
         if last2Readings.count >= 2 {
             let (slope, hide) = last2Readings[0].calculateSlope(lastBgReading: last2Readings[1])
@@ -319,7 +367,7 @@ class MedtrumEasyViewFollowManager: NSObject {
     /// - returns: Login response with user ID
     /// - throws: MedtrumEasyViewFollowError on failure
     private func requestLogin() async throws -> MedtrumEasyViewLoginResponse {
-        trace("in requestLogin", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
+        trace("in requestLogin", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, troubleshooting: .detailed(.follower(source: .medtrumEasyView, activity: .loginStarted)))
 
         // Check if login is prevented due to previous invalid credentials
         if UserDefaults.standard.medtrumEasyViewPreventLogin {
@@ -559,7 +607,8 @@ class MedtrumEasyViewFollowManager: NSObject {
 
     /// Schedule next download
     private func scheduleNewDownload() {
-        guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
+        guard !UserDefaults.standard.medtrumEasyViewManuallyLoggedOut,
+              UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
 
         trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
 
@@ -572,83 +621,26 @@ class MedtrumEasyViewFollowManager: NSObject {
         }
     }
     
-    // MARK: - Background Keep-Alive Functions
-    
-    /// disable suspension prevention by removing the closures from ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground and ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground
-    private func disableSuspensionPrevention() {
-        // stop the timer for now, might be already suspended but doesn't harm
-        if let playSoundTimer = playSoundTimer {
-            playSoundTimer.suspend()
-        }
-        
-        // no need anymore to resume the player when coming in foreground
-        ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer)
-        
-        // no need anymore to suspend the soundplayer when entering foreground, because it's not even resumed
-        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer)
-    }
-    
-    /// launches timer that will regular play sound - this will be played only when app goes to background and only if the user wants to keep the app alive
-    private func enableSuspensionPrevention() {
-        // if keep-alive is not needed, then just return and do nothing
-        if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-            trace("not enabling suspension prevention as keep-alive type is: %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .debug, UserDefaults.standard.followerBackgroundKeepAliveType.description)
-            return
-        }
-        let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal ? ConstantsSuspensionPrevention.intervalNormal : ConstantsSuspensionPrevention.intervalAggressive
-        // create playSoundTimer depending on the keep-alive type selected
-        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: { [weak self] in
-            guard let self = self else { return }
-            // play the sound
-            trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
-            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, interval.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
-                audioPlayer.play()
-            }
-        })
-        // schedulePlaySoundTimer needs to be created when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                if let playSoundTimer = self.playSoundTimer {
-                    playSoundTimer.resume()
-                }
-                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                    audioPlayer.play()
-                }
-            }
-        })
-        // schedulePlaySoundTimer needs to be invalidated when app goes to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            if let playSoundTimer = self.playSoundTimer {
-                playSoundTimer.suspend()
-            }
-        })
-    }
-
     /// Verify UserDefaults and start or stop follower mode accordingly
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
         // Check if we should be running
         let shouldRun = !UserDefaults.standard.isMaster &&
                        UserDefaults.standard.followerDataSourceType == .medtrumEasyView &&
                        UserDefaults.standard.medtrumEasyViewEmail != nil &&
-                       UserDefaults.standard.medtrumEasyViewPassword != nil
+                       UserDefaults.standard.medtrumEasyViewPassword != nil &&
+                       !UserDefaults.standard.medtrumEasyViewManuallyLoggedOut
 
         if shouldRun {
-            // this will enable the suspension prevention sound playing if background keep-alive is needed
-            // (i.e. not disabled and not using a heartbeat)
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                self.enableSuspensionPrevention()
-            } else {
-                self.disableSuspensionPrevention()
-            }
+            FollowerSessionState.shared.update(.loggingIn, for: .medtrumEasyView)
+            backgroundKeepAliveManager.start(for: .medtrumEasyView)
+
+            guard startsInitialDownload else { return }
 
             // Start downloading
             download()
         } else {
-            // disable the suspension prevention
-            disableSuspensionPrevention()
+            FollowerSessionState.shared.update(.loggedOut, for: .medtrumEasyView)
+            backgroundKeepAliveManager.stop(for: .medtrumEasyView)
             
             // invalidate the downloadtimer
             if let invalidateDownLoadTimerClosure = invalidateDownLoadTimerClosure {
@@ -672,19 +664,17 @@ class MedtrumEasyViewFollowManager: NSObject {
             }
 
         case .medtrumEasyViewEmail, .medtrumEasyViewPassword:
-            // Credentials changed, clear everything
-            if keyValueObserverTimeKeeper.verifyKey(forKey: keyPath, withMinimumDelayMilliSeconds: 200) {
-                trace("    credentials changed, resetting state", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
-                self.medtrumUserId = nil
-                self.lastFetchedTimestamp = nil
-                // Clear cached user type, connections, and selection
-                UserDefaults.standard.medtrumEasyViewUserType = nil
-                UserDefaults.standard.medtrumEasyViewCachedConnections = nil
-                UserDefaults.standard.medtrumEasyViewSelectedPatientUid = 0
-                UserDefaults.standard.medtrumEasyViewConnectionsFetchFailed = false
-                UserDefaults.standard.medtrumEasyViewPreventLogin = false
-                verifyUserDefaultsAndStartOrStopFollowMode()
-            }
+            // Credentials are bound to the authenticated user ID. End the current session and
+            // leave the account logged out until the user explicitly logs in with the new values.
+            trace("    credentials changed, logging out and resetting state", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
+            logOut()
+            // Clear cached user type, connections, and selection
+            UserDefaults.standard.medtrumEasyViewUserType = nil
+            UserDefaults.standard.medtrumEasyViewCachedConnections = nil
+            UserDefaults.standard.medtrumEasyViewSelectedPatientUid = 0
+            UserDefaults.standard.medtrumEasyViewConnectionsFetchFailed = false
+            UserDefaults.standard.medtrumEasyViewPreventLogin = false
+            UserDefaults.standard.timeStampOfLastFollowerConnection = nil
 
         case .medtrumEasyViewSelectedPatientUid:
             // Selected patient changed, only reset user ID and timestamp to trigger refetch
@@ -710,8 +700,7 @@ class MedtrumEasyViewFollowManager: NSObject {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewPassword.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewSelectedPatientUid.rawValue)
         
-        // stop keep-alive helpers
-        disableSuspensionPrevention()
+        backgroundKeepAliveManager.stop(for: .medtrumEasyView)
 
         // invalidate any pending download timer
         invalidateDownLoadTimerClosure?()

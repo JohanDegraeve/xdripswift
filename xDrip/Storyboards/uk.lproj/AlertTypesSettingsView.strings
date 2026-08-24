@@ -28,7 +28,7 @@
 "alerttypesettingsview_screentitle" = "Edit Alarm Type";
 
 /// when editing an alert type, field title for Snooze Period
-"alerttypesettingsview_defaultsnoozeperiod" = "Default Snooze Time (mins)";
+"alerttypesettingsview_defaultsnoozeperiod" = "Default Snooze Time";
 
 /// when trying to delete an alert type, user needs to confirm first, this is the message
 "confirmdeletionalerttype" = "Delete Alarm Type: ";

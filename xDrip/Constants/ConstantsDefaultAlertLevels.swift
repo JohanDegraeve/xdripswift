@@ -23,6 +23,9 @@ enum ConstantsDefaultAlertLevels {
     
     // in minutes, after how many minutes of now reading should alert be raised
     static let missedReading = 30
+
+    // in minutes, after how many minutes without a loop cycle should an alert be raised
+    static let notLooping = 30
     
     // in hours, after how many hours alert to request a new calibration
     static let calibration = 24

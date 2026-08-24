@@ -12,7 +12,12 @@ import SwiftUI
 extension XDripWatchComplication.EntryView {
     @ViewBuilder
     var accessoryCircularView: some View {
-        if !entry.widgetState.keepAliveIsDisabled && entry.widgetState.liveDataIsEnabled {
+        if entry.widgetState.keepAliveIsDisabled {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.title2)
+                .foregroundStyle(.colorPrimary)
+                .widgetBackground(backgroundView: Color.clear)
+        } else {
             Gauge(value: entry.widgetState.bgValueInMgDl ?? entry.widgetState.gaugeModel().nilValue, in: entry.widgetState.gaugeModel().minValue...entry.widgetState.gaugeModel().maxValue) {
                 Text("Not shown")
             } currentValueLabel: {
@@ -34,10 +39,6 @@ extension XDripWatchComplication.EntryView {
             .gaugeStyle(.accessoryCircular)
             .tint(entry.widgetState.gaugeModel().gaugeGradient)
             .widgetBackground(backgroundView: Color.clear)
-        } else {
-            Image("ComplicationIcon")
-                .resizable()
-                .widgetBackground(backgroundView: Color.clear)
         }
     }
 }

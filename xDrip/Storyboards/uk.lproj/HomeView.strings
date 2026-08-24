@@ -94,7 +94,7 @@
 "scanbluetoothdeviceongoing" = "Scanning for Transmitter...";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code use 0000 but be aware that you will need to manually calibrate before you get readings.";
+"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
 
 /// status info : literally 'not known', used if transmitter name is not known
 "notknown" = "Not Known";
@@ -143,7 +143,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -153,3 +153,57 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "Залишилося %@";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Шум сенсора";
+"sensorManagementNoiseShortTerm" = "Останні 30 хвилин";
+"sensorManagementNoiseLongTerm" = "Останні 4 години";
+"sensorManagementNoiseCollecting" = "Збір даних";
+"sensorManagementNoiseLow" = "Низький";
+"sensorManagementNoiseElevated" = "Підвищений";
+"sensorManagementNoiseVeryHigh" = "Дуже високий";
+"sensorManagementNoiseExtreme" = "Екстремальний";
+"sensorManagementNoiseFlatline" = "Сенсор, імовірно, вийшов з ладу.";
+"sensorNoiseWarningExtremeTitle" = "Екстремальний шум сенсора";
+"sensorNoiseWarningPersistentTitle" = "Постійний шум сенсора";
+"sensorNoiseWarningFlatlineTitle" = "Сигнал сенсора плаский";
+"sensorNoiseHistoryTitle" = "Історія шуму";
+"sensorNoiseHistoryCurrentTitle" = "Поточні вимірювання";
+"sensorNoiseHistoryChartTitle" = "Шум у часі";
+"sensorNoiseHistoryRangeTitle" = "Період";
+"sensorNoiseHistoryDayRange" = "1d";
+"sensorNoiseHistoryThreeDayRange" = "3 дн.";
+"sensorNoiseHistoryWeekRange" = "7 дн.";
+"sensorNoiseHistoryAllRange" = "Усе";
+"sensorNoiseHistoryShortCompact" = "30 хв";
+"sensorNoiseHistoryLongCompact" = "4 год";
+"sensorNoiseHistoryLoading" = "Створення історії сенсора";
+"sensorNoiseHistoryNoDataTitle" = "Поки недостатньо даних про шум";
+"sensorNoiseHistoryNoDataMessage" = "Графік з’явиться після накопичення достатньої кількості показань сенсора.";
+"sensorNoiseHistoryChartAccessibility" = "Графік історії шуму сенсора";
+"pumpBattery" = "Батарея";
+"pumpReservoir" = "Резервуар";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Останнє";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";
+"sensorHealthPersistentNoiseTitle" = "Дуже високий шум сенсора";
+"sensorHealthPersistentNoiseGuidance" = "Дуже високий шум протягом 12 годин. Якщо він триває, розгляньте заміну сенсора.";
+"sensorHealthFlatlineTitle" = "Сигнал сенсора не змінюється";
+"sensorHealthFlatlineGuidance" = "Показники не змінювалися 30 хвилин. Зазвичай це означає, що сенсор несправний/прострочений.";
+"sensorHealthTemporaryIssueTitle" = "Тимчасова проблема із сенсором";
+"sensorHealthTemporaryIssueGuidance" = "Тимчасова проблема із сенсором протягом 3 годин. Перевірте глюкометром і дотримуйтеся рекомендацій виробника.";
+"sensorHealthSensorFailedTitle" = "Відмова сенсора";
+"sensorHealthSensorFailedGuidance" = "Повідомлено про відмову сенсора. Замініть сенсор.";
+"sensorHealthTransmitterFailedTitle" = "Відмова передавача";
+"sensorHealthTransmitterFailedGuidance" = "Повідомлено про відмову передавача. Перевірте або замініть його.";
+"connectingToCGM" = "Підключення до CGM...";
+"reconnectingToCGM" = "Повторне підключення до CGM...";

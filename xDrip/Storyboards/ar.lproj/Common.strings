@@ -14,6 +14,8 @@
 "common_minute" = "دقيقة";
 "common_day" = "يوم";
 "common_days" = "أيام";
+"common_landscape_comparingWithLast" = "المقارنة مع آخر:";
+"common_landscape_comparisonDays" = "%d أيام";
 "common_today" = "اليوم";
 "common_week" = "أسبوع";
 "common_todayshort" = "اليوم";

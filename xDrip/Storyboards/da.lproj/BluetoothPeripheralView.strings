@@ -13,6 +13,14 @@
 "battery" = "Battery";
 "needsTransmitterId" = "Missing Transmitter ID";
 "scan" = "Scan";
+"medtrumNanoPumpScanNoticeTitle" = "Forbindelse til Medtrum Nano-pumpe";
+"medtrumNanoPumpScanNoticeMessage" = "Denne indstilling opretter forbindelse til Medtrum Nano-pumpen, ikke direkte til Nano CGM-senderen.\n\nFør scanning skal du sikre dig, at EasyPatch kører, er forbundet til pumpen og modtager aktuelle CGM-værdier.\n\nEasyPatch skal altid køre og fortsat modtage værdier.";
+"libre2ScanNoticeTitle" = "Bluetooth for Libre-appen";
+"libre2ScanNoticeMessage" = "Før scanning skal du deaktivere Bluetooth-tilladelsen for Libre-appen i iPhone-indstillingerne.\n\nBluetooth-tilladelsen for Libre-appen skal altid være deaktiveret. Ellers kan Libre-appen overtage sensorforbindelsen og forhindre denne app i at modtage værdier.";
+"dexcomG6ScanNoticeTitle" = "Forbindelse til Dexcom-appen";
+"dexcomG6ScanNoticeMessage" = "Før scanning skal du tvangslukke Dexcom-appen eller deaktivere dens Bluetooth-tilladelse.\n\nDexcom-appen må ikke være forbundet til senderen, mens denne app scanner eller modtager værdier.";
+"dexcomG7ScanNoticeTitle" = "Dexcom G7-appen er påkrævet";
+"dexcomG7ScanNoticeMessage" = "Før scanning skal du sikre dig, at Dexcom G7-appen kører i baggrunden, er forbundet til sensoren og modtager aktuelle glukoseværdier.\n\nDexcom G7-appen skal altid køre og fortsat modtage værdier.";
 "readyToScan" = "Ready to Scan";
 "scanning" = "Scanning";
 "disconnect" = "Disconnect";
@@ -31,7 +39,11 @@
 "confirmDisconnectMessage" = "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.";
 "transmittterStartDate" = "Transmitter Started";
 "sensorStartDate" = "Sensor Started";
-"useOtherDexcomApp" = "Use With Other App";
+"useOtherDexcomApp" = "Sameksistenstilstand";
+"useOtherDexcomAppCoexistenceFooter" = "Sameksistenstilstand lader os arbejde sammen med en anden app, f.eks. Dexcom eller CamAPS. Den app skal fortsat køre i baggrunden.";
+"useOtherDexcomAppPrimaryFooter" = "Primær tilstand forbinder som hovedappen og styrer forbindelsen.";
+"runningInCoexistenceMode" = "Kører i sameksistenstilstand";
+"runningInPrimaryMode" = "Kører i primær tilstand";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -66,3 +78,33 @@
 
 /// Tell the user the scan was successful and to just wait now for connection
 "nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+
+/// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
+"readSuccessLast24Hours" = "Seneste 24 timer";
+/// Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings
+"readSuccessReadingsReceived" = "%d af %d målinger modtaget";
+/// Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated
+"readSuccessCadenceFooter" = "Forventede målinger er baseret på den observerede senderkadence for %@.";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for good read success
+"readSuccessLegendGood" = "God";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success
+"readSuccessLegendLow" = "Lav";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for poor read success
+"readSuccessLegendPoor" = "Dårlig";
+/// Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available
+"readSuccessLegendNoData" = "Ingen data";
+/// Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings
+"readSuccessNoReadingsExpected" = "Ingen målinger forventet";
+/// Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket
+"readSuccessTimelineAccessibility" = "%0.1f procent, %d af %d målinger";
+
+/// Bluetooth peripheral screen. Row title and screen title for read success information
+"readSuccess" = "Læsesucces";
+/// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
+"readSuccessNow" = "Nu";
+"scanningForTransmitter" = "Søger...";
+"connecting" = "Forbinder";
+"connectingToTransmitter" = "Connecting...";
+"reconnecting" = "Genopretter forbindelse";
+"reconnectingToTransmitter" = "Genopretter forbindelse...";
+"waiting" = "Venter...";

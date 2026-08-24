@@ -71,6 +71,10 @@ protocol CGMTransmitter: AnyObject {
     /// - default false
     func needsSensorStartCode() -> Bool
     
+    /// if true, then the UI should ask the user to confirm a large one-step calibration change
+    /// - default false
+    func shouldWarnOnLargeCalibrationStep() -> Bool
+
     /// returns the service CBUUID
     func getCBUUID_Service() -> String
     
@@ -82,7 +86,8 @@ protocol CGMTransmitter: AnyObject {
 /// cgm transmitter types
 enum CGMTransmitterType:String, CaseIterable {
     
-    /// dexcom G5, G6
+    /// 2026-08-13: Keep this legacy raw value because it is persisted in UserDefaults.
+    /// User-facing setup labels omit G5, while existing G5 transmitters remain supported.
     case dexcom = "Dexcom G5/G6/ONE"
     
     /// dexcom G7
@@ -96,7 +101,22 @@ enum CGMTransmitterType:String, CaseIterable {
     
     /// Libre2
     case Libre2 = "Libre2"
-    
+
+    /// Medtrum TouchCare Nano Pump with integrated CGM data relayed via the pump BLE session.
+    /// Keep this raw value stable because it is persisted in UserDefaults.
+    case medtrumTouchCareNano = "Medtrum Nano"
+
+    /// Direct Medtrum Nano glucose is already consumed by the connected pump and must not be
+    /// exported as an independent CGM source to another OS-AID system.
+    var osAidSharingPolicy: OSAidSharingPolicy {
+        switch self {
+        case .medtrumTouchCareNano:
+            return .blocked
+        default:
+            return .allowed
+        }
+    }
+
     /// what sensorType does this CGMTransmitter type support
     func sensorType() -> CGMSensorType {
         
@@ -107,7 +127,10 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .miaomiao, .Bubble, .Libre2:
             return .Libre
-            
+
+        case .medtrumTouchCareNano:
+            return .Medtrum
+
         }
         
     }
@@ -134,7 +157,13 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .dexcomG7:
             return true
-            
+
+        case .medtrumTouchCareNano:
+            // EasyPatch runs the actual sensor lifecycle, but we *can* infer sensor start by combining
+            // packet timestamp with the reading-counter we decode. Returning true lets xDrip auto-start
+            // its internal sensor record from the sensorAge we pass with each reading.
+            return true
+
         }
     }
     
@@ -153,7 +182,11 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .dexcomG7:
             return false
-        
+
+        case .medtrumTouchCareNano:
+            // EasyPatch owns sensor lifecycle; xDrip should not offer a manual start UI.
+            return false
+
         }
     }
         
@@ -176,7 +209,11 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG7:
             // we don't use this
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG5
-            
+
+        case .medtrumTouchCareNano:
+            // No pump-battery surface in xDrip; reuse the generic threshold so the UI has a sane default.
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelLibre2
+
         }
     }
     
@@ -199,7 +236,10 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG7:
             // we don't use this
             return ""
-            
+
+        case .medtrumTouchCareNano:
+            return ""
+
         }
     }
     
@@ -251,6 +291,9 @@ enum CGMTransmitterType:String, CaseIterable {
             } else {
                 return "Libre 2 EU"
             }
+
+        case .medtrumTouchCareNano:
+            return "Medtrum Nano Pump CGM"
             
         default:
             return self.rawValue
@@ -302,6 +345,9 @@ extension CGMTransmitter {
     // default implementation, returns false
     func needsSensorStartCode() -> Bool { return false }
     
+    // default implementation, returns false
+    func shouldWarnOnLargeCalibrationStep() -> Bool { return false }
+
     // default implementation, returns true
     func nonWebOOPAllowed() -> Bool { return true }
     

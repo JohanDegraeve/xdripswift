@@ -8,7 +8,16 @@ fileprivate let log = OSLog(subsystem: ConstantsLog.subSystem, category: Constan
 /// - if read via NFC or other transmitter, go to PreLibre2
 /// -  this is not the handling of bluetooth itself, this is done in class CGMLibre2Transmitter
 class Libre2BLEUtilities {
-    
+
+    /// this used to store 70 previous values because the old upstream Libre smoothing path reused a much longer raw history across BLE sessions
+    ///
+    /// after removing that smoothing workflow, the remaining job here is only o align the next sparse 16-value BLE frame against the previous one,
+    /// fill short missing slots, and append the older overlap tail
+    ///
+    /// the parseBLEData comment already documents that this overlap recovery is only useful when the difference between sessions is up to 8 minutes, so
+    /// 16 current values + 8 older values means 24 stored values is enough
+    private static let amountOfPreviousRawValuesToStore = 24
+
     public static func streamingUnlockPayload(sensorUID: Data, info: Data, enableTime: UInt32, unlockCount: UInt16) -> [UInt8] {
         
         // First 4 bytes are just int32 of timestamp + unlockCount
@@ -161,9 +170,9 @@ class Libre2BLEUtilities {
         }
         
         // store current values (appended with previous values) in userdefaults previous values
-        UserDefaults.standard.previousRawGlucoseValues = Array(rawGlucoseValues[0..<(min(rawGlucoseValues.count, ConstantsLibreSmoothing.amountOfPreviousReadingsToStore))])
-        UserDefaults.standard.previousTemperatureAdjustmentValues = Array(temperatureAdjustmentValues[0..<(min(rawGlucoseValues.count, ConstantsLibreSmoothing.amountOfPreviousReadingsToStore))])
-        UserDefaults.standard.previousRawTemperatureValues = Array(rawTemperatureValues[0..<(min(rawGlucoseValues.count, ConstantsLibreSmoothing.amountOfPreviousReadingsToStore))])
+        UserDefaults.standard.previousRawGlucoseValues = Array(rawGlucoseValues[0..<(min(rawGlucoseValues.count, amountOfPreviousRawValuesToStore))])
+        UserDefaults.standard.previousTemperatureAdjustmentValues = Array(temperatureAdjustmentValues[0..<(min(rawGlucoseValues.count, amountOfPreviousRawValuesToStore))])
+        UserDefaults.standard.previousRawTemperatureValues = Array(rawTemperatureValues[0..<(min(rawGlucoseValues.count, amountOfPreviousRawValuesToStore))])
         
         // create glucosedata for each known rawglucose and add to returnvallue
         for (index, _) in rawGlucoseValues.enumerated() {
@@ -185,23 +194,16 @@ class Libre2BLEUtilities {
                         
         }
         
-        // sensor gives values only every 1 minute but it gives only 7 readings for the last 16 minutes, with gaps between 1 and 4 minutes Try to fill those gaps using previous sessions, but this may not always be successful, (eg if there's been a disconnection of 2 minutes). So let's fill missing gaps
-        // in case smoothing is used, then maximum gap is 4, if no smoothing is used, then maximum gap is 1
-        bleGlucose.fill0Gaps(maxGapWidth: UserDefaults.standard.smoothLibreValues ? 4:1)
+        // sensor gives values only every 1 minute but it gives only 7 readings
+        // for the last 16 minutes, with gaps between 1 and 4 minutes. Fill only
+        // the short gaps that can be reconstructed reliably from the cached data.
+        bleGlucose.fill0Gaps(maxGapWidth: 1)
         
         // if first (most recent) value has rawGlucose 0.0 then return empty array
         if let first = bleGlucose.first {
             if first.glucoseLevelRaw == 0.0 {
                 return ([GlucoseData](), wearTimeMinutes)
             }
-        }
-        
-        // smooth, if required
-        if UserDefaults.standard.smoothLibreValues {
-            
-            // apply Libre smoothing
-            LibreSmoothing.smooth(trend: &bleGlucose, repeatPerMinuteSmoothingSavitzkyGolay: ConstantsLibreSmoothing.libreSmoothingRepeatPerMinuteSmoothing, filterWidthPerMinuteValuesSavitzkyGolay: ConstantsLibreSmoothing.filterWidthPerMinuteValues, filterWidthPer5MinuteValuesSavitzkyGolay: ConstantsLibreSmoothing.filterWidthPer5MinuteValues, repeatPer5MinuteSmoothingSavitzkyGolay: ConstantsLibreSmoothing.repeatPer5MinuteSmoothing)
-            
         }
         
         // there's still possibly 0 values, eg first or last

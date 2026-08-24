@@ -58,6 +58,8 @@
 
 /// literal translation needed
 "common_days" = "päivää";
+"common_landscape_comparingWithLast" = "Vertailu viimeisiin:";
+"common_landscape_comparisonDays" = "%d päivää";
 
 /// the word average
 "common_statistics_average" = "Keskiarvo";

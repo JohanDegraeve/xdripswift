@@ -13,6 +13,14 @@
 "battery" = "Batteri";
 "needsTransmitterId" = "Saknar sändar-ID";
 "scan" = "Scanna";
+"medtrumNanoPumpScanNoticeTitle" = "Anslutning till Medtrum Nano-pump";
+"medtrumNanoPumpScanNoticeMessage" = "Det här alternativet ansluter till Medtrum Nano-pumpen, inte direkt till Nano CGM-sändaren.\n\nKontrollera före skanning att EasyPatch körs, är ansluten till pumpen och tar emot aktuella CGM-värden.\n\nEasyPatch måste alltid vara igång och fortsätta ta emot värden.";
+"libre2ScanNoticeTitle" = "Bluetooth för Libre-appen";
+"libre2ScanNoticeMessage" = "Inaktivera Bluetooth-behörigheten för Libre-appen i iPhone-inställningarna före skanning.\n\nBluetooth-behörigheten för Libre-appen måste alltid vara inaktiverad. Annars kan Libre-appen ta över sensoranslutningen och hindra den här appen från att ta emot värden.";
+"dexcomG6ScanNoticeTitle" = "Anslutning till Dexcom-appen";
+"dexcomG6ScanNoticeMessage" = "Tvångsavsluta Dexcom-appen före skanning eller inaktivera dess Bluetooth-behörighet.\n\nDexcom-appen får inte vara ansluten till sändaren medan den här appen skannar eller tar emot värden.";
+"dexcomG7ScanNoticeTitle" = "Dexcom G7-appen krävs";
+"dexcomG7ScanNoticeMessage" = "Kontrollera före skanning att Dexcom G7-appen körs i bakgrunden, är ansluten till sensorn och tar emot aktuella glukosvärden.\n\nDexcom G7-appen måste alltid vara igång och fortsätta ta emot värden.";
 "readyToScan" = "Klar att scanna";
 "scanning" = "Scannar";
 "disconnect" = "Koppla ifrån";
@@ -35,8 +43,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Use With Other App";
-
+"useOtherDexcomApp" = "Samexistensläge";
+"useOtherDexcomAppCoexistenceFooter" = "Samexistensläge låter oss fungera med en annan app, till exempel Dexcom eller CamAPS. Den appen måste fortsätta köras i bakgrunden.";
+"useOtherDexcomAppPrimaryFooter" = "Primärt läge ansluter som huvudapp och styr anslutningen.";
+"runningInCoexistenceMode" = "Körs i samexistensläge";
+"runningInPrimaryMode" = "Körs i primärt läge";
 /// cell text, sensor start time
 "sensorStartDate" = "Sensor Started";
 
@@ -77,3 +88,33 @@
 "confirmCalibrationChangeToSinglePointMessage" = "Bekräfta att du vill ändra kalibreringstypen till Standardkalibrering\n\nDetta stoppar avläsningarna under en kort tid och du kommer få ange ett initialt kalibreringsvärde.";
 "confirmCalibrationChangeToMultiPointMessage" = "Bekräfta att du vill ändra kalibreringstypen till Flerpunktskalibrering\n\n⚠️ Observera att denna metod endast är för avancerade användare och kan potentiellt ge farliga resultat om kalibreringen inte är korrekt utförd.\n\n Om du är osäker på hur man använder denna metod, vänligen tryck på avbryt.";
 "confirm" = "Bekräfta";
+
+/// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
+"readSuccessLast24Hours" = "Senaste 24 timmarna";
+/// Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings
+"readSuccessReadingsReceived" = "%d av %d avläsningar mottagna";
+/// Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated
+"readSuccessCadenceFooter" = "Förväntade avläsningar baseras på den observerade sändarkadensen för %@.";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for good read success
+"readSuccessLegendGood" = "Bra";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success
+"readSuccessLegendLow" = "Låg";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for poor read success
+"readSuccessLegendPoor" = "Dålig";
+/// Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available
+"readSuccessLegendNoData" = "Inga data";
+/// Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings
+"readSuccessNoReadingsExpected" = "Inga avläsningar förväntade";
+/// Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket
+"readSuccessTimelineAccessibility" = "%0.1f procent, %d av %d avläsningar";
+
+/// Bluetooth peripheral screen. Row title and screen title for read success information
+"readSuccess" = "Läsningsframgång";
+/// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
+"readSuccessNow" = "Nu";
+"scanningForTransmitter" = "Söker...";
+"connecting" = "Ansluter";
+"connectingToTransmitter" = "Connecting...";
+"reconnecting" = "Återansluter";
+"reconnectingToTransmitter" = "Återansluter...";
+"waiting" = "Väntar...";

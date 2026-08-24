@@ -6,8 +6,6 @@
 //  Copyright © 2023 Johan Degraeve. All rights reserved.
 //
 
-import AudioToolbox
-import AVFoundation
 import Foundation
 import os
 
@@ -31,21 +29,16 @@ class LibreLinkUpFollowManager: NSObject {
     
     /// delegate to pass back glucosedata
     private(set) weak var followerDelegate: FollowerDelegate?
-    
-    /// AVAudioPlayer to use
-    private var audioPlayer: AVAudioPlayer?
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create playsoundtimer
-    private let applicationManagerKeyResumePlaySoundTimer = "LibreLinkUpFollowerManager-ResumePlaySoundTimer"
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate playsoundtimer
-    private let applicationManagerKeySuspendPlaySoundTimer = "LibreLinkUpFollowerManager-SuspendPlaySoundTimer"
+
+    /// The root-owned shared keep-alive engine; this follower reports operational state only and
+    /// does not own silent-audio playback, replay timing, or application lifecycle callbacks.
+    private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
+
+    /// Allows wiring tests to reconcile real manager state without starting follower networking.
+    private let startsInitialDownload: Bool
     
     /// closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
     private var invalidateDownLoadTimerClosure: (() -> Void)?
-    
-    /// timer for playsound
-    private var playSoundTimer: RepeatingTimer?
     
     /// http header array - need to append "version" key before making request
     /// https://gist.github.com/khskekec/6c13ba01b10d3018d816706a32ae8ab2#headers
@@ -85,11 +78,18 @@ class LibreLinkUpFollowManager: NSObject {
     // MARK: - initializer
     
     /// initializer
-    public init(coreDataManager: CoreDataManager, followerDelegate: FollowerDelegate) {
+    init(
+        coreDataManager: CoreDataManager,
+        followerDelegate: FollowerDelegate,
+        backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging,
+        startsInitialDownload: Bool = true
+    ) {
         // initialize non optional private properties
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.followerDelegate = followerDelegate
+        self.backgroundKeepAliveManager = backgroundKeepAliveManager
+        self.startsInitialDownload = startsInitialDownload
         
         // initialize the LibreLinkUpRegion
         self.libreLinkUpRegion = .notConfigured
@@ -101,17 +101,6 @@ class LibreLinkUpFollowManager: NSObject {
             trace("in init, updating userdefaults LibreLinkUp version from '%{public}@' to '%{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, UserDefaults.standard.libreLinkUpVersion ?? "nil", ConstantsLibreLinkUp.libreLinkUpVersionDefault)
             
             UserDefaults.standard.libreLinkUpVersion = ConstantsLibreLinkUp.libreLinkUpVersionDefault
-        }
-        
-        // set up audioplayer
-        if let url = Bundle.main.url(forResource: ConstantsSuspensionPrevention.soundFileName, withExtension: "") {
-            // create audioplayer
-            do {
-                self.audioPlayer = try AVAudioPlayer(contentsOf: url)
-                
-            } catch {
-                trace("in init, exception while trying to create audoplayer, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, error.localizedDescription)
-            }
         }
         
         // call super.init
@@ -130,6 +119,47 @@ class LibreLinkUpFollowManager: NSObject {
     }
     
     // MARK: - public functions
+
+    public func logIn() {
+        let source = TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType)
+        trace(
+            "user requested LibreLinkUp login",
+            log: log,
+            category: ConstantsLog.categoryLibreLinkUpFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: source, activity: .loginStarted))
+        )
+        UserDefaults.standard.libreLinkUpManuallyLoggedOut = false
+        UserDefaults.standard.libreLinkUpPreventLogin = false
+        updateSessionState(.loggingIn)
+        verifyUserDefaultsAndStartOrStopFollowMode()
+    }
+
+    public func logOut() {
+        let source = TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType)
+        trace(
+            "LibreLinkUp logged out",
+            log: log,
+            category: ConstantsLog.categoryLibreLinkUpFollowManager,
+            type: .info,
+            troubleshooting: .standard(.follower(source: source, activity: .loggedOut))
+        )
+        UserDefaults.standard.libreLinkUpManuallyLoggedOut = true
+        invalidateDownLoadTimerClosure?()
+        invalidateDownLoadTimerClosure = nil
+        backgroundKeepAliveManager.stop(for: .libreLinkUp)
+        libreLinkUpToken = nil
+        libreLinkUpExpires = nil
+        libreLinkUpId = nil
+        libreLinkUpPatientId = nil
+        updateSessionState(.loggedOut)
+    }
+
+    /// Both LibreLinkUp variants share one account and one authenticated session.
+    private func updateSessionState(_ status: FollowerSessionStatus) {
+        FollowerSessionState.shared.update(status, for: .libreLinkUp)
+        FollowerSessionState.shared.update(status, for: .libreLinkUpRussia)
+    }
     
     /// creates a bgReading for reading downloaded from LibreLinkUp
     /// - parameters:
@@ -162,7 +192,7 @@ class LibreLinkUpFollowManager: NSObject {
         var calculatedValueSlope = 0.0
         
         // get last readings
-        let last2Readings = self.bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let last2Readings = self.bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false, includingSuppressed: true)
         
         // if more thant 2 readings, calculate slope and hie
         if last2Readings.count >= 2 {
@@ -176,7 +206,7 @@ class LibreLinkUpFollowManager: NSObject {
     
     /// download recent readings from LibreView, send result to delegate, and schedule new download
     @objc public func download() {
-        trace("in download", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+        trace("in download", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, troubleshooting: .detailed(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .downloadStarted)))
         
         if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? .distantPast).timeIntervalSinceNow < -15 {
             trace("    setting nightscoutSyncRequired to true, this will also initiate a treatments/devicestatus sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
@@ -195,6 +225,11 @@ class LibreLinkUpFollowManager: NSObject {
             return
         }
 
+        guard !UserDefaults.standard.libreLinkUpManuallyLoggedOut else {
+            updateSessionState(.loggedOut)
+            return
+        }
+
         guard UserDefaults.standard.libreLinkUpEmail != nil else {
             trace("    libreLinkUpEmail is nil", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
             return
@@ -203,6 +238,12 @@ class LibreLinkUpFollowManager: NSObject {
         guard UserDefaults.standard.libreLinkUpPassword != nil else {
             trace("    libreLinkUpPassword is nil", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
             return
+        }
+
+        if libreLinkUpToken == nil
+            || libreLinkUpPatientId == nil
+            || (libreLinkUpExpires ?? 0) < (Date().toMillisecondsAsDouble() / 1000) {
+            updateSessionState(.loggingIn)
         }
 
         Task {
@@ -218,6 +259,10 @@ class LibreLinkUpFollowManager: NSObject {
                 
                 // this takes care of 1 and 2
                 try await self.checkLoginAndConnections()
+                if self.libreLinkUpToken != nil && self.libreLinkUpPatientId != nil {
+                    self.updateSessionState(.loggedIn)
+                    trace("    in download, login and connection check succeeded", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .debug, troubleshooting: .detailed(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .loginSucceeded)))
+                }
                 
                 // this takes care of 3
                 if self.libreLinkUpToken != nil && self.libreLinkUpPatientId != nil {
@@ -225,6 +270,10 @@ class LibreLinkUpFollowManager: NSObject {
                     
                     // at this stage, we've now got a valid authentication token and we know the patientId we need to follow
                     let graphResponse = try await requestGraph(patientId: patientId)
+                    guard !UserDefaults.standard.libreLinkUpManuallyLoggedOut else {
+                        self.resetAuthenticationState()
+                        return
+                    }
                     
                     // before processing the glucoseMeasurement values, let's set up the sensor info in coredata so that we can show it to the user in the settings screen
                     // starting with LLU 4.12.0 this data sometimes isn't sent for some users so we'll try and use it if available and if not, just try to get it from the data.connection and if not, just continue as normal without throwing an error
@@ -250,7 +299,7 @@ class LibreLinkUpFollowManager: NSObject {
                     // make a quick check in case the graphResponse returns nil for both graphData and even the glucoseMeasurement attributes
                     // this can happen if somebody tries to read from a new account before they've even started uploading any sensor values to it
                     if glucoseMeasurementsArray.count > 0, glucoseMeasurementsArray[0] != nil {
-                        trace("    in download, %{public}@ BG values downloaded", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, glucoseMeasurementsArray.count.description)
+                        trace("    in download, %{public}@ BG values downloaded", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, troubleshooting: .standard(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .downloadSucceeded(readingCount: glucoseMeasurementsArray.count))), glucoseMeasurementsArray.count.description)
                         
                         // create an empty array of FollowerBgReading(s)
                         var followGlucoseDataArray = [FollowerBgReading]()
@@ -268,12 +317,12 @@ class LibreLinkUpFollowManager: NSObject {
                             }
                         }
                     } else {
-                        trace("    in download, no glucose values were downloaded. Nothing to process and send to the delegate.", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, glucoseMeasurementsArray.count.description)
+                        trace("    in download, no glucose values were downloaded. Nothing to process and send to the delegate.", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, troubleshooting: .standard(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .noReadings)), glucoseMeasurementsArray.count.description)
                     }
                 }
             } catch {
                 // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
-                trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, error.localizedDescription)
+                trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, troubleshooting: .standard(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .downloadFailed)), error.localizedDescription)
             }
             
             // rescheduling the timer must be done on the main actor
@@ -315,13 +364,18 @@ class LibreLinkUpFollowManager: NSObject {
             UserDefaults.standard.activeSensorSerialNumber = String(serialNumber.dropLast())
         }
         
-        UserDefaults.standard.activeSensorDescription = UserDefaults.standard.followerDataSourceType.fullDescription + " (" + activeSensorDescription + ")"
+        UserDefaults.standard.activeSensorDescription = UserDefaults.standard.followerDataSourceType.description + " (" + activeSensorDescription + ")"
         
         return
     }
     
     /// if needed, perform a login request and retreive authentication token and expiry date. Then retreive the patient ID.
     private func checkLoginAndConnections() async throws {
+        guard !UserDefaults.standard.libreLinkUpManuallyLoggedOut else {
+            resetAuthenticationState()
+            return
+        }
+
         // if there is no authentication token or if the token expiry date is expired, then make a new login request
         if self.libreLinkUpToken == nil || (self.libreLinkUpExpires ?? 0) < (Date().toMillisecondsAsDouble() / 1000) || self.libreLinkUpPatientId == nil {
             trace("    in checkLoginAndConnections, auth token is nil or is expired so processing new login request", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
@@ -330,6 +384,10 @@ class LibreLinkUpFollowManager: NSObject {
                 // let's process a login request to the server. If it is successful, then we will process a connections request to get the patient ID
                 
                 let requestLoginResponse = try await requestLogin()
+                guard !UserDefaults.standard.libreLinkUpManuallyLoggedOut else {
+                    resetAuthenticationState()
+                    return
+                }
                 
                 if requestLoginResponse.status == 2 {
                     throw LibreLinkUpFollowError.invalidCredentials
@@ -391,6 +449,10 @@ class LibreLinkUpFollowManager: NSObject {
                 
                 if self.libreLinkUpPatientId == nil {
                     let connectionsResponse = try await requestConnections()
+                    guard !UserDefaults.standard.libreLinkUpManuallyLoggedOut else {
+                        resetAuthenticationState()
+                        return
+                    }
                     
                     guard let patientId = connectionsResponse.data?.first(where: { $0.patientId == userId })?.patientId ?? connectionsResponse.data?.first?.patientId else {
                         throw LibreLinkUpFollowError.invalidPatientId
@@ -400,17 +462,21 @@ class LibreLinkUpFollowManager: NSObject {
                     
                     self.libreLinkUpPatientId = patientId
                 }
+
+                self.updateSessionState(.loggedIn)
                 
             } catch LibreLinkUpFollowError.reAcceptNeeded {
-                trace("    in checkLoginAndConnections, login failed with status 4. New terms of use or privacy policy must be accepted first", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+                trace("    in checkLoginAndConnections, login failed with status 4. New terms of use or privacy policy must be accepted first", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, troubleshooting: .standard(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .loginFailed)))
                 
                 UserDefaults.standard.libreLinkUpReAcceptNeeded = true
                 
                 self.resetActiveSensorData()
+                self.resetAuthenticationState()
+                self.updateSessionState(.loggedOut)
                 
             } catch LibreLinkUpFollowError.invalidCredentials {
                 // we could just throw/cascade the same error back to the parent function and handle it there, but let's be redundant to make it clear what we're doing
-                trace("    in checkLoginAndConnections, requestLogin threw and error and exited before login due to previous bad credentials. This will be reset when the user updates their user/password.", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+                trace("    in checkLoginAndConnections, requestLogin threw and error and exited before login due to previous bad credentials. This will be reset when the user updates their user/password.", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, troubleshooting: .standard(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .loginFailed)))
                 
                 // make sure we don't try and login again until the user updates their account info
                 UserDefaults.standard.libreLinkUpPreventLogin = true
@@ -418,10 +484,12 @@ class LibreLinkUpFollowManager: NSObject {
                 UserDefaults.standard.timeStampOfLastFollowerConnection = .distantPast
                 
                 self.resetActiveSensorData()
+                self.resetAuthenticationState()
+                self.updateSessionState(.loggedOut)
                 
             } catch {
                 // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
-                trace("    in checkLoginAndConnections, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, error.localizedDescription)
+                trace("    in checkLoginAndConnections, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, troubleshooting: .standard(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .loginFailed)), error.localizedDescription)
             }
             
         } else {
@@ -444,7 +512,7 @@ class LibreLinkUpFollowManager: NSObject {
             throw LibreLinkUpFollowError.missingCredentials
         }
         
-        trace("    in requestLogin, running login request", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+        trace("    in requestLogin, running login request", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, troubleshooting: .detailed(.follower(source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType), activity: .loginStarted)))
         
         // create the authorization credentials
         guard let authCredentials = try? JSONSerialization.data(withJSONObject: [
@@ -603,15 +671,19 @@ class LibreLinkUpFollowManager: NSObject {
         UserDefaults.standard.activeSensorStartDate = nil
         UserDefaults.standard.activeSensorMaxSensorAgeInDays = nil
         UserDefaults.standard.libreLinkUpCountry = nil
-        
+    }
+
+    private func resetAuthenticationState() {
         self.libreLinkUpToken = nil
+        self.libreLinkUpExpires = nil
         self.libreLinkUpId = nil
         self.libreLinkUpPatientId = nil
     }
     
     /// schedule new download with timer, when timer expires download() will be called
     private func scheduleNewDownload() {
-        guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
+        guard !UserDefaults.standard.libreLinkUpManuallyLoggedOut,
+              UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
         
         trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
         
@@ -656,81 +728,20 @@ class LibreLinkUpFollowManager: NSObject {
         }
     }
     
-    /// disable suspension prevention by removing the closures from ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground and ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground
-    private func disableSuspensionPrevention() {
-        // stop the timer for now, might be already suspended but doesn't harm
-        if let playSoundTimer = playSoundTimer {
-            playSoundTimer.suspend()
-        }
-        
-        // no need anymore to resume the player when coming in foreground
-        ApplicationManager.shared.removeClosureToRunWhenAppDidEnterBackground(key: self.applicationManagerKeyResumePlaySoundTimer)
-        
-        // no need anymore to suspend the soundplayer when entering foreground, because it's not even resumed
-        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeySuspendPlaySoundTimer)
-    }
-    
-    /// launches timer that will regular play sound - this will be played only when app goes to background and only if the user wants to keep the app alive
-    private func enableSuspensionPrevention() {
-        // if keep-alive is disabled or if using a heartbeat, then just return and do nothing
-        if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-            print("not enabling suspension prevention as keep-alive type is:  \(UserDefaults.standard.followerBackgroundKeepAliveType.description)")
-            
-            return
-        }
-        
-        let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal ? ConstantsSuspensionPrevention.intervalNormal : ConstantsSuspensionPrevention.intervalAggressive
-        
-        // create playSoundTimer depending on the keep-alive type selected
-        self.playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: { [weak self] in
-            guard let self = self else { return }
-            // play the sound
-            trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
-            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, interval.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
-                audioPlayer.play()
-            }
-        })
-        
-        // schedulePlaySoundTimer needs to be created when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: self.applicationManagerKeyResumePlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                if let playSoundTimer = self.playSoundTimer {
-                    playSoundTimer.resume()
-                }
-                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                    audioPlayer.play()
-                }
-            }
-        })
-        
-        // schedulePlaySoundTimer needs to be invalidated when app goes to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeySuspendPlaySoundTimer, closure: { [weak self] in
-            guard let self = self else { return }
-            if let playSoundTimer = self.playSoundTimer {
-                playSoundTimer.suspend()
-            }
-        })
-    }
-    
-    /// verifies values of applicable UserDefaults and either starts or stops follower mode, inclusive call to enableSuspensionPrevention or disableSuspensionPrevention - also first download is started if applicable
+    /// Verifies settings and either starts or stops follower mode and its background keep-alive registration.
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
-        if !UserDefaults.standard.isMaster && (UserDefaults.standard.followerDataSourceType == .libreLinkUp || UserDefaults.standard.followerDataSourceType == .libreLinkUpRussia) && UserDefaults.standard.libreLinkUpEmail != nil && UserDefaults.standard.libreLinkUpPassword != nil {
-            // this will enable the suspension prevention sound playing if background keep-alive is needed
-            // (i.e. not disabled and not using a heartbeat)
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                self.enableSuspensionPrevention()
-            } else {
-                self.disableSuspensionPrevention()
-            }
+        if !UserDefaults.standard.isMaster && (UserDefaults.standard.followerDataSourceType == .libreLinkUp || UserDefaults.standard.followerDataSourceType == .libreLinkUpRussia) && UserDefaults.standard.libreLinkUpEmail != nil && UserDefaults.standard.libreLinkUpPassword != nil && !UserDefaults.standard.libreLinkUpManuallyLoggedOut {
+            updateSessionState(.loggingIn)
+            backgroundKeepAliveManager.start(for: .libreLinkUp)
+
+            guard startsInitialDownload else { return }
             
             // do initial download, this will also schedule future downloads
             self.download()
                         
         } else {
-            // disable the suspension prevention
-            self.disableSuspensionPrevention()
+            updateSessionState(.loggedOut)
+            backgroundKeepAliveManager.stop(for: .libreLinkUp)
             
             // invalidate the downloadtimer
             if let invalidateDownLoadTimerClosure = invalidateDownLoadTimerClosure {
@@ -746,8 +757,7 @@ class LibreLinkUpFollowManager: NSObject {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.libreLinkUpEmail.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.libreLinkUpPassword.rawValue)
 
-        // stop keep-alive helpers
-        disableSuspensionPrevention()
+        backgroundKeepAliveManager.stop(for: .libreLinkUp)
 
         // invalidate any pending download timer
         invalidateDownLoadTimerClosure?()
@@ -759,7 +769,16 @@ class LibreLinkUpFollowManager: NSObject {
         if let keyPath = keyPath {
             if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
                 switch keyPathEnum {
-                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType, UserDefaults.Key.libreLinkUpEmail, UserDefaults.Key.libreLinkUpPassword:
+                case UserDefaults.Key.libreLinkUpEmail, UserDefaults.Key.libreLinkUpPassword:
+                    // Account credentials are bound to the active token. Changing either value
+                    // must end that session and require an explicit Log In with the new account.
+                    self.resetActiveSensorData()
+                    self.logOut()
+                    UserDefaults.standard.libreLinkUpPreventLogin = false
+                    UserDefaults.standard.libreLinkUpReAcceptNeeded = false
+                    UserDefaults.standard.timeStampOfLastFollowerConnection = nil
+
+                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType:
                     
                     // change by user, should not be done within 200 ms
                     if self.keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
@@ -769,6 +788,7 @@ class LibreLinkUpFollowManager: NSObject {
                         // reset the token so that a new login process is forced when the download() function is later run
                         // this will also reset all activeSensor coredata values to update the UI
                         self.resetActiveSensorData()
+                        self.resetAuthenticationState()
                         
                         self.verifyUserDefaultsAndStartOrStopFollowMode()
                     }

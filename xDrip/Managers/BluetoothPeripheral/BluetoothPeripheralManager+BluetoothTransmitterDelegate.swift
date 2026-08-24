@@ -1,4 +1,3 @@
-import UIKit
 import CoreBluetooth
 import AVFoundation
 import AudioToolbox
@@ -21,9 +20,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     
     /// Transmitter is calling this delegate function to indicate that bluetooth pairing is needed. If the app is in the background, the user will be informed, after opening the app a pairing request will be initiated. if the app is in the foreground, the pairing request will be initiated immediately
     func transmitterNeedsPairing(bluetoothTransmitter: BluetoothTransmitter) {
-        
-        trace("transmitter needs pairing", log: log, category: ConstantsLog.categoryRootView, type: .info)
-        
+
         if let timeStampLastNotificationForPairing = PropertyHolder.timeStampLastNotificationForPairing {
             
             // check timestamp of last notification, if too soon then return
@@ -34,6 +31,17 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         
         // set timeStampLastNotificationForPairing
         PropertyHolder.timeStampLastNotificationForPairing = Date()
+
+        // Pairing is a meaningful CGM milestone, but the callback can repeat while the same system
+        // prompt is outstanding. Emit it only after the existing notification throttle accepts the
+        // request, and never expose the transmitter name or identifier to the shareable log.
+        trace(
+            "transmitter needs pairing",
+            log: log,
+            category: ConstantsLog.categoryRootView,
+            type: .info,
+            troubleshooting: .standard(.bluetooth(.pairingRequested))
+        )
         
         // remove existing notification if any
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
@@ -81,9 +89,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             // if it was too long since notification was fired, then forget about it - inform user that it's too late
             if Date() > maxTimeUserCanOpenApp {
                 trace("in cgmTransmitterNeedsPairing, user opened the app too late", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
-                let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.transmitterPairingTooLate, actionHandler: nil)
-                
-                self.uIViewController.present(alert, animated: true, completion: nil)
+                self.messageHandler(Texts_Common.warning, Texts_HomeView.transmitterPairingTooLate)
                 
                 return
             }
@@ -99,6 +105,13 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     }
 
     func successfullyPaired() {
+        trace(
+            "transmitter paired successfully",
+            log: log,
+            category: ConstantsLog.categoryRootView,
+            type: .info,
+            troubleshooting: .standard(.bluetooth(.pairingSucceeded))
+        )
         
         // remove existing notification if any
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing])
@@ -109,14 +122,20 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         }
         
         // inform user
-        let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.transmitterPairingSuccessful, actionHandler: nil)
-        
-        uIViewController.present(alert, animated: true, completion: nil)
+        messageHandler(Texts_HomeView.info, Texts_HomeView.transmitterPairingSuccessful)
         
     }
 
     
     func pairingFailed() {
+        trace(
+            "transmitter pairing did not complete",
+            log: log,
+            category: ConstantsLog.categoryRootView,
+            type: .error,
+            troubleshooting: .standard(.bluetooth(.pairingFailed))
+        )
+
         // this should be the consequence of the user not accepting the pairing request, there's no need to inform the user
         // invalidate transmitterPairingResponseTimer
         if let transmitterPairingResponseTimer = PropertyHolder.transmitterPairingResponseTimer {
@@ -155,6 +174,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
             if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
                 bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+                recordSuccessfulConnection(for: bluetoothPeripheral)
             }
             
             return
@@ -181,6 +201,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
             if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
                 bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+                recordSuccessfulConnection(for: bluetoothPeripheral)
             }
             
             return
@@ -192,7 +213,16 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             
             if bluetoothPeripheral.blePeripheral.address == deviceAddressNewTransmitter {
                 
-                trace("in didConnect, transmitter address already known. Treating as existing device, continuing setup (no disconnect)", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
+                let namedDevice = TroubleshootingBluetoothDeviceName(deviceNameNewTransmitter)
+                trace(
+                    "in didConnect, transmitter address already known. Treating as existing device, continuing setup (no disconnect)",
+                    log: log,
+                    category: ConstantsLog.categoryBluetoothPeripheralManager,
+                    type: .info,
+                    troubleshooting: namedDevice.map {
+                        .standard(.bluetoothDevice(name: $0, activity: .reconnectedToExisting))
+                    }
+                )
 
                 // This is an already known BluetoothTransmitter. Do not disconnect, avoid creating a duplicate entry.
                 // Clear the temporary scanning transmitter so we do not go through the "new device" creation path below.
@@ -203,6 +233,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
 
                 // Update the existing peripheral's last connection status change timestamp to now.
                 bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+                recordSuccessfulConnection(for: bluetoothPeripheral)
 
                 // Continue normal flow without creating a new BluetoothPeripheral and without disconnecting.
                 return
@@ -238,7 +269,16 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             
         }
         
-        trace("in didconnect to, created a new bluetoothperipheral", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
+        let namedDevice = TroubleshootingBluetoothDeviceName(deviceNameNewTransmitter)
+        trace(
+            "in didconnect to, created a new bluetoothperipheral",
+            log: log,
+            category: ConstantsLog.categoryBluetoothPeripheralManager,
+            type: .info,
+            troubleshooting: namedDevice.map {
+                .standard(.bluetoothDevice(name: $0, activity: .added))
+            }
+        )
         
         // add new bluetoothPeripheral and bluetoothTransmitter to array of bluetoothPeripherals and bluetoothTransmitters
         bluetoothTransmitters.insert(bluetoothTransmitter, at: insertInBluetoothPeripherals(bluetoothPeripheral: newBluetoothPeripheral))
@@ -254,6 +294,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         
         // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
         newBluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+        recordSuccessfulConnection(for: newBluetoothPeripheral)
         
         // call sendSettings function
         newBluetoothPeripheral.sendSettings(to: bluetoothTransmitter)
@@ -299,12 +340,9 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         
         trace("in didDisconnectFrom", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .debug)
         
-        // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
         if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {
-            bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+            recordDisconnection(for: bluetoothPeripheral)
         }
-
-        coreDataManager.saveChanges()
         
     }
     
@@ -327,20 +365,28 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     // inform user that pairing request timed out
     @objc private func informUserThatPairingTimedOut() {
         
-        let alert = UIAlertController(title: Texts_Common.warning, message: "time out", actionHandler: nil)
-        
-        uIViewController.present(alert, animated: true, completion: nil)
+        messageHandler(Texts_Common.warning, "time out")
         
     }
 
     // to confirm to protocol BluetoothPeripheralDelegate
     func heartBeat() {
-        // bluetooth peripheral's heart is beating
-        // if a heartBeat function is set, then call it
+        // Every transmitter heartbeat converges here after the transmitter's own minimum-interval
+        // guard. Recording the typed fact at this boundary captures every real heartbeat without
+        // exposing a transmitter identifier, packet contents or the developer trace message.
+        trace(
+            "heartbeat received",
+            log: log,
+            category: ConstantsLog.categoryBluetoothPeripheralManager,
+            type: .info,
+            troubleshooting: .standard(.heartbeatReceived)
+        )
+
+        // Keep the existing callback behavior completely independent from consumer persistence.
+        // A slow or failed troubleshooting write must never alter heartbeat-driven app behavior.
         if let heartBeatFunction = heartBeatFunction {
             heartBeatFunction()
         }
     }
 
 }
-

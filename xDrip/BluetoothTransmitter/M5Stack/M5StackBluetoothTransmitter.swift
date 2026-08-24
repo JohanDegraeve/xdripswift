@@ -106,7 +106,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         }
         
        // create text to send, reading value, one blanc, timestamp in seconds
-        let textToSend = Int(round(bgReading.calculatedValue)).description + " " + bgReading.timeStamp.toSecondsAsInt64().description
+        let textToSend = Int(round(bgReading.finalValue)).description + " " + bgReading.timeStamp.toSecondsAsInt64().description
         
         // create packets to send reading and timestamp
         guard let packetsWithReadingAndTimestamp = M5StackUtilities.splitTextInBLEPackets(text: textToSend, maxBytesInOneBLEPacket: ConstantsM5Stack.maximumMBLEPacketsize, opCode: M5StackTransmitterOpCodeTx.bgReadingTx.rawValue) else {

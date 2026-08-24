@@ -10,6 +10,14 @@
 
 /// text in button to start scanning
 "scan" = "Scannen";
+"medtrumNanoPumpScanNoticeTitle" = "Verbindung mit der Medtrum Nano Pumpe";
+"medtrumNanoPumpScanNoticeMessage" = "Diese Option stellt eine Verbindung mit der Medtrum Nano Pumpe her, nicht direkt mit dem Nano CGM-Transmitter.\n\nStelle vor dem Scannen sicher, dass EasyPatch ausgeführt wird, mit der Pumpe verbunden ist und aktuelle CGM-Werte empfängt.\n\nEasyPatch muss jederzeit ausgeführt werden und weiterhin Werte empfangen.";
+"libre2ScanNoticeTitle" = "Bluetooth der Libre-App";
+"libre2ScanNoticeMessage" = "Deaktiviere vor dem Scannen die Bluetooth-Berechtigung für die Libre-App in den iPhone-Einstellungen.\n\nDie Bluetooth-Berechtigung für die Libre-App muss jederzeit deaktiviert bleiben. Andernfalls kann die Libre-App die Sensorverbindung übernehmen und verhindern, dass diese App Werte empfängt.";
+"dexcomG6ScanNoticeTitle" = "Verbindung der Dexcom-App";
+"dexcomG6ScanNoticeMessage" = "Beende vor dem Scannen die Dexcom-App vollständig oder deaktiviere ihre Bluetooth-Berechtigung.\n\nDie Dexcom-App darf nicht mit dem Transmitter verbunden sein, während diese App scannt oder Werte empfängt.";
+"dexcomG7ScanNoticeTitle" = "Dexcom G7-App erforderlich";
+"dexcomG7ScanNoticeMessage" = "Stelle vor dem Scannen sicher, dass die Dexcom G7-App im Hintergrund ausgeführt wird, mit dem Sensor verbunden ist und aktuelle Glukosewerte empfängt.\n\nDie Dexcom G7-App muss jederzeit ausgeführt werden und weiterhin Werte empfangen.";
 
 /// cell text, where user can select to reset a transmitter at next connect. Only for Dexcom
 "resetRequired" = "Transmitter zurücksetzen";
@@ -94,8 +102,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Use With Other App";
-
+"useOtherDexcomApp" = "Koexistenzmodus";
+"useOtherDexcomAppCoexistenceFooter" = "Im Koexistenzmodus können wir mit einer anderen App wie Dexcom oder CamAPS zusammenarbeiten. Diese App muss im Hintergrund weiterlaufen.";
+"useOtherDexcomAppPrimaryFooter" = "Der Primärmodus verbindet sich als Haupt-App und steuert die Verbindung.";
+"runningInCoexistenceMode" = "Läuft im Koexistenzmodus";
+"runningInPrimaryMode" = "Läuft im Primärmodus";
 /// cell text, sensor start time
 "sensorStartDate" = "Sensor Started";
 
@@ -136,3 +147,33 @@
 "confirmCalibrationChangeToSinglePointMessage" = "Bitte um Bestätigung, dass zur Standard Kalibrierung gewechselt werden soll.\n\nDies stoppt für kurze Zeit die Datenübermittlung und Du wirst um einen initialen Kalibrierungswert (Blut) gebeten.";
 "confirmCalibrationChangeToMultiPointMessage" = "Bitte um Bestätigung, dass zur Mehrpunkt Kalibrierung gewechselt werden soll.\n\n⚠️ Diese Methode ist nur  für erfahrene Benutzer, es könnte ein falscher und damit gefährlicher Wert angezeigt werden, wenn die Kalibrierung nicht korrekt durchgeführt wurde.\n\nWenn Du unsicher bist, bitte drücke Abbruch/Cancel.";
 "confirm" = "Bestätigen";
+
+/// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
+"readSuccessLast24Hours" = "Letzte 24 Stunden";
+/// Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings
+"readSuccessReadingsReceived" = "%d von %d Messwerten empfangen";
+/// Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated
+"readSuccessCadenceFooter" = "Die erwarteten Messwerte basieren auf der beobachteten Sender-Kadenz für %@.";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for good read success
+"readSuccessLegendGood" = "Gut";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success
+"readSuccessLegendLow" = "Niedrig";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for poor read success
+"readSuccessLegendPoor" = "Schlecht";
+/// Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available
+"readSuccessLegendNoData" = "Keine Daten";
+/// Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings
+"readSuccessNoReadingsExpected" = "Keine Messwerte erwartet";
+/// Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket
+"readSuccessTimelineAccessibility" = "%0.1f Prozent, %d von %d Messwerten";
+
+/// Bluetooth peripheral screen. Row title and screen title for read success information
+"readSuccess" = "Leseerfolg";
+/// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
+"readSuccessNow" = "Jetzt";
+"scanningForTransmitter" = "Suche...";
+"connecting" = "Verbinden";
+"connectingToTransmitter" = "Connecting...";
+"reconnecting" = "Erneut verbinden";
+"reconnectingToTransmitter" = "Erneute Verbindung...";
+"waiting" = "Warten...";

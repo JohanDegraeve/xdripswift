@@ -11,15 +11,14 @@ extension BgReading {
             "date": timeStamp.toMillisecondsAsInt64(),
             "dateString": timeStamp.ISOStringFromDate(reuseDateFormatter: reuseDateFormatter),
             "type": "sgv",
-            "sgv": Int(calculatedValue.round(toDecimalPlaces: 0)),
+            "sgv": Int(finalValue.round(toDecimalPlaces: 0)),
             "direction": slopeName,
-            "filtered": (ageAdjustedRawValue > 0.0 ? round(ageAdjustedRawValue * 1000) : Int(calculatedValue.round(toDecimalPlaces: 0))*1000),
-            "unfiltered": (ageAdjustedRawValue > 0.0 ? round(ageAdjustedRawValue * 1000) : Int(calculatedValue.round(toDecimalPlaces: 0))*1000),
+            "filtered": (ageAdjustedRawValue > 0.0 ? round(ageAdjustedRawValue * 1000) : Int(finalValue.round(toDecimalPlaces: 0))*1000),
+            "unfiltered": (ageAdjustedRawValue > 0.0 ? round(ageAdjustedRawValue * 1000) : Int(finalValue.round(toDecimalPlaces: 0))*1000),
             "noise": 1,
-            "sysTime": timeStamp.ISOStringFromDate()
+            "sysTime": timeStamp.ISOStringFromDate(reuseDateFormatter: reuseDateFormatter)
         ]
         
     }
     
 }
-

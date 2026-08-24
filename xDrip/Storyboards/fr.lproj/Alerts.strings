@@ -1,4 +1,10 @@
 "alertsettingsview_screentitle" = "Alerte";
+"alerts_snooze_high_title" = "Valeur haute";
+"alerts_snooze_very_high_title" = "Valeur très haute";
+"alerts_snooze_low_title" = "Valeur faible";
+"alerts_snooze_very_low_title" = "Valeur très faible";
+"alerts_snooze_fast_drop_title" = "Chute rapide";
+"alerts_snooze_fast_rise_title" = "Augmentation rapide";
 "alertssettingsview_screentitle" = "Editer l'alerte";
 "alerts_highalerttitle" = "Valeur haute";
 "alerts_veryhighalerttitle" = "Valeur très haute";
@@ -18,4 +24,3 @@
 "alerts_fastrise" = "Augmentation rapide";
 "alertWhenBelowValue" = "Que si inf à";
 "alertWhenAboveValue" = "Que si sup à";
-

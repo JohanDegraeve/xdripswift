@@ -5,6 +5,12 @@
 
 /// When very high alert rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alert
 "alerts_veryhighalerttitle" = "Very High Alarm";
+"alerts_snooze_high_title" = "Високий";
+"alerts_snooze_very_high_title" = "Дуже високий";
+"alerts_snooze_low_title" = "Низький";
+"alerts_snooze_very_low_title" = "Дуже низький";
+"alerts_snooze_fast_drop_title" = "Швидке падіння";
+"alerts_snooze_fast_rise_title" = "Швидке зростання";
 
 /// an alentry is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule
 "alerttype" = "Alarm Type";

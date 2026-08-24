@@ -60,6 +60,10 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     /// sensor type
     private var libreSensorType: LibreSensorType?
+
+    /// Bluetooth name selected from the NFC result. Newer 7F sensors advertise the returned
+    /// MAC-derived name instead of the legacy "ABBOTT" + sensor serial number.
+    private var expectedBluetoothNameFromNFC: String?
     
     // MARK: - Initialization
 
@@ -107,23 +111,42 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     // MARK: - overriden  BluetoothTransmitter functions
     
     override func startScanning() -> BluetoothTransmitter.startScanningResult {
-        // overriding startScanning, because it's the time to trigger NFC Scan
-        // when user clicks the scan button, an NFC read is initiated which will enable the bluetooth streaming
-        // meanwhile, the real scanning can start
+        // For Libre 2, a user-requested scan starts with NFC because the NFC read enables
+        // Bluetooth streaming and refreshes the unlock state before BLE reconnects.
         
         // create libreNFC instance and start session
         if NFCTagReaderSession.readingAvailable {
             // startScanning is getting called several times, but we must restrict launch of nfc scan to one single time, therefore check if libreNFC == nil
             if libreNFC == nil {
+                // One explicit Libre Connect/Add request creates one NFC session. Log that user-level
+                // milestone here, where the session is actually created, rather than in the repeated
+                // Bluetooth scanning callbacks that can occur while iOS changes radio state.
+                trace(
+                    "starting Libre NFC sensor scan",
+                    log: log,
+                    category: ConstantsLog.categoryCGMLibre2,
+                    type: .info,
+                    troubleshooting: .standard(.cgm(source: .libre2, activity: .nfcScanStarted))
+                )
+
                 // NFC session creation must be on main thread
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
-                    self.libreNFC = LibreNFC(libreNFCDelegate: self)
-                    (self.libreNFC as! LibreNFC).startSession()
+                    let libreNFC = LibreNFC(libreNFCDelegate: self)
+                    self.libreNFC = libreNFC
+                    libreNFC.startSession()
                 }
             }
             
         } else {
+            trace(
+                "Libre NFC sensor scanning is unavailable on this device",
+                log: log,
+                category: ConstantsLog.categoryCGMLibre2,
+                type: .error,
+                troubleshooting: .standard(.cgm(source: .libre2, activity: .nfcUnavailable))
+            )
+
             // delegate may touch UI/Core Data → ensure main thread
             DispatchQueue.main.async { [weak self] in
                 self?.bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.deviceMustSupportNFC)
@@ -133,7 +156,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         // start the NFC scan (not BLE scanning)
         return .nfcScanNeeded
     }
-    
+
     override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         super.centralManager(central, didConnect: peripheral)
         
@@ -147,10 +170,10 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
             // set to nil so we don't send it again to the delegate when there's a new connect
             tempSensorSerialNumber = nil
             
-            // for Libre 2, the device name includes the sensor id
-            // if tempSensorSerialNumber != deviceName, then it means the user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user
-            // compare only the last 10 characters. Normally it should be 10, but for some reason, xDrip4iOS does not correctly decode the sensor uid, the first character is not correct
-            if let deviceName = deviceName, sensorSerialNumber.serialNumber.suffix(9).uppercased() != deviceName.suffix(9) {
+            // Validate using the identity advertised by this sensor generation. Older Libre 2
+            // sensors include their serial number in the Bluetooth name, while 7F sensors use
+            // the MAC-derived name returned by the NFC enable-streaming command.
+            if connectedDeviceMatchesScannedSensor(serialNumber: sensorSerialNumber) == false {
                 DispatchQueue.main.async { [weak self] in
                     self?.bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.connectedLibre2DoesNotMatchScannedLibre2)
                 }
@@ -198,15 +221,22 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
             
             return
         }
+
+        // the unlock algorithm reads 6 bytes directly, so invalid restored sensor metadata must be rejected before creating the payload
+        guard libreSensorUID.count >= 6, librePatchInfo.count >= 6 else {
+            trace("in peripheral didUpdateNotificationStateFor but the stored sensor metadata is incomplete, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
+
+            return
+        }
         
         if error == nil && characteristic.isNotifying {
             UserDefaults.standard.libreActiveSensorUnlockCount += 1
             
-            trace("sensorid as data =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.toHexString(), librePatchInfo.toHexString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
+            trace("sensorid as data =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.hexEncodedString(), librePatchInfo.hexEncodedString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
             
             let unLockPayLoad = Data(Libre2BLEUtilities.streamingUnlockPayload(sensorUID: libreSensorUID, info: librePatchInfo, enableTime: UserDefaults.standard.libreActiveSensorUnlockCode, unlockCount: UserDefaults.standard.libreActiveSensorUnlockCount))
             
-            trace("in peripheral didUpdateNotificationStateFor, writing streaming unlock payload: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, unLockPayLoad.toHexString())
+            trace("in peripheral didUpdateNotificationStateFor, writing streaming unlock payload: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, unLockPayLoad.hexEncodedString())
                 
             // user may have chosen to run xDrip4iOS in parallel with other apps, in this case suppress sending unlockpayload
             if !UserDefaults.standard.suppressUnLockPayLoad {
@@ -225,6 +255,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
             self.tempSensorSerialNumber = nil
             self.libreNFC = nil
             self.libreSensorType = nil
+            self.expectedBluetoothNameFromNFC = nil
         }
         if Thread.isMainThread {
             tearDown()
@@ -244,6 +275,23 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     private func resetRxBuffer() {
         rxBuffer = Data()
         startDate = Date()
+    }
+
+    /// Returns nil when the connected peripheral cannot be validated. A missing identifier must
+    /// not be reported as a wrong sensor because connection and payload authentication still
+    /// provide their own checks.
+    private func connectedDeviceMatchesScannedSensor(serialNumber: LibreSensorSerialNumber) -> Bool? {
+        guard let deviceName = deviceName else { return nil }
+
+        if libreSensorType?.usesMacAddressAsBluetoothName == true {
+            guard let expectedBluetoothNameFromNFC = expectedBluetoothNameFromNFC else { return nil }
+
+            return deviceName.caseInsensitiveCompare(expectedBluetoothNameFromNFC) == .orderedSame
+        }
+
+        // Preserve the legacy comparison: historically the first decoded serial character was
+        // unreliable, so only the final nine characters were used to identify ABBOTT-named sensors.
+        return serialNumber.serialNumber.suffix(9).uppercased() == deviceName.suffix(9).uppercased()
     }
     
     /// process value received from transmitter
@@ -268,7 +316,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
                 } else {
                     libre1DerivedAlgorithmParametersAsString = "unknown"
                 }
-                trace("in peripheral didUpdateValueFor libreSensorUID = %{public}@, libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug, sensorUID.toHexString(), libre1DerivedAlgorithmParametersAsString)
+                trace("in peripheral didUpdateValueFor libreSensorUID = %{public}@, libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug, sensorUID.hexEncodedString(), libre1DerivedAlgorithmParametersAsString)
             }
             
             do {
@@ -357,7 +405,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {}
 
 extension CGMLibre2Transmitter: LibreNFCDelegate {
     func received(fram: Data) {
-        trace("received fram :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, fram.toHexString())
+        trace("received fram :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, fram.hexEncodedString())
         
         // if we already know the patchinfo (which we should because normally received(sensorUID: Data, patchInfo: Data) gets called before received(fram: Data), then patchInfo should not be nil
         // same for sensorUID
@@ -378,7 +426,7 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         UserDefaults.standard.libreSensorUID = sensorUID
         
         // store the sensorUID as tempSensorSerialNumber (as LibreSensorSerialNumber)
-        let receivedSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.toHexString()))
+        let receivedSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.hexEncodedString()))
         if let receivedSensorSerialNumber = receivedSensorSerialNumber {
             tempSensorSerialNumber = receivedSensorSerialNumber
         }
@@ -402,10 +450,10 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
             }
             
         } else {
-            trace("could not created sensor serial number from received sensorUID, sensorUID = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, sensorUID.toHexString())
+            trace("could not created sensor serial number from received sensorUID, sensorUID = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, sensorUID.hexEncodedString())
         }
         
-        trace("patchInfo received :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, patchInfo.toHexString())
+        trace("patchInfo received :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, patchInfo.hexEncodedString())
         
         UserDefaults.standard.librePatchInfo = patchInfo
     }
@@ -421,22 +469,45 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         }
     }
     
-    func nfcScanResult(successful: Bool) {
-        if successful {
-            trace("received NFC scan result from NFC with result successful", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
-            
-            // only process if userdefaults needs changing to true to avoid triggering the observer unnecessarily
+    func nfcScanResult(_ result: LibreNFCScanResult) {
+        // Keep the Core NFC error and sensor payload in the developer trace. Only this closed result
+        // crosses into the shareable Activity Log, so cancellation and timeout remain distinct from
+        // an actual scan failure without exposing a sensor serial number or raw NFC response.
+        let activity: TroubleshootingCGMActivity
+        let developerResult: String
+        switch result {
+        case .succeeded:
+            activity = .nfcScanSucceeded
+            developerResult = "successful"
+        case .failed:
+            activity = .nfcScanFailed
+            developerResult = "failed"
+        case .cancelled:
+            activity = .nfcScanCancelled
+            developerResult = "cancelled"
+        case .timedOut:
+            activity = .nfcScanTimedOut
+            developerResult = "timed out"
+        }
+
+        trace(
+            "received NFC scan result from NFC with result %{public}@",
+            log: log,
+            category: ConstantsLog.categoryCGMLibre2,
+            type: result == .succeeded ? .info : .error,
+            troubleshooting: .standard(.cgm(source: .libre2, activity: activity)),
+            developerResult
+        )
+
+        if result == .succeeded {
+            // Avoid triggering the success observer more than once for the same scan.
             if !UserDefaults.standard.nfcScanSuccessful {
                 UserDefaults.standard.nfcScanSuccessful = true
             }
-            
-        } else {
-            trace("received NFC scan result from NFC with result unsuccessful", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
-            
-            // only process if userdefaults needs changing to true to avoid triggering the observer unnecessarily
-            if !UserDefaults.standard.nfcScanFailed {
-                UserDefaults.standard.nfcScanFailed = true
-            }
+        } else if !UserDefaults.standard.nfcScanFailed {
+            // The current UI offers the same retry sheet for failure, cancellation and timeout. The
+            // Activity Log has already retained the more accurate reason above.
+            UserDefaults.standard.nfcScanFailed = true
         }
     }
     
@@ -445,10 +516,11 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
     }
     
     func nfcScanExpectedDevice(serialNumber: String, macAddress: String) {
-        if libreSensorType == .libre27F {
-            updateExpectedDeviceName(name: macAddress)
-        } else {
-            updateExpectedDeviceName(name: "ABBOTT" + serialNumber)
-        }
+        let expectedBluetoothName = libreSensorType?.usesMacAddressAsBluetoothName == true
+            ? macAddress
+            : "ABBOTT" + serialNumber
+
+        expectedBluetoothNameFromNFC = expectedBluetoothName
+        updateExpectedDeviceName(name: expectedBluetoothName)
     }
 }

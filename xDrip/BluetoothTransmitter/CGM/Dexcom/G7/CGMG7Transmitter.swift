@@ -8,7 +8,9 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     /// is the transmitter oop web enabled or not. For G7/ONE+/Stelo this must be set to true to use only the transmitter algorithm
     private var webOOPEnabled: Bool
 
-    /// stored when receiving single reading, needed when receiving backfill data
+    /// Stored from the current connection's real-time reading and used to anchor backfill timestamps.
+    /// This must be reset for every connection: reusing an earlier connection's age can create
+    /// future-dated backfill readings when the sensor's backfill counter has advanced.
     private var sensorAge: TimeInterval?
     
     /// used when receiving backfill data from G7 sensor
@@ -216,33 +218,17 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         // Clear authenticated session tracking on disconnect
         self.currentlyAuthenticatedDeviceName = nil
 
-        // Ensure any queued raw backfill frames are parsed before flushing
+        // Parse only when this connection supplied a fresh sensor age, then deliver one captured batch.
         processPendingBackfillFramesIfPossible()
+        flushBackfillDeliveringToDelegate()
 
-        // backfill should not contain at leats the latest reading, and possibly also real backfill data
-        // this is the right moment to send it to the delegate
-        
-        // if nothing to deliver, skip
-        if backfill.isEmpty == false {
-            // sort backfill, first element should be youngest
-            backfill = backfill.sorted(by: { $0.timeStamp > $1.timeStamp })
-            
-            // send glucoseData to cgmTransmitterDelegate on main (UI/Core Data safety), use a local copy for inout
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                var copy = self.backfill
-                self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
-            }
-            
-            // set timeStampLastReading to timestamp of the most recent reading, which is the first
-            if let firstReading = backfill.first {
-                timeStampLastReading = firstReading.timeStamp
-            }
-            
-            // reset backfill
-            backfill = [GlucoseData]()
+        if pendingBackfillRawFrames.isEmpty == false {
+            trace("    discarded %{public}d backfill frame(s) without a fresh sensor age for this connection", log: log, category: ConstantsLog.categoryCGMG7, type: .info, pendingBackfillRawFrames.count)
+            pendingBackfillRawFrames.removeAll(keepingCapacity: true)
         }
+
+        // Never allow timing state from this connection to anchor the next connection's backfill.
+        sensorAge = nil
 
         // setting characteristics to nil, they will be reinitialized at next connect
         writeControlCharacteristic = nil
@@ -291,7 +277,8 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 }
                 
                 // set sensorAge as early as possible to avoid race with Backfill frames
-                sensorAge = g7GlucoseMessage.sensorAge
+                let currentSensorAge = g7GlucoseMessage.sensorAge
+                sensorAge = currentSensorAge
                 
                 // if any Backfill frames arrived just before this, parse them now
                 processPendingBackfillFramesIfPossible()
@@ -347,7 +334,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     var copy = newGlucoseDataArray
-                    self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
+                    self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: currentSensorAge)
                 }
 
                 // Update last delivered timestamp
@@ -357,6 +344,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     guard let self = self else { return }
 
                     self.cGMG7TransmitterDelegate?.received(sensorStatus: g7GlucoseMessage.algorithmStatus.description, cGMG7Transmitter: self)
+                    self.cgmTransmitterDelegate?.sensorHealthEventOccurred(g7GlucoseMessage.algorithmStatus.sensorHealthEvent)
 
                     // send sensorStartDate to cGMG7TransmitterDelegate
                     self.cGMG7TransmitterDelegate?.received(sensorStartDate: Date(timeIntervalSinceNow: -g7GlucoseMessage.sensorAge), cGMG7Transmitter: self)
@@ -394,18 +382,9 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 if let dexcomG7BackfillMessage = DexcomG7BackfillMessage(data: value, sensorAge: sensorAge) {
                     trace("    received backfill mesage, calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, dexcomG7BackfillMessage.calculatedValue.description, dexcomG7BackfillMessage.timeStamp.description(with: .current))
 
-                    let newBackfillGlucoseData = GlucoseData(timeStamp: dexcomG7BackfillMessage.timeStamp, glucoseLevelRaw: dexcomG7BackfillMessage.calculatedValue)
+                    let appended = appendBackfillMessage(dexcomG7BackfillMessage)
 
-                    backfill.append(newBackfillGlucoseData)
-
-                    // Immediately deliver this backfill item so it is not lost if no "current" value arrives in the same cycle.
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else { return }
-                        var copy = [newBackfillGlucoseData]
-                        self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
-                    }
-
-                    if timeStampLastReading == nil || dexcomG7BackfillMessage.timeStamp > timeStampLastReading! {
+                    if appended, timeStampLastReading.map({ dexcomG7BackfillMessage.timeStamp > $0 }) ?? true {
                         timeStampLastReading = dexcomG7BackfillMessage.timeStamp
                     }
                 } else {
@@ -471,6 +450,12 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         cancelConnectionTimer()
         
         cycleId += 1
+
+        // Backfill may arrive before the current value. Require this connection's real-time frame
+        // to establish a fresh age instead of retaining the previous connection's timing anchor.
+        sensorAge = nil
+        pendingBackfillRawFrames.removeAll(keepingCapacity: true)
+        backfill.removeAll(keepingCapacity: true)
 
         trace("connected to peripheral with name %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, deviceName ?? "'unknown'")
 
@@ -626,7 +611,8 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         trace("G7 notify: %{public}@ - %{public}@ isNotifying = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, label, name, String(characteristic.isNotifying))
     }
 
-    /// Attempt to parse and deliver any queued raw backfill frames now that sensorAge is available
+    /// Attempt to parse queued raw backfill frames after this connection supplies a fresh sensor age.
+    /// Delivery is intentionally deferred to one batch at backfill-finished or disconnect.
     private func processPendingBackfillFramesIfPossible() {
         
         // calculate the actual maxSensorAgeInDays - it should be 15 days for a Stelo or for the 15-day G7
@@ -639,46 +625,54 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         guard let sensorAge = sensorAge, sensorAge < (maxSensorAgeInDays * 24 * 3600) else { return }
         guard pendingBackfillRawFrames.isEmpty == false else { return }
 
-        var delivered: [GlucoseData] = []
-
         for raw in pendingBackfillRawFrames {
             if let message = DexcomG7BackfillMessage(data: raw, sensorAge: sensorAge) {
-                let glucoseDataItem = GlucoseData(timeStamp: message.timeStamp, glucoseLevelRaw: message.calculatedValue)
-                backfill.append(glucoseDataItem)
-                delivered.append(glucoseDataItem)
+                appendBackfillMessage(message)
                 trace("    received backfill mesage (deferred parse), calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, message.calculatedValue.description, message.timeStamp.description(with: .current))
             } else {
                 trace("    backfill parse failed (deferred). raw = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, raw.hexEncodedString())
             }
         }
 
-        if delivered.isEmpty == false {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                var copy = delivered
-                self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
-            }
-
-            if let newest = delivered.max(by: { $0.timeStamp < $1.timeStamp }) {
-                if self.timeStampLastReading == nil || newest.timeStamp > self.timeStampLastReading! {
-                    self.timeStampLastReading = newest.timeStamp
-                }
-            }
-        }
-
         pendingBackfillRawFrames.removeAll(keepingCapacity: true)
     }
-    
+
+    @discardableResult
+    private func appendBackfillMessage(_ message: DexcomG7BackfillMessage) -> Bool {
+        guard Self.isPlausibleBackfillTimestamp(message.timeStamp) else {
+            trace("    ignored future-dated backfill message at %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .error, message.timeStamp.description(with: .current))
+            return false
+        }
+
+        guard backfill.contains(where: { $0.timeStamp == message.timeStamp }) == false else {
+            trace("    ignored duplicate backfill message at %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, message.timeStamp.description(with: .current))
+            return false
+        }
+
+        backfill.append(GlucoseData(timeStamp: message.timeStamp, glucoseLevelRaw: message.calculatedValue, backfilledAt: Date()))
+        return true
+    }
+
+    /// Allow a small amount of clock skew, but never feed materially future-dated history into storage.
+    private static func isPlausibleBackfillTimestamp(_ timestamp: Date, now: Date = Date()) -> Bool {
+        timestamp <= now.addingTimeInterval(60)
+    }
+
     private func flushBackfillDeliveringToDelegate() {
         guard backfill.isEmpty == false else { return }
-        // sort backfill, first element should be youngest
-        backfill = backfill.sorted(by: { $0.timeStamp > $1.timeStamp })
 
-        // send glucoseData to cgmTransmitterDelegate on main (UI/Core Data safety), use a local copy for inout
+        // Capture before clearing. Reading self.backfill inside the asynchronous closure could otherwise
+        // observe the already-cleared array and silently lose the batch.
+        let batch = backfill.sorted(by: { $0.timeStamp > $1.timeStamp })
+        backfill.removeAll(keepingCapacity: true)
+
+        // Historical readings must not supply sensorAge. The coordinator uses sensorAge to reconcile
+        // sensor start time against the newest reading in a callback; doing that with history shifts the
+        // sensor start repeatedly and launches expensive downstream reprocessing for every backfill item.
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            var copy = self.backfill
-            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
+            var copy = batch
+            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: nil)
             if let latest = copy.first {
                 let v = String(format: "%.1f", latest.glucoseLevelRaw)
                 let t = DateFormatter.localizedString(from: latest.timeStamp, dateStyle: .none, timeStyle: .medium)
@@ -687,27 +681,20 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         }
 
         // set timeStampLastReading to timestamp of the most recent reading, which is the first
-        if let firstReading = backfill.first {
+        if let firstReading = batch.first {
             timeStampLastReading = firstReading.timeStamp
         }
-
-        // reset backfill
-        backfill = [GlucoseData]()
     }
     
     private func addGlucoseValueToUserDefaults(_ newValue: Int) {
-        // Als de array nil is, initialiseer ze
-        if UserDefaults.standard.previousRawGlucoseValues == nil {
-            UserDefaults.standard.previousRawGlucoseValues = []
+        var previousRawGlucoseValues = UserDefaults.standard.previousRawGlucoseValues ?? []
+        previousRawGlucoseValues.insert(newValue, at: 0)
+
+        if previousRawGlucoseValues.count > 6 {
+            previousRawGlucoseValues.removeLast()
         }
 
-        // Voeg de nieuwe waarde toe aan het begin van de array
-        UserDefaults.standard.previousRawGlucoseValues!.insert(newValue, at: 0)
-
-        // Als er meer dan 6 waarden zijn, verwijder de laatste
-        if UserDefaults.standard.previousRawGlucoseValues!.count > 6 {
-            UserDefaults.standard.previousRawGlucoseValues!.removeLast()
-        }
+        UserDefaults.standard.previousRawGlucoseValues = previousRawGlucoseValues
     }
 
     func hasSixIdenticalValues() -> Bool {

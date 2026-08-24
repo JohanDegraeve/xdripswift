@@ -7,25 +7,31 @@ public class GlucoseData {
 
     var glucoseLevelRaw:Double
 
+    var backfilledAt: Date?
+
     /// used when needed
     var slopeOrdinal: Int?
     
     /// used when needed
     var slopeName: String?
     
-    init(timeStamp:Date, glucoseLevelRaw:Double) {
+    init(timeStamp:Date, glucoseLevelRaw:Double, backfilledAt: Date? = nil) {
         
         self.timeStamp = timeStamp
         
         self.glucoseLevelRaw = glucoseLevelRaw
+
+        self.backfilledAt = backfilledAt
         
     }
     
-    init(timeStamp:Date, glucoseLevelRaw:Double, slopeOrdinal: Int, slopeName: String) {
+    init(timeStamp:Date, glucoseLevelRaw:Double, backfilledAt: Date? = nil, slopeOrdinal: Int, slopeName: String) {
         
         self.timeStamp = timeStamp
         
         self.glucoseLevelRaw = glucoseLevelRaw
+
+        self.backfilledAt = backfilledAt
         
         self.slopeOrdinal = slopeOrdinal
         
@@ -40,4 +46,3 @@ public class GlucoseData {
     }
     
 }
-

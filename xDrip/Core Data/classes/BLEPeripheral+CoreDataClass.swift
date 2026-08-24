@@ -20,6 +20,7 @@ public class BLEPeripheral: NSManagedObject {
         self.address = address
         self.name = name
         self.shouldconnect = true
+        self.hasConnectedSinceActivation = false
         self.alias = alias
         self.parameterUpdateNeededAtNextConnect = false
      

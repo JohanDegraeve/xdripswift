@@ -2,6 +2,36 @@ import Foundation
 
 // MARK: - AlertKind
 
+struct NotLoopingDeviceStatus: Sendable {
+    let createdAt: Date
+    let lastCheckedDate: Date
+    let lastLoopDate: Date
+
+    init(createdAt: Date, lastCheckedDate: Date, lastLoopDate: Date) {
+        self.createdAt = createdAt
+        self.lastCheckedDate = lastCheckedDate
+        self.lastLoopDate = lastLoopDate
+    }
+
+    init(deviceStatus: NightscoutDeviceStatus) {
+        self.init(createdAt: deviceStatus.createdAt, lastCheckedDate: deviceStatus.lastCheckedDate, lastLoopDate: deviceStatus.lastLoopDate)
+    }
+
+    init(snapshot: NightscoutDeviceStatusSnapshot) {
+        self.init(createdAt: snapshot.createdAt, lastCheckedDate: snapshot.lastCheckedDate, lastLoopDate: snapshot.lastLoopDate)
+    }
+
+    /// Rejects server dates that are too far ahead to be valid for an alert decision.
+    func sanitizingFutureDates(referenceDate: Date = Date(), futureTolerance: TimeInterval = 20) -> NotLoopingDeviceStatus {
+        let maximumAllowedDate = referenceDate.addingTimeInterval(futureTolerance)
+        return NotLoopingDeviceStatus(
+            createdAt: createdAt > maximumAllowedDate ? .distantPast : createdAt,
+            lastCheckedDate: lastCheckedDate > maximumAllowedDate ? .distantPast : lastCheckedDate,
+            lastLoopDate: lastLoopDate > maximumAllowedDate ? .distantPast : lastLoopDate
+        )
+    }
+}
+
 /// low, high, very low, very high, ...
 public enum AlertKind: Int, CaseIterable {
     // when adding alertkinds, add new cases at the end (ie 9, ...)
@@ -18,6 +48,11 @@ public enum AlertKind: Int, CaseIterable {
     case fastdrop = 7
     case fastrise = 8
     case phonebatterylow = 9
+    case notlooping = 10
+    /// Configuration for a transmitter-reported terminal sensor or transmitter failure.
+    /// The event arrives from the active BLE peripheral and fires once through AlertManager.
+    /// Recoverable sensor-health episodes never use this AlertKind.
+    case sensorTransmitterFailure = 11
 
     /// this is used for presentation in UI table view. It allows to order the alert kinds in the view, different than they case ordering, and so allows to add new cases
     init?(forSection section: Int) {
@@ -37,11 +72,15 @@ public enum AlertKind: Int, CaseIterable {
         case 6:
             self = .missedreading
         case 7:
-            self = .calibration
+            self = .notlooping
         case 8:
-            self = .batterylow
+            self = .calibration
         case 9:
+            self = .batterylow
+        case 10:
             self = .phonebatterylow
+        case 11:
+            self = .sensorTransmitterFailure
         default:
             fatalError("in AlertKind initializer init(forRowAt row: Int), there's no case for the rownumber")
         }
@@ -64,12 +103,16 @@ public enum AlertKind: Int, CaseIterable {
             return 8
         case 6: // missed reading
             return 4
-        case 7: // calibration
+        case 7: // not looping
+            return 10
+        case 8: // calibration
             return 5
-        case 8: // battery low
+        case 9: // battery low
             return 6
-        case 9: // phone battery low
+        case 10: // phone battery low
             return 9
+        case 11: // sensor/transmitter failure
+            return 11
         default:
             fatalError("in alertKindRawValue, unknown case")
         }
@@ -89,7 +132,18 @@ public enum AlertKind: Int, CaseIterable {
     ///
     /// probably only useful in UI - named AlertKind and not AlertType because there's already an AlertType which has a different goal
     func needsAlertValue() -> Bool {
-        return true
+        return self != .sensorTransmitterFailure
+    }
+
+    /// A terminal failure is event-driven and has one all-day configuration.
+    /// It cannot be divided into schedules because there is no value or time window to evaluate.
+    func supportsAlertSchedules() -> Bool {
+        return self != .sensorTransmitterFailure
+    }
+
+    /// A terminal failure is reported once by the active BLE peripheral and is never snoozable.
+    func supportsSnooze() -> Bool {
+        return self != .sensorTransmitterFailure
     }
     
     /// a trigger value used for some alert types that:
@@ -153,6 +207,20 @@ public enum AlertKind: Int, CaseIterable {
             return ConstantsDefaultAlertLevels.fastrise
         case .phonebatterylow:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelPhone
+        case .notlooping:
+            return ConstantsDefaultAlertLevels.notLooping
+        case .sensorTransmitterFailure:
+            return 0
+        }
+    }
+
+    /// default enabled state for newly introduced alert kinds.
+    func defaultIsDisabled() -> Bool {
+        switch self {
+        case .notlooping:
+            return true
+        default:
+            return false
         }
     }
     
@@ -191,6 +259,10 @@ public enum AlertKind: Int, CaseIterable {
             return "fastrise"
         case .phonebatterylow:
             return "phonebatterylow"
+        case .notlooping:
+            return "notlooping"
+        case .sensorTransmitterFailure:
+            return "sensorTransmitterFailure"
         }
     }
     
@@ -212,7 +284,7 @@ public enum AlertKind: Int, CaseIterable {
     ///     - alertbody : AlertBody, AlertTitle and delay are used if an alert needs to be raised for the notification.
     ///     - alerttitle : AlertBody, AlertTitle and delay are used if an alert needs to be raised for the notification.
     ///     - delayInSeconds : If delayInSeconds not nil and > 0 or if delayInSeconds is nil, then the alert will be a future planned Alert. This will only be applicable to missed reading alerts.
-    func alertNeeded(currentAlertEntry: AlertEntry, nextAlertEntry: AlertEntry?, lastBgReading: BgReading?, _ lastButOneBgReading: BgReading?, lastCalibration: Calibration?, transmitterBatteryInfo: TransmitterBatteryInfo?) -> (alertNeeded: Bool, alertBody: String?, alertTitle: String?, delayInSeconds: Int?) {
+    func alertNeeded(currentAlertEntry: AlertEntry, nextAlertEntry: AlertEntry?, lastBgReading: BgReading?, _ lastButOneBgReading: BgReading?, lastCalibration: Calibration?, transmitterBatteryInfo: TransmitterBatteryInfo?, deviceStatus: NotLoopingDeviceStatus? = nil) -> (alertNeeded: Bool, alertBody: String?, alertTitle: String?, delayInSeconds: Int?) {
         // Not all input parameters in the closure are needed for every type of alert. - this is to make it generic
         
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
@@ -224,9 +296,9 @@ public enum AlertKind: Int, CaseIterable {
                 
             if let lastBgReading = lastBgReading {
                 // first check if lastBgReading not nil and calculatedValue > 0.0, never know that it's not been checked by caller
-                if lastBgReading.calculatedValue == 0.0 { return (false, nil, nil, nil) }
+                if lastBgReading.finalValue == 0.0 { return (false, nil, nil, nil) }
                 // now do the actual check if alert is applicable or not
-                if lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) < Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) {
+                if lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) < Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) {
                     return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
                 } else { return (false, nil, nil, nil) }
             } else { return (false, nil, nil, nil) }
@@ -237,9 +309,9 @@ public enum AlertKind: Int, CaseIterable {
                 
             if let lastBgReading = lastBgReading {
                 // first check if calculatedValue > 0.0, never know that it's not been checked by caller
-                if lastBgReading.calculatedValue == 0.0 { return (false, nil, nil, nil) }
+                if lastBgReading.finalValue == 0.0 { return (false, nil, nil, nil) }
                 // now do the actual check if alert is applicable or not
-                if lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) {
+                if lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) {
                     return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
                 } else { return (false, nil, nil, nil) }
             } else { return (false, nil, nil, nil) }
@@ -252,9 +324,9 @@ public enum AlertKind: Int, CaseIterable {
                 // lastbut one reading and last reading shoud be maximum 5 minutes apart (+10 seconds to give some margin!)
                 if (lastBgReading.timeStamp.timeIntervalSince(lastButOneBgReading.timeStamp)) < (5 * 60 + 10) {
                     // first check if calculatedValue > 0.0, never know that it's not been checked by caller
-                    if lastBgReading.calculatedValue == 0.0 || lastButOneBgReading.calculatedValue == 0.0 { return (false, nil, nil, nil) }
+                    if lastBgReading.finalValue == 0.0 || lastButOneBgReading.finalValue == 0.0 { return (false, nil, nil, nil) }
                     // now do the actual check if alert is applicable or not. As this is fast drop, we'll only fire when *under* the trigger value
-                    if (lastButOneBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) - lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl)) && (lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) < Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
+                    if (lastButOneBgReading.finalValue.bgValueRounded(mgDl: isMgDl) - lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl)) && (lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) < Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
                             return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
                     } else { return (false, nil, nil, nil) }
                 } else { return (false, nil, nil, nil) }
@@ -268,9 +340,9 @@ public enum AlertKind: Int, CaseIterable {
                 // lastbut one reading and last reading shoud be maximum 5 minutes apart (+10 seconds to give some margin!)
                 if (lastBgReading.timeStamp.timeIntervalSince(lastButOneBgReading.timeStamp)) < (5 * 60 + 10) {
                     // first check if calculatedValue > 0.0, never know that it's not been checked by caller
-                    if lastBgReading.calculatedValue == 0.0 || lastButOneBgReading.calculatedValue == 0.0 { return (false, nil, nil, nil) }
+                    if lastBgReading.finalValue == 0.0 || lastButOneBgReading.finalValue == 0.0 { return (false, nil, nil, nil) }
                     // now do the actual check if alert is applicable or not. As this is fast rise, we'll only fire when *over* the trigger value
-                    if lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) - lastButOneBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) && (lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
+                    if lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) - lastButOneBgReading.finalValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) && (lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
                             return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
                         } else { return (false, nil, nil, nil) }
                 } else { return (false, nil, nil, nil) }
@@ -296,7 +368,7 @@ public enum AlertKind: Int, CaseIterable {
                     // if start of nextAlertEntry < start of currentAlertEntry, then ad 24 hours, because it means the nextAlertEntry is actually the one of the day after
                     var nextAlertEntryStartValueToUse = nextAlertEntry.start
                     if nextAlertEntry.start < currentAlertEntry.start {
-                        nextAlertEntryStartValueToUse += nextAlertEntryStartValueToUse + 24 * 60
+                        nextAlertEntryStartValueToUse += 24 * 60
                     }
                     
                     if !nextAlertEntry.alertType.enabled {
@@ -329,7 +401,7 @@ public enum AlertKind: Int, CaseIterable {
                     // if start of nextAlertEntry < start of currentAlertEntry, then ad 24 hours, because it means the nextAlertEntry is actually the one of the day after
                     var nextAlertEntryStartValueToUse = nextAlertEntry.start
                     if nextAlertEntry.start < currentAlertEntry.start {
-                        nextAlertEntryStartValueToUse += nextAlertEntryStartValueToUse + 24 * 60
+                        nextAlertEntryStartValueToUse += 24 * 60
                     }
                     
                     // if this would be before start of nextAlertEntry then increase the delay
@@ -389,14 +461,55 @@ public enum AlertKind: Int, CaseIterable {
             if !currentAlertEntry.alertType.enabled { return (false, nil, nil, nil) }
             
             // Create battery info similar to transmitter battery info
-            UIDevice.current.isBatteryMonitoringEnabled = true
-            let phoneBatteryLevel = Int(UIDevice.current.batteryLevel * 100)
+            let device = UIDevice.current
+            device.isBatteryMonitoringEnabled = true
+
+            // The user has already taken the required action when the phone is connected to power,
+            // so don't raise a low phone battery alert while it is charging or fully charged.
+            // https://developer.apple.com/documentation/uikit/uidevice/batterystate-swift.enum
+            if device.batteryState == .charging || device.batteryState == .full {
+                return (false, nil, nil, nil)
+            }
+
+            // Apple returns a negative battery level when the value is unavailable. Ignore it to
+            // avoid incorrectly treating an unknown level as an extremely low battery.
+            let batteryLevel = device.batteryLevel
+            guard batteryLevel >= 0 else { return (false, nil, nil, nil) }
+
+            let phoneBatteryLevel = Int(batteryLevel * 100)
             
             // Check if battery level is below threshold, similar to transmitter check
             if currentAlertEntry.value > phoneBatteryLevel {
                 return (true, "", Texts_Alerts.phoneBatteryLowAlertTitle, nil)
             }
             
+            return (false, nil, nil, nil)
+
+        case .notlooping:
+            guard currentAlertEntry.alertType.enabled, let deviceStatus else { return (false, nil, nil, nil) }
+
+            let alertValue = Int(currentAlertEntry.value)
+            let threshold = TimeInterval(Double(alertValue) * 60.0)
+            let now = Date()
+            let freshnessBoundary = now.addingTimeInterval(-threshold)
+            guard deviceStatus.lastCheckedDate > freshnessBoundary,
+                  deviceStatus.createdAt > freshnessBoundary else {
+                return (false, nil, nil, nil)
+            }
+
+            if deviceStatus.lastLoopDate == .distantPast {
+                return (true, "", Texts_Alerts.notLoopingAlertTitle, nil)
+            } else {
+                let secondsSinceLastLoop = now.timeIntervalSince(deviceStatus.lastLoopDate)
+                guard secondsSinceLastLoop >= threshold else { return (false, nil, nil, nil) }
+            }
+
+            return (true, "", Texts_Alerts.notLoopingAlertTitle, nil)
+
+        case .sensorTransmitterFailure:
+            // Terminal failures are pushed by the active CGM peripheral. They are not found by the
+            // normal value and schedule checks. AlertManager reads this kind's enabled state and
+            // assigned Alert Type only when SensorHealthIssueManager passes the event across.
             return (false, nil, nil, nil)
         }
     }
@@ -424,6 +537,10 @@ public enum AlertKind: Int, CaseIterable {
             return ConstantsNotifications.NotificationIdentifiersForAlerts.fastRiseAlert
         case .phonebatterylow:
             return ConstantsNotifications.NotificationIdentifiersForAlerts.phoneBatteryLow
+        case .notlooping:
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.notLoopingAlert
+        case .sensorTransmitterFailure:
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.sensorTransmitterFailure
         }
     }
     
@@ -450,6 +567,31 @@ public enum AlertKind: Int, CaseIterable {
             return Texts_Alerts.fastRiseTitle
         case .phonebatterylow:
             return Texts_Alerts.phoneBatteryLowAlertTitle
+        case .notlooping:
+            return Texts_Alerts.notLoopingAlertTitle
+        case .sensorTransmitterFailure:
+            return Texts_Alerts.sensorTransmitterFailureAlertTitle
+        }
+    }
+
+    /// A concise, independently localized title for the large snooze presentation.
+    /// Other alert kinds already have compact titles and can keep their normal name.
+    func largeSnoozeTitle() -> String {
+        switch self {
+        case .low:
+            return Texts_Alerts.lowSnoozeTitle
+        case .high:
+            return Texts_Alerts.highSnoozeTitle
+        case .verylow:
+            return Texts_Alerts.veryLowSnoozeTitle
+        case .veryhigh:
+            return Texts_Alerts.veryHighSnoozeTitle
+        case .fastdrop:
+            return Texts_Alerts.fastDropSnoozeTitle
+        case .fastrise:
+            return Texts_Alerts.fastRiseSnoozeTitle
+        default:
+            return alertTitle()
         }
     }
     
@@ -459,7 +601,7 @@ public enum AlertKind: Int, CaseIterable {
         switch self {
         case .verylow, .low, .high, .veryhigh, .fastdrop, .fastrise:
             return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol
-        case .missedreading:
+        case .missedreading, .notlooping:
             return Texts_Common.minutes
         case .calibration:
             return Texts_Common.hours
@@ -471,6 +613,8 @@ public enum AlertKind: Int, CaseIterable {
             }
         case .phonebatterylow:
             return "%"
+        case .sensorTransmitterFailure:
+            return ""
         }
     }
     
@@ -480,7 +624,7 @@ public enum AlertKind: Int, CaseIterable {
         switch self {
         case .verylow, .veryhigh, .fastdrop:
             return .urgent
-        case .low, .high, .fastrise:
+        case .low, .high, .fastrise, .notlooping:
             return .warning
         default:
             return .normal
@@ -504,7 +648,7 @@ private func createAlertTitleForBgReadingAlerts(alertKind: AlertKind) -> String 
         return Texts_Alerts.fastDropTitle
     case .fastrise:
         return Texts_Alerts.fastRiseTitle
-    case .missedreading, .calibration, .batterylow, .phonebatterylow:
+    case .missedreading, .calibration, .batterylow, .phonebatterylow, .notlooping, .sensorTransmitterFailure:
         return ""
     }
 }
@@ -514,7 +658,7 @@ private func createAlertBodyForBgReadingAlerts(bgReading: BgReading, alertKind: 
     var returnValue = ""
     
     // add unit
-    returnValue = returnValue + " " + bgReading.calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+    returnValue = returnValue + " " + bgReading.finalValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
     
     // add slopeArrow
     if !bgReading.hideSlope {

@@ -1,4 +1,10 @@
 "alertsettingsview_screentitle" = "التنبيهات";
+"alerts_snooze_high_title" = "ارتفاع";
+"alerts_snooze_very_high_title" = "ارتفاع شديد";
+"alerts_snooze_low_title" = "انخفاض";
+"alerts_snooze_very_low_title" = "انخفاض شديد";
+"alerts_snooze_fast_drop_title" = "انخفاض سريع";
+"alerts_snooze_fast_rise_title" = "ارتفاع سريع";
 "alertssettingsview_screentitle" = "تعديل التنبيه";
 "alerts_highalerttitle" = "تنبيه الارتفاع";
 "alerts_veryhighalerttitle" = "تنبيه الارتفاع الشديد";

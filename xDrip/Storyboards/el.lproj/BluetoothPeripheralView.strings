@@ -13,6 +13,14 @@
 "battery" = "Μπαταρία";
 "needsTransmitterId" = "Λείπει το αναγνωριστικό πομπού";
 "scan" = "Σάρωση";
+"medtrumNanoPumpScanNoticeTitle" = "Σύνδεση αντλίας Medtrum Nano";
+"medtrumNanoPumpScanNoticeMessage" = "Αυτή η επιλογή συνδέεται με την αντλία Medtrum Nano και όχι απευθείας με τον πομπό Nano CGM.\n\nΠριν από τη σάρωση, βεβαιωθείτε ότι το EasyPatch εκτελείται, είναι συνδεδεμένο με την αντλία και λαμβάνει τρέχουσες τιμές CGM.\n\nΤο EasyPatch πρέπει να παραμένει σε λειτουργία και να συνεχίζει να λαμβάνει τιμές ανά πάσα στιγμή.";
+"libre2ScanNoticeTitle" = "Bluetooth εφαρμογής Libre";
+"libre2ScanNoticeMessage" = "Πριν από τη σάρωση, απενεργοποιήστε την άδεια Bluetooth για την εφαρμογή Libre στις ρυθμίσεις του iPhone.\n\nΗ άδεια Bluetooth για την εφαρμογή Libre πρέπει να παραμένει πάντα απενεργοποιημένη. Διαφορετικά, η εφαρμογή Libre μπορεί να αναλάβει τη σύνδεση του αισθητήρα και να εμποδίσει αυτή την εφαρμογή να λαμβάνει τιμές.";
+"dexcomG6ScanNoticeTitle" = "Σύνδεση εφαρμογής Dexcom";
+"dexcomG6ScanNoticeMessage" = "Πριν από τη σάρωση, κλείστε αναγκαστικά την εφαρμογή Dexcom ή απενεργοποιήστε την άδεια Bluetooth της.\n\nΗ εφαρμογή Dexcom δεν πρέπει να είναι συνδεδεμένη με τον πομπό ενώ αυτή η εφαρμογή πραγματοποιεί σάρωση ή λαμβάνει τιμές.";
+"dexcomG7ScanNoticeTitle" = "Απαιτείται η εφαρμογή Dexcom G7";
+"dexcomG7ScanNoticeMessage" = "Πριν από τη σάρωση, βεβαιωθείτε ότι η εφαρμογή Dexcom G7 εκτελείται στο παρασκήνιο, είναι συνδεδεμένη με τον αισθητήρα και λαμβάνει τρέχουσες τιμές γλυκόζης.\n\nΗ εφαρμογή Dexcom G7 πρέπει να παραμένει σε λειτουργία και να συνεχίζει να λαμβάνει τιμές ανά πάσα στιγμή.";
 "readyToScan" = "Έτοιμο για σάρωση";
 "scanning" = "Σάρωση";
 "disconnect" = "Αποσύνδεση";
@@ -31,7 +39,11 @@
 "confirmDisconnectMessage" = "Κάντε κλικ στο «Αποσύνδεση» για να επιβεβαιώσετε την αποσύνδεση από τον πομπό.";
 "transmittterStartDate" = "Έναρξη πομπού";
 "sensorStartDate" = "Έναρξη αισθητήρα";
-"useOtherDexcomApp" = "Ακόλουθος εφαρμογής Dexcom";
+"useOtherDexcomApp" = "Λειτουργία συνύπαρξης";
+"useOtherDexcomAppCoexistenceFooter" = "Η λειτουργία συνύπαρξης μας επιτρέπει να λειτουργούμε με άλλη εφαρμογή, όπως Dexcom ή CamAPS. Η εφαρμογή αυτή πρέπει να συνεχίσει να εκτελείται στο παρασκήνιο.";
+"useOtherDexcomAppPrimaryFooter" = "Η κύρια λειτουργία συνδέεται ως κύρια εφαρμογή και ελέγχει τη σύνδεση.";
+"runningInCoexistenceMode" = "Εκτελείται σε λειτουργία συνύπαρξης";
+"runningInPrimaryMode" = "Εκτελείται σε κύρια λειτουργία";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -66,3 +78,33 @@
 
 /// Tell the user the scan was successful and to just wait now for connection
 "nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+
+/// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
+"readSuccessLast24Hours" = "Τελευταίες 24 ώρες";
+/// Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings
+"readSuccessReadingsReceived" = "Ελήφθησαν %d από %d μετρήσεις";
+/// Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated
+"readSuccessCadenceFooter" = "Οι αναμενόμενες μετρήσεις βασίζονται στον παρατηρούμενο ρυθμό του πομπού για %@.";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for good read success
+"readSuccessLegendGood" = "Καλή";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success
+"readSuccessLegendLow" = "Χαμηλή";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for poor read success
+"readSuccessLegendPoor" = "Κακή";
+/// Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available
+"readSuccessLegendNoData" = "Χωρίς δεδομένα";
+/// Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings
+"readSuccessNoReadingsExpected" = "Δεν αναμένονται μετρήσεις";
+/// Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket
+"readSuccessTimelineAccessibility" = "%0.1f τοις εκατό, %d από %d μετρήσεις";
+
+/// Bluetooth peripheral screen. Row title and screen title for read success information
+"readSuccess" = "Επιτυχία ανάγνωσης";
+/// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
+"readSuccessNow" = "Τώρα";
+"scanningForTransmitter" = "Αναζήτηση...";
+"connecting" = "Σύνδεση";
+"connectingToTransmitter" = "Connecting...";
+"reconnecting" = "Επανασύνδεση";
+"reconnectingToTransmitter" = "Επανασύνδεση...";
+"waiting" = "Αναμονή...";

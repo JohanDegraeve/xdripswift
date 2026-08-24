@@ -16,3 +16,4 @@
 "treatments_sync_complete" = "Синхронизация завершена.";
 "treatments_filterTreatmentsLabel" = "Фильтр";
 "treatments_cannotStoreFutureBGCheck" = "Вы не можете сохранить проверку ГК в будущем.\n\nОна будет сохранена в фактическое время.";
+"treatments_automaticBasal" = "Автоматическая базальная подача";
