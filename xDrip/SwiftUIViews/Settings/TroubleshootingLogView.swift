@@ -85,8 +85,21 @@ struct TroubleshootingLogView: View {
         _viewModel = StateObject(wrappedValue: TroubleshootingLogViewModel(
             store: store,
             appInfoProvider: {
-                .current(
-                    currentSourceCanUseFiveMinuteReadings: bgPostProcessingManager?.currentSourceCanUseFiveMinuteReadings()
+                // Read the current G5/G6 channel for each report snapshot. The effective accessor
+                // applies the default in memory without materializing it merely by opening this view.
+                let dexcomG5 = coreDataManager.flatMap { coreDataManager in
+                    BLEPeripheralAccessor(coreDataManager: coreDataManager)
+                        .getBLEPeripherals()
+                        .first(where: { $0.shouldconnect && $0.dexcomG5 != nil })?
+                        .dexcomG5
+                }
+                return .current(
+                    currentSourceCanUseFiveMinuteReadings: bgPostProcessingManager?.currentSourceCanUseFiveMinuteReadings(),
+                    dexcomBluetoothChannel: dexcomG5.map {
+                        TroubleshootingDexcomBluetoothChannel(
+                            $0.effectiveBluetoothSlot(as: DexcomG6BluetoothSlot.self)
+                        )
+                    }
                 )
             }
         ))
@@ -354,6 +367,8 @@ struct TroubleshootingLogView: View {
             case .followerSourceChanged: return "arrow.triangle.branch"
             case .cgmSourceChanged, .cgmSourceDisconnected: return "sensor.tag.radiowaves.forward.fill"
             case .keepAliveChanged: return "gearshape.2.fill"
+            case .dexcomConnectionModeChanged: return "person.2.fill"
+            case .dexcomBluetoothChannelChanged: return "antenna.radiowaves.left.and.right"
             case .therapySourceChanged: return "cross.case.fill"
             case .liveActivityChanged: return "iphone"
             case .aidFollowerChanged: return "waveform.path.ecg"

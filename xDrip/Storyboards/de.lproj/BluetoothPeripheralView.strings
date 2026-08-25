@@ -177,3 +177,14 @@
 "reconnecting" = "Erneut verbinden";
 "reconnectingToTransmitter" = "Erneute Verbindung...";
 "waiting" = "Warten...";
+
+/* Dexcom G6 Bluetooth authentication slot */
+"dexcomG6BluetoothSlot" = "Bluetooth-Kanal";
+"dexcomG6MobileAppSlot" = "Mobile App (Standard)";
+"dexcomG6MobileAppSlotShort" = "Mobile App";
+"dexcomG6MedicalDeviceSlot" = "Empfänger oder Pumpe (Experimentell)";
+"dexcomG6MedicalDeviceSlotShort" = "Pumpe";
+"dexcomG6MobileAppSlotFooter" = "Der Kanal „Mobile App“ ist der Standard für Telefonverbindungen.";
+"dexcomG6MedicalDeviceSlotFooter" = "Der Kanal „Empfänger oder Pumpe“ ist normalerweise für den Dexcom-Empfänger oder eine kompatible Pumpe reserviert. Wenn diese App ihn verwendet, bleibt der Kanal „Mobile App“ für ein Telefon oder ein anderes Gerät verfügbar.";
+"dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Im Koexistenzmodus nicht verfügbar";
+"dexcomG6MedicalDeviceSlotWarning" = "Der Kanal „Empfänger oder Pumpe“ ist normalerweise für einen Dexcom-Empfänger oder eine kompatible Pumpe reserviert. Seine Auswahl kann verhindern, dass sich dieses Gerät verbindet.\n\nDie Verwendung des Kanals „Empfänger oder Pumpe“ sollte nur als experimentell betrachtet werden. Die Auswahl wird bei der nächsten Authentifizierung wirksam.";

@@ -298,6 +298,39 @@ enum TroubleshootingKeepAliveMode: String, Codable {
     }
 }
 
+enum TroubleshootingDexcomConnectionMode: String, Codable {
+    case primary, coexistence
+
+    init(useOtherApp: Bool) {
+        self = useOtherApp ? .coexistence : .primary
+    }
+
+    var name: String {
+        switch self {
+        case .primary: return "Primary"
+        case .coexistence: return "Co-existence"
+        }
+    }
+}
+
+enum TroubleshootingDexcomBluetoothChannel: String, Codable {
+    case mobileApp, receiverOrPump
+
+    init(_ slot: DexcomG6BluetoothSlot) {
+        switch slot {
+        case .mobileApp: self = .mobileApp
+        case .medicalDevice: self = .receiverOrPump
+        }
+    }
+
+    var name: String {
+        switch self {
+        case .mobileApp: return "Mobile App"
+        case .receiverOrPump: return "Receiver or Pump"
+        }
+    }
+}
+
 enum TroubleshootingTherapySource: String, Codable {
     case automatic, none, nightscout, careLink
 
@@ -449,6 +482,8 @@ enum TroubleshootingConfigurationActivity: Codable, Equatable {
     case cgmSourceChanged(TroubleshootingLogSource)
     case cgmSourceDisconnected
     case keepAliveChanged(TroubleshootingKeepAliveMode)
+    case dexcomConnectionModeChanged(TroubleshootingDexcomConnectionMode)
+    case dexcomBluetoothChannelChanged(TroubleshootingDexcomBluetoothChannel)
     case therapySourceChanged(TroubleshootingTherapySource)
     case liveActivityChanged(TroubleshootingLiveActivityMode)
     case aidFollowerChanged(TroubleshootingAIDFollowerMode)
@@ -1492,6 +1527,7 @@ struct TroubleshootingLogAppInfo: Equatable {
     let systemVersion: String
     let modeDescription: String
     let dataSourceDescription: String
+    let dexcomBluetoothChannelDescription: String?
     let unitDescription: String
     let keepAliveDescription: String?
     let processingLines: [String]
@@ -1500,7 +1536,8 @@ struct TroubleshootingLogAppInfo: Equatable {
     /// Reads current settings so a report reflects configuration changes made after older entries.
     static func current(
         defaults: UserDefaults = .standard,
-        currentSourceCanUseFiveMinuteReadings: Bool? = nil
+        currentSourceCanUseFiveMinuteReadings: Bool? = nil,
+        dexcomBluetoothChannel: TroubleshootingDexcomBluetoothChannel? = nil
     ) -> TroubleshootingLogAppInfo {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
         let deviceClass = UIDevice.current.userInterfaceIdiom == .pad ? "iPad" : "iPhone"
@@ -1573,6 +1610,7 @@ struct TroubleshootingLogAppInfo: Equatable {
             systemVersion: UIDevice.current.systemVersion,
             modeDescription: modeDescription,
             dataSourceDescription: dataSourceDescription,
+            dexcomBluetoothChannelDescription: dexcomBluetoothChannel?.name,
             unitDescription: defaults.bloodGlucoseUnitIsMgDl ? "mg/dL" : "mmol/L",
             keepAliveDescription: keepAliveDescription,
             processingLines: [
@@ -1631,6 +1669,9 @@ struct TroubleshootingLogReportBuilder {
             "Mode: \(appInfo.modeDescription) (\(appInfo.dataSourceDescription))"
         ]
 
+        if let dexcomBluetoothChannel = appInfo.dexcomBluetoothChannelDescription {
+            lines.append("Dexcom Bluetooth channel: \(dexcomBluetoothChannel)")
+        }
         if let keepAlive = appInfo.keepAliveDescription {
             lines.append("Background keep-alive: \(keepAlive)")
         }
@@ -1866,6 +1907,10 @@ struct TroubleshootingLogReportBuilder {
                 return "The configured CGM was disconnected."
             case let .keepAliveChanged(mode):
                 return "Background keep-alive changed to \(mode.name)."
+            case let .dexcomConnectionModeChanged(mode):
+                return "Dexcom connection mode changed to \(mode.name)."
+            case let .dexcomBluetoothChannelChanged(channel):
+                return "Dexcom Bluetooth channel changed to \(channel.name)."
             case let .therapySourceChanged(source):
                 return "Pump & Treatments source changed to \(source.name)."
             case let .liveActivityChanged(mode):

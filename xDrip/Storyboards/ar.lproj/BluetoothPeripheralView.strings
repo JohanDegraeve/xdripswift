@@ -108,3 +108,14 @@
 "reconnecting" = "جارٍ إعادة الاتصال";
 "reconnectingToTransmitter" = "جارٍ إعادة الاتصال...";
 "waiting" = "انتظار...";
+
+/* Dexcom G6 Bluetooth authentication slot */
+"dexcomG6BluetoothSlot" = "قناة Bluetooth";
+"dexcomG6MobileAppSlot" = "تطبيق الهاتف (افتراضي)";
+"dexcomG6MobileAppSlotShort" = "تطبيق الهاتف";
+"dexcomG6MedicalDeviceSlot" = "جهاز استقبال أو مضخة (تجريبي)";
+"dexcomG6MedicalDeviceSlotShort" = "مضخة";
+"dexcomG6MobileAppSlotFooter" = "قناة تطبيق الهاتف هي القناة الافتراضية لاتصالات الهاتف.";
+"dexcomG6MedicalDeviceSlotFooter" = "تكون قناة جهاز الاستقبال أو المضخة عادةً محجوزة لجهاز استقبال Dexcom أو لمضخة متوافقة. يترك استخدامها لهذا التطبيق قناة تطبيق الهاتف متاحة لهاتف أو جهاز آخر.";
+"dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "غير متاح في وضع التعايش";
+"dexcomG6MedicalDeviceSlotWarning" = "تكون قناة جهاز الاستقبال أو المضخة عادةً محجوزة لجهاز استقبال Dexcom أو لمضخة متوافقة. قد يؤدي تحديدها إلى منع ذلك الجهاز من الاتصال.\n\nيجب اعتبار استخدام قناة جهاز الاستقبال أو المضخة تجريبيًا فقط. يسري التحديد عند المصادقة التالية.";

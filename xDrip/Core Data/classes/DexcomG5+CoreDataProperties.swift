@@ -19,6 +19,9 @@ extension DexcomG5 {
     @NSManaged public var batteryStatus: Int32
     
     @NSManaged public var batteryTemperature: Int32
+
+    /// The raw Dexcom authentication role. Nil resolves to the family default for migrated stores.
+    @NSManaged public var bluetoothSlot: NSNumber?
     
     @NSManaged public var voltageA: Int32
     
@@ -40,3 +43,37 @@ extension DexcomG5 {
     @NSManaged public var isAnubis: Bool
     
 }
+
+/// Shared storage contract for Dexcom transmitter families that persist a Bluetooth slot.
+/// DexcomG7 can adopt the same contract when its protocol slot values are established.
+protocol DexcomBluetoothSlotPersisting: AnyObject {
+    var bluetoothSlot: NSNumber? { get set }
+}
+
+extension DexcomBluetoothSlotPersisting {
+    /// Returns the stored slot or the family default without changing persistent storage.
+    func effectiveBluetoothSlot<Slot: DexcomBluetoothSlotValue>(as _: Slot.Type) -> Slot {
+        bluetoothSlot.flatMap { storedValue in
+            let integerValue = storedValue.intValue
+            guard Int(UInt8.min)...Int(UInt8.max) ~= integerValue else { return nil }
+            return Slot(rawValue: UInt8(integerValue))
+        } ?? Slot.defaultSlot
+    }
+
+    /// Returns a valid typed slot and materializes the family default when storage is missing or invalid.
+    func resolvedBluetoothSlot<Slot: DexcomBluetoothSlotValue>(as _: Slot.Type) -> Slot {
+        let resolvedSlot = effectiveBluetoothSlot(as: Slot.self)
+
+        if bluetoothSlot?.intValue != Int(resolvedSlot.rawValue) {
+            bluetoothSlot = NSNumber(value: resolvedSlot.rawValue)
+        }
+
+        return resolvedSlot
+    }
+
+    func setBluetoothSlot<Slot: DexcomBluetoothSlotValue>(_ slot: Slot) {
+        bluetoothSlot = NSNumber(value: slot.rawValue)
+    }
+}
+
+extension DexcomG5: DexcomBluetoothSlotPersisting {}

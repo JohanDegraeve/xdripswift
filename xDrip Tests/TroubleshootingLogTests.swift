@@ -1109,6 +1109,7 @@ final class TroubleshootingLogTests: XCTestCase {
         XCTAssertTrue(report.headerLines.contains("App Name: xDrip4iOS"))
         XCTAssertTrue(report.headerLines.contains("Version: 7.2.1"))
         XCTAssertTrue(report.headerLines.contains("Mode: Follower (Nightscout)"))
+        XCTAssertTrue(report.headerLines.contains("Dexcom Bluetooth channel: Mobile App"))
         XCTAssertFalse(report.headerLines.contains(where: { $0.hasPrefix("Data source:") }))
         XCTAssertTrue(report.headerLines.contains("Background keep-alive: Normal"))
         XCTAssertTrue(report.headerLines.contains("BG adjustment: None"))
@@ -1272,6 +1273,8 @@ final class TroubleshootingLogTests: XCTestCase {
             .standard(.configuration(.cgmSourceChanged(.dexcomG7)), timestamp: referenceDate),
             .standard(.configuration(.cgmSourceDisconnected), timestamp: referenceDate),
             .standard(.configuration(.keepAliveChanged(.continuous)), timestamp: referenceDate),
+            .standard(.configuration(.dexcomConnectionModeChanged(.coexistence)), timestamp: referenceDate),
+            .standard(.configuration(.dexcomBluetoothChannelChanged(.receiverOrPump)), timestamp: referenceDate),
             .standard(.configuration(.therapySourceChanged(.careLink)), timestamp: referenceDate),
             .standard(.configuration(.liveActivityChanged(.large)), timestamp: referenceDate),
             .standard(.configuration(.aidFollowerChanged(.openAPS)), timestamp: referenceDate),
@@ -1290,6 +1293,8 @@ final class TroubleshootingLogTests: XCTestCase {
             "CGM source changed to Dexcom G7.",
             "The configured CGM was disconnected.",
             "Background keep-alive changed to Continuous.",
+            "Dexcom connection mode changed to Co-existence.",
+            "Dexcom Bluetooth channel changed to Receiver or Pump.",
             "Pump & Treatments source changed to CareLink.",
             "Live Activity changed to Large.",
             "AID follower type changed to Trio/iAPS/AAPS.",
@@ -1543,6 +1548,7 @@ final class TroubleshootingLogTests: XCTestCase {
             systemVersion: "19.0",
             modeDescription: "Follower",
             dataSourceDescription: "Nightscout",
+            dexcomBluetoothChannelDescription: "Mobile App",
             unitDescription: "mg/dL",
             keepAliveDescription: "Normal",
             processingLines: ["BG adjustment: None", "Smoothing: None", "5-minute readings: Disabled"],

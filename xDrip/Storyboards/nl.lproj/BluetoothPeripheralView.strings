@@ -115,3 +115,14 @@
 "reconnecting" = "Opnieuw verbinden";
 "reconnectingToTransmitter" = "Opnieuw verbinden...";
 "waiting" = "Wachten...";
+
+/* Dexcom G6 Bluetooth authentication slot */
+"dexcomG6BluetoothSlot" = "Bluetooth-kanaal";
+"dexcomG6MobileAppSlot" = "Mobiele app (Standaard)";
+"dexcomG6MobileAppSlotShort" = "Mobiele app";
+"dexcomG6MedicalDeviceSlot" = "Ontvanger of pomp (Experimenteel)";
+"dexcomG6MedicalDeviceSlotShort" = "Pomp";
+"dexcomG6MobileAppSlotFooter" = "Het kanaal Mobiele app is de standaard voor telefoonverbindingen.";
+"dexcomG6MedicalDeviceSlotFooter" = "Het kanaal Ontvanger of pomp is normaal gereserveerd voor de Dexcom-ontvanger of een compatibele pomp. Als deze app dit kanaal gebruikt, blijft het kanaal Mobiele app beschikbaar voor een telefoon of ander apparaat.";
+"dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Niet beschikbaar in de co-existentiemodus";
+"dexcomG6MedicalDeviceSlotWarning" = "Het kanaal Ontvanger of pomp is normaal gereserveerd voor een Dexcom-ontvanger of een compatibele pomp. Als u dit selecteert, kan dat verhinderen dat dit apparaat verbinding maakt.\n\nHet gebruik van het kanaal Ontvanger of pomp moet uitsluitend als experimenteel worden beschouwd. De selectie wordt actief bij de volgende authenticatie.";

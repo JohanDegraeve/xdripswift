@@ -108,3 +108,14 @@
 "reconnecting" = "Genopretter forbindelse";
 "reconnectingToTransmitter" = "Genopretter forbindelse...";
 "waiting" = "Venter...";
+
+/* Dexcom G6 Bluetooth authentication slot */
+"dexcomG6BluetoothSlot" = "Bluetooth-kanal";
+"dexcomG6MobileAppSlot" = "Mobilapp (Standard)";
+"dexcomG6MobileAppSlotShort" = "Mobilapp";
+"dexcomG6MedicalDeviceSlot" = "Modtager eller pumpe (Eksperimentel)";
+"dexcomG6MedicalDeviceSlotShort" = "Pumpe";
+"dexcomG6MobileAppSlotFooter" = "Mobilapp-kanalen er standarden til telefonforbindelser.";
+"dexcomG6MedicalDeviceSlotFooter" = "Modtager- eller pumpekanalen er normalt reserveret til Dexcom-modtageren eller en kompatibel pumpe. Når denne app bruger den, forbliver mobilapp-kanalen tilgængelig for en telefon eller en anden enhed.";
+"dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Ikke tilgængelig i sameksistenstilstand";
+"dexcomG6MedicalDeviceSlotWarning" = "Modtager- eller pumpekanalen er normalt reserveret til en Dexcom-modtager eller en kompatibel pumpe. Hvis du vælger den, kan det forhindre denne enhed i at oprette forbindelse.\n\nBrug af modtager- eller pumpekanalen bør kun betragtes som eksperimentel. Valget træder i kraft ved næste godkendelse.";

@@ -82,7 +82,7 @@
 "common_minutes" = "mins";
 
 /// literally yes, without capital
-"yes" = "Yes";
+"yes" = "Tak";
 
 /// literally 'Cancel'
 "common_cancel" = "Cancel";

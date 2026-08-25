@@ -108,3 +108,14 @@
 "reconnecting" = "Yeniden bağlanıyor";
 "reconnectingToTransmitter" = "Yeniden bağlanıyor...";
 "waiting" = "Bekleniyor...";
+
+/* Dexcom G6 Bluetooth authentication slot */
+"dexcomG6BluetoothSlot" = "Bluetooth Kanalı";
+"dexcomG6MobileAppSlot" = "Mobil Uygulama (Varsayılan)";
+"dexcomG6MobileAppSlotShort" = "Mobil Uygulama";
+"dexcomG6MedicalDeviceSlot" = "Alıcı veya Pompa (Deneysel)";
+"dexcomG6MedicalDeviceSlotShort" = "Pompa";
+"dexcomG6MobileAppSlotFooter" = "Mobil Uygulama kanalı, telefon bağlantıları için varsayılandır.";
+"dexcomG6MedicalDeviceSlotFooter" = "Alıcı veya Pompa kanalı normalde Dexcom alıcısı veya uyumlu bir pompa için ayrılmıştır. Bu uygulamanın bu kanalı kullanması, Mobil Uygulama kanalını bir telefon veya başka bir cihaz için kullanılabilir durumda bırakır.";
+"dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Birlikte Çalışma Modunda kullanılamaz";
+"dexcomG6MedicalDeviceSlotWarning" = "Alıcı veya Pompa kanalı normalde bir Dexcom alıcısı veya uyumlu bir pompa için ayrılmıştır. Bu kanalın seçilmesi, söz konusu cihazın bağlanmasını engelleyebilir.\n\nAlıcı veya Pompa kanalı kullanımı yalnızca deneysel olarak değerlendirilmelidir. Seçim bir sonraki kimlik doğrulamada geçerli olur.";

@@ -21,6 +21,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// - sending should be done by other app (eg official Dexcom app)
     /// - exception could be sending calibration request or start sensor request, because if user is calibrating or starting the sensor via xDrip4iOS then it would need to be send to the transmitter by xDrip4iOS
     public var useOtherApp = false
+
+    /// Authentication role requested on the next active G6 connection.
+    /// Co-existence mode does not send an authentication request, so this value has no effect there.
+    public var bluetoothSlot: DexcomG6BluetoothSlot
     
     /// is the G6 transmitter Anubis-modified?
     /// use this flag (once set by the TransmitterVersionRxMessage) to enable extra features as needed
@@ -206,7 +210,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - webOOPEnabled : enabled or not, if nil then default false
     ///     - userOtherApp
     ///     - isAnubis: true or false. If true then we can take advantage of extra features
-    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, transmitterStartDate: Date?, sensorStartDate: Date?, activeSensorStartDate: Date?, calibrationToSendToTransmitter: Calibration?, firmware: String?, webOOPEnabled: Bool?, useOtherApp: Bool, isAnubis: Bool) {
+    ///     - bluetoothSlot: the role byte to use for G6 authentication
+    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, transmitterStartDate: Date?, sensorStartDate: Date?, activeSensorStartDate: Date?, calibrationToSendToTransmitter: Calibration?, firmware: String?, webOOPEnabled: Bool?, useOtherApp: Bool, isAnubis: Bool, bluetoothSlot: DexcomG6BluetoothSlot) {
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DEXCOM" + transmitterID[transmitterID.index(transmitterID.startIndex, offsetBy: 4)..<transmitterID.endIndex])
         if let address = address {
@@ -215,6 +220,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // assign useOtherApp
         self.useOtherApp = useOtherApp
+
+        // assign the requested G6 authentication role
+        self.bluetoothSlot = bluetoothSlot
         
         // initialize webOOPEnabled
         self.webOOPEnabled = webOOPEnabled ?? false
@@ -1218,7 +1226,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             return
         }
         
-        let authMessage = AuthRequestTxMessage()
+        let authMessage = AuthRequestTxMessage(slot: bluetoothSlot)
         
         if let receiveAuthenticationCharacteristic = receiveAuthenticationCharacteristic {
 

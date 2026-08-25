@@ -117,3 +117,14 @@
 "reconnecting" = "Yhdistetään uudelleen";
 "reconnectingToTransmitter" = "Yhdistetään uudelleen...";
 "waiting" = "Odotetaan...";
+
+/* Dexcom G6 Bluetooth authentication slot */
+"dexcomG6BluetoothSlot" = "Bluetooth-kanava";
+"dexcomG6MobileAppSlot" = "Mobiilisovellus (Oletus)";
+"dexcomG6MobileAppSlotShort" = "Mobiilisovellus";
+"dexcomG6MedicalDeviceSlot" = "Vastaanotin tai pumppu (Kokeellinen)";
+"dexcomG6MedicalDeviceSlotShort" = "Pumppu";
+"dexcomG6MobileAppSlotFooter" = "Mobiilisovelluskanava on puhelinyhteyksien oletuskanava.";
+"dexcomG6MedicalDeviceSlotFooter" = "Vastaanotin- tai pumppukanava on tavallisesti varattu Dexcom-vastaanottimelle tai yhteensopivalle pumpulle. Kun tämä appi käyttää sitä, mobiilisovelluskanava jää puhelimen tai muun laitteen käyttöön.";
+"dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Ei käytettävissä rinnakkaistilassa";
+"dexcomG6MedicalDeviceSlotWarning" = "Vastaanotin- tai pumppukanava on tavallisesti varattu Dexcom-vastaanottimelle tai yhteensopivalle pumpulle. Sen valitseminen voi estää kyseistä laitetta muodostamasta yhteyttä.\n\nVastaanotin- tai pumppukanavan käyttöä tulee pitää vain kokeellisena. Valinta tulee voimaan seuraavan todennuksen yhteydessä.";

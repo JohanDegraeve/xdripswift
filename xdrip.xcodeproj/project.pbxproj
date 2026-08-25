@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4D7B00023014000200000001 /* CGMG5SensorSessionDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */; };
+		4D7E00023017000200000001 /* DexcomG6BluetoothSlotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E00013017000200000001 /* DexcomG6BluetoothSlotTests.swift */; };
 		4D7D00023016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */; };
 		4D7A00023014000100000001 /* TroubleshootingLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7A00013014000100000001 /* TroubleshootingLog.swift */; };
 		4D7A00043014000100000001 /* TroubleshootingLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7A00033014000100000001 /* TroubleshootingLogView.swift */; };
@@ -878,6 +879,7 @@
 
 /* Begin PBXFileReference section */
 		4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG5SensorSessionDetectionTests.swift; sourceTree = "<group>"; };
+		4D7E00013017000200000001 /* DexcomG6BluetoothSlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG6BluetoothSlotTests.swift; sourceTree = "<group>"; };
 		4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDisplayStatusTests.swift; sourceTree = "<group>"; };
 		4D7A00013014000100000001 /* TroubleshootingLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TroubleshootingLog.swift; sourceTree = "<group>"; };
 		4D7A00033014000100000001 /* TroubleshootingLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TroubleshootingLogView.swift; sourceTree = "<group>"; };
@@ -1185,6 +1187,7 @@
 		4F2400183001000100000001 /* NightscoutProfileAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutProfileAccessor.swift; sourceTree = "<group>"; };
 		4F2400313001000100000001 /* xdrip v24.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v24.xcdatamodel"; sourceTree = "<group>"; };
 		4F2500313002000100000001 /* xdrip v25.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v25.xcdatamodel"; sourceTree = "<group>"; };
+		4F2600313002000100000001 /* xdrip v26.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v26.xcdatamodel"; sourceTree = "<group>"; };
 		4F2500113002000100000001 /* SensorHealthIssueManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorHealthIssueManager.swift; sourceTree = "<group>"; };
 		4F2500133002000100000001 /* SensorHealthModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorHealthModels.swift; sourceTree = "<group>"; };
 		4F2600113002000200000001 /* SensorNoisePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorNoisePersistenceTests.swift; sourceTree = "<group>"; };
@@ -2518,6 +2521,7 @@
 				4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */,
 				4D7C00013015000100000001 /* CalibrationReadinessTests.swift */,
 				4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */,
+				4D7E00013017000200000001 /* DexcomG6BluetoothSlotTests.swift */,
 				4D7A00053014000100000001 /* TroubleshootingLogTests.swift */,
 				A50000040000000000000001 /* OnlineHelpTests.swift */,
 				FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */,
@@ -4274,6 +4278,7 @@
 				4D7D00023016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift in Sources */,
 				4D7C00023015000100000001 /* CalibrationReadinessTests.swift in Sources */,
 				4D7B00023014000200000001 /* CGMG5SensorSessionDetectionTests.swift in Sources */,
+				4D7E00023017000200000001 /* DexcomG6BluetoothSlotTests.swift in Sources */,
 				4D7A00063014000100000001 /* TroubleshootingLogTests.swift in Sources */,
 				A50000030000000000000001 /* OnlineHelpTests.swift in Sources */,
 				FBA100040000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift in Sources */,
@@ -5931,6 +5936,7 @@
 		F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				4F2600313002000100000001 /* xdrip v26.xcdatamodel */,
 				4F2500313002000100000001 /* xdrip v25.xcdatamodel */,
 				4F2400313001000100000001 /* xdrip v24.xcdatamodel */,
 				4E6100312FF3000100000001 /* xdrip v23.xcdatamodel */,
@@ -5946,7 +5952,7 @@
 				F85FF3CB252F9C9A004E6FF1 /* xdrip v13.xcdatamodel */,
 				F85FF3C3252D0C32004E6FF1 /* xdrip v12.xcdatamodel */,
 			);
-			currentVersion = 4F2500313002000100000001 /* xdrip v25.xcdatamodel */;
+			currentVersion = 4F2600313002000100000001 /* xdrip v26.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
