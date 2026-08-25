@@ -774,20 +774,24 @@ struct RootHomeView: View {
         if state.visibility.showsClock {
             RootHomeClockView(text: state.controls.clockText)
         }
-
-        if state.visibility.showsSensor {
-            RootHomeSensorLifetimeView(state: state.sensor)
-        }
     }
 
     @ViewBuilder private var ipadDataSourceContent: some View {
-        if state.visibility.showsDataSource {
-            RootHomeDataSourceView(
-                state: state.dataSource,
-                sensorState: state.sensor,
-                sensorNoiseState: state.sensorNoise,
-                action: actions.hideFollowerUrl
-            )
+        if state.visibility.showsSensor || state.visibility.showsDataSource {
+            VStack(spacing: 0) {
+                if state.visibility.showsSensor {
+                    RootHomeSensorLifetimeView(state: state.sensor)
+                }
+
+                if state.visibility.showsDataSource {
+                    RootHomeDataSourceView(
+                        state: state.dataSource,
+                        sensorState: state.sensor,
+                        sensorNoiseState: state.sensorNoise,
+                        action: actions.hideFollowerUrl
+                    )
+                }
+            }
         }
     }
 
