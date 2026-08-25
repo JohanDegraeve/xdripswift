@@ -586,11 +586,11 @@ struct TroubleshootingCalibrationReadiness: Codable, Equatable {
     let overall: TroubleshootingCalibrationReadinessLevel
 }
 
-/// A calculated or transmitter-reported condition that became a sensor-health episode.
+/// A calculated or transmitter-reported sensor-health condition.
 ///
 /// This is deliberately separate from the hourly `sensorNoise` measurement and configured alarm
-/// delivery. It records the condition itself even when optional noise UI, sensor-health notifications
-/// or the terminal-failure alert is disabled. No sensor or transmitter identity is retained.
+/// delivery. It records transmitter conditions when first observed and calculated conditions when
+/// activated, even when optional UI or alerts are disabled. No hardware identity is retained.
 enum TroubleshootingSensorHealthAlert: String, Codable, Equatable {
     case persistentNoise
     case possibleFlatline
@@ -1207,10 +1207,10 @@ final class TroubleshootingLogStore {
                 lastSensorNoiseAt = entry.timestamp
 
             case .sensorHealthAlert:
-                // SensorHealthIssueManager emits this only when a new episode is activated. Never
-                // apply the hourly metric throttle here: crossing an alert boundary is meaningful
-                // even when a noise measurement was retained only moments earlier or the user's
-                // notification/alarm preference prevents external presentation.
+                // SensorHealthIssueManager emits this only when a transmitter condition is first
+                // observed or a calculated episode is activated. Never apply the hourly metric
+                // throttle here: the state transition is meaningful even when a nearby noise
+                // measurement was retained or external presentation remains intentionally delayed.
                 result.append(entry)
 
             case .transmitterReadSuccess:
