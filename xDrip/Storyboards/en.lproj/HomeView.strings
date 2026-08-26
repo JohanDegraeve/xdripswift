@@ -195,3 +195,36 @@
 "noSensorCodeSelectedMessage" = "Starting a Dexcom G6 sensor with 0000 means no sensor code will be sent to the transmitter.\n\nThe Dexcom transmitter will require calibrations for this sensor session: two calibrations after warm-up, another 12 hours later, another 12 hours after that, then once every 24 hours until the sensor ends.\n\nThese calibration requests come from the Dexcom transmitter/no-code workflow. They are not caused by the %@ calibration reminder setting, and disabling that reminder will not stop required transmitter calibrations.";
 "connectingToCGM" = "Connecting to CGM...";
 "reconnectingToCGM" = "Reconnecting to CGM...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "Scan with Camera";
+"chooseSensorLabelPhoto" = "Choose Photo";
+"readingSensorLabel" = "Reading sensor label...";
+"scanSensorLabel" = "Scan Sensor Label";
+"sensorCodeScannerGuidance" = "Place the Data Matrix inside the frame.";
+"sensorCodeScannerTorch" = "Torch";
+"cameraAccessRequired" = "Camera Access Required";
+"cameraAccessRequiredMessage" = "Allow camera access in Settings, or enter the code manually or choose a photo.";
+"openSettings" = "Open Settings";
+"cameraUnavailable" = "Camera Unavailable";
+"cameraUnavailableMessage" = "Enter the sensor code manually or choose a photo.";
+"sensorInformationTitle" = "Sensor Information";
+"sensorLotNumber" = "Lot Number";
+"sensorSerialNumberMetadata" = "Sensor Serial Number";
+"sensorLabelReviewFooter" = "Check the decoded information before starting the sensor.";
+"sensorLabelScanFailed" = "Sensor Label Not Read";
+"multipleSensorLabelsFound" = "The photo contains more than one sensor label. Choose a photo containing one label.";
+"noSensorLabelFound" = "No valid Dexcom G6 sensor label was found in the photo.";
+"invalidSensorLabelFound" = "A Data Matrix was found, but it was not a valid Dexcom G6 sensor label.";
+"sensorLabelPhotoUnreadable" = "The selected photo could not be read.";
+"sensorCodeMetadata" = "Sensor Code";
+"scannedSensorLabelCode" = "Scanned Label Code";
+"noCodeSensorSessionValue" = "0000 (No-code session)";
+"sensorCodeUnknown" = "Unknown";
+"sensorSessionOrigin" = "Session Origin";
+"sensorSessionOriginUnknown" = "Unknown";
+"sensorSessionOriginAwaitingTransmitter" = "Awaiting transmitter";
+"sensorSessionOriginStartedByApp" = "Started by xDrip4iOS";
+"sensorSessionOriginExistingAdopted" = "Existing session adopted";
+"sensorSessionOriginTransmitterDetected" = "Detected from transmitter";
+"sensorSessionOriginRejected" = "Start request rejected";

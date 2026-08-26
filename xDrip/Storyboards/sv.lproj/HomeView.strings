@@ -136,3 +136,36 @@
 "sensorHealthTransmitterFailedGuidance" = "Sändarfel rapporterat. Kontrollera eller byt sändaren.";
 "connectingToCGM" = "Ansluter till CGM...";
 "reconnectingToCGM" = "Återansluter till CGM...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "Skanna med kamera";
+"chooseSensorLabelPhoto" = "Välj foto";
+"readingSensorLabel" = "Läser sensoretikett...";
+"scanSensorLabel" = "Skanna sensoretikett";
+"sensorCodeScannerGuidance" = "Placera Data Matrix inom ramen.";
+"sensorCodeScannerTorch" = "Ficklampa";
+"cameraAccessRequired" = "Kameraåtkomst krävs";
+"cameraAccessRequiredMessage" = "Tillåt kameraåtkomst i Inställningar, ange koden manuellt eller välj ett foto.";
+"openSettings" = "Öppna Inställningar";
+"cameraUnavailable" = "Kameran är inte tillgänglig";
+"cameraUnavailableMessage" = "Ange sensorkoden manuellt eller välj ett foto.";
+"sensorInformationTitle" = "Sensorinformation";
+"sensorLotNumber" = "Lotnummer";
+"sensorSerialNumberMetadata" = "Sensorns serienummer";
+"sensorLabelReviewFooter" = "Kontrollera den avkodade informationen innan sensorn startas.";
+"sensorLabelScanFailed" = "Sensoretiketten kunde inte läsas";
+"multipleSensorLabelsFound" = "Fotot innehåller fler än en sensoretikett. Välj ett foto med en etikett.";
+"noSensorLabelFound" = "Ingen giltig Dexcom G6-sensoretikett hittades i fotot.";
+"invalidSensorLabelFound" = "En Data Matrix hittades, men den var inte en giltig Dexcom G6-sensoretikett.";
+"sensorLabelPhotoUnreadable" = "Det valda fotot kunde inte läsas.";
+"sensorCodeMetadata" = "Sensorkod";
+"scannedSensorLabelCode" = "Skannad etikettkod";
+"noCodeSensorSessionValue" = "0000 (Session utan kod)";
+"sensorCodeUnknown" = "Okänd";
+"sensorSessionOrigin" = "Sessionens ursprung";
+"sensorSessionOriginUnknown" = "Okänt";
+"sensorSessionOriginAwaitingTransmitter" = "Väntar på sändaren";
+"sensorSessionOriginStartedByApp" = "Startad av xDrip4iOS";
+"sensorSessionOriginExistingAdopted" = "Befintlig session övertagen";
+"sensorSessionOriginTransmitterDetected" = "Identifierad från sändaren";
+"sensorSessionOriginRejected" = "Startbegäran avvisad";

@@ -123,3 +123,36 @@
 "sensorHealthTransmitterFailedGuidance" = "Verici arızası bildirildi. Kontrol edin veya değiştirin.";
 "connectingToCGM" = "CGM'ye bağlanıyor...";
 "reconnectingToCGM" = "CGM'ye yeniden bağlanıyor...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "Kamerayla Tara";
+"chooseSensorLabelPhoto" = "Fotoğraf Seç";
+"readingSensorLabel" = "Sensör etiketi okunuyor...";
+"scanSensorLabel" = "Sensör Etiketini Tara";
+"sensorCodeScannerGuidance" = "Data Matrix'i çerçevenin içine yerleştirin.";
+"sensorCodeScannerTorch" = "El feneri";
+"cameraAccessRequired" = "Kamera Erişimi Gerekli";
+"cameraAccessRequiredMessage" = "Ayarlar’dan kamera erişimine izin verin, kodu elle girin veya bir fotoğraf seçin.";
+"openSettings" = "Ayarları Aç";
+"cameraUnavailable" = "Kamera Kullanılamıyor";
+"cameraUnavailableMessage" = "Sensör kodunu elle girin veya bir fotoğraf seçin.";
+"sensorInformationTitle" = "Sensör Bilgileri";
+"sensorLotNumber" = "Lot Numarası";
+"sensorSerialNumberMetadata" = "Sensör Seri Numarası";
+"sensorLabelReviewFooter" = "Sensörü başlatmadan önce çözümlenen bilgileri kontrol edin.";
+"sensorLabelScanFailed" = "Sensör Etiketi Okunamadı";
+"multipleSensorLabelsFound" = "Fotoğrafta birden fazla sensör etiketi var. Tek etiket içeren bir fotoğraf seçin.";
+"noSensorLabelFound" = "Fotoğrafta geçerli bir Dexcom G6 sensör etiketi bulunamadı.";
+"invalidSensorLabelFound" = "Bir Data Matrix bulundu ancak geçerli bir Dexcom G6 sensör etiketi değildi.";
+"sensorLabelPhotoUnreadable" = "Seçilen fotoğraf okunamadı.";
+"sensorCodeMetadata" = "Sensör Kodu";
+"scannedSensorLabelCode" = "Taranan Etiket Kodu";
+"noCodeSensorSessionValue" = "0000 (Kodsuz oturum)";
+"sensorCodeUnknown" = "Bilinmiyor";
+"sensorSessionOrigin" = "Oturum Kaynağı";
+"sensorSessionOriginUnknown" = "Bilinmiyor";
+"sensorSessionOriginAwaitingTransmitter" = "Verici bekleniyor";
+"sensorSessionOriginStartedByApp" = "xDrip4iOS tarafından başlatıldı";
+"sensorSessionOriginExistingAdopted" = "Mevcut oturum devralındı";
+"sensorSessionOriginTransmitterDetected" = "Vericiden algılandı";
+"sensorSessionOriginRejected" = "Başlatma isteği reddedildi";

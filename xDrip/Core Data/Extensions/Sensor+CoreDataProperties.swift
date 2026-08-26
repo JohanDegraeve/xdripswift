@@ -17,6 +17,12 @@ extension Sensor {
     @NSManaged public var noiseLatestReadingAt: Date?
     @NSManaged public var noiseStateRaw: Int16
     @NSManaged public var noiseUpdatedAt: Date?
+    @NSManaged public var requestedSensorCode: String?
+    @NSManaged public var sensorCalibrationModeRaw: Int16
+    @NSManaged public var sensorLabelCode: String?
+    @NSManaged public var sensorLotNumber: String?
+    @NSManaged public var sensorSerialNumber: String?
+    @NSManaged public var sensorSessionOriginRaw: Int16
     @NSManaged public var shortTermNoise: NSNumber?
     @NSManaged public var shortTermNoiseCoverage: Double
     @NSManaged public var startDate: Date

@@ -160,3 +160,36 @@
 "sensorHealthTransmitterFailedGuidance" = "Défaillance du transmetteur signalée. Vérifiez-le ou remplacez-le.";
 "connectingToCGM" = "Connexion au CGM...";
 "reconnectingToCGM" = "Reconnexion au CGM...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "Scanner avec l’appareil photo";
+"chooseSensorLabelPhoto" = "Choisir une photo";
+"readingSensorLabel" = "Lecture de l’étiquette du capteur...";
+"scanSensorLabel" = "Scanner l’étiquette du capteur";
+"sensorCodeScannerGuidance" = "Placez le Data Matrix dans le cadre.";
+"sensorCodeScannerTorch" = "Lampe";
+"cameraAccessRequired" = "Accès à l’appareil photo requis";
+"cameraAccessRequiredMessage" = "Autorisez l’accès à l’appareil photo dans Réglages, saisissez le code manuellement ou choisissez une photo.";
+"openSettings" = "Ouvrir Réglages";
+"cameraUnavailable" = "Appareil photo indisponible";
+"cameraUnavailableMessage" = "Saisissez le code du capteur manuellement ou choisissez une photo.";
+"sensorInformationTitle" = "Informations du capteur";
+"sensorLotNumber" = "Numéro de lot";
+"sensorSerialNumberMetadata" = "Numéro de série du capteur";
+"sensorLabelReviewFooter" = "Vérifiez les informations décodées avant de démarrer le capteur.";
+"sensorLabelScanFailed" = "Étiquette du capteur non lue";
+"multipleSensorLabelsFound" = "La photo contient plusieurs étiquettes de capteur. Choisissez une photo avec une seule étiquette.";
+"noSensorLabelFound" = "Aucune étiquette de capteur Dexcom G6 valide n’a été trouvée sur la photo.";
+"invalidSensorLabelFound" = "Un Data Matrix a été trouvé, mais ce n’était pas une étiquette de capteur Dexcom G6 valide.";
+"sensorLabelPhotoUnreadable" = "La photo sélectionnée n’a pas pu être lue.";
+"sensorCodeMetadata" = "Code du capteur";
+"scannedSensorLabelCode" = "Code de l’étiquette scannée";
+"noCodeSensorSessionValue" = "0000 (Session sans code)";
+"sensorCodeUnknown" = "Inconnu";
+"sensorSessionOrigin" = "Origine de la session";
+"sensorSessionOriginUnknown" = "Inconnue";
+"sensorSessionOriginAwaitingTransmitter" = "En attente du transmetteur";
+"sensorSessionOriginStartedByApp" = "Démarrée par xDrip4iOS";
+"sensorSessionOriginExistingAdopted" = "Session existante adoptée";
+"sensorSessionOriginTransmitterDetected" = "Détectée par le transmetteur";
+"sensorSessionOriginRejected" = "Demande de démarrage rejetée";

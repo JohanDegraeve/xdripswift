@@ -172,7 +172,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// Core Data snapshot used for the first validated packet because app startup temporarily clears the UserDefaults mirror.
     private var activeSensorStartDateAtInitialization: Date?
 
-    private static let sensorStartDateTolerance: TimeInterval = 15.0
+    static let sensorStartDateTolerance: TimeInterval = 15.0
     
     /// - used to send sensor start done by user via xDrip4iOS to Dexcom transmitter. For example, user may have started a sensor in the app, but it's not yet send to the transmitter.
     /// - tuple consisitng of startDate and dexcomCalibrationParameters. If startDate is nil, then there's no start sensor waiting to be sent to the transmitter.
@@ -1353,6 +1353,13 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.cGMG5TransmitterDelegate?.received(sensorStatus: dexcomSessionStartRxMessage.sessionStartResponse.description, cGMG5Transmitter: self)
+                self.cgmTransmitterDelegate?.sensorSessionStartResultReceived(
+                    CGMSensorSessionStartResult(
+                        response: dexcomSessionStartRxMessage.sessionStartResponse,
+                        requestedStartDate: dexcomSessionStartRxMessage.requestedStartDate,
+                        sessionStartDate: dexcomSessionStartRxMessage.sessionStartDate
+                    )
+                )
             }
             
         } else {

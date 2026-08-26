@@ -335,6 +335,7 @@ struct TroubleshootingLogView: View {
                 return "network"
             }
         case .sensor: return "sensor.tag.radiowaves.forward.fill"
+        case .sensorLabelScan: return "barcode.viewfinder"
         case .sensorNoise: return "waveform.path.ecg"
         case .sensorHealthAlert: return "exclamationmark.triangle.fill"
         case .transmitterReadSuccess: return "antenna.radiowaves.left.and.right"
@@ -406,6 +407,8 @@ struct TroubleshootingLogView: View {
         case let .follower(_, activity) where activity == .loginFailed || activity == .downloadFailed:
             return .orange
         case let .integration(_, activity) where activity == .failed || activity == .permissionDenied:
+            return .orange
+        case .sensorLabelScan(.failed):
             return .orange
         case let .alert(_, activity) where activity == .notificationsDenied:
             return .orange

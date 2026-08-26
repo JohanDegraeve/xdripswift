@@ -409,6 +409,7 @@ private struct BluetoothPeripheralDetailRowView: View {
                     detail: row.detail,
                     detailIndicator: row.detailIndicator,
                     detailSymbol: row.detailSymbol,
+                    detailLineLimit: row.detailLineLimit,
                     showsDisclosure: row.showsDisclosure,
                     isEnabled: row.isEnabled
                 )
@@ -420,6 +421,7 @@ private struct BluetoothPeripheralDetailRowView: View {
                 detail: row.detail,
                 detailIndicator: row.detailIndicator,
                 detailSymbol: row.detailSymbol,
+                detailLineLimit: row.detailLineLimit,
                 showsDisclosure: false,
                 isEnabled: row.isEnabled
             )

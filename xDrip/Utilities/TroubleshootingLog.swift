@@ -644,10 +644,36 @@ enum TroubleshootingSensorHealthAlert: String, Codable, Equatable {
 enum TroubleshootingSensorActivity: Codable, Equatable {
     case detected
     case started
+    case startedWithCode(sensorCode: String)
     case warmingUp(minutesRemaining: Int)
     case stopped
     case notDetected
     case unusableReading
+}
+
+enum TroubleshootingSensorLabelScanSource: String, Codable, Equatable {
+    case camera
+    case photo
+}
+
+enum TroubleshootingSensorLabelScanFailure: String, Codable, Equatable {
+    case cameraPermissionDenied
+    case cameraUnavailable
+    case malformedLabel
+    case multipleValidLabels
+    case noValidLabel
+    case unreadableImage
+}
+
+/// A sensor-label scan result, including all decoded label information when available.
+enum TroubleshootingSensorLabelScanActivity: Codable, Equatable {
+    case succeeded(
+        source: TroubleshootingSensorLabelScanSource,
+        sensorCode: String,
+        lotNumber: String,
+        serialNumber: String
+    )
+    case failed(source: TroubleshootingSensorLabelScanSource, reason: TroubleshootingSensorLabelScanFailure)
 }
 
 /// Alert outcomes that explain user-visible behavior without copying alert text or notification data.
@@ -728,6 +754,8 @@ enum TroubleshootingLogKind: Codable, Equatable {
         measuredAt: Date
     )
     case sensor(TroubleshootingSensorActivity)
+    /// A user-initiated sensor-label scan outcome with its decoded label metadata when available.
+    case sensorLabelScan(TroubleshootingSensorLabelScanActivity)
     /// Hourly, bounded sensor-quality context. Values are aggregate glucose deviations only.
     case sensorNoise(shortTermMgDl: Double?, longTermMgDl: Double?, status: TroubleshootingSensorNoiseStatus)
     /// A deduplicated sensor-health condition, independent of UI and alarm delivery settings.
@@ -1231,6 +1259,11 @@ final class TroubleshootingLogStore {
                 result.append(entry)
                 lastSensorActivity = activity
 
+            case .sensorLabelScan:
+                // Each result belongs to an explicit camera or photo action and is useful even when
+                // the preceding attempt had the same outcome.
+                result.append(entry)
+
             case .sensorNoise:
                 // Noise is calculated for the developer trace every ten minutes. One consumer row
                 // per hour preserves the trend without allowing this periodic metric to overwhelm
@@ -1421,7 +1454,7 @@ final class TroubleshootingLogStore {
     ) -> Bool {
         let isSessionStart: (TroubleshootingSensorActivity?) -> Bool = { activity in
             switch activity {
-            case .detected?, .started?: return true
+            case .detected?, .started?, .startedWithCode?: return true
             default: return false
             }
         }
@@ -1788,10 +1821,19 @@ struct TroubleshootingLogReportBuilder {
             switch activity {
             case .detected: return "A new sensor session was started."
             case .started: return "A sensor session started."
+            case let .startedWithCode(sensorCode): return "A sensor session started with sensor code \(sensorCode)."
             case let .warmingUp(minutesRemaining): return "Sensor is warming up for about \(minutesRemaining) more minute\(minutesRemaining == 1 ? "" : "s")."
             case .stopped: return "The sensor session stopped."
             case .notDetected: return "No active sensor was detected."
             case .unusableReading: return "A sensor reading was rejected because it was not usable."
+            }
+
+        case let .sensorLabelScan(activity):
+            switch activity {
+            case let .succeeded(source, sensorCode, lotNumber, serialNumber):
+                return "Dexcom G6 sensor label \(source.rawValue) scan succeeded: sensor code \(sensorCode), lot \(lotNumber), serial \(serialNumber)."
+            case let .failed(source, reason):
+                return "Dexcom G6 sensor label \(source.rawValue) scan failed: \(sensorLabelScanFailureText(reason))."
             }
 
         case let .sensorNoise(shortTermMgDl, longTermMgDl, status):
@@ -1983,6 +2025,17 @@ struct TroubleshootingLogReportBuilder {
             case let .deleted(kind, treatmentAt):
                 return "\(kind.name) treatment deleted at \(measurementTimeText(treatmentAt, recordedAt: entry.timestamp))."
             }
+        }
+    }
+
+    private func sensorLabelScanFailureText(_ failure: TroubleshootingSensorLabelScanFailure) -> String {
+        switch failure {
+        case .cameraPermissionDenied: return "camera permission denied"
+        case .cameraUnavailable: return "camera unavailable"
+        case .malformedLabel: return "malformed sensor label"
+        case .multipleValidLabels: return "multiple valid sensor labels found"
+        case .noValidLabel: return "no valid sensor label found"
+        case .unreadableImage: return "selected image could not be read"
         }
     }
 

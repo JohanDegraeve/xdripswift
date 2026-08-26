@@ -123,3 +123,36 @@
 "sensorHealthTransmitterFailedGuidance" = "Senderfejl rapporteret. Kontrollér eller udskift senderen.";
 "connectingToCGM" = "Forbinder til CGM...";
 "reconnectingToCGM" = "Genopretter forbindelse til CGM...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "Scan med kamera";
+"chooseSensorLabelPhoto" = "Vælg foto";
+"readingSensorLabel" = "Læser sensormærkat...";
+"scanSensorLabel" = "Scan sensormærkat";
+"sensorCodeScannerGuidance" = "Placer Data Matrix inden for rammen.";
+"sensorCodeScannerTorch" = "Lommelygte";
+"cameraAccessRequired" = "Kameraadgang kræves";
+"cameraAccessRequiredMessage" = "Tillad kameraadgang i Indstillinger, indtast koden manuelt, eller vælg et foto.";
+"openSettings" = "Åbn Indstillinger";
+"cameraUnavailable" = "Kamera ikke tilgængeligt";
+"cameraUnavailableMessage" = "Indtast sensorkoden manuelt, eller vælg et foto.";
+"sensorInformationTitle" = "Sensoroplysninger";
+"sensorLotNumber" = "Lotnummer";
+"sensorSerialNumberMetadata" = "Sensorens serienummer";
+"sensorLabelReviewFooter" = "Kontrollér de afkodede oplysninger, før sensoren startes.";
+"sensorLabelScanFailed" = "Sensormærkat ikke læst";
+"multipleSensorLabelsFound" = "Fotoet indeholder mere end én sensormærkat. Vælg et foto med én mærkat.";
+"noSensorLabelFound" = "Der blev ikke fundet en gyldig Dexcom G6-sensormærkat på fotoet.";
+"invalidSensorLabelFound" = "Der blev fundet en Data Matrix, men den var ikke en gyldig Dexcom G6-sensormærkat.";
+"sensorLabelPhotoUnreadable" = "Det valgte foto kunne ikke læses.";
+"sensorCodeMetadata" = "Sensorkode";
+"scannedSensorLabelCode" = "Scannet mærkatkode";
+"noCodeSensorSessionValue" = "0000 (Session uden kode)";
+"sensorCodeUnknown" = "Ukendt";
+"sensorSessionOrigin" = "Sessionsoprindelse";
+"sensorSessionOriginUnknown" = "Ukendt";
+"sensorSessionOriginAwaitingTransmitter" = "Afventer sender";
+"sensorSessionOriginStartedByApp" = "Startet af xDrip4iOS";
+"sensorSessionOriginExistingAdopted" = "Eksisterende session overtaget";
+"sensorSessionOriginTransmitterDetected" = "Registreret fra sender";
+"sensorSessionOriginRejected" = "Startanmodning afvist";

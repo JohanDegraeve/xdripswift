@@ -312,6 +312,74 @@ final class TroubleshootingLogTests: XCTestCase {
         ])
     }
 
+    func testSensorStartActivityRetainsSubmittedCode() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+
+        fixture.store.record(.standard(
+            .sensor(.startedWithCode(sensorCode: "0000")),
+            timestamp: referenceDate
+        ))
+        fixture.store.record(.standard(
+            .sensor(.detected),
+            timestamp: referenceDate.addingTimeInterval(1)
+        ))
+
+        let entries = fixture.store.snapshot()
+        XCTAssertEqual(entries.map(\.kind), [
+            .sensor(.startedWithCode(sensorCode: "0000"))
+        ])
+
+        let report = makeReport(entries: entries)
+        XCTAssertEqual(
+            entries.map(report.message(for:)),
+            ["A sensor session started with sensor code 0000."]
+        )
+
+        let storedText = String(decoding: try Data(contentsOf: fixture.fileURL), as: UTF8.self)
+        XCTAssertTrue(storedText.contains("0000"))
+        XCTAssertTrue(report.reportText.contains("0000"))
+    }
+
+    func testSensorLabelScanActivityRetainsDecodedInformationAndFailures() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+
+        fixture.store.record(.standard(.sensorLabelScan(.succeeded(
+            source: .camera,
+            sensorCode: "5937",
+            lotNumber: "5336121",
+            serialNumber: "821184A"
+        )), timestamp: referenceDate))
+        fixture.store.record(.standard(
+            .sensorLabelScan(.failed(source: .photo, reason: .noValidLabel)),
+            timestamp: referenceDate.addingTimeInterval(1)
+        ))
+
+        let entries = fixture.store.snapshot()
+        let report = makeReport(entries: entries)
+        XCTAssertEqual(entries.map(\.kind), [
+            .sensorLabelScan(.failed(source: .photo, reason: .noValidLabel)),
+            .sensorLabelScan(.succeeded(
+                source: .camera,
+                sensorCode: "5937",
+                lotNumber: "5336121",
+                serialNumber: "821184A"
+            ))
+        ])
+        XCTAssertEqual(entries.map(report.message(for:)), [
+            "Dexcom G6 sensor label photo scan failed: no valid sensor label found.",
+            "Dexcom G6 sensor label camera scan succeeded: sensor code 5937, lot 5336121, serial 821184A."
+        ])
+
+        let storedText = String(decoding: try Data(contentsOf: fixture.fileURL), as: UTF8.self)
+        let sharedText = report.reportText
+        for decodedValue in ["5937", "5336121", "821184A"] {
+            XCTAssertTrue(storedText.contains(decodedValue))
+            XCTAssertTrue(sharedText.contains(decodedValue))
+        }
+    }
+
     func testCGMUserActionsKeepOneConnectionOutcomeWithoutRoutineRadioChurn() throws {
         let fixture = makeStore()
         defer { removeFixture(fixture.directory) }

@@ -123,3 +123,36 @@
 "sensorHealthTransmitterFailedGuidance" = "Αναφέρθηκε αποτυχία πομπού. Ελέγξτε ή αντικαταστήστε τον.";
 "connectingToCGM" = "Σύνδεση με το CGM...";
 "reconnectingToCGM" = "Επανασύνδεση με το CGM...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "Σάρωση με κάμερα";
+"chooseSensorLabelPhoto" = "Επιλογή φωτογραφίας";
+"readingSensorLabel" = "Ανάγνωση ετικέτας αισθητήρα...";
+"scanSensorLabel" = "Σάρωση ετικέτας αισθητήρα";
+"sensorCodeScannerGuidance" = "Τοποθετήστε το Data Matrix μέσα στο πλαίσιο.";
+"sensorCodeScannerTorch" = "Φακός";
+"cameraAccessRequired" = "Απαιτείται πρόσβαση στην κάμερα";
+"cameraAccessRequiredMessage" = "Επιτρέψτε την πρόσβαση στην κάμερα στις Ρυθμίσεις, εισαγάγετε τον κωδικό χειροκίνητα ή επιλέξτε φωτογραφία.";
+"openSettings" = "Άνοιγμα Ρυθμίσεων";
+"cameraUnavailable" = "Η κάμερα δεν είναι διαθέσιμη";
+"cameraUnavailableMessage" = "Εισαγάγετε τον κωδικό αισθητήρα χειροκίνητα ή επιλέξτε φωτογραφία.";
+"sensorInformationTitle" = "Πληροφορίες αισθητήρα";
+"sensorLotNumber" = "Αριθμός παρτίδας";
+"sensorSerialNumberMetadata" = "Σειριακός αριθμός αισθητήρα";
+"sensorLabelReviewFooter" = "Ελέγξτε τις αποκωδικοποιημένες πληροφορίες πριν ξεκινήσετε τον αισθητήρα.";
+"sensorLabelScanFailed" = "Η ετικέτα αισθητήρα δεν διαβάστηκε";
+"multipleSensorLabelsFound" = "Η φωτογραφία περιέχει περισσότερες από μία ετικέτες αισθητήρα. Επιλέξτε φωτογραφία με μία ετικέτα.";
+"noSensorLabelFound" = "Δεν βρέθηκε έγκυρη ετικέτα αισθητήρα Dexcom G6 στη φωτογραφία.";
+"invalidSensorLabelFound" = "Βρέθηκε Data Matrix, αλλά δεν ήταν έγκυρη ετικέτα αισθητήρα Dexcom G6.";
+"sensorLabelPhotoUnreadable" = "Δεν ήταν δυνατή η ανάγνωση της επιλεγμένης φωτογραφίας.";
+"sensorCodeMetadata" = "Κωδικός αισθητήρα";
+"scannedSensorLabelCode" = "Κωδικός σαρωμένης ετικέτας";
+"noCodeSensorSessionValue" = "0000 (Συνεδρία χωρίς κωδικό)";
+"sensorCodeUnknown" = "Άγνωστος";
+"sensorSessionOrigin" = "Προέλευση συνεδρίας";
+"sensorSessionOriginUnknown" = "Άγνωστη";
+"sensorSessionOriginAwaitingTransmitter" = "Αναμονή πομπού";
+"sensorSessionOriginStartedByApp" = "Ξεκίνησε από το xDrip4iOS";
+"sensorSessionOriginExistingAdopted" = "Υιοθετήθηκε υπάρχουσα συνεδρία";
+"sensorSessionOriginTransmitterDetected" = "Εντοπίστηκε από τον πομπό";
+"sensorSessionOriginRejected" = "Το αίτημα έναρξης απορρίφθηκε";

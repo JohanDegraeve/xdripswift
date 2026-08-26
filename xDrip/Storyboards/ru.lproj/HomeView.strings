@@ -123,3 +123,36 @@
 "sensorHealthTransmitterFailedGuidance" = "Сообщается об отказе передатчика. Проверьте или замените его.";
 "connectingToCGM" = "Подключение к CGM...";
 "reconnectingToCGM" = "Переподключение к CGM...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "Сканировать камерой";
+"chooseSensorLabelPhoto" = "Выбрать фото";
+"readingSensorLabel" = "Чтение этикетки сенсора...";
+"scanSensorLabel" = "Сканировать этикетку сенсора";
+"sensorCodeScannerGuidance" = "Поместите Data Matrix внутри рамки.";
+"sensorCodeScannerTorch" = "Фонарик";
+"cameraAccessRequired" = "Требуется доступ к камере";
+"cameraAccessRequiredMessage" = "Разрешите доступ к камере в Настройках, введите код вручную или выберите фото.";
+"openSettings" = "Открыть Настройки";
+"cameraUnavailable" = "Камера недоступна";
+"cameraUnavailableMessage" = "Введите код сенсора вручную или выберите фото.";
+"sensorInformationTitle" = "Информация о сенсоре";
+"sensorLotNumber" = "Номер партии";
+"sensorSerialNumberMetadata" = "Серийный номер сенсора";
+"sensorLabelReviewFooter" = "Проверьте распознанные данные перед запуском сенсора.";
+"sensorLabelScanFailed" = "Этикетка сенсора не прочитана";
+"multipleSensorLabelsFound" = "На фото несколько этикеток сенсора. Выберите фото с одной этикеткой.";
+"noSensorLabelFound" = "На фото не найдена допустимая этикетка сенсора Dexcom G6.";
+"invalidSensorLabelFound" = "Найден код Data Matrix, но это не допустимая этикетка сенсора Dexcom G6.";
+"sensorLabelPhotoUnreadable" = "Не удалось прочитать выбранное фото.";
+"sensorCodeMetadata" = "Код сенсора";
+"scannedSensorLabelCode" = "Код со сканированной этикетки";
+"noCodeSensorSessionValue" = "0000 (Сеанс без кода)";
+"sensorCodeUnknown" = "Неизвестно";
+"sensorSessionOrigin" = "Источник сеанса";
+"sensorSessionOriginUnknown" = "Неизвестно";
+"sensorSessionOriginAwaitingTransmitter" = "Ожидание трансмиттера";
+"sensorSessionOriginStartedByApp" = "Запущен xDrip4iOS";
+"sensorSessionOriginExistingAdopted" = "Принят существующий сеанс";
+"sensorSessionOriginTransmitterDetected" = "Обнаружен трансмиттером";
+"sensorSessionOriginRejected" = "Запрос запуска отклонён";

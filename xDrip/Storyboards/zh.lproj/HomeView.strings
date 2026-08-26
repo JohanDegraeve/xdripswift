@@ -176,3 +176,36 @@
 "sensorHealthTransmitterFailedGuidance" = "已报告发射器故障。请检查或更换。";
 "connectingToCGM" = "正在连接 CGM...";
 "reconnectingToCGM" = "正在重新连接 CGM...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "使用相机扫描";
+"chooseSensorLabelPhoto" = "选择照片";
+"readingSensorLabel" = "正在读取传感器标签...";
+"scanSensorLabel" = "扫描传感器标签";
+"sensorCodeScannerGuidance" = "将 Data Matrix 置于框内。";
+"sensorCodeScannerTorch" = "手电筒";
+"cameraAccessRequired" = "需要相机权限";
+"cameraAccessRequiredMessage" = "请在“设置”中允许相机访问，或手动输入代码，或选择照片。";
+"openSettings" = "打开设置";
+"cameraUnavailable" = "相机不可用";
+"cameraUnavailableMessage" = "请手动输入传感器代码或选择照片。";
+"sensorInformationTitle" = "传感器信息";
+"sensorLotNumber" = "批号";
+"sensorSerialNumberMetadata" = "传感器序列号";
+"sensorLabelReviewFooter" = "启动传感器前，请检查解码的信息。";
+"sensorLabelScanFailed" = "未能读取传感器标签";
+"multipleSensorLabelsFound" = "照片中包含多个传感器标签。请选择仅含一个标签的照片。";
+"noSensorLabelFound" = "照片中未找到有效的 Dexcom G6 传感器标签。";
+"invalidSensorLabelFound" = "找到了 Data Matrix，但它不是有效的 Dexcom G6 传感器标签。";
+"sensorLabelPhotoUnreadable" = "无法读取所选照片。";
+"sensorCodeMetadata" = "传感器代码";
+"scannedSensorLabelCode" = "扫描的标签代码";
+"noCodeSensorSessionValue" = "0000（无代码会话）";
+"sensorCodeUnknown" = "未知";
+"sensorSessionOrigin" = "会话来源";
+"sensorSessionOriginUnknown" = "未知";
+"sensorSessionOriginAwaitingTransmitter" = "等待发射器";
+"sensorSessionOriginStartedByApp" = "由 xDrip4iOS 启动";
+"sensorSessionOriginExistingAdopted" = "已采用现有会话";
+"sensorSessionOriginTransmitterDetected" = "由发射器检测";
+"sensorSessionOriginRejected" = "启动请求被拒绝";

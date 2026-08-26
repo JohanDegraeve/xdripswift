@@ -134,3 +134,36 @@
 "sensorHealthTransmitterFailedGuidance" = "Fallo del transmisor detectado. Compruébalo o reemplázalo.";
 "connectingToCGM" = "Conectando al CGM...";
 "reconnectingToCGM" = "Reconectando al CGM...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "Escanear con la cámara";
+"chooseSensorLabelPhoto" = "Elegir foto";
+"readingSensorLabel" = "Leyendo la etiqueta del sensor...";
+"scanSensorLabel" = "Escanear etiqueta del sensor";
+"sensorCodeScannerGuidance" = "Coloque el código Data Matrix dentro del marco.";
+"sensorCodeScannerTorch" = "Linterna";
+"cameraAccessRequired" = "Se necesita acceso a la cámara";
+"cameraAccessRequiredMessage" = "Permita el acceso a la cámara en Ajustes, introduzca el código manualmente o elija una foto.";
+"openSettings" = "Abrir Ajustes";
+"cameraUnavailable" = "Cámara no disponible";
+"cameraUnavailableMessage" = "Introduzca el código del sensor manualmente o elija una foto.";
+"sensorInformationTitle" = "Información del sensor";
+"sensorLotNumber" = "Número de lote";
+"sensorSerialNumberMetadata" = "Número de serie del sensor";
+"sensorLabelReviewFooter" = "Compruebe la información decodificada antes de iniciar el sensor.";
+"sensorLabelScanFailed" = "No se pudo leer la etiqueta";
+"multipleSensorLabelsFound" = "La foto contiene más de una etiqueta de sensor. Elija una foto con una sola etiqueta.";
+"noSensorLabelFound" = "No se encontró ninguna etiqueta válida de sensor Dexcom G6 en la foto.";
+"invalidSensorLabelFound" = "Se encontró un Data Matrix, pero no era una etiqueta válida de sensor Dexcom G6.";
+"sensorLabelPhotoUnreadable" = "No se pudo leer la foto seleccionada.";
+"sensorCodeMetadata" = "Código del sensor";
+"scannedSensorLabelCode" = "Código de etiqueta escaneado";
+"noCodeSensorSessionValue" = "0000 (Sesión sin código)";
+"sensorCodeUnknown" = "Desconocido";
+"sensorSessionOrigin" = "Origen de la sesión";
+"sensorSessionOriginUnknown" = "Desconocido";
+"sensorSessionOriginAwaitingTransmitter" = "Esperando al transmisor";
+"sensorSessionOriginStartedByApp" = "Iniciada por xDrip4iOS";
+"sensorSessionOriginExistingAdopted" = "Sesión existente adoptada";
+"sensorSessionOriginTransmitterDetected" = "Detectada por el transmisor";
+"sensorSessionOriginRejected" = "Solicitud de inicio rechazada";

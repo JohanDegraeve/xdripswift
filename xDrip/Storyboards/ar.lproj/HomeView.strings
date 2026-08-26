@@ -125,3 +125,36 @@
 "sensorHealthTransmitterFailedGuidance" = "تم الإبلاغ عن فشل جهاز الإرسال. تحقّق منه أو استبدله.";
 "connectingToCGM" = "جارٍ الاتصال بجهاز CGM...";
 "reconnectingToCGM" = "جارٍ إعادة الاتصال بجهاز CGM...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "المسح بالكاميرا";
+"chooseSensorLabelPhoto" = "اختيار صورة";
+"readingSensorLabel" = "جارٍ قراءة ملصق المستشعر...";
+"scanSensorLabel" = "مسح ملصق المستشعر";
+"sensorCodeScannerGuidance" = "ضع رمز Data Matrix داخل الإطار.";
+"sensorCodeScannerTorch" = "المصباح";
+"cameraAccessRequired" = "يلزم الوصول إلى الكاميرا";
+"cameraAccessRequiredMessage" = "اسمح بالوصول إلى الكاميرا في الإعدادات، أو أدخل الرمز يدويًا، أو اختر صورة.";
+"openSettings" = "فتح الإعدادات";
+"cameraUnavailable" = "الكاميرا غير متاحة";
+"cameraUnavailableMessage" = "أدخل رمز المستشعر يدويًا أو اختر صورة.";
+"sensorInformationTitle" = "معلومات المستشعر";
+"sensorLotNumber" = "رقم الدفعة";
+"sensorSerialNumberMetadata" = "الرقم التسلسلي للمستشعر";
+"sensorLabelReviewFooter" = "تحقق من المعلومات التي تم فكها قبل بدء المستشعر.";
+"sensorLabelScanFailed" = "تعذرت قراءة ملصق المستشعر";
+"multipleSensorLabelsFound" = "تحتوي الصورة على أكثر من ملصق مستشعر. اختر صورة تحتوي على ملصق واحد.";
+"noSensorLabelFound" = "لم يتم العثور على ملصق مستشعر Dexcom G6 صالح في الصورة.";
+"invalidSensorLabelFound" = "تم العثور على Data Matrix، لكنه لم يكن ملصق مستشعر Dexcom G6 صالحًا.";
+"sensorLabelPhotoUnreadable" = "تعذرت قراءة الصورة المحددة.";
+"sensorCodeMetadata" = "رمز المستشعر";
+"scannedSensorLabelCode" = "رمز الملصق الممسوح";
+"noCodeSensorSessionValue" = "0000 (جلسة بدون رمز)";
+"sensorCodeUnknown" = "غير معروف";
+"sensorSessionOrigin" = "مصدر الجلسة";
+"sensorSessionOriginUnknown" = "غير معروف";
+"sensorSessionOriginAwaitingTransmitter" = "في انتظار جهاز الإرسال";
+"sensorSessionOriginStartedByApp" = "بدأت بواسطة xDrip4iOS";
+"sensorSessionOriginExistingAdopted" = "تم اعتماد جلسة موجودة";
+"sensorSessionOriginTransmitterDetected" = "تم اكتشافها من جهاز الإرسال";
+"sensorSessionOriginRejected" = "تم رفض طلب البدء";

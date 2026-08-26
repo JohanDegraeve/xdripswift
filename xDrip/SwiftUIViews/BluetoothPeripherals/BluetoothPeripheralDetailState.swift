@@ -432,6 +432,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         detail: String? = nil,
         detailIndicator: SettingsIndicator? = nil,
         detailSymbol: BluetoothPeripheralDetailSymbol? = nil,
+        detailLineLimit: Int = 2,
         showsDisclosure: Bool = false,
         isEnabled: Bool = true,
         action: (() -> Void)? = nil
@@ -442,6 +443,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             detail: detail,
             detailIndicator: detailIndicator,
             detailSymbol: detailSymbol,
+            detailLineLimit: detailLineLimit,
             showsDisclosure: showsDisclosure,
             isEnabled: isEnabled,
             toggle: nil,
@@ -463,6 +465,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             detail: nil,
             detailIndicator: nil,
             detailSymbol: detailSymbol,
+            detailLineLimit: 2,
             showsDisclosure: false,
             isEnabled: isEnabled,
             toggle: BluetoothPeripheralDetailToggle(isOn: isOn, setValue: setValue),
@@ -1584,6 +1587,7 @@ struct BluetoothPeripheralDetailRow: Identifiable {
     let detail: String?
     let detailIndicator: SettingsIndicator?
     let detailSymbol: BluetoothPeripheralDetailSymbol?
+    let detailLineLimit: Int
     let showsDisclosure: Bool
     let isEnabled: Bool
     let toggle: BluetoothPeripheralDetailToggle?
@@ -1595,6 +1599,7 @@ struct BluetoothPeripheralDetailRow: Identifiable {
         detail: String?,
         detailIndicator: SettingsIndicator?,
         detailSymbol: BluetoothPeripheralDetailSymbol?,
+        detailLineLimit: Int,
         showsDisclosure: Bool,
         isEnabled: Bool,
         toggle: BluetoothPeripheralDetailToggle?,
@@ -1605,6 +1610,7 @@ struct BluetoothPeripheralDetailRow: Identifiable {
         self.detail = detail
         self.detailIndicator = detailIndicator
         self.detailSymbol = detailSymbol
+        self.detailLineLimit = detailLineLimit
         self.showsDisclosure = showsDisclosure
         self.isEnabled = isEnabled
         self.toggle = toggle
@@ -1806,6 +1812,7 @@ private extension BluetoothPeripheralDetailState {
                 id: "dexcom-g5-sensor-start-date",
                 title: Texts_BluetoothPeripheralView.sensorStartDate,
                 detail: dexcomG5SensorStartDateText(dexcomG5: dexcomG5),
+                detailLineLimit: 1,
                 showsDisclosure: shouldShowDexcomG5SensorStartDate(dexcomG5: dexcomG5),
                 isEnabled: shouldShowDexcomG5SensorStartDate(dexcomG5: dexcomG5),
                 action: { [weak self] in
@@ -1844,6 +1851,7 @@ private extension BluetoothPeripheralDetailState {
                 // Only the active transmitter should show a health indicator.
                 // Stored inactive devices may have stale sensor status values.
                 detailIndicator: dexcomG5.blePeripheral.shouldconnect ? sensorStatusDetailIndicator(for: dexcomG5.sensorStatus) : nil,
+                detailLineLimit: 1,
                 showsDisclosure: dexcomG5.sensorStatus != nil,
                 isEnabled: dexcomG5.sensorStatus != nil,
                 action: { [weak self] in
@@ -2080,7 +2088,8 @@ private extension BluetoothPeripheralDetailState {
             row(
                 id: "dexcom-g7-sensor-start-date",
                 title: Texts_BluetoothPeripheralView.sensorStartDate,
-                detail: dexcomG7.sensorStartDate?.toStringInUserLocale(timeStyle: .none, dateStyle: .short) ?? ""
+                detail: dexcomG7.sensorStartDate?.toStringInUserLocale(timeStyle: .none, dateStyle: .short) ?? "",
+                detailLineLimit: 1
             ),
             row(
                 id: "dexcom-g7-sensor-status",
@@ -2088,7 +2097,8 @@ private extension BluetoothPeripheralDetailState {
                 detail: dexcomG7.sensorStatus,
                 // Only the active transmitter should show a health indicator.
                 // Stored inactive devices may have stale sensor status values.
-                detailIndicator: dexcomG7.blePeripheral.shouldconnect ? sensorStatusDetailIndicator(for: dexcomG7.sensorStatus) : nil
+                detailIndicator: dexcomG7.blePeripheral.shouldconnect ? sensorStatusDetailIndicator(for: dexcomG7.sensorStatus) : nil,
+                detailLineLimit: 1
             )
         ]
 

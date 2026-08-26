@@ -13,6 +13,7 @@ struct BluetoothPeripheralSettingsRow: View {
     let detail: String?
     let detailIndicator: SettingsIndicator?
     let detailSymbol: BluetoothPeripheralDetailSymbol?
+    let detailLineLimit: Int
     let showsDisclosure: Bool
     let isEnabled: Bool
 
@@ -21,6 +22,7 @@ struct BluetoothPeripheralSettingsRow: View {
         detail: String?,
         detailIndicator: SettingsIndicator? = nil,
         detailSymbol: BluetoothPeripheralDetailSymbol? = nil,
+        detailLineLimit: Int = 2,
         showsDisclosure: Bool = false,
         isEnabled: Bool = true
     ) {
@@ -28,6 +30,7 @@ struct BluetoothPeripheralSettingsRow: View {
         self.detail = detail
         self.detailIndicator = detailIndicator
         self.detailSymbol = detailSymbol
+        self.detailLineLimit = detailLineLimit
         self.showsDisclosure = showsDisclosure
         self.isEnabled = isEnabled
     }
@@ -58,7 +61,8 @@ struct BluetoothPeripheralSettingsRow: View {
                     Text(detail)
                         .foregroundStyle(isEnabled ? ConstantsAppColors.rowDetailText : ConstantsAppColors.disabledText)
                         .multilineTextAlignment(.trailing)
-                        .lineLimit(2)
+                        .lineLimit(detailLineLimit)
+                        .truncationMode(.tail)
                 }
             }
 
