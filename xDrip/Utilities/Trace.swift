@@ -613,7 +613,7 @@ class Trace {
                             
                             traceInfo.appendStringAndNewLine("        Use With Other App: " + dexcomG5.useOtherApp.description)
 
-                            let bluetoothSlot = dexcomG5.effectiveBluetoothSlot(as: DexcomG6BluetoothSlot.self)
+                            let bluetoothSlot = dexcomG5.effectiveDexcomG6BluetoothSlot()
                             traceInfo.appendStringAndNewLine(
                                 "        Bluetooth channel: "
                                     + TroubleshootingDexcomBluetoothChannel(bluetoothSlot).name

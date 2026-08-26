@@ -289,7 +289,7 @@ class BluetoothPeripheralManager: NSObject {
                         if let transmitterId = dexcomG5orG6.blePeripheral.transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate {
                             
                             let activeSensor = sensorsAccessor.fetchActiveSensor()
-                            let bluetoothSlot = dexcomG5orG6.resolvedBluetoothSlot(as: DexcomG6BluetoothSlot.self)
+                            let bluetoothSlot = dexcomG5orG6.resolvedDexcomG6BluetoothSlot()
                             newTransmitter = CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, activeSensorStartDate: activeSensor?.startDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: activeSensor), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled, useOtherApp: dexcomG5orG6.useOtherApp, isAnubis: dexcomG5orG6.isAnubis, bluetoothSlot: bluetoothSlot)
                             
                             
@@ -796,7 +796,7 @@ class BluetoothPeripheralManager: NSObject {
                                 // create an instance of CGMG5Transmitter, will automatically try to connect to the dexcom with the address that is stored in dexcom
                                 // add it to the array of bluetoothTransmitters
                                 let activeSensor = sensorsAccessor.fetchActiveSensor()
-                                let bluetoothSlot = dexcomG5orG6.resolvedBluetoothSlot(as: DexcomG6BluetoothSlot.self)
+                                let bluetoothSlot = dexcomG5orG6.resolvedDexcomG6BluetoothSlot()
                                 bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, activeSensorStartDate: activeSensor?.startDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: activeSensor), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled, useOtherApp: dexcomG5orG6.useOtherApp, isAnubis: dexcomG5orG6.isAnubis, bluetoothSlot: bluetoothSlot), at: index)
 
                                 // if DexcomG5Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true

@@ -83,6 +83,9 @@ extension BluetoothPeripheralManager: CGMG5TransmitterDelegate {
         guard let dexcomG5 = getDexcomG5(cGMG5Transmitter: cGMG5Transmitter) else { return }
         
         dexcomG5.isAnubis = isAnubis
+        // Slot 3 belongs to Anubis firmware. Repair stale storage and the next authentication role
+        // immediately if a transmitter identifies itself as a standard Dexcom model.
+        cGMG5Transmitter.bluetoothSlot = dexcomG5.resolvedDexcomG6BluetoothSlot()
         
         coreDataManager.saveChanges()
         

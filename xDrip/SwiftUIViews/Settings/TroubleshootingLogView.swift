@@ -97,7 +97,7 @@ struct TroubleshootingLogView: View {
                     currentSourceCanUseFiveMinuteReadings: bgPostProcessingManager?.currentSourceCanUseFiveMinuteReadings(),
                     dexcomBluetoothChannel: dexcomG5.map {
                         TroubleshootingDexcomBluetoothChannel(
-                            $0.effectiveBluetoothSlot(as: DexcomG6BluetoothSlot.self)
+                            $0.effectiveDexcomG6BluetoothSlot()
                         )
                     }
                 )

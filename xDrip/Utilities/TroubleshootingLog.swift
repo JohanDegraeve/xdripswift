@@ -314,12 +314,13 @@ enum TroubleshootingDexcomConnectionMode: String, Codable {
 }
 
 enum TroubleshootingDexcomBluetoothChannel: String, Codable {
-    case mobileApp, receiverOrPump
+    case mobileApp, receiverOrPump, anubisExperimental
 
     init(_ slot: DexcomG6BluetoothSlot) {
         switch slot {
         case .mobileApp: self = .mobileApp
         case .medicalDevice: self = .receiverOrPump
+        case .anubisExperimental: self = .anubisExperimental
         }
     }
 
@@ -327,6 +328,7 @@ enum TroubleshootingDexcomBluetoothChannel: String, Codable {
         switch self {
         case .mobileApp: return "Mobile App"
         case .receiverOrPump: return "Receiver or Pump"
+        case .anubisExperimental: return "Slot 3 (Anubis Experimental)"
         }
     }
 }

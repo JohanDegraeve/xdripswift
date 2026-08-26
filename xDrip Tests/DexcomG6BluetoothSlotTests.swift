@@ -28,6 +28,24 @@ final class DexcomG6BluetoothSlotTests: XCTestCase {
         XCTAssertEqual(request.data.last, DexcomG6BluetoothSlot.medicalDevice.rawValue)
     }
 
+    func testAuthenticationRequestCanUseAnubisSlot() {
+        XCTAssertEqual(
+            AuthRequestTxMessage(slot: .anubisExperimental).data.last,
+            UInt8(0x03)
+        )
+    }
+
+    func testAnubisSlotFallsBackToMobileAppForStandardTransmitters() {
+        XCTAssertEqual(
+            DexcomG6BluetoothSlot.anubisExperimental.normalized(isAnubis: true),
+            .anubisExperimental
+        )
+        XCTAssertEqual(
+            DexcomG6BluetoothSlot.anubisExperimental.normalized(isAnubis: false),
+            .mobileApp
+        )
+    }
+
     func testMissingStoredSlotIsMaterializedAsFamilyDefault() {
         let store = SlotStore()
 

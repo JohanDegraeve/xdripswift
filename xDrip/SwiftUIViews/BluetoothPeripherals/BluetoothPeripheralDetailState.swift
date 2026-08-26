@@ -100,9 +100,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         self.presentSelectionListView = presentSelectionListView
         self.presentReadSuccessView = presentReadSuccessView
         self.transmitterIdTempValue = bluetoothPeripheral?.blePeripheral.transmitterId
-        self.dexcomG6BluetoothSlot = (bluetoothPeripheral as? DexcomG5)?.resolvedBluetoothSlot(
-            as: DexcomG6BluetoothSlot.self
-        ) ?? .defaultSlot
+        self.dexcomG6BluetoothSlot = (bluetoothPeripheral as? DexcomG5)?
+            .resolvedDexcomG6BluetoothSlot() ?? .defaultSlot
 
         super.init()
 
@@ -985,6 +984,8 @@ private extension DexcomG6BluetoothSlot {
             return Texts_BluetoothPeripheralView.dexcomG6MobileAppSlot
         case .medicalDevice:
             return Texts_BluetoothPeripheralView.dexcomG6MedicalDeviceSlot
+        case .anubisExperimental:
+            return Texts_BluetoothPeripheralView.dexcomG6AnubisSlot
         }
     }
 
@@ -994,6 +995,19 @@ private extension DexcomG6BluetoothSlot {
             return Texts_BluetoothPeripheralView.dexcomG6MobileAppSlotShort
         case .medicalDevice:
             return Texts_BluetoothPeripheralView.dexcomG6MedicalDeviceSlotShort
+        case .anubisExperimental:
+            return Texts_BluetoothPeripheralView.dexcomG6AnubisSlotShort
+        }
+    }
+
+    var footer: String {
+        switch self {
+        case .mobileApp:
+            return Texts_BluetoothPeripheralView.dexcomG6MobileAppSlotFooter
+        case .medicalDevice:
+            return Texts_BluetoothPeripheralView.dexcomG6MedicalDeviceSlotFooter
+        case .anubisExperimental:
+            return Texts_BluetoothPeripheralView.dexcomG6AnubisSlotFooter
         }
     }
 }
@@ -1270,7 +1284,10 @@ private extension BluetoothPeripheralDetailState {
     }
 
     func requestDexcomG6BluetoothSlot() {
-        let slots = DexcomG6BluetoothSlot.allCases
+        let isAnubis = (bluetoothPeripheral as? DexcomG5)?.isAnubis == true
+        let slots = DexcomG6BluetoothSlot.allCases.filter { slot in
+            slot != .anubisExperimental || isAnubis
+        }
 
         presentSelectionListView(BluetoothPeripheralSelectionList(
             title: Texts_BluetoothPeripheralView.dexcomG6BluetoothSlot,
@@ -1286,10 +1303,12 @@ private extension BluetoothPeripheralDetailState {
     func selectDexcomG6BluetoothSlot(_ slot: DexcomG6BluetoothSlot) {
         guard slot != dexcomG6BluetoothSlot else { return }
 
-        if slot == .medicalDevice {
+        if slot == .medicalDevice || slot == .anubisExperimental {
             pendingAlert = BluetoothPeripheralDetailAlert(
                 title: Texts_Common.warning,
-                message: Texts_BluetoothPeripheralView.dexcomG6MedicalDeviceSlotWarning,
+                message: slot == .medicalDevice
+                    ? Texts_BluetoothPeripheralView.dexcomG6MedicalDeviceSlotWarning
+                    : Texts_BluetoothPeripheralView.dexcomG6AnubisSlotWarning,
                 primaryButtonTitle: Texts_Common.yes,
                 primaryAction: { [weak self] in
                     self?.setDexcomG6BluetoothSlot(slot)
@@ -1302,6 +1321,8 @@ private extension BluetoothPeripheralDetailState {
     }
 
     func setDexcomG6BluetoothSlot(_ slot: DexcomG6BluetoothSlot) {
+        guard slot != .anubisExperimental || (bluetoothPeripheral as? DexcomG5)?.isAnubis == true else { return }
+
         let previousSlot = dexcomG6BluetoothSlot
         guard slot != previousSlot else { return }
 
@@ -1763,9 +1784,7 @@ private extension BluetoothPeripheralDetailState {
             title: Texts_SettingsView.developerSettings,
             footer: coexistenceModeIsEnabled
                 ? Texts_BluetoothPeripheralView.dexcomG6BluetoothSlotUnavailableInCoexistenceMode
-                : dexcomG6BluetoothSlot == .medicalDevice
-                    ? Texts_BluetoothPeripheralView.dexcomG6MedicalDeviceSlotFooter
-                    : Texts_BluetoothPeripheralView.dexcomG6MobileAppSlotFooter,
+                : dexcomG6BluetoothSlot.footer,
             rows: [
                 row(
                     id: "dexcom-g6-bluetooth-slot-selection",

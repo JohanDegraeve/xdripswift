@@ -77,3 +77,21 @@ extension DexcomBluetoothSlotPersisting {
 }
 
 extension DexcomG5: DexcomBluetoothSlotPersisting {}
+
+extension DexcomG5 {
+    /// Applies the Anubis-only Slot 3 rule without changing persistent storage.
+    func effectiveDexcomG6BluetoothSlot() -> DexcomG6BluetoothSlot {
+        effectiveBluetoothSlot(as: DexcomG6BluetoothSlot.self).normalized(isAnubis: isAnubis)
+    }
+
+    /// Returns a usable slot and repairs stale Slot 3 values on non-Anubis transmitters.
+    func resolvedDexcomG6BluetoothSlot() -> DexcomG6BluetoothSlot {
+        let resolvedSlot = effectiveDexcomG6BluetoothSlot()
+
+        if bluetoothSlot?.intValue != Int(resolvedSlot.rawValue) {
+            setBluetoothSlot(resolvedSlot)
+        }
+
+        return resolvedSlot
+    }
+}
