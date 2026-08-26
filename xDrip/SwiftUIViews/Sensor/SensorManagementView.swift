@@ -783,17 +783,25 @@ struct SensorManagementView: View {
 // MARK: - sensitivity picker
 
 private struct SensorNoiseSensitivitySelectionView: View {
-    let selectedSensitivity: SensorNoiseSensitivity
+    @State private var selectedSensitivity: SensorNoiseSensitivity
+
+    private let initialSensitivity: SensorNoiseSensitivity
     let onSelect: (SensorNoiseSensitivity) -> Void
     @Environment(\.dismiss) private var dismiss
+
+    /// Starts the picker on the sensitivity currently stored by the parent view.
+    init(selectedSensitivity: SensorNoiseSensitivity, onSelect: @escaping (SensorNoiseSensitivity) -> Void) {
+        self.initialSensitivity = selectedSensitivity
+        self.onSelect = onSelect
+        _selectedSensitivity = State(initialValue: selectedSensitivity)
+    }
 
     var body: some View {
         List {
             Section {
                 ForEach(SensorNoiseSensitivity.allCases, id: \.self) { sensitivity in
                     Button {
-                        onSelect(sensitivity)
-                        dismiss()
+                        selectedSensitivity = sensitivity
                     } label: {
                         HStack {
                             Text(sensitivity.description)
@@ -816,6 +824,16 @@ private struct SensorNoiseSensitivitySelectionView: View {
         }
         .navigationTitle(Texts_SettingsView.sensorNoiseSensitivity)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button(Texts_Common.Ok) {
+                    onSelect(selectedSensitivity)
+                    dismiss()
+                }
+                .tint(ConstantsAppColors.toolbarAction)
+                .disabled(selectedSensitivity == initialSensitivity)
+            }
+        }
     }
 }
 
