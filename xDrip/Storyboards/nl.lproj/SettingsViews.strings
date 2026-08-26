@@ -532,3 +532,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Basaalpulsen";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Tijdelijke basaalstanden";
 "settingsviews_careLinkAutomaticBasalFooter" = "Basaalpulsen toont elke automatische basaalafgifte als een korte puls in de hoofdglucosegrafiek. Tijdelijke basaalstanden toont de equivalente snelheid in E/u tussen afgiften.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Stijl";
+"settingsviews_carPlayLiveActivityTypeChart" = "Grafiek";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Basis";
+"settingsviews_liveActivitySectionTitle" = "Liveactiviteit";

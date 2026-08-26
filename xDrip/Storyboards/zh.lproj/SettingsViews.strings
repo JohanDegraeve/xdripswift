@@ -658,3 +658,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "基础脉冲";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "临时基础率";
 "settingsviews_careLinkAutomaticBasalFooter" = "基础脉冲会在主血糖图表上将每次自动基础输注显示为短脉冲。临时基础率会显示两次输注之间的等效 U/小时速率。";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "样式";
+"settingsviews_carPlayLiveActivityTypeChart" = "图表";
+"settingsviews_carPlayLiveActivityTypeBasic" = "基础";
+"settingsviews_liveActivitySectionTitle" = "实时活动";

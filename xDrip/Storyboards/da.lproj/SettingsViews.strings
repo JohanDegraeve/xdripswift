@@ -476,3 +476,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Basalimpulser";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Midlertidige basaler";
 "settingsviews_careLinkAutomaticBasalFooter" = "Basalimpulser viser hver automatisk basaltilførsel som en kort impuls på hovedglukosegrafen. Midlertidige basaler viser den tilsvarende hastighed i E/t mellem tilførslerne.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Stil";
+"settingsviews_carPlayLiveActivityTypeChart" = "Graf";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Enkel";
+"settingsviews_liveActivitySectionTitle" = "Liveaktivitet";

@@ -733,3 +733,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Bazalni pulzi";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Začasni bazali";
 "settingsviews_careLinkAutomaticBasalFooter" = "Bazalni pulzi prikažejo vsak samodejni bazalni odmerek kot kratek pulz na glavnem grafikonu glukoze. Začasni bazali prikažejo enakovredno hitrost v E/h med odmerki.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Slog";
+"settingsviews_carPlayLiveActivityTypeChart" = "Graf";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Osnovno";
+"settingsviews_liveActivitySectionTitle" = "Dejavnost v živo";

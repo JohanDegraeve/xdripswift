@@ -688,3 +688,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Базальні імпульси";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Тимчасові базальні";
 "settingsviews_careLinkAutomaticBasalFooter" = "Базальні імпульси показують кожну автоматичну базальну подачу як короткий імпульс на основному графіку глюкози. Тимчасові базальні показують еквівалентну швидкість в Од/год між подачами.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Стиль";
+"settingsviews_carPlayLiveActivityTypeChart" = "Графік";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Базовий";
+"settingsviews_liveActivitySectionTitle" = "Дія наживо";

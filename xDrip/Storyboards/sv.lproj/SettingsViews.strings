@@ -506,3 +506,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Basalpulser";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Tillfälliga basaler";
 "settingsviews_careLinkAutomaticBasalFooter" = "Basalpulser visar varje automatisk basaldos som en kort puls i huvudglukosdiagrammet. Tillfälliga basaler visar motsvarande hastighet i E/tim mellan doserna.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Stil";
+"settingsviews_carPlayLiveActivityTypeChart" = "Diagram";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Grundläggande";
+"settingsviews_liveActivitySectionTitle" = "Liveaktivitet";

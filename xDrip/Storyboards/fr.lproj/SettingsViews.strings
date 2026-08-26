@@ -548,3 +548,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Impulsions basales";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Basales temporaires";
 "settingsviews_careLinkAutomaticBasalFooter" = "Impulsions basales affiche chaque administration basale automatique sous forme d'une courte impulsion sur le graphique principal de glycémie. Basales temporaires affiche le débit équivalent en U/h entre les administrations.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Style";
+"settingsviews_carPlayLiveActivityTypeChart" = "Graphique";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Simple";
+"settingsviews_liveActivitySectionTitle" = "Activité en direct";

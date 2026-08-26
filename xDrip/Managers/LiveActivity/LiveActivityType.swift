@@ -69,3 +69,18 @@ public enum LiveActivityType: Int, CaseIterable, Codable {
     
 }
 
+/// Layout used by the small supplemental Live Activity family in CarPlay and Apple Watch.
+public enum CarPlayLiveActivityType: Int, CaseIterable, Codable {
+    // Keep persisted raw values stable.
+    case chart = 0
+    case basic = 1
+
+    var description: String {
+        switch self {
+        case .chart:
+            return Texts_SettingsView.carPlayLiveActivityTypeChart
+        case .basic:
+            return Texts_SettingsView.carPlayLiveActivityTypeBasic
+        }
+    }
+}

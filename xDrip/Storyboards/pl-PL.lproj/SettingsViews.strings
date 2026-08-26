@@ -733,3 +733,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Impulsy bazy";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Bazy tymczasowe";
 "settingsviews_careLinkAutomaticBasalFooter" = "Impulsy bazy pokazują każdą automatyczną dawkę bazową jako krótki impuls na głównym wykresie glukozy. Bazy tymczasowe pokazują równoważne tempo w j./h pomiędzy dawkami.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Styl";
+"settingsviews_carPlayLiveActivityTypeChart" = "Wykres";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Podstawowy";
+"settingsviews_liveActivitySectionTitle" = "Aktywność na żywo";

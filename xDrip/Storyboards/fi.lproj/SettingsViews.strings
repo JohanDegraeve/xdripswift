@@ -518,3 +518,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Basaalipulssit";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Väliaikaiset basaalit";
 "settingsviews_careLinkAutomaticBasalFooter" = "Basaalipulssit näyttää jokaisen automaattisen basaaliannoksen lyhyenä pulssina pääglukoosikaaviossa. Väliaikaiset basaalit näyttää vastaavan U/h-nopeuden annosten välillä.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Tyyli";
+"settingsviews_carPlayLiveActivityTypeChart" = "Kaavio";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Perus";
+"settingsviews_liveActivitySectionTitle" = "Live-toiminto";

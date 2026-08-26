@@ -27,6 +27,7 @@ enum NotificationSettingsRowGroup {
     case notifications
     case appBadge
     case liveActivities
+    case carPlay
 }
 
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
@@ -43,7 +44,11 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
         switch rowGroup {
         case .notifications:
             return Texts_SettingsView.sectionTitleNotifications
-        case .appBadge, .liveActivities:
+        case .carPlay:
+            return carPlaySettingsVisible ? Texts_SettingsView.carPlaySectionTitle : nil
+        case .liveActivities:
+            return Texts_SettingsView.liveActivitySectionTitle
+        case .appBadge:
             return nil
         }
     }
@@ -134,10 +139,39 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
                 liveActivityTypeRow,
                 SettingsRow(
                     id: "notifications.liveActivityPreview",
-                    title: Texts_SettingsView.labelLiveActivityType,
+                    title: Texts_SettingsView.liveActivityStyle,
                     accessory: .none,
                     control: .custom(content: { AnyView(LiveActivitySettingsPreview()) }),
                     isVisible: liveActivitiesAvailable && UserDefaults.standard.liveActivityType != .disabled
+                )
+            ]
+        case .carPlay:
+            let carPlayLiveActivityTypes = CarPlayLiveActivityType.allCases
+
+            return [
+                SettingsRow(
+                    id: "notifications.carPlayLiveActivityType",
+                    title: Texts_SettingsView.liveActivityStyle,
+                    accessory: .none,
+                    control: .menu(
+                        options: {
+                            carPlayLiveActivityTypes.map {
+                                SettingsMenuOption(title: $0.description, isSelected: $0 == UserDefaults.standard.carPlayLiveActivityType)
+                            }
+                        },
+                        selectOption: { index in
+                            guard carPlayLiveActivityTypes.indices.contains(index) else { return }
+                            UserDefaults.standard.carPlayLiveActivityType = carPlayLiveActivityTypes[index]
+                        }
+                    ),
+                    isVisible: carPlaySettingsVisible
+                ),
+                SettingsRow(
+                    id: "notifications.carPlayLiveActivityPreview",
+                    title: Texts_SettingsView.liveActivityStyle,
+                    accessory: .none,
+                    control: .custom(content: { AnyView(CarPlayLiveActivitySettingsPreview()) }),
+                    isVisible: carPlaySettingsVisible
                 )
             ]
         }
@@ -279,7 +313,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
             return Texts_SettingsView.settingsviews_IntervalTitle
             
         case .liveActivityType:
-            return Texts_SettingsView.labelLiveActivityType
+            return Texts_SettingsView.liveActivityStyle
             
         case .showReadingInAppBadge:
             return Texts_SettingsView.labelShowReadingInAppBadge
@@ -371,6 +405,14 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
         UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat
     }
 
+    private var carPlaySettingsVisible: Bool {
+        guard liveActivitiesAvailable, UserDefaults.standard.liveActivityType != .disabled else { return false }
+        if #available(iOS 26.0, *) {
+            return true
+        }
+        return false
+    }
+
     private func notificationIntervalTextEntry() -> SettingsTextEntryContent {
         SettingsTextEntryContent(
             title: Texts_SettingsView.settingsviews_IntervalTitle,
@@ -399,6 +441,8 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
         
         // Listen for changes in the active sensor value to trigger the UI to be updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivityType.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.carPlayLiveActivityType.rawValue, options: .new, context: nil)
         
     }
     
@@ -409,7 +453,9 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
         else { return }
         
         switch keyPathEnum {
-        case UserDefaults.Key.followerBackgroundKeepAliveType:
+        case UserDefaults.Key.followerBackgroundKeepAliveType,
+             UserDefaults.Key.liveActivityType,
+             UserDefaults.Key.carPlayLiveActivityType:
             
             // we have to run this in the main thread to avoid access errors
             DispatchQueue.main.async {
