@@ -1,5 +1,7 @@
 # xDrip4iOS
 
+**[Online documentation: compatibility, installation, setup and troubleshooting](https://xdrip4ios.readthedocs.io/en/latest/)**
+
 xDrip4iOS (`xdripswift`) is a community-developed, open-source iOS app for displaying and managing real-time continuous glucose monitor (CGM) data. It can connect directly to a compatible CGM in **Master** mode or retrieve remote readings from an online service in **Follower** mode.
 
 xDrip4iOS is not related to the xDrip+ project for Android.
@@ -21,55 +23,44 @@ Master mode currently includes:
 Follower mode supports:
 
 - Nightscout, including Loop and OpenAPS/AAPS status data
-- LibreLinkUp and LibreLinkUp Russia
 - Dexcom Share
+- Shared Calendar
+- CareLink
+- LibreLinkUp and LibreLinkUp Russia
 - Medtrum EasyView
 
 Sensor support depends on the exact model, region, transmitter firmware and whether an official CGM app must run alongside xDrip4iOS. Check the [compatibility guide](https://xdrip4ios.readthedocs.io/en/latest/#compatible-sensors) before choosing hardware or changing your setup.
 
 ### App features
 
-- Configurable glucose charts with optional sensor-noise bands, reading history, treatments, statistics and time-in-range views
+- Adaptive iPhone and iPad Home layouts, including Clock Mode and configurable glucose chart ranges
+- Optional sensor-noise bands, reading history, treatments, statistics and time-in-range views
 - Custom glucose, missed-reading, device and battery alerts, with spoken readings and trends
 - Nightscout upload and synchronization, Dexcom Share upload and Apple Health integration
 - Apple Watch app and complications
 - Home Screen and Lock Screen widgets, StandBy support, Live Activities and Dynamic Island layouts
 - Siri and Shortcuts access to the latest reading
 - Optional calendar events and contact-image displays
-- Open-source AID sharing with Loop/iAPS and Trio
+- AID status displays and open-source data sharing with Loop/iAPS and Trio
+- Contextual links to the online documentation and a filterable Activity Log for troubleshooting
 - Bluetooth output to M5Stack and M5StickC companion displays
 
 ## Requirements
 
-- iPhone 7 or newer running iOS 16.2 or later
+- An iPhone or iPad running iOS/iPadOS 16.2 or later
 - Apple Watch Series 4 or newer running watchOS 10 or later for Watch features
 - An internet connection for follower modes and cloud services
 - A compatible CGM setup for Master mode
 
 Some extensions and system features require newer hardware or iOS versions.
 
-## Installation
+## Availability and development
 
-xDrip4iOS is primarily a do-it-yourself app and does not have an open public TestFlight. See the maintained [installation guide](https://xdrip4ios.readthedocs.io/en/latest/install/install/) for the currently available options.
+xDrip4iOS is primarily a do-it-yourself app and does not have an open public TestFlight. The supported installation paths are building from source with Xcode on a Mac or creating a personal TestFlight build with GitHub Actions and Fastlane.
 
-You can install it by:
+The current project is configured for Xcode 26, Swift 5, iOS 16.2 and watchOS 10. Stable releases are maintained on `master`, while ongoing development is merged through `develop`.
 
-- Building from source with Xcode on a Mac
-- Creating a personal TestFlight build with GitHub Actions and Fastlane
-
-The repository includes detailed [personal TestFlight instructions](fastlane/testflight.md). A paid Apple Developer account is strongly recommended for either method.
-
-## Building from source
-
-The current project is configured for Xcode 26, Swift 5, iOS 16.2 and watchOS 10. Use the stable `master` branch for normal installs; ongoing work is merged through `develop`.
-
-```sh
-git clone --branch master https://github.com/JohanDegraeve/xdripswift.git
-cd xdripswift
-open xdrip.xcworkspace
-```
-
-Before building, configure your Apple development team in `xDripConfigOverride.xcconfig` as described in the full [Xcode build guide](https://xdrip4ios.readthedocs.io/en/latest/install/build/). Open the workspace rather than the project file so Xcode can resolve all package dependencies and targets correctly.
+The maintained [installation documentation](https://xdrip4ios.readthedocs.io/en/latest/install/install/) describes the available options and requirements. The repository also contains the supporting [personal TestFlight documentation](fastlane/testflight.md).
 
 ## Documentation and support
 

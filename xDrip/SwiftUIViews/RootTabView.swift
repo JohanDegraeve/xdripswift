@@ -90,7 +90,7 @@ struct RootTabDependencies {
     let rootHomeActions: RootHomeActions
     let activeSensorProvider: () -> Sensor?
     let transmitterProvider: () -> CGMTransmitter?
-    let startSensor: (Date, String?) -> Void
+    let startSensor: (SensorStartRequest) -> Void
     let stopSensor: () -> Void
     let submitCalibration: (CalibrationSubmission) -> String?
     let updateScreenLock: (Bool, Bool) -> Bool
@@ -280,7 +280,7 @@ struct RootTabDependencies {
         rootHomeActions: RootHomeActions,
         activeSensorProvider: @escaping () -> Sensor?,
         transmitterProvider: @escaping () -> CGMTransmitter?,
-        startSensor: @escaping (Date, String?) -> Void,
+        startSensor: @escaping (SensorStartRequest) -> Void,
         stopSensor: @escaping () -> Void,
         submitCalibration: @escaping (CalibrationSubmission) -> String?,
         updateScreenLock: @escaping (Bool, Bool) -> Bool,

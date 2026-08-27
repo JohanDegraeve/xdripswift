@@ -451,3 +451,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Pulsos basales";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Basales temporales";
 "settingsviews_careLinkAutomaticBasalFooter" = "Pulsos basales muestra cada administración basal automática como un pulso breve en el gráfico principal de glucosa. Basales temporales muestra la tasa equivalente en U/h entre administraciones.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Estilo";
+"settingsviews_carPlayLiveActivityTypeChart" = "Gráfico";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Básico";
+"settingsviews_liveActivitySectionTitle" = "Actividad en directo";

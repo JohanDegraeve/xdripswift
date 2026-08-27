@@ -92,3 +92,18 @@
 "reconnecting" = "Reconnecting";
 "reconnectingToTransmitter" = "Reconnecting...";
 "waiting" = "Waiting...";
+
+/* Dexcom G6 Bluetooth authentication slot */
+"dexcomG6BluetoothSlot" = "Bluetooth Channel";
+"dexcomG6MobileAppSlot" = "Mobile App (Default)";
+"dexcomG6MobileAppSlotShort" = "Mobile App";
+"dexcomG6MedicalDeviceSlot" = "Receiver or Pump (Experimental)";
+"dexcomG6MedicalDeviceSlotShort" = "Pump";
+"dexcomG6MobileAppSlotFooter" = "The Mobile App channel is the default for phone connections.";
+"dexcomG6MedicalDeviceSlotFooter" = "The Receiver or Pump channel is normally reserved for the Dexcom receiver or a compatible pump. Using it for this app leaves the Mobile App channel available for a phone or another device.";
+"dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Unavailable in Co-existence mode";
+"dexcomG6MedicalDeviceSlotWarning" = "The Receiver or Pump channel is normally reserved for a Dexcom receiver or compatible pump. Selecting it can prevent that device from connecting.\n\nUsing the Receiver or Pump channel should be considered for experimental use only. The selection takes effect on the next authentication.";
+"dexcomG6AnubisSlot" = "Slot 3 (Anubis Experimental)";
+"dexcomG6AnubisSlotShort" = "Slot 3";
+"dexcomG6AnubisSlotFooter" = "Slot 3 is available only on Anubis transmitters. It is experimental and leaves the Mobile App and Receiver or Pump channels available for other devices.";
+"dexcomG6AnubisSlotWarning" = "Slot 3 is an experimental channel available only on Anubis transmitters.\n\nUse Slot 3 for testing only. The selection takes effect on the next authentication.";

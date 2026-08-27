@@ -452,3 +452,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Βασικοί παλμοί";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Προσωρινοί βασικοί ρυθμοί";
 "settingsviews_careLinkAutomaticBasalFooter" = "Οι βασικοί παλμοί εμφανίζουν κάθε αυτόματη βασική χορήγηση ως σύντομο παλμό στο κύριο γράφημα γλυκόζης. Οι προσωρινοί βασικοί ρυθμοί εμφανίζουν τον ισοδύναμο ρυθμό σε U/ώρα μεταξύ των χορηγήσεων.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Στυλ";
+"settingsviews_carPlayLiveActivityTypeChart" = "Γράφημα";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Βασικό";
+"settingsviews_liveActivitySectionTitle" = "Ζωντανή δραστηριότητα";

@@ -449,3 +449,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Basal Pulses";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Temp Basals";
 "settingsviews_careLinkAutomaticBasalFooter" = "Basal Pulses shows each automatic basal delivery as a short pulse on the main glucose chart. Temp Basals shows the equivalent U/hr rate between deliveries.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Style";
+"settingsviews_carPlayLiveActivityTypeChart" = "Chart";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Basic";
+"settingsviews_liveActivitySectionTitle" = "Live Activity";

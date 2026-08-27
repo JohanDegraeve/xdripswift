@@ -119,6 +119,26 @@ class Texts_SettingsView {
     static let liveActivityTypeLarge: String = {
         return NSLocalizedString("settingsviews_liveActivityTypeLarge", tableName: filename, bundle: Bundle.main, value: "Large", comment: "notification settings, live activity size large")
     }()
+
+    static let liveActivitySectionTitle: String = {
+        return NSLocalizedString("settingsviews_liveActivitySectionTitle", tableName: filename, bundle: Bundle.main, value: "Live Activity", comment: "notification settings, Live Activity section title")
+    }()
+
+    static let carPlaySectionTitle: String = {
+        return NSLocalizedString("settingsviews_carPlaySectionTitle", tableName: filename, bundle: Bundle.main, value: "CarPlay", comment: "notification settings, CarPlay section title")
+    }()
+
+    static let liveActivityStyle: String = {
+        return NSLocalizedString("settingsviews_liveActivityStyle", tableName: filename, bundle: Bundle.main, value: "Style", comment: "notification settings, Live Activity style")
+    }()
+
+    static let carPlayLiveActivityTypeChart: String = {
+        return NSLocalizedString("settingsviews_carPlayLiveActivityTypeChart", tableName: filename, bundle: Bundle.main, value: "Chart", comment: "notification settings, CarPlay Live Activity with glucose chart")
+    }()
+
+    static let carPlayLiveActivityTypeBasic: String = {
+        return NSLocalizedString("settingsviews_carPlayLiveActivityTypeBasic", tableName: filename, bundle: Bundle.main, value: "Basic", comment: "notification settings, basic CarPlay Live Activity")
+    }()
     
     
     // MARK: - Section Data Source

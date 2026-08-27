@@ -228,6 +228,58 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("useOtherDexcomApp", tableName: filename, bundle: Bundle.main, value: "Coexistence Mode", comment: "Dexcom bluetooth screen. Toggle title. When enabled, another app such as Dexcom or CamAPS authenticates with the transmitter while this app receives alongside it.")
     }()
 
+    static let dexcomG6BluetoothSlot: String = {
+        return NSLocalizedString("dexcomG6BluetoothSlot", tableName: filename, bundle: Bundle.main, value: "Bluetooth Channel", comment: "Dexcom G6 Bluetooth screen. Picker title for the authentication role/slot.")
+    }()
+
+    static let dexcomG6MobileAppSlot: String = {
+        return NSLocalizedString("dexcomG6MobileAppSlot", tableName: filename, bundle: Bundle.main, value: "Mobile App (Default)", comment: "Dexcom G6 Bluetooth slot picker. Default mobile-app role.")
+    }()
+
+    static let dexcomG6MobileAppSlotShort: String = {
+        return NSLocalizedString("dexcomG6MobileAppSlotShort", tableName: filename, bundle: Bundle.main, value: "Mobile App", comment: "Dexcom G6 Bluetooth screen. Compact detail value for the default mobile-app role.")
+    }()
+
+    static let dexcomG6MedicalDeviceSlot: String = {
+        return NSLocalizedString("dexcomG6MedicalDeviceSlot", tableName: filename, bundle: Bundle.main, value: "Receiver or Pump (Experimental)", comment: "Dexcom G6 Bluetooth slot picker. Experimental medical-device role.")
+    }()
+
+    static let dexcomG6MedicalDeviceSlotShort: String = {
+        return NSLocalizedString("dexcomG6MedicalDeviceSlotShort", tableName: filename, bundle: Bundle.main, value: "Pump", comment: "Dexcom G6 Bluetooth screen. Compact detail value for the receiver or pump role.")
+    }()
+
+    static let dexcomG6AnubisSlot: String = {
+        return NSLocalizedString("dexcomG6AnubisSlot", tableName: filename, bundle: Bundle.main, value: "Slot 3 (Anubis Experimental)", comment: "Dexcom G6 Bluetooth slot picker. Experimental third slot implemented by Anubis transmitters.")
+    }()
+
+    static let dexcomG6AnubisSlotShort: String = {
+        return NSLocalizedString("dexcomG6AnubisSlotShort", tableName: filename, bundle: Bundle.main, value: "Slot 3", comment: "Dexcom G6 Bluetooth screen. Compact detail value for the experimental Anubis third slot.")
+    }()
+
+    static let dexcomG6MobileAppSlotFooter: String = {
+        return NSLocalizedString("dexcomG6MobileAppSlotFooter", tableName: filename, bundle: Bundle.main, value: "The Mobile App channel is the default for phone connections.", comment: "Dexcom G6 Bluetooth screen. Footer shown while the default mobile-app channel is selected.")
+    }()
+
+    static let dexcomG6MedicalDeviceSlotFooter: String = {
+        return NSLocalizedString("dexcomG6MedicalDeviceSlotFooter", tableName: filename, bundle: Bundle.main, value: "The Receiver or Pump channel is normally reserved for the Dexcom receiver or a compatible pump. Using it for this app leaves the Mobile App channel available for a phone or another device.", comment: "Dexcom G6 Bluetooth screen. Footer shown while the receiver or pump channel is selected.")
+    }()
+
+    static let dexcomG6AnubisSlotFooter: String = {
+        return NSLocalizedString("dexcomG6AnubisSlotFooter", tableName: filename, bundle: Bundle.main, value: "Slot 3 is available only on Anubis transmitters. It is experimental and leaves the Mobile App and Receiver or Pump channels available for other devices.", comment: "Dexcom G6 Bluetooth screen. Footer shown while the experimental Anubis third slot is selected.")
+    }()
+
+    static let dexcomG6BluetoothSlotUnavailableInCoexistenceMode: String = {
+        return NSLocalizedString("dexcomG6BluetoothSlotUnavailableInCoexistenceMode", tableName: filename, bundle: Bundle.main, value: "Unavailable in Co-existence mode", comment: "Dexcom G6 Bluetooth screen. Footer shown when Bluetooth channel selection is disabled by Coexistence Mode.")
+    }()
+
+    static let dexcomG6MedicalDeviceSlotWarning: String = {
+        return NSLocalizedString("dexcomG6MedicalDeviceSlotWarning", tableName: filename, bundle: Bundle.main, value: "The Receiver or Pump channel is normally reserved for a Dexcom receiver or compatible pump. Selecting it can prevent that device from connecting.\n\nUsing the Receiver or Pump channel should be considered for experimental use only. The selection takes effect on the next authentication.", comment: "Safety warning before selecting the experimental Dexcom G6 receiver-or-pump Bluetooth channel.")
+    }()
+
+    static let dexcomG6AnubisSlotWarning: String = {
+        return NSLocalizedString("dexcomG6AnubisSlotWarning", tableName: filename, bundle: Bundle.main, value: "Slot 3 is an experimental channel available only on Anubis transmitters.\n\nUse Slot 3 for testing only. The selection takes effect on the next authentication.", comment: "Safety warning before selecting the experimental Anubis third Bluetooth slot.")
+    }()
+
     static let useOtherDexcomAppCoexistenceFooter: String = {
         return NSLocalizedString("useOtherDexcomAppCoexistenceFooter", tableName: filename, bundle: Bundle.main, value: "Coexistence mode allows us to work with another app such as the Dexcom or CamAPS apps. That app must keep running in the background.", comment: "Dexcom bluetooth screen. Footer explaining coexistence mode.")
     }()

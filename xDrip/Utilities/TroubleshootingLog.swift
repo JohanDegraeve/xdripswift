@@ -298,6 +298,41 @@ enum TroubleshootingKeepAliveMode: String, Codable {
     }
 }
 
+enum TroubleshootingDexcomConnectionMode: String, Codable {
+    case primary, coexistence
+
+    init(useOtherApp: Bool) {
+        self = useOtherApp ? .coexistence : .primary
+    }
+
+    var name: String {
+        switch self {
+        case .primary: return "Primary"
+        case .coexistence: return "Co-existence"
+        }
+    }
+}
+
+enum TroubleshootingDexcomBluetoothChannel: String, Codable {
+    case mobileApp, receiverOrPump, anubisExperimental
+
+    init(_ slot: DexcomG6BluetoothSlot) {
+        switch slot {
+        case .mobileApp: self = .mobileApp
+        case .medicalDevice: self = .receiverOrPump
+        case .anubisExperimental: self = .anubisExperimental
+        }
+    }
+
+    var name: String {
+        switch self {
+        case .mobileApp: return "Mobile App"
+        case .receiverOrPump: return "Receiver or Pump"
+        case .anubisExperimental: return "Slot 3 (Anubis Experimental)"
+        }
+    }
+}
+
 enum TroubleshootingTherapySource: String, Codable {
     case automatic, none, nightscout, careLink
 
@@ -449,6 +484,8 @@ enum TroubleshootingConfigurationActivity: Codable, Equatable {
     case cgmSourceChanged(TroubleshootingLogSource)
     case cgmSourceDisconnected
     case keepAliveChanged(TroubleshootingKeepAliveMode)
+    case dexcomConnectionModeChanged(TroubleshootingDexcomConnectionMode)
+    case dexcomBluetoothChannelChanged(TroubleshootingDexcomBluetoothChannel)
     case therapySourceChanged(TroubleshootingTherapySource)
     case liveActivityChanged(TroubleshootingLiveActivityMode)
     case aidFollowerChanged(TroubleshootingAIDFollowerMode)
@@ -586,11 +623,11 @@ struct TroubleshootingCalibrationReadiness: Codable, Equatable {
     let overall: TroubleshootingCalibrationReadinessLevel
 }
 
-/// A calculated or transmitter-reported condition that became a sensor-health episode.
+/// A calculated or transmitter-reported sensor-health condition.
 ///
 /// This is deliberately separate from the hourly `sensorNoise` measurement and configured alarm
-/// delivery. It records the condition itself even when optional noise UI, sensor-health notifications
-/// or the terminal-failure alert is disabled. No sensor or transmitter identity is retained.
+/// delivery. It records transmitter conditions when first observed and calculated conditions when
+/// activated, even when optional UI or alerts are disabled. No hardware identity is retained.
 enum TroubleshootingSensorHealthAlert: String, Codable, Equatable {
     case persistentNoise
     case possibleFlatline
@@ -607,10 +644,36 @@ enum TroubleshootingSensorHealthAlert: String, Codable, Equatable {
 enum TroubleshootingSensorActivity: Codable, Equatable {
     case detected
     case started
+    case startedWithCode(sensorCode: String)
     case warmingUp(minutesRemaining: Int)
     case stopped
     case notDetected
     case unusableReading
+}
+
+enum TroubleshootingSensorLabelScanSource: String, Codable, Equatable {
+    case camera
+    case photo
+}
+
+enum TroubleshootingSensorLabelScanFailure: String, Codable, Equatable {
+    case cameraPermissionDenied
+    case cameraUnavailable
+    case malformedLabel
+    case multipleValidLabels
+    case noValidLabel
+    case unreadableImage
+}
+
+/// A sensor-label scan result, including all decoded label information when available.
+enum TroubleshootingSensorLabelScanActivity: Codable, Equatable {
+    case succeeded(
+        source: TroubleshootingSensorLabelScanSource,
+        sensorCode: String,
+        lotNumber: String,
+        serialNumber: String
+    )
+    case failed(source: TroubleshootingSensorLabelScanSource, reason: TroubleshootingSensorLabelScanFailure)
 }
 
 /// Alert outcomes that explain user-visible behavior without copying alert text or notification data.
@@ -691,6 +754,8 @@ enum TroubleshootingLogKind: Codable, Equatable {
         measuredAt: Date
     )
     case sensor(TroubleshootingSensorActivity)
+    /// A user-initiated sensor-label scan outcome with its decoded label metadata when available.
+    case sensorLabelScan(TroubleshootingSensorLabelScanActivity)
     /// Hourly, bounded sensor-quality context. Values are aggregate glucose deviations only.
     case sensorNoise(shortTermMgDl: Double?, longTermMgDl: Double?, status: TroubleshootingSensorNoiseStatus)
     /// A deduplicated sensor-health condition, independent of UI and alarm delivery settings.
@@ -1194,6 +1259,11 @@ final class TroubleshootingLogStore {
                 result.append(entry)
                 lastSensorActivity = activity
 
+            case .sensorLabelScan:
+                // Each result belongs to an explicit camera or photo action and is useful even when
+                // the preceding attempt had the same outcome.
+                result.append(entry)
+
             case .sensorNoise:
                 // Noise is calculated for the developer trace every ten minutes. One consumer row
                 // per hour preserves the trend without allowing this periodic metric to overwhelm
@@ -1207,10 +1277,10 @@ final class TroubleshootingLogStore {
                 lastSensorNoiseAt = entry.timestamp
 
             case .sensorHealthAlert:
-                // SensorHealthIssueManager emits this only when a new episode is activated. Never
-                // apply the hourly metric throttle here: crossing an alert boundary is meaningful
-                // even when a noise measurement was retained only moments earlier or the user's
-                // notification/alarm preference prevents external presentation.
+                // SensorHealthIssueManager emits this only when a transmitter condition is first
+                // observed or a calculated episode is activated. Never apply the hourly metric
+                // throttle here: the state transition is meaningful even when a nearby noise
+                // measurement was retained or external presentation remains intentionally delayed.
                 result.append(entry)
 
             case .transmitterReadSuccess:
@@ -1384,7 +1454,7 @@ final class TroubleshootingLogStore {
     ) -> Bool {
         let isSessionStart: (TroubleshootingSensorActivity?) -> Bool = { activity in
             switch activity {
-            case .detected?, .started?: return true
+            case .detected?, .started?, .startedWithCode?: return true
             default: return false
             }
         }
@@ -1492,6 +1562,7 @@ struct TroubleshootingLogAppInfo: Equatable {
     let systemVersion: String
     let modeDescription: String
     let dataSourceDescription: String
+    let dexcomBluetoothChannelDescription: String?
     let unitDescription: String
     let keepAliveDescription: String?
     let processingLines: [String]
@@ -1500,7 +1571,8 @@ struct TroubleshootingLogAppInfo: Equatable {
     /// Reads current settings so a report reflects configuration changes made after older entries.
     static func current(
         defaults: UserDefaults = .standard,
-        currentSourceCanUseFiveMinuteReadings: Bool? = nil
+        currentSourceCanUseFiveMinuteReadings: Bool? = nil,
+        dexcomBluetoothChannel: TroubleshootingDexcomBluetoothChannel? = nil
     ) -> TroubleshootingLogAppInfo {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
         let deviceClass = UIDevice.current.userInterfaceIdiom == .pad ? "iPad" : "iPhone"
@@ -1573,6 +1645,7 @@ struct TroubleshootingLogAppInfo: Equatable {
             systemVersion: UIDevice.current.systemVersion,
             modeDescription: modeDescription,
             dataSourceDescription: dataSourceDescription,
+            dexcomBluetoothChannelDescription: dexcomBluetoothChannel?.name,
             unitDescription: defaults.bloodGlucoseUnitIsMgDl ? "mg/dL" : "mmol/L",
             keepAliveDescription: keepAliveDescription,
             processingLines: [
@@ -1631,6 +1704,9 @@ struct TroubleshootingLogReportBuilder {
             "Mode: \(appInfo.modeDescription) (\(appInfo.dataSourceDescription))"
         ]
 
+        if let dexcomBluetoothChannel = appInfo.dexcomBluetoothChannelDescription {
+            lines.append("Dexcom Bluetooth channel: \(dexcomBluetoothChannel)")
+        }
         if let keepAlive = appInfo.keepAliveDescription {
             lines.append("Background keep-alive: \(keepAlive)")
         }
@@ -1745,10 +1821,19 @@ struct TroubleshootingLogReportBuilder {
             switch activity {
             case .detected: return "A new sensor session was started."
             case .started: return "A sensor session started."
+            case let .startedWithCode(sensorCode): return "A sensor session started with sensor code \(sensorCode)."
             case let .warmingUp(minutesRemaining): return "Sensor is warming up for about \(minutesRemaining) more minute\(minutesRemaining == 1 ? "" : "s")."
             case .stopped: return "The sensor session stopped."
             case .notDetected: return "No active sensor was detected."
             case .unusableReading: return "A sensor reading was rejected because it was not usable."
+            }
+
+        case let .sensorLabelScan(activity):
+            switch activity {
+            case let .succeeded(source, sensorCode, lotNumber, serialNumber):
+                return "Dexcom G6 sensor label \(source.rawValue) scan succeeded: sensor code \(sensorCode), lot \(lotNumber), serial \(serialNumber)."
+            case let .failed(source, reason):
+                return "Dexcom G6 sensor label \(source.rawValue) scan failed: \(sensorLabelScanFailureText(reason))."
             }
 
         case let .sensorNoise(shortTermMgDl, longTermMgDl, status):
@@ -1866,6 +1951,10 @@ struct TroubleshootingLogReportBuilder {
                 return "The configured CGM was disconnected."
             case let .keepAliveChanged(mode):
                 return "Background keep-alive changed to \(mode.name)."
+            case let .dexcomConnectionModeChanged(mode):
+                return "Dexcom connection mode changed to \(mode.name)."
+            case let .dexcomBluetoothChannelChanged(channel):
+                return "Dexcom Bluetooth channel changed to \(channel.name)."
             case let .therapySourceChanged(source):
                 return "Pump & Treatments source changed to \(source.name)."
             case let .liveActivityChanged(mode):
@@ -1936,6 +2025,17 @@ struct TroubleshootingLogReportBuilder {
             case let .deleted(kind, treatmentAt):
                 return "\(kind.name) treatment deleted at \(measurementTimeText(treatmentAt, recordedAt: entry.timestamp))."
             }
+        }
+    }
+
+    private func sensorLabelScanFailureText(_ failure: TroubleshootingSensorLabelScanFailure) -> String {
+        switch failure {
+        case .cameraPermissionDenied: return "camera permission denied"
+        case .cameraUnavailable: return "camera unavailable"
+        case .malformedLabel: return "malformed sensor label"
+        case .multipleValidLabels: return "multiple valid sensor labels found"
+        case .noValidLabel: return "no valid sensor label found"
+        case .unreadableImage: return "selected image could not be read"
         }
     }
 

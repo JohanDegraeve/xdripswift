@@ -184,3 +184,18 @@
 "reconnecting" = "正在重新连接";
 "reconnectingToTransmitter" = "正在重新连接...";
 "waiting" = "等待中...";
+
+/* Dexcom G6 Bluetooth authentication slot */
+"dexcomG6BluetoothSlot" = "蓝牙通道";
+"dexcomG6MobileAppSlot" = "移动 App（默认）";
+"dexcomG6MobileAppSlotShort" = "移动 App";
+"dexcomG6MedicalDeviceSlot" = "接收器或胰岛素泵（实验性）";
+"dexcomG6MedicalDeviceSlotShort" = "胰岛素泵";
+"dexcomG6MobileAppSlotFooter" = "移动 App 通道是手机连接的默认通道。";
+"dexcomG6MedicalDeviceSlotFooter" = "接收器或胰岛素泵通道通常预留给 Dexcom 接收器或兼容的胰岛素泵。此 App 使用该通道后，移动 App 通道仍可供手机或其他设备使用。";
+"dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "共存模式下不可用";
+"dexcomG6MedicalDeviceSlotWarning" = "接收器或胰岛素泵通道通常预留给 Dexcom 接收器或兼容的胰岛素泵。选择此通道可能会导致该设备无法连接。\n\n接收器或胰岛素泵通道应仅用于实验用途。此选择将在下次认证时生效。";
+"dexcomG6AnubisSlot" = "通道 3（Anubis 实验性）";
+"dexcomG6AnubisSlotShort" = "通道 3";
+"dexcomG6AnubisSlotFooter" = "通道 3 仅适用于 Anubis 发射器。此通道为实验性通道，并会为其他设备保留移动 App 和接收器或胰岛素泵通道。";
+"dexcomG6AnubisSlotWarning" = "通道 3 是仅适用于 Anubis 发射器的实验性通道。\n\n仅将通道 3 用于测试。此选择将在下次认证时生效。";

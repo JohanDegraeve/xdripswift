@@ -184,3 +184,18 @@
 "reconnecting" = "Ponovno povezovanje";
 "reconnectingToTransmitter" = "Ponovno povezovanje...";
 "waiting" = "Čakanje...";
+
+/* Dexcom G6 Bluetooth authentication slot */
+"dexcomG6BluetoothSlot" = "Kanal Bluetooth";
+"dexcomG6MobileAppSlot" = "Mobilna aplikacija (Privzeto)";
+"dexcomG6MobileAppSlotShort" = "Mobilna aplikacija";
+"dexcomG6MedicalDeviceSlot" = "Sprejemnik ali črpalka (Poskusno)";
+"dexcomG6MedicalDeviceSlotShort" = "Črpalka";
+"dexcomG6MobileAppSlotFooter" = "Kanal Mobilna aplikacija je privzet za telefonske povezave.";
+"dexcomG6MedicalDeviceSlotFooter" = "Kanal Sprejemnik ali črpalka je običajno rezerviran za sprejemnik Dexcom ali združljivo črpalko. Če ga uporablja ta aplikacija, ostane kanal Mobilna aplikacija na voljo za telefon ali drugo napravo.";
+"dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Ni na voljo v načinu soobstoja";
+"dexcomG6MedicalDeviceSlotWarning" = "Kanal Sprejemnik ali črpalka je običajno rezerviran za sprejemnik Dexcom ali združljivo črpalko. Če ga izberete, se ta naprava morda ne bo mogla povezati.\n\nUporaba kanala Sprejemnik ali črpalka naj se šteje samo za poskusno. Izbira začne veljati ob naslednjem preverjanju pristnosti.";
+"dexcomG6AnubisSlot" = "Kanal 3 (Anubis, poskusno)";
+"dexcomG6AnubisSlotShort" = "Kanal 3";
+"dexcomG6AnubisSlotFooter" = "Kanal 3 je na voljo samo pri oddajnikih Anubis. Je poskusni in pušča kanala Mobilna aplikacija ter Sprejemnik ali črpalka na voljo drugim napravam.";
+"dexcomG6AnubisSlotWarning" = "Kanal 3 je poskusni kanal, ki je na voljo samo pri oddajnikih Anubis.\n\nKanal 3 uporabljajte samo za preizkušanje. Izbira začne veljati ob naslednjem preverjanju pristnosti.";

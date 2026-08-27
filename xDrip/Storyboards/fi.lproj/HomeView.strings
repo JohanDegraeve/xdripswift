@@ -139,3 +139,36 @@
 "sensorHealthTransmitterFailedGuidance" = "Lähetinvika ilmoitettu. Tarkista tai vaihda lähetin.";
 "connectingToCGM" = "Yhdistetään CGM-laitteeseen...";
 "reconnectingToCGM" = "Yhdistetään uudelleen CGM-laitteeseen...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "Skannaa kameralla";
+"chooseSensorLabelPhoto" = "Valitse kuva";
+"readingSensorLabel" = "Luetaan anturin etikettiä...";
+"scanSensorLabel" = "Skannaa anturin etiketti";
+"sensorCodeScannerGuidance" = "Aseta Data Matrix kehyksen sisään.";
+"sensorCodeScannerTorch" = "Taskulamppu";
+"cameraAccessRequired" = "Kameran käyttöoikeus tarvitaan";
+"cameraAccessRequiredMessage" = "Salli kameran käyttö Asetuksissa, syötä koodi käsin tai valitse kuva.";
+"openSettings" = "Avaa Asetukset";
+"cameraUnavailable" = "Kamera ei ole käytettävissä";
+"cameraUnavailableMessage" = "Syötä anturikoodi käsin tai valitse kuva.";
+"sensorInformationTitle" = "Anturin tiedot";
+"sensorLotNumber" = "Eränumero";
+"sensorSerialNumberMetadata" = "Anturin sarjanumero";
+"sensorLabelReviewFooter" = "Tarkista puretut tiedot ennen anturin käynnistämistä.";
+"sensorLabelScanFailed" = "Anturin etikettiä ei luettu";
+"multipleSensorLabelsFound" = "Kuvassa on useampi kuin yksi anturin etiketti. Valitse kuva, jossa on yksi etiketti.";
+"noSensorLabelFound" = "Kuvasta ei löytynyt kelvollista Dexcom G6 -anturin etikettiä.";
+"invalidSensorLabelFound" = "Data Matrix löytyi, mutta se ei ollut kelvollinen Dexcom G6 -anturin etiketti.";
+"sensorLabelPhotoUnreadable" = "Valittua kuvaa ei voitu lukea.";
+"sensorCodeMetadata" = "Anturikoodi";
+"scannedSensorLabelCode" = "Skannatun etiketin koodi";
+"noCodeSensorSessionValue" = "0000 (Kooditon istunto)";
+"sensorCodeUnknown" = "Tuntematon";
+"sensorSessionOrigin" = "Istunnon alkuperä";
+"sensorSessionOriginUnknown" = "Tuntematon";
+"sensorSessionOriginAwaitingTransmitter" = "Odotetaan lähetintä";
+"sensorSessionOriginStartedByApp" = "xDrip4iOS:n käynnistämä";
+"sensorSessionOriginExistingAdopted" = "Olemassa oleva istunto otettu käyttöön";
+"sensorSessionOriginTransmitterDetected" = "Havaittu lähettimestä";
+"sensorSessionOriginRejected" = "Käynnistyspyyntö hylätty";

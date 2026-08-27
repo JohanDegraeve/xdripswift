@@ -118,3 +118,18 @@
 "reconnecting" = "Återansluter";
 "reconnectingToTransmitter" = "Återansluter...";
 "waiting" = "Väntar...";
+
+/* Dexcom G6 Bluetooth authentication slot */
+"dexcomG6BluetoothSlot" = "Bluetooth-kanal";
+"dexcomG6MobileAppSlot" = "Mobilapp (Standard)";
+"dexcomG6MobileAppSlotShort" = "Mobilapp";
+"dexcomG6MedicalDeviceSlot" = "Mottagare eller pump (Experimentell)";
+"dexcomG6MedicalDeviceSlotShort" = "Pump";
+"dexcomG6MobileAppSlotFooter" = "Mobilapp-kanalen är standard för telefonanslutningar.";
+"dexcomG6MedicalDeviceSlotFooter" = "Mottagar- eller pumpkanalen är normalt reserverad för Dexcom-mottagaren eller en kompatibel pump. När den används av den här appen förblir mobilapp-kanalen tillgänglig för en telefon eller annan enhet.";
+"dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Inte tillgängligt i samexistensläge";
+"dexcomG6MedicalDeviceSlotWarning" = "Mottagar- eller pumpkanalen är normalt reserverad för en Dexcom-mottagare eller en kompatibel pump. Om du väljer den kan enheten hindras från att ansluta.\n\nAnvändning av mottagar- eller pumpkanalen bör endast betraktas som experimentell. Valet träder i kraft vid nästa autentisering.";
+"dexcomG6AnubisSlot" = "Kanal 3 (Anubis, experimentell)";
+"dexcomG6AnubisSlotShort" = "Kanal 3";
+"dexcomG6AnubisSlotFooter" = "Kanal 3 är endast tillgänglig på Anubis-sändare. Den är experimentell och lämnar kanalerna Mobilapp och Mottagare eller pump tillgängliga för andra enheter.";
+"dexcomG6AnubisSlotWarning" = "Kanal 3 är en experimentell kanal som endast är tillgänglig på Anubis-sändare.\n\nAnvänd Kanal 3 endast för tester. Valet träder i kraft vid nästa autentisering.";

@@ -488,3 +488,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "نبضات قاعدية";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "معدلات قاعدية مؤقتة";
 "settingsviews_careLinkAutomaticBasalFooter" = "تعرض النبضات القاعدية كل جرعة قاعدية تلقائية كنبضة قصيرة على مخطط الجلوكوز الرئيسي. تعرض المعدلات القاعدية المؤقتة معدل U/ساعة المكافئ بين الجرعات.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "النمط";
+"settingsviews_carPlayLiveActivityTypeChart" = "مخطط";
+"settingsviews_carPlayLiveActivityTypeBasic" = "أساسي";
+"settingsviews_liveActivitySectionTitle" = "النشاط المباشر";

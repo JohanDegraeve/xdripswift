@@ -219,3 +219,36 @@
 "sensorHealthTransmitterFailedGuidance" = "Zgłoszono awarię nadajnika. Sprawdź go lub wymień.";
 "connectingToCGM" = "Łączenie z CGM...";
 "reconnectingToCGM" = "Ponowne łączenie z CGM...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "Skanuj aparatem";
+"chooseSensorLabelPhoto" = "Wybierz zdjęcie";
+"readingSensorLabel" = "Odczytywanie etykiety sensora...";
+"scanSensorLabel" = "Skanuj etykietę sensora";
+"sensorCodeScannerGuidance" = "Umieść Data Matrix wewnątrz ramki.";
+"sensorCodeScannerTorch" = "Latarka";
+"cameraAccessRequired" = "Wymagany dostęp do aparatu";
+"cameraAccessRequiredMessage" = "Zezwól na dostęp do aparatu w Ustawieniach, wpisz kod ręcznie lub wybierz zdjęcie.";
+"openSettings" = "Otwórz Ustawienia";
+"cameraUnavailable" = "Aparat niedostępny";
+"cameraUnavailableMessage" = "Wpisz kod sensora ręcznie lub wybierz zdjęcie.";
+"sensorInformationTitle" = "Informacje o sensorze";
+"sensorLotNumber" = "Numer partii";
+"sensorSerialNumberMetadata" = "Numer seryjny sensora";
+"sensorLabelReviewFooter" = "Sprawdź odczytane informacje przed uruchomieniem sensora.";
+"sensorLabelScanFailed" = "Nie odczytano etykiety sensora";
+"multipleSensorLabelsFound" = "Zdjęcie zawiera więcej niż jedną etykietę sensora. Wybierz zdjęcie z jedną etykietą.";
+"noSensorLabelFound" = "Na zdjęciu nie znaleziono prawidłowej etykiety sensora Dexcom G6.";
+"invalidSensorLabelFound" = "Znaleziono kod Data Matrix, ale nie był on prawidłową etykietą sensora Dexcom G6.";
+"sensorLabelPhotoUnreadable" = "Nie można odczytać wybranego zdjęcia.";
+"sensorCodeMetadata" = "Kod sensora";
+"scannedSensorLabelCode" = "Kod zeskanowanej etykiety";
+"noCodeSensorSessionValue" = "0000 (Sesja bez kodu)";
+"sensorCodeUnknown" = "Nieznany";
+"sensorSessionOrigin" = "Pochodzenie sesji";
+"sensorSessionOriginUnknown" = "Nieznane";
+"sensorSessionOriginAwaitingTransmitter" = "Oczekiwanie na nadajnik";
+"sensorSessionOriginStartedByApp" = "Uruchomiona przez xDrip4iOS";
+"sensorSessionOriginExistingAdopted" = "Przejęto istniejącą sesję";
+"sensorSessionOriginTransmitterDetected" = "Wykryta przez nadajnik";
+"sensorSessionOriginRejected" = "Żądanie uruchomienia odrzucone";

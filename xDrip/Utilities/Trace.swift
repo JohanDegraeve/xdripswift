@@ -612,6 +612,15 @@ class Trace {
                             traceInfo.appendStringAndNewLine("        Firmware: " + (dexcomG5.firmwareVersion?.description ?? "nil"))
                             
                             traceInfo.appendStringAndNewLine("        Use With Other App: " + dexcomG5.useOtherApp.description)
+
+                            let bluetoothSlot = dexcomG5.effectiveDexcomG6BluetoothSlot()
+                            traceInfo.appendStringAndNewLine(
+                                "        Bluetooth channel: "
+                                    + TroubleshootingDexcomBluetoothChannel(bluetoothSlot).name
+                                    + " (0x"
+                                    + String(format: "%02X", bluetoothSlot.rawValue)
+                                    + ")"
+                            )
                             
                             traceInfo.appendStringAndNewLine("        Is Anubis?: " + dexcomG5.isAnubis.description)
                             

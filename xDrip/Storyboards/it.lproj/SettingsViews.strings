@@ -734,3 +734,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Impulsi basali";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Basali temporanee";
 "settingsviews_careLinkAutomaticBasalFooter" = "Impulsi basali mostra ogni erogazione basale automatica come un breve impulso nel grafico glicemico principale. Basali temporanee mostra la velocità equivalente in U/h tra le erogazioni.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Stile";
+"settingsviews_carPlayLiveActivityTypeChart" = "Grafico";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Base";
+"settingsviews_liveActivitySectionTitle" = "Attività in tempo reale";

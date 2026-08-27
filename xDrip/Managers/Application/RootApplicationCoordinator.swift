@@ -319,8 +319,8 @@ import AppIntents
                     rootHomeActions: self.makeRootHomeActions(),
                     activeSensorProvider: { [weak coordinator = self] in coordinator?.activeSensor },
                     transmitterProvider: { [weak coordinator = self] in coordinator?.bluetoothPeripheralManager?.getCGMTransmitter() },
-                    startSensor: { [weak coordinator = self] startDate, sensorCode in
-                        coordinator?.startSensorFromManagementView(startDate: startDate, sensorCode: sensorCode)
+                    startSensor: { [weak coordinator = self] request in
+                        coordinator?.startSensorFromManagementView(request: request)
                     },
                     stopSensor: { [weak coordinator = self] in
                         coordinator?.stopSensorFromManagementView()
@@ -419,6 +419,7 @@ import AppIntents
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showClockWhenScreenIsLocked.rawValue, options: .new, context: nil)
         // if live action type is updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivityType.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.carPlayLiveActivityType.rawValue, options: .new, context: nil)
         
         // high mark , low mark , urgent high mark, urgent low mark. change requires redraw of chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentLowMarkValue.rawValue, options: .new, context: nil)
@@ -1330,7 +1331,7 @@ import AppIntents
             
             updateLiveActivityAndWidgets(forceRestart: false)
             
-        case UserDefaults.Key.liveActivityType, UserDefaults.Key.allowStandByHighContrast, UserDefaults.Key.forceStandByBigNumbers:
+        case UserDefaults.Key.liveActivityType, UserDefaults.Key.carPlayLiveActivityType, UserDefaults.Key.allowStandByHighContrast, UserDefaults.Key.forceStandByBigNumbers:
             // check and configure the live activity and widgets if applicable
             updateLiveActivityAndWidgets(forceRestart: false)
             
@@ -2212,16 +2213,25 @@ import AppIntents
         }
     }
     
-    /// - creates a new sensor and assigns it to activeSensor
-    /// - if sendToTransmitter is true then sends startSensor command to transmitter (ony useful for Firefly)
-    /// - saves to coredata
-    private func startSensor(cGMTransmitter: CGMTransmitter?, sensorStarDate: Date, sensorCode: String?, coreDataManager: CoreDataManager, sendToTransmitter: Bool) {
+    /// creates, persists and assigns a new active Sensor
+    /// - sends the existing transmitter start command when sendToTransmitter is true
+    private func startSensor(
+        cGMTransmitter: CGMTransmitter?,
+        sensorStarDate: Date,
+        sensorCode: String?,
+        coreDataManager: CoreDataManager,
+        sendToTransmitter: Bool,
+        startRequest: SensorStartRequest? = nil
+    ) {
         // create active sensor
         let newSensor = Sensor(startDate: sensorStarDate, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+        if let startRequest {
+            newSensor.apply(startRequest: startRequest)
+        }
         
         bgPostProcessingManager?.handleSourceContextChanged()
         
-        // save the newly created Sensor permenantly in coredata
+        // save the newly created Sensor permanently in Core Data
         coreDataManager.saveChanges()
         
         // send to transmitter
@@ -2271,19 +2281,29 @@ import AppIntents
         updateDataSourceInfo()
     }
     
-    private func startSensorFromManagementView(startDate: Date, sensorCode: String?) {
+    private func startSensorFromManagementView(request: SensorStartRequest) {
         guard let coreDataManager = coreDataManager, let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() else { return }
 
-        startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: startDate, sensorCode: sensorCode, coreDataManager: coreDataManager, sendToTransmitter: true)
+        startSensor(
+            cGMTransmitter: cgmTransmitter,
+            sensorStarDate: request.startDate,
+            sensorCode: request.requestedSensorCode,
+            coreDataManager: coreDataManager,
+            sendToTransmitter: true,
+            startRequest: request
+        )
 
-        // This is the confirmed user action from Sensor Management. Never include the optional
-        // sensor code or transmitter command payload in the shareable Activity Log.
+        // Record the exact sensor code submitted by the user when this start route requires one.
+        let sensorActivity = request.requestedSensorCode.map {
+            TroubleshootingSensorActivity.startedWithCode(sensorCode: $0)
+        } ?? .started
         trace(
-            "user started a sensor session from Sensor Management",
+            "user started a sensor session from Sensor Management, sensor code = %{public}@",
             log: log,
             category: ConstantsLog.categoryRootView,
             type: .info,
-            troubleshooting: .standard(.sensor(.started))
+            troubleshooting: .standard(.sensor(sensorActivity)),
+            request.requestedSensorCode ?? "none"
         )
         updateDataSourceInfo()
         updateLabelsAndChart(overrideApplicationState: false)
@@ -2441,7 +2461,7 @@ import AppIntents
                 // if we should show it, then let's continue processing the lastReading array to create a valid contentState
                 if (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)) && UserDefaults.standard.liveActivityType != .disabled {
                     // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                    let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, sensorNoiseStateRawValue: sensorNoiseStateRawValue, aidStatus: aidStatus)
+                    let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, carPlayLiveActivityType: UserDefaults.standard.carPlayLiveActivityType, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, sensorNoiseStateRawValue: sensorNoiseStateRawValue, aidStatus: aidStatus)
                     
                     LiveActivityManager.shared.update(contentState: contentState, forceRestart: forceRestart)
                 } else {
@@ -2533,6 +2553,43 @@ import AppIntents
 
 /// conform to CGMTransmitterDelegate
 extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
+    func sensorSessionStartResultReceived(_ result: CGMSensorSessionStartResult) {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in
+                self?.sensorSessionStartResultReceived(result)
+            }
+            return
+        }
+
+        guard let transmitter = bluetoothPeripheralManager?.getCGMTransmitter(),
+              transmitter.needsSensorStartCode(),
+              let coreDataManager else {
+            return
+        }
+
+        let origin = result.sessionOrigin(tolerance: CGMG5Transmitter.sensorStartDateTolerance)
+
+        // reconcile the provisional local Sensor with an older session reported by the transmitter
+        if origin == .existingSessionAdopted,
+           activeSensor.map({ abs($0.startDate.timeIntervalSince(result.sessionStartDate)) > CGMG5Transmitter.sensorStartDateTolerance }) == true {
+            newSensorDetected(sensorStartDate: result.sessionStartDate)
+        }
+
+        guard let activeSensor else { return }
+
+        if origin == .startRejected {
+            guard activeSensor.sensorSessionOrigin == .startRequested else { return }
+            activeSensor.sensorSessionOrigin = .startRejected
+            activeSensor.sensorCalibrationMode = .unknown
+        } else {
+            activeSensor.sensorSessionOrigin = origin
+            activeSensor.sensorCalibrationMode = result.calibrationMode
+        }
+
+        coreDataManager.saveChanges()
+        updateLabelsAndChart(overrideApplicationState: false)
+    }
+
     func sensorStopDetected() {
         trace("sensor stop detected", log: log, category: ConstantsLog.categoryRootView, type: .info, troubleshooting: .standard(.sensor(.stopped)))
         
@@ -2546,16 +2603,39 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
     
     func newSensorDetected(sensorStartDate: Date?) {
         trace("new sensor detected", log: log, category: ConstantsLog.categoryRootView, type: .info, troubleshooting: .standard(.sensor(.detected)))
+
+        let transmitter = bluetoothPeripheralManager?.getCGMTransmitter()
+        if transmitter?.needsSensorStartCode() == true,
+           let sensorStartDate,
+           let activeSensor,
+           abs(activeSensor.startDate.timeIntervalSince(sensorStartDate)) <= CGMG5Transmitter.sensorStartDateTolerance {
+            return
+        }
         
         bgPostProcessingManager?.handleSourceContextChanged()
+
+        let pendingDexcomSensor = transmitter?.needsSensorStartCode() == true && activeSensor?.sensorSessionOrigin == .startRequested
+            ? activeSensor
+            : nil
         
-        // stop sensor, self.bluetoothPeripheralManager?.getCGMTransmitter() can be nil in case of Libre2, because new sensor is detected via NFC call which usually happens before the transmitter connection is made (and so before cGMTransmitter is assigned a new value)
-        stopSensor(cGMTransmitter: self.bluetoothPeripheralManager?.getCGMTransmitter(), sendToTransmitter: false)
+        // transmitter can be nil for Libre2 because NFC can detect the sensor before the transmitter is assigned
+        stopSensor(cGMTransmitter: transmitter, sendToTransmitter: false)
         
         // if sensorStartDate is given, then unwrap coreDataManager and startSensor
         if let sensorStartDate = sensorStartDate, let coreDataManager = coreDataManager {
             // use sensorCode nil, in the end there will be no start sensor command sent to the transmitter because we just received the sensorStartTime from the transmitter, so it's already started
-            startSensor(cGMTransmitter: self.bluetoothPeripheralManager?.getCGMTransmitter(), sensorStarDate: sensorStartDate, sensorCode: nil, coreDataManager: coreDataManager, sendToTransmitter: false)
+            startSensor(cGMTransmitter: transmitter, sensorStarDate: sensorStartDate, sensorCode: nil, coreDataManager: coreDataManager, sendToTransmitter: false)
+
+            if transmitter?.needsSensorStartCode() == true, let activeSensor {
+                // keep request metadata only when replacing a provisional G6/ONE start
+                if let pendingDexcomSensor {
+                    activeSensor.copyDexcomStartMetadata(from: pendingDexcomSensor)
+                    activeSensor.sensorSessionOrigin = .existingSessionAdopted
+                } else {
+                    activeSensor.sensorSessionOrigin = .transmitterDetected
+                }
+                coreDataManager.saveChanges()
+            }
             
             UserDefaults.standard.activeSensorStartDate = sensorStartDate
         }

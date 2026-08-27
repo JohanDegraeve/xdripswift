@@ -54,7 +54,7 @@
 "name" = "Name";
 
 /// literally yes, without capital
-"yes" = "Yes";
+"yes" = "是";
 
 /// literally 'Cancel'
 "common_cancel" = "Cancel";

@@ -219,3 +219,36 @@
 "sensorHealthTransmitterFailedGuidance" = "Sporočena je odpoved oddajnika. Preverite ga ali ga zamenjajte.";
 "connectingToCGM" = "Povezovanje s CGM...";
 "reconnectingToCGM" = "Ponovno povezovanje s CGM...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "Skeniraj s kamero";
+"chooseSensorLabelPhoto" = "Izberi fotografijo";
+"readingSensorLabel" = "Branje oznake senzorja...";
+"scanSensorLabel" = "Skeniraj oznako senzorja";
+"sensorCodeScannerGuidance" = "Postavite Data Matrix znotraj okvirja.";
+"sensorCodeScannerTorch" = "Svetilka";
+"cameraAccessRequired" = "Potreben je dostop do kamere";
+"cameraAccessRequiredMessage" = "Dovolite dostop do kamere v Nastavitvah, ročno vnesite kodo ali izberite fotografijo.";
+"openSettings" = "Odpri Nastavitve";
+"cameraUnavailable" = "Kamera ni na voljo";
+"cameraUnavailableMessage" = "Ročno vnesite kodo senzorja ali izberite fotografijo.";
+"sensorInformationTitle" = "Podatki o senzorju";
+"sensorLotNumber" = "Številka serije";
+"sensorSerialNumberMetadata" = "Serijska številka senzorja";
+"sensorLabelReviewFooter" = "Pred zagonom senzorja preverite dekodirane podatke.";
+"sensorLabelScanFailed" = "Oznaka senzorja ni prebrana";
+"multipleSensorLabelsFound" = "Fotografija vsebuje več kot eno oznako senzorja. Izberite fotografijo z eno oznako.";
+"noSensorLabelFound" = "Na fotografiji ni bila najdena veljavna oznaka senzorja Dexcom G6.";
+"invalidSensorLabelFound" = "Najdena je bila koda Data Matrix, vendar ni bila veljavna oznaka senzorja Dexcom G6.";
+"sensorLabelPhotoUnreadable" = "Izbrane fotografije ni bilo mogoče prebrati.";
+"sensorCodeMetadata" = "Koda senzorja";
+"scannedSensorLabelCode" = "Koda skenirane oznake";
+"noCodeSensorSessionValue" = "0000 (Seja brez kode)";
+"sensorCodeUnknown" = "Neznano";
+"sensorSessionOrigin" = "Izvor seje";
+"sensorSessionOriginUnknown" = "Neznano";
+"sensorSessionOriginAwaitingTransmitter" = "Čakanje na oddajnik";
+"sensorSessionOriginStartedByApp" = "Zagnal xDrip4iOS";
+"sensorSessionOriginExistingAdopted" = "Obstoječa seja prevzeta";
+"sensorSessionOriginTransmitterDetected" = "Zaznano iz oddajnika";
+"sensorSessionOriginRejected" = "Zahteva za zagon zavrnjena";

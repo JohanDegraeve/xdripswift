@@ -21,7 +21,7 @@ struct SensorManagementView: View {
     let calibrationsAccessor: CalibrationsAccessor
     let bgReadingsAccessor: BgReadingsAccessor
     let sensorNoiseManager: SensorNoiseManager
-    let onStartSensor: (Date, String?) -> Void
+    let onStartSensor: (SensorStartRequest) -> Void
     let onStopSensor: () -> Void
     let onSubmitCalibration: (CalibrationSubmission) -> String?
     let initiallyShowsCalibration: Bool
@@ -37,6 +37,7 @@ struct SensorManagementView: View {
     @State private var persistentNoise: Double?
     @State private var persistentNoiseSensorID: String?
     @State private var pendingStartSensorCode: String?
+    @State private var pendingStartSensorLabel: DexcomG6SensorLabel?
 
     private let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
     private let timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
@@ -99,7 +100,16 @@ struct SensorManagementView: View {
                         Section(header: Text(Texts_HomeView.sensorManagementSummaryTitle), footer: summaryFooter(for: state)) {
                             statusRow(state: state)
                                 .id(refreshView)
-                            row(title: Texts_HomeView.sensorManagementCGMType, data: state.bannerTitle)
+
+                            if state.sensorInformationRows.isEmpty {
+                                row(title: Texts_HomeView.sensorManagementCGMType, data: state.bannerTitle)
+                            } else {
+                                NavigationLink {
+                                    SensorInformationView(rows: state.sensorInformationRows)
+                                } label: {
+                                    row(title: Texts_HomeView.sensorManagementCGMType, data: state.bannerTitle)
+                                }
+                            }
 
                             Button {
                                 showingSensorDetails = true
@@ -219,6 +229,7 @@ struct SensorManagementView: View {
         .alert(Texts_HomeView.noSensorCodeSelectedTitle, isPresented: $showingNoSensorCodeConfirmation) {
             Button(Texts_Common.Cancel, role: .cancel) {
                 pendingStartSensorCode = nil
+                pendingStartSensorLabel = nil
             }
             Button(Texts_HomeView.startSensorAnyway) {
                 startSensorWithPendingCode()
@@ -233,7 +244,7 @@ struct SensorManagementView: View {
                 },
                 onStart: { startDate in
                     showingStartDateSheet = false
-                    onStartSensor(startDate, nil)
+                    onStartSensor(SensorStartRequest(startDate: startDate))
                     refreshView.toggle()
                 }
             )
@@ -325,28 +336,42 @@ struct SensorManagementView: View {
         } else if state.needsSensorStartCode {
             showingStartCodeSheet = true
         } else {
-            onStartSensor(Date(), nil)
+            onStartSensor(SensorStartRequest(startDate: Date()))
             refreshView.toggle()
         }
     }
 
-    private func submitStartSensorCode(_ codeToSubmit: String) {
+    private func submitStartSensorCode(_ codeToSubmit: String, sensorLabel: DexcomG6SensorLabel?) {
         let normalizedCode = codeToSubmit.isEmpty ? "0000" : codeToSubmit
 
         showingStartCodeSheet = false
 
         if normalizedCode == "0000" {
             pendingStartSensorCode = normalizedCode
+            pendingStartSensorLabel = sensorLabel
             showingNoSensorCodeConfirmation = true
         } else {
-            onStartSensor(Date(), normalizedCode)
+            onStartSensor(
+                SensorStartRequest(
+                    startDate: Date(),
+                    requestedSensorCode: normalizedCode,
+                    sensorLabel: sensorLabel
+                )
+            )
             refreshView.toggle()
         }
     }
 
     private func startSensorWithPendingCode() {
-        onStartSensor(Date(), pendingStartSensorCode ?? "0000")
+        onStartSensor(
+            SensorStartRequest(
+                startDate: Date(),
+                requestedSensorCode: pendingStartSensorCode ?? "0000",
+                sensorLabel: pendingStartSensorLabel
+            )
+        )
         pendingStartSensorCode = nil
+        pendingStartSensorLabel = nil
         refreshView.toggle()
     }
 
@@ -410,7 +435,8 @@ struct SensorManagementView: View {
         expiryDate: Date?,
         elapsedString: String,
         remainingString: String,
-        warmupReadyTimeString: String?
+        warmupReadyTimeString: String?,
+        sensorInformationRows: [SensorManagementInformationRow]
     ) -> String {
         var detailLines = [
             Texts_HomeView.sensor + ": " + sensorDescription,
@@ -422,6 +448,11 @@ struct SensorManagementView: View {
 
         if let warmupReadyTimeString {
             detailLines.append(Texts_BluetoothPeripheralView.warmingUpUntil + ": " + warmupReadyTimeString)
+        }
+
+        if !sensorInformationRows.isEmpty {
+            detailLines.append("")
+            detailLines.append(contentsOf: sensorInformationRows.map { $0.title + ": " + $0.value })
         }
 
         return detailLines.joined(separator: "\n")
@@ -535,13 +566,19 @@ struct SensorManagementView: View {
         let sessionLifetimeString = elapsedString
         let sessionLifetimeColor = Color(.colorSecondary)
 
+        let sensorInformationRows = sensorInformationRows(
+            activeSensor: activeSensor,
+            isDexcomG6: transmitter?.needsSensorStartCode() == true
+        )
+
         let sensorDetailsMessage = sensorDetailsMessage(
             sensorDescription: sensorDescription,
             startDate: startDate,
             expiryDate: expiryDate,
             elapsedString: elapsedString,
             remainingString: displayRemainingString,
-            warmupReadyTimeString: warmupReadyTimeString
+            warmupReadyTimeString: warmupReadyTimeString,
+            sensorInformationRows: sensorInformationRows
         )
 
         let noiseMeasurementsDetail: String?
@@ -653,6 +690,7 @@ struct SensorManagementView: View {
             sessionLifetimeString: sessionLifetimeString,
             sessionLifetimeColor: sessionLifetimeColor,
             sensorDetailsMessage: sensorDetailsMessage,
+            sensorInformationRows: sensorInformationRows,
             startDateString: startDate?.toStringInUserLocale(timeStyle: .short, dateStyle: .short) ?? nilString,
             secondarySessionTitle: secondarySessionTitle,
             secondarySessionValue: secondarySessionValue,
@@ -686,22 +724,84 @@ struct SensorManagementView: View {
         )
     }
 
+    private func sensorInformationRows(
+        activeSensor: Sensor?,
+        isDexcomG6: Bool
+    ) -> [SensorManagementInformationRow] {
+        guard isDexcomG6, let activeSensor else { return [] }
+
+        let origin = activeSensor.sensorSessionOrigin
+        let hasStoredInformation = origin != .unknown
+            || activeSensor.requestedSensorCode != nil
+            || activeSensor.sensorLabelCode != nil
+            || activeSensor.sensorLotNumber != nil
+            || activeSensor.sensorSerialNumber != nil
+        guard hasStoredInformation else { return [] }
+
+        var rows: [SensorManagementInformationRow] = []
+        let activeCode = activeSensor.activeSensorCode
+
+        if let labelCode = activeSensor.sensorLabelCode {
+            rows.append(.init(title: Texts_HomeView.scannedSensorLabelCode, value: labelCode))
+        } else {
+            let displayedCode = activeCode
+                ?? (origin == .startRequested ? activeSensor.requestedSensorCode : nil)
+            let value: String
+            if displayedCode == "0000" {
+                value = Texts_HomeView.noCodeSensorSessionValue
+            } else {
+                value = displayedCode ?? Texts_HomeView.sensorCodeUnknown
+            }
+            rows.append(.init(title: Texts_HomeView.sensorCode, value: value))
+        }
+
+        if let lotNumber = activeSensor.sensorLotNumber {
+            rows.append(.init(title: Texts_HomeView.sensorLotNumber, value: lotNumber))
+        }
+
+        if let serialNumber = activeSensor.sensorSerialNumber {
+            rows.append(.init(title: Texts_HomeView.sensorSerialNumber, value: serialNumber))
+        }
+
+        rows.append(.init(title: Texts_HomeView.sensorSessionOrigin, value: sessionOriginText(origin)))
+        return rows
+    }
+
+    private func sessionOriginText(_ origin: SensorSessionOrigin) -> String {
+        switch origin {
+        case .unknown: return Texts_HomeView.sensorSessionOriginUnknown
+        case .startRequested: return Texts_HomeView.sensorSessionOriginAwaitingTransmitter
+        case .startedByApp: return Texts_HomeView.sensorSessionOriginStartedByApp
+        case .existingSessionAdopted: return Texts_HomeView.sensorSessionOriginExistingAdopted
+        case .transmitterDetected: return Texts_HomeView.sensorSessionOriginTransmitterDetected
+        case .startRejected: return Texts_HomeView.sensorSessionOriginRejected
+        }
+    }
+
 }
 
 // MARK: - sensitivity picker
 
 private struct SensorNoiseSensitivitySelectionView: View {
-    let selectedSensitivity: SensorNoiseSensitivity
+    @State private var selectedSensitivity: SensorNoiseSensitivity
+
+    private let initialSensitivity: SensorNoiseSensitivity
     let onSelect: (SensorNoiseSensitivity) -> Void
     @Environment(\.dismiss) private var dismiss
+
+    /// Starts the picker on the sensitivity currently stored by the parent view.
+    init(selectedSensitivity: SensorNoiseSensitivity, onSelect: @escaping (SensorNoiseSensitivity) -> Void) {
+        self.initialSensitivity = selectedSensitivity
+        self.onSelect = onSelect
+        _selectedSensitivity = State(initialValue: selectedSensitivity)
+    }
 
     var body: some View {
         List {
             Section {
                 ForEach(SensorNoiseSensitivity.allCases, id: \.self) { sensitivity in
                     Button {
-                        onSelect(sensitivity)
-                        dismiss()
+                        selectedSensitivity = sensitivity
                     } label: {
                         HStack {
                             Text(sensitivity.description)
@@ -724,6 +824,16 @@ private struct SensorNoiseSensitivitySelectionView: View {
         }
         .navigationTitle(Texts_SettingsView.sensorNoiseSensitivity)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button(Texts_Common.Ok) {
+                    onSelect(selectedSensitivity)
+                    dismiss()
+                }
+                .tint(ConstantsAppColors.toolbarAction)
+                .disabled(selectedSensitivity == initialSensitivity)
+            }
+        }
     }
 }
 
@@ -740,6 +850,7 @@ private struct SensorManagementState {
     let sessionLifetimeString: String
     let sessionLifetimeColor: Color
     let sensorDetailsMessage: String
+    let sensorInformationRows: [SensorManagementInformationRow]
     let startDateString: String
     let secondarySessionTitle: String
     let secondarySessionValue: String
@@ -768,4 +879,39 @@ private struct SensorManagementState {
     let calibrationReadiness: CalibrationReadiness
     let currentCalibration: SensorManagementCalibrationDisplay?
     let calibrationHistory: [SensorManagementCalibrationDisplay]
+}
+
+private struct SensorManagementInformationRow: Identifiable {
+    let title: String
+    let value: String
+
+    var id: String { title }
+}
+
+/// Presents the optional Dexcom G6 label and session metadata outside the main summary.
+private struct SensorInformationView: View {
+    let rows: [SensorManagementInformationRow]
+
+    var body: some View {
+        List {
+            Section {
+                ForEach(rows) { informationRow in
+                    HStack {
+                        Text(informationRow.title)
+                            .foregroundStyle(Color(.colorPrimary))
+
+                        Spacer()
+
+                        Text(informationRow.value)
+                            .foregroundStyle(Color(.colorSecondary))
+                            .multilineTextAlignment(.trailing)
+                    }
+                }
+            }
+        }
+        .ipadReadableContentWidth(860)
+        .navigationTitle(Texts_HomeView.sensorInformationTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+    }
 }

@@ -108,3 +108,18 @@
 "reconnecting" = "Yeniden bağlanıyor";
 "reconnectingToTransmitter" = "Yeniden bağlanıyor...";
 "waiting" = "Bekleniyor...";
+
+/* Dexcom G6 Bluetooth authentication slot */
+"dexcomG6BluetoothSlot" = "Bluetooth Kanalı";
+"dexcomG6MobileAppSlot" = "Mobil Uygulama (Varsayılan)";
+"dexcomG6MobileAppSlotShort" = "Mobil Uygulama";
+"dexcomG6MedicalDeviceSlot" = "Alıcı veya Pompa (Deneysel)";
+"dexcomG6MedicalDeviceSlotShort" = "Pompa";
+"dexcomG6MobileAppSlotFooter" = "Mobil Uygulama kanalı, telefon bağlantıları için varsayılandır.";
+"dexcomG6MedicalDeviceSlotFooter" = "Alıcı veya Pompa kanalı normalde Dexcom alıcısı veya uyumlu bir pompa için ayrılmıştır. Bu uygulamanın bu kanalı kullanması, Mobil Uygulama kanalını bir telefon veya başka bir cihaz için kullanılabilir durumda bırakır.";
+"dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Birlikte Çalışma Modunda kullanılamaz";
+"dexcomG6MedicalDeviceSlotWarning" = "Alıcı veya Pompa kanalı normalde bir Dexcom alıcısı veya uyumlu bir pompa için ayrılmıştır. Bu kanalın seçilmesi, söz konusu cihazın bağlanmasını engelleyebilir.\n\nAlıcı veya Pompa kanalı kullanımı yalnızca deneysel olarak değerlendirilmelidir. Seçim bir sonraki kimlik doğrulamada geçerli olur.";
+"dexcomG6AnubisSlot" = "Kanal 3 (Anubis Deneysel)";
+"dexcomG6AnubisSlotShort" = "Kanal 3";
+"dexcomG6AnubisSlotFooter" = "Kanal 3 yalnızca Anubis vericilerinde kullanılabilir. Deneyseldir ve Mobil Uygulama ile Alıcı veya Pompa kanallarını diğer cihazlar için kullanılabilir bırakır.";
+"dexcomG6AnubisSlotWarning" = "Kanal 3, yalnızca Anubis vericilerinde kullanılabilen deneysel bir kanaldır.\n\nKanal 3'ü yalnızca test için kullanın. Seçim bir sonraki kimlik doğrulamada geçerli olur.";

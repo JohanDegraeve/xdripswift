@@ -52,6 +52,8 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var eventStartDate: Date = Date()
         var warnUserToOpenApp: Bool = true
         var liveActivityType: LiveActivityType
+        // Keep this optional so an activity started before the preference existed still decodes.
+        var carPlayLiveActivityType: CarPlayLiveActivityType?
         var dataSourceDescription: String
         var followerPatientName: String?
         var sensorNoiseStateRawValue: Int?
@@ -70,7 +72,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             bgReadingDates.first
         }
 
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "", followerPatientName: String? = nil, sensorNoiseStateRawValue: Int? = nil, aidStatus: AIDStatus?) {
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, carPlayLiveActivityType: CarPlayLiveActivityType? = nil, dataSourceDescription: String? = "", followerPatientName: String? = nil, sensorNoiseStateRawValue: Int? = nil, aidStatus: AIDStatus?) {
             let readings = Array(zip(bgReadingValues, bgReadingDates))
             self.bgReadingFloats = readings.map { Float16($0.0) }
 
@@ -86,6 +88,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.highLimitInMgDl = highLimitInMgDl
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl            
             self.liveActivityType = liveActivityType
+            self.carPlayLiveActivityType = carPlayLiveActivityType
             self.dataSourceDescription = dataSourceDescription ?? ""
             self.followerPatientName = followerPatientName
             self.sensorNoiseStateRawValue = sensorNoiseStateRawValue

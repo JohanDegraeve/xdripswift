@@ -184,3 +184,18 @@
 "reconnecting" = "Ponowne łączenie";
 "reconnectingToTransmitter" = "Ponowne łączenie...";
 "waiting" = "Oczekiwanie...";
+
+/* Dexcom G6 Bluetooth authentication slot */
+"dexcomG6BluetoothSlot" = "Kanał Bluetooth";
+"dexcomG6MobileAppSlot" = "Aplikacja mobilna (Domyślna)";
+"dexcomG6MobileAppSlotShort" = "Aplikacja mobilna";
+"dexcomG6MedicalDeviceSlot" = "Odbiornik lub pompa (Eksperymentalne)";
+"dexcomG6MedicalDeviceSlotShort" = "Pompa";
+"dexcomG6MobileAppSlotFooter" = "Kanał Aplikacja mobilna jest domyślny dla połączeń telefonicznych.";
+"dexcomG6MedicalDeviceSlotFooter" = "Kanał Odbiornik lub pompa jest zwykle zarezerwowany dla odbiornika Dexcom lub zgodnej pompy. Użycie go przez tę aplikację pozostawia kanał Aplikacja mobilna dostępny dla telefonu lub innego urządzenia.";
+"dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Niedostępne w trybie współistnienia";
+"dexcomG6MedicalDeviceSlotWarning" = "Kanał Odbiornik lub pompa jest zwykle zarezerwowany dla odbiornika Dexcom lub zgodnej pompy. Wybranie go może uniemożliwić połączenie tego urządzenia.\n\nUżycie kanału Odbiornik lub pompa należy traktować wyłącznie jako eksperymentalne. Wybór zacznie obowiązywać przy następnym uwierzytelnieniu.";
+"dexcomG6AnubisSlot" = "Kanał 3 (Anubis, eksperymentalny)";
+"dexcomG6AnubisSlotShort" = "Kanał 3";
+"dexcomG6AnubisSlotFooter" = "Kanał 3 jest dostępny tylko w nadajnikach Anubis. Jest eksperymentalny i pozostawia kanały Aplikacja mobilna oraz Odbiornik lub pompa dostępne dla innych urządzeń.";
+"dexcomG6AnubisSlotWarning" = "Kanał 3 jest eksperymentalnym kanałem dostępnym tylko w nadajnikach Anubis.\n\nUżywaj Kanału 3 tylko do testów. Wybór zacznie obowiązywać przy następnym uwierzytelnieniu.";

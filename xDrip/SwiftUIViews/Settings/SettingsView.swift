@@ -665,7 +665,8 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                                 [
                                     SettingsViewNotificationsSettingsViewModel(),
                                     SettingsViewNotificationsSettingsViewModel(rowGroup: .appBadge),
-                                    SettingsViewNotificationsSettingsViewModel(rowGroup: .liveActivities)
+                                    SettingsViewNotificationsSettingsViewModel(rowGroup: .liveActivities),
+                                    SettingsViewNotificationsSettingsViewModel(rowGroup: .carPlay)
                                 ]
                             }
                         )

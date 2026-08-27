@@ -289,7 +289,8 @@ class BluetoothPeripheralManager: NSObject {
                         if let transmitterId = dexcomG5orG6.blePeripheral.transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate {
                             
                             let activeSensor = sensorsAccessor.fetchActiveSensor()
-                            newTransmitter = CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, activeSensorStartDate: activeSensor?.startDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: activeSensor), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled, useOtherApp: dexcomG5orG6.useOtherApp, isAnubis: dexcomG5orG6.isAnubis)
+                            let bluetoothSlot = dexcomG5orG6.resolvedDexcomG6BluetoothSlot()
+                            newTransmitter = CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, activeSensorStartDate: activeSensor?.startDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: activeSensor), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled, useOtherApp: dexcomG5orG6.useOtherApp, isAnubis: dexcomG5orG6.isAnubis, bluetoothSlot: bluetoothSlot)
                             
                             
                         } else {
@@ -493,8 +494,9 @@ class BluetoothPeripheralManager: NSObject {
 
     /// - parameters:
     ///     - transmitterId : only for transmitter types that need it (at the moment only Dexcom)
+    ///     - dexcomG6BluetoothSlot: the role to use when creating a temporary G6 transmitter
     ///     - bluetoothTransmitterDelegate : if not nil then this bluetoothTransmitterDelegate will be used when creating bluetoothTransmitter, otherwise self is used
-    public func createNewTransmitter(type: BluetoothPeripheralType, transmitterId: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?) -> BluetoothTransmitter {
+    public func createNewTransmitter(type: BluetoothPeripheralType, transmitterId: String?, dexcomG6BluetoothSlot: DexcomG6BluetoothSlot, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?) -> BluetoothTransmitter {
         
         switch type {
             
@@ -508,7 +510,7 @@ class BluetoothPeripheralManager: NSObject {
                 fatalError("in createNewTransmitter, type DexcomType, transmitterId is nil or cgmTransmitterDelegate is nil")
             }
             
-            return CGMG5Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: nil, sensorStartDate: nil, activeSensorStartDate: nil, calibrationToSendToTransmitter: nil, firmware: nil, webOOPEnabled: nil, useOtherApp: false, isAnubis: false)
+            return CGMG5Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: nil, sensorStartDate: nil, activeSensorStartDate: nil, calibrationToSendToTransmitter: nil, firmware: nil, webOOPEnabled: nil, useOtherApp: false, isAnubis: false, bluetoothSlot: dexcomG6BluetoothSlot)
             
         case .BubbleType:
             
@@ -794,7 +796,8 @@ class BluetoothPeripheralManager: NSObject {
                                 // create an instance of CGMG5Transmitter, will automatically try to connect to the dexcom with the address that is stored in dexcom
                                 // add it to the array of bluetoothTransmitters
                                 let activeSensor = sensorsAccessor.fetchActiveSensor()
-                                bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, activeSensorStartDate: activeSensor?.startDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: activeSensor), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled, useOtherApp: dexcomG5orG6.useOtherApp, isAnubis: dexcomG5orG6.isAnubis), at: index)
+                                let bluetoothSlot = dexcomG5orG6.resolvedDexcomG6BluetoothSlot()
+                                bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, activeSensorStartDate: activeSensor?.startDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: activeSensor), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled, useOtherApp: dexcomG5orG6.useOtherApp, isAnubis: dexcomG5orG6.isAnubis, bluetoothSlot: bluetoothSlot), at: index)
 
                                 // if DexcomG5Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                                 if bluetoothPeripheralType.category() == .CGM {
@@ -1264,12 +1267,12 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         
     }
     
-    func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?, callBackForScanningResult: ((BluetoothTransmitter.startScanningResult) -> Void)?, callback: @escaping (BluetoothPeripheral) -> Void)  {
+    func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, dexcomG6BluetoothSlot: DexcomG6BluetoothSlot, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?, callBackForScanningResult: ((BluetoothTransmitter.startScanningResult) -> Void)?, callback: @escaping (BluetoothPeripheral) -> Void)  {
         
         callBackAfterDiscoveringDevice = callback
         
         // create a temporary transmitter of requested type
-        let newBluetoothTranmsitter = createNewTransmitter(type: type, transmitterId: transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self)
+        let newBluetoothTranmsitter = createNewTransmitter(type: type, transmitterId: transmitterId, dexcomG6BluetoothSlot: dexcomG6BluetoothSlot, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self)
         
         // assign transmitterTypeBeingScannedFor, will be needed in case tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is being recreated (search for transmitterTypeBeingScannedFor in BluetoothPeripheralManager+BluetoothTransmitterDelegate
         transmitterTypeBeingScannedFor = type

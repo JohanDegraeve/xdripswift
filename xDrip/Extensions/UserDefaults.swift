@@ -120,6 +120,8 @@ extension UserDefaults {
         case notificationInterval = "notificationInterval"
         /// which type of live activities should be shown, if any?
         case liveActivityType = "liveActivityType"
+        /// which layout should the small Live Activity family use?
+        case carPlayLiveActivityType = "carPlayLiveActivityType"
         /// should BG adjustment be enabled?
         case enableAdjustment = "enableAdjustment"
         /// should BG smoothing be enabled?
@@ -991,6 +993,16 @@ extension UserDefaults {
         }
         set {
             set(newValue.rawValue, forKey: Key.liveActivityType.rawValue)
+        }
+    }
+
+    /// Holds the layout used by the small supplemental Live Activity family.
+    var carPlayLiveActivityType: CarPlayLiveActivityType {
+        get {
+            CarPlayLiveActivityType(rawValue: integer(forKey: Key.carPlayLiveActivityType.rawValue)) ?? .chart
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.carPlayLiveActivityType.rawValue)
         }
     }
 

@@ -210,6 +210,12 @@ final class SensorHealthIssueManager: ObservableObject {
                 )
                 persistedState.temporaryStatus = temporaryStatus
                 resolve(kind: .temporaryTransmitterIssue)
+
+                // A recoverable transmitter state is useful support evidence from its first
+                // occurrence even though it does not become a user-facing warning for three hours.
+                // Record only this new-condition boundary so five-minute transmitter reports do
+                // not flood the Activity Log.
+                recordTroubleshootingCondition(reason: reason, now: now, transition: "observed")
             }
 
             if now.timeIntervalSince(temporaryStatus.firstSeen) >= Self.temporaryIssuePersistence {
@@ -370,9 +376,21 @@ final class SensorHealthIssueManager: ObservableObject {
         persistedState.dismissedEpisodeID = nil
         visibleIssue = issue
 
-        // `activate` is the episode transition boundary: repeated ten-minute calculations for the
-        // same problem return above, so one real alert creates exactly one consumer log row. Keep
-        // the controlled alert kind separate from sensor IDs, raw values and developer arguments.
+        // Temporary transmitter conditions are recorded when first observed, before their
+        // three-hour warning boundary. Every other condition first becomes reportable here.
+        if kind != .temporaryTransmitterIssue {
+            recordTroubleshootingCondition(reason: reason, now: now, transition: "activated")
+        }
+
+        scheduleNotificationIfNeeded(for: issue)
+    }
+
+    /// Records a controlled, share-safe condition without sensor IDs or raw transmitter data.
+    private func recordTroubleshootingCondition(
+        reason: SensorHealthReason,
+        now: Date,
+        transition: String
+    ) {
         let troubleshootingAlert: TroubleshootingSensorHealthAlert
         switch reason {
         case .persistentNoise:
@@ -396,15 +414,14 @@ final class SensorHealthIssueManager: ObservableObject {
         }
 
         trace(
-            "sensor-health alert activated: %{public}@",
+            "sensor-health condition %{public}@: %{public}@",
             log: log,
             category: ConstantsLog.categoryApplicationDataSensors,
             type: .info,
             troubleshooting: .standard(.sensorHealthAlert(troubleshootingAlert), timestamp: now),
+            transition,
             troubleshootingAlert.rawValue
         )
-
-        scheduleNotificationIfNeeded(for: issue)
     }
 
     /// Clears the matching episode without disturbing a different active condition.

@@ -162,3 +162,36 @@
 "sensorHealthTransmitterFailedGuidance" = "Zenderfout gemeld. Controleer of vervang de zender.";
 "connectingToCGM" = "Verbinden met CGM...";
 "reconnectingToCGM" = "Opnieuw verbinden met CGM...";
+
+/* Dexcom G6 sensor-label scanning */
+"scanWithCamera" = "Scannen met camera";
+"chooseSensorLabelPhoto" = "Foto kiezen";
+"readingSensorLabel" = "Sensorlabel lezen...";
+"scanSensorLabel" = "Sensorlabel scannen";
+"sensorCodeScannerGuidance" = "Plaats de Data Matrix binnen het kader.";
+"sensorCodeScannerTorch" = "Zaklamp";
+"cameraAccessRequired" = "Cameratoegang vereist";
+"cameraAccessRequiredMessage" = "Sta cameratoegang toe in Instellingen, voer de code handmatig in of kies een foto.";
+"openSettings" = "Open Instellingen";
+"cameraUnavailable" = "Camera niet beschikbaar";
+"cameraUnavailableMessage" = "Voer de sensorcode handmatig in of kies een foto.";
+"sensorInformationTitle" = "Sensorinformatie";
+"sensorLotNumber" = "Lotnummer";
+"sensorSerialNumberMetadata" = "Serienummer sensor";
+"sensorLabelReviewFooter" = "Controleer de gedecodeerde informatie voordat u de sensor start.";
+"sensorLabelScanFailed" = "Sensorlabel niet gelezen";
+"multipleSensorLabelsFound" = "De foto bevat meer dan één sensorlabel. Kies een foto met één label.";
+"noSensorLabelFound" = "Er is geen geldig Dexcom G6-sensorlabel in de foto gevonden.";
+"invalidSensorLabelFound" = "Er is een Data Matrix gevonden, maar dit was geen geldig Dexcom G6-sensorlabel.";
+"sensorLabelPhotoUnreadable" = "De geselecteerde foto kon niet worden gelezen.";
+"sensorCodeMetadata" = "Sensorcode";
+"scannedSensorLabelCode" = "Code van gescand label";
+"noCodeSensorSessionValue" = "0000 (Sessie zonder code)";
+"sensorCodeUnknown" = "Onbekend";
+"sensorSessionOrigin" = "Oorsprong sessie";
+"sensorSessionOriginUnknown" = "Onbekend";
+"sensorSessionOriginAwaitingTransmitter" = "Wachten op zender";
+"sensorSessionOriginStartedByApp" = "Gestart door xDrip4iOS";
+"sensorSessionOriginExistingAdopted" = "Bestaande sessie overgenomen";
+"sensorSessionOriginTransmitterDetected" = "Gedetecteerd door zender";
+"sensorSessionOriginRejected" = "Startverzoek geweigerd";

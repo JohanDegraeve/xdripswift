@@ -708,3 +708,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Basalimpulse";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Temporäre Basalraten";
 "settingsviews_careLinkAutomaticBasalFooter" = "Basalimpulse zeigen jede automatische Basalabgabe als kurzen Impuls im Hauptglukosediagramm. Temporäre Basalraten zeigen die entsprechende Rate in E/h zwischen den Abgaben.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Stil";
+"settingsviews_carPlayLiveActivityTypeChart" = "Diagramm";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Einfach";
+"settingsviews_liveActivitySectionTitle" = "Live-Aktivität";

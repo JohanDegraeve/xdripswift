@@ -13,6 +13,7 @@ extension DexcomG5: BluetoothPeripheral {
         if let cGMG5Transmitter = bluetoothTransmitter as? CGMG5Transmitter {
             
             cGMG5Transmitter.useOtherApp = useOtherApp
+            cGMG5Transmitter.bluetoothSlot = resolvedDexcomG6BluetoothSlot()
             
         }
         

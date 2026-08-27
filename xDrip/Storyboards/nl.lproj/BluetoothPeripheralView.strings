@@ -115,3 +115,18 @@
 "reconnecting" = "Opnieuw verbinden";
 "reconnectingToTransmitter" = "Opnieuw verbinden...";
 "waiting" = "Wachten...";
+
+/* Dexcom G6 Bluetooth authentication slot */
+"dexcomG6BluetoothSlot" = "Bluetooth-kanaal";
+"dexcomG6MobileAppSlot" = "Mobiele app (Standaard)";
+"dexcomG6MobileAppSlotShort" = "Mobiele app";
+"dexcomG6MedicalDeviceSlot" = "Ontvanger of pomp (Experimenteel)";
+"dexcomG6MedicalDeviceSlotShort" = "Pomp";
+"dexcomG6MobileAppSlotFooter" = "Het kanaal Mobiele app is de standaard voor telefoonverbindingen.";
+"dexcomG6MedicalDeviceSlotFooter" = "Het kanaal Ontvanger of pomp is normaal gereserveerd voor de Dexcom-ontvanger of een compatibele pomp. Als deze app dit kanaal gebruikt, blijft het kanaal Mobiele app beschikbaar voor een telefoon of ander apparaat.";
+"dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Niet beschikbaar in de co-existentiemodus";
+"dexcomG6MedicalDeviceSlotWarning" = "Het kanaal Ontvanger of pomp is normaal gereserveerd voor een Dexcom-ontvanger of een compatibele pomp. Als u dit selecteert, kan dat verhinderen dat dit apparaat verbinding maakt.\n\nHet gebruik van het kanaal Ontvanger of pomp moet uitsluitend als experimenteel worden beschouwd. De selectie wordt actief bij de volgende authenticatie.";
+"dexcomG6AnubisSlot" = "Kanaal 3 (Anubis experimenteel)";
+"dexcomG6AnubisSlotShort" = "Kanaal 3";
+"dexcomG6AnubisSlotFooter" = "Kanaal 3 is alleen beschikbaar op Anubis-zenders. Het is experimenteel en laat de kanalen Mobiele app en Ontvanger of pomp beschikbaar voor andere apparaten.";
+"dexcomG6AnubisSlotWarning" = "Kanaal 3 is een experimenteel kanaal dat alleen beschikbaar is op Anubis-zenders.\n\nGebruik Kanaal 3 alleen voor tests. De selectie wordt actief bij de volgende authenticatie.";

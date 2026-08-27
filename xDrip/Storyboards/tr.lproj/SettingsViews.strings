@@ -480,3 +480,9 @@
 "settingsviews_careLinkAutomaticBasalDeliveredDoses" = "Bazal atımları";
 "settingsviews_careLinkAutomaticBasalSimulatedTempBasals" = "Geçici bazallar";
 "settingsviews_careLinkAutomaticBasalFooter" = "Bazal atımları, her otomatik bazal dozunu ana glikoz grafiğinde kısa bir atım olarak gösterir. Geçici bazallar, dozlar arasındaki eşdeğer U/sa hızını gösterir.";
+
+"settingsviews_carPlaySectionTitle" = "CarPlay";
+"settingsviews_liveActivityStyle" = "Stil";
+"settingsviews_carPlayLiveActivityTypeChart" = "Grafik";
+"settingsviews_carPlayLiveActivityTypeBasic" = "Temel";
+"settingsviews_liveActivitySectionTitle" = "Canlı Etkinlik";
