@@ -233,10 +233,3 @@
 "scannedSensorLabelCode" = "Код зі сканованої етикетки";
 "noCodeSensorSessionValue" = "0000 (Сеанс без коду)";
 "sensorCodeUnknown" = "Невідомо";
-"sensorSessionOrigin" = "Походження сеансу";
-"sensorSessionOriginUnknown" = "Невідомо";
-"sensorSessionOriginAwaitingTransmitter" = "Очікування трансмітера";
-"sensorSessionOriginStartedByApp" = "Запущено xDrip4iOS";
-"sensorSessionOriginExistingAdopted" = "Прийнято наявний сеанс";
-"sensorSessionOriginTransmitterDetected" = "Виявлено трансмітером";
-"sensorSessionOriginRejected" = "Запит запуску відхилено";

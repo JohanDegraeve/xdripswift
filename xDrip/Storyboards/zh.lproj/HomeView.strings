@@ -202,10 +202,3 @@
 "scannedSensorLabelCode" = "扫描的标签代码";
 "noCodeSensorSessionValue" = "0000（无代码会话）";
 "sensorCodeUnknown" = "未知";
-"sensorSessionOrigin" = "会话来源";
-"sensorSessionOriginUnknown" = "未知";
-"sensorSessionOriginAwaitingTransmitter" = "等待发射器";
-"sensorSessionOriginStartedByApp" = "由 xDrip4iOS 启动";
-"sensorSessionOriginExistingAdopted" = "已采用现有会话";
-"sensorSessionOriginTransmitterDetected" = "由发射器检测";
-"sensorSessionOriginRejected" = "启动请求被拒绝";

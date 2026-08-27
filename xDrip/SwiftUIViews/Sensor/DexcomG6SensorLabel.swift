@@ -177,6 +177,26 @@ extension Sensor {
         sensorLotNumber = sensor.sensorLotNumber
         sensorSerialNumber = sensor.sensorSerialNumber
     }
+
+    /// replaces a provisional or rejected command result after validated glucose data confirms the matching session
+    @discardableResult
+    func confirmSessionStartedByApp() -> Bool {
+        guard sensorSessionOrigin == .startRequested || sensorSessionOrigin == .startRejected else {
+            return false
+        }
+
+        sensorSessionOrigin = .startedByApp
+
+        if requestedSensorCode == "0000" {
+            sensorCalibrationMode = .noCode
+        } else if requestedSensorCode != nil {
+            sensorCalibrationMode = .factoryCoded
+        } else {
+            sensorCalibrationMode = .unknown
+        }
+
+        return true
+    }
 }
 
 /// Derives an active code only when the transmitter result makes that code safe to claim.

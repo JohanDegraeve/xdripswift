@@ -31,10 +31,15 @@ protocol CGMTransmitterDelegate:AnyObject {
     /// Reports the decoded result of a sensor-start request.
     /// Dexcom G6/ONE provides this callback; the default implementation does nothing.
     func sensorSessionStartResultReceived(_ result: CGMSensorSessionStartResult)
+
+    /// confirms that a validated glucose packet belongs to the matching local sensor session
+    /// Dexcom G6/ONE provides this callback; the default implementation does nothing.
+    func sensorSessionConfirmed(startDate: Date)
     
 }
 
 extension CGMTransmitterDelegate {
     func sensorHealthEventOccurred(_ event: CGMSensorHealthEvent) {}
     func sensorSessionStartResultReceived(_ result: CGMSensorSessionStartResult) {}
+    func sensorSessionConfirmed(startDate: Date) {}
 }

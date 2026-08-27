@@ -728,13 +728,6 @@ enum Texts_HomeView {
     static let scannedSensorLabelCode = NSLocalizedString("scannedSensorLabelCode", tableName: filename, bundle: .main, value: "Scanned Label Code", comment: "sensor code decoded from a physical label")
     static let noCodeSensorSessionValue = NSLocalizedString("noCodeSensorSessionValue", tableName: filename, bundle: .main, value: "0000 (No-code session)", comment: "confirmed no-code Dexcom session value")
     static let sensorCodeUnknown = NSLocalizedString("sensorCodeUnknown", tableName: filename, bundle: .main, value: "Unknown", comment: "unknown active sensor code value")
-    static let sensorSessionOrigin = NSLocalizedString("sensorSessionOrigin", tableName: filename, bundle: .main, value: "Session Origin", comment: "sensor session origin label")
-    static let sensorSessionOriginUnknown = NSLocalizedString("sensorSessionOriginUnknown", tableName: filename, bundle: .main, value: "Unknown", comment: "unknown sensor session origin")
-    static let sensorSessionOriginAwaitingTransmitter = NSLocalizedString("sensorSessionOriginAwaitingTransmitter", tableName: filename, bundle: .main, value: "Awaiting transmitter", comment: "pending sensor-start request origin")
-    static let sensorSessionOriginStartedByApp = NSLocalizedString("sensorSessionOriginStartedByApp", tableName: filename, bundle: .main, value: "Started by xDrip4iOS", comment: "sensor session started by this app")
-    static let sensorSessionOriginExistingAdopted = NSLocalizedString("sensorSessionOriginExistingAdopted", tableName: filename, bundle: .main, value: "Existing session adopted", comment: "existing transmitter session adopted by this app")
-    static let sensorSessionOriginTransmitterDetected = NSLocalizedString("sensorSessionOriginTransmitterDetected", tableName: filename, bundle: .main, value: "Detected from transmitter", comment: "sensor session automatically detected from transmitter")
-    static let sensorSessionOriginRejected = NSLocalizedString("sensorSessionOriginRejected", tableName: filename, bundle: .main, value: "Start request rejected", comment: "sensor-start request rejected by transmitter")
 
     static let noSensorCodeSelectedTitle: String = {
         return NSLocalizedString("noSensorCodeSelectedTitle", tableName: filename, bundle: Bundle.main, value: "No Sensor Code Selected", comment: "Alert title shown before starting a Dexcom G6 sensor with no code/0000")

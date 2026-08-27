@@ -149,10 +149,3 @@
 "scannedSensorLabelCode" = "Scannet mærkatkode";
 "noCodeSensorSessionValue" = "0000 (Session uden kode)";
 "sensorCodeUnknown" = "Ukendt";
-"sensorSessionOrigin" = "Sessionsoprindelse";
-"sensorSessionOriginUnknown" = "Ukendt";
-"sensorSessionOriginAwaitingTransmitter" = "Afventer sender";
-"sensorSessionOriginStartedByApp" = "Startet af xDrip4iOS";
-"sensorSessionOriginExistingAdopted" = "Eksisterende session overtaget";
-"sensorSessionOriginTransmitterDetected" = "Registreret fra sender";
-"sensorSessionOriginRejected" = "Startanmodning afvist";

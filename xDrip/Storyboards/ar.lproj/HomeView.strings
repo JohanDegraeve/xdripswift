@@ -151,10 +151,3 @@
 "scannedSensorLabelCode" = "رمز الملصق الممسوح";
 "noCodeSensorSessionValue" = "0000 (جلسة بدون رمز)";
 "sensorCodeUnknown" = "غير معروف";
-"sensorSessionOrigin" = "مصدر الجلسة";
-"sensorSessionOriginUnknown" = "غير معروف";
-"sensorSessionOriginAwaitingTransmitter" = "في انتظار جهاز الإرسال";
-"sensorSessionOriginStartedByApp" = "بدأت بواسطة xDrip4iOS";
-"sensorSessionOriginExistingAdopted" = "تم اعتماد جلسة موجودة";
-"sensorSessionOriginTransmitterDetected" = "تم اكتشافها من جهاز الإرسال";
-"sensorSessionOriginRejected" = "تم رفض طلب البدء";

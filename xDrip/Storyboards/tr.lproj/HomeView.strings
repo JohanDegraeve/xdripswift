@@ -149,10 +149,3 @@
 "scannedSensorLabelCode" = "Taranan Etiket Kodu";
 "noCodeSensorSessionValue" = "0000 (Kodsuz oturum)";
 "sensorCodeUnknown" = "Bilinmiyor";
-"sensorSessionOrigin" = "Oturum Kaynağı";
-"sensorSessionOriginUnknown" = "Bilinmiyor";
-"sensorSessionOriginAwaitingTransmitter" = "Verici bekleniyor";
-"sensorSessionOriginStartedByApp" = "xDrip4iOS tarafından başlatıldı";
-"sensorSessionOriginExistingAdopted" = "Mevcut oturum devralındı";
-"sensorSessionOriginTransmitterDetected" = "Vericiden algılandı";
-"sensorSessionOriginRejected" = "Başlatma isteği reddedildi";

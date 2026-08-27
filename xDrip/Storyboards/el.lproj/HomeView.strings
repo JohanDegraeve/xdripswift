@@ -149,10 +149,3 @@
 "scannedSensorLabelCode" = "Κωδικός σαρωμένης ετικέτας";
 "noCodeSensorSessionValue" = "0000 (Συνεδρία χωρίς κωδικό)";
 "sensorCodeUnknown" = "Άγνωστος";
-"sensorSessionOrigin" = "Προέλευση συνεδρίας";
-"sensorSessionOriginUnknown" = "Άγνωστη";
-"sensorSessionOriginAwaitingTransmitter" = "Αναμονή πομπού";
-"sensorSessionOriginStartedByApp" = "Ξεκίνησε από το xDrip4iOS";
-"sensorSessionOriginExistingAdopted" = "Υιοθετήθηκε υπάρχουσα συνεδρία";
-"sensorSessionOriginTransmitterDetected" = "Εντοπίστηκε από τον πομπό";
-"sensorSessionOriginRejected" = "Το αίτημα έναρξης απορρίφθηκε";

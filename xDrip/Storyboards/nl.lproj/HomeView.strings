@@ -188,10 +188,3 @@
 "scannedSensorLabelCode" = "Code van gescand label";
 "noCodeSensorSessionValue" = "0000 (Sessie zonder code)";
 "sensorCodeUnknown" = "Onbekend";
-"sensorSessionOrigin" = "Oorsprong sessie";
-"sensorSessionOriginUnknown" = "Onbekend";
-"sensorSessionOriginAwaitingTransmitter" = "Wachten op zender";
-"sensorSessionOriginStartedByApp" = "Gestart door xDrip4iOS";
-"sensorSessionOriginExistingAdopted" = "Bestaande sessie overgenomen";
-"sensorSessionOriginTransmitterDetected" = "Gedetecteerd door zender";
-"sensorSessionOriginRejected" = "Startverzoek geweigerd";

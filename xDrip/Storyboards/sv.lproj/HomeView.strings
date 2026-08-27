@@ -162,10 +162,3 @@
 "scannedSensorLabelCode" = "Skannad etikettkod";
 "noCodeSensorSessionValue" = "0000 (Session utan kod)";
 "sensorCodeUnknown" = "Okänd";
-"sensorSessionOrigin" = "Sessionens ursprung";
-"sensorSessionOriginUnknown" = "Okänt";
-"sensorSessionOriginAwaitingTransmitter" = "Väntar på sändaren";
-"sensorSessionOriginStartedByApp" = "Startad av xDrip4iOS";
-"sensorSessionOriginExistingAdopted" = "Befintlig session övertagen";
-"sensorSessionOriginTransmitterDetected" = "Identifierad från sändaren";
-"sensorSessionOriginRejected" = "Startbegäran avvisad";
