@@ -185,86 +185,11 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         
     }
     
-    /// writes a wifi name
-    /// - parameters:
-    ///     - name : the wifi name or ssid, if nil then nothing is sent
-    ///     - number : the wifi number (1 to 10)
-    /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
-    ///
-    /// byte 0 will be opcode, byte 1 and 2 packetnumber and number of packets respectively, byte 3 will number of the wifi converted to string, next bytes are the actually name
-    func writeWifiName(name: String?, number: UInt8) -> Bool {
-        guard let name = name else {
-            trace("    name is nil", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
-            return false
-        }
-        guard (1...10).contains(number) else {
-            trace("    wifi slot out of range (1-10): %{public}@", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error, String(number))
-            return false
-        }
-        // we will send the number as a string followed by the actual wifiname
-        let numberAndName = number.description + name
-        // use writeStringToPeripheral to send it
-        return writeStringToPeripheral(text: numberAndName, opCode: .writeWlanSSIDTx)
-    }
-
-    /// writes a wifi password
-    /// - parameters:
-    ///     - password : the wifi password, if nil then nothing is sent
-    ///     - number : the wifi number (1 to 10)
-    /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
-    ///
-    /// byte 0 will be opcode, byte 1 and 2 packetnumber and number of packets respectively, byte 3 will number of the wifi converted to string, next bytes are the actually password
-    func writeWifiPassword(password: String?, number: UInt8) -> Bool {
-        guard let password = password else {
-            trace("    password is nil", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
-            return false
-        }
-        guard (1...10).contains(number) else {
-            trace("    wifi slot out of range (1-10): %{public}@", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error, String(number))
-            return false
-        }
-        // we will send the number as a string followed by the actual password
-        let numberAndPassword = number.description + password
-        return writeStringToPeripheral(text: numberAndPassword, opCode: .writeWlanPassTx)
-    }
-
     /// writes bloodglucose unit to M5Stack
     /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
     func writeBloodGlucoseUnit(isMgDl: Bool) -> Bool {
         
         return writeStringToPeripheral(text: isMgDl ? "true":"false", opCode: .writemgdlTx)
-        
-    }
-    
-    /// writes value of connectToWiFi
-    /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
-    func writeConnectToWiFi(connect: Bool) -> Bool {
-        
-        return writeStringToPeripheral(text: connect ? "true":"false", opCode: .writeConnectToWiFiTx)
-        
-    }
-    
-    /// writes nightscout url to M5Stack
-    /// - parameters:
-    ///     - url : the nightscout url, if nil then nothing is sent
-    /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
-    func writeNightscoutUrl(url: String?) -> Bool {
-        
-        if let url = url {
-            return writeStringToPeripheral(text: url, opCode: .writeNightscoutUrlTx)
-        } else {return false}
-        
-    }
-    
-    /// writes nightscout apikey to M5Stack
-    /// - parameters:
-    ///     - apikey : the apikeyl, if nil then nothing is sent
-    /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
-    func writeNightscoutAPIKey(apiKey: String?) -> Bool {
-        
-        if let apiKey = apiKey {
-            return writeStringToPeripheral(text: apiKey, opCode: .writeNightscoutAPIKeyTx)
-        } else {return false}
         
     }
     

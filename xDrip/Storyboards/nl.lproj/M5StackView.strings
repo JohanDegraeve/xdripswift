@@ -5,7 +5,6 @@
 "m5StackViewscreenTitle" = "M5Stack";
 "screenTitle" = "M5Stack";
 "blePasswordMissingWarning" = "Stel het wachtwoord in in de Instellingen";
-"connectToWiFi" = "Verbinden via WiFi";
 "powerOff" = "Uitschakelen";
 "m5StackResetRequiredWarning" = "M5Stack moet gereset worden om een nieuw tijdelijk wachtwoord te krijgen. Klik indien voltooid ";
 "deviceMustBeConnectedToPowerOff" = "M5Stack moet verbonden zijn om uitgeschakeld te worden";

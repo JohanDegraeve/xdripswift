@@ -1065,7 +1065,6 @@ enum SettingsListFactory {
 
 enum M5StackSettingsSection: Int, CaseIterable, SettingsProtocol {
     case general
-    case wifi
     case bluetooth
 
     /// Creates the M5Stack Settings view model for the selected subsection.
@@ -1074,8 +1073,6 @@ enum M5StackSettingsSection: Int, CaseIterable, SettingsProtocol {
         switch self {
         case .general:
             return SettingsViewM5StackGeneralSettingsViewModel()
-        case .wifi:
-            return SettingsViewM5StackWiFiSettingsViewModel()
         case .bluetooth:
             return SettingsViewM5StackBluetoothSettingsViewModel()
         }

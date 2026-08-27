@@ -81,12 +81,6 @@ enum BackupAccountCategory: String, CaseIterable, Hashable, Identifiable, Sendab
         case .m5Stack:
             [
                 UserDefaults.Key.m5StackBlePassword.rawValue,
-                UserDefaults.Key.m5StackWiFiName1.rawValue,
-                UserDefaults.Key.m5StackWiFiName2.rawValue,
-                UserDefaults.Key.m5StackWiFiName3.rawValue,
-                UserDefaults.Key.m5StackWiFiPassword1.rawValue,
-                UserDefaults.Key.m5StackWiFiPassword2.rawValue,
-                UserDefaults.Key.m5StackWiFiPassword3.rawValue,
             ]
         }
     }
@@ -105,12 +99,7 @@ enum BackupAccountCategory: String, CaseIterable, Hashable, Identifiable, Sendab
         case .careLink:
             [UserDefaults.Key.careLinkUsername.rawValue]
         case .m5Stack:
-            [
-                UserDefaults.Key.m5StackBlePassword.rawValue,
-                UserDefaults.Key.m5StackWiFiName1.rawValue,
-                UserDefaults.Key.m5StackWiFiName2.rawValue,
-                UserDefaults.Key.m5StackWiFiName3.rawValue,
-            ]
+            [UserDefaults.Key.m5StackBlePassword.rawValue]
         }
     }
 

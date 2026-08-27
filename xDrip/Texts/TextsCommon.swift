@@ -167,10 +167,6 @@ class Texts_Common {
         return NSLocalizedString("common_enterValue", tableName: filename, bundle: Bundle.main, value: "Enter Value", comment: "generic label for a row where the user enters a value")
     }()
     
-    static let WiFi = {
-        return NSLocalizedString("WiFi", tableName: filename, bundle: Bundle.main, value: "WiFi", comment: "WiFi")
-    }()
-    
     static let on = {
         return NSLocalizedString("on", tableName: filename, bundle: Bundle.main, value: "On", comment: "on")
     }()

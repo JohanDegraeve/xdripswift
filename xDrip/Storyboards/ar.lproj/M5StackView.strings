@@ -10,4 +10,3 @@
 "deviceMustBeConnectedToPowerOff" = "يجب توصيل M5Stack لتتمكن من إيقاف تشغيله";
 "powerOffConfirm" = "هل أنت متأكد أنك تريد إيقاف تشغيل M5Stack؟";
 "powerOff" = "إيقاف التشغيل";
-"connectToWiFi" = "اتصل بشبكة WiFi";
