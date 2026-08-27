@@ -33,11 +33,11 @@ struct LiveActivitySettingsPreview: View {
     private var liveActivityPreviewHeight: CGFloat {
         switch liveActivityType {
         case .minimal:
-            return 78
+            return 84
         case .normal:
             return 104
         case .large:
-            return 166
+            return 160
         case .disabled:
             return 0
         }
@@ -89,9 +89,10 @@ struct CarPlayLiveActivitySettingsPreview: View {
     var body: some View {
         if #available(iOS 26.0, *), liveActivityType != .disabled {
             LiveActivityViewContentActivityFamiliesState(state: previewState)
-                .frame(maxWidth: .infinity)
-                .frame(height: 112)
+                // Use a representative CarPlay size instead of the full Settings row width.
+                .frame(width: 240, height: 100)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
+                .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
                 .accessibilityElement(children: .contain)
         }
