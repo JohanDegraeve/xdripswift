@@ -68,8 +68,6 @@
 /// literal translation needed
 "common_day" = "Tag";
 
-/// WiFi
-"WiFi" = "WiFi";
 
 /// on
 "on" = "An";

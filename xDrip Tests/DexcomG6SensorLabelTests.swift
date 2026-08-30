@@ -295,4 +295,39 @@ final class DexcomG6SensorLabelTests: XCTestCase {
             )
         )
     }
+
+    func testValidatedMatchingSessionRepairsRejectedCodedStart() {
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let sensor = Sensor(startDate: Date(), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+        sensor.apply(startRequest: SensorStartRequest(startDate: sensor.startDate, requestedSensorCode: "5937"))
+        sensor.sensorSessionOrigin = .startRejected
+
+        XCTAssertTrue(sensor.confirmSessionStartedByApp())
+        XCTAssertEqual(sensor.sensorSessionOrigin, .startedByApp)
+        XCTAssertEqual(sensor.sensorCalibrationMode, .factoryCoded)
+        XCTAssertEqual(sensor.activeSensorCode, "5937")
+    }
+
+    func testValidatedMatchingSessionConfirmsPendingNoCodeStart() {
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let sensor = Sensor(startDate: Date(), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+        sensor.apply(startRequest: SensorStartRequest(startDate: sensor.startDate, requestedSensorCode: "0000"))
+
+        XCTAssertTrue(sensor.confirmSessionStartedByApp())
+        XCTAssertEqual(sensor.sensorSessionOrigin, .startedByApp)
+        XCTAssertEqual(sensor.sensorCalibrationMode, .noCode)
+        XCTAssertEqual(sensor.activeSensorCode, "0000")
+    }
+
+    func testValidatedMatchingSessionDoesNotReplaceAdoptedOrigin() {
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let sensor = Sensor(startDate: Date(), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+        sensor.apply(startRequest: SensorStartRequest(startDate: sensor.startDate, requestedSensorCode: "5937"))
+        sensor.sensorSessionOrigin = .existingSessionAdopted
+        sensor.sensorCalibrationMode = .factoryCoded
+
+        XCTAssertFalse(sensor.confirmSessionStartedByApp())
+        XCTAssertEqual(sensor.sensorSessionOrigin, .existingSessionAdopted)
+        XCTAssertNil(sensor.activeSensorCode)
+    }
 }

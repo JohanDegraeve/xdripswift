@@ -2553,6 +2553,28 @@ import AppIntents
 
 /// conform to CGMTransmitterDelegate
 extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
+    func sensorSessionConfirmed(startDate: Date) {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in
+                self?.sensorSessionConfirmed(startDate: startDate)
+            }
+            return
+        }
+
+        guard bluetoothPeripheralManager?.getCGMTransmitter()?.needsSensorStartCode() == true,
+              let activeSensor,
+              let coreDataManager,
+              abs(activeSensor.startDate.timeIntervalSince(startDate)) <= CGMG5Transmitter.sensorStartDateTolerance,
+              activeSensor.confirmSessionStartedByApp() else {
+            return
+        }
+
+        trace("validated Dexcom glucose data confirms sensor session started by xDrip with requested code %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, activeSensor.requestedSensorCode ?? "none")
+
+        coreDataManager.saveChanges()
+        updateLabelsAndChart(overrideApplicationState: false)
+    }
+
     func sensorSessionStartResultReceived(_ result: CGMSensorSessionStartResult) {
         guard Thread.isMainThread else {
             DispatchQueue.main.async { [weak self] in

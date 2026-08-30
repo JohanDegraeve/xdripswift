@@ -35,9 +35,26 @@ final class CGMG5SensorSessionDetectionTests: XCTestCase {
         XCTAssertTrue(shouldReport(activeSensorStartDate: nil))
     }
 
+    func testReportsMatchingSessionConfirmationOnlyOnce() {
+        XCTAssertTrue(shouldReportConfirmation(reportedSensorStartDate: nil))
+        XCTAssertFalse(shouldReportConfirmation(reportedSensorStartDate: sensorStartDate))
+        XCTAssertFalse(shouldReportConfirmation(reportedSensorStartDate: sensorStartDate.addingTimeInterval(15)))
+    }
+
+    func testReportsConfirmationForDifferentSession() {
+        XCTAssertTrue(shouldReportConfirmation(reportedSensorStartDate: sensorStartDate.addingTimeInterval(16)))
+    }
+
     private func shouldReport(activeSensorStartDate: Date?) -> Bool {
         CGMG5Transmitter.shouldReportDetectedSensor(
             activeSensorStartDate: activeSensorStartDate,
+            receivedSensorStartDate: sensorStartDate
+        )
+    }
+
+    private func shouldReportConfirmation(reportedSensorStartDate: Date?) -> Bool {
+        CGMG5Transmitter.shouldReportConfirmedSensorSession(
+            reportedSensorStartDate: reportedSensorStartDate,
             receivedSensorStartDate: sensorStartDate
         )
     }

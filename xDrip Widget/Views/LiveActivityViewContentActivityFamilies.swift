@@ -69,25 +69,13 @@ struct LiveActivityViewContentActivityFamiliesState: View {
                 Group {
                     if let aidStatus = state.aidStatus {
                         HStack(alignment: .center, spacing: 8) {
-                            if let iob = aidStatus.iob {
-                                metricText(
-                                    label: "IOB: ",
-                                    value: "\(iob.formatted(.number.precision(.fractionLength(1))))U"
-                                )
-                            }
-
-                            if let cob = aidStatus.cob {
-                                metricText(
-                                    label: "COB: ",
-                                    value: "\(cob.formatted(.number.precision(.fractionLength(0))))g"
-                                )
+                            if aidStatus.iob != nil || aidStatus.cob != nil {
+                                aidMetrics(iob: aidStatus.iob, cob: aidStatus.cob)
                             }
 
                             deviceStatusIcon
                         }
-                        .font(.footnote.bold())
                         .lineLimit(1)
-                        .minimumScaleFactor(0.65)
                     } else {
                         HStack(alignment: .center, spacing: 6) {
                             Text("\(state.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
@@ -130,25 +118,21 @@ struct LiveActivityViewContentActivityFamiliesState: View {
         GeometryReader { geometry in
             let fontSize = max(geometry.size.height * 0.76, 1)
 
-            HStack(alignment: .center, spacing: 8) {
-                Text("\(state.bgValueStringInUserChosenUnit()) \(state.trendArrow())")
-                    .font(.system(size: fontSize, weight: .bold))
-                    .foregroundStyle(state.bgTextColor())
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.25)
-                    .layoutPriority(1)
-
-                Spacer(minLength: 0)
-
-                Text(state.deltaChangeStringInUserChosenUnit())
-                    .font(.system(size: fontSize, weight: .bold))
-                    .foregroundStyle(state.deltaChangeTextColor())
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.25)
-            }
-            .frame(width: geometry.size.width, height: geometry.size.height)
+            basicReadingText
+                .font(.system(size: fontSize, weight: .bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.1)
+                .allowsTightening(true)
+                .frame(width: geometry.size.width, height: geometry.size.height)
         }
-        .padding(.horizontal, 8)
+        .padding(.horizontal, 12)
+    }
+
+    private var basicReadingText: Text {
+        Text("\(state.bgValueStringInUserChosenUnit()) \(state.trendArrow())")
+            .foregroundColor(state.bgTextColor())
+            + Text("\u{2003}\(state.deltaChangeStringInUserChosenUnit())")
+            .foregroundColor(state.deltaChangeTextColor())
     }
 
     @ViewBuilder
@@ -160,10 +144,46 @@ struct LiveActivityViewContentActivityFamiliesState: View {
         }
     }
 
-    private func metricText(label: String, value: String) -> Text {
-        Text(label)
-            .foregroundColor(Color("colorSecondary"))
-            + Text(value)
-            .foregroundColor(Color("colorPrimary"))
+    private func aidMetrics(iob: Double?, cob: Double?) -> some View {
+        // Keep both metrics at the same size while adapting to the limited CarPlay width.
+        ViewThatFits(in: .horizontal) {
+            aidMetricsRow(iob: iob, cob: cob, font: .footnote)
+            aidMetricsRow(iob: iob, cob: cob, font: .system(size: 12))
+            aidMetricsRow(iob: iob, cob: cob, font: .system(size: 11))
+            aidMetricsRow(iob: iob, cob: cob, font: .system(size: 10))
+            aidMetricsRow(iob: iob, cob: cob, font: .system(size: 9))
+        }
+    }
+
+    private func aidMetricsRow(iob: Double?, cob: Double?, font: Font) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            if let iob {
+                aidMetric(
+                    value: iob.formatted(.number.precision(.fractionLength(1))),
+                    unit: "U",
+                    font: font
+                )
+            }
+
+            if let cob {
+                aidMetric(
+                    value: cob.formatted(.number.precision(.fractionLength(0))),
+                    unit: "g",
+                    font: font
+                )
+            }
+        }
+        .fixedSize(horizontal: true, vertical: false)
+    }
+
+    private func aidMetric(value: String, unit: String, font: Font) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 2) {
+            Text(value)
+                .fontWeight(.bold)
+
+            Text(unit)
+        }
+        .font(font)
+        .foregroundColor(Color("colorSecondary"))
     }
 }

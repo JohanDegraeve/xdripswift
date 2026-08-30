@@ -34,7 +34,6 @@
 "name" = "Name";
 "common_value" = "Value";
 "common_enterValue" = "Enter Value";
-"WiFi" = "WiFi";
 "on" = "On";
 "off" = "Off";
 "delete" = "Delete";

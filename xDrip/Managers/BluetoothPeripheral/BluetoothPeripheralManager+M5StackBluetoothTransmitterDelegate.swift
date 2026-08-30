@@ -153,41 +153,6 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
         // send rotation
         if !m5StackBluetoothTransmitter.writeRotation(rotation: Int(m5Stack.rotation)) {success = false}
         
-        // send connectToWiFi
-        if !m5StackBluetoothTransmitter.writeConnectToWiFi(connect: m5Stack.connectToWiFi) {success = false}
-        
-        // send WiFiSSID's
-        if let wifiName = UserDefaults.standard.m5StackWiFiName1 {
-            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 1) {success = false}
-        }
-        if let wifiName = UserDefaults.standard.m5StackWiFiName2 {
-            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 2) {success = false}
-        }
-        if let wifiName = UserDefaults.standard.m5StackWiFiName3 {
-            if !m5StackBluetoothTransmitter.writeWifiName(name: wifiName, number: 3) {success = false}
-        }
-        
-        // send WiFiPasswords
-        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword1 {
-            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 1) {success = false}
-        }
-        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword2 {
-            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 2) {success = false}
-        }
-        if let wifiPassword = UserDefaults.standard.m5StackWiFiPassword3 {
-            if !m5StackBluetoothTransmitter.writeWifiPassword(password: wifiPassword, number: 3) {success = false}
-        }
-        
-        // send nightscout url
-        if let url = UserDefaults.standard.nightscoutUrl {
-            if !m5StackBluetoothTransmitter.writeNightscoutUrl(url: url) {success = false}
-        }
-        
-        // send nightscout token
-        if let token = UserDefaults.standard.nightscoutAPIKey {
-            if !m5StackBluetoothTransmitter.writeNightscoutAPIKey(apiKey: token) {success = false}
-        }
-        
         // return success
         return success
     }

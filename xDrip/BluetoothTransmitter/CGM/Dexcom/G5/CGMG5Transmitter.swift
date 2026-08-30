@@ -169,6 +169,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// to temporary store the received SensorStartDate. Will be compared to sensorStartDate only after having received a glucoseRx message with a valid algorithm status
     private var receivedSensorStartDate: Date?
 
+    /// the start date last reported after a glucose packet confirmed the matching internal session
+    private var reportedConfirmedSensorStartDate: Date?
+
     /// Core Data snapshot used for the first validated packet because app startup temporarily clears the UserDefaults mirror.
     private var activeSensorStartDateAtInitialization: Date?
 
@@ -1440,6 +1443,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         case .SensorWarmup, .SessionStopped:
             lastGlucoseInSensorDataRxReading = nil
             if algorithmStatus == .SessionStopped {
+                reportedConfirmedSensorStartDate = nil
                 DispatchQueue.main.async { [weak self] in
                     self?.cgmTransmitterDelegate?.sensorStopDetected()
                 }
@@ -1484,6 +1488,18 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 trace("in reconcileInternalSensorSession, received Dexcom sensor session is missing or different in xDrip, reporting it as detected", log: self.log, category: ConstantsLog.categoryCGMG5, type: .info)
                 self.cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: receivedSensorStartDate)
             }
+        } else if Self.shouldReportConfirmedSensorSession(
+            reportedSensorStartDate: reportedConfirmedSensorStartDate,
+            receivedSensorStartDate: receivedSensorStartDate
+        ) {
+            reportedConfirmedSensorStartDate = receivedSensorStartDate
+
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+
+                trace("in reconcileInternalSensorSession, validated Dexcom glucose data confirms the matching internal sensor session", log: self.log, category: ConstantsLog.categoryCGMG5, type: .info)
+                self.cgmTransmitterDelegate?.sensorSessionConfirmed(startDate: receivedSensorStartDate)
+            }
         }
 
         sensorStartDate = receivedSensorStartDate
@@ -1493,6 +1509,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         guard let activeSensorStartDate else { return true }
 
         return abs(activeSensorStartDate.timeIntervalSince(receivedSensorStartDate)) > sensorStartDateTolerance
+    }
+
+    static func shouldReportConfirmedSensorSession(reportedSensorStartDate: Date?, receivedSensorStartDate: Date) -> Bool {
+        guard let reportedSensorStartDate else { return true }
+
+        return abs(reportedSensorStartDate.timeIntervalSince(receivedSensorStartDate)) > sensorStartDateTolerance
     }
     
 

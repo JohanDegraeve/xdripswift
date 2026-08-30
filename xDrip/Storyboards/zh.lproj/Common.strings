@@ -62,8 +62,6 @@
 /// white
 "white" = "white";
 
-/// WiFi
-"WiFi" = "WiFi";
 
 /// whenever invalid value is given by user somewhere in a field
 "invalidValue" = "Invalid Value";

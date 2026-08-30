@@ -2394,14 +2394,6 @@ private extension BluetoothPeripheralDetailState {
                 action: { [weak self] in
                     self?.requestM5Rotation(m5Stack: m5Stack)
                 }
-            ),
-            toggleRow(
-                id: "m5-connect-to-wifi",
-                title: Texts_M5StackView.connectToWiFi,
-                isOn: m5Stack.connectToWiFi,
-                setValue: { [weak self] isOn in
-                    self?.setM5ConnectToWiFi(isOn, m5Stack: m5Stack)
-                }
             )
         ]
     }
@@ -2557,17 +2549,6 @@ private extension BluetoothPeripheralDetailState {
         }
     }
 
-    func setM5ConnectToWiFi(_ isOn: Bool, m5Stack: M5Stack) {
-        m5Stack.connectToWiFi = isOn
-
-        if let m5StackBluetoothTransmitter = bluetoothPeripheralManager?.getBluetoothTransmitter(for: m5Stack, createANewOneIfNecesssary: false) as? M5StackBluetoothTransmitter,
-           m5StackBluetoothTransmitter.writeConnectToWiFi(connect: isOn) {
-            refresh()
-        } else {
-            m5Stack.blePeripheral.parameterUpdateNeededAtNextConnect = true
-            refresh()
-        }
-    }
 }
 
 // MARK: - Delegate Wiring

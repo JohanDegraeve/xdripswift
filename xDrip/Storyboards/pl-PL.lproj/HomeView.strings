@@ -245,10 +245,3 @@
 "scannedSensorLabelCode" = "Kod zeskanowanej etykiety";
 "noCodeSensorSessionValue" = "0000 (Sesja bez kodu)";
 "sensorCodeUnknown" = "Nieznany";
-"sensorSessionOrigin" = "Pochodzenie sesji";
-"sensorSessionOriginUnknown" = "Nieznane";
-"sensorSessionOriginAwaitingTransmitter" = "Oczekiwanie na nadajnik";
-"sensorSessionOriginStartedByApp" = "Uruchomiona przez xDrip4iOS";
-"sensorSessionOriginExistingAdopted" = "Przejęto istniejącą sesję";
-"sensorSessionOriginTransmitterDetected" = "Wykryta przez nadajnik";
-"sensorSessionOriginRejected" = "Żądanie uruchomienia odrzucone";

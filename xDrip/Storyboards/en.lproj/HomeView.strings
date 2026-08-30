@@ -221,10 +221,3 @@
 "scannedSensorLabelCode" = "Scanned Label Code";
 "noCodeSensorSessionValue" = "0000 (No-code session)";
 "sensorCodeUnknown" = "Unknown";
-"sensorSessionOrigin" = "Session Origin";
-"sensorSessionOriginUnknown" = "Unknown";
-"sensorSessionOriginAwaitingTransmitter" = "Awaiting transmitter";
-"sensorSessionOriginStartedByApp" = "Started by xDrip4iOS";
-"sensorSessionOriginExistingAdopted" = "Existing session adopted";
-"sensorSessionOriginTransmitterDetected" = "Detected from transmitter";
-"sensorSessionOriginRejected" = "Start request rejected";

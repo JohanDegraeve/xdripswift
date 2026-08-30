@@ -400,19 +400,6 @@ extension UserDefaults {
         case m5StackTextColor = "m5StackTextColor"
         /// M5Stack background color
         case m5StackBackGroundColor = "m5StackBackGroundColor"
-        /// name of wifi 1 to be configured in M5Stack
-        case m5StackWiFiName1 = "m5StackWiFiName1"
-        /// name of wifi 2 to be configured in M5Stack
-        case m5StackWiFiName2 = "m5StackWiFiName2"
-        /// name of wifi 3 to be configured in M5Stack
-        case m5StackWiFiName3 = "m5StackWiFiName3"
-        /// Password of wifi 1 to be configured in M5Stack
-        case m5StackWiFiPassword1 = "m5StackWiFiPassword1"
-        /// Password of wifi 2 to be configured in M5Stack
-        case m5StackWiFiPassword2 = "m5StackWiFiPassword2"
-        /// Password of wifi 3 to be configured in M5Stack
-        case m5StackWiFiPassword3 = "m5StackWiFiPassword3"
-
         // Apple Watch
 
         /// how often to request a complication update while the Watch app is in the background
@@ -2395,66 +2382,6 @@ extension UserDefaults {
         set {
             let newValueAsInt:Int? = {if let newValue = newValue {return Int(newValue.rawValue)} else {return nil}}()
             set(newValueAsInt, forKey: Key.m5StackTextColor.rawValue)
-        }
-    }
-
-    /// name of wifi 1 to be configured in M5Stack
-    var m5StackWiFiName1: String? {
-        get {
-            return string(forKey: Key.m5StackWiFiName1.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.m5StackWiFiName1.rawValue)
-        }
-    }
-
-    /// name of wifi 2 to be configured in M5Stack
-    var m5StackWiFiName2: String? {
-        get {
-            return string(forKey: Key.m5StackWiFiName2.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.m5StackWiFiName2.rawValue)
-        }
-    }
-
-    /// name of wifi 3 to be configured in M5Stack
-    var m5StackWiFiName3: String? {
-        get {
-            return string(forKey: Key.m5StackWiFiName3.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.m5StackWiFiName3.rawValue)
-        }
-    }
-
-    /// Password of wifi 1 to be configured in M5Stack
-    var m5StackWiFiPassword1: String? {
-        get {
-            return string(forKey: Key.m5StackWiFiPassword1.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.m5StackWiFiPassword1.rawValue)
-        }
-    }
-
-    /// Password of wifi 2 to be configured in M5Stack
-    var m5StackWiFiPassword2: String? {
-        get {
-            return string(forKey: Key.m5StackWiFiPassword2.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.m5StackWiFiPassword2.rawValue)
-        }
-    }
-
-    /// Password of wifi 3 to be configured in M5Stack
-    var m5StackWiFiPassword3: String? {
-        get {
-            return string(forKey: Key.m5StackWiFiPassword3.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.m5StackWiFiPassword3.rawValue)
         }
     }
 

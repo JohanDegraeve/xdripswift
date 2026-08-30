@@ -134,7 +134,6 @@
         <attribute name="backGroundColor" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="blepassword" optional="YES" attributeType="String"/>
         <attribute name="brightness" optional="YES" attributeType="Integer 16" defaultValueString="100" usesScalarValueType="YES"/>
-        <attribute name="connectToWiFi" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="isM5StickC" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="rotation" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="textcolor" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>

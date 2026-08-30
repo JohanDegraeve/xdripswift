@@ -245,10 +245,3 @@
 "scannedSensorLabelCode" = "Koda skenirane oznake";
 "noCodeSensorSessionValue" = "0000 (Seja brez kode)";
 "sensorCodeUnknown" = "Neznano";
-"sensorSessionOrigin" = "Izvor seje";
-"sensorSessionOriginUnknown" = "Neznano";
-"sensorSessionOriginAwaitingTransmitter" = "Čakanje na oddajnik";
-"sensorSessionOriginStartedByApp" = "Zagnal xDrip4iOS";
-"sensorSessionOriginExistingAdopted" = "Obstoječa seja prevzeta";
-"sensorSessionOriginTransmitterDetected" = "Zaznano iz oddajnika";
-"sensorSessionOriginRejected" = "Zahteva za zagon zavrnjena";

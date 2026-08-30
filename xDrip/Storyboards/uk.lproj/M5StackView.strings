@@ -38,6 +38,3 @@
 
 /// in case M5Stack authentication failed
 "authenticationFailureWarning" = "Authentication to M5Stack Failed, either set the pre-configured password in the Settings, or, if the M5Stack does not have a preconfigured password then reset the M5Stack. M5Stack will disconnect now. You can make a new attempt by clicking ";
-
-/// text for cell in settings view, connect to wifi yes or no
-"connectToWiFi" = "Connect to WiFi";

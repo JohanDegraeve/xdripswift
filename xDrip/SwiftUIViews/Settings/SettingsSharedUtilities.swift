@@ -370,7 +370,6 @@ extension SettingsViewInfoViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewDevelopmentSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewHousekeeperSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewM5StackGeneralSettingsViewModel: SettingsNativeSectionProvider {}
-extension SettingsViewM5StackWiFiSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewM5StackBluetoothSettingsViewModel: SettingsNativeSectionProvider {}
 
 enum SettingsReloadScope {

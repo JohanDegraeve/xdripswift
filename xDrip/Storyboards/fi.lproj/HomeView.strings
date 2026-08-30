@@ -165,10 +165,3 @@
 "scannedSensorLabelCode" = "Skannatun etiketin koodi";
 "noCodeSensorSessionValue" = "0000 (Kooditon istunto)";
 "sensorCodeUnknown" = "Tuntematon";
-"sensorSessionOrigin" = "Istunnon alkuperä";
-"sensorSessionOriginUnknown" = "Tuntematon";
-"sensorSessionOriginAwaitingTransmitter" = "Odotetaan lähetintä";
-"sensorSessionOriginStartedByApp" = "xDrip4iOS:n käynnistämä";
-"sensorSessionOriginExistingAdopted" = "Olemassa oleva istunto otettu käyttöön";
-"sensorSessionOriginTransmitterDetected" = "Havaittu lähettimestä";
-"sensorSessionOriginRejected" = "Käynnistyspyyntö hylätty";
