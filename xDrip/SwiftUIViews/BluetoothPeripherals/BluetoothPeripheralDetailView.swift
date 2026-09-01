@@ -277,12 +277,21 @@ struct BluetoothPeripheralTextEntryView: View {
             }
 
             Section {
-                TextField(textEntry.placeholder ?? "", text: $text)
-                    .keyboardType(textEntry.keyboardType)
-                    .textInputAutocapitalization(textEntry.textInputAutocapitalization)
-                    .autocorrectionDisabled()
-                    .submitLabel(.done)
-                    .onSubmit(submit)
+                if textEntry.isSecureTextEntry {
+                    SecureField(textEntry.placeholder ?? "", text: $text)
+                        .keyboardType(textEntry.keyboardType)
+                        .textInputAutocapitalization(textEntry.textInputAutocapitalization)
+                        .autocorrectionDisabled()
+                        .submitLabel(.done)
+                        .onSubmit(submit)
+                } else {
+                    TextField(textEntry.placeholder ?? "", text: $text)
+                        .keyboardType(textEntry.keyboardType)
+                        .textInputAutocapitalization(textEntry.textInputAutocapitalization)
+                        .autocorrectionDisabled()
+                        .submitLabel(.done)
+                        .onSubmit(submit)
+                }
             }
 
             if let validationMessage {
@@ -324,8 +333,12 @@ struct BluetoothPeripheralTextEntryView: View {
             return
         }
 
-        textEntry.actionHandler(text)
+        // Close this entry BEFORE running the handler. The entry is a navigation push and
+        // close() pops the last pushed view — a handler that presents the next step (email →
+        // password, phone → SMS code) pushes it, and closing afterwards would pop that new
+        // step instead of this one, so the second field never appeared.
         close()
+        textEntry.actionHandler(text)
     }
 }
 

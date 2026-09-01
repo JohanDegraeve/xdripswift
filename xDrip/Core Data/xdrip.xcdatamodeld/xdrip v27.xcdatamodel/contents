@@ -77,6 +77,7 @@
         <relationship name="medtrumTouchCareNano" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="MedtrumTouchCareNano" inverseName="blePeripheral" inverseEntity="MedtrumTouchCareNano"/>
         <relationship name="miaoMiao" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="MiaoMiao" inverseName="blePeripheral" inverseEntity="MiaoMiao"/>
         <relationship name="omniPodHeartBeat" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="OmniPodHeartBeat" inverseName="blePeripheral" inverseEntity="OmniPodHeartBeat"/>
+        <relationship name="ottai" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Ottai" inverseName="blePeripheral" inverseEntity="Ottai"/>
     </entity>
     <entity name="Bubble" representedClassName=".Bubble" syncable="YES">
         <attribute name="firmware" optional="YES" attributeType="String"/>
@@ -147,6 +148,10 @@
     <entity name="MedtrumTouchCareNano" representedClassName=".MedtrumTouchCareNano" syncable="YES">
         <attribute name="firmware" optional="YES" attributeType="String"/>
         <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="medtrumTouchCareNano" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="Ottai" representedClassName=".Ottai" syncable="YES">
+        <attribute name="ottaiSensorId" optional="YES" attributeType="String"/>
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="ottai" inverseEntity="BLEPeripheral"/>
     </entity>
     <entity name="MiaoMiao" representedClassName=".MiaoMiao" syncable="YES">
         <attribute name="firmware" optional="YES" attributeType="String"/>

@@ -70,6 +70,11 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     private var didAddObservers = false
     private var didStart = false
 
+    /// Shown as the detail of the Ottai row that is waiting for the cloud, so the screen gives
+    /// feedback while a sign-in or a fetch is running.
+    fileprivate var ottaiBusyMessage: String?
+    fileprivate let ottaiCloudQueue = DispatchQueue(label: "OttaiCloud.work")
+
     private var webOOPSettingsSectionIsShown = false
     private var nonFixedSettingsSectionIsShown = false
     private var webOOPAndNonFixedSlopeVisibilityIsKnown = false
@@ -415,6 +420,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             return makeMiaoMiaoSections(bluetoothPeripheral: bluetoothPeripheral)
         case .BubbleType:
             return makeBubbleSections(bluetoothPeripheral: bluetoothPeripheral)
+        case .OttaiType:
+            return makeOttaiSections(bluetoothPeripheral: bluetoothPeripheral)
         case .MedtrumTouchCareNanoType:
             return makeMedtrumTouchCareNanoSections(bluetoothPeripheral: bluetoothPeripheral)
         case .M5StackType:
@@ -1696,6 +1703,8 @@ struct BluetoothPeripheralTextEntry: Identifiable {
     let actionHandler: (String) -> Void
     let actionIsEnabled: ((String) -> Bool)?
     let inputValidator: ((String) -> String?)?
+    /// Render the field as a SecureField (passwords).
+    let isSecureTextEntry: Bool
 
     init(
         title: String?,
@@ -1708,7 +1717,8 @@ struct BluetoothPeripheralTextEntry: Identifiable {
         cancelTitle: String,
         actionHandler: @escaping (String) -> Void,
         actionIsEnabled: ((String) -> Bool)?,
-        inputValidator: ((String) -> String?)?
+        inputValidator: ((String) -> String?)?,
+        isSecureTextEntry: Bool = false
     ) {
         self.title = title
         self.message = message
@@ -1721,6 +1731,7 @@ struct BluetoothPeripheralTextEntry: Identifiable {
         self.actionHandler = actionHandler
         self.actionIsEnabled = actionIsEnabled
         self.inputValidator = inputValidator
+        self.isSecureTextEntry = isSecureTextEntry
     }
 }
 
@@ -2290,6 +2301,614 @@ private extension BluetoothPeripheralDetailState {
                 }
             )
         ]
+    }
+}
+
+// MARK: - Ottai / Syai
+
+/// The cloud region for an Ottai / Syai account: which server and which sign-in flow.
+private enum OttaiRegion: String, CaseIterable {
+    case china = "China"
+    case global = "Global"
+    case syai = "Syai"
+
+    var apiBase: String {
+        switch self {
+        case .china: return OttaiConstants.apiBase
+        case .global: return OttaiConstants.apiBaseGlobal
+        case .syai: return OttaiConstants.apiBaseSyai
+        }
+    }
+
+    var webBase: String? {
+        switch self {
+        case .china: return nil
+        case .global: return OttaiConstants.webBaseOttai
+        case .syai: return OttaiConstants.webBaseSyai
+        }
+    }
+
+    var usesSms: Bool { self == .china }
+
+    static func from(apiBase: String) -> OttaiRegion {
+        OttaiRegion.allCases.first { $0.apiBase == apiBase } ?? .syai
+    }
+}
+
+private extension BluetoothPeripheralDetailState {
+    /// The settings screen for an Ottai / Syai CGM.
+    ///
+    /// Here the user picks a region, signs in (Syai / Global with email and password, China with
+    /// phone and SMS), gets the sensor keys from the cloud, and starts the sensor. The real work is done in OttaiCloudClient and
+    /// OttaiRegistry; this only builds the rows.
+    func makeOttaiSections(bluetoothPeripheral: BluetoothPeripheral) -> [BluetoothPeripheralDetailSection] {
+        guard let ottai = bluetoothPeripheral as? Ottai else { return [] }
+
+        let sensorId = ottaiCloudId(for: ottai)
+        let signedIn = ottaiIsSignedIn
+        let materials = OttaiRegistry.loadMaterials(sensorId: sensorId)
+        let hasMaterials = materials.authKeys != nil
+        let uploadEnabled = OttaiRegistry.loadCloudUploadEnabled()
+        let uploadStatus = OttaiRegistry.loadCloudUploadStatus()
+
+        let accountDetail: String
+        if let busy = ottaiBusyMessage {
+            accountDetail = busy
+        } else if signedIn {
+            let login = OttaiRegistry.loadAccountLogin()
+            accountDetail = login.isEmpty ? "Signed in — tap to sign out" : "\(login) — tap to sign out"
+        } else {
+            accountDetail = "Tap to sign in"
+        }
+
+        // After activation, show when the sensor started and until when it is valid.
+        // The start is the confirmed activation time, or the provisional one (marked ~).
+        var sensorInfoRows: [BluetoothPeripheralDetailRow] = []
+        let startMs = materials.activeTimeMs > 0 ? materials.activeTimeMs : OttaiRegistry.loadProvisionalActiveTime(sensorId)
+        if startMs > 0 {
+            let startDate = Date(timeIntervalSince1970: Double(startMs) / 1000.0)
+            let lifetimeMs = OttaiConstants.expectedLifetimeMs(
+                cloudActiveExpireMs: materials.activeExpireTimeMs,
+                acceptedMaxActiveMs: OttaiRegistry.loadAcceptedMaxActive(sensorId)
+            )
+            let endDate = startDate.addingTimeInterval(Double(lifetimeMs) / 1000.0)
+            let commandStatus = ottaiTransmitter(for: ottai)?.sensorCommandStatus ?? -1
+            let approximate = materials.activeTimeMs <= 0 ? "~ " : ""
+
+            let activatedDetail = approximate + startDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
+                + " (" + startDate.daysAndHoursAgo() + " " + Texts_HomeView.ago + ")"
+
+            let validDetail: String
+            if commandStatus >= 4 {
+                validDetail = "Sensor has ended"
+            } else if endDate <= Date() {
+                validDetail = "Expired " + endDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
+            } else {
+                let minutesLeft = endDate.timeIntervalSinceNow / 60.0
+                validDetail = endDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
+                    + " (" + minutesLeft.minutesToDaysAndHours() + " left)"
+            }
+
+            sensorInfoRows = [
+                row(
+                    id: "ottai-sensor-activated",
+                    title: "Activated",
+                    detail: activatedDetail,
+                    showsDisclosure: true,
+                    action: { [weak self] in self?.showOttaiSensorInfo(for: ottai) }
+                ),
+                row(
+                    id: "ottai-sensor-valid-until",
+                    title: "Valid until",
+                    detail: validDetail,
+                    showsDisclosure: true,
+                    action: { [weak self] in self?.showOttaiSensorInfo(for: ottai) }
+                )
+            ]
+        }
+
+        let sensorSection = BluetoothPeripheralDetailSection(
+            id: "ottai-sensor",
+            title: BluetoothPeripheralType.OttaiType.rawValue,
+            rows: sensorInfoRows + [
+                row(
+                    id: "ottai-region",
+                    title: "Region",
+                    detail: OttaiRegion.from(apiBase: OttaiRegistry.loadApiBase()).rawValue,
+                    showsDisclosure: true,
+                    action: { [weak self] in self?.requestOttaiRegion() }
+                ),
+                row(
+                    id: "ottai-account",
+                    title: "Account",
+                    detail: accountDetail,
+                    showsDisclosure: true,
+                    action: { [weak self] in self?.requestOttaiAccount() }
+                ),
+                row(
+                    id: "ottai-cloud-id",
+                    title: "Cloud ID (MAC)",
+                    detail: sensorId.isEmpty ? "Tap to enter (from sensor box)" : sensorId,
+                    showsDisclosure: true,
+                    action: { [weak self] in self?.requestOttaiCloudId(for: ottai) }
+                ),
+                row(
+                    id: "ottai-fetch-materials",
+                    title: "Fetch sensor from cloud",
+                    detail: hasMaterials ? "Materials present ✓" : (signedIn ? "Tap to fetch" : "Sign in first"),
+                    showsDisclosure: true,
+                    action: { [weak self] in self?.requestOttaiFetchMaterials(for: ottai) }
+                ),
+                row(
+                    id: "ottai-activate",
+                    title: "Start / activate sensor",
+                    detail: OttaiRegistry.loadActivationAttempted(sensorId) ? "Activation requested" : nil,
+                    showsDisclosure: true,
+                    action: { [weak self] in self?.requestOttaiActivation(for: ottai) }
+                )
+            ]
+        )
+
+        var uploadRows: [BluetoothPeripheralDetailRow] = [
+            toggleRow(
+                id: "ottai-cloud-upload",
+                title: "Upload readings to Syai cloud",
+                isOn: uploadEnabled,
+                setValue: { [weak self] isOn in
+                    OttaiRegistry.saveCloudUploadEnabled(isOn)
+                    OttaiRegistry.saveCloudUploadStatus(nil)
+                    self?.refresh()
+                }
+            ),
+            row(
+                id: "ottai-cloud-upload-status",
+                title: "Last upload",
+                detail: OttaiCloudUploader.unavailableReason()
+                    ?? (uploadStatus.isEmpty ? "Waiting for the next reading" : uploadStatus),
+                showsDisclosure: true,
+                action: { [weak self] in self?.showOttaiUploadStatus() }
+            )
+        ]
+
+        // Keep the section shape identical whether or not the upload is switched on; the rows below
+        // the switch stay readable as the explanation of what the switch does.
+        if !uploadEnabled {
+            uploadRows = [uploadRows[0]]
+        }
+
+        return [
+            sensorSection,
+            BluetoothPeripheralDetailSection(
+                id: "ottai-cloud-upload-section",
+                title: "Syai cloud",
+                rows: uploadRows
+            )
+        ]
+    }
+
+    // MARK: Ottai helpers
+
+    var ottaiIsSignedIn: Bool {
+        !OttaiRegistry.loadAccessToken().isEmpty && !OttaiRegistry.loadGlucoseSecretKey().isEmpty
+    }
+
+    /// The cloud id of the sensor (12 hex characters). On iOS the Bluetooth address is not the MAC,
+    /// so the user must type the id from the sensor box or QR code.
+    func ottaiCloudId(for ottai: Ottai) -> String {
+        ottai.ottaiSensorId ?? ""
+    }
+
+    func ottaiTransmitter(for ottai: Ottai) -> CGMOttaiTransmitter? {
+        bluetoothPeripheralManager?.getBluetoothTransmitter(for: ottai, createANewOneIfNecesssary: false) as? CGMOttaiTransmitter
+    }
+
+    /// Full sensor detail — start, expiry, lifetime, firmware and state — shown when the
+    /// user taps the Activated / Valid until rows.
+    func showOttaiSensorInfo(for ottai: Ottai) {
+        let sensorId = ottaiCloudId(for: ottai)
+        let materials = OttaiRegistry.loadMaterials(sensorId: sensorId)
+        let startMs = materials.activeTimeMs > 0 ? materials.activeTimeMs : OttaiRegistry.loadProvisionalActiveTime(sensorId)
+        guard startMs > 0 else { return }
+
+        let startDate = Date(timeIntervalSince1970: Double(startMs) / 1000.0)
+        let acceptedMs = OttaiRegistry.loadAcceptedMaxActive(sensorId)
+        let lifetimeMs = OttaiConstants.expectedLifetimeMs(cloudActiveExpireMs: materials.activeExpireTimeMs, acceptedMaxActiveMs: acceptedMs)
+        let endDate = startDate.addingTimeInterval(Double(lifetimeMs) / 1000.0)
+
+        var lines: [String] = []
+        lines.append("Activated: " + startDate.toStringInUserLocale(timeStyle: .short, dateStyle: .medium))
+        if materials.activeTimeMs <= 0 { lines.append("(start time not confirmed yet — taken from the activation moment)") }
+        lines.append("Valid until: " + endDate.toStringInUserLocale(timeStyle: .short, dateStyle: .medium))
+        lines.append("Lifetime: \(Int(lifetimeMs / 86_400_000)) days" + (OttaiConstants.sanitizeActiveExpireMs(acceptedMs) > 0 ? " (accepted by the sensor)" : " (from the cloud)"))
+        if !materials.deviceVersion.isEmpty { lines.append("Firmware: " + materials.deviceVersion) }
+        if let status = ottaiTransmitter(for: ottai)?.sensorCommandStatus, status >= 0 {
+            let text = status == 3 ? "active" : (status >= 4 ? "ended" : "not activated yet")
+            lines.append("Sensor state: \(text) (command \(status))")
+        }
+        showInfo(title: "Sensor", message: lines.joined(separator: "\n"))
+    }
+
+    // MARK: Ottai row actions
+
+    func requestOttaiRegion() {
+        let regions = OttaiRegion.allCases
+        let current = OttaiRegion.from(apiBase: OttaiRegistry.loadApiBase())
+
+        presentSelectionListView(BluetoothPeripheralSelectionList(
+            title: "Region",
+            data: regions.map(\.rawValue),
+            selectedRow: regions.firstIndex(of: current),
+            actionHandler: { [weak self] index in
+                OttaiRegistry.saveApiBase(regions[index].apiBase)
+                self?.refresh()
+            }
+        ))
+    }
+
+    func requestOttaiAccount() {
+        guard !ottaiIsSignedIn else {
+            pendingAlert = BluetoothPeripheralDetailAlert(
+                title: "Sign out",
+                message: "Sign out of the Ottai/Syai cloud?",
+                primaryButtonTitle: "Sign out",
+                primaryAction: { [weak self] in
+                    guard let self = self else { return }
+                    self.ottaiCloudQueue.async {
+                        OttaiCloudClient.logout()
+                        DispatchQueue.main.async { self.refresh() }
+                    }
+                },
+                secondaryButtonTitle: Texts_Common.Cancel
+            )
+            return
+        }
+
+        let region = OttaiRegion.from(apiBase: OttaiRegistry.loadApiBase())
+        if region.usesSms {
+            requestOttaiPhoneNumber()
+        } else {
+            requestOttaiEmail(region: region)
+        }
+    }
+
+    /// Email sign-in, asked in two steps because the shared text-entry route holds one field.
+    func requestOttaiEmail(region: OttaiRegion) {
+        guard let webBase = region.webBase else { return }
+
+        presentTextEntryView(BluetoothPeripheralTextEntry(
+            title: "Sign in to \(region.rawValue)",
+            message: "Enter your account email.",
+            keyboardType: .emailAddress,
+            textInputAutocapitalization: .never,
+            text: OttaiRegistry.loadAccountLogin().isEmpty ? nil : OttaiRegistry.loadAccountLogin(),
+            placeholder: "Email",
+            actionTitle: Texts_Common.Ok,
+            cancelTitle: Texts_Common.Cancel,
+            actionHandler: { [weak self] email in
+                self?.requestOttaiPassword(email: email, webBase: webBase)
+            },
+            actionIsEnabled: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty },
+            inputValidator: nil
+        ))
+    }
+
+    func requestOttaiPassword(email: String, webBase: String) {
+        presentTextEntryView(BluetoothPeripheralTextEntry(
+            title: "Sign in",
+            message: "Enter the password for \(email).",
+            keyboardType: .default,
+            textInputAutocapitalization: .never,
+            text: nil,
+            placeholder: "Password",
+            actionTitle: Texts_Common.Ok,
+            cancelTitle: Texts_Common.Cancel,
+            actionHandler: { [weak self] password in
+                OttaiRegistry.saveAccountLogin(email)
+                self?.runOttaiSignIn { OttaiCloudClient.mailLogin(email: email, password: password, webBase: webBase)?.ok == true }
+            },
+            actionIsEnabled: { !$0.isEmpty },
+            inputValidator: nil,
+            isSecureTextEntry: true
+        ))
+    }
+
+    func requestOttaiPhoneNumber() {
+        presentTextEntryView(BluetoothPeripheralTextEntry(
+            title: "Sign in to China",
+            message: "Enter your mobile number (China +86).",
+            keyboardType: .phonePad,
+            textInputAutocapitalization: .never,
+            text: OttaiRegistry.loadAccountLogin().isEmpty ? nil : OttaiRegistry.loadAccountLogin(),
+            placeholder: "Phone number",
+            actionTitle: "Send code",
+            cancelTitle: Texts_Common.Cancel,
+            actionHandler: { [weak self] phone in
+                self?.sendOttaiSmsCode(phone: phone)
+            },
+            actionIsEnabled: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty },
+            inputValidator: nil
+        ))
+    }
+
+    func sendOttaiSmsCode(phone: String) {
+        setOttaiBusy("Sending code…")
+
+        ottaiCloudQueue.async { [weak self] in
+            let requestId = OttaiCloudClient.requestSmsCode(phone: phone)
+
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.setOttaiBusy(nil)
+
+                guard let requestId = requestId else {
+                    self.showInfo(
+                        title: "Could not send code",
+                        message: OttaiCloudClient.lastError.isEmpty ? "The server did not accept the number." : OttaiCloudClient.lastError
+                    )
+                    return
+                }
+
+                self.requestOttaiSmsCode(phone: phone, requestId: requestId)
+            }
+        }
+    }
+
+    func requestOttaiSmsCode(phone: String, requestId: String) {
+        presentTextEntryView(BluetoothPeripheralTextEntry(
+            title: "Enter SMS code",
+            message: "Enter the verification code sent to \(phone).",
+            keyboardType: .numberPad,
+            textInputAutocapitalization: .never,
+            text: nil,
+            placeholder: "Code",
+            actionTitle: Texts_Common.Ok,
+            cancelTitle: Texts_Common.Cancel,
+            actionHandler: { [weak self] code in
+                OttaiRegistry.saveAccountLogin(phone)
+                self?.runOttaiSignIn { OttaiCloudClient.smsLogin(phone: phone, code: code, requestId: requestId)?.ok == true }
+            },
+            actionIsEnabled: { !$0.isEmpty },
+            inputValidator: nil
+        ))
+    }
+
+    /// Run the sign-in in the background, show the result, and rebuild the rows.
+    func runOttaiSignIn(_ work: @escaping () -> Bool) {
+        setOttaiBusy("Signing in…")
+
+        ottaiCloudQueue.async { [weak self] in
+            let ok = work()
+
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.setOttaiBusy(nil)
+
+                if ok {
+                    self.showInfo(title: "Signed in", message: "You can now fetch the sensor from the cloud.")
+                } else {
+                    self.showInfo(
+                        title: "Sign-in failed",
+                        message: OttaiCloudClient.lastError.isEmpty ? "Check your credentials and region." : OttaiCloudClient.lastError
+                    )
+                }
+            }
+        }
+    }
+
+    func requestOttaiCloudId(for ottai: Ottai) {
+        let sensorId = ottaiCloudId(for: ottai)
+
+        presentTextEntryView(BluetoothPeripheralTextEntry(
+            title: "Cloud ID (MAC)",
+            message: "Enter the sensor's 12-hex ID (from the box label / QR). iOS can't read it over Bluetooth.",
+            keyboardType: .asciiCapable,
+            textInputAutocapitalization: .never,
+            text: sensorId.isEmpty ? nil : sensorId,
+            placeholder: "e.g. 6CA04230E260",
+            actionTitle: Texts_Common.Ok,
+            cancelTitle: Texts_Common.Cancel,
+            actionHandler: { [weak self] entered in
+                // accept a plain MAC, a MAC with colons, or a scanned QR code text
+                let mac = OttaiConstants.extractMacFromQr(entered) ?? OttaiConstants.canonicalSensorId(entered)
+
+                guard OttaiConstants.looksLikeMac(mac) else {
+                    self?.showInfo(title: "Invalid ID", message: "Expected a 12-character hex ID like 6CA04230E260.")
+                    return
+                }
+
+                let newId = OttaiConstants.canonicalSensorId(mac)
+                let oldId = OttaiConstants.canonicalSensorId(ottai.ottaiSensorId)
+                ottai.ottaiSensorId = newId
+                if newId != oldId {
+                    self?.forgetOttaiBleAddress(for: ottai)
+                }
+                self?.refresh()
+                self?.recreateOttaiTransmitterIfMaterialsReady(for: ottai)
+            },
+            actionIsEnabled: nil,
+            inputValidator: nil
+        ))
+    }
+
+    func requestOttaiFetchMaterials(for ottai: Ottai) {
+        let sensorId = ottaiCloudId(for: ottai)
+
+        guard !sensorId.isEmpty else {
+            showInfo(title: "Cloud ID needed", message: "Enter the sensor's Cloud ID (MAC) first.")
+            return
+        }
+
+        guard ottaiIsSignedIn else {
+            showInfo(title: "Not signed in", message: "Sign in to your Ottai/Syai account first, then fetch the sensor.")
+            return
+        }
+
+        fetchOttaiMaterials(sensorId: sensorId, for: ottai)
+    }
+
+    /// Fetches and saves the sensor's cloud keys. The Syai cloud allows only one bound
+    /// sensor per account: if another one is still bound, this offers to release it and
+    /// try again, instead of just showing "Fetch failed".
+    private func fetchOttaiMaterials(sensorId: String, for ottai: Ottai, busyMessage: String = "Fetching sensor…") {
+        setOttaiBusy(busyMessage)
+
+        ottaiCloudQueue.async { [weak self] in
+            let ok = OttaiCloudClient.fetchAndSaveMaterials(cloudId: sensorId)
+            let failureCode = OttaiCloudClient.lastFailure?.code ?? ""
+            let failureText = OttaiCloudClient.lastError
+
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.setOttaiBusy(nil)
+
+                if ok {
+                    ottai.ottaiSensorId = OttaiConstants.canonicalSensorId(sensorId)
+                    self.showInfo(title: "Sensor ready", message: "Materials saved. Reconnecting to the sensor with the new credentials.")
+                    self.recreateOttaiTransmitterIfMaterialsReady(for: ottai)
+                } else if failureCode.caseInsensitiveCompare(OttaiCloudClient.bizAlreadyBinding) == .orderedSame {
+                    self.offerToUnbindPreviousSensor(newCloudId: sensorId, for: ottai)
+                } else {
+                    self.showInfo(
+                        title: "Fetch failed",
+                        message: failureText.isEmpty ? "No materials for this Cloud ID on this account." : failureText
+                    )
+                }
+
+                self.refresh()
+            }
+        }
+    }
+
+    /// The account already has a different sensor bound (server error AppUser_AlreadyBinding).
+    /// Finds which one that is and asks the user before releasing it — unbinding is not
+    /// reversible from here.
+    private func offerToUnbindPreviousSensor(newCloudId: String, for ottai: Ottai) {
+        setOttaiBusy("Checking the account…")
+        ottaiCloudQueue.async { [weak self] in
+            let bound = OttaiCloudClient.getBindDevice()
+
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.setOttaiBusy(nil)
+
+                guard let bound = bound, !bound.mac.isEmpty else {
+                    self.showInfo(
+                        title: "Sensor already bound",
+                        message: "Your Syai account has another sensor bound, but it could not be identified here. Unbind it in the Syai app, then fetch again."
+                    )
+                    return
+                }
+
+                let boundId = OttaiConstants.canonicalSensorId(bound.mac)
+                self.pendingAlert = BluetoothPeripheralDetailAlert(
+                    title: "Sensor already bound",
+                    message: "Your Syai account still has sensor \(boundId) bound. It must be released before \(newCloudId) can be fetched.\n\nUnbind \(boundId) and fetch \(newCloudId) again? This cannot be undone.",
+                    primaryButtonTitle: "Unbind and retry",
+                    primaryAction: { [weak self] in
+                        self?.unbindPreviousSensorAndRetryFetch(oldMac: boundId, newCloudId: newCloudId, for: ottai)
+                    },
+                    secondaryButtonTitle: Texts_Common.Cancel
+                )
+            }
+        }
+    }
+
+    private func unbindPreviousSensorAndRetryFetch(oldMac: String, newCloudId: String, for ottai: Ottai) {
+        setOttaiBusy("Unbinding \(oldMac)…")
+        ottaiCloudQueue.async { [weak self] in
+            let unbound = OttaiCloudClient.unbind(mac: oldMac)
+            // Give the server a moment to release the old binding before the next fetch.
+            if unbound { usleep(1_000_000) }
+
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                if unbound {
+                    self.fetchOttaiMaterials(sensorId: newCloudId, for: ottai)
+                } else {
+                    self.setOttaiBusy(nil)
+                    self.showInfo(
+                        title: "Unbind failed",
+                        message: OttaiCloudClient.lastError.isEmpty ? "Could not unbind \(oldMac). Try again, or unbind it in the Syai app." : OttaiCloudClient.lastError
+                    )
+                    self.refresh()
+                }
+            }
+        }
+    }
+
+    func requestOttaiActivation(for ottai: Ottai) {
+        // Like Android's Advanced "Activate", this always sends the activation. Warn the user when
+        // the sensor is already active or has ended.
+        let status = ottaiTransmitter(for: ottai)?.sensorCommandStatus ?? -1
+        let message: String
+
+        if status == 3 {
+            message = "The sensor is already active. This sends the activation again and may change its lifetime. This cannot be undone. Continue?"
+        } else if status >= 4 {
+            message = "The sensor reports that it has ended. This tries to start it again. This cannot be undone. Continue?"
+        } else {
+            message = "Activation is irreversible and starts the sensor's lifetime. Continue?"
+        }
+
+        pendingAlert = BluetoothPeripheralDetailAlert(
+            title: "Activate sensor",
+            message: message,
+            primaryButtonTitle: "Activate",
+            primaryAction: { [weak self] in
+                guard let self = self else { return }
+                self.ottaiTransmitter(for: ottai)?.startSensor(sensorCode: nil, startDate: Date())
+                OttaiRegistry.setActivationAttempted(self.ottaiCloudId(for: ottai), true)
+                self.refresh()
+            },
+            secondaryButtonTitle: Texts_Common.Cancel
+        )
+    }
+
+    func showOttaiUploadStatus() {
+        let status = OttaiRegistry.loadCloudUploadStatus()
+        let message = OttaiCloudUploader.unavailableReason()
+            ?? (status.isEmpty ? "Nothing uploaded yet. Readings are sent a few seconds after the sensor delivers them." : status)
+
+        showInfo(title: "Upload to Syai cloud", message: message)
+    }
+
+    /// The transmitter reads the cloud id and the keys only when it is created. A running one never
+    /// sees keys entered later; it just stays connected and does nothing. So we replace it: the
+    /// manager disconnects and drops the old one (its slot is cleared a moment later), then we
+    /// connect again and the new one logs in with the new keys.
+    func recreateOttaiTransmitterIfMaterialsReady(for ottai: Ottai) {
+        guard let manager = bluetoothPeripheralManager else { return }
+
+        let sensorId = ottaiCloudId(for: ottai)
+        guard !sensorId.isEmpty, OttaiRegistry.loadMaterials(sensorId: sensorId).authKeys != nil else { return }
+
+        manager.setBluetoothTransmitterToNil(forBluetoothPeripheral: ottai)
+
+        guard ottai.blePeripheral.shouldconnect else { return }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+            self?.bluetoothPeripheralManager?.connect(to: ottai)
+        }
+    }
+
+    /// The stored BLE address belongs to the physical sensor, not to the cloud id. After
+    /// a Cloud ID change it would still point to the old sensor, and the app would keep
+    /// connecting there with the new keys (login fails with a bad device signature). So
+    /// forget it: drop the transmitter, clear the address, and let the next connect scan
+    /// for the sensor that matches the new keys.
+    func forgetOttaiBleAddress(for ottai: Ottai) {
+        guard let manager = bluetoothPeripheralManager else { return }
+        guard !ottai.blePeripheral.address.isEmpty else { return }
+        trace("Ottai cloud id changed — forgetting stored BLE address %{public}@ so the app scans for the new sensor", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .info, ottai.blePeripheral.address)
+        manager.getBluetoothTransmitter(for: ottai, createANewOneIfNecesssary: false)?.disconnectAndForget()
+        manager.setBluetoothTransmitterToNil(forBluetoothPeripheral: ottai)
+        ottai.blePeripheral.address = ""
+        coreDataManager.saveChanges()
+    }
+
+    func setOttaiBusy(_ message: String?) {
+        ottaiBusyMessage = message
+        refresh()
     }
 }
 

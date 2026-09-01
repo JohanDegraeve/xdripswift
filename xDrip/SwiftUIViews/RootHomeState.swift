@@ -613,6 +613,10 @@ final class RootHomeStateModel: ObservableObject {
            sensorAgeInMinutes < ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre {
             warmUpMinutes = ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre
         } else if UserDefaults.standard.isMaster,
+                  cgmTransmitter?.cgmTransmitterType() == .ottai {
+            let requiredMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutesOttai
+            warmUpMinutes = sensorAgeInMinutes < requiredMinutes ? requiredMinutes : nil
+        } else if UserDefaults.standard.isMaster,
                   sensorType == .Libre,
                   sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutes {
             warmUpMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutes

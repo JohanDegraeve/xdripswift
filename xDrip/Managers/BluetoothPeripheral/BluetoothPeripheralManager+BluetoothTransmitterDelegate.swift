@@ -150,6 +150,21 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             coreDataManager.saveChanges()
         }
 
+        // On iOS the CoreBluetooth address of a sensor is not its cloud id. An Ottai/Syai
+        // peripheral can move to another physical sensor (a new sensor with the same name),
+        // and a peripheral whose address was cleared on a Cloud ID change reconnects by
+        // scanning. In both cases the stored address must follow the connected device.
+        if let connectedAddress = bluetoothTransmitter.deviceAddress,
+           let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter),
+           bluetoothPeripheral.blePeripheral.address != connectedAddress,
+           bluetoothPeripheral.blePeripheral.address.isEmpty || bluetoothTransmitter is CGMOttaiTransmitter {
+            trace("in didConnect, adopting connected address %{public}@ (stored was '%{public}@')", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info, connectedAddress, bluetoothPeripheral.blePeripheral.address)
+            bluetoothPeripheral.blePeripheral.address = connectedAddress
+            if let connectedName = bluetoothTransmitter.deviceName {
+                bluetoothPeripheral.blePeripheral.name = connectedName
+            }
+        }
+
         /// helper function : if bluetoothTransmitter is a CGMTransmitter and if it's a new one (ie address is different than currentCgmTransmitterAddress then call cgmTransmitterChanged
         let checkCurrentCGMTransmitterHelper = {
             
