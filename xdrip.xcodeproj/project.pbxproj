@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		13A4747AD828AEAD1B723DFE /* OttaiParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4C2CD24CCBDD12F4AAD88F /* OttaiParser.swift */; };
+		20F4EB764FB424E5A06F2695 /* OttaiFormula.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BDDE308B4B89A171F4D37B1 /* OttaiFormula.swift */; };
+		284B12C5555D9CA475E0D576 /* OttaiMethodDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24908660CE15BFB909B35AC2 /* OttaiMethodDefaults.swift */; };
+		4071F7FB5794CBC8DE811814 /* Ottai+BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = B35E0E6A27CECBA8ACF864CE /* Ottai+BluetoothPeripheral.swift */; };
+		4294841340A00CD35B2FE78C /* Ottai+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0D3DC0FFED93EC7192B8943 /* Ottai+CoreDataProperties.swift */; };
 		4D7B00023014000200000001 /* CGMG5SensorSessionDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */; };
 		4D7E00023017000200000001 /* DexcomG6BluetoothSlotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E00013017000200000001 /* DexcomG6BluetoothSlotTests.swift */; };
 		4D7D00023016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */; };
@@ -361,6 +366,13 @@
 		C8BA6BBA5746888144511D55 /* GlucoseChartStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685B5F8D633F5492574F0567 /* GlucoseChartStateManager.swift */; };
 		CA1E00010000000000000001 /* CareLinkTherapyImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1E00020000000000000001 /* CareLinkTherapyImporter.swift */; };
 		CA1E00030000000000000001 /* CareLinkPumpStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1E00040000000000000001 /* CareLinkPumpStatusView.swift */; };
+		4C1A430E1DFC09DF02914AE6 /* OttaiOutputFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD70B4E5132F31AFDCDE39 /* OttaiOutputFilter.swift */; };
+		4EC6804439696544CF369887 /* Ottai+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F9DC54A8DE3925EF7CD5B8C /* Ottai+CoreDataClass.swift */; };
+		58281D5256BFCC099E79E7B9 /* CGMOttaiTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865572E2A097E6DBB6175393 /* CGMOttaiTransmitter.swift */; };
+		5E654193B5CBF596D6D66001 /* OttaiCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FA1EB69C25CDA25ADA2E74D /* OttaiCrypto.swift */; };
+		6B8581D1BDABE338819A6B84 /* OttaiPhoneNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EFAF67ABC87895110E03927 /* OttaiPhoneNumber.swift */; };
+		A394DC7F0CC35A564469332E /* OttaiRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7097940AE41A4C3A698607 /* OttaiRegistry.swift */; };
+		B8EA54913CEE6B223ACC6A4B /* OttaiConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40108EB773324614E41E9731 /* OttaiConstants.swift */; };
 		D400F8032778BD8000B57648 /* TextsTreatmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */; };
 		D40C3DA4277542C400111B73 /* TreatmentEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40C3DA3277542C400111B73 /* TreatmentEntry+CoreDataClass.swift */; };
 		D40C3DA62775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40C3DA52775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift */; };
@@ -370,9 +382,13 @@
 		D4E499AB277B43E3000F8CBA /* TreatmentCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E499AA277B43E3000F8CBA /* TreatmentCollection.swift */; };
 		D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E499AC277B4CE7000F8CBA /* DateOnly.swift */; };
 		D4FD899727772F9100689788 /* TreatmentEntryAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */; };
+		DF60C8F6A6C18C5CB7F098A2 /* OttaiCloudClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09EE74853FB148C4278C1DD1 /* OttaiCloudClient.swift */; };
+		14FD801068B18CBB8EC4FCBA /* OttaiCloudUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310FB85B4345230331321EEA /* OttaiCloudUploader.swift */; };
 		DAF100012E7A000100000001 /* DataFlowPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF100022E7A000100000001 /* DataFlowPolicy.swift */; };
 		DB718DBF9805AC4B21C95739 /* TimeScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */; };
 		E4C006212B3DE8EC00D59303 /* GlucoseIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C006202B3DE8EC00D59303 /* GlucoseIntent.swift */; };
+		E8393C9948F10303A38E7BDA /* OttaiBleAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187BAE275FDE4E081346A887 /* OttaiBleAuth.swift */; };
+		F112B4E7317472D8D52D276E /* OttaiV3BootstrapPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521D08EAAAFF5A14216FA21D /* OttaiV3BootstrapPolicy.swift */; };
 		F227BF192B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF182B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift */; };
 		F227BF1C2B9E426B00CEEAAD /* ContactImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */; };
 		F51B9F7D24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */; };
@@ -880,6 +896,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		09EE74853FB148C4278C1DD1 /* OttaiCloudClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OttaiCloudClient.swift; sourceTree = "<group>"; };
+		310FB85B4345230331321EEA /* OttaiCloudUploader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OttaiCloudUploader.swift; sourceTree = "<group>"; };
+		0F9DC54A8DE3925EF7CD5B8C /* Ottai+CoreDataClass.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Ottai+CoreDataClass.swift"; sourceTree = "<group>"; };
+		187BAE275FDE4E081346A887 /* OttaiBleAuth.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OttaiBleAuth.swift; sourceTree = "<group>"; };
 		4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG5SensorSessionDetectionTests.swift; sourceTree = "<group>"; };
 		4D7E00013017000200000001 /* DexcomG6BluetoothSlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG6BluetoothSlotTests.swift; sourceTree = "<group>"; };
 		4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDisplayStatusTests.swift; sourceTree = "<group>"; };
@@ -908,6 +928,7 @@
 		198D44D8260A3A3400A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		198D44E7260A822000A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/RootTab.strings; sourceTree = "<group>"; };
 		2867F5C925BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/RootTab.strings; sourceTree = "<group>"; };
+		24908660CE15BFB909B35AC2 /* OttaiMethodDefaults.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OttaiMethodDefaults.swift; sourceTree = "<group>"; };
 		2867F5CB25BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Alerts.strings; sourceTree = "<group>"; };
 		2867F5CC25BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
 		2867F5CD25BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
@@ -928,6 +949,7 @@
 		2BBDAD3BFBEF70B1B2A1AFAD /* CareLinkTokenStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkTokenStore.swift; sourceTree = "<group>"; };
 		3DBC8BB898BFD4C30858ED5D /* CareLinkFollowerSettings.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkFollowerSettings.swift; sourceTree = "<group>"; };
 		4166BFB828C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/RootTab.strings; sourceTree = "<group>"; };
+		40108EB773324614E41E9731 /* OttaiConstants.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OttaiConstants.swift; sourceTree = "<group>"; };
 		4166BFBA28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Treatments.strings; sourceTree = "<group>"; };
 		4166BFBB28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Alerts.strings; sourceTree = "<group>"; };
 		4166BFBC28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
@@ -1242,6 +1264,14 @@
 		CA1E00020000000000000001 /* CareLinkTherapyImporter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkTherapyImporter.swift; sourceTree = "<group>"; };
 		CA1E00040000000000000001 /* CareLinkPumpStatusView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkPumpStatusView.swift; sourceTree = "<group>"; };
 		CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TimeScheduleView.swift; sourceTree = "<group>"; };
+		4EFAF67ABC87895110E03927 /* OttaiPhoneNumber.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OttaiPhoneNumber.swift; sourceTree = "<group>"; };
+		521D08EAAAFF5A14216FA21D /* OttaiV3BootstrapPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OttaiV3BootstrapPolicy.swift; sourceTree = "<group>"; };
+		5ADD70B4E5132F31AFDCDE39 /* OttaiOutputFilter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OttaiOutputFilter.swift; sourceTree = "<group>"; };
+		6BDDE308B4B89A171F4D37B1 /* OttaiFormula.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OttaiFormula.swift; sourceTree = "<group>"; };
+		7FA1EB69C25CDA25ADA2E74D /* OttaiCrypto.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OttaiCrypto.swift; sourceTree = "<group>"; };
+		865572E2A097E6DBB6175393 /* CGMOttaiTransmitter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CGMOttaiTransmitter.swift; sourceTree = "<group>"; };
+		AE7097940AE41A4C3A698607 /* OttaiRegistry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OttaiRegistry.swift; sourceTree = "<group>"; };
+		B35E0E6A27CECBA8ACF864CE /* Ottai+BluetoothPeripheral.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Ottai+BluetoothPeripheral.swift"; sourceTree = "<group>"; };
 		CE1B2FC825D0261500F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Alerts.strings; sourceTree = "<group>"; };
 		CE1B2FCD25D0264900F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
 		CE1B2FCF25D0264900F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/LibreNFC.strings; sourceTree = "<group>"; };
@@ -1285,6 +1315,7 @@
 		E4D530622B418FF80018C6A4 /* AppShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShortcuts.swift; sourceTree = "<group>"; };
 		E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsSharedUtilities.swift; sourceTree = "<group>"; };
 		F081BB1D5F106F950C4A8EA4 /* CareLinkAccountState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkAccountState.swift; sourceTree = "<group>"; };
+		F0D3DC0FFED93EC7192B8943 /* Ottai+CoreDataProperties.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Ottai+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F227BF182B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewContactImageSettingsViewModel.swift; sourceTree = "<group>"; };
 		F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactImageManager.swift; sourceTree = "<group>"; };
 		F40AD096DBCD9BD7C4BA770E /* CareLinkClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkClient.swift; sourceTree = "<group>"; };
@@ -1950,6 +1981,7 @@
 		F8FDFEA7260DE1A70047597D /* DTCustomColoredAccessory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTCustomColoredAccessory.h; sourceTree = "<group>"; };
 		F8FDFEA8260DE1A70047597D /* DTCustomColoredAccessory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTCustomColoredAccessory.m; sourceTree = "<group>"; };
 		F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsUI.swift; sourceTree = "<group>"; };
+		FC4C2CD24CCBDD12F4AAD88F /* OttaiParser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OttaiParser.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2007,6 +2039,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1BF2F101CFCCD2F3D73F2EAD /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				40108EB773324614E41E9731 /* OttaiConstants.swift */,
+				7FA1EB69C25CDA25ADA2E74D /* OttaiCrypto.swift */,
+				187BAE275FDE4E081346A887 /* OttaiBleAuth.swift */,
+				FC4C2CD24CCBDD12F4AAD88F /* OttaiParser.swift */,
+				6BDDE308B4B89A171F4D37B1 /* OttaiFormula.swift */,
+				5ADD70B4E5132F31AFDCDE39 /* OttaiOutputFilter.swift */,
+				24908660CE15BFB909B35AC2 /* OttaiMethodDefaults.swift */,
+				521D08EAAAFF5A14216FA21D /* OttaiV3BootstrapPolicy.swift */,
+				4EFAF67ABC87895110E03927 /* OttaiPhoneNumber.swift */,
+				AE7097940AE41A4C3A698607 /* OttaiRegistry.swift */,
+				09EE74853FB148C4278C1DD1 /* OttaiCloudClient.swift */,
+				310FB85B4345230331321EEA /* OttaiCloudUploader.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
 		065EEDCFBA12133E67945FEA /* CareLink */ = {
 			isa = PBXGroup;
 			children = (
@@ -2392,6 +2443,23 @@
 				4716A4EE2B406C3D00419052 /* WidgetKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6D5AA1B8EE1345A92487C156 /* Ottai */ = {
+			isa = PBXGroup;
+			children = (
+				1BF2F101CFCCD2F3D73F2EAD /* Core */,
+				865572E2A097E6DBB6175393 /* CGMOttaiTransmitter.swift */,
+			);
+			path = Ottai;
+			sourceTree = "<group>";
+		};
+		AE40321AAEBC6D228E1DAD91 /* Ottai */ = {
+			isa = PBXGroup;
+			children = (
+				B35E0E6A27CECBA8ACF864CE /* Ottai+BluetoothPeripheral.swift */,
+			);
+			path = Ottai;
 			sourceTree = "<group>";
 		};
 		4A9B10212F0A000100000001 /* PostProcessing */ = {
@@ -3404,6 +3472,8 @@
 				F85FF3CC252F9FD7004E6FF1 /* SnoozeParameters+CoreDataProperties.swift */,
 				D40C3DA3277542C400111B73 /* TreatmentEntry+CoreDataClass.swift */,
 				D40C3DA52775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift */,
+				0F9DC54A8DE3925EF7CD5B8C /* Ottai+CoreDataClass.swift */,
+				F0D3DC0FFED93EC7192B8943 /* Ottai+CoreDataProperties.swift */,
 			);
 			path = classes;
 			sourceTree = "<group>";
@@ -3522,6 +3592,7 @@
 			children = (
 				F8DF765923E350B100063910 /* Dexcom */,
 				F808D2CF240329D40084B5DB /* Libre */,
+				AE40321AAEBC6D228E1DAD91 /* Ottai */,
 				4D7180102FE8000100000001 /* Medtrum */,
 			);
 			path = CGM;
@@ -3579,6 +3650,7 @@
 				F8F971BB23A5915900C3F17D /* Dexcom */,
 				F8F971F023A5915900C3F17D /* Generic */,
 				F8F971D623A5915900C3F17D /* Libre */,
+				6D5AA1B8EE1345A92487C156 /* Ottai */,
 				4D7180122FE8000100000001 /* Medtrum */,
 			);
 			path = CGM;
@@ -4761,6 +4833,22 @@
 				F8A1586522EDB89D007F5B5D /* ConstantsDefaultAlertTypeSettings.swift in Sources */,
 				D41F32922827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift in Sources */,
 				F8FDFEAD260DE1B90047597D /* ConstantsUI.swift in Sources */,
+				B8EA54913CEE6B223ACC6A4B /* OttaiConstants.swift in Sources */,
+				5E654193B5CBF596D6D66001 /* OttaiCrypto.swift in Sources */,
+				E8393C9948F10303A38E7BDA /* OttaiBleAuth.swift in Sources */,
+				13A4747AD828AEAD1B723DFE /* OttaiParser.swift in Sources */,
+				20F4EB764FB424E5A06F2695 /* OttaiFormula.swift in Sources */,
+				4C1A430E1DFC09DF02914AE6 /* OttaiOutputFilter.swift in Sources */,
+				284B12C5555D9CA475E0D576 /* OttaiMethodDefaults.swift in Sources */,
+				F112B4E7317472D8D52D276E /* OttaiV3BootstrapPolicy.swift in Sources */,
+				6B8581D1BDABE338819A6B84 /* OttaiPhoneNumber.swift in Sources */,
+				A394DC7F0CC35A564469332E /* OttaiRegistry.swift in Sources */,
+				DF60C8F6A6C18C5CB7F098A2 /* OttaiCloudClient.swift in Sources */,
+				14FD801068B18CBB8EC4FCBA /* OttaiCloudUploader.swift in Sources */,
+				58281D5256BFCC099E79E7B9 /* CGMOttaiTransmitter.swift in Sources */,
+				4EC6804439696544CF369887 /* Ottai+CoreDataClass.swift in Sources */,
+				4294841340A00CD35B2FE78C /* Ottai+CoreDataProperties.swift in Sources */,
+				4071F7FB5794CBC8DE811814 /* Ottai+BluetoothPeripheral.swift in Sources */,
 				7DDD89BD4ECFCE7BDA8D3AE2 /* SettingsSharedUtilities.swift in Sources */,
 				2BB9AEE4FF9AF41B59A1AA52 /* SettingsView.swift in Sources */,
 				DB718DBF9805AC4B21C95739 /* TimeScheduleView.swift in Sources */,
