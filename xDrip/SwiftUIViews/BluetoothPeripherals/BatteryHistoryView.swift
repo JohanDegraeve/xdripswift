@@ -106,6 +106,12 @@ struct BatteryHistoryXAxis {
         return dates
     }
 
+    /// Endpoint labels use their own mark layer so dense hourly or daily checks cannot compress
+    /// either localized date into the narrow interval allocated to a neighbouring unlabeled mark.
+    var endpointDates: [Date] {
+        [domain.lowerBound, domain.upperBound]
+    }
+
     func label(for date: Date) -> String {
         usesHourlyMarks
             ? date.formatted(.dateTime.hour())
@@ -395,16 +401,22 @@ struct BatteryHistoryView: View {
         .chartXScale(domain: domain)
         .chartYScale(domain: isPercentage ? 0 ... 100 : automaticVoltageDomain)
         .chartXAxis {
-            AxisMarks(values: xAxis.dates) { value in
+            // Draw compact checks for every requested hour or day without asking this dense layer
+            // to lay out endpoint text as well.
+            AxisMarks(values: xAxis.dates) { _ in
                 AxisGridLine()
                     .foregroundStyle(Color(.systemGray3).opacity(0.18))
-                AxisTick()
+                AxisTick(length: 4)
                     .foregroundStyle(Color(.systemGray2))
-                if let date = value.as(Date.self), xAxis.isEndpoint(date) {
-                    AxisValueLabel(anchor: xAxis.labelAnchor(for: date)) {
+            }
+
+            AxisMarks(values: xAxis.endpointDates) { value in
+                if let date = value.as(Date.self) {
+                    AxisValueLabel(anchor: xAxis.labelAnchor(for: date), collisionResolution: .disabled) {
                         Text(xAxis.label(for: date))
                             .font(.caption2.monospacedDigit())
                             .foregroundStyle(Color(.colorSecondary))
+                            .fixedSize()
                     }
                 }
             }

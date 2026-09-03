@@ -76,6 +76,7 @@ final class BatteryHistoryTests: XCTestCase {
         XCTAssertTrue(axis.isEndpoint(start))
         XCTAssertTrue(axis.isEndpoint(end))
         XCTAssertTrue(axis.dates.dropFirst().dropLast().allSatisfy { !axis.isEndpoint($0) })
+        XCTAssertEqual(axis.endpointDates, [start, end])
     }
 
     func testStandardBatteryParserAcceptsZeroAndRejectsMalformedValues() {
