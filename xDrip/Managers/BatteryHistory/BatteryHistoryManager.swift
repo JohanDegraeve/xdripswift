@@ -8,6 +8,7 @@
 
 import CoreData
 import Foundation
+import os
 
 /// Identifies the unit and chart semantics of a persisted observation.
 enum BatteryMeasurementKind: Int16, Codable {
@@ -67,6 +68,7 @@ extension Notification.Name {
 /// a genuine producer callback and the permanent object ID of the peripheral that emitted it.
 final class BatteryHistoryManager {
     static let retentionInterval = TimeInterval(days: 400)
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCoreDataManager)
     private let coreDataManager: CoreDataManager
 
     init(coreDataManager: CoreDataManager) {
@@ -75,10 +77,14 @@ final class BatteryHistoryManager {
 
     func record(peripheralObjectID: NSManagedObjectID, observedAt: Date = Date(), observation: BatteryHistoryObservation) {
         let context = coreDataManager.mainManagedObjectContext
+        var didPrepareSample = false
         context.performAndWait {
             guard !peripheralObjectID.isTemporaryID,
                   let peripheral = try? context.existingObject(with: peripheralObjectID) as? BLEPeripheral,
-                  !peripheral.isDeleted else { return }
+                  !peripheral.isDeleted else {
+                trace("Battery history write rejected: unavailable peripheral %{public}@", log: log, category: ConstantsLog.categoryCoreDataManager, type: .error, peripheralObjectID.uriRepresentation().absoluteString)
+                return
+            }
 
             if case .percentage(let value, _) = observation, !(0 ... 100).contains(value) { return }
 
@@ -117,9 +123,19 @@ final class BatteryHistoryManager {
             }
 
             prune(before: observedAt.addingTimeInterval(-Self.retentionInterval), context: context)
-            guard coreDataManager.saveChanges() else { return }
-            NotificationCenter.default.post(name: .batteryHistoryDidChange, object: peripheralObjectID)
+            didPrepareSample = true
         }
+
+        // Leave the main-context mutation block before flushing both contexts. Battery callbacks
+        // are sparse and may be followed by an immediate process replacement during development,
+        // so reporting success before SQLite has committed the sample would silently lose history.
+        guard didPrepareSample else { return }
+        guard coreDataManager.saveChangesSynchronously() else {
+            trace("Battery history write failed for %{public}@", log: log, category: ConstantsLog.categoryCoreDataManager, type: .error, peripheralObjectID.uriRepresentation().absoluteString)
+            return
+        }
+        trace("Battery history committed peripheral=%{public}@ observedAt=%{public}@", log: log, category: ConstantsLog.categoryCoreDataManager, type: .info, peripheralObjectID.uriRepresentation().absoluteString, observedAt.description)
+        NotificationCenter.default.post(name: .batteryHistoryDidChange, object: peripheralObjectID)
     }
 
     /// Returns whether this exact saved peripheral has at least one retained observation.
@@ -145,23 +161,37 @@ final class BatteryHistoryManager {
         context.performAndWait {
             guard !peripheralObjectID.isTemporaryID,
                   let peripheral = try? context.existingObject(with: peripheralObjectID) as? BLEPeripheral,
-                  !peripheral.isDeleted else { return }
+                  !peripheral.isDeleted else {
+                trace("Battery history fetch rejected: unavailable peripheral %{public}@", log: log, category: ConstantsLog.categoryCoreDataManager, type: .error, peripheralObjectID.uriRepresentation().absoluteString)
+                return
+            }
             let request: NSFetchRequest<BatteryHistorySample> = BatteryHistorySample.fetchRequest()
             request.predicate = NSPredicate(format: "blePeripheral == %@", peripheral)
             request.sortDescriptors = [NSSortDescriptor(key: #keyPath(BatteryHistorySample.observedAt), ascending: true)]
-            result = (try? request.execute())?.compactMap { sample in
-                guard let kind = BatteryMeasurementKind(rawValue: sample.measurementKindRaw),
-                      BatteryProducerKind(rawValue: sample.producerKindRaw) != nil else { return nil }
-                return BatteryHistoryPoint(
-                    id: sample.id,
-                    observedAt: sample.observedAt,
-                    kind: kind,
-                    family: sample.dexcomFamilyRaw.flatMap { DexcomBatteryFamily(rawValue: $0.int16Value) },
-                    percentage: sample.percentage?.intValue,
-                    voltageA: sample.voltageARaw?.intValue,
-                    voltageB: sample.voltageBRaw?.intValue
-                )
-            } ?? []
+            do {
+                let samples = try context.fetch(request)
+                result = samples.compactMap { sample in
+                    // Producer is provenance only. A newer producer must not hide a measurement
+                    // whose units this build can already display.
+                    guard let kind = BatteryMeasurementKind(rawValue: sample.measurementKindRaw) else { return nil }
+                    return BatteryHistoryPoint(
+                        id: sample.id,
+                        observedAt: sample.observedAt,
+                        kind: kind,
+                        family: sample.dexcomFamilyRaw.flatMap { DexcomBatteryFamily(rawValue: $0.int16Value) },
+                        percentage: sample.percentage?.intValue,
+                        voltageA: sample.voltageARaw?.intValue,
+                        voltageB: sample.voltageBRaw?.intValue
+                    )
+                }
+                // Compare store-wide and exact-device counts only when the chart requests history.
+                // This distinguishes absent rows from a changed peripheral relationship.
+                request.predicate = nil
+                let total = try context.count(for: request)
+                trace("Battery history fetched peripheral=%{public}@ total=%{public}d matched=%{public}d decoded=%{public}d oldest=%{public}@", log: log, category: ConstantsLog.categoryCoreDataManager, type: .info, peripheralObjectID.uriRepresentation().absoluteString, total, samples.count, result.count, result.first?.observedAt.description ?? "none")
+            } catch {
+                trace("Battery history fetch failed peripheral=%{public}@ error=%{public}@", log: log, category: ConstantsLog.categoryCoreDataManager, type: .error, peripheralObjectID.uriRepresentation().absoluteString, error.localizedDescription)
+            }
         }
         return result
     }

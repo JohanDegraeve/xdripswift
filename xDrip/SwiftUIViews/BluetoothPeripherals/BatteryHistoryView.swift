@@ -237,16 +237,15 @@ struct BatteryHistoryView: View {
 
     @ViewBuilder private func batteryValuePill(for point: BatteryHistoryPoint) -> some View {
         if let reading = batteryReading(for: point) {
-            HStack(spacing: 4) {
-                Text(Texts_BluetoothPeripheralView.battery + ":")
-                    .foregroundStyle(Color(.colorSecondary))
-                Text(currentReadingValueText(reading))
-                    .foregroundStyle(Color.cyan)
-            }
-            .padding(.horizontal, 7)
-            .padding(.vertical, 4)
-            .background(Color(.systemGray6), in: Capsule())
-            .accessibilityLabel(Texts_BluetoothPeripheralView.battery + " " + currentReadingValueText(reading))
+            // Keep the measurement name for VoiceOver without crowding the visible value.
+            let label = point.kind == .dexcomVoltage ? Texts_BluetoothPeripheralView.voltageB : Texts_BluetoothPeripheralView.battery
+
+            Text(currentReadingValueText(reading))
+                .foregroundStyle(Color.cyan)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 4)
+                .background(Color(.systemGray6), in: Capsule())
+                .accessibilityLabel(label + " " + currentReadingValueText(reading))
         }
     }
 

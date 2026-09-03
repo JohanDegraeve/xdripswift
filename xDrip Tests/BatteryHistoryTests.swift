@@ -99,6 +99,127 @@ final class BatteryHistoryTests: XCTestCase {
         XCTAssertEqual(DexcomBatteryFamily.g7.greenFrom, 250)
     }
 
+    func testRecordedSampleSurvivesCoreDataStackRecreation() throws {
+        let directoryURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("BatteryHistoryTests-\(UUID().uuidString)", isDirectory: true)
+        let storeURL = directoryURL.appendingPathComponent("xdrip.sqlite")
+        try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directoryURL) }
+
+        let address = "battery-history-test-peripheral"
+        let observedAt = utcDate(year: 2026, month: 9, day: 3, hour: 12, minute: 30)
+
+        // Create and commit the peripheral in its own stack first. Real battery callbacks refer to
+        // devices loaded from the application store and therefore always carry a permanent ID.
+        try autoreleasepool {
+            let coreDataManager = try CoreDataManager(
+                testModelName: ConstantsCoreData.modelName,
+                persistentStoreURL: storeURL
+            )
+            defer { try? coreDataManager.disconnectPersistentStoresForTesting() }
+
+            _ = Libre2HeartBeat(
+                address: address,
+                name: "Battery History Test",
+                alias: nil,
+                nsManagedObjectContext: coreDataManager.mainManagedObjectContext
+            )
+            XCTAssertTrue(coreDataManager.saveChangesSynchronously())
+        }
+
+        // A second stack records against the persisted peripheral and flushes the observation all
+        // the way through the private context before it disconnects from the SQLite store.
+        try autoreleasepool {
+            let coreDataManager = try CoreDataManager(
+                testModelName: ConstantsCoreData.modelName,
+                persistentStoreURL: storeURL
+            )
+            defer { try? coreDataManager.disconnectPersistentStoresForTesting() }
+
+            let peripheral = try XCTUnwrap(
+                BLEPeripheralAccessor(coreDataManager: coreDataManager)
+                    .getBLEPeripherals()
+                    .first { $0.address == address }
+            )
+            XCTAssertFalse(peripheral.objectID.isTemporaryID)
+
+            BatteryHistoryManager(coreDataManager: coreDataManager).record(
+                peripheralObjectID: peripheral.objectID,
+                observedAt: observedAt,
+                observation: .percentage(value: 42, producer: .genericHeartbeat)
+            )
+
+            XCTAssertEqual(
+                BatteryHistoryManager(coreDataManager: coreDataManager)
+                    .history(peripheralObjectID: peripheral.objectID)
+                    .count,
+                1
+            )
+        }
+
+        // A third stack can see only committed store data, matching an app process restarted by an
+        // over-the-top build rather than either earlier context's registered managed objects.
+        try autoreleasepool {
+            let coreDataManager = try CoreDataManager(
+                testModelName: ConstantsCoreData.modelName,
+                persistentStoreURL: storeURL
+            )
+            defer { try? coreDataManager.disconnectPersistentStoresForTesting() }
+
+            let peripheral = try XCTUnwrap(
+                BLEPeripheralAccessor(coreDataManager: coreDataManager)
+                    .getBLEPeripherals()
+                    .first { $0.address == address }
+            )
+            let point = try XCTUnwrap(
+                BatteryHistoryManager(coreDataManager: coreDataManager)
+                    .history(peripheralObjectID: peripheral.objectID)
+                    .first
+            )
+
+            XCTAssertEqual(point.observedAt, observedAt)
+            XCTAssertEqual(point.kind, .percentage)
+            XCTAssertEqual(point.percentage, 42)
+            XCTAssertNil(point.family)
+            XCTAssertNil(point.voltageA)
+            XCTAssertNil(point.voltageB)
+        }
+    }
+
+    func testDexcomHistoryBeforeFirstReadSurvivesReopening() throws {
+        let directoryURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("BatteryHistoryTests-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directoryURL) }
+        let storeURL = directoryURL.appendingPathComponent("xdrip.sqlite")
+        let dates = (0..<12).map { now.addingTimeInterval(Double($0 - 11) * 7200) }
+
+        try autoreleasepool {
+            let core = try CoreDataManager(testModelName: ConstantsCoreData.modelName, persistentStoreURL: storeURL)
+            defer { try? core.disconnectPersistentStoresForTesting() }
+            let device = DexcomG7(address: "battery-g7", name: "DX02z1", alias: nil, nsManagedObjectContext: core.mainManagedObjectContext)
+            XCTAssertTrue(core.saveChanges())
+            XCTAssertFalse(device.blePeripheral.objectID.isTemporaryID)
+            let manager = BatteryHistoryManager(coreDataManager: core)
+            // Record a full day of identical voltages without ever querying history or opening UI.
+            for date in dates {
+                manager.record(peripheralObjectID: device.blePeripheral.objectID, observedAt: date,
+                               observation: .dexcom(family: .g7, status: 0, voltageA: 289, voltageB: 273,
+                                                    resistance: 0, runtime: 0, temperature: 25, producer: .dexcomG7))
+            }
+            XCTAssertTrue(core.saveChangesSynchronously())
+        }
+
+        try autoreleasepool {
+            let core = try CoreDataManager(testModelName: ConstantsCoreData.modelName, persistentStoreURL: storeURL)
+            defer { try? core.disconnectPersistentStoresForTesting() }
+            let device = try XCTUnwrap(BLEPeripheralAccessor(coreDataManager: core).getBLEPeripherals().first)
+            let points = BatteryHistoryManager(coreDataManager: core).history(peripheralObjectID: device.objectID)
+            XCTAssertEqual(points.map(\.observedAt), dates)
+            XCTAssertEqual(points.map(\.voltageB), Array(repeating: 273, count: dates.count))
+        }
+    }
+
     private var utcCalendar: Calendar {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
