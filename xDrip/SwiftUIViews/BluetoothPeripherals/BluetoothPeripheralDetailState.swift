@@ -354,7 +354,9 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         genericHeartbeatTransmitter()?.batteryLevel
     }
 
-    private func batteryHistoryRow(requireExistingHistory: Bool) -> BluetoothPeripheralDetailRow? {
+    /// Builds the navigation action used by the existing battery-value row. Keeping history behind
+    /// the value itself avoids a second row that repeats the meaning of the battery section.
+    private func batteryHistoryAction(requireExistingHistory: Bool) -> (() -> Void)? {
         guard let peripheral = bluetoothPeripheral?.blePeripheral,
               !peripheral.objectID.isTemporaryID else { return nil }
 
@@ -364,18 +366,13 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             return nil
         }
 
-        return row(
-            id: "battery-history",
-            title: Texts_BluetoothPeripheralView.batteryHistory,
-            showsDisclosure: true,
-            action: { [weak self] in self?.presentBatteryHistoryView(peripheral.objectID) }
-        )
+        return { [weak self] in self?.presentBatteryHistoryView(peripheral.objectID) }
     }
 
     private func makeHeartbeatBatterySections() -> [BluetoothPeripheralDetailSection] {
         guard let batteryLevel = genericHeartbeatBatteryLevel(),
               let detail = BluetoothBatteryLevelPresentation.detail(for: batteryLevel),
-              let historyRow = batteryHistoryRow(requireExistingHistory: false) else { return [] }
+              let historyAction = batteryHistoryAction(requireExistingHistory: false) else { return [] }
 
         return [BluetoothPeripheralDetailSection(
             id: "heartbeat-battery",
@@ -385,9 +382,10 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
                 row(
                     id: "battery-level",
                     title: Texts_BluetoothPeripheralsView.batteryLevel,
-                    detail: detail
-                ),
-                historyRow
+                    detail: detail,
+                    showsDisclosure: true,
+                    action: historyAction
+                )
             ]
         )]
     }
@@ -2105,14 +2103,17 @@ private extension BluetoothPeripheralDetailState {
             title: Texts_BluetoothPeripheralView.battery,
             headerSymbol: batterySymbol(voltageB: voltageB, family: family),
             rows: makeDexcomBatteryRows(rowIDPrefix: rowIDPrefix, voltageA: voltageA, voltageB: voltageB)
-                + (batteryHistoryRow(requireExistingHistory: false).map { [$0] } ?? [])
         )
     }
 
     /// Shows both raw Dexcom voltage channels. A zero value means that no valid battery packet has
     /// been saved yet, which is different from a real zero-millivolt battery measurement.
     func makeDexcomBatteryRows(rowIDPrefix: String, voltageA: Int32, voltageB: Int32) -> [BluetoothPeripheralDetailRow] {
-        [
+        // Voltage B is the dominant Dexcom battery reading used by the history chart. It is
+        // therefore the single navigation row for G5/G6 and G7-family battery sections.
+        let historyAction = batteryHistoryAction(requireExistingHistory: false)
+
+        return [
             row(
                 id: "\(rowIDPrefix)-voltage-a",
                 title: Texts_BluetoothPeripheralView.voltageA,
@@ -2121,7 +2122,9 @@ private extension BluetoothPeripheralDetailState {
             row(
                 id: "\(rowIDPrefix)-voltage-b",
                 title: Texts_BluetoothPeripheralView.voltageB,
-                detail: dexcomVoltageText(voltageB)
+                detail: dexcomVoltageText(voltageB),
+                showsDisclosure: historyAction != nil,
+                action: historyAction
             )
         ]
     }
@@ -2563,6 +2566,8 @@ private extension BluetoothPeripheralDetailState {
         firmware: String?,
         hardware: String?
     ) -> [BluetoothPeripheralDetailRow] {
+        let historyAction = batteryHistoryAction(requireExistingHistory: true)
+
         var rows = [
             row(id: "\(idPrefix)-sensor-type", title: Texts_BluetoothPeripheralView.sensorType, detail: sensorType),
             row(
@@ -2580,13 +2585,11 @@ private extension BluetoothPeripheralDetailState {
                 id: "\(idPrefix)-battery-level",
                 title: Texts_BluetoothPeripheralsView.batteryLevel,
                 detail: batteryLevel > 0 ? batteryLevel.description + " %" : "",
-                detailSymbol: batterySymbol(percent: batteryLevel)
+                detailSymbol: batterySymbol(percent: batteryLevel),
+                showsDisclosure: historyAction != nil,
+                action: historyAction
             )
         ]
-
-        if let historyRow = batteryHistoryRow(requireExistingHistory: true) {
-            rows.append(historyRow)
-        }
 
         rows.append(contentsOf: [
             row(
@@ -2708,18 +2711,18 @@ private extension BluetoothPeripheralDetailState {
     }
 
     func makeM5StackSpecificRows(m5Stack: M5Stack) -> [BluetoothPeripheralDetailRow] {
+        let historyAction = batteryHistoryAction(requireExistingHistory: true)
+
         var rows = [
             row(
                 id: "m5-battery-level",
                 title: Texts_BluetoothPeripheralsView.batteryLevel,
                 detail: m5Stack.batteryLevel > 0 ? m5Stack.batteryLevel.description + " %" : "",
-                detailSymbol: batterySymbol(percent: m5Stack.batteryLevel)
+                detailSymbol: batterySymbol(percent: m5Stack.batteryLevel),
+                showsDisclosure: historyAction != nil,
+                action: historyAction
             )
         ]
-
-        if let historyRow = batteryHistoryRow(requireExistingHistory: true) {
-            rows.append(historyRow)
-        }
 
         rows.append(contentsOf: [
             row(
