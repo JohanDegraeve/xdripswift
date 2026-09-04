@@ -430,6 +430,62 @@ final class DexcomG7CalibrationTests: XCTestCase {
         XCTAssertEqual(AlertKind.dexcomG7BatteryLow.defaultAlertValue(), 215)
     }
 
+    func testDexcomBatteryAlertsRejectZeroVoltageB() {
+        let zeroG5 = TransmitterBatteryInfo.dexcom(
+            family: .g5,
+            voltageA: 290,
+            voltageB: 0,
+            resist: 0,
+            runtime: 0,
+            temperature: 0
+        )
+        let zeroG7 = TransmitterBatteryInfo.dexcom(
+            family: .g7,
+            voltageA: 282,
+            voltageB: 0,
+            resist: 0,
+            runtime: 0,
+            temperature: 0
+        )
+
+        XCTAssertNil(AlertKind.dexcomG5BatteryLow.matchingBatteryLevel(from: zeroG5))
+        XCTAssertNil(AlertKind.dexcomG7BatteryLow.matchingBatteryLevel(from: zeroG7))
+
+        // Zero is a genuine value for a percentage-based transmitter and must remain alertable.
+        XCTAssertEqual(
+            AlertKind.batterylow.matchingBatteryLevel(from: .percentage(percentage: 0)),
+            0
+        )
+    }
+
+    func testDexcomBatteryAlertSettlingPeriodUsesSixHourBoundary() {
+        let now = Date(timeIntervalSince1970: 2_000_000_000)
+        let suppressionInterval = TimeInterval(
+            ConstantsAlerts.dexcomBatteryAlertSuppressionPeriodInHours * 60 * 60
+        )
+
+        XCTAssertEqual(ConstantsAlerts.dexcomBatteryAlertSuppressionPeriodInHours, 6)
+        XCTAssertTrue(DexcomBatteryAlertPolicy.shouldSuppress(hardwareStartDate: nil, now: now))
+        XCTAssertTrue(
+            DexcomBatteryAlertPolicy.shouldSuppress(
+                hardwareStartDate: now.addingTimeInterval(-suppressionInterval + 1),
+                now: now
+            )
+        )
+        XCTAssertFalse(
+            DexcomBatteryAlertPolicy.shouldSuppress(
+                hardwareStartDate: now.addingTimeInterval(-suppressionInterval),
+                now: now
+            )
+        )
+        XCTAssertFalse(
+            DexcomBatteryAlertPolicy.shouldSuppress(
+                hardwareStartDate: now.addingTimeInterval(-suppressionInterval - 1),
+                now: now
+            )
+        )
+    }
+
     func testBatteryAlertRoutingSelectsThePayloadFamilyConfiguration() {
         let percentage = TransmitterBatteryInfo.percentage(percentage: 18)
         let g5 = TransmitterBatteryInfo.dexcom(

@@ -10,6 +10,10 @@ enum ConstantsAlerts {
     /// when the snooze all picker is brought up, this will be the default selected mute time
     /// unlike the specific alarms, we'll set this to a longer period such as 6 hours
     static let defaultSnoozeAllPeriodInMinutes = 6 * 60
+
+    /// number of hours to suppress Dexcom battery level alarms after the transmitter starts
+    /// G5/G6/ONE use transmitter age while G7/ONE+/Stelo use the disposable sensor age
+    static let dexcomBatteryAlertSuppressionPeriodInHours = 6
     
     // Snooze all
     /// the snooze all banner background color when not activated

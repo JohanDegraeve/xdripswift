@@ -100,6 +100,49 @@ final class BatteryHistoryTests: XCTestCase {
         XCTAssertEqual(DexcomBatteryFamily.g7.greenFrom, 250)
     }
 
+    func testActiveDexcomBatteryStartDateUsesTheFamilyHardwareClock() throws {
+        let directoryURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("DexcomBatteryStartDateTests-\(UUID().uuidString)", isDirectory: true)
+        let storeURL = directoryURL.appendingPathComponent("xdrip.sqlite")
+        try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directoryURL) }
+
+        let coreDataManager = try CoreDataManager(
+            testModelName: ConstantsCoreData.modelName,
+            persistentStoreURL: storeURL
+        )
+        defer { try? coreDataManager.disconnectPersistentStoresForTesting() }
+
+        let g6StartDate = now.addingTimeInterval(-2 * 60 * 60)
+        let g7StartDate = now.addingTimeInterval(-3 * 60 * 60)
+        let g6 = DexcomG5(
+            address: "dexcom-g6-battery-alert-test",
+            name: "DexcomAB",
+            alias: nil,
+            nsManagedObjectContext: coreDataManager.mainManagedObjectContext
+        )
+        let g7 = DexcomG7(
+            address: "dexcom-g7-battery-alert-test",
+            name: "DXCMAB",
+            alias: nil,
+            nsManagedObjectContext: coreDataManager.mainManagedObjectContext
+        )
+        g6.transmitterStartDate = g6StartDate
+        g7.sensorStartDate = g7StartDate
+
+        // Only the enabled CGM supplies the age used by its family-specific battery alarm.
+        g6.blePeripheral.shouldconnect = true
+        g7.blePeripheral.shouldconnect = false
+        let accessor = BLEPeripheralAccessor(coreDataManager: coreDataManager)
+        XCTAssertEqual(accessor.activeDexcomBatteryStartDate(for: .g5), g6StartDate)
+        XCTAssertNil(accessor.activeDexcomBatteryStartDate(for: .g7))
+
+        g6.blePeripheral.shouldconnect = false
+        g7.blePeripheral.shouldconnect = true
+        XCTAssertNil(accessor.activeDexcomBatteryStartDate(for: .g5))
+        XCTAssertEqual(accessor.activeDexcomBatteryStartDate(for: .g7), g7StartDate)
+    }
+
     func testRecordedSampleSurvivesCoreDataStackRecreation() throws {
         let directoryURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("BatteryHistoryTests-\(UUID().uuidString)", isDirectory: true)

@@ -32,6 +32,21 @@ struct NotLoopingDeviceStatus: Sendable {
     }
 }
 
+/// Defines the short settling period during which an initially low Dexcom battery value is not a
+/// reliable indication of the battery's usable state.
+struct DexcomBatteryAlertPolicy {
+    /// A missing start date is treated as still inside the settling period. In particular, a G6
+    /// battery response can arrive before its transmitter-time response during the first message
+    /// flow. Allowing the alarm at that point would recreate the false warning this policy prevents.
+    static func shouldSuppress(hardwareStartDate: Date?, now: Date = Date()) -> Bool {
+        guard let hardwareStartDate else { return true }
+        let suppressionInterval = TimeInterval(
+            ConstantsAlerts.dexcomBatteryAlertSuppressionPeriodInHours * 60 * 60
+        )
+        return now < hardwareStartDate.addingTimeInterval(suppressionInterval)
+    }
+}
+
 /// low, high, very low, very high, ...
 public enum AlertKind: Int, CaseIterable {
     // when adding alertkinds, add new cases at the end (ie 9, ...)
@@ -534,7 +549,10 @@ public enum AlertKind: Int, CaseIterable {
         case .dexcom(let family, _, let voltageB, _, _, _):
             switch (self, family) {
             case (.dexcomG5BatteryLow, .g5), (.dexcomG7BatteryLow, .g7):
-                return voltageB
+                // Dexcom uses zero while a real Voltage B value is unavailable. The battery UI
+                // already presents this as unknown, so the alert must not interpret it as an
+                // exceptionally low battery. Negative protocol values are likewise invalid.
+                return voltageB > 0 ? voltageB : nil
             default:
                 return nil
             }
