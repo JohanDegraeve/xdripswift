@@ -27,9 +27,10 @@ class BgPostProcessingManager {
     private struct BgReadingDownstreamChange {
         let finalValueChanged: Bool
         let suppressionChanged: Bool
+        let trendChanged: Bool
 
         var affectsOlderDownstreamHistory: Bool {
-            return finalValueChanged || suppressionChanged
+            return finalValueChanged || suppressionChanged || trendChanged
         }
     }
 
@@ -116,19 +117,17 @@ class BgPostProcessingManager {
     func processBgReadings(processingStartDateOverride: Date?, fiveMinuteReadingsStartTimeStampOverride: Date? = nil, forceFullDownstreamRewrite: Bool = false, allowHistoricalDownstreamRewrite: Bool = false) -> Bool {
         refreshSourceContext()
 
-        guard let sourceContextIdentifier = currentSourceContextIdentifier() else {
-            trace("in processLatestReadings, sourceContextIdentifier is nil", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info)
-            return false
-        }
-
         let hasActivePostProcessing = hasActiveDownstreamPostProcessing()
         let isExplicitHistoricalPass = allowHistoricalDownstreamRewrite
             && (processingStartDateOverride != nil || forceFullDownstreamRewrite)
+        let shouldRecomputePostProcessing = hasActivePostProcessing || isExplicitHistoricalPass
 
-        // Automatic reading updates have nothing to recalculate when adjustment, smoothing and
-        // cadence reduction are all disabled. Explicit settings changes still process their
-        // requested history so disabling an existing configuration clears its stored values.
-        guard hasActivePostProcessing || isExplicitHistoricalPass else { return false }
+        // every display surface uses the stored slope, so it must also be recalculated when post processing is disabled
+        let sourceContextIdentifier = currentSourceContextIdentifier()
+        if shouldRecomputePostProcessing && sourceContextIdentifier == nil {
+            trace("in processLatestReadings, sourceContextIdentifier is nil", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info)
+            return false
+        }
 
         let currentSensor = UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
         let fromDate = processingStartDate(for: processingStartDateOverride, currentSensor: currentSensor)
@@ -162,13 +161,16 @@ class BgPostProcessingManager {
             )
         }
 
-        recomputeAdjustedValues(bgReadings: bgReadings, sourceContextIdentifier: sourceContextIdentifier)
-        recomputeSmoothedValues(bgReadings: bgReadings)
-        recomputeFiveMinuteCadenceSuppression(
-            bgReadings: bgReadings,
-            fiveMinuteReadingsStartTimeStampOverride: fiveMinuteReadingsStartTimeStampOverride,
-            rebuildCadenceFromStart: fiveMinuteReadingsStartTimeStampOverride != nil
-        )
+        if shouldRecomputePostProcessing, let sourceContextIdentifier = sourceContextIdentifier {
+            recomputeAdjustedValues(bgReadings: bgReadings, sourceContextIdentifier: sourceContextIdentifier)
+            recomputeSmoothedValues(bgReadings: bgReadings)
+            recomputeFiveMinuteCadenceSuppression(
+                bgReadings: bgReadings,
+                fiveMinuteReadingsStartTimeStampOverride: fiveMinuteReadingsStartTimeStampOverride,
+                rebuildCadenceFromStart: fiveMinuteReadingsStartTimeStampOverride != nil
+            )
+        }
+
         recomputeSlopes(bgReadings: bgReadings)
 
         let latestVisibleBgReading = bgReadings.last(where: { !$0.isSuppressedByFiveMinuteCadence })
@@ -198,9 +200,12 @@ class BgPostProcessingManager {
 
         let downstreamChangesByObjectID = Dictionary(uniqueKeysWithValues: bgReadings.map { bgReading in
             let stateBeforeProcessing = statesBeforeProcessing[bgReading.objectID]
+
+            // include slope-only changes so older downstream entries do not keep a different trend
             let change = BgReadingDownstreamChange(
                 finalValueChanged: stateBeforeProcessing == nil ? true : abs(stateBeforeProcessing!.finalValue - bgReading.finalValue) > 0.001,
-                suppressionChanged: stateBeforeProcessing == nil ? true : stateBeforeProcessing!.isSuppressedByFiveMinuteCadence != bgReading.isSuppressedByFiveMinuteCadence
+                suppressionChanged: stateBeforeProcessing == nil ? true : stateBeforeProcessing!.isSuppressedByFiveMinuteCadence != bgReading.isSuppressedByFiveMinuteCadence,
+                trendChanged: stateBeforeProcessing == nil ? true : abs(stateBeforeProcessing!.calculatedValueSlope - bgReading.calculatedValueSlope) > 0.0000001 || stateBeforeProcessing!.hideSlope != bgReading.hideSlope
             )
             return (bgReading.objectID, change)
         })
@@ -878,7 +883,8 @@ class BgPostProcessingManager {
     }
 
     private func recomputeSlopes(bgReadings: [BgReading]) {
-        var lastVisibleBgReading: BgReading?
+        var previousVisibleBgReadings = [BgReading]()
+        let maximumTimeInterval = TimeInterval(minutes: Double(ConstantsBGGraphBuilder.maxSlopeInMinutes))
 
         for bgReading in bgReadings {
             if bgReading.isSuppressedByFiveMinuteCadence {
@@ -887,16 +893,15 @@ class BgPostProcessingManager {
                 continue
             }
 
-            if let lastVisibleBgReading = lastVisibleBgReading {
-                let (calculatedValueSlope, hideSlope) = bgReading.calculateSlope(lastBgReading: lastVisibleBgReading)
-                bgReading.calculatedValueSlope = calculatedValueSlope
-                bgReading.hideSlope = hideSlope
-            } else {
-                bgReading.calculatedValueSlope = 0.0
-                bgReading.hideSlope = true
-            }
+            // readings outside the continuity window cannot be used and should not accumulate during a historical pass
+            previousVisibleBgReadings.removeAll { bgReading.timeStamp.timeIntervalSince($0.timeStamp) > maximumTimeInterval }
 
-            lastVisibleBgReading = bgReading
+            // choose the nearest older visible reading which gives a real trend interval
+            let (calculatedValueSlope, hideSlope) = bgReading.calculateSlope(lastBgReadings: previousVisibleBgReadings)
+            bgReading.calculatedValueSlope = calculatedValueSlope
+            bgReading.hideSlope = hideSlope
+
+            previousVisibleBgReadings.append(bgReading)
         }
     }
 

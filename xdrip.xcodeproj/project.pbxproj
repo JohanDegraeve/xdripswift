@@ -327,6 +327,7 @@
 		4F3100033007000100000001 /* BatteryHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3100133007000100000001 /* BatteryHistoryManager.swift */; };
 		4F3100043007000100000001 /* BatteryHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3100143007000100000001 /* BatteryHistoryView.swift */; };
 		4F3100053007000100000001 /* BatteryHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3100153007000100000001 /* BatteryHistoryTests.swift */; };
+		4F3200013008000100000001 /* BgReadingTrendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3200023008000100000001 /* BgReadingTrendTests.swift */; };
 		4F2400013001000100000001 /* NightscoutDeviceStatusEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400113001000100000001 /* NightscoutDeviceStatusEntry+CoreDataClass.swift */; };
 		4F2400023001000100000001 /* NightscoutDeviceStatusEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400123001000100000001 /* NightscoutDeviceStatusEntry+CoreDataProperties.swift */; };
 		4F2400033001000100000001 /* NightscoutProfileEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400133001000100000001 /* NightscoutProfileEntry+CoreDataClass.swift */; };
@@ -1263,6 +1264,7 @@
 		4F3100133007000100000001 /* BatteryHistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryHistoryManager.swift; sourceTree = "<group>"; };
 		4F3100143007000100000001 /* BatteryHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryHistoryView.swift; sourceTree = "<group>"; };
 		4F3100153007000100000001 /* BatteryHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryHistoryTests.swift; sourceTree = "<group>"; };
+		4F3200023008000100000001 /* BgReadingTrendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingTrendTests.swift; sourceTree = "<group>"; };
 		4F3100313007000100000001 /* xdrip v31.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v31.xcdatamodel"; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xDrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xDrip/Version.xcconfig; sourceTree = "<group>"; };
@@ -2626,6 +2628,7 @@
 		4F2600213002000200000001 /* xDrip Tests */ = {
 			isa = PBXGroup;
 			children = (
+				4F3200023008000100000001 /* BgReadingTrendTests.swift */,
 				5A0100033015000100000001 /* GlucoseRangeDistributionTests.swift */,
 				4F3100153007000100000001 /* BatteryHistoryTests.swift */,
 				4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */,
@@ -4401,6 +4404,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4F3200013008000100000001 /* BgReadingTrendTests.swift in Sources */,
 				5A0100043015000100000001 /* GlucoseRangeDistributionTests.swift in Sources */,
 				4F3100053007000100000001 /* BatteryHistoryTests.swift in Sources */,
 				4D7D00023016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift in Sources */,
