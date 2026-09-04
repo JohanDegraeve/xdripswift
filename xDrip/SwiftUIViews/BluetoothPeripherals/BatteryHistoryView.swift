@@ -326,6 +326,7 @@ struct BatteryHistoryView: View {
         let percentagePoints = visiblePoints.filter { $0.percentage != nil }
         let voltageBPoints = visiblePoints.filter { $0.voltageB != nil }
         let activePoint = activeChartPoint
+        let voltageDomain = automaticVoltageDomain
 
         Chart {
             if isPercentage {
@@ -337,14 +338,21 @@ struct BatteryHistoryView: View {
                     yStart: .value("Urgent", 0),
                     yEnd: .value("Urgent threshold", BluetoothBatteryLevelPresentation.urgentUpperBound)
                 )
-                .foregroundStyle(Color.red.opacity(0.06))
+                .foregroundStyle(ConstantsAppColors.urgent.opacity(0.10))
                 RectangleMark(
                     xStart: .value("Start", domain.lowerBound),
                     xEnd: .value("End", domain.upperBound),
                     yStart: .value("Warning", BluetoothBatteryLevelPresentation.urgentUpperBound),
                     yEnd: .value("Healthy", BluetoothBatteryLevelPresentation.warningUpperBound)
                 )
-                .foregroundStyle(Color.yellow.opacity(0.055))
+                .foregroundStyle(ConstantsAppColors.warning.opacity(0.09))
+                RectangleMark(
+                    xStart: .value("Start", domain.lowerBound),
+                    xEnd: .value("End", domain.upperBound),
+                    yStart: .value("Healthy", BluetoothBatteryLevelPresentation.warningUpperBound),
+                    yEnd: .value("Maximum", 100)
+                )
+                .foregroundStyle(ConstantsAppColors.normal.opacity(0.08))
                 ForEach(BluetoothBatteryLevelPresentation.chartThresholds, id: \.self) { threshold in
                     RuleMark(y: .value("Threshold", threshold))
                         .foregroundStyle(Color(.systemGray2).opacity(0.5))
@@ -360,20 +368,19 @@ struct BatteryHistoryView: View {
                 }
             } else {
                 if let family {
-                    RectangleMark(xStart: .value("Start", domain.lowerBound), xEnd: .value("End", domain.upperBound), yStart: .value("Low", 0), yEnd: .value("Low threshold", family.redBelow * 10))
-                        .foregroundStyle(Color.red.opacity(0.06))
+                    // Start at the visible domain rather than zero. Swift Charts otherwise renders
+                    // the off-domain rectangle below the plot and into the X-axis controls.
+                    RectangleMark(xStart: .value("Start", domain.lowerBound), xEnd: .value("End", domain.upperBound), yStart: .value("Low", voltageDomain.lowerBound), yEnd: .value("Low threshold", family.redBelow * 10))
+                        .foregroundStyle(ConstantsAppColors.urgent.opacity(0.10))
                     RectangleMark(xStart: .value("Start", domain.lowerBound), xEnd: .value("End", domain.upperBound), yStart: .value("Caution", family.redBelow * 10), yEnd: .value("Healthy", family.greenFrom * 10))
-                        .foregroundStyle(Color.yellow.opacity(0.055))
+                        .foregroundStyle(ConstantsAppColors.warning.opacity(0.09))
+                    RectangleMark(xStart: .value("Start", domain.lowerBound), xEnd: .value("End", domain.upperBound), yStart: .value("Healthy", family.greenFrom * 10), yEnd: .value("Maximum", voltageDomain.upperBound))
+                        .foregroundStyle(ConstantsAppColors.normal.opacity(0.08))
                     ForEach([family.redBelow, family.greenFrom], id: \.self) { threshold in
                         RuleMark(y: .value("Threshold", threshold * 10))
                             .foregroundStyle(Color(.systemGray2).opacity(0.5))
                             .lineStyle(StrokeStyle(lineWidth: 0.8, dash: [4, 4]))
                     }
-                }
-                ForEach(visiblePoints.filter { $0.voltageA != nil }) { point in
-                    LineMark(x: .value("Time", point.observedAt), y: .value("Voltage A", point.voltageA! * 10), series: .value("Series", "Voltage A"))
-                        .foregroundStyle(Color(.systemGray2).opacity(0.55))
-                        .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 4]))
                 }
                 ForEach(voltageBPoints) { point in
                     LineMark(x: .value("Time", point.observedAt), y: .value("Voltage B", point.voltageB! * 10), series: .value("Series", "Voltage B"))
@@ -399,7 +406,7 @@ struct BatteryHistoryView: View {
             }
         }
         .chartXScale(domain: domain)
-        .chartYScale(domain: isPercentage ? 0 ... 100 : automaticVoltageDomain)
+        .chartYScale(domain: isPercentage ? 0 ... 100 : voltageDomain)
         .chartXAxis {
             // Draw compact checks for every requested hour or day without asking this dense layer
             // to lay out endpoint text as well.
@@ -447,7 +454,13 @@ struct BatteryHistoryView: View {
     }
 
     private var automaticVoltageDomain: ClosedRange<Int> {
-        let values = visiblePoints.flatMap { [$0.voltageA, $0.voltageB].compactMap { $0 }.map { $0 * 10 } }
+        // Voltage B is the only Dexcom battery value presented by this chart. Include both family
+        // thresholds so even an entirely low history retains visible red, yellow and green context.
+        var values = visiblePoints.compactMap(\.voltageB).map { $0 * 10 }
+        if let family = points.last?.family {
+            values.append(contentsOf: [family.redBelow * 10, family.greenFrom * 10])
+        }
+
         guard let minimum = values.min(), let maximum = values.max() else { return 0 ... 3000 }
         let padding = max(50, (maximum - minimum) / 5)
         return max(0, minimum - padding) ... (maximum + padding)
