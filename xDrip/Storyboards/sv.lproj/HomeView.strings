@@ -139,6 +139,8 @@
 
 /* Dexcom G6 sensor-label scanning */
 "scanWithCamera" = "Skanna med kamera";
+"manuallyEnterSensorCode" = "Ange koden manuellt";
+"dexcomG6ManualSensorCodeMessage" = "Ange den fyrsiffriga kalibreringskoden från sensoretiketten.";
 "chooseSensorLabelPhoto" = "Välj foto";
 "readingSensorLabel" = "Läser sensoretikett...";
 "scanSensorLabel" = "Skanna sensoretikett";

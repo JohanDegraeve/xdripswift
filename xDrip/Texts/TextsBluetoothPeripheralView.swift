@@ -327,7 +327,7 @@ class Texts_BluetoothPeripheralView {
     }()
 
     static let dexcomG7PairingCodeMessage: String = {
-        return NSLocalizedString("dexcomG7PairingCodeMessage", tableName: filename, bundle: Bundle.main, value: "Enter the four-digit code from the current sensor applicator. Primary mode cannot authenticate without this code.", comment: "Dexcom G7 bluetooth screen. Explanation for the native authentication pairing code.")
+        return NSLocalizedString("dexcomG7PairingCodeMessage", tableName: filename, bundle: Bundle.main, value: "Enter the four-digit sensor pairing code from the current applicator. Primary mode cannot authenticate without this code.", comment: "Dexcom G7 bluetooth screen. Explanation for the native authentication pairing code.")
     }()
 
     static let dexcomG7BluetoothSlot: String = {

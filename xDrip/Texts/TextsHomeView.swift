@@ -781,6 +781,8 @@ enum Texts_HomeView {
     }()
 
     static let scanWithCamera = NSLocalizedString("scanWithCamera", tableName: filename, bundle: .main, value: "Scan with Camera", comment: "button to scan a Dexcom G6 sensor label")
+    static let manuallyEnterSensorCode = NSLocalizedString("manuallyEnterSensorCode", tableName: filename, bundle: .main, value: "Manually Enter Code", comment: "label for the manual Dexcom sensor-code entry field")
+    static let dexcomG6ManualSensorCodeMessage = NSLocalizedString("dexcomG6ManualSensorCodeMessage", tableName: filename, bundle: .main, value: "Enter the four-digit calibration code from the sensor label.", comment: "instructions for manually entering a Dexcom G6 sensor calibration code")
     static let chooseSensorLabelPhoto = NSLocalizedString("chooseSensorLabelPhoto", tableName: filename, bundle: .main, value: "Choose Photo", comment: "button to decode a Dexcom G6 sensor label from a photo")
     static let readingSensorLabel = NSLocalizedString("readingSensorLabel", tableName: filename, bundle: .main, value: "Reading sensor label...", comment: "progress text while decoding a sensor label photo")
     static let scanSensorLabel = NSLocalizedString("scanSensorLabel", tableName: filename, bundle: .main, value: "Scan Sensor Label", comment: "camera scanner title")

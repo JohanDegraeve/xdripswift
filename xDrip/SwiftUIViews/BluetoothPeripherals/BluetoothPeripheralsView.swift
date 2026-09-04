@@ -82,12 +82,30 @@ struct BluetoothPeripheralsNavigationView: View {
                 initialCode: capture.initialCode,
                 initialLabel: capture.initialLabel,
                 onCancel: router.closeCurrentView,
+                onManualEntry: {
+                    router.showManualSensorCodeEntry(DexcomManualSensorCodeEntry(
+                        title: capture.configuration.title,
+                        message: capture.configuration.manualEntryMessage,
+                        placeholder: capture.configuration.placeholder,
+                        onSubmit: { code in
+                            capture.onSubmit(code, nil)
+                        }
+                    ))
+                },
                 onSubmit: { code, label in
                     capture.onSubmit(code, label)
                     if capture.dismissAfterSubmit {
                         router.closeCurrentView()
                     }
                 }
+            )
+
+        case let .manualSensorCodeEntry(entry):
+            SensorManualCodeEntryView(
+                title: entry.title,
+                message: entry.message,
+                placeholder: entry.placeholder,
+                onSubmit: entry.onSubmit
             )
 
         case let .peripheral(bluetoothPeripheral, bluetoothPeripheralType, dexcomConfiguration):
@@ -152,6 +170,8 @@ private struct BluetoothIPadPlaceholderView: View {
 /// Owns one peripheral detail state for as long as its NavigationStack destination is visible.
 private struct BluetoothPeripheralDetailContainerView: View {
     @StateObject private var state: BluetoothPeripheralDetailState
+    private let isOnboarding: Bool
+    private let closeOnboarding: () -> Void
 
     init(
         bluetoothPeripheral: BluetoothPeripheral?,
@@ -163,6 +183,11 @@ private struct BluetoothPeripheralDetailContainerView: View {
         router: BluetoothPeripheralsRouter,
         viewModel: BluetoothPeripheralsViewModel
     ) {
+        isOnboarding = dexcomConfiguration != nil
+        closeOnboarding = {
+            router.path.removeAll()
+            viewModel.reload()
+        }
         _state = StateObject(wrappedValue: BluetoothPeripheralDetailState(
             bluetoothPeripheral: bluetoothPeripheral,
             expectedBluetoothPeripheralType: bluetoothPeripheralType,
@@ -171,7 +196,11 @@ private struct BluetoothPeripheralDetailContainerView: View {
             bluetoothPeripheralManager: bluetoothPeripheralManager,
             sensorProvider: sensorProvider,
             closeDetailView: {
-                router.closeCurrentView()
+                if dexcomConfiguration != nil {
+                    router.path.removeAll()
+                } else {
+                    router.closeCurrentView()
+                }
                 viewModel.reload()
             },
             presentTextEntryView: router.showTextEntry,
@@ -183,6 +212,17 @@ private struct BluetoothPeripheralDetailContainerView: View {
 
     var body: some View {
         BluetoothPeripheralDetailView(state: state)
+            .navigationBarBackButtonHidden(isOnboarding)
+            .toolbar {
+                if isOnboarding {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: closeOnboarding) {
+                            Image(systemName: "chevron.left")
+                        }
+                        .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
+                    }
+                }
+            }
             .onDisappear(perform: state.stop)
     }
 }
@@ -490,6 +530,7 @@ extension SensorStartCodeView.Configuration {
         message: Texts_BluetoothPeripheralView.dexcomG7PairingCodeMessage,
         codeSectionTitle: Texts_BluetoothPeripheralView.sensorCode,
         placeholder: "----",
+        manualEntryMessage: Texts_BluetoothPeripheralView.dexcomG7PairingCodeMessage,
         allowsEmptyCode: false,
         scanner: .g7,
         showsCancelButton: false,

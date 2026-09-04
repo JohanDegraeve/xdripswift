@@ -128,6 +128,8 @@
 
 /* Dexcom G6 sensor-label scanning */
 "scanWithCamera" = "المسح بالكاميرا";
+"manuallyEnterSensorCode" = "إدخال الرمز يدويًا";
+"dexcomG6ManualSensorCodeMessage" = "أدخل رمز المعايرة المكوّن من أربعة أرقام من ملصق المستشعر.";
 "chooseSensorLabelPhoto" = "اختيار صورة";
 "readingSensorLabel" = "جارٍ قراءة ملصق المستشعر...";
 "scanSensorLabel" = "مسح ملصق المستشعر";

@@ -163,6 +163,8 @@
 
 /* Dexcom G6 sensor-label scanning */
 "scanWithCamera" = "Digitalizar com a câmara";
+"manuallyEnterSensorCode" = "Introduzir código manualmente";
+"dexcomG6ManualSensorCodeMessage" = "Introduza o código de calibração de quatro dígitos da etiqueta do sensor.";
 "chooseSensorLabelPhoto" = "Escolher foto";
 "readingSensorLabel" = "A ler a etiqueta do sensor...";
 "scanSensorLabel" = "Digitalizar etiqueta do sensor";

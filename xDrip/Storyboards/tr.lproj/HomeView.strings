@@ -126,6 +126,8 @@
 
 /* Dexcom G6 sensor-label scanning */
 "scanWithCamera" = "Kamerayla Tara";
+"manuallyEnterSensorCode" = "Kodu Elle Girin";
+"dexcomG6ManualSensorCodeMessage" = "Sensör etiketindeki dört haneli kalibrasyon kodunu girin.";
 "chooseSensorLabelPhoto" = "Fotoğraf Seç";
 "readingSensorLabel" = "Sensör etiketi okunuyor...";
 "scanSensorLabel" = "Sensör Etiketini Tara";

@@ -179,6 +179,8 @@
 
 /* Dexcom G6 sensor-label scanning */
 "scanWithCamera" = "使用相机扫描";
+"manuallyEnterSensorCode" = "手动输入代码";
+"dexcomG6ManualSensorCodeMessage" = "请输入传感器标签上的四位校准码。";
 "chooseSensorLabelPhoto" = "选择照片";
 "readingSensorLabel" = "正在读取传感器标签...";
 "scanSensorLabel" = "扫描传感器标签";

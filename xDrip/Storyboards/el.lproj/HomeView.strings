@@ -126,6 +126,8 @@
 
 /* Dexcom G6 sensor-label scanning */
 "scanWithCamera" = "Σάρωση με κάμερα";
+"manuallyEnterSensorCode" = "Μη αυτόματη εισαγωγή κωδικού";
+"dexcomG6ManualSensorCodeMessage" = "Εισαγάγετε τον τετραψήφιο κωδικό βαθμονόμησης από την ετικέτα του αισθητήρα.";
 "chooseSensorLabelPhoto" = "Επιλογή φωτογραφίας";
 "readingSensorLabel" = "Ανάγνωση ετικέτας αισθητήρα...";
 "scanSensorLabel" = "Σάρωση ετικέτας αισθητήρα";

@@ -38,8 +38,12 @@ final class BluetoothPeripheralsRouter: ObservableObject {
         path.append(BluetoothPeripheralsRoute(.sensorCodeCapture(capture)))
     }
 
+    func showManualSensorCodeEntry(_ entry: DexcomManualSensorCodeEntry) {
+        path.append(BluetoothPeripheralsRoute(.manualSensorCodeEntry(entry)))
+    }
+
     func finishDexcomG7Onboarding(_ configuration: DexcomAddConfiguration) {
-        openPeripheral(nil, type: .DexcomG7Type, dexcomConfiguration: configuration)
+        path.append(BluetoothPeripheralsRoute(.peripheral(nil, .DexcomG7Type, configuration)))
     }
 
     func showAddPeripheralCategories() {
@@ -83,6 +87,7 @@ struct BluetoothPeripheralsRoute: Hashable {
         case types(BluetoothPeripheralCategory)
         case dexcomConnectionMode(BluetoothPeripheralType)
         case sensorCodeCapture(DexcomSensorCodeCapture)
+        case manualSensorCodeEntry(DexcomManualSensorCodeEntry)
         case peripheral(BluetoothPeripheral?, BluetoothPeripheralType, DexcomAddConfiguration?)
         case textEntry(BluetoothPeripheralTextEntry)
         case selectionList(BluetoothPeripheralSelectionList)
@@ -119,6 +124,13 @@ struct DexcomSensorCodeCapture {
     let initialLabel: DexcomG6SensorLabel?
     let dismissAfterSubmit: Bool
     let onSubmit: (String, DexcomG6SensorLabel?) -> Void
+}
+
+struct DexcomManualSensorCodeEntry {
+    let title: String
+    let message: String
+    let placeholder: String
+    let onSubmit: (String) -> Void
 }
 
 // MARK: - List State

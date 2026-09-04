@@ -142,6 +142,8 @@
 
 /* Dexcom G6 sensor-label scanning */
 "scanWithCamera" = "Skannaa kameralla";
+"manuallyEnterSensorCode" = "Syötä koodi manuaalisesti";
+"dexcomG6ManualSensorCodeMessage" = "Syötä sensorin etiketissä oleva nelinumeroinen kalibrointikoodi.";
 "chooseSensorLabelPhoto" = "Valitse kuva";
 "readingSensorLabel" = "Luetaan anturin etikettiä...";
 "scanSensorLabel" = "Skannaa anturin etiketti";

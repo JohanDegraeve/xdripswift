@@ -8,6 +8,7 @@
 
 import SwiftUI
 import PhotosUI
+import UIKit
 
 /// Collects the start time for sensor types that do not require a sensor code.
 struct SensorStartDateView: View {
@@ -61,6 +62,7 @@ struct SensorStartCodeView: View {
         let message: String
         let codeSectionTitle: String
         let placeholder: String
+        let manualEntryMessage: String
         let allowsEmptyCode: Bool
         let scanner: DexcomSensorLabelScannerConfiguration
         let showsCancelButton: Bool
@@ -72,6 +74,7 @@ struct SensorStartCodeView: View {
             message: Texts_HomeView.enterSensorCode,
             codeSectionTitle: Texts_HomeView.startSensorActionTitle,
             placeholder: "0000",
+            manualEntryMessage: Texts_HomeView.dexcomG6ManualSensorCodeMessage,
             allowsEmptyCode: true,
             scanner: .g6,
             showsCancelButton: true,
@@ -82,24 +85,29 @@ struct SensorStartCodeView: View {
 
     let configuration: Configuration
     let onCancel: () -> Void
+    let onManualEntry: (() -> Void)?
     let onSubmit: (String, DexcomG6SensorLabel?) -> Void
 
     @State private var sensorCode: String
     @State private var sensorLabel: DexcomG6SensorLabel?
+    @State private var showingManualEntry = false
     @State private var showingCameraScanner = false
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var isDecodingPhoto = false
     @State private var scanErrorMessage: String?
+    @State private var hasSubmitted = false
 
     init(
         configuration: Configuration = .g6,
         initialCode: String = "",
         initialLabel: DexcomG6SensorLabel? = nil,
         onCancel: @escaping () -> Void,
+        onManualEntry: (() -> Void)? = nil,
         onSubmit: @escaping (String, DexcomG6SensorLabel?) -> Void
     ) {
         self.configuration = configuration
         self.onCancel = onCancel
+        self.onManualEntry = onManualEntry
         self.onSubmit = onSubmit
         _sensorCode = State(initialValue: initialCode)
         _sensorLabel = State(initialValue: initialLabel)
@@ -113,23 +121,38 @@ struct SensorStartCodeView: View {
             }
 
             Section(header: Text(configuration.codeSectionTitle)) {
-                TextField(configuration.placeholder, text: $sensorCode)
-                    .keyboardType(.numberPad)
-            }
+                Button {
+                    if let onManualEntry {
+                        onManualEntry()
+                    } else {
+                        showingManualEntry = true
+                    }
+                } label: {
+                    codeEntryActionRow(
+                        title: Texts_HomeView.manuallyEnterSensorCode,
+                        systemImage: "keyboard"
+                    )
+                }
+                .buttonStyle(.plain)
 
-            Section {
                 Button {
                     DexcomG6SensorLabelScanLogger.requested(source: .camera)
                     showingCameraScanner = true
                 } label: {
-                    Label(Texts_HomeView.scanWithCamera, systemImage: "barcode.viewfinder")
+                    codeEntryActionRow(
+                        title: Texts_HomeView.scanWithCamera,
+                        systemImage: "barcode.viewfinder"
+                    )
                 }
-                .foregroundStyle(ConstantsAppColors.toolbarAction)
+                .buttonStyle(.plain)
 
                 PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                    Label(Texts_HomeView.chooseSensorLabelPhoto, systemImage: "photo")
+                    codeEntryActionRow(
+                        title: Texts_HomeView.chooseSensorLabelPhoto,
+                        systemImage: "photo"
+                    )
                 }
-                .foregroundStyle(ConstantsAppColors.toolbarAction)
+                .buttonStyle(.plain)
 
                 if isDecodingPhoto {
                     HStack {
@@ -156,13 +179,23 @@ struct SensorStartCodeView: View {
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(Texts_Common.Ok) {
-                    onSubmit(sensorCode.trimmingCharacters(in: .whitespacesAndNewlines), sensorLabel)
+                    submit(sensorCode.trimmingCharacters(in: .whitespacesAndNewlines), label: sensorLabel)
                 }
                 .tint(ConstantsAppColors.toolbarAction)
                 .disabled(!isSensorCodeValid)
             }
         }
         .colorScheme(.dark)
+        .navigationDestination(isPresented: $showingManualEntry) {
+            SensorManualCodeEntryView(
+                title: configuration.title,
+                message: configuration.manualEntryMessage,
+                placeholder: configuration.placeholder,
+                onSubmit: { code in
+                    submit(code, label: nil)
+                }
+            )
+        }
         .onChange(of: sensorCode) { newValue in
             guard let sensorLabel,
                   newValue.trimmingCharacters(in: .whitespacesAndNewlines) != sensorLabel.sensorCode else {
@@ -194,7 +227,31 @@ struct SensorStartCodeView: View {
     private var isSensorCodeValid: Bool {
         let trimmedCode = sensorCode.trimmingCharacters(in: .whitespacesAndNewlines)
         return (configuration.allowsEmptyCode && trimmedCode.isEmpty)
-            || (trimmedCode.count == 4 && trimmedCode.utf8.allSatisfy { (48...57).contains($0) })
+            || isFourDigitSensorCode(trimmedCode)
+    }
+
+    private func isFourDigitSensorCode(_ code: String) -> Bool {
+        code.count == 4 && code.utf8.allSatisfy { (48...57).contains($0) }
+    }
+
+    private func submit(_ code: String, label: DexcomG6SensorLabel?) {
+        guard !hasSubmitted else { return }
+        hasSubmitted = true
+        onSubmit(code, label)
+    }
+
+    private func codeEntryActionRow(title: String, systemImage: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .frame(width: 24)
+            Text(title)
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ConstantsUI.disclosureIndicatorColor)
+        }
+        .foregroundStyle(ConstantsAppColors.rowTitleText)
+        .contentShape(Rectangle())
     }
 
     private func sensorLabelRow(title: String, value: String) -> some View {
@@ -210,6 +267,7 @@ struct SensorStartCodeView: View {
 
     private func sensorLabelInformationSection(_ label: DexcomG6SensorLabel) -> some View {
         Section {
+            sensorLabelRow(title: Texts_HomeView.sensorCode, value: label.sensorCode)
             if !label.lotNumber.isEmpty {
                 sensorLabelRow(title: Texts_HomeView.sensorLotNumber, value: label.lotNumber)
             }
@@ -266,6 +324,80 @@ struct SensorStartCodeView: View {
                 DexcomG6SensorLabelScanLogger.failed(source: .photo, reason: .unreadableImage)
                 scanErrorMessage = Texts_HomeView.sensorLabelPhotoUnreadable
             }
+        }
+    }
+}
+
+/// Large four-digit entry screen shared by Dexcom G6 calibration codes and G7 pairing codes.
+struct SensorManualCodeEntryView: View {
+    let title: String
+    let message: String
+    let placeholder: String
+    let onSubmit: (String) -> Void
+
+    @State private var code = ""
+    @State private var isValidated = false
+    @State private var submissionTask: Task<Void, Never>?
+    @FocusState private var codeFieldIsFocused: Bool
+
+    var body: some View {
+        Form {
+            Section {
+                Text(message)
+                    .foregroundStyle(Color(.colorSecondary))
+            }
+
+            Section {
+                HStack(spacing: 12) {
+                    TextField(
+                        title,
+                        text: $code,
+                        prompt: Text(placeholder)
+                            .foregroundColor(Color(.secondaryLabel))
+                    )
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.center)
+                    .font(.system(.title, design: .monospaced, weight: .bold))
+                    .tracking(8)
+                    .padding(.leading, 8)
+                    .padding(.vertical, 8)
+                    .focused($codeFieldIsFocused)
+                    .accessibilityLabel(Texts_HomeView.manuallyEnterSensorCode)
+                    .disabled(isValidated)
+                    .onChange(of: code, perform: codeChanged)
+
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(isValidated ? Color.green : Color(.colorTertiary))
+                        .animation(.easeInOut(duration: 0.2), value: isValidated)
+                }
+            }
+        }
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            codeFieldIsFocused = true
+        }
+        .onDisappear {
+            submissionTask?.cancel()
+        }
+    }
+
+    private func codeChanged(_ enteredCode: String) {
+        let digitsOnly = String(enteredCode.filter { ("0"..."9").contains(String($0)) }.prefix(4))
+        if code != digitsOnly {
+            code = digitsOnly
+            return
+        }
+
+        guard digitsOnly.count == 4, !isValidated else { return }
+        isValidated = true
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+
+        submissionTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            guard !Task.isCancelled else { return }
+            onSubmit(digitsOnly)
         }
     }
 }

@@ -45,7 +45,7 @@
 "sensorStartDate" = "Sensor Started";
 "useOtherDexcomAppCoexistenceFooter" = "Coexistence mode is selected. Another app such as Dexcom or CamAPS must keep running in the background.";
 "useOtherDexcomAppPrimaryFooter" = "Primary mode is selected. This app connects as the main app and controls the connection.";
-"dexcomG7PairingCodeMessage" = "Enter the four-digit code from the current sensor applicator. Primary mode cannot authenticate without this code.";
+"dexcomG7PairingCodeMessage" = "Enter the four-digit sensor pairing code from the current applicator. Primary mode cannot authenticate without this code.";
 "dexcomG7BluetoothSlot" = "Bluetooth Channel";
 "dexcomG7MobileAppSlot" = "Slot 2: Mobile App (Default)";
 "dexcomG7MobileAppSlotShort" = "Mobile App";
