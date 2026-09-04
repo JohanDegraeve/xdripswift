@@ -200,43 +200,49 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         }
     }
     
-    override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
-        super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
+    override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        super.peripheral(peripheral, didDiscoverCharacteristicsFor: service, error: error)
+
+        guard
+            error == nil,
+            service.characteristics?.contains(where: { $0.uuid == CBUUID(string: CBUUID_WriteCharacteristic_Libre2) }) == true,
+            service.characteristics?.contains(where: { $0.uuid == CBUUID(string: CBUUID_ReceiveCharacteristic_Libre2) }) == true
+        else { return }
         
         // there should be already stored a value for libreSensorUID in the userdefaults at this moment, otherwise processing is not possible
         guard let libreSensorUID = UserDefaults.standard.libreSensorUID else {
-            trace("in peripheral didUpdateNotificationStateFor but libreSensorUID is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+            trace("in peripheral didDiscoverCharacteristicsFor but libreSensorUID is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
             
             return
         }
         
         // there should be already stored a value for librePatchInfo in the userdefaults at this moment, otherwise processing is not possible
         guard let librePatchInfo = UserDefaults.standard.librePatchInfo else {
-            trace("in peripheral didUpdateNotificationStateFor but librePatchInfo is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+            trace("in peripheral didDiscoverCharacteristicsFor but librePatchInfo is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
             
             return
         }
 
         // the unlock algorithm reads 6 bytes directly, so invalid restored sensor metadata must be rejected before creating the payload
         guard libreSensorUID.count >= 6, librePatchInfo.count >= 6 else {
-            trace("in peripheral didUpdateNotificationStateFor but the stored sensor metadata is incomplete, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
+            trace("in peripheral didDiscoverCharacteristicsFor but the stored sensor metadata is incomplete, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
 
             return
         }
+
+        UserDefaults.standard.libreActiveSensorUnlockCount += 1
+
+        trace("sensorid as data =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.hexEncodedString(), librePatchInfo.hexEncodedString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
         
-        if error == nil && characteristic.isNotifying {
-            UserDefaults.standard.libreActiveSensorUnlockCount += 1
+        let unLockPayLoad = Data(Libre2BLEUtilities.streamingUnlockPayload(sensorUID: libreSensorUID, info: librePatchInfo, enableTime: UserDefaults.standard.libreActiveSensorUnlockCode, unlockCount: UserDefaults.standard.libreActiveSensorUnlockCount))
+
+        // Queue the unlock directly after the notification subscription. Waiting for CoreBluetooth's
+        // notification-state callback can delay it long enough for Libre 2 to disconnect.
+        trace("in peripheral didDiscoverCharacteristicsFor, writing streaming unlock payload: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, unLockPayLoad.hexEncodedString())
             
-            trace("sensorid as data =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.hexEncodedString(), librePatchInfo.hexEncodedString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
-            
-            let unLockPayLoad = Data(Libre2BLEUtilities.streamingUnlockPayload(sensorUID: libreSensorUID, info: librePatchInfo, enableTime: UserDefaults.standard.libreActiveSensorUnlockCode, unlockCount: UserDefaults.standard.libreActiveSensorUnlockCount))
-            
-            trace("in peripheral didUpdateNotificationStateFor, writing streaming unlock payload: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, unLockPayLoad.hexEncodedString())
-                
-            // user may have chosen to run xDrip4iOS in parallel with other apps, in this case suppress sending unlockpayload
-            if !UserDefaults.standard.suppressUnLockPayLoad {
-                _ = writeDataToPeripheral(data: unLockPayLoad, type: .withResponse)
-            }
+        // user may have chosen to run xDrip4iOS in parallel with other apps, in this case suppress sending unlockpayload
+        if !UserDefaults.standard.suppressUnLockPayLoad {
+            _ = writeDataToPeripheral(data: unLockPayLoad, type: .withResponse)
         }
     }
     
