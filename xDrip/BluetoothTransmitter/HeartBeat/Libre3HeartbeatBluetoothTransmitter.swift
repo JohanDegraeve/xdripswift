@@ -205,7 +205,9 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter, StandardBattery
     }
 
     override func prepareForRelease() {
-        runOnCentralQueueSync {
+        // Characteristic and cadence state belong to the Core Bluetooth queue. Queue cleanup
+        // without introducing a synchronous main-to-Bluetooth dependency during device removal.
+        runOnCentralQueue {
             self.timeStampOfLastHeartBeat = Date(timeIntervalSince1970: 0)
             self.batteryLevelCharacteristic = nil
         }

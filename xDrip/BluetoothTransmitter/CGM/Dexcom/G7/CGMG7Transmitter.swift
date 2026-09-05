@@ -199,6 +199,12 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
     /// is initialized from Core Data and updated immediately when the `0x52` response arrives.
     private var sensorSessionLength: TimeInterval?
 
+    /// Protects the lifetime value consumed by main-thread presentation code. The full G7 state
+    /// machine remains on `bt.central`; copying only this value avoids making UI refreshes wait
+    /// synchronously for a Bluetooth callback that may already be notifying the main thread.
+    private let maximumSensorAgeLock = NSLock()
+    private var maximumSensorAgeInDaysSnapshot: Double
+
     /// Prevents repeated extended-version writes during one short G7 connection. It resets on
     /// disconnect so a missing or malformed response can be retried on a later connection.
     private var extendedVersionRequestSent = false
@@ -276,6 +282,11 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
     /// The latest trustworthy age received during this connection. Backfill remains raw until
     /// this value is available because its packets contain relative rather than absolute time.
     private var sensorAge: TimeInterval?
+
+    /// Keeps the six-reading stalled-stream safeguard on the Bluetooth queue. UserDefaults is only
+    /// the persistence boundary between launches; writing it inside a Core Bluetooth callback can
+    /// synchronously notify a main-thread observer and must never block protocol processing.
+    private var recentRawGlucoseValues: [Int]
 
     /// Accumulates decoded historical readings until the connection finishes or the transmitter
     /// sends its explicit backfill-complete response.
@@ -357,7 +368,13 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
         self.bluetoothSlot = bluetoothSlot
         self.pairingCode = hasValidPairingCode ? pairingCode : nil
         clearPersistedAuthenticationWhenIdentityIsKnown = address == nil
-        self.sensorSessionLength = DexcomG7SensorLifetime.supportedSessionLength(sensorSessionLength)
+        let supportedSessionLength = DexcomG7SensorLifetime.supportedSessionLength(sensorSessionLength)
+        self.sensorSessionLength = supportedSessionLength
+        maximumSensorAgeInDaysSnapshot = DexcomG7SensorLifetime.maximumSensorAgeInDays(
+            reportedSessionLength: supportedSessionLength,
+            deviceName: name ?? transmitterID
+        )
+        recentRawGlucoseValues = Array((UserDefaults.standard.previousRawGlucoseValues ?? []).prefix(6))
         self.firmwareVersion = firmwareVersion
         self.firmwareBuildVersion = firmwareBuildVersion
         self.firmwareVersionCode = firmwareVersionCode
@@ -394,8 +411,9 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
 
     override func prepareForRelease() {
         // Authentication and characteristic state is owned by the Core Bluetooth queue. Incrementing
-        // the auth generation here also makes every delayed write from this connection a no-op.
-        runOnCentralQueueSync {
+        // the auth generation here also makes every delayed write from this connection a no-op. Do
+        // not wait from main: the queue may be finishing a callback that publishes back to main.
+        runOnCentralQueue {
             self.authSession.resetForConnection()
             self.writeControlCharacteristic = nil
             self.receiveAuthenticationCharacteristic = nil
@@ -827,7 +845,9 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
     func cgmTransmitterType() -> CGMTransmitterType { .dexcomG7 }
 
     func maxSensorAgeInDays() -> Double? {
-        runOnCentralQueueSync { maximumSensorAgeInDays }
+        maximumSensorAgeLock.lock()
+        defer { maximumSensorAgeLock.unlock() }
+        return maximumSensorAgeInDaysSnapshot
     }
 
     /// Keeps every lifetime consumer on the same decision. The authenticated peripheral name is
@@ -838,6 +858,16 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
             reportedSessionLength: sensorSessionLength,
             deviceName: currentlyAuthenticatedDeviceName ?? deviceName ?? transmitterId
         )
+    }
+
+    /// Refreshes the one lifetime value that may be read outside `bt.central`. The lock is held only
+    /// while copying a `Double`; no delegate, persistence or queue operation can run while held.
+    private func refreshMaximumSensorAgeSnapshot() {
+        assertOnCentral()
+        let value = maximumSensorAgeInDays
+        maximumSensorAgeLock.lock()
+        maximumSensorAgeInDaysSnapshot = value
+        maximumSensorAgeLock.unlock()
     }
 
     func getCBUUID_Service() -> String { CBUUID_Service_G7 }
@@ -924,6 +954,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
         // glucose, lifetime, calibration, and backfill sequence for this wake cycle.
         primaryAuthenticated = true
         currentlyAuthenticatedDeviceName = deviceName
+        refreshMaximumSensorAgeSnapshot()
         updateActiveTransmitterIdIfNeeded()
         trace("G7 primary authentication complete. Arming Write_Control", log: log, category: ConstantsLog.categoryCGMG7, type: .info)
 
@@ -1379,6 +1410,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
         }
 
         sensorSessionLength = supportedSessionLength
+        refreshMaximumSensorAgeSnapshot()
         trace(
             "G7 extended version RX mode=%{public}@ lifetime=%{public}@ session=%{public}@ days warmup=%{public}@ minutes algorithm=%{public}@ hardware=%{public}@ maxLifetimeDays=%{public}@ data=%{public}@",
             log: log,
@@ -1559,6 +1591,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
             // calibration while the shared connection is already authenticated.
             coexistenceAuthenticated = true
             currentlyAuthenticatedDeviceName = deviceName
+            refreshMaximumSensorAgeSnapshot()
             updateActiveTransmitterIdIfNeeded()
             trace("G7 coexistence session is paired and authenticated", log: log, category: ConstantsLog.categoryCGMG7, type: .info)
             if let writeControlCharacteristic, !writeControlCharacteristic.isNotifying {
@@ -2058,10 +2091,16 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
             ? "DX"
             : transmitterId
         guard let authenticatedDeviceName = deviceName,
-              authenticatedDeviceName.hasPrefix(expectedPrefix ?? "DX"),
-              UserDefaults.standard.activeSensorTransmitterId != authenticatedDeviceName else { return }
-        UserDefaults.standard.activeSensorTransmitterId = authenticatedDeviceName
-        trace("active G7 transmitter id set after authentication: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, authenticatedDeviceName)
+              authenticatedDeviceName.hasPrefix(expectedPrefix ?? "DX") else { return }
+
+        // UserDefaults changes notify KVO and SwiftUI observers synchronously. Publish on main so
+        // the Bluetooth queue can never wait for UI work while UI is querying transmitter state.
+        DispatchQueue.main.async { [weak self] in
+            guard let self,
+                  UserDefaults.standard.activeSensorTransmitterId != authenticatedDeviceName else { return }
+            UserDefaults.standard.activeSensorTransmitterId = authenticatedDeviceName
+            trace("active G7 transmitter id set after authentication: %{public}@", log: self.log, category: ConstantsLog.categoryCGMG7, type: .info, authenticatedDeviceName)
+        }
     }
 
     private func traceNotifyState(_ characteristic: CBCharacteristic, label: String) {
@@ -2115,18 +2154,21 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
 
     private func addGlucoseValueToUserDefaults(_ newValue: Int) {
         // Keep only the six values used by `hasSixIdenticalValues()`. This established shared store
-        // lets the stalled-stream safeguard span separate short G7 connections.
-        var values = UserDefaults.standard.previousRawGlucoseValues ?? []
-        values.insert(newValue, at: 0)
-        if values.count > 6 { values.removeLast() }
-        UserDefaults.standard.previousRawGlucoseValues = values
+        // lets the stalled-stream safeguard span app launches. Protocol decisions use the local
+        // queue-owned copy immediately; persistence is handed to main without blocking Bluetooth.
+        recentRawGlucoseValues.insert(newValue, at: 0)
+        if recentRawGlucoseValues.count > 6 { recentRawGlucoseValues.removeLast() }
+        let valuesToPersist = recentRawGlucoseValues
+        DispatchQueue.main.async {
+            UserDefaults.standard.previousRawGlucoseValues = valuesToPersist
+        }
     }
 
     func hasSixIdenticalValues() -> Bool {
         // Six entries are required before equality is meaningful. A shorter startup history must
         // never suppress legitimate repeated readings.
-        guard let values = UserDefaults.standard.previousRawGlucoseValues, values.count == 6 else { return false }
-        return values.allSatisfy { $0 == values[0] }
+        guard recentRawGlucoseValues.count == 6 else { return false }
+        return recentRawGlucoseValues.allSatisfy { $0 == recentRawGlucoseValues[0] }
     }
 }
 

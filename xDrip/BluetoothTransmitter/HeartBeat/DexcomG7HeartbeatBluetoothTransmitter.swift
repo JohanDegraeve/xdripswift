@@ -62,7 +62,9 @@ class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter, StandardBatte
     }
     
     override func prepareForRelease() {
-        runOnCentralQueueSync {
+        // Characteristic ownership follows the Core Bluetooth queue. Queue cleanup without making
+        // the main-thread device-removal path wait for a callback that may be publishing to main.
+        runOnCentralQueue {
             self.batteryLevelCharacteristic = nil
         }
         super.prepareForRelease()

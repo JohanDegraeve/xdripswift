@@ -65,8 +65,10 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
     }
 
-    /// helper to synchronously execute work on centralQueue (re-entrant safe)
-    final func runOnCentralQueueSync<T>(_ block: () -> T) -> T {
+    /// Synchronously enters the Core Bluetooth queue for the established APIs that must return an
+    /// immediate scan result. Keep this private so a subclass cannot expose Bluetooth-owned state
+    /// to the main thread and recreate a queue inversion.
+    private func runOnCentralQueueSync<T>(_ block: () -> T) -> T {
         if DispatchQueue.getSpecific(key: centralQueueSpecificKey) != nil {
             return block()
         } else {
@@ -182,31 +184,21 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: - De-initialization
     
     deinit {
-        // Clear CoreBluetooth delegates synchronously on main as last resort
-        let clear = {
-            self.centralManager?.delegate = nil
-            self.peripheral?.delegate = nil
-        }
-        if Thread.isMainThread {
-            clear()
-        } else {
-            DispatchQueue.main.sync(execute: clear)
-        }
+        // Core Bluetooth delegates are weak. Clear them directly as a final safeguard; dispatching
+        // synchronously from deinit could deadlock if main and Bluetooth are already waiting on one another.
+        centralManager?.delegate = nil
+        peripheral?.delegate = nil
     }
     
     // MARK: - public functions
     
-    /// Hook for subclasses to clear CoreBluetooth delegates/timers before ARC release.
-    /// Default clears CoreBluetooth delegates on the main thread synchronously to avoid races with CB callbacks.
+    /// Hook for subclasses to clear Core Bluetooth delegates and connection-owned state before ARC
+    /// release. Cleanup is queued with the callbacks it protects; callers must never wait for the
+    /// Bluetooth queue from main because a callback may itself be completing main-thread work.
     @objc func prepareForRelease() {
-        let clear = {
+        runOnCentralQueue {
             self.centralManager?.delegate = nil
             self.peripheral?.delegate = nil
-        }
-        if Thread.isMainThread {
-            clear()
-        } else {
-            DispatchQueue.main.sync(execute: clear)
         }
     }
     
