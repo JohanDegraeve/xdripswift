@@ -455,6 +455,67 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(reading.timeStamp.timeIntervalSince1970, now.timeIntervalSince1970, accuracy: 1)
     }
 
+    /// A payload without its device clock can reuse only a patient offset proven by an earlier response.
+    func testGlucoseParserRetainsProvenOffsetWhenDeviceClockIsMissing() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "currentServerTime": now.timeIntervalSince1970 * 1000,
+            "sgs": [["sg": 126, "timestamp": "2027-01-15T10:00:00"]]
+        ])
+
+        // Without trusted clock evidence the local timestamp remains in the future and is rejected.
+        let withoutOffset = try CareLinkGlucoseParser.readings(from: data, now: now)
+        XCTAssertTrue(withoutOffset.readings.isEmpty)
+        XCTAssertEqual(withoutOffset.diagnostics.futureTimestampCount, 1)
+        XCTAssertEqual(withoutOffset.diagnostics.clockSource, .unavailable)
+
+        // The retained two-hour offset normalizes the same timestamp without becoming fresh proof.
+        let retained = try CareLinkGlucoseParser.readings(
+            from: data,
+            now: now,
+            retainedDeviceOffset: 2 * 60 * 60
+        )
+        XCTAssertEqual(try XCTUnwrap(retained.readings.first).timeStamp, now)
+        XCTAssertEqual(retained.diagnostics.acceptedCount, 1)
+        XCTAssertEqual(retained.diagnostics.clockSource, .retained)
+        XCTAssertEqual(retained.diagnostics.offsetMinutes, 120)
+        XCTAssertNil(retained.payloadDeviceOffset)
+    }
+
+    /// Explicitly zoned timestamps remain absolute even when a retained device offset is available.
+    func testGlucoseParserNeverShiftsAbsoluteTimestampWithRetainedOffset() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "sgs": [["sg": 126, "timestamp": "2027-01-15T08:00:00Z"]]
+        ])
+        let result = try CareLinkGlucoseParser.readings(
+            from: data,
+            now: now,
+            retainedDeviceOffset: 2 * 60 * 60
+        )
+
+        XCTAssertEqual(try XCTUnwrap(result.readings.first).timeStamp, now)
+        XCTAssertEqual(result.diagnostics.clockSource, .retained)
+    }
+
+    /// Diagnostic counters identify why a payload produced no readings without logging medical data.
+    func testGlucoseParserReportsPrivacySafeRejectionCounts() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "sgs": [
+                ["sg": 0, "timestamp": now.timeIntervalSince1970 * 1000],
+                ["sg": 120],
+                ["sg": 121, "timestamp": now.addingTimeInterval(301).timeIntervalSince1970 * 1000],
+                ["sg": 122, "timestamp": now.addingTimeInterval(-49 * 60 * 60).timeIntervalSince1970 * 1000]
+            ]
+        ])
+        let diagnostics = try CareLinkGlucoseParser.readings(from: data, now: now).diagnostics
+
+        XCTAssertEqual(diagnostics.candidateCount, 4)
+        XCTAssertEqual(diagnostics.acceptedCount, 0)
+        XCTAssertEqual(diagnostics.invalidValueCount, 1)
+        XCTAssertEqual(diagnostics.missingTimestampCount, 1)
+        XCTAssertEqual(diagnostics.futureTimestampCount, 1)
+        XCTAssertEqual(diagnostics.expiredTimestampCount, 1)
+    }
+
     func testTherapyParserStoresNativeAutoBasalAmountAndNormalizesPumpRate() throws {
         let markers: [[String: Any]] = [
             marker(type: "AUTO_BASAL_DELIVERY", timestamp: "2027-01-15T08:55:00", values: ["bolusAmount": "0.125"]),
@@ -750,6 +811,34 @@ final class CareLinkTests: XCTestCase {
         )
     }
 
+    /// A fresh conduit timestamp cannot turn an empty glucose response into a completed sample cycle.
+    func testCareLinkPollingIgnoresConduitUpdateWhenGlucoseIsMissing() {
+        XCTAssertEqual(
+            CareLinkPollingPolicy.nextPollDate(
+                latestReadingAt: nil,
+                lastDataUpdateAt: now,
+                now: now
+            ),
+            now.addingTimeInterval(60)
+        )
+    }
+
+    /// Heartbeat cadence opens at 270 seconds while callbacks within the same cycle remain coalesced.
+    func testCareLinkHeartbeatPollingUsesSensorCycleWithoutUploadGrace() {
+        XCTAssertFalse(
+            CareLinkPollingPolicy.heartbeatPollIsDue(
+                lastPollStartedAt: now.addingTimeInterval(-269),
+                now: now
+            )
+        )
+        XCTAssertTrue(
+            CareLinkPollingPolicy.heartbeatPollIsDue(
+                lastPollStartedAt: now.addingTimeInterval(-270),
+                now: now
+            )
+        )
+    }
+
     func testLoginPrefillAllowsPartialStoredValues() throws {
         let suiteName = "CareLinkTests.credentials.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
@@ -980,6 +1069,59 @@ final class CareLinkTests: XCTestCase {
         manager = nil
 
         defaultsSnapshot.restore()
+    }
+
+    /// One accepted heartbeat fetch owns one finite background task and immediate repeats own none.
+    @MainActor
+    func testHeartbeatPollUsesFiniteBackgroundExecutionAndRejectsImmediateRepeat() async {
+        // Isolate every default observed by CareLink lifecycle reconciliation.
+        let defaultsSnapshot = CareLinkDefaultsSnapshot(keys: [
+            .isMaster,
+            .followerDataSourceType,
+            .followerBackgroundKeepAliveType,
+            .careLinkRegion,
+            .careLinkSelectedPatientID,
+            .careLinkVersion,
+        ])
+        let defaults = UserDefaults.standard
+        defaults.isMaster = false
+        defaults.followerDataSourceType = .careLink
+        defaults.followerBackgroundKeepAliveType = .heartbeat
+        defaults.careLinkRegion = CareLinkRegion.outsideUnitedStates.rawValue
+        defaults.careLinkSelectedPatientID = nil
+
+        let keepAlive = CareLinkNoOpKeepAliveManager()
+        let backgroundExecution = CareLinkBackgroundExecutionSpy()
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        var manager: CareLinkFollowManager? = CareLinkFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: FollowerDelegateSpy(),
+            backgroundKeepAliveManager: keepAlive,
+            client: makeClient(),
+            startsInitialDownload: false,
+            pollingSchedulerFactory: { _, _ in CareLinkNoOpTimer() },
+            backgroundExecutionManager: backgroundExecution
+        )
+        defer {
+            manager = nil
+            defaultsSnapshot.restore()
+        }
+
+        // Authentication must finish before `download()` represents a valid heartbeat request.
+        let didStartKeepAlive = await waitUntil { keepAlive.startCount == 1 }
+        XCTAssertTrue(didStartKeepAlive)
+        manager?.download()
+        // The background task must end with the network transaction rather than remaining active.
+        let didFinishBackgroundExecution = await waitUntil { backgroundExecution.endCount == 1 }
+        XCTAssertTrue(didFinishBackgroundExecution)
+        XCTAssertEqual(backgroundExecution.beginCount, 1)
+
+        // A reconnect can generate several callbacks close together. Heartbeat cadence remains
+        // independent of the ordinary deadline without permitting another immediate cloud fetch.
+        manager?.download()
+        try? await Task.sleep(nanoseconds: 50_000_000)
+        XCTAssertEqual(backgroundExecution.beginCount, 1)
+        XCTAssertEqual(backgroundExecution.endCount, 1)
     }
 
     func testPendingTherapyBatchRetainsUniqueRecordsAndUsesNewestValues() {
@@ -2036,11 +2178,42 @@ private actor BlockingCareLinkTherapyImporter: CareLinkTherapyImporting {
     }
 }
 
+/// Records lifecycle registration without creating a real Bluetooth keep-alive in manager tests.
 private final class CareLinkNoOpKeepAliveManager: FollowerBackgroundKeepAliveManaging {
-    func start(for source: FollowerBackgroundKeepAliveSource, backgroundRefresh: (() -> Void)?) {}
+    /// Confirms that the manager reached authenticated keep-alive ownership.
+    private(set) var startCount = 0
+
+    func start(for source: FollowerBackgroundKeepAliveSource, backgroundRefresh: (() -> Void)?) {
+        startCount += 1
+    }
+
+    /// Stopping the test double intentionally has no external effect.
     func stop(for source: FollowerBackgroundKeepAliveSource) {}
 }
 
+/// Supplies stable identifiers and records balanced finite background-task ownership.
+private final class CareLinkBackgroundExecutionSpy: CareLinkBackgroundExecutionManaging {
+    /// Counts accepted CareLink requests that asked iOS for completion time.
+    private(set) var beginCount = 0
+    /// Counts the matching completion or expiration cleanup calls.
+    private(set) var endCount = 0
+    /// Mimics UIKit's unique identifier without starting system background work.
+    private var nextToken = 0
+
+    /// Returns a distinct token so the manager must close the same task that it opened.
+    func begin(name: String, expirationHandler: @escaping () -> Void) -> Int? {
+        beginCount += 1
+        nextToken += 1
+        return nextToken
+    }
+
+    /// Records cleanup without interacting with UIApplication during unit tests.
+    func end(_ token: Int) {
+        endCount += 1
+    }
+}
+
+/// Prevents lifecycle tests from starting the manager's real deadline scheduler.
 private final class CareLinkNoOpTimer: FollowerBackgroundTimer {
     func resume() {}
     func suspend() {}

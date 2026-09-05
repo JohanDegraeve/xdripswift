@@ -109,12 +109,13 @@ enum CareLinkPollingPolicy {
     /// `now`, so a future nominal glucose time cannot postpone the next expected update. When the
     /// chosen timestamp does not advance, the scheduler naturally moves to one-minute retries.
     static func nextPollDate(latestReadingAt: Date?, lastDataUpdateAt: Date?, now: Date) -> Date {
-        let anchor = lastDataUpdateAt.map { min($0, now) }
-            ?? latestReadingAt.map { min($0, now) }
-
-        guard let anchor else {
+        // `lastMedicalDeviceDataUpdateServerTime` can advance for a sensor conduit even when the
+        // response contains no usable glucose. That is missed data, not a completed sample cycle.
+        guard let latestReadingAt else {
             return now.addingTimeInterval(ConstantsCareLink.missedDataPollingInterval)
         }
+        let anchor = lastDataUpdateAt.map { min($0, now) }
+            ?? min(latestReadingAt, now)
 
         let firstExpectedPoll = anchor.addingTimeInterval(
             ConstantsCareLink.samplePeriod + ConstantsCareLink.pollingGracePeriod
@@ -130,6 +131,13 @@ enum CareLinkPollingPolicy {
             )
         }
         return max(candidate, now.addingTimeInterval(ConstantsCareLink.minimumPollingInterval))
+    }
+
+    /// A Bluetooth heartbeat is already evidence of a new device cycle. Permit it slightly before
+    /// five minutes so normal sensor jitter cannot collide with the scheduler's upload grace, while
+    /// reconnect bursts remain unable to generate repeated CareLink requests.
+    static func heartbeatPollIsDue(lastPollStartedAt: Date, now: Date) -> Bool {
+        now.timeIntervalSince(lastPollStartedAt) >= ConstantsCareLink.samplePeriod - ConstantsCareLink.pollingGracePeriod
     }
 
     /// Evaluates reading age even when the most recent network request succeeded.

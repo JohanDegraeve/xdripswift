@@ -8,6 +8,25 @@
 
 import Foundation
 import os
+import UIKit
+
+/// Owns the short execution allowance used only to finish a CareLink request that a Bluetooth
+/// heartbeat has already started. It never schedules work or attempts to detect a missing wake-up.
+protocol CareLinkBackgroundExecutionManaging: AnyObject {
+    func begin(name: String, expirationHandler: @escaping () -> Void) -> Int?
+    func end(_ token: Int)
+}
+
+final class CareLinkBackgroundExecutionManager: CareLinkBackgroundExecutionManaging {
+    func begin(name: String, expirationHandler: @escaping () -> Void) -> Int? {
+        let identifier = UIApplication.shared.beginBackgroundTask(withName: name, expirationHandler: expirationHandler)
+        return identifier == .invalid ? nil : identifier.rawValue
+    }
+
+    func end(_ token: Int) {
+        UIApplication.shared.endBackgroundTask(UIBackgroundTaskIdentifier(rawValue: token))
+    }
+}
 
 /// Authentication readiness is deliberately separate from follower selection.
 enum CareLinkLifecycleState: Equatable {
@@ -102,6 +121,8 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     private let startsInitialDownload: Bool
     /// Creates CareLink's local deadline scheduler. Injection keeps lifecycle tests deterministic.
     private let pollingSchedulerFactory: PollingSchedulerFactory
+    /// Protects only a fetch already initiated during a Bluetooth background wake-up.
+    private let backgroundExecutionManager: CareLinkBackgroundExecutionManaging
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCareLinkFollowManager)
     private let keyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
     /// One persistent scheduler checks the retained deadline outside heartbeat mode.
@@ -112,6 +133,8 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     /// A single in-flight poll prevents timer, foreground and heartbeat callbacks from overlapping.
     private var pollTask: Task<Void, Never>?
     private var pollIdentifier: UUID?
+    /// Couples one finite iOS background allowance to the poll that owns it.
+    private var pollBackgroundExecution: (identifier: UUID, token: Int)?
     /// Prevents lifecycle and coordinator callbacks from starting requests too close together.
     private var lastPollStartedAt = Date.distantPast
     /// Retains one explicit Refresh request when a scheduled poll is already in progress.
@@ -129,6 +152,9 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     private var invalidationTask: Task<Void, Never>?
     private var invalidationIdentifier: UUID?
     private var failureCount = 0
+    /// A payload-proven device/server offset can safely normalize a later response that omits its
+    /// device clock. Patient identity prevents one linked account from influencing another.
+    private var retainedDeviceOffsets: [String: TimeInterval] = [:]
 
     /// Creates the long-lived manager and immediately evaluates the current follower selection.
     init(
@@ -141,7 +167,8 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         startsInitialDownload: Bool = true,
         pollingSchedulerFactory: @escaping PollingSchedulerFactory = { interval, eventHandler in
             RepeatingTimer(timeInterval: interval, eventHandler: eventHandler)
-        }
+        },
+        backgroundExecutionManager: CareLinkBackgroundExecutionManaging = CareLinkBackgroundExecutionManager()
     ) {
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
@@ -152,6 +179,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         self.backgroundKeepAliveManager = backgroundKeepAliveManager
         self.startsInitialDownload = startsInitialDownload
         self.pollingSchedulerFactory = pollingSchedulerFactory
+        self.backgroundExecutionManager = backgroundExecutionManager
         super.init()
 
         // Mirror LibreLinkUp's launch-time update catcher: when a release ships a numerically
@@ -226,15 +254,20 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     }
 
     private func dispatchPollRequest(force: Bool) {
+        // Preserve immediate main-thread requests while still isolating Objective-C timer and
+        // Bluetooth callbacks that arrive on another queue to the main actor.
         if Thread.isMainThread {
-            requestPoll(force: force)
+            MainActor.assumeIsolated {
+                requestPoll(force: force)
+            }
             return
         }
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor [weak self] in
             self?.requestPoll(force: force)
         }
     }
 
+    @MainActor
     private func requestPoll(force: Bool) {
         guard CareLinkLifecyclePolicy.permitsPolling(lifecycleState),
               isActive else { return }
@@ -243,23 +276,38 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             return
         }
         let now = Date()
+        // In Heartbeat mode recurring `download()` calls come from the root Bluetooth callback;
+        // foreground and user refreshes use `refreshNow()`. A real five-minute wake-up must not be
+        // rejected by the scheduler's additional 30-second server-upload grace period.
+        let isHeartbeatModePoll = !force && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat
+        let regularPollIsDue = nextPollAt.map { now >= $0 } ?? true
+        let heartbeatPollIsDue = CareLinkPollingPolicy.heartbeatPollIsDue(
+            lastPollStartedAt: lastPollStartedAt,
+            now: now
+        )
         guard force || (
             now.timeIntervalSince(lastPollStartedAt) >= ConstantsCareLink.minimumPollingInterval
-                && (nextPollAt.map { now >= $0 } ?? true)
+                && (isHeartbeatModePoll ? heartbeatPollIsDue : regularPollIsDue)
         ) else { return }
         lastPollStartedAt = now
         let identifier = UUID()
         let generation = lifecycleGeneration
         pollIdentifier = identifier
+        // Registering before the request also protects a foreground fetch if the app backgrounds
+        // while CareLink is responding. The allowance ends as soon as this poll finishes.
+        if isHeartbeatModePoll {
+            beginBackgroundExecution(for: identifier)
+        }
         pollTask = Task { [weak self] in
             await self?.performPoll(generation: generation)
-            await self?.finishPoll(identifier: identifier)
+            self?.finishPoll(identifier: identifier)
         }
     }
 
     /// Clears only the poll that owns the matching identifier, avoiding a stale task racing a new one.
     @MainActor
     private func finishPoll(identifier: UUID) {
+        endBackgroundExecution(for: identifier)
         guard pollIdentifier == identifier else { return }
         pollTask = nil
         pollIdentifier = nil
@@ -267,6 +315,46 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             refreshRequestedWhilePolling = false
             requestPoll(force: true)
         }
+    }
+
+    /// Requests enough background time to complete work already triggered by BLE. Expiration
+    /// invalidates the owning poll so a suspended request cannot block the next genuine heartbeat.
+    @MainActor
+    private func beginBackgroundExecution(for identifier: UUID) {
+        let token = backgroundExecutionManager.begin(name: "CareLink heartbeat fetch") { [weak self] in
+            DispatchQueue.main.async {
+                self?.expireBackgroundPoll(identifier: identifier)
+            }
+        }
+        if let token {
+            pollBackgroundExecution = (identifier, token)
+        }
+    }
+
+    @MainActor
+    private func expireBackgroundPoll(identifier: UUID) {
+        guard pollIdentifier == identifier else {
+            endBackgroundExecution(for: identifier)
+            return
+        }
+        trace(
+            "CareLink heartbeat fetch background time expired",
+            log: log,
+            category: ConstantsLog.categoryCareLinkFollowManager,
+            type: .error
+        )
+        pollTask?.cancel()
+        pollTask = nil
+        pollIdentifier = nil
+        endBackgroundExecution(for: identifier)
+    }
+
+    @MainActor
+    private func endBackgroundExecution(for identifier: UUID) {
+        guard let execution = pollBackgroundExecution,
+              execution.identifier == identifier else { return }
+        pollBackgroundExecution = nil
+        backgroundExecutionManager.end(execution.token)
     }
 
     // MARK: - Settings actions
@@ -542,8 +630,33 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             let response = try await client.fetchPatientData(region: currentRegion, patient: patient, username: account.metadata.accountName, accountRole: account.metadata.role, countryCode: account.metadata.countryCode, linkedPatientCount: account.patients.count)
             guard await pollIsCurrent(generation) else { return }
             let refreshedAt = await client.tokenRefreshDate()
-            var parsed = try CareLinkGlucoseParser.readings(from: response.0)
+            var parsed = try CareLinkGlucoseParser.readings(
+                from: response.0,
+                retainedDeviceOffset: retainedDeviceOffsets[patient.id]
+            )
             let therapy = try CareLinkTherapyParser.payload(from: response.0, patientID: patient.id)
+            let parseDiagnostics = parsed.diagnostics
+            trace(
+                "CareLink glucose parse candidates=%{public}d accepted=%{public}d invalid=%{public}d missingTime=%{public}d future=%{public}d expired=%{public}d duplicates=%{public}d lastSG=%{public}@ clock=%{public}@ offsetMinutes=%{public}@",
+                log: log,
+                category: ConstantsLog.categoryCareLinkFollowManager,
+                type: .info,
+                parseDiagnostics.candidateCount,
+                parseDiagnostics.acceptedCount,
+                parseDiagnostics.invalidValueCount,
+                parseDiagnostics.missingTimestampCount,
+                parseDiagnostics.futureTimestampCount,
+                parseDiagnostics.expiredTimestampCount,
+                parseDiagnostics.duplicateTimestampCount,
+                parseDiagnostics.hasLastSG.description,
+                parseDiagnostics.clockSource.rawValue,
+                parseDiagnostics.offsetMinutes.map(String.init) ?? "unavailable"
+            )
+            // Cache only an offset proven by this payload and a valid glucose result. A retained
+            // fallback is deliberately unable to renew itself indefinitely.
+            if !parsed.readings.isEmpty, let payloadDeviceOffset = parsed.payloadDeviceOffset {
+                retainedDeviceOffsets[patient.id] = payloadDeviceOffset
+            }
             parsed.metadata.accountName = account.metadata.accountName
             parsed.metadata.role = account.metadata.role
             parsed.metadata.countryCode = account.metadata.countryCode
@@ -875,6 +988,10 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         stopPollingScheduler()
         pollingScheduler = nil
         pollTask?.cancel()
+        if let execution = pollBackgroundExecution {
+            pollBackgroundExecution = nil
+            backgroundExecutionManager.end(execution.token)
+        }
         pollTask = nil
         pollIdentifier = nil
         nextPollAt = nil
