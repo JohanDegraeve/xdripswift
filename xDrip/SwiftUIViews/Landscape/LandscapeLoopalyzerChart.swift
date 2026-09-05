@@ -27,7 +27,8 @@ struct LandscapeLoopalyzerChart: View {
         static let xAxisHeight: CGFloat = 18
         static let yAxisLabelWidth: CGFloat = 24
         static let axisLabelFontSize = ConstantsStatistics.chartAxisLabelFontSize + 1
-        static let treatmentBarWidthMinutes = 5.0
+        static let treatmentBarWidthMinutes = 10.0
+        static let treatmentBarOpacity = 1.0
     }
 
     var body: some View {
@@ -258,7 +259,7 @@ struct LandscapeLoopalyzerChart: View {
             yStart: .value("Zero", 0),
             yEnd: .value("Treatment", min(marker.amount, yDomain.upperBound))
         )
-        .foregroundStyle(Color(.lightGray).opacity(0.6))
+        .foregroundStyle(Color(.colorPrimary).opacity(Layout.treatmentBarOpacity))
     }
 
     private var basalDeltaDomain: ClosedRange<Double> {
