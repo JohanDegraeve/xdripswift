@@ -6,16 +6,30 @@ import UIKit
 public class NightscoutSyncManager: NSObject, ObservableObject {
     
     private struct NightscoutDeleteEntriesResponse: Decodable {
+        private struct LegacyResult: Decodable {
+            let n: Int?
+        }
+
         let deletedEntriesCount: Int?
 
         private enum CodingKeys: String, CodingKey {
-            case deletedEntriesCount = "n"
+            case n
+            case deletedCount
+            case result
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let legacyResult = try container.decodeIfPresent(LegacyResult.self, forKey: .result)
+            deletedEntriesCount = try container.decodeIfPresent(Int.self, forKey: .n)
+                ?? container.decodeIfPresent(Int.self, forKey: .deletedCount)
+                ?? legacyResult?.n
         }
     }
 
     /// Plain snapshot used by queued historical BG replacement.
     ///
-    /// Replacement may wait for an active delete/upload cycle and split a large payload into several
+    /// Replacement may wait for an active replacement upload and split a large payload into several
     /// requests. Managed objects may change or fault during that delay, so the queued work receives
     /// the exact timestamp and Nightscout dictionary captured at scheduling time.
     private struct BgReadingReplacementPayload {
@@ -103,11 +117,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     private var lastBackgroundFollowerRefreshAt: Date = .distantPast
     private let backgroundFollowerRefreshCooldown: TimeInterval = 60
 
-    /// BG overwrite requests must run strictly in sequence.
-    /// Historical apply can delete and re-add a large range, while live post
-    /// processing may also request narrow replacements. If those requests are
-    /// allowed to overlap, a later delete can remove data that an earlier task
-    /// has only just re-uploaded.
+    /// Keep replacement requests in scheduling order so a later cadence change
+    /// cannot overtake an earlier exact deletion or value update.
     private var bgReadingsReplacementTask: Task<Void, Never>?
     private var bgReadingsReplacementTaskIdentifier: String?
     private var bgReadingsReplacementBlocksDirectLiveUpload = false
@@ -327,11 +338,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             UserDefaults.standard.nightscoutSyncRequired = true
         }
         
-        // Manual historical replacement deletes an explicit Nightscout window,
-        // so direct live upload must wait until that full-window rewrite is
-        // finished. Automatic smoothing tail replacement does not own the newest
-        // live reading and must not stall the normal live upload path in the
-        // background.
+        // A historical rewrite may overlap the newest reading, so keep its direct
+        // upload behind that replacement. Automatic smoothing does not own the
+        // newest reading and must not stall normal live upload in the background.
         if bgReadingsReplacementTaskIdentifier != nil && bgReadingsReplacementBlocksDirectLiveUpload {
             trace("in uploadLatestBgReadings, pending BG replacement task detected, queuing direct BG upload until replacement completes", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
 
@@ -391,7 +400,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         }
     }
     
-    public func replaceBgReadingsInNightscout(bgReadings: [BgReading], deleteFromTimeStamp: Date? = nil, deleteToTimeStamp: Date? = nil) {
+    public func replaceBgReadingsInNightscout(bgReadings: [BgReading], bgReadingsToDelete: [BgReading] = [], blocksDirectLiveUpload: Bool = false) {
         // Use the same BG write gate as the direct upload path.
         // If master BG upload is disabled, no adjusted, smoothed or rewritten
         // BG values should be sent to Nightscout either.
@@ -402,31 +411,36 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         else { return }
         
         // Build plain payload snapshots before the queued async work starts.
-        // The historical replacement path may need to delete first,
-        // wait for an earlier replacement task, and then split a large upload
+        // The historical replacement path may need to wait for an earlier replacement task
+        // and then split a large upload
         // into several Nightscout requests. Keeping managed objects alive across
         // that whole delayed path caused crashes when the dictionary payload was
         // rebuilt later on.
         let dateFormatter = Date.ISODateFormatter()
         let bgReadingsToReplace = bgReadings.sorted(by: { $0.timeStamp < $1.timeStamp }).map {
-            BgReadingReplacementPayload(timeStamp: $0.timeStamp, dictionaryRepresentationForNightscoutUpload: $0.dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: dateFormatter))
+            var dictionaryRepresentation = $0.dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: dateFormatter)
+            // Let Nightscout retain or create its own MongoDB ID. Its long-standing
+            // sysTime + type upsert then replaces the reading without deleting it first.
+            dictionaryRepresentation.removeValue(forKey: "_id")
+            return BgReadingReplacementPayload(timeStamp: $0.timeStamp, dictionaryRepresentationForNightscoutUpload: dictionaryRepresentation)
         }
-        guard bgReadingsToReplace.count > 0 else { return }
+        let bgReadingTimeStampsToDelete = Array(Set(bgReadingsToDelete.map { $0.timeStamp })).sorted()
+        guard bgReadingsToReplace.count > 0 || bgReadingTimeStampsToDelete.count > 0 else { return }
 
         let newestTimeStamp = bgReadingsToReplace.last?.timeStamp
         let previousReplacementTask = bgReadingsReplacementTask
         let replacementTaskIdentifier = UUID().uuidString
 
         bgReadingsReplacementTaskIdentifier = replacementTaskIdentifier
-        bgReadingsReplacementBlocksDirectLiveUpload = bgReadingsReplacementBlocksDirectLiveUpload || (deleteFromTimeStamp != nil && deleteToTimeStamp != nil)
+        bgReadingsReplacementBlocksDirectLiveUpload = bgReadingsReplacementBlocksDirectLiveUpload || blocksDirectLiveUpload
 
         bgReadingsReplacementTask = Task { @MainActor [weak self] in
             _ = await previousReplacementTask?.result
 
             guard let self = self else { return }
-            // The user can turn off master Nightscout BG upload while a replacement task is queued.
+            // The user can turn off Nightscout BG upload while a replacement task is queued.
             // Re-check the write permission after waiting so the delayed task
-            // does not continue deleting and re-uploading BG values anyway.
+            // does not continue uploading BG values anyway.
             guard self.shouldAllowNightscoutBgWrites() else {
                 if self.bgReadingsReplacementTaskIdentifier == replacementTaskIdentifier {
                     self.bgReadingsReplacementTask = nil
@@ -438,19 +452,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 return
             }
 
-            // Historical overwrite uses one explicit time window.
-            // Normal live replacement uses per-reading windows so only the affected slots are replaced.
-            if let deleteFromTimeStamp = deleteFromTimeStamp, let deleteToTimeStamp = deleteToTimeStamp {
-                let defaultHalfWindowInSeconds = ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes * 60.0 / 2.0
-                await self.deleteBgReadingEntriesAtNightscout(fromTimeStamp: deleteFromTimeStamp.addingTimeInterval(-defaultHalfWindowInSeconds), toTimeStamp: deleteToTimeStamp.addingTimeInterval(defaultHalfWindowInSeconds))
-            } else {
-                for (index, bgReading) in bgReadingsToReplace.enumerated() {
-                    let previousTimeStamp = index > 0 ? bgReadingsToReplace[index - 1].timeStamp : nil
-                    let nextTimeStamp = index + 1 < bgReadingsToReplace.count ? bgReadingsToReplace[index + 1].timeStamp : nil
-                    await self.deleteBgReadingEntriesAroundBgReadingAtNightscout(bgReadingTimeStamp: bgReading.timeStamp, previousTimeStamp: previousTimeStamp, nextTimeStamp: nextTimeStamp)
-                }
-            }
-
+            await self.deleteBgReadingEntriesAtNightscout(timeStamps: bgReadingTimeStampsToDelete)
             let uploadSucceeded = await self.uploadBgReadingsReplacementChunksToNightscout(bgReadings: bgReadingsToReplace)
 
             if uploadSucceeded, let newestTimeStamp = newestTimeStamp {
@@ -768,55 +770,44 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         }
     }
     
-    @MainActor private func deleteBgReadingEntriesAroundBgReadingAtNightscout(bgReadingTimeStamp: Date, previousTimeStamp: Date?, nextTimeStamp: Date?) async {
-        let lowerBoundTimeStamp: Date
-        let upperBoundTimeStamp: Date
-        let defaultHalfWindowInSeconds = ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes * 60.0 / 2.0
-        
-        if let previousTimeStamp = previousTimeStamp {
-            lowerBoundTimeStamp = Date(timeIntervalSince1970: (previousTimeStamp.timeIntervalSince1970 + bgReadingTimeStamp.timeIntervalSince1970) / 2.0)
-        } else {
-            lowerBoundTimeStamp = bgReadingTimeStamp.addingTimeInterval(-defaultHalfWindowInSeconds)
-        }
-        
-        if let nextTimeStamp = nextTimeStamp {
-            upperBoundTimeStamp = Date(timeIntervalSince1970: (bgReadingTimeStamp.timeIntervalSince1970 + nextTimeStamp.timeIntervalSince1970) / 2.0)
-        } else {
-            upperBoundTimeStamp = bgReadingTimeStamp.addingTimeInterval(defaultHalfWindowInSeconds)
-        }
-        
-        await deleteBgReadingEntriesAtNightscout(fromTimeStamp: lowerBoundTimeStamp, toTimeStamp: upperBoundTimeStamp)
-    }
-    
     @MainActor private func deleteBgReadingEntriesAtNightscout(fromTimeStamp: Date, toTimeStamp: Date) async {
         let typedQueries = [
             URLQueryItem(name: "find[type]", value: "sgv"),
             URLQueryItem(name: "find[date][$gte]", value: String(fromTimeStamp.toMillisecondsAsInt64())),
             URLQueryItem(name: "find[date][$lte]", value: String(toTimeStamp.toMillisecondsAsInt64()))
         ]
-        
-        let untypedQueries = [
-            URLQueryItem(name: "find[date][$gte]", value: String(fromTimeStamp.toMillisecondsAsInt64())),
-            URLQueryItem(name: "find[date][$lte]", value: String(toTimeStamp.toMillisecondsAsInt64()))
-        ]
-        
+
         do {
             let typedResponse = try await nightscoutRequest(path: nightscoutEntriesJsonPath, queryItems: typedQueries, httpMethod: "DELETE", responseType: NightscoutDeleteEntriesResponse.self)
-            
+
             if let deletedEntriesCount = typedResponse?.deletedEntriesCount, deletedEntriesCount > 0 {
                 trace("in deleteBgReadingEntriesAtNightscout, deleted %{public}@ matching SGV entries in range %{public}@ to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deletedEntriesCount.description, fromTimeStamp.description, toTimeStamp.description)
-                return
-            }
-            
-            let untypedResponse = try await nightscoutRequest(path: nightscoutEntriesJsonPath, queryItems: untypedQueries, httpMethod: "DELETE", responseType: NightscoutDeleteEntriesResponse.self)
-            
-            if let deletedEntriesCount = untypedResponse?.deletedEntriesCount, deletedEntriesCount > 0 {
-                trace("in deleteBgReadingEntriesAtNightscout, deleted %{public}@ matching entries in range %{public}@ to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deletedEntriesCount.description, fromTimeStamp.description, toTimeStamp.description)
             } else {
-                trace("in deleteBgReadingEntriesAtNightscout, no matching entries found in range %{public}@ to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, fromTimeStamp.description, toTimeStamp.description)
+                trace("in deleteBgReadingEntriesAtNightscout, no matching SGV entries found in range %{public}@ to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, fromTimeStamp.description, toTimeStamp.description)
             }
         } catch {
             trace("in deleteBgReadingEntriesAtNightscout, failed to delete entries in range %{public}@ to %{public}@: %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, fromTimeStamp.description, toTimeStamp.description, error.localizedDescription)
+        }
+    }
+
+    /// Deletes only the exact SGV timestamps hidden by a user-requested five-minute cadence rebuild.
+    /// Chunking keeps historical Apply requests below common proxy URL limits.
+    @MainActor private func deleteBgReadingEntriesAtNightscout(timeStamps: [Date]) async {
+        let maximumTimeStampsPerRequest = 50
+        for chunkStartIndex in stride(from: 0, to: timeStamps.count, by: maximumTimeStampsPerRequest) {
+            let chunkEndIndex = min(chunkStartIndex + maximumTimeStampsPerRequest, timeStamps.count)
+            var queries = [URLQueryItem(name: "find[type]", value: "sgv")]
+            queries.append(contentsOf: timeStamps[chunkStartIndex..<chunkEndIndex].map {
+                URLQueryItem(name: "find[date][$in][]", value: String($0.toMillisecondsAsInt64()))
+            })
+
+            do {
+                let response = try await nightscoutRequest(path: nightscoutEntriesJsonPath, queryItems: queries, httpMethod: "DELETE", responseType: NightscoutDeleteEntriesResponse.self)
+                let deletedEntriesCount = response?.deletedEntriesCount ?? 0
+                trace("in deleteBgReadingEntriesAtNightscout, deleted %{public}@ suppressed SGV entries", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deletedEntriesCount.description)
+            } catch {
+                trace("in deleteBgReadingEntriesAtNightscout, failed to delete suppressed SGV entries: %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+            }
         }
     }
     

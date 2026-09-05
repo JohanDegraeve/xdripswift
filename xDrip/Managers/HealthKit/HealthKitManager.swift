@@ -174,6 +174,43 @@ public class HealthKitManager: NSObject {
             deleteExistingBgReadingsFromHealthKit(bgReading: bgReading, bloodGlucoseType: bloodGlucoseType, bloodGlucoseUnit: bloodGlucoseUnit)
         }
     }
+
+    /// Removes readings hidden by an explicit five-minute cadence rebuild without
+    /// touching the samples that remain visible and will be updated separately.
+    public func deleteBgReadingsFromHealthKit(bgReadingIDs: [String]) {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { [weak self] in
+                self?.deleteBgReadingsFromHealthKit(bgReadingIDs: bgReadingIDs)
+            }
+            return
+        }
+
+        guard UserDefaults.standard.storeReadingsInHealthkit,
+              healthKitInitialized,
+              let bloodGlucoseType = bloodGlucoseType,
+              bgReadingIDs.count > 0
+        else { return }
+
+        let metadataPredicate = HKQuery.predicateForObjects(withMetadataKey: bgReadingIdMetadataKey, allowedValues: bgReadingIDs)
+        let sampleQuery = HKSampleQuery(sampleType: bloodGlucoseType, predicate: metadataPredicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { [weak self] _, samples, error in
+            guard let self = self else { return }
+
+            if let error = error {
+                trace("failed query suppressed healthkit BG readings, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, error.localizedDescription)
+                return
+            }
+
+            guard let samples = samples, samples.count > 0 else { return }
+
+            self.healthStore.delete(samples) { success, deleteError in
+                if !success, let deleteError = deleteError {
+                    trace("failed delete suppressed healthkit BG readings, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, deleteError.localizedDescription)
+                }
+            }
+        }
+
+        healthStore.execute(sampleQuery)
+    }
     
     // MARK: - observe function
     

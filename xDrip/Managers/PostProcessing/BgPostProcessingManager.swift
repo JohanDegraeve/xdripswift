@@ -161,13 +161,15 @@ class BgPostProcessingManager {
             )
         }
 
+        let rebuildFiveMinuteCadenceFromStart = fiveMinuteReadingsStartTimeStampOverride != nil
+
         if shouldRecomputePostProcessing, let sourceContextIdentifier = sourceContextIdentifier {
             recomputeAdjustedValues(bgReadings: bgReadings, sourceContextIdentifier: sourceContextIdentifier)
             recomputeSmoothedValues(bgReadings: bgReadings)
             recomputeFiveMinuteCadenceSuppression(
                 bgReadings: bgReadings,
                 fiveMinuteReadingsStartTimeStampOverride: fiveMinuteReadingsStartTimeStampOverride,
-                rebuildCadenceFromStart: fiveMinuteReadingsStartTimeStampOverride != nil
+                rebuildCadenceFromStart: rebuildFiveMinuteCadenceFromStart
             )
         }
 
@@ -243,13 +245,20 @@ class BgPostProcessingManager {
             bgReadingsToReplaceDownstream = []
         }
         let downstreamReadingsToReplace = bgReadingsToReplaceDownstream
+        // Direct value replacement cannot remove a reading that the five-minute cadence now hides.
+        // Delete only those exact suppressed readings during an explicit cadence rebuild. Automatic
+        // processing receives new readings before downstream upload, so it must not issue deletes.
+        let downstreamReadingsToDelete = rebuildFiveMinuteCadenceFromStart && UserDefaults.standard.useFiveMinuteReadings
+            ? bgReadings.filter { $0.isSuppressedByFiveMinuteCadence }
+            : []
 
-        if downstreamReadingsToReplace.count > 0 {
-            if shouldRewriteFullDownstreamWindow, let earliestBgReading = bgReadings.first, let latestBgReading = bgReadings.last {
-                nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: downstreamReadingsToReplace, deleteFromTimeStamp: earliestBgReading.timeStamp, deleteToTimeStamp: latestBgReading.timeStamp)
-            } else {
-                nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: downstreamReadingsToReplace)
-            }
+        if downstreamReadingsToReplace.count > 0 || downstreamReadingsToDelete.count > 0 {
+            nightscoutSyncManager?.replaceBgReadingsInNightscout(
+                bgReadings: downstreamReadingsToReplace,
+                bgReadingsToDelete: downstreamReadingsToDelete,
+                blocksDirectLiveUpload: shouldRewriteFullDownstreamWindow
+            )
+            healthKitManager?.deleteBgReadingsFromHealthKit(bgReadingIDs: downstreamReadingsToDelete.map { $0.id })
             healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: downstreamReadingsToReplace)
             return true
         }
@@ -370,8 +379,9 @@ class BgPostProcessingManager {
             disableCurrentAdjustment()
         }
 
-        if UserDefaults.standard.useFiveMinuteReadings != useFiveMinuteReadings {
-            UserDefaults.standard.fiveMinuteReadingsStartTimeStamp = applyFromTimeStamp
+        let rewriteStartDate = processingStartDateOverride ?? applyFromTimeStamp
+        if UserDefaults.standard.useFiveMinuteReadings != useFiveMinuteReadings || processingStartDateOverride != nil {
+            UserDefaults.standard.fiveMinuteReadingsStartTimeStamp = rewriteStartDate
         }
 
         // After "Apply from Now", the next automatic processing pass must not start
@@ -391,7 +401,6 @@ class BgPostProcessingManager {
             troubleshootingPostProcessingSettings(applyRange: troubleshootingApplyRange)
         )
 
-        let rewriteStartDate = processingStartDateOverride ?? applyFromTimeStamp
         _ = processBgReadings(processingStartDateOverride: rewriteStartDate, fiveMinuteReadingsStartTimeStampOverride: rewriteStartDate, allowHistoricalDownstreamRewrite: true)
         replacePostProcessingNote(enableAdjustment: enableAdjustment, slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: applyFromTimeStamp, enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingStrength: smoothingStrength, noteWindowStartDate: rewriteStartDate)
 

@@ -1230,9 +1230,9 @@ import AppIntents
                 }
                 
                 // Always run the normal latest-reading Nightscout upload path.
-                // If post processing is also rewriting a recent BG tail, the
-                // sync manager serializes the overlap and runs this direct
-                // upload immediately afterwards.
+                // Historical rewrites may queue an overlapping direct upload until
+                // their exact deletions and updates finish. Automatic smoothing
+                // leaves the newest reading to this normal path.
                 nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 nightscoutSyncManager?.syncAllWithNightscout()
