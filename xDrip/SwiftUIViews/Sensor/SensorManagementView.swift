@@ -48,7 +48,7 @@ struct SensorManagementView: View {
     var body: some View {
         let state = currentState()
 
-        if initiallyShowsCalibration, state.canCalibrate, state.currentBgDisplay != nil {
+        if initiallyShowsCalibration, state.canEnterCalibration {
             CalibrationView(
                 canCalibrate: state.canCalibrate,
                 shouldWarnOnLargeCalibrationStep: state.shouldWarnOnLargeCalibrationStep,
@@ -95,7 +95,7 @@ struct SensorManagementView: View {
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(Color(.systemBlue))
-                        .disabled(!state.canCalibrate || state.currentBgDisplay == nil)
+                        .disabled(!state.canEnterCalibration)
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
@@ -275,7 +275,7 @@ struct SensorManagementView: View {
                 pendingStartSensorCode = nil
                 pendingStartSensorLabel = nil
             }
-            Button(Texts_HomeView.startSensorAnyway) {
+            Button(Texts_HomeView.sensorCodeContinue) {
                 startSensorWithPendingCode()
             }
         } message: {
@@ -837,6 +837,7 @@ struct SensorManagementView: View {
             shouldWarnOnLargeCalibrationStep: transmitter?.shouldWarnOnLargeCalibrationStep() ?? false,
             sensorActionNote: sensorActionNote,
             canCalibrate: canCalibrate,
+            isNativeG6: transmitter is CGMG5Transmitter && transmitter?.needsSensorStartCode() == true,
             showCalibrationUnavailableRow: showCalibrationUnavailableRow,
             calibrationNote: calibrationNote,
             calibrationSummary: calibrationSummary,
@@ -1070,6 +1071,13 @@ private struct SensorManagementState {
     let shouldWarnOnLargeCalibrationStep: Bool
     let sensorActionNote: String?
     let canCalibrate: Bool
+    let isNativeG6: Bool
+
+    var canEnterCalibration: Bool {
+        DexcomG6InitialCalibrationPolicy.canEnterCalibration(
+            canCalibrate: canCalibrate, hasReading: currentBgDisplay != nil, isNativeG6: isNativeG6
+        )
+    }
     let showCalibrationUnavailableRow: Bool
     let calibrationNote: String?
     let calibrationSummary: String

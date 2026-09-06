@@ -36,7 +36,7 @@
 "success" = "Başarı";
 "failed" = "Başarısız oldu";
 "dexcomBatteryTooLow" = "Verici pili çok düşük!";
-"enterSensorCode" = "Sensör kodunu bilmiyorsanız 0000 kullanmak için bunu boş bırakın. Kod girmeden OK düğmesine basarsanız sensör kodu olarak 0000 kullanılır veya zaten başlamışsa mevcut oturum yakalanır.";
+"enterSensorCode" = "Sensör kodunu elle girin, sensör etiketini tarayın veya bir fotoğraf seçin.\n\nKodunuz yoksa veya vericide zaten çalışan bir sensör oturumunu kullanmak istiyorsanız Kodsuz Kullan seçeneğini seçin.";
 "stopSensorConfirmation" = "Sensörü durdurmak istediğinizden emin misiniz?";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,7 +141,7 @@
 "sensorInformationTitle" = "Sensör Bilgileri";
 "sensorLotNumber" = "Lot Numarası";
 "sensorSerialNumberMetadata" = "Sensör Seri Numarası";
-"sensorLabelReviewFooter" = "Sensörü başlatmadan önce çözümlenen bilgileri kontrol edin.";
+"sensorLabelReviewFooter" = "Seçiminizi ve varsa etiket bilgilerini kontrol edin, ardından Devam düğmesine dokunun.";
 "sensorLabelScanFailed" = "Sensör Etiketi Okunamadı";
 "multipleSensorLabelsFound" = "Fotoğrafta birden fazla sensör etiketi var. Tek etiket içeren bir fotoğraf seçin.";
 "noSensorLabelFound" = "Fotoğrafta geçerli bir Dexcom G6 sensör etiketi bulunamadı.";
@@ -174,3 +174,9 @@
 "sensorExpirationDate" = "Son Kullanma Tarihi";
 "sensorManagementWaitingForSensorStart" = "Sensörün başlaması bekleniyor";
 "sensorManagementStatusWarmingUp" = "Isınıyor";
+"sensorCodeContinue" = "Devam";
+"useWithoutSensorCode" = "Kodsuz Kullan";
+"noSensorCode" = "Kod Yok (0000)";
+"dexcomG7SelectSensorCodeMessage" = "Dört haneli eşleştirme kodunu elle girin, mevcut aplikatörü tarayın veya bir fotoğraf seçin. Seçilen kodu kontrol edin, ardından Devam düğmesine dokunun.";
+"noSensorCodeSelectedTitle" = "Sensör kodu olmadan devam edilsin mi?";
+"noSensorCodeSelectedMessage" = "Vericide zaten bir sensör oturumu çalışıyorsa uygulama bu oturumu mevcut kalibrasyon gereksinimleriyle kullanır.\n\nKodsuz yeni bir oturum başlatmak, ısınmadan sonra ve ardından düzenli aralıklarla kalibrasyon gerektirir. Uygulamanın kalibrasyon hatırlatıcısını kapatmak bu gereksinimleri ortadan kaldırmaz.";

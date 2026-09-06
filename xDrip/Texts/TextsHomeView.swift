@@ -777,8 +777,13 @@ enum Texts_HomeView {
     }()
     
     static let enterSensorCode: String = {
-        return NSLocalizedString("enterSensorCode", tableName: filename, bundle: Bundle.main, value: "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.", comment: "When user needs to enter sensor code, to start firefly sensor")
+        return NSLocalizedString("enterSensorCode", tableName: filename, bundle: Bundle.main, value: "Enter the sensor code manually, scan the sensor label, or choose a photo.\n\nIf you don't have the code, or want to use a sensor session already running on the transmitter, choose Use Without Code.", comment: "Instructions on the G6 sensor-code selection screen")
     }()
+
+    static let sensorCodeContinue = NSLocalizedString("sensorCodeContinue", tableName: filename, bundle: .main, value: "Continue", comment: "Common advance action after reviewing a G6 or G7 sensor-code selection")
+    static let useWithoutSensorCode = NSLocalizedString("useWithoutSensorCode", tableName: filename, bundle: .main, value: "Use Without Code", comment: "Select the G6 no-code option without advancing")
+    static let noSensorCode = NSLocalizedString("noSensorCode", tableName: filename, bundle: .main, value: "No code (0000)", comment: "Selected G6 no-code option before confirmation")
+    static let dexcomG7SelectSensorCodeMessage = NSLocalizedString("dexcomG7SelectSensorCodeMessage", tableName: filename, bundle: .main, value: "Enter the four-digit pairing code manually, scan the current applicator, or choose a photo. Check the selected code, then tap Continue.", comment: "Instructions on the G7 pairing-code selection screen")
 
     static let scanWithCamera = NSLocalizedString("scanWithCamera", tableName: filename, bundle: .main, value: "Scan with Camera", comment: "button to scan a Dexcom G6 sensor label")
     static let manuallyEnterSensorCode = NSLocalizedString("manuallyEnterSensorCode", tableName: filename, bundle: .main, value: "Manually Enter Code", comment: "label for the manual Dexcom sensor-code entry field")
@@ -798,7 +803,7 @@ enum Texts_HomeView {
     static let sensorManufactureDate = NSLocalizedString("sensorManufactureDate", tableName: filename, bundle: .main, value: "Manufacture Date", comment: "Dexcom sensor manufacture date label")
     static let sensorExpirationDate = NSLocalizedString("sensorExpirationDate", tableName: filename, bundle: .main, value: "Expiry Date", comment: "Dexcom sensor expiry date label")
     static let sensorSerialNumber = NSLocalizedString("sensorSerialNumberMetadata", tableName: filename, bundle: .main, value: "Sensor Serial Number", comment: "Dexcom sensor serial number label")
-    static let sensorLabelReviewFooter = NSLocalizedString("sensorLabelReviewFooter", tableName: filename, bundle: .main, value: "Check the decoded information before starting the sensor.", comment: "footer below decoded sensor-label information")
+    static let sensorLabelReviewFooter = NSLocalizedString("sensorLabelReviewFooter", tableName: filename, bundle: .main, value: "Check your selection and any label information, then tap Continue.", comment: "Review footer shared by manual, scanned and no-code selections")
     static let sensorLabelScanFailed = NSLocalizedString("sensorLabelScanFailed", tableName: filename, bundle: .main, value: "Sensor Label Not Read", comment: "sensor-label decoding alert title")
     static let multipleSensorLabelsFound = NSLocalizedString("multipleSensorLabelsFound", tableName: filename, bundle: .main, value: "The photo contains more than one sensor label. Choose a photo containing one label.", comment: "multiple sensor labels error")
     static let noSensorLabelFound = NSLocalizedString("noSensorLabelFound", tableName: filename, bundle: .main, value: "No valid Dexcom G6 sensor label was found in the photo.", comment: "no sensor label error")
@@ -810,23 +815,20 @@ enum Texts_HomeView {
     static let sensorCodeUnknown = NSLocalizedString("sensorCodeUnknown", tableName: filename, bundle: .main, value: "Unknown", comment: "unknown active sensor code value")
 
     static let noSensorCodeSelectedTitle: String = {
-        return NSLocalizedString("noSensorCodeSelectedTitle", tableName: filename, bundle: Bundle.main, value: "No Sensor Code Selected", comment: "Alert title shown before starting a Dexcom G6 sensor with no code/0000")
+        return NSLocalizedString("noSensorCodeSelectedTitle", tableName: filename, bundle: Bundle.main, value: "Continue Without a Sensor Code?", comment: "Confirmation title for starting or adopting a G6 session without a code")
     }()
 
     static let noSensorCodeSelectedMessage: String = {
-        let message = "Starting a Dexcom G6 sensor with 0000 means no sensor code will be sent to the transmitter.\n\n"
-            + "The Dexcom transmitter will require calibrations for this sensor session: two calibrations after warm-up, "
-            + "another 12 hours later, another 12 hours after that, then once every 24 hours until the sensor ends.\n\n"
-            + "These calibration requests come from the Dexcom transmitter/no-code workflow. They are not caused by the "
-            + "%@ calibration reminder setting, and disabling that reminder will not stop required transmitter calibrations."
-        let localizedMessage = NSLocalizedString(
+        let message = "If a sensor session is already running on the transmitter, the app will use that session with its existing calibration requirements.\n\n"
+            + "Starting a new session without a code requires calibrations after warm-up and periodically afterward. "
+            + "Turning off the app's calibration reminder does not remove these requirements."
+        return NSLocalizedString(
             "noSensorCodeSelectedMessage",
             tableName: filename,
             bundle: Bundle.main,
             value: message,
-            comment: "Alert message shown before starting a Dexcom G6 sensor with no code/0000. Placeholder is the app display name"
+            comment: "Distinguishes adopting an existing G6 session from starting a new no-code session"
         )
-        return String(format: localizedMessage, ConstantsHomeView.applicationName)
     }()
 
     static let startSensorAnyway: String = {

@@ -38,7 +38,7 @@
 "failed" = "Failed";
 "calibrationNotNecessary" = "When using the native transmitter algorithm, manual calibration is not available.\n\nIf you want to calibrate, you can switch to the xDrip algorithm in the transmitter screen (if available).";
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
-"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
+"enterSensorCode" = "Enter the sensor code manually, scan the sensor label, or choose a photo.\n\nIf you don't have the code, or want to use a sensor session already running on the transmitter, choose Use Without Code.";
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 "calibrationNotNecessary" = "When using the native transmitter algorithm, manual calibration is not available.\n\nIf you want to calibrate, you can switch to the xDrip algorithm in the transmitter screen (if available).";
 "noSensorData" = "No sensor data";
@@ -192,7 +192,7 @@
 "sensorHealthTestTemporaryIssue" = "Test Temporary Issue in 5 Seconds";
 "sensorHealthTestSensorFailure" = "Test Sensor Failure in 5 Seconds";
 "sensorHealthTestTransmitterFailure" = "Test Transmitter Failure in 5 Seconds";
-"noSensorCodeSelectedMessage" = "Starting a Dexcom G6 sensor with 0000 means no sensor code will be sent to the transmitter.\n\nThe Dexcom transmitter will require calibrations for this sensor session: two calibrations after warm-up, another 12 hours later, another 12 hours after that, then once every 24 hours until the sensor ends.\n\nThese calibration requests come from the Dexcom transmitter/no-code workflow. They are not caused by the %@ calibration reminder setting, and disabling that reminder will not stop required transmitter calibrations.";
+"noSensorCodeSelectedMessage" = "If a sensor session is already running on the transmitter, the app will use that session with its existing calibration requirements.\n\nStarting a new session without a code requires calibrations after warm-up and periodically afterward. Turning off the app's calibration reminder does not remove these requirements.";
 "connectingToCGM" = "Connecting to CGM...";
 "reconnectingToCGM" = "Reconnecting to CGM...";
 
@@ -213,7 +213,7 @@
 "sensorInformationTitle" = "Sensor Information";
 "sensorLotNumber" = "Lot Number";
 "sensorSerialNumberMetadata" = "Sensor Serial Number";
-"sensorLabelReviewFooter" = "Check the decoded information before starting the sensor.";
+"sensorLabelReviewFooter" = "Check your selection and any label information, then tap Continue.";
 "sensorLabelScanFailed" = "Sensor Label Not Read";
 "multipleSensorLabelsFound" = "The photo contains more than one sensor label. Choose a photo containing one label.";
 "noSensorLabelFound" = "No valid Dexcom G6 sensor label was found in the photo.";
@@ -246,3 +246,8 @@
 "sensorExpirationDate" = "Expiry Date";
 "sensorManagementWaitingForSensorStart" = "Waiting for Sensor Start";
 "sensorManagementStatusWarmingUp" = "Warming Up";
+"sensorCodeContinue" = "Continue";
+"useWithoutSensorCode" = "Use Without Code";
+"noSensorCode" = "No code (0000)";
+"dexcomG7SelectSensorCodeMessage" = "Enter the four-digit pairing code manually, scan the current applicator, or choose a photo. Check the selected code, then tap Continue.";
+"noSensorCodeSelectedTitle" = "Continue Without a Sensor Code?";

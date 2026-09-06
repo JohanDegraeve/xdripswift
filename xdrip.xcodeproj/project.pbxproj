@@ -705,6 +705,7 @@
 		F8CB59C42739D1CD00BA199E /* DexcomBackfillTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59C32739D1CD00BA199E /* DexcomBackfillTxMessage.swift */; };
 		F8CB59C6273ECFE500BA199E /* DexcomG6GlucoseDataRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59C5273ECFE500BA199E /* DexcomG6GlucoseDataRxMessage.swift */; };
 		F8CB59C8273EF9F800BA199E /* DexcomAlgorithmState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59C7273EF9F800BA199E /* DexcomAlgorithmState.swift */; };
+		C606CA18273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606CA17273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift */; };
 		F8CB59CA27405A6800BA199E /* DexcomCalibrationTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59C927405A6800BA199E /* DexcomCalibrationTxMessage.swift */; };
 		F8CB59CC2744471100BA199E /* DexcomSessionStartResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59CB2744471000BA199E /* DexcomSessionStartResponse.swift */; };
 		F8CB59CE27444D6300BA199E /* DexcomSessionStopResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59CD27444D6300BA199E /* DexcomSessionStopResponse.swift */; };
@@ -1856,6 +1857,7 @@
 		F8CB59C32739D1CD00BA199E /* DexcomBackfillTxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomBackfillTxMessage.swift; sourceTree = "<group>"; };
 		F8CB59C5273ECFE500BA199E /* DexcomG6GlucoseDataRxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG6GlucoseDataRxMessage.swift; sourceTree = "<group>"; };
 		F8CB59C7273EF9F800BA199E /* DexcomAlgorithmState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomAlgorithmState.swift; sourceTree = "<group>"; };
+		C606CA17273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG6InitialCalibrationPolicy.swift; sourceTree = "<group>"; };
 		F8CB59C927405A6800BA199E /* DexcomCalibrationTxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomCalibrationTxMessage.swift; sourceTree = "<group>"; };
 		F8CB59CB2744471000BA199E /* DexcomSessionStartResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStartResponse.swift; sourceTree = "<group>"; };
 		F8CB59CD27444D6300BA199E /* DexcomSessionStopResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStopResponse.swift; sourceTree = "<group>"; };
@@ -3550,6 +3552,7 @@
 				F8F971D123A5915900C3F17D /* BatteryStatusRxMessage.swift */,
 				F8F971C523A5915900C3F17D /* BatteryStatusTxMessage.swift */,
 				F8CB59C7273EF9F800BA199E /* DexcomAlgorithmState.swift */,
+				C606CA17273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift */,
 				F8F1671A272B3E4F001AA3D8 /* DexcomBackfillStream.swift */,
 				F8CB59C32739D1CD00BA199E /* DexcomBackfillTxMessage.swift */,
 				F828422F274ED56A0097E0C9 /* DexcomCalibrationParameters.swift */,
@@ -4865,6 +4868,7 @@
 				F857A32A253E2D9E00951BB2 /* LibreAlgorithmThresholds.swift in Sources */,
 				F8A1850C25643B16000EF8A0 /* Double+Smoothable.swift in Sources */,
 				F8CB59C8273EF9F800BA199E /* DexcomAlgorithmState.swift in Sources */,
+				C606CA18273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift in Sources */,
 				F890E07A247687AE008FB2EC /* URL.swift in Sources */,
 				47AECB9E2CD2B62B005F1814 /* NightscoutDeviceStatusModels.swift in Sources */,
 				47A05CC52EF160A9004DABE7 /* MedtrumEasyViewFollowManager.swift in Sources */,

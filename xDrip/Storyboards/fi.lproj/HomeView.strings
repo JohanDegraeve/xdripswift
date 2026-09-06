@@ -47,7 +47,7 @@
 "stopSensorConfirmation" = "Oletko varma, että haluat pysäyttää sensorin?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "Jos et tiedä sensorin koodia, jätä tämä tyhjäksi käyttääksesi 0000. Jos painat OK ilman koodia, sensorikoodina käytetään 0000, tai nykyinen istunto vain otetaan käyttöön, jos se on jo alkanut.";
+"enterSensorCode" = "Syötä anturin koodi käsin, skannaa anturin etiketti tai valitse kuva.\n\nJos sinulla ei ole koodia tai haluat käyttää lähettimessä jo käynnissä olevaa anturijaksoa, valitse Käytä ilman koodia.";
 
 /// status info : literally 'Sensor End'
 "sensorend" = "Sensori loppuu";
@@ -157,7 +157,7 @@
 "sensorInformationTitle" = "Anturin tiedot";
 "sensorLotNumber" = "Eränumero";
 "sensorSerialNumberMetadata" = "Anturin sarjanumero";
-"sensorLabelReviewFooter" = "Tarkista puretut tiedot ennen anturin käynnistämistä.";
+"sensorLabelReviewFooter" = "Tarkista valintasi ja mahdolliset etiketin tiedot ja napauta Jatka.";
 "sensorLabelScanFailed" = "Anturin etikettiä ei luettu";
 "multipleSensorLabelsFound" = "Kuvassa on useampi kuin yksi anturin etiketti. Valitse kuva, jossa on yksi etiketti.";
 "noSensorLabelFound" = "Kuvasta ei löytynyt kelvollista Dexcom G6 -anturin etikettiä.";
@@ -190,3 +190,9 @@
 "sensorExpirationDate" = "Viimeinen käyttöpäivä";
 "sensorManagementWaitingForSensorStart" = "Odotetaan sensorin käynnistymistä";
 "sensorManagementStatusWarmingUp" = "Lämpenee";
+"sensorCodeContinue" = "Jatka";
+"useWithoutSensorCode" = "Käytä ilman koodia";
+"noSensorCode" = "Ei koodia (0000)";
+"dexcomG7SelectSensorCodeMessage" = "Syötä nelinumeroinen pariliitoskoodi käsin, skannaa nykyinen asetin tai valitse kuva. Tarkista valittu koodi ja napauta Jatka.";
+"noSensorCodeSelectedTitle" = "Jatketaanko ilman anturin koodia?";
+"noSensorCodeSelectedMessage" = "Jos lähettimessä on jo käynnissä anturijakso, sovellus käyttää sitä sen nykyisten kalibrointivaatimusten mukaisesti.\n\nUuden jakson aloittaminen ilman koodia edellyttää kalibrointeja lämpenemisen jälkeen ja myöhemmin säännöllisesti. Sovelluksen kalibrointimuistutuksen poistaminen käytöstä ei poista näitä vaatimuksia.";

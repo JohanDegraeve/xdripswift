@@ -83,7 +83,7 @@
 "nfcScanNeeded" = "NFC scan needed";
 
 /// sensor warm-up text
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "Chauffe jusqu’à";
 
 "nativeAlgorithm" = "Algorithme natif";
 "xDripAlgorithm" = "Algorithme xDrip";

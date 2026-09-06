@@ -44,7 +44,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
+"enterSensorCode" = "Saisissez le code du capteur manuellement, scannez son étiquette ou choisissez une photo.\n\nSi vous ne connaissez pas le code ou souhaitez utiliser une session de capteur déjà active sur le transmetteur, choisissez Utiliser sans code.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -178,7 +178,7 @@
 "sensorInformationTitle" = "Informations du capteur";
 "sensorLotNumber" = "Numéro de lot";
 "sensorSerialNumberMetadata" = "Numéro de série du capteur";
-"sensorLabelReviewFooter" = "Vérifiez les informations décodées avant de démarrer le capteur.";
+"sensorLabelReviewFooter" = "Vérifiez votre sélection et les éventuelles informations de l’étiquette, puis touchez Continuer.";
 "sensorLabelScanFailed" = "Étiquette du capteur non lue";
 "multipleSensorLabelsFound" = "La photo contient plusieurs étiquettes de capteur. Choisissez une photo avec une seule étiquette.";
 "noSensorLabelFound" = "Aucune étiquette de capteur Dexcom G6 valide n’a été trouvée sur la photo.";
@@ -211,3 +211,9 @@
 "sensorExpirationDate" = "Date d’expiration";
 "sensorManagementWaitingForSensorStart" = "En attente du démarrage du capteur";
 "sensorManagementStatusWarmingUp" = "Préchauffage";
+"sensorCodeContinue" = "Continuer";
+"useWithoutSensorCode" = "Utiliser sans code";
+"noSensorCode" = "Sans code (0000)";
+"dexcomG7SelectSensorCodeMessage" = "Saisissez manuellement le code d’appairage à quatre chiffres, scannez l’applicateur actuel ou choisissez une photo. Vérifiez le code sélectionné, puis touchez Continuer.";
+"noSensorCodeSelectedTitle" = "Continuer sans code de capteur ?";
+"noSensorCodeSelectedMessage" = "Si une session de capteur est déjà active sur le transmetteur, l’app l’utilisera avec ses exigences de calibration existantes.\n\nLe démarrage d’une nouvelle session sans code nécessite des calibrations après le préchauffage, puis régulièrement. Désactiver le rappel de calibration de l’app ne supprime pas ces exigences.";

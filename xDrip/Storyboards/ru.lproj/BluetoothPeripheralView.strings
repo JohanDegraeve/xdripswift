@@ -77,7 +77,7 @@
 "transmittterStartDate" = "Transmitter Started";
 
 /// sensor warm-up text
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "Прогрев до";
 
 /// Scan again button
 "nfcScanFailedScanAgainButton" = "Scan Again";

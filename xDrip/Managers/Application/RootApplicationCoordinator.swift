@@ -24,6 +24,10 @@ import AppIntents
 /// receives transmitter, follower, notification and UserDefaults callbacks, none of which require
 /// a view-controller lifecycle.
 @MainActor final class RootApplicationCoordinator: NSObject {
+    private var dexcomG6InitialCalibrationPolicy = DexcomG6InitialCalibrationPolicy()
+    private var dexcomG6CalibrationInputID: UUID?
+    private weak var dexcomG6CalibrationTransmitter: CGMG5Transmitter?
+    private let applicationManagerKeyDexcomG6Calibration = "dexcomG6InitialCalibration"
     
     // MARK: - Constants for ApplicationManager usage
     
@@ -815,6 +819,11 @@ import AppIntents
         var hasCapturedInitialTroubleshootingCGMSource = false
         var previousTroubleshootingCGMSource: TroubleshootingLogSource?
         let cgmTransmitterInfoChanged = {
+            if self.dexcomG6InitialCalibrationPolicy.requiredState != nil,
+               self.bluetoothPeripheralManager?.getCGMTransmitter() as? CGMG5Transmitter !== self.dexcomG6CalibrationTransmitter {
+                self.dexcomG6InitialCalibrationPolicy = DexcomG6InitialCalibrationPolicy()
+                self.clearDexcomG6CalibrationPrompt()
+            }
             // A callback can occur inside BluetoothPeripheralManager.init, before Swift has assigned
             // that finished manager to this coordinator. Do not seed the comparison with a false nil
             // source in that window or the following explicit initialization call would look like a
@@ -1606,7 +1615,7 @@ import AppIntents
     /// opens an alert, that requests user to enter a calibration value, and calibrates
     /// - parameters:
     ///     - userRequested : if true, it's a requestCalibration initiated by user clicking on the calibrate button in the homescreen
-    private func requestCalibration(userRequested:Bool) {
+    private func requestCalibration(userRequested:Bool, expectedDexcomInitialCalibrationState: DexcomAlgorithmState? = nil) {
         // unwrap calibrationsAccessor, coreDataManager , bgReadingsAccessor
         guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = self.coreDataManager, let bgReadingsAccessor = self.bgReadingsAccessor else {
             trace("in requestCalibration, calibrationsAccessor or coreDataManager or bgReadingsAccessor is nil, no further processing", log: log, category: ConstantsLog.categoryRootView, type: .error)
@@ -1642,13 +1651,40 @@ import AppIntents
         
         // assign deviceName, needed in the closure when creating alert. As closures can create strong references (to bluetoothTransmitter in this case), I'm fetching the deviceName here
         let deviceName = bluetoothTransmitter.deviceName
-        
+
+        let prefill = expectedDexcomInitialCalibrationState == .SecondofTwoBGsNeeded
+            && dexcomG6InitialCalibrationPolicy.matches(sensorStartDate: activeSensor.startDate)
+            ? dexcomG6InitialCalibrationPolicy.secondCalibrationPrefill : nil
+        let calibrationStage = expectedDexcomInitialCalibrationState.map {
+            $0 == .FirstofTwoBGsNeeded ? " (1/2)" : " (2/2)"
+        } ?? ""
+
         rootTabStateModel?.presentTextInput(
-            title: Texts_Calibrations.enterCalibrationValue,
+            title: Texts_Calibrations.enterCalibrationValue + calibrationStage,
             placeholder: "...",
-            usesDecimalKeyboard: !UserDefaults.standard.bloodGlucoseUnitIsMgDl
+            usesDecimalKeyboard: !UserDefaults.standard.bloodGlucoseUnitIsMgDl,
+            initialText: prefill?.valueInMgDl.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ?? "",
+            message: prefill.map {
+                String(format: Texts_Calibrations.previousCalibrationPrefillMessage,
+                       $0.enteredAt.toStringInUserLocale(timeStyle: .short, dateStyle: .none))
+            }
         ) { text in
+            if let expectedDexcomInitialCalibrationState {
+                guard self.activeSensor?.id == activeSensor.id,
+                      self.bluetoothPeripheralManager?.getCGMTransmitter() as? CGMG5Transmitter === self.dexcomG6CalibrationTransmitter,
+                      self.dexcomG6InitialCalibrationPolicy.hasPendingPrompt,
+                      self.dexcomG6InitialCalibrationPolicy.matches(sensorStartDate: activeSensor.startDate),
+                      self.dexcomG6InitialCalibrationPolicy.requiredState == expectedDexcomInitialCalibrationState else {
+                    return
+                }
+            }
             guard let valueAsDouble = text.toDouble() else {
+                self.presentAlert(title: Texts_Common.warning, message: Texts_Common.invalidValue)
+                return
+            }
+
+            if expectedDexcomInitialCalibrationState != nil,
+               !(40.0...400.0).contains(valueAsDouble.mmolToMgdl(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)) {
                 self.presentAlert(title: Texts_Common.warning, message: Texts_Common.invalidValue)
                 return
             }
@@ -1664,6 +1700,9 @@ import AppIntents
             ) {
                 self.presentAlert(title: Texts_Common.warning, message: errorMessage)
             }
+        }
+        if expectedDexcomInitialCalibrationState != nil {
+            dexcomG6CalibrationInputID = rootTabStateModel?.textInputRequest?.id
         }
     }
 
@@ -1717,6 +1756,14 @@ import AppIntents
 
         coreDataManager.saveChanges()
         sensorNoiseManager?.update(activeSensor: activeSensor)
+
+        if cgmTransmitter is CGMG5Transmitter {
+            dexcomG6InitialCalibrationPolicy.calibrationSubmitted(
+                valueInMgDl: dexcomG6InitialCalibrationPolicy.matches(sensorStartDate: activeSensor.startDate)
+                    ? valueAsDoubleConvertedToMgDl : nil
+            )
+            clearDexcomG6CalibrationPrompt()
+        }
 
         // Record the exact immutable snapshot supplied by CalibrationView. Recomputing here after
         // calibration could make the developer trace and Activity Log disagree with what the user saw.
@@ -1820,6 +1867,34 @@ import AppIntents
         })
     }
     
+    private func clearDexcomG6CalibrationPrompt() {
+        let identifier = ConstantsNotifications.NotificationIdentifiersForCalibration.dexcomG6InitialCalibrationRequest
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [identifier])
+        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyDexcomG6Calibration)
+        if let dexcomG6CalibrationInputID, rootTabStateModel?.textInputRequest?.id == dexcomG6CalibrationInputID {
+            rootTabStateModel?.textInputRequest = nil
+        }
+        dexcomG6CalibrationInputID = nil
+    }
+
+    private func presentDexcomG6InitialCalibration() {
+        if let dexcomG6CalibrationInputID, rootTabStateModel?.textInputRequest?.id == dexcomG6CalibrationInputID {
+            return
+        }
+        clearDexcomG6CalibrationPrompt()
+        guard UserDefaults.standard.isMaster,
+              let transmitter = bluetoothPeripheralManager?.getCGMTransmitter() as? CGMG5Transmitter,
+              transmitter === dexcomG6CalibrationTransmitter,
+              transmitter.needsSensorStartCode(),
+              dexcomG6InitialCalibrationPolicy.hasPendingPrompt,
+              let activeSensor,
+              dexcomG6InitialCalibrationPolicy.matches(sensorStartDate: activeSensor.startDate),
+              let state = dexcomG6InitialCalibrationPolicy.requiredState else { return }
+
+        requestCalibration(userRequested: false, expectedDexcomInitialCalibrationState: state)
+    }
+
     /// creates bgreading notification, and set app badge to value of reading
     /// - parameters:
     ///     - if overrideShowReadingInNotification then badge counter will be set (if enabled off course) with function UIApplication.shared.applicationIconBadgeNumber. To be used if badge counter is  to be set eg when UserDefaults.standard.showReadingInAppBadge is changed
@@ -2251,6 +2326,9 @@ import AppIntents
     }
     
     private func stopSensor(cGMTransmitter: CGMTransmitter?, sendToTransmitter: Bool) {
+        dexcomG6InitialCalibrationPolicy = DexcomG6InitialCalibrationPolicy()
+        dexcomG6CalibrationTransmitter = nil
+        clearDexcomG6CalibrationPrompt()
         // create stopDate
         let stopDate = Date()
         
@@ -2553,6 +2631,49 @@ import AppIntents
 
 /// conform to CGMTransmitterDelegate
 extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
+    func dexcomG6CalibrationStateReceived(_ state: DexcomAlgorithmState, sensorStartDate: Date, from transmitter: CGMG5Transmitter) {
+        guard UserDefaults.standard.isMaster,
+              bluetoothPeripheralManager?.getCGMTransmitter() as? CGMG5Transmitter === transmitter,
+              transmitter.needsSensorStartCode() else { return }
+
+        if dexcomG6CalibrationTransmitter !== transmitter {
+            dexcomG6InitialCalibrationPolicy = DexcomG6InitialCalibrationPolicy()
+            clearDexcomG6CalibrationPrompt()
+            dexcomG6CalibrationTransmitter = transmitter
+        }
+
+        guard let activeSensor,
+              abs(activeSensor.startDate.timeIntervalSince(sensorStartDate)) <= CGMG5Transmitter.sensorStartDateTolerance else {
+            dexcomG6InitialCalibrationPolicy = DexcomG6InitialCalibrationPolicy()
+            clearDexcomG6CalibrationPrompt()
+            return
+        }
+
+        let shouldPrompt = dexcomG6InitialCalibrationPolicy.update(state: state, sensorStartDate: sensorStartDate)
+        guard dexcomG6InitialCalibrationPolicy.requiredState != nil else {
+            clearDexcomG6CalibrationPrompt()
+            return
+        }
+        guard shouldPrompt else { return }
+
+        clearDexcomG6CalibrationPrompt()
+        if UIApplication.shared.applicationState == .active {
+            presentDexcomG6InitialCalibration()
+        } else {
+            // As with the raw-calibration flow, reopening the app also opens entry without
+            // requiring a notification tap. Recheck the live state before presenting it.
+            ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyDexcomG6Calibration) { [weak self] in
+                self?.presentDexcomG6InitialCalibration()
+            }
+            createNotification(
+                title: Texts_Calibrations.calibrationNotificationRequestTitle,
+                body: Texts_Calibrations.calibrationNotificationRequestBody,
+                identifier: ConstantsNotifications.NotificationIdentifiersForCalibration.dexcomG6InitialCalibrationRequest,
+                sound: UNNotificationSound(named: UNNotificationSoundName(""))
+            )
+        }
+    }
+
     func sensorSessionConfirmed(startDate: Date) {
         guard Thread.isMainThread else {
             DispatchQueue.main.async { [weak self] in
@@ -2796,6 +2917,11 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
 extension RootApplicationCoordinator: @preconcurrency UNUserNotificationCenterDelegate {
     // called when notification created while app is in foreground
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        if notification.request.identifier == ConstantsNotifications.NotificationIdentifiersForCalibration.dexcomG6InitialCalibrationRequest {
+            presentDexcomG6InitialCalibration()
+            completionHandler([])
+            return
+        }
         if notification.request.identifier == ConstantsNotifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
             
             // request calibration
@@ -2842,7 +2968,10 @@ extension RootApplicationCoordinator: @preconcurrency UNUserNotificationCenterDe
             completionHandler()
         }
         
-        if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
+        if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifiersForCalibration.dexcomG6InitialCalibrationRequest {
+            // Foreground entry may already have presented the same request.
+            presentDexcomG6InitialCalibration()
+        } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
             // nothing required, the requestCalibration function will be called as it's been added to ApplicationManager
             trace("in userNotificationCenter didReceive, user pressed calibration notification to open the app, requestCalibration should be called because closure is added in ApplicationManager.shared", log: log, category: ConstantsLog.categoryRootView, type: .info)
         } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {

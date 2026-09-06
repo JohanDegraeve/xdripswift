@@ -110,7 +110,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
+"enterSensorCode" = "Gib den Sensorcode manuell ein, scanne das Sensoretikett oder wähle ein Foto aus.\n\nWenn du den Code nicht hast oder eine bereits auf dem Transmitter laufende Sensorsitzung verwenden möchtest, wähle Ohne Code verwenden.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -244,7 +244,7 @@
 "sensorInformationTitle" = "Sensorinformationen";
 "sensorLotNumber" = "Chargennummer";
 "sensorSerialNumberMetadata" = "Sensor-Seriennummer";
-"sensorLabelReviewFooter" = "Die decodierten Informationen vor dem Sensorstart prüfen.";
+"sensorLabelReviewFooter" = "Prüfe deine Auswahl und gegebenenfalls die Etikettinformationen und tippe auf Weiter.";
 "sensorLabelScanFailed" = "Sensor-Etikett nicht gelesen";
 "multipleSensorLabelsFound" = "Das Foto enthält mehr als ein Sensor-Etikett. Ein Foto mit nur einem Etikett auswählen.";
 "noSensorLabelFound" = "Auf dem Foto wurde kein gültiges Dexcom-G6-Sensor-Etikett gefunden.";
@@ -277,3 +277,9 @@
 "sensorExpirationDate" = "Verfallsdatum";
 "sensorManagementWaitingForSensorStart" = "Warten auf Sensorstart";
 "sensorManagementStatusWarmingUp" = "Aufwärmphase";
+"sensorCodeContinue" = "Weiter";
+"useWithoutSensorCode" = "Ohne Code verwenden";
+"noSensorCode" = "Kein Code (0000)";
+"dexcomG7SelectSensorCodeMessage" = "Gib den vierstelligen Kopplungscode manuell ein, scanne den aktuellen Applikator oder wähle ein Foto aus. Prüfe den ausgewählten Code und tippe auf Weiter.";
+"noSensorCodeSelectedTitle" = "Ohne Sensorcode fortfahren?";
+"noSensorCodeSelectedMessage" = "Wenn auf dem Transmitter bereits eine Sensorsitzung läuft, verwendet die App diese Sitzung mit ihren bestehenden Kalibrierungsanforderungen.\n\nEine neue Sitzung ohne Code erfordert Kalibrierungen nach der Aufwärmphase und danach in regelmäßigen Abständen. Das Ausschalten der Kalibrierungserinnerung der App hebt diese Anforderungen nicht auf.";

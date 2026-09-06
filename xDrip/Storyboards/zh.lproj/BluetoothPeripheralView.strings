@@ -150,7 +150,7 @@
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
 
 /// sensor warm-up text
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "预热至";
 
 /// Scan again button
 "nfcScanFailedScanAgainButton" = "Scan Again";

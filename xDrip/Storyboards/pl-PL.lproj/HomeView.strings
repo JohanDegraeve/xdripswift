@@ -126,7 +126,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
+"enterSensorCode" = "Wpisz kod sensora ręcznie, zeskanuj etykietę sensora lub wybierz zdjęcie.\n\nJeśli nie masz kodu lub chcesz użyć sesji sensora już działającej w nadajniku, wybierz Użyj bez kodu.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -237,7 +237,7 @@
 "sensorInformationTitle" = "Informacje o sensorze";
 "sensorLotNumber" = "Numer partii";
 "sensorSerialNumberMetadata" = "Numer seryjny sensora";
-"sensorLabelReviewFooter" = "Sprawdź odczytane informacje przed uruchomieniem sensora.";
+"sensorLabelReviewFooter" = "Sprawdź swój wybór i ewentualne dane z etykiety, a następnie stuknij Kontynuuj.";
 "sensorLabelScanFailed" = "Nie odczytano etykiety sensora";
 "multipleSensorLabelsFound" = "Zdjęcie zawiera więcej niż jedną etykietę sensora. Wybierz zdjęcie z jedną etykietą.";
 "noSensorLabelFound" = "Na zdjęciu nie znaleziono prawidłowej etykiety sensora Dexcom G6.";
@@ -270,3 +270,9 @@
 "sensorExpirationDate" = "Data ważności";
 "sensorManagementWaitingForSensorStart" = "Oczekiwanie na uruchomienie sensora";
 "sensorManagementStatusWarmingUp" = "Rozgrzewanie";
+"sensorCodeContinue" = "Kontynuuj";
+"useWithoutSensorCode" = "Użyj bez kodu";
+"noSensorCode" = "Brak kodu (0000)";
+"dexcomG7SelectSensorCodeMessage" = "Wpisz ręcznie czterocyfrowy kod parowania, zeskanuj bieżący aplikator lub wybierz zdjęcie. Sprawdź wybrany kod, a następnie stuknij Kontynuuj.";
+"noSensorCodeSelectedTitle" = "Kontynuować bez kodu sensora?";
+"noSensorCodeSelectedMessage" = "Jeśli w nadajniku działa już sesja sensora, aplikacja użyje jej z dotychczasowymi wymaganiami dotyczącymi kalibracji.\n\nRozpoczęcie nowej sesji bez kodu wymaga kalibracji po rozgrzewaniu, a następnie okresowo. Wyłączenie przypomnienia o kalibracji w aplikacji nie znosi tych wymagań.";

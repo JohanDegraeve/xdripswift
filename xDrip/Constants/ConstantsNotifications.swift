@@ -34,6 +34,7 @@ enum ConstantsNotifications {
     enum NotificationIdentifiersForCalibration {
         /// for initial calibration
         static let initialCalibrationRequest = "initialCalibrationRequest"
+        static let dexcomG6InitialCalibrationRequest = "dexcomG6InitialCalibrationRequest"
         /// subsequent calibration request
         static let subsequentCalibrationRequest = "subsequentCalibrationRequest"
     }

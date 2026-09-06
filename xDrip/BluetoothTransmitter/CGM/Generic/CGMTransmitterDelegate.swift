@@ -35,6 +35,9 @@ protocol CGMTransmitterDelegate:AnyObject {
     /// confirms that a validated glucose packet belongs to the matching local sensor session
     /// Dexcom G6/ONE provides this callback; the default implementation does nothing.
     func sensorSessionConfirmed(startDate: Date)
+
+    /// Reports G6/ONE calibration stages after reconciling the transmitter's session date.
+    func dexcomG6CalibrationStateReceived(_ state: DexcomAlgorithmState, sensorStartDate: Date, from transmitter: CGMG5Transmitter)
     
 }
 
@@ -42,4 +45,5 @@ extension CGMTransmitterDelegate {
     func sensorHealthEventOccurred(_ event: CGMSensorHealthEvent) {}
     func sensorSessionStartResultReceived(_ result: CGMSensorSessionStartResult) {}
     func sensorSessionConfirmed(startDate: Date) {}
+    func dexcomG6CalibrationStateReceived(_ state: DexcomAlgorithmState, sensorStartDate: Date, from transmitter: CGMG5Transmitter) {}
 }

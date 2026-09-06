@@ -83,7 +83,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
+"enterSensorCode" = "手动输入传感器代码、扫描传感器标签或选择照片。\n\n如果您没有代码，或想使用发射器上已在运行的传感器会话，请选择“不使用代码”。";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -194,7 +194,7 @@
 "sensorInformationTitle" = "传感器信息";
 "sensorLotNumber" = "批号";
 "sensorSerialNumberMetadata" = "传感器序列号";
-"sensorLabelReviewFooter" = "启动传感器前，请检查解码的信息。";
+"sensorLabelReviewFooter" = "请检查您的选择以及标签信息（如有），然后轻点“继续”。";
 "sensorLabelScanFailed" = "未能读取传感器标签";
 "multipleSensorLabelsFound" = "照片中包含多个传感器标签。请选择仅含一个标签的照片。";
 "noSensorLabelFound" = "照片中未找到有效的 Dexcom G6 传感器标签。";
@@ -227,3 +227,9 @@
 "sensorExpirationDate" = "有效期至";
 "sensorManagementWaitingForSensorStart" = "正在等待传感器启动";
 "sensorManagementStatusWarmingUp" = "预热中";
+"sensorCodeContinue" = "继续";
+"useWithoutSensorCode" = "不使用代码";
+"noSensorCode" = "无代码 (0000)";
+"dexcomG7SelectSensorCodeMessage" = "手动输入四位配对代码、扫描当前的传感器助针器或选择照片。确认所选代码后，轻点“继续”。";
+"noSensorCodeSelectedTitle" = "不使用传感器代码继续？";
+"noSensorCodeSelectedMessage" = "如果发射器上已有正在运行的传感器会话，应用将使用该会话并保留其现有校准要求。\n\n不使用代码启动新会话时，需要在预热后进行校准，并在之后定期校准。关闭应用的校准提醒并不会取消这些要求。";

@@ -44,7 +44,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
+"enterSensorCode" = "Ange sensorkoden manuellt, skanna sensorns etikett eller välj ett foto.\n\nOm du inte har koden eller vill använda en sensorsession som redan är aktiv på sändaren väljer du Använd utan kod.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -154,7 +154,7 @@
 "sensorInformationTitle" = "Sensorinformation";
 "sensorLotNumber" = "Lotnummer";
 "sensorSerialNumberMetadata" = "Sensorns serienummer";
-"sensorLabelReviewFooter" = "Kontrollera den avkodade informationen innan sensorn startas.";
+"sensorLabelReviewFooter" = "Kontrollera ditt val och eventuell etikettinformation och tryck på Fortsätt.";
 "sensorLabelScanFailed" = "Sensoretiketten kunde inte läsas";
 "multipleSensorLabelsFound" = "Fotot innehåller fler än en sensoretikett. Välj ett foto med en etikett.";
 "noSensorLabelFound" = "Ingen giltig Dexcom G6-sensoretikett hittades i fotot.";
@@ -187,3 +187,9 @@
 "sensorExpirationDate" = "Utgångsdatum";
 "sensorManagementWaitingForSensorStart" = "Väntar på sensorstart";
 "sensorManagementStatusWarmingUp" = "Värmer upp";
+"sensorCodeContinue" = "Fortsätt";
+"useWithoutSensorCode" = "Använd utan kod";
+"noSensorCode" = "Ingen kod (0000)";
+"dexcomG7SelectSensorCodeMessage" = "Ange den fyrsiffriga parkopplingskoden manuellt, skanna den aktuella applikatorn eller välj ett foto. Kontrollera den valda koden och tryck på Fortsätt.";
+"noSensorCodeSelectedTitle" = "Fortsätta utan sensorkod?";
+"noSensorCodeSelectedMessage" = "Om en sensorsession redan är aktiv på sändaren använder appen den sessionen med dess befintliga kalibreringskrav.\n\nEn ny session utan kod kräver kalibreringar efter uppvärmningen och därefter regelbundet. Kraven försvinner inte om appens kalibreringspåminnelse stängs av.";

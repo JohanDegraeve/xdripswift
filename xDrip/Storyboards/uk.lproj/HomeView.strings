@@ -94,7 +94,7 @@
 "scanbluetoothdeviceongoing" = "Scanning for Transmitter...";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
+"enterSensorCode" = "Введіть код сенсора вручну, відскануйте етикетку сенсора або виберіть фото.\n\nЯкщо у вас немає коду або ви хочете використовувати сеанс сенсора, який уже працює на передавачі, виберіть «Використовувати без коду».";
 
 /// status info : literally 'not known', used if transmitter name is not known
 "notknown" = "Not Known";
@@ -225,7 +225,7 @@
 "sensorInformationTitle" = "Інформація про сенсор";
 "sensorLotNumber" = "Номер партії";
 "sensorSerialNumberMetadata" = "Серійний номер сенсора";
-"sensorLabelReviewFooter" = "Перевірте розпізнані дані перед запуском сенсора.";
+"sensorLabelReviewFooter" = "Перевірте свій вибір і дані етикетки, якщо вони є, потім натисніть «Продовжити».";
 "sensorLabelScanFailed" = "Етикетку сенсора не прочитано";
 "multipleSensorLabelsFound" = "На фото є кілька етикеток сенсора. Виберіть фото з однією етикеткою.";
 "noSensorLabelFound" = "На фото не знайдено дійсної етикетки сенсора Dexcom G6.";
@@ -258,3 +258,9 @@
 "sensorExpirationDate" = "Термін придатності";
 "sensorManagementWaitingForSensorStart" = "Очікування запуску сенсора";
 "sensorManagementStatusWarmingUp" = "Прогрівання";
+"sensorCodeContinue" = "Продовжити";
+"useWithoutSensorCode" = "Використовувати без коду";
+"noSensorCode" = "Без коду (0000)";
+"dexcomG7SelectSensorCodeMessage" = "Введіть чотиризначний код сполучення вручну, відскануйте поточний аплікатор або виберіть фото. Перевірте вибраний код і натисніть «Продовжити».";
+"noSensorCodeSelectedTitle" = "Продовжити без коду сенсора?";
+"noSensorCodeSelectedMessage" = "Якщо на передавачі вже працює сеанс сенсора, застосунок використовуватиме його з наявними вимогами до калібрування.\n\nЗапуск нового сеансу без коду потребує калібрувань після прогрівання та періодично надалі. Вимкнення нагадування про калібрування в застосунку не скасовує цих вимог.";

@@ -36,7 +36,7 @@
 "success" = "Success";
 "failed" = "Failed";
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
-"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
+"enterSensorCode" = "Indtast sensorkoden manuelt, scan sensorens etiket, eller vælg et foto.\n\nHvis du ikke har koden eller vil bruge en sensorsession, der allerede kører på senderen, skal du vælge Brug uden kode.";
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,7 +141,7 @@
 "sensorInformationTitle" = "Sensoroplysninger";
 "sensorLotNumber" = "Lotnummer";
 "sensorSerialNumberMetadata" = "Sensorens serienummer";
-"sensorLabelReviewFooter" = "Kontrollér de afkodede oplysninger, før sensoren startes.";
+"sensorLabelReviewFooter" = "Kontrollér dit valg og eventuelle etiketoplysninger, og tryk på Fortsæt.";
 "sensorLabelScanFailed" = "Sensormærkat ikke læst";
 "multipleSensorLabelsFound" = "Fotoet indeholder mere end én sensormærkat. Vælg et foto med én mærkat.";
 "noSensorLabelFound" = "Der blev ikke fundet en gyldig Dexcom G6-sensormærkat på fotoet.";
@@ -174,3 +174,9 @@
 "sensorExpirationDate" = "Udløbsdato";
 "sensorManagementWaitingForSensorStart" = "Venter på sensorstart";
 "sensorManagementStatusWarmingUp" = "Varmer op";
+"sensorCodeContinue" = "Fortsæt";
+"useWithoutSensorCode" = "Brug uden kode";
+"noSensorCode" = "Ingen kode (0000)";
+"dexcomG7SelectSensorCodeMessage" = "Indtast den firecifrede parringskode manuelt, scan den aktuelle applikator, eller vælg et foto. Kontrollér den valgte kode, og tryk på Fortsæt.";
+"noSensorCodeSelectedTitle" = "Fortsæt uden sensorkode?";
+"noSensorCodeSelectedMessage" = "Hvis en sensorsession allerede kører på senderen, bruger appen den session med dens eksisterende kalibreringskrav.\n\nEn ny session uden kode kræver kalibreringer efter opvarmning og derefter med jævne mellemrum. Disse krav forsvinder ikke, når appens kalibreringspåmindelse slås fra.";

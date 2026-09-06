@@ -82,13 +82,14 @@ struct BluetoothPeripheralsNavigationView: View {
                 initialCode: capture.initialCode,
                 initialLabel: capture.initialLabel,
                 onCancel: router.closeCurrentView,
-                onManualEntry: {
+                onManualEntry: { selectCode in
                     router.showManualSensorCodeEntry(DexcomManualSensorCodeEntry(
                         title: capture.configuration.title,
                         message: capture.configuration.manualEntryMessage,
                         placeholder: capture.configuration.placeholder,
-                        onSubmit: { code in
-                            capture.onSubmit(code, nil)
+                        onSelect: { code in
+                            selectCode(code)
+                            router.closeCurrentView()
                         }
                     ))
                 },
@@ -105,7 +106,7 @@ struct BluetoothPeripheralsNavigationView: View {
                 title: entry.title,
                 message: entry.message,
                 placeholder: entry.placeholder,
-                onSubmit: entry.onSubmit
+                onSelect: entry.onSelect
             )
 
         case let .peripheral(bluetoothPeripheral, bluetoothPeripheralType, dexcomConfiguration):
@@ -527,11 +528,11 @@ private struct DexcomConnectionModeSelectionView: View {
 extension SensorStartCodeView.Configuration {
     static let g7 = SensorStartCodeView.Configuration(
         title: Texts_BluetoothPeripheralView.sensorCode,
-        message: Texts_BluetoothPeripheralView.dexcomG7PairingCodeMessage,
+        message: Texts_HomeView.dexcomG7SelectSensorCodeMessage,
         codeSectionTitle: Texts_BluetoothPeripheralView.sensorCode,
         placeholder: "----",
         manualEntryMessage: Texts_BluetoothPeripheralView.dexcomG7PairingCodeMessage,
-        allowsEmptyCode: false,
+        allowsNoCode: false,
         scanner: .g7,
         showsCancelButton: false,
         noLabelFoundMessage: Texts_BluetoothPeripheralView.dexcomG7NoSensorLabelFound,

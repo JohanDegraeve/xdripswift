@@ -126,7 +126,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
+"enterSensorCode" = "Kodo senzorja vnesite ročno, optično preberite nalepko senzorja ali izberite fotografijo.\n\nČe kode nimate ali želite uporabiti sejo senzorja, ki že poteka na oddajniku, izberite Uporabi brez kode.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -237,7 +237,7 @@
 "sensorInformationTitle" = "Podatki o senzorju";
 "sensorLotNumber" = "Številka serije";
 "sensorSerialNumberMetadata" = "Serijska številka senzorja";
-"sensorLabelReviewFooter" = "Pred zagonom senzorja preverite dekodirane podatke.";
+"sensorLabelReviewFooter" = "Preverite svojo izbiro in morebitne podatke z nalepke ter tapnite Nadaljuj.";
 "sensorLabelScanFailed" = "Oznaka senzorja ni prebrana";
 "multipleSensorLabelsFound" = "Fotografija vsebuje več kot eno oznako senzorja. Izberite fotografijo z eno oznako.";
 "noSensorLabelFound" = "Na fotografiji ni bila najdena veljavna oznaka senzorja Dexcom G6.";
@@ -270,3 +270,9 @@
 "sensorExpirationDate" = "Rok uporabe";
 "sensorManagementWaitingForSensorStart" = "Čakanje na zagon senzorja";
 "sensorManagementStatusWarmingUp" = "Ogrevanje";
+"sensorCodeContinue" = "Nadaljuj";
+"useWithoutSensorCode" = "Uporabi brez kode";
+"noSensorCode" = "Brez kode (0000)";
+"dexcomG7SelectSensorCodeMessage" = "Ročno vnesite štirimestno kodo za seznanjanje, optično preberite trenutni aplikator ali izberite fotografijo. Preverite izbrano kodo in tapnite Nadaljuj.";
+"noSensorCodeSelectedTitle" = "Nadaljujem brez kode senzorja?";
+"noSensorCodeSelectedMessage" = "Če na oddajniku že poteka seja senzorja, bo aplikacija uporabila to sejo z njenimi obstoječimi zahtevami za umerjanje.\n\nZačetek nove seje brez kode zahteva umerjanje po ogrevanju in nato v rednih presledkih. Izklop opomnika za umerjanje v aplikaciji teh zahtev ne odpravi.";

@@ -58,6 +58,7 @@ struct RootTextInputRequest: Identifiable {
     let title: String
     let placeholder: String
     let usesDecimalKeyboard: Bool
+    let message: String?
     let action: (String) -> Void
 }
 
@@ -189,13 +190,16 @@ struct RootTabDependencies {
         title: String,
         placeholder: String,
         usesDecimalKeyboard: Bool,
+        initialText: String = "",
+        message: String? = nil,
         action: @escaping (String) -> Void
     ) {
-        textInput = ""
+        textInput = initialText
         textInputRequest = RootTextInputRequest(
             title: title,
             placeholder: placeholder,
             usesDecimalKeyboard: usesDecimalKeyboard,
+            message: message,
             action: action
         )
     }
@@ -444,6 +448,10 @@ struct RootTabView: View {
                 Button(Texts_Common.Ok) {
                     request.action(stateModel.textInput)
                 }
+            }
+        } message: {
+            if let message = stateModel.textInputRequest?.message {
+                Text(message)
             }
         }
         .overlay {

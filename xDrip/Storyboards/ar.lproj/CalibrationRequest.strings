@@ -2,3 +2,4 @@
 "calibration_title" = "المعايرة";
 "calibration_notification_title" = "المعايرة";
 "calibration_notification_body" = "إضغط على الإشعار للمعايرة";
+"previousCalibrationPrefillMessage" = "تم ملء قيمة المعايرة السابقة من الساعة %@ مسبقًا. قارنها بقراءة جهاز قياس السكر الحالية قبل التأكيد.";

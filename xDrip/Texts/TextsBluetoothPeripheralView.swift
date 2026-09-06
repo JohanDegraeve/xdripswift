@@ -387,7 +387,7 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let warmingUpUntil: String = {
-        return NSLocalizedString("warmingUpUntil", tableName: filename, bundle: Bundle.main, value: "Warming up until", comment: "sensor warm-up text")
+        return NSLocalizedString("warmingUpUntil", tableName: filename, bundle: Bundle.main, value: "Warmup until", comment: "Compact sensor warm-up label followed by the localized completion time")
     }()
     
     static let nativeAlgorithm: String = {

@@ -130,7 +130,7 @@ struct DexcomManualSensorCodeEntry {
     let title: String
     let message: String
     let placeholder: String
-    let onSubmit: (String) -> Void
+    let onSelect: (String) -> Void
 }
 
 // MARK: - List State

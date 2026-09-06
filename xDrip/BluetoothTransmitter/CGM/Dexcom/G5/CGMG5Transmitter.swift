@@ -1555,15 +1555,26 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private func reconcileInternalSensorSessionIfConfirmed() {
         guard let receivedSensorStartDate, let lastAlgorithmStatus else { return }
 
-        // A usable glucose or warm-up status confirms that the date belongs to a real running
-        // session. Other states must not start an internal xDrip4iOS Sensor. In particular,
+        // Glucose, warm-up and initial-calibration states confirm a real running session.
+        // A no-code session needs an internal Sensor before it can accept its first calibration.
+        // Other states must not start an internal xDrip4iOS Sensor. In particular,
         // SessionStopped can still be followed by a transmitter time response containing an old
         // start date which must not be adopted again.
         switch lastAlgorithmStatus {
-        case .okay, .needsCalibration, .SensorWarmup:
+        case .okay, .needsCalibration, .SensorWarmup, .FirstofTwoBGsNeeded, .SecondofTwoBGsNeeded:
             reconcileInternalSensorSession(with: receivedSensorStartDate)
         default:
-            return
+            break
+        }
+
+        // Queue after session reconciliation so calibration entry belongs to the actual session,
+        // including when `0000` was only used to adopt a sensor already running on the transmitter.
+        guard transmitterId.isFireFly() else { return }
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.cgmTransmitterDelegate?.dexcomG6CalibrationStateReceived(
+                lastAlgorithmStatus, sensorStartDate: receivedSensorStartDate, from: self
+            )
         }
     }
 

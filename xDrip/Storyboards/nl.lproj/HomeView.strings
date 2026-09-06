@@ -46,7 +46,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
+"enterSensorCode" = "Voer de sensorcode handmatig in, scan het sensoretiket of kies een foto.\n\nAls je de code niet hebt of een sensorsessie wilt gebruiken die al op de zender actief is, kies dan Zonder code gebruiken.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -180,7 +180,7 @@
 "sensorInformationTitle" = "Sensorinformatie";
 "sensorLotNumber" = "Lotnummer";
 "sensorSerialNumberMetadata" = "Serienummer sensor";
-"sensorLabelReviewFooter" = "Controleer de gedecodeerde informatie voordat u de sensor start.";
+"sensorLabelReviewFooter" = "Controleer je keuze en eventuele etiketgegevens en tik op Doorgaan.";
 "sensorLabelScanFailed" = "Sensorlabel niet gelezen";
 "multipleSensorLabelsFound" = "De foto bevat meer dan één sensorlabel. Kies een foto met één label.";
 "noSensorLabelFound" = "Er is geen geldig Dexcom G6-sensorlabel in de foto gevonden.";
@@ -213,3 +213,9 @@
 "sensorExpirationDate" = "Vervaldatum";
 "sensorManagementWaitingForSensorStart" = "Wachten op sensorstart";
 "sensorManagementStatusWarmingUp" = "Opwarmen";
+"sensorCodeContinue" = "Doorgaan";
+"useWithoutSensorCode" = "Zonder code gebruiken";
+"noSensorCode" = "Geen code (0000)";
+"dexcomG7SelectSensorCodeMessage" = "Voer de viercijferige koppelingscode handmatig in, scan de huidige applicator of kies een foto. Controleer de geselecteerde code en tik op Doorgaan.";
+"noSensorCodeSelectedTitle" = "Doorgaan zonder sensorcode?";
+"noSensorCodeSelectedMessage" = "Als er al een sensorsessie actief is op de zender, gebruikt de app die sessie met de bestaande kalibratievereisten.\n\nEen nieuwe sessie zonder code vereist kalibraties na het opwarmen en daarna periodiek. Het uitschakelen van de kalibratieherinnering van de app neemt deze vereisten niet weg.";
