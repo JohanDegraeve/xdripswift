@@ -154,7 +154,6 @@
 "sensorManagementStarted" = "Started";
 "sensorManagementEnds" = "Ends";
 "sensorManagementCalibrationValue" = "Calibration Value";
-"sensorManagementCalibrationPending" = "Pending...";
 "sensorManagementCalibrationStableTrend" = "Stable trend";
 "sensorManagementCalibrationSlightlyLow" = "Slightly Low";
 "sensorManagementCalibrationSlightlyHigh" = "Slightly High";

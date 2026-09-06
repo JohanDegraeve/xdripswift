@@ -449,10 +449,6 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorManagementCalibrationValue", tableName: filename, bundle: Bundle.main, value: "Calibration Value", comment: "calibration readiness row title for the entered fingerstick value")
     }()
 
-    static let sensorManagementCalibrationPending: String = {
-        return NSLocalizedString("sensorManagementCalibrationPending", tableName: filename, bundle: Bundle.main, value: "Pending...", comment: "calibration readiness detail before a valid fingerstick value is entered")
-    }()
-
     static let sensorManagementCalibrationInProgress: String = {
         NSLocalizedString("sensorManagementCalibrationInProgress", tableName: filename, bundle: Bundle.main, value: "Calibration In Progress...", comment: "disabled calibration button while the transmitter is processing a previous calibration")
     }()
