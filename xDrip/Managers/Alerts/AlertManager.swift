@@ -183,7 +183,7 @@ public class AlertManager: NSObject {
                 _ = checkAlertAndFireHelper(.missedreading)
                 
             } else {
-                trace("in checkAlerts, latestBgReadings is older than %{public}@ minutes", log: log, category: ConstantsLog.categoryAlertManager, type: .info, maxAgeOfLastBgReadingInSeconds.description)
+                trace("in checkAlerts, latestBgReadings is older than %{public}@ seconds", log: log, category: ConstantsLog.categoryAlertManager, type: .info, maxAgeOfLastBgReadingInSeconds.description)
             }
         } else {
             trace("in checkAlerts, latestBgReadings.count == 0", log: log, category: ConstantsLog.categoryAlertManager, type: .info)
