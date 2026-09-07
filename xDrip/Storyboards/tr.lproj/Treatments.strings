@@ -17,3 +17,6 @@
 "treatments_filterTreatmentsLabel" = "Filtre:";
 "treatments_cannotStoreFutureBGCheck" = "Gelecekte bir KŞ Kontürolü kaydedemezsiniz.\n\nGerçek zamanda kaydedilir.";
 "treatments_automaticBasal" = "Otomatik bazal";
+
+/* Section heading when choosing a new treatment type. */
+"treatments_treatmentType" = "Tedavi Türü";

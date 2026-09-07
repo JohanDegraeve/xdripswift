@@ -92,6 +92,10 @@ enum Texts_TreatmentsView {
         return NSLocalizedString("treatments_noTreatmentsToShow", tableName: filename, bundle: Bundle.main, value: "No treatments to show for this date.", comment: "Shown when no treatments match the current date and filters.")
     }()
 
+    static let treatmentType: String = {
+        return NSLocalizedString("treatments_treatmentType", tableName: filename, bundle: Bundle.main, value: "Treatment Type", comment: "Section heading when choosing a new treatment type.")
+    }()
+
     static let type:String = {
         return NSLocalizedString("treatments_type", tableName: filename, bundle: Bundle.main, value: "Type", comment: "Treatment type label.")
     }()

@@ -21,3 +21,6 @@
 "treatments_filterTreatmentsLabel" = "Filter";
 "treatments_cannotStoreFutureBGCheck" = "You cannot store a BG Check in the future.\n\nIt will be stored at the actual time.";
 "treatments_automaticBasal" = "Αυτόματη βασική χορήγηση";
+
+/* Section heading when choosing a new treatment type. */
+"treatments_treatmentType" = "Τύπος θεραπείας";

@@ -61,3 +61,6 @@
 /// filter the treatments by type
 "treatments_filterTreatmentsLabel" = "Filter";
 "treatments_automaticBasal" = "Автоматична базальна подача";
+
+/* Section heading when choosing a new treatment type. */
+"treatments_treatmentType" = "Тип лікування";

@@ -29,3 +29,6 @@
 /// filter the treatments by type
 "treatments_filterTreatmentsLabel" = "Filter";
 "treatments_automaticBasal" = "Samodejni bazal";
+
+/* Section heading when choosing a new treatment type. */
+"treatments_treatmentType" = "Vrsta zdravljenja";

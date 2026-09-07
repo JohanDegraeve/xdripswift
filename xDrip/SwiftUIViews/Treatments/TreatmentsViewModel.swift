@@ -264,49 +264,11 @@ struct TreatmentSnapshot: Hashable {
     }
 
     var iconSystemName: String {
-        switch treatmentType {
-        case .Insulin:
-            return "arrowtriangle.down.fill"
-        case .Carbs:
-            return "circle.fill"
-        case .Exercise:
-            return "heart.fill"
-        case .BgCheck:
-            return "drop.fill"
-        case .Basal, .AutomaticBasal:
-            return "chart.bar.fill"
-        case .SiteChange:
-            return "cross.vial.fill"
-        case .SensorStart:
-            return "sensor.tag.radiowaves.forward.fill"
-        case .PumpBatteryChange:
-            return "battery.100percent"
-        case .Note:
-            return "note.text"
-        }
+        treatmentType.iconSystemName
     }
 
     var iconColor: Color {
-        let baseColor: Color
-
-        switch treatmentType {
-        case .Insulin:
-            baseColor = ConstantsGlucoseChart.bolusTreatmentColor
-        case .Carbs:
-            baseColor = ConstantsGlucoseChart.carbsTreatmentColor
-        case .Exercise:
-            baseColor = Color(red: 1, green: 0, blue: 1)
-        case .BgCheck:
-            baseColor = ConstantsGlucoseChart.bgCheckTreatmentColorInner
-        case .Basal, .AutomaticBasal:
-            baseColor = ConstantsGlucoseChart.basalTreatmentColor
-        case .SiteChange, .SensorStart, .PumpBatteryChange:
-            baseColor = .yellow
-        case .Note:
-            baseColor = ConstantsGlucoseChart.noteTreatmentColor
-        }
-
-        return date > Date() ? baseColor.opacity(0.5) : baseColor
+        date > Date() ? treatmentType.iconColor.opacity(0.5) : treatmentType.iconColor
     }
 
     var iconSize: CGFloat {
@@ -394,4 +356,54 @@ struct TreatmentSnapshot: Hashable {
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .toNilIfLength0()
     }
+}
+
+/// Shared symbols and colors for treatment rows and type selection.
+extension TreatmentType {
+    var iconSystemName: String {
+        switch self {
+        case .Insulin:
+            return "arrowtriangle.down.fill"
+        case .Carbs:
+            return "circle.fill"
+        case .Exercise:
+            return "heart.fill"
+        case .BgCheck:
+            return "drop.fill"
+        case .Basal, .AutomaticBasal:
+            return "chart.bar.fill"
+        case .SiteChange:
+            return "cross.vial.fill"
+        case .SensorStart:
+            return "sensor.tag.radiowaves.forward.fill"
+        case .PumpBatteryChange:
+            return "battery.100percent"
+        case .Note:
+            return "note.text"
+        }
+    }
+
+    var iconColor: Color {
+        let baseColor: Color
+
+        switch self {
+        case .Insulin:
+            baseColor = ConstantsGlucoseChart.bolusTreatmentColor
+        case .Carbs:
+            baseColor = ConstantsGlucoseChart.carbsTreatmentColor
+        case .Exercise:
+            baseColor = Color(red: 1, green: 0, blue: 1)
+        case .BgCheck:
+            baseColor = ConstantsGlucoseChart.bgCheckTreatmentColorInner
+        case .Basal, .AutomaticBasal:
+            baseColor = ConstantsGlucoseChart.basalTreatmentColor
+        case .SiteChange, .SensorStart, .PumpBatteryChange:
+            baseColor = .yellow
+        case .Note:
+            baseColor = ConstantsGlucoseChart.noteTreatmentColor
+        }
+
+        return baseColor
+    }
+
 }

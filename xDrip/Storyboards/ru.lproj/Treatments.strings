@@ -17,3 +17,6 @@
 "treatments_filterTreatmentsLabel" = "Фильтр";
 "treatments_cannotStoreFutureBGCheck" = "Вы не можете сохранить проверку ГК в будущем.\n\nОна будет сохранена в фактическое время.";
 "treatments_automaticBasal" = "Автоматическая базальная подача";
+
+/* Section heading when choosing a new treatment type. */
+"treatments_treatmentType" = "Тип лечения";

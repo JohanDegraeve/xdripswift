@@ -33,7 +33,7 @@ import OSLog
 
     // MARK: - initialization
 
-    init(coreDataManager: CoreDataManager?, treatmentToEdit: TreatmentEntry?) {
+    init(coreDataManager: CoreDataManager?, treatmentToEdit: TreatmentEntry?, initialType: TreatmentType = .Carbs) {
         self.coreDataManager = coreDataManager
         self.treatmentToEditObjectID = treatmentToEdit?.objectID
         self.initialTreatmentState = treatmentToEdit.map {
@@ -45,7 +45,7 @@ import OSLog
                 notes: $0.notes
             )
         }
-        self.selectedType = treatmentToEdit?.treatmentType ?? .Carbs
+        self.selectedType = treatmentToEdit?.treatmentType ?? initialType
         self.selectedDate = treatmentToEdit?.date ?? Date()
         self.enteredByValue = treatmentToEdit?.enteredBy ?? ConstantsHomeView.applicationName
         self.enteredNotesValue = treatmentToEdit?.notes ?? ""

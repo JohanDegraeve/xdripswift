@@ -25,3 +25,6 @@
 /// filter the treatments by type
 "treatments_filterTreatmentsLabel" = "Filter";
 "treatments_automaticBasal" = "Automatisk basal";
+
+/* Section heading when choosing a new treatment type. */
+"treatments_treatmentType" = "Behandlingstype";
