@@ -37,31 +37,23 @@ enum ConstantsGlucoseChart {
     
     /// bolus Treatment marker colour
     static let bolusTreatmentColor = Color.blue
+
+    /// Long-acting injections use a pink double triangle and sit further below the glucose curve.
+    static let basalInjectionTreatmentColor = GlucoseChartTreatmentStyle.basalInjectionColor
+    static let basalInjectionOffsetMultiplier: Double = 2.2
     
     static let defaultSmallBolusTreatmentThreshold: Double = 1.0
     
-    /// values below this threshold will be shown as micro-boluses without labels and scaled accordingly
-    static let smallBolusTreatmentThreshold: Double = 0.8
-    
-    /// values below this threshold will be shown as micro-boluses without labels and scaled accordingly
-    static let mediumBolusTreatmentThreshold: Double = 2
-    
-    /// values below this threshold will be shown as micro-boluses without labels and scaled accordingly
-    static let largeBolusTreatmentThreshold: Double = 5
+    /// Bolus chart labels are hidden below this dose, independently of dynamic symbol size.
+    static let minimumBolusLabelValue: Double = 0.8
 
     // carb treatment marker color/sizes
     
     /// carbs Treatment marker colour
     static let carbsTreatmentColor = Color.orange
     
-    /// threshold below which carbs will be added to the smallCarbs array
-    static let smallCarbsTreatmentThreshold: CGFloat = 5.0
-    
-    /// threshold below which carbs will be added to the mediumCarbs array (if not previously added to another array)
-    static let mediumCarbsTreatmentThreshold: CGFloat = 20.0
-    
-    /// threshold below which carbs will be added to the largeCarbs array (if not previously added to another array)
-    static let largeCarbsTreatmentThreshold: CGFloat = 45.0
+    /// Carb chart labels are hidden below this amount, independently of dynamic symbol size.
+    static let minimumCarbsLabelValue: Double = 5
 
     // bg check circle fill/border color/sizes
     
@@ -93,6 +85,9 @@ enum ConstantsGlucoseChart {
     
     /// amount (in mg/dL) the treatments marker be offset above/below the BG value marker
     static let defaultOffsetTreatmentPositionFromBgMarker: Double = 20
+
+    /// Give dynamically sized carb and bolus symbols more clearance above and below the glucose curve.
+    static let doseTreatmentOffsetMultiplier: Double = 1.6
 
     // chart format parameters
 

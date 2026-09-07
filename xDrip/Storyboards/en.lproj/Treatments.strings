@@ -20,3 +20,12 @@
 
 /* Section heading when choosing a new treatment type. */
 "treatments_treatmentType" = "Treatment Type";
+
+/* Long-acting basal injection entry */
+"treatments_basalInjection" = "Basal (Injection)";
+"treatments_insulinDescription" = "Insulin Type";
+"treatments_insulinDescriptionPlaceholder" = "e.g. Tresiba";
+"treatments_invalidBasalInjectionValueMessage" = "Please enter a whole number of units greater than zero.";
+
+/* Footer shown when a new basal injection is prefilled from the previous entry. */
+"treatments_basalInjectionCopiedFooter" = "The basal amount and type have been copied from the previous entry";

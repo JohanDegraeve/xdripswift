@@ -32,3 +32,12 @@
 
 /* Section heading when choosing a new treatment type. */
 "treatments_treatmentType" = "治疗类型";
+
+/* Long-acting basal injection entry */
+"treatments_basalInjection" = "基础胰岛素（注射）";
+"treatments_insulinDescription" = "胰岛素类型";
+"treatments_insulinDescriptionPlaceholder" = "例如：德谷胰岛素";
+"treatments_invalidBasalInjectionValueMessage" = "请输入大于零的整数单位数。";
+
+/* Footer shown when a new basal injection is prefilled from the previous entry. */
+"treatments_basalInjectionCopiedFooter" = "基础胰岛素剂量和类型已从上一条记录复制";

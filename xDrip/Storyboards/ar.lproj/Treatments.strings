@@ -32,3 +32,12 @@
 
 /* Section heading when choosing a new treatment type. */
 "treatments_treatmentType" = "نوع العلاج";
+
+/* Long-acting basal injection entry */
+"treatments_basalInjection" = "الأنسولين القاعدي (حقن)";
+"treatments_insulinDescription" = "نوع الأنسولين";
+"treatments_insulinDescriptionPlaceholder" = "مثل تريسيبا";
+"treatments_invalidBasalInjectionValueMessage" = "يرجى إدخال عدد صحيح من الوحدات أكبر من الصفر.";
+
+/* Footer shown when a new basal injection is prefilled from the previous entry. */
+"treatments_basalInjectionCopiedFooter" = "تم نسخ كمية الأنسولين القاعدي ونوعه من الإدخال السابق";

@@ -450,7 +450,7 @@ class BgPostProcessingManager {
                 !treatmentEntry.treatmentdeleted
                     && treatmentEntry.treatmentType == .Note
                     && treatmentEntry.enteredBy == appName
-                    && (treatmentEntry.notes?.hasPrefix(ConstantsNightscout.postProcessingNotePrefix) ?? false)
+                    && isPostProcessingNote(treatmentEntry.notes)
             }
 
             for existingNote in existingNotes {
@@ -472,10 +472,21 @@ class BgPostProcessingManager {
         }
     }
 
+    /// Recognize the readable format used for post-processing notes.
+    /// The caller also checks the author and treatment type before replacing a note.
+    private func isPostProcessingNote(_ notes: String?) -> Bool {
+        guard let notes = notes else { return false }
+
+        let lines = notes.components(separatedBy: "\n")
+        return lines.count == 2
+            && (lines[0].hasPrefix("Adjustment: offset ") || lines[0].hasPrefix("Adjustment: disabled. "))
+            && lines[0].contains(". Smoothing: ")
+            && lines[1].hasPrefix("Applied at ")
+            && lines[1].hasSuffix(".")
+    }
+
     private func postProcessingNoteText(enableAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, appliedAtTimeStamp: Date, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm) -> String {
         var noteComponents = [String]()
-
-        noteComponents.append(ConstantsNightscout.postProcessingNotePrefix)
 
         if enableAdjustment, let slope = slope, let intercept = intercept {
             noteComponents.append("Adjustment: offset \(intercept.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes), scale \(slope.round(toDecimalPlaces: 2).stringWithoutTrailingZeroes), emphasis \(adjustmentShapeType.description). " + smoothingNoteText(enableSmoothing: enableSmoothing, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm, useFiveMinuteReadings: useFiveMinuteReadings))

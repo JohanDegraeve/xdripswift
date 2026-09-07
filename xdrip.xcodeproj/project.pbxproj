@@ -372,6 +372,7 @@
 		BA000001000000000000000A /* ImportDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA000001000000000000001A /* ImportDataView.swift */; };
 		BA0000020000000000000001 /* NightscoutFollowerGapFillService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000020000000000000011 /* NightscoutFollowerGapFillService.swift */; };
 		BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */; };
+		BA0709260000000000000001 /* BasalInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0709260000000000000002 /* BasalInjectionTests.swift */; };
 		C2385D0CA6579919114B060A /* AlertTypesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */; };
 		C8BA6BBA5746888144511D55 /* GlucoseChartStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685B5F8D633F5492574F0567 /* GlucoseChartStateManager.swift */; };
 		CA1E00010000000000000001 /* CareLinkTherapyImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1E00020000000000000001 /* CareLinkTherapyImporter.swift */; };
@@ -1290,6 +1291,7 @@
 		BA000001000000000000001A /* ImportDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportDataView.swift; sourceTree = "<group>"; };
 		BA0000020000000000000011 /* NightscoutFollowerGapFillService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowerGapFillService.swift; sourceTree = "<group>"; };
 		BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowerGapFillTests.swift; sourceTree = "<group>"; };
+		BA0709260000000000000002 /* BasalInjectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasalInjectionTests.swift; sourceTree = "<group>"; };
 		CA1E00020000000000000001 /* CareLinkTherapyImporter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkTherapyImporter.swift; sourceTree = "<group>"; };
 		CA1E00040000000000000001 /* CareLinkPumpStatusView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkPumpStatusView.swift; sourceTree = "<group>"; };
 		CA1E00060000000000000001 /* AIDStatusBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIDStatusBanner.swift; sourceTree = "<group>"; };
@@ -2615,6 +2617,7 @@
 				5A0100033015000100000001 /* GlucoseRangeDistributionTests.swift */,
 				4D800003301F000100000001 /* Libre2FrameAssemblerTests.swift */,
 				BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */,
+				BA0709260000000000000002 /* BasalInjectionTests.swift */,
 				A50000040000000000000001 /* OnlineHelpTests.swift */,
 				4F2800113004000100000001 /* RootHomeInteractionTests.swift */,
 				4F2600123002000200000001 /* SensorHealthIssueManagerTests.swift */,
@@ -4399,6 +4402,7 @@
 				A50000030000000000000001 /* OnlineHelpTests.swift in Sources */,
 				FBA100040000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift in Sources */,
 				BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */,
+				BA0709260000000000000001 /* BasalInjectionTests.swift in Sources */,
 				4F2600023002000200000001 /* SensorHealthIssueManagerTests.swift in Sources */,
 				4F2800023004000100000001 /* GlucoseChartYAxisRetentionTests.swift in Sources */,
 				4F2800013004000100000001 /* RootHomeInteractionTests.swift in Sources */,

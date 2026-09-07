@@ -48,7 +48,6 @@ enum ConstantsGlucoseChartSwiftUI {
     // Swift Charts `symbolSize` is area-based, so small changes here make a visible but controlled
     // difference to point diameter without changing every chart type's base size.
     static let glucosePointSymbolSizeMultiplier: Double = 1.2
-    static let carbTreatmentSymbolSizeMultiplier: Double = 2.0
 
     // AGP background styling
     // keep these values in the shared glucose chart constants so the same renderer can be used

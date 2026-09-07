@@ -579,6 +579,7 @@ enum TroubleshootingTreatmentKind: String, Codable {
     case bgCheck
     case basal
     case automaticBasal
+    case basalInjection
     case siteChange
     case sensorStart
     case pumpBatteryChange
@@ -592,6 +593,7 @@ enum TroubleshootingTreatmentKind: String, Codable {
         case .BgCheck: self = .bgCheck
         case .Basal: self = .basal
         case .AutomaticBasal: self = .automaticBasal
+        case .BasalInjection: self = .basalInjection
         case .SiteChange: self = .siteChange
         case .SensorStart: self = .sensorStart
         case .PumpBatteryChange: self = .pumpBatteryChange
@@ -607,6 +609,7 @@ enum TroubleshootingTreatmentKind: String, Codable {
         case .bgCheck: return "BG check"
         case .basal: return "Basal"
         case .automaticBasal: return "Automatic basal"
+        case .basalInjection: return "Basal injection"
         case .siteChange: return "Site change"
         case .sensorStart: return "Sensor start"
         case .pumpBatteryChange: return "Pump battery change"

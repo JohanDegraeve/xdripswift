@@ -32,3 +32,12 @@
 
 /* Section heading when choosing a new treatment type. */
 "treatments_treatmentType" = "Vrsta zdravljenja";
+
+/* Long-acting basal injection entry */
+"treatments_basalInjection" = "Bazalni inzulin (injekcija)";
+"treatments_insulinDescription" = "Vrsta inzulina";
+"treatments_insulinDescriptionPlaceholder" = "npr. Tresiba";
+"treatments_invalidBasalInjectionValueMessage" = "Vnesite celo število enot, večje od nič.";
+
+/* Footer shown when a new basal injection is prefilled from the previous entry. */
+"treatments_basalInjectionCopiedFooter" = "Količina in vrsta bazalnega inzulina sta bili kopirani iz prejšnjega vnosa";

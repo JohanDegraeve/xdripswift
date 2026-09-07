@@ -32,8 +32,7 @@ struct TreatmentEditorContainerView: View {
                                 )
                             } label: {
                                 HStack(spacing: 12) {
-                                    Image(systemName: treatmentType.iconSystemName)
-                                        .foregroundStyle(treatmentType.iconColor)
+                                    treatmentType.iconView()
                                         .frame(width: 24)
                                         .accessibilityHidden(true)
                                     Text(treatmentType.asString())
@@ -54,13 +53,24 @@ struct TreatmentEditorContainerView: View {
                     }
                 }
             case .edit(let treatment):
-                TreatmentEditorScreen(
-                    coreDataManager: coreDataManager,
-                    treatmentToEdit: TreatmentEntryAccessor(coreDataManager: coreDataManager)
-                        .getTreatment(objectID: treatment.objectID),
-                    onSave: onSave,
-                    onCancel: onCancel
-                )
+                // A stale or deleted row must not open an empty editor in add mode.
+                if let entry = TreatmentEntryAccessor(coreDataManager: coreDataManager)
+                    .getTreatment(objectID: treatment.objectID), !entry.isDeleted, !entry.treatmentdeleted {
+                    TreatmentEditorScreen(
+                        coreDataManager: coreDataManager,
+                        treatmentToEdit: entry,
+                        onSave: onSave,
+                        onCancel: onCancel
+                    )
+                } else {
+                    Text(Texts_TreatmentsView.noTreatmentsToShow)
+                        .navigationTitle(Texts_TreatmentsView.editTreatmentTitle)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button(Texts_Common.Cancel, action: onCancel)
+                            }
+                        }
+                }
             }
         }
         .colorScheme(.dark)
@@ -139,32 +149,42 @@ struct TreatmentEditorView: View {
                     Text(Texts_TreatmentsView.type)
                     Spacer()
                     HStack(spacing: 8) {
-                        Image(systemName: viewModel.selectedType.iconSystemName)
-                            .foregroundStyle(viewModel.selectedType.iconColor)
+                        viewModel.selectedType.iconView()
                             .accessibilityHidden(true)
                         Text(viewModel.selectedType.asString())
                             .foregroundStyle(Color(.colorSecondary))
                     }
                 }
 
-                DatePicker(selection: $viewModel.selectedDate, displayedComponents: [.date, .hourAndMinute]) {
+                DatePicker(selection: $viewModel.selectedDate, in: ...viewModel.latestSelectableDate, displayedComponents: [.date, .hourAndMinute]) {
                     Text(Texts_BgReadings.date)
+                        .foregroundStyle(Color(.colorPrimary))
                 }
+                .foregroundStyle(Color(.colorSecondary))
 
                 if viewModel.showsNumericValueEditor {
                     LabeledContent(Texts_TreatmentsView.value) {
                         HStack(spacing: 6) {
                             TextField(viewModel.valuePlaceholder, text: $viewModel.enteredValue)
-                                .keyboardType(.decimalPad)
+                                .keyboardType(viewModel.selectedType == .BasalInjection ? .numberPad : .decimalPad)
                                 .multilineTextAlignment(.trailing)
                                 .textFieldStyle(.plain)
-                                .foregroundStyle(Color(.colorPrimary))
+                                .foregroundStyle(Color(.colorSecondary))
                                 .frame(minWidth: 72, maxWidth: 96, alignment: .trailing)
 
                             Text(viewModel.unitText)
-                                .foregroundStyle(Color(.colorSecondary))
+                                .foregroundStyle(Color(.colorTertiary))
                         }
                         .fixedSize(horizontal: true, vertical: false)
+                    }
+                }
+
+                if viewModel.selectedType == .BasalInjection {
+                    LabeledContent(Texts_TreatmentsView.insulinDescription) {
+                        TextField(Texts_TreatmentsView.insulinDescriptionPlaceholder, text: $viewModel.enteredInsulinDescription)
+                            .multilineTextAlignment(.trailing)
+                            .textFieldStyle(.plain)
+                            .foregroundStyle(Color(.colorSecondary))
                     }
                 }
 
@@ -176,7 +196,7 @@ struct TreatmentEditorView: View {
                             .padding(6)
                             .background(ConstantsAppColors.groupedBackground)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .foregroundStyle(Color(.colorPrimary))
+                            .foregroundStyle(Color(.colorSecondary))
                             .overlay(alignment: .topLeading) {
                                 if viewModel.enteredNotesValue.isEmpty {
                                     Text(Texts_TreatmentsView.notePlaceholder)
@@ -194,7 +214,7 @@ struct TreatmentEditorView: View {
                     TextField(Texts_Common.unknown, text: $viewModel.enteredByValue)
                         .multilineTextAlignment(.trailing)
                         .textFieldStyle(.plain)
-                        .foregroundStyle(Color(.colorPrimary))
+                        .foregroundStyle(Color(.colorSecondary))
                         .frame(minWidth: 120, maxWidth: 220, alignment: .trailing)
                 }
             }
@@ -217,6 +237,9 @@ struct TreatmentEditorView: View {
                 dismissButton: .default(Text(Texts_Common.Ok))
             )
         }
+        .onAppear {
+            viewModel.validateSelectedDateIfNeeded()
+        }
         .onChange(of: viewModel.selectedType) { _ in
             viewModel.validateSelectedDateIfNeeded()
         }
@@ -226,6 +249,10 @@ struct TreatmentEditorView: View {
     }
 
     @ViewBuilder private func editorFooterView() -> some View {
+        if viewModel.selectedType == .BasalInjection, viewModel.didPrefillBasalInjection {
+            Text(Texts_TreatmentsView.basalInjectionCopiedFooter)
+        }
+
         if let helperText = viewModel.helperText {
             Text(helperText)
                 .foregroundStyle(Color(.systemRed))

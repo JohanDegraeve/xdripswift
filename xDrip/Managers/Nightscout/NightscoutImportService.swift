@@ -1393,6 +1393,14 @@ final class NightscoutImportService: @unchecked Sendable {
             ))
         }
 
+        // The recovery importer must use the same classification as normal treatment sync.
+        // Return here so the encoded Note cannot also create a bolus or a general Note row.
+        if eventType?.caseInsensitiveCompare(ConstantsNightscout.noteEventType) == .orderedSame,
+           let payload = BasalInjectionPayload.decode(from: document.notes) {
+            append(type: .BasalInjection, value: Double(payload.units), notes: payload.insulinDescription.toNilIfLength0())
+            return records
+        }
+
         if let carbs = document.carbs?.value, carbs >= 0 { append(type: .Carbs, value: carbs) }
         if let insulin = document.insulin?.value, insulin >= 0 { append(type: .Insulin, value: insulin) }
         if eventType?.caseInsensitiveCompare("Exercise") == .orderedSame,

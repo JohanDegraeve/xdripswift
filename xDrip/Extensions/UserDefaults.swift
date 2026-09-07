@@ -206,6 +206,12 @@ extension UserDefaults {
         case showBgCheckTreatmentsInList = "showBgCheckTreatmentsInList"
         /// should the notes be listed in the treatment list/table?
         case showNoteTreatmentsInList = "showNoteTreatmentsInList"
+        /// should basal injections be listed independently of notes and pump basal?
+        case showBasalInjectionTreatmentsInList = "showBasalInjectionTreatmentsInList"
+        /// last saved whole-unit dose used to prefill a new basal injection
+        case lastBasalInjectionUnits = "lastBasalInjectionUnits"
+        /// last saved insulin type used to prefill a new basal injection
+        case lastBasalInjectionInsulinDescription = "lastBasalInjectionInsulinDescription"
         /// override the default canula age value (CAGE = time since site change)?
         case CAGEMaxHours = "CAGEMaxHours"
 
@@ -1635,6 +1641,24 @@ extension UserDefaults {
         set {
             set(!newValue, forKey: Key.showBgCheckTreatmentsInList.rawValue)
         }
+    }
+
+    /// New injections start with the last explicitly saved dose, never with an automatic submission.
+    var lastBasalInjectionUnits: Int {
+        get { integer(forKey: Key.lastBasalInjectionUnits.rawValue) }
+        set { set(newValue, forKey: Key.lastBasalInjectionUnits.rawValue) }
+    }
+
+    /// Last saved insulin name, or an empty field before the first basal injection.
+    var lastBasalInjectionInsulinDescription: String {
+        get { string(forKey: Key.lastBasalInjectionInsulinDescription.rawValue) ?? "" }
+        set { set(newValue, forKey: Key.lastBasalInjectionInsulinDescription.rawValue) }
+    }
+
+    /// Invert the stored flag so injections are visible before a filter preference has been saved.
+    @objc dynamic var showBasalInjectionTreatmentsInList: Bool {
+        get { !bool(forKey: Key.showBasalInjectionTreatmentsInList.rawValue) }
+        set { set(!newValue, forKey: Key.showBasalInjectionTreatmentsInList.rawValue) }
     }
 
     /// should the app show the Note treatments in the treatments list/table?

@@ -28,3 +28,12 @@
 
 /* Section heading when choosing a new treatment type. */
 "treatments_treatmentType" = "Behandlingstype";
+
+/* Long-acting basal injection entry */
+"treatments_basalInjection" = "Basal (injektion)";
+"treatments_insulinDescription" = "Insulintype";
+"treatments_insulinDescriptionPlaceholder" = "f.eks. Tresiba";
+"treatments_invalidBasalInjectionValueMessage" = "Indtast et helt antal enheder større end nul.";
+
+/* Footer shown when a new basal injection is prefilled from the previous entry. */
+"treatments_basalInjectionCopiedFooter" = "Mængden og typen af basalinsulin er kopieret fra den forrige registrering";

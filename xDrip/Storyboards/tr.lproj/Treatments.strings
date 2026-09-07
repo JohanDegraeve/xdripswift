@@ -20,3 +20,12 @@
 
 /* Section heading when choosing a new treatment type. */
 "treatments_treatmentType" = "Tedavi Türü";
+
+/* Long-acting basal injection entry */
+"treatments_basalInjection" = "Bazal (enjeksiyon)";
+"treatments_insulinDescription" = "İnsülin türü";
+"treatments_insulinDescriptionPlaceholder" = "ör. Tresiba";
+"treatments_invalidBasalInjectionValueMessage" = "Lütfen sıfırdan büyük bir tam sayı olarak ünite girin.";
+
+/* Footer shown when a new basal injection is prefilled from the previous entry. */
+"treatments_basalInjectionCopiedFooter" = "Bazal insülin miktarı ve türü önceki kayıttan kopyalandı";

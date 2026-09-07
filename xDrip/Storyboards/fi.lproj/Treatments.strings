@@ -28,3 +28,12 @@
 
 /* Section heading when choosing a new treatment type. */
 "treatments_treatmentType" = "Hoidon tyyppi";
+
+/* Long-acting basal injection entry */
+"treatments_basalInjection" = "Perusinsuliini (pistos)";
+"treatments_insulinDescription" = "Insuliinityyppi";
+"treatments_insulinDescriptionPlaceholder" = "esim. Tresiba";
+"treatments_invalidBasalInjectionValueMessage" = "Anna nollaa suurempi kokonaisluku yksiköitä.";
+
+/* Footer shown when a new basal injection is prefilled from the previous entry. */
+"treatments_basalInjectionCopiedFooter" = "Perusinsuliinin määrä ja tyyppi on kopioitu edellisestä merkinnästä";

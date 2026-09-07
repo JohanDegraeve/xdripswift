@@ -24,3 +24,12 @@
 
 /* Section heading when choosing a new treatment type. */
 "treatments_treatmentType" = "Τύπος θεραπείας";
+
+/* Long-acting basal injection entry */
+"treatments_basalInjection" = "Βασική ινσουλίνη (ένεση)";
+"treatments_insulinDescription" = "Τύπος ινσουλίνης";
+"treatments_insulinDescriptionPlaceholder" = "π.χ. Tresiba";
+"treatments_invalidBasalInjectionValueMessage" = "Εισαγάγετε ακέραιο αριθμό μονάδων μεγαλύτερο από το μηδέν.";
+
+/* Footer shown when a new basal injection is prefilled from the previous entry. */
+"treatments_basalInjectionCopiedFooter" = "Η ποσότητα και ο τύπος βασικής ινσουλίνης αντιγράφηκαν από την προηγούμενη καταχώριση";
