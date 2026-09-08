@@ -36,6 +36,8 @@ enum LandscapeComparisonPeriod: Int, CaseIterable, Identifiable {
 // MARK: - State Model
 
 /// Owns the selected day trace and recent AGP baseline for the landscape comparison view.
+/// Keep snapshot requests and published UI state on the same actor as chart lifecycle changes.
+@MainActor
 final class LandscapeChartStateModel: ObservableObject {
 
     @Published var selectedDate = Date().toMidnight()

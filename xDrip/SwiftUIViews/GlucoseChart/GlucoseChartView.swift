@@ -10,6 +10,39 @@ import Charts
 import SwiftUI
 import Foundation
 
+/// Owns delayed chart presentation changes without capturing a SwiftUI view or its previous state.
+/// The queued closure holds this owner weakly, so replacing or releasing it cannot recursively
+/// destroy a chain of old views and work items. Access is confined to the main queue.
+final class ChartDelayedState<Value>: ObservableObject {
+    @Published var value: Value
+    private var pending: DispatchWorkItem?
+    private var revision = UUID()
+
+    init(_ value: Value) { self.value = value }
+
+    func cancel() {
+        // Invalidate callbacks even if cancellation races with a work item already dequeued.
+        revision = UUID()
+        pending?.cancel()
+        pending = nil
+    }
+
+    func schedule(_ value: Value, after delay: TimeInterval, animation: Animation? = nil) {
+        cancel()
+        let revision = self.revision
+        let item = DispatchWorkItem { [weak self] in
+            guard let self, self.revision == revision else { return }
+            // Release ownership before publishing, which can synchronously trigger another update.
+            self.pending = nil
+            withAnimation(animation) { self.value = value }
+        }
+        pending = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
+    }
+
+    deinit { pending?.cancel() }
+}
+
 /// Retains the largest upper domain encountered by an interactive chart until an explicit reset.
 ///
 /// Keeping this as presentation state avoids coupling y-axis interaction behaviour to chart data
@@ -84,8 +117,9 @@ struct GlucoseChartView: View {
     var usesMainChartYAxisContext = false
     var mainChartYAxisResetRevision = 0
 
-    @State private var yAxisRetentionState = GlucoseChartYAxisRetentionState()
-    @State private var yAxisAutoResetWorkItem: DispatchWorkItem?
+    @StateObject private var yAxisState = ChartDelayedState(GlucoseChartYAxisRetentionState())
+
+    private var yAxisRetentionState: GlucoseChartYAxisRetentionState { yAxisState.value }
 
     private enum YAxisLabelStyle {
         case objective
@@ -953,38 +987,30 @@ struct GlucoseChartView: View {
             resetRetainedYAxisMaximum(to: calculatedMaximumDomainValue)
         }
         .onDisappear {
-            yAxisAutoResetWorkItem?.cancel()
-            yAxisAutoResetWorkItem = nil
+            yAxisState.cancel()
         }
     }
 
     private func retainYAxisMaximum(_ maximumInMgDl: Double) {
         var retentionState = yAxisRetentionState
         retentionState.retain(maximumInMgDl: maximumInMgDl)
-        yAxisRetentionState = retentionState
+        yAxisState.value = retentionState
     }
 
     private func resetRetainedYAxisMaximum(to maximumInMgDl: Double) {
-        yAxisAutoResetWorkItem?.cancel()
-        yAxisAutoResetWorkItem = nil
+        yAxisState.cancel()
 
         var retentionState = yAxisRetentionState
         retentionState.reset(to: maximumInMgDl)
-        yAxisRetentionState = retentionState
+        yAxisState.value = retentionState
     }
 
     private func scheduleYAxisAutoReset(to maximumInMgDl: Double) {
-        yAxisAutoResetWorkItem?.cancel()
-        yAxisAutoResetWorkItem = nil
-
-        let workItem = DispatchWorkItem {
-            resetRetainedYAxisMaximum(to: maximumInMgDl)
-        }
-        yAxisAutoResetWorkItem = workItem
-        DispatchQueue.main.asyncAfter(
-            deadline: .now() + ConstantsHomeView.mainChartYAxisAutoResetDelay,
-            execute: workItem
-        )
+        // Queue only the target value. Capturing this view here retained earlier work items and
+        // caused recursive destruction to overflow the main-thread stack in TestFlight build 4240.
+        var target = GlucoseChartYAxisRetentionState()
+        target.reset(to: maximumInMgDl)
+        yAxisState.schedule(target, after: ConstantsHomeView.mainChartYAxisAutoResetDelay)
     }
 
     // MARK: - Chart Mark Helpers

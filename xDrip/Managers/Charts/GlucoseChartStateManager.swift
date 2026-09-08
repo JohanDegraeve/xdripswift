@@ -31,7 +31,10 @@ final class GlucoseChartStateManager: ObservableObject {
     private let calibrationsAccessor: CalibrationsAccessor
     private let treatmentEntryAccessor: TreatmentEntryAccessor
     private let nightscoutSyncManager: NightscoutSyncManager
-    private let operationQueue = OperationQueue()
+    private let operationQueue: OperationQueue
+
+    /// Main-thread lifecycle token. Loads from before cleanup must not publish into a reopened chart.
+    @MainActor private var cacheRevision = UUID()
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryGlucoseChartManager)
 
     // MARK: - Cached Data
@@ -92,7 +95,9 @@ final class GlucoseChartStateManager: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager, showsSensorNoiseBands: Bool = false) {
+    init(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager, showsSensorNoiseBands: Bool = false, operationQueue: OperationQueue = OperationQueue()) {
+        // Allow tests to control queue progress without changing the production loading path.
+        self.operationQueue = operationQueue
         self.coreDataManager = coreDataManager
         self.nightscoutSyncManager = nightscoutSyncManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
@@ -123,8 +128,10 @@ final class GlucoseChartStateManager: ObservableObject {
     ///     when Core Data changes inside a date range that the manager has already loaded.
     ///   - showTreatments: Whether treatment and basal points should be included.
     ///   - showOriginalReadingsOnly: Temporarily render original readings instead of processed readings.
-    ///   - completionHandler: Called on the main queue after the state has been published.
+    ///   - completionHandler: Called on the main queue unless cleanup has invalidated this request.
+    @MainActor
     func updateState(endDate: Date = Date(), startDate: Date? = nil, forceReset: Bool = false, refreshCachedData: Bool = false, showTreatments: Bool = UserDefaults.standard.showTreatmentsOnChart, showOriginalReadingsOnly: Bool = false, completionHandler: ((GlucoseChartState) -> Void)? = nil) {
+        let revision = cacheRevision
         let startDateToUse = startDate ?? endDate.addingTimeInterval(-state.endDate.timeIntervalSince(state.startDate))
 
         operationQueue.addOperation { [weak self] in
@@ -132,6 +139,8 @@ final class GlucoseChartStateManager: ObservableObject {
 
             guard self.operationQueue.operations.count <= 1 else {
                 DispatchQueue.main.async {
+                    // Coalesced requests belong to the same lifecycle as fully processed requests.
+                    guard self.cacheRevision == revision else { return }
                     completionHandler?(self.state)
                 }
 
@@ -154,19 +163,29 @@ final class GlucoseChartStateManager: ObservableObject {
             let chartState = self.makeState(startDate: startDateToUse, endDate: endDate, showTreatments: showTreatments, showOriginalReadingsOnly: showOriginalReadingsOnly)
 
             DispatchQueue.main.async {
+                // Cleanup can happen after processing finishes but before this main-queue delivery.
+                guard self.cacheRevision == revision else { return }
                 self.state = chartState
                 completionHandler?(chartState)
             }
         }
     }
 
+    /// Discard pending results immediately, then release caches after any active load finishes.
+    @MainActor
     func cleanUpMemory() {
+        cacheRevision = UUID()
         operationQueue.cancelAllOperations()
-        resetCache()
+        // Cancellation does not stop an already running operation. A barrier keeps reset on the
+        // cache queue and ensures loads submitted after cleanup cannot overtake it.
+        operationQueue.addBarrierBlock { [weak self] in
+            self?.resetCache()
+        }
     }
 
     // MARK: - Cache Loading
 
+    /// Only called on the cache queue, including cleanup, so array mutations never overlap.
     private func resetCache() {
         cachedReadings.removeAll()
         cachedOriginalReadings.removeAll()

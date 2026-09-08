@@ -19,8 +19,7 @@ struct RootHomeMainChartView: View {
     let updateChartStateIfNeeded: () -> Void
     let finishChartScroll: (_ forceReset: Bool, _ showsLoading: Bool) -> Void
 
-    @State private var showsRangeOverlay = false
-    @State private var hideRangeOverlayWorkItem: DispatchWorkItem?
+    @StateObject private var rangeOverlay = ChartDelayedState(false)
     @State private var hasUpdatedRangeDuringPinch = false
 
     private enum Layout {
@@ -83,7 +82,7 @@ struct RootHomeMainChartView: View {
                 )
                 .clipped()
 
-                if showsRangeOverlay {
+                if rangeOverlay.value {
                     HStack(spacing: 4) {
                         Text("\(Int(selectedRange.rawValue))")
                             .fontWeight(.semibold)
@@ -114,8 +113,7 @@ struct RootHomeMainChartView: View {
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
         }
         .onDisappear {
-            hideRangeOverlayWorkItem?.cancel()
-            hideRangeOverlayWorkItem = nil
+            rangeOverlay.cancel()
         }
     }
 
@@ -142,24 +140,19 @@ struct RootHomeMainChartView: View {
     }
 
     private func showRangeOverlay() {
-        hideRangeOverlayWorkItem?.cancel()
+        rangeOverlay.cancel()
 
         var transaction = Transaction()
         transaction.animation = nil
         withTransaction(transaction) {
-            showsRangeOverlay = true
+            rangeOverlay.value = true
         }
 
-        // Restart the delayed fade whenever another successful pinch selects a range.
-        let workItem = DispatchWorkItem {
-            withAnimation(.easeOut(duration: ConstantsHomeView.mainChartZoomOverlayFadeDuration)) {
-                showsRangeOverlay = false
-            }
-        }
-        hideRangeOverlayWorkItem = workItem
-        DispatchQueue.main.asyncAfter(
-            deadline: .now() + ConstantsHomeView.mainChartZoomOverlayVisibleDuration,
-            execute: workItem
+        // The owner schedules a value change without retaining this view and its old work item.
+        rangeOverlay.schedule(
+            false,
+            after: ConstantsHomeView.mainChartZoomOverlayVisibleDuration,
+            animation: .easeOut(duration: ConstantsHomeView.mainChartZoomOverlayFadeDuration)
         )
     }
 }
