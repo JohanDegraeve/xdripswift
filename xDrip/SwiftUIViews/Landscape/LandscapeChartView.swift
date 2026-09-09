@@ -45,6 +45,7 @@ final class LandscapeChartStateModel: ObservableObject {
     @Published var chartState = GlucoseChartState.empty(startDate: Date().toMidnight(), endDate: Date().toMidnight().addingTimeInterval(.hours(24) - 1))
     @Published var baseline = StatisticsManager.LandscapeBaseline.empty
     @Published var rangeSummary = GlucoseClinicalRangeSummary.empty
+    @Published var averageMgDl: Double?
     @Published var loopalyzerSnapshot: StatisticsManager.LandscapeLoopalyzerSnapshot?
     @Published private(set) var comparisonPeriod: LandscapeComparisonPeriod
     let showsAIDCharts: Bool
@@ -196,6 +197,7 @@ final class LandscapeChartStateModel: ObservableObject {
                 chartState: loadedChartState,
                 baseline: loadedAnalytics.baseline,
                 rangeSummary: loadedAnalytics.rangeSummary,
+                averageMgDl: loadedAnalytics.averageMgDl,
                 loopalyzerSnapshot: loadedAnalytics.loopalyzer
             ))
         }
@@ -234,6 +236,7 @@ final class LandscapeChartStateModel: ObservableObject {
         chartState = snapshot.chartState
         baseline = snapshot.baseline
         rangeSummary = snapshot.rangeSummary
+        averageMgDl = snapshot.averageMgDl
         loopalyzerSnapshot = snapshot.loopalyzerSnapshot
         prefetchAdjacentDates(around: cacheKey.date, comparisonPeriod: comparisonPeriod)
     }
@@ -280,6 +283,7 @@ private struct LandscapeDaySnapshot {
     let chartState: GlucoseChartState
     let baseline: StatisticsManager.LandscapeBaseline
     let rangeSummary: GlucoseClinicalRangeSummary
+    let averageMgDl: Double?
     let loopalyzerSnapshot: StatisticsManager.LandscapeLoopalyzerSnapshot?
 }
 
@@ -368,7 +372,10 @@ struct LandscapeChartView: View {
                     landscapeAGPColumn
                         .frame(width: availableWidth * Layout.agpColumnFraction)
 
-                    LandscapeLoopalyzerCharts(snapshot: stateModel.loopalyzerSnapshot)
+                    LandscapeLoopalyzerCharts(
+                        snapshot: stateModel.loopalyzerSnapshot,
+                        showsNowRule: Calendar.current.isDateInToday(stateModel.displayedDate)
+                    )
                         .frame(width: availableWidth * (1 - Layout.agpColumnFraction))
                 }
             }
@@ -414,6 +421,13 @@ struct LandscapeChartView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
+            averageGlucoseLabel
+                .font(.system(size: 15))
+                .foregroundStyle(ConstantsAppColors.primaryText)
+                .fixedSize(horizontal: true, vertical: false)
+                .accessibilityLabel(Texts_Common.statisticsAverageGlucose)
+                .accessibilityValue(averageGlucoseText)
+
             LandscapeTIRBadge(
                 rangeSummary: stateModel.rangeSummary,
                 isExpandedIPad: presentation == .expandedIPad
@@ -422,7 +436,7 @@ struct LandscapeChartView: View {
         .padding(.horizontal, 14)
         .frame(height: presentation == .expandedIPad ? Layout.expandedToolbarHeight : Layout.toolbarHeight)
         .background(ConstantsAppColors.homePanelBackground)
-        .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius + 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
     }
 
     private var expandedSummary: some View {
@@ -484,8 +498,18 @@ struct LandscapeChartView: View {
         return dailyValuesMgDl.reduce(0, +) / Double(dailyValuesMgDl.count)
     }
 
+    private var averageGlucoseLabel: Text {
+        guard let averageMgDl = stateModel.averageMgDl else { return Text("-").bold() }
+
+        let usesMgDl = stateModel.baseline.usesMgDl
+        let value = averageMgDl.mgDlToMmolAndToString(mgDl: usesMgDl)
+        let unit = usesMgDl ? Texts_Common.mgdl : Texts_Common.mmol
+
+        return Text("\(Text(value).bold()) \(Text(unit).foregroundColor(Color(.colorSecondary)))")
+    }
+
     private var averageGlucoseText: String {
-        guard let averageMgDl else { return "-" }
+        guard let averageMgDl = stateModel.averageMgDl else { return "-" }
 
         let usesMgDl = stateModel.baseline.usesMgDl
         let unit = usesMgDl ? Texts_Common.mgdl : Texts_Common.mmol
@@ -611,6 +635,7 @@ struct IPadHomeAGPView: View {
 
 private struct LandscapeLoopalyzerCharts: View {
     let snapshot: StatisticsManager.LandscapeLoopalyzerSnapshot?
+    let showsNowRule: Bool
 
     private enum Layout {
         static let chartSpacing: CGFloat = 14
@@ -628,7 +653,8 @@ private struct LandscapeLoopalyzerCharts: View {
                         44,
                         (validLandscapeDimension(geometry.size.height) - Layout.chartChromeHeight) / 3
                     ),
-                    chartSpacing: Layout.chartSpacing
+                    chartSpacing: Layout.chartSpacing,
+                    showsNowRule: showsNowRule
                 )
             }
         }
@@ -851,6 +877,8 @@ private struct LandscapeTIRBadge: View {
 
     var body: some View {
         HStack(spacing: isExpandedIPad ? 22 : 8) {
+            tirBar
+
             HStack(spacing: isExpandedIPad ? 12 : 0) {
                 percentageText(wholePercentages[0], ConstantsAppColors.statisticsLow)
                 separator
@@ -860,35 +888,31 @@ private struct LandscapeTIRBadge: View {
             }
             .fixedSize(horizontal: true, vertical: false)
 
-            HStack(spacing: isExpandedIPad ? 16 : 8) {
-                tirBar
-
-                Menu {
-                    ForEach(RangeMode.allCases, id: \.self) { mode in
-                        Button {
-                            rangeMode = mode
-                        } label: {
-                            if rangeMode == mode {
-                                Label(mode.title, systemImage: "checkmark")
-                                    .font(.system(size: 15))
-                            } else {
-                                Text(mode.title)
-                                    .font(.system(size: 15))
-                            }
+            Menu {
+                ForEach(RangeMode.allCases, id: \.self) { mode in
+                    Button {
+                        rangeMode = mode
+                    } label: {
+                        if rangeMode == mode {
+                            Label(mode.title, systemImage: "checkmark")
+                                .font(.system(size: 15))
+                        } else {
+                            Text(mode.title)
+                                .font(.system(size: 15))
                         }
                     }
-                } label: {
-                    HStack(spacing: 2) {
-                        Text(rangeMode.title)
-                        Image(systemName: "chevron.up.chevron.down")
-                            .font(.caption.weight(.semibold))
-                    }
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(ConstantsAppColors.primaryText)
                 }
-                .buttonStyle(.plain)
-                .dynamicTypeSize(.xSmall ... .large)
+            } label: {
+                HStack(spacing: 2) {
+                    Text(rangeMode.title)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption.weight(.semibold))
+                }
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(ConstantsAppColors.primaryText)
             }
+            .buttonStyle(.plain)
+            .dynamicTypeSize(.xSmall ... .large)
         }
         .frame(height: isExpandedIPad ? 48 : 40)
         .accessibilityLabel(rangeMode.title)
@@ -914,9 +938,9 @@ private struct LandscapeTIRBadge: View {
             .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
         }
         .frame(
-            minWidth: isExpandedIPad ? 160 : 44,
-            idealWidth: isExpandedIPad ? 220 : 160,
-            maxWidth: isExpandedIPad ? 220 : 160,
+            minWidth: isExpandedIPad ? 130 : 35,
+            idealWidth: isExpandedIPad ? 180 : 130,
+            maxWidth: isExpandedIPad ? 180 : 130,
             minHeight: isExpandedIPad ? 22 : 18,
             maxHeight: isExpandedIPad ? 22 : 18
         )

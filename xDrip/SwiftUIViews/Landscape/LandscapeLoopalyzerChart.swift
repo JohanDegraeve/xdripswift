@@ -16,6 +16,7 @@ struct LandscapeLoopalyzerChart: View {
     let carbTreatmentMarkers: [GlucoseReportLoopalyzerTreatmentMarker]
     let plotHeight: CGFloat
     let chartSpacing: CGFloat
+    let showsNowRule: Bool
 
     private enum Series: CaseIterable {
         case tempBasalDelta
@@ -84,6 +85,7 @@ struct LandscapeLoopalyzerChart: View {
                     dataMarks(for: series)
                     referenceMarks(yDomain: yDomain, includesZero: includesZero)
                     treatmentMarks(for: series, yDomain: yDomain)
+                    nowRule
                 }
                 .chartLegend(.hidden)
                 .chartXScale(
@@ -189,6 +191,19 @@ struct LandscapeLoopalyzerChart: View {
                 .lineStyle(StrokeStyle(lineWidth: 0.5))
                 .foregroundStyle(Color(.colorSecondary).opacity(0.45))
         }
+    }
+
+    @ChartContentBuilder private var nowRule: some ChartContent {
+        if showsNowRule {
+            RuleMark(x: .value("Now", currentMinuteOfDay))
+                .lineStyle(StrokeStyle(lineWidth: 1.0, dash: [4, 4]))
+                .foregroundStyle(ConstantsAppColors.primaryText)
+        }
+    }
+
+    private var currentMinuteOfDay: Int {
+        let components = Calendar.current.dateComponents([.hour, .minute], from: Date())
+        return (components.hour ?? 0) * 60 + (components.minute ?? 0)
     }
 
     @ChartContentBuilder private func treatmentMarks(

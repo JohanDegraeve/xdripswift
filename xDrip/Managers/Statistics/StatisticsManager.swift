@@ -45,6 +45,7 @@ public final class StatisticsManager: @unchecked Sendable {
         let baseline: LandscapeBaseline
         /// Selected-day TIR and TITR calculated from the same validated samples as Statistics.
         let rangeSummary: GlucoseClinicalRangeSummary
+        let averageMgDl: Double?
         let loopalyzer: LandscapeLoopalyzerSnapshot?
     }
 
@@ -302,6 +303,7 @@ public final class StatisticsManager: @unchecked Sendable {
                     continuation.resume(returning: LandscapeAnalytics(
                         baseline: StatisticsManager.emptyLandscapeBaseline(),
                         rangeSummary: .empty,
+                        averageMgDl: nil,
                         loopalyzer: nil
                     ))
                     return
@@ -320,6 +322,7 @@ public final class StatisticsManager: @unchecked Sendable {
                     continuation.resume(returning: LandscapeAnalytics(
                         baseline: StatisticsManager.emptyLandscapeBaseline(),
                         rangeSummary: .empty,
+                        averageMgDl: nil,
                         loopalyzer: nil
                     ))
                     return
@@ -344,10 +347,14 @@ public final class StatisticsManager: @unchecked Sendable {
                     valuesMgDl: selectedDaySamples.map(\.valueMgDl)
                 )
 
+                let averageMgDl = selectedDaySamples.isEmpty ? nil
+                    : selectedDaySamples.reduce(0) { $0 + $1.valueMgDl } / Double(selectedDaySamples.count)
+
                 guard includesAID else {
                     continuation.resume(returning: LandscapeAnalytics(
                         baseline: baseline,
                         rangeSummary: rangeSummary,
+                        averageMgDl: averageMgDl,
                         loopalyzer: nil
                     ))
                     return
@@ -390,6 +397,7 @@ public final class StatisticsManager: @unchecked Sendable {
                 continuation.resume(returning: LandscapeAnalytics(
                     baseline: baseline,
                     rangeSummary: rangeSummary,
+                    averageMgDl: averageMgDl,
                     loopalyzer: loopalyzer
                 ))
             }
