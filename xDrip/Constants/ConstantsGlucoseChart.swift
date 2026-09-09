@@ -84,10 +84,13 @@ enum ConstantsGlucoseChart {
     static let automaticBasalPulseDisplayDuration: TimeInterval = 150
     
     /// amount (in mg/dL) the treatments marker be offset above/below the BG value marker
-    static let defaultOffsetTreatmentPositionFromBgMarker: Double = 20
+    static let defaultOffsetTreatmentPositionFromBgMarker: Double = 18
 
     /// Give dynamically sized carb and bolus symbols more clearance above and below the glucose curve.
     static let doseTreatmentOffsetMultiplier: Double = 1.6
+
+    /// Note labels anchor at the glucose value with only the annotation spacing above it.
+    static let noteLabelOffsetMultiplier: Double = 0
 
     // chart format parameters
 

@@ -715,6 +715,9 @@ struct GlucoseChartView: View {
                     .foregroundStyle(GlucoseChartTreatmentStyle.scheduledBasalLineColor)
                 }
 
+                // Note labels sit above basal lines and below dose treatments.
+                treatmentSymbolMarks(points: visibleTreatmentPoints.notes, systemImage: nil, size: { _ in 0 }, color: GlucoseChartTreatmentStyle.noteColor, labelPosition: .top, verticalLabel: true)
+
                 treatmentSymbolMarks(points: visibleTreatmentPoints.carbs, systemImage: GlucoseChartTreatmentStyle.carbsSymbol, size: GlucoseChartTreatmentStyle.carbsSymbolSizing.size, color: GlucoseChartTreatmentStyle.carbsColor, labelPosition: .top)
                 treatmentSymbolMarks(points: visibleTreatmentPoints.boluses, systemImage: GlucoseChartTreatmentStyle.bolusSymbol, size: GlucoseChartTreatmentStyle.bolusSymbolSizing.size, color: GlucoseChartTreatmentStyle.bolusColor, labelPosition: .bottom)
                 treatmentSymbolMarks(points: visibleTreatmentPoints.basalInjections, systemImage: GlucoseChartTreatmentStyle.basalInjectionSymbol, size: { _ in treatmentSymbolSize() * GlucoseChartTreatmentStyle.basalInjectionScale }, color: GlucoseChartTreatmentStyle.basalInjectionColor, labelPosition: .bottom)
@@ -766,13 +769,11 @@ struct GlucoseChartView: View {
                     .foregroundStyle(bgColor(bgValueInMgDl: bgReadingValues[index]))
             }
 
-            // Calibration, BG check and note markers sit above glucose points.
+            // Calibration and BG check markers sit above glucose points.
             if chartState != nil {
                 borderedCircleMarks(points: visibleCalibrationPoints, outerColor: GlucoseChartTreatmentStyle.calibrationOuterColor, innerColor: GlucoseChartTreatmentStyle.calibrationInnerColor, outerScale: GlucoseChartTreatmentStyle.calibrationOuterScale, innerScale: GlucoseChartTreatmentStyle.calibrationInnerScale)
 
                 treatmentSymbolMarks(points: visibleTreatmentPoints.bgChecks, systemImage: GlucoseChartTreatmentStyle.bgCheckSymbol, size: { _ in treatmentSymbolSize() }, color: GlucoseChartTreatmentStyle.bgCheckInnerColor, labelPosition: nil)
-
-                treatmentSymbolMarks(points: visibleTreatmentPoints.notes, systemImage: GlucoseChartTreatmentStyle.noteSymbol, size: { _ in treatmentSymbolSize() * GlucoseChartTreatmentStyle.noteSymbolScale + GlucoseChartTreatmentStyle.noteSymbolSizeAdjustment }, color: GlucoseChartTreatmentStyle.noteColor, labelPosition: .top, verticalLabel: true)
             }
 
             ForEach(additionalBgReadingDataSets.indices, id: \.self) { dataSetIndex in
@@ -1040,19 +1041,25 @@ struct GlucoseChartView: View {
     }
 
     /// Native SF Symbols are the actual chart points, with dose labels anchored separately.
-    private func treatmentSymbolMarks(points: [GlucoseChartTreatmentPoint], systemImage: String, size: @escaping (Double) -> Double, color: Color, labelPosition: AnnotationPosition?, verticalLabel: Bool = false) -> some ChartContent {
+    private func treatmentSymbolMarks(points: [GlucoseChartTreatmentPoint], systemImage: String?, size: @escaping (Double) -> Double, color: Color, labelPosition: AnnotationPosition?, verticalLabel: Bool = false) -> some ChartContent {
         ForEach(points) { point in
             PointMark(x: .value("Time", point.date), y: .value("BG", point.yValue))
                 .symbol {
-                    ChartTreatmentSymbol(systemImage: systemImage, size: size(point.treatmentValue), color: color)
+                    if let systemImage {
+                        ChartTreatmentSymbol(systemImage: systemImage, size: size(point.treatmentValue), color: color)
+                    } else {
+                        // A zero-size anchor places note labels directly above the glucose value.
+                        Color.clear.frame(width: size(point.treatmentValue), height: size(point.treatmentValue))
+                    }
                 }
                 .annotation(position: labelPosition ?? .overlay) {
                     if labelPosition != nil, let label = point.label {
                         if verticalLabel {
                             // Rotating counter-clockwise puts the text's leading edge at the bottom,
-                            // immediately above the Note marker, and lets the remaining text read upward.
+                            // immediately above the note anchor, and lets the remaining text read upward.
                             VerticalChartLabelLayout {
-                                treatmentLabel(label, fontSize: GlucoseChartTreatmentStyle.noteLabelFontSize, color: Color(.colorSecondary))
+                                // The leading arrow points down toward the reading after rotation.
+                                treatmentLabel("← \(label)", fontSize: GlucoseChartTreatmentStyle.noteLabelFontSize, color: Color(.colorSecondary))
                                     .fixedSize()
                                     .rotationEffect(.degrees(-90))
                             }
@@ -1065,7 +1072,7 @@ struct GlucoseChartView: View {
         }
     }
 
-    /// Basal injection, BG check and Note symbols follow the visible time range.
+    /// Basal injection and BG check symbols follow the visible time range.
     /// Bolus and carb sizes depend only on the entered amount.
     private func treatmentSymbolSize() -> Double {
         switch hoursToShow {

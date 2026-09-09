@@ -18,7 +18,9 @@ import SwiftUI
 /// rebuilding the complete payload on every scroll update. The append, prepend and trim pattern is
 /// applied to glucose, original glucose, calibrations, treatments and derived basal points so the
 /// renderer receives stable, already-materialised data.
-final class GlucoseChartStateManager: ObservableObject {
+// Cache mutations use the serial operation queue. State publication and lifecycle changes use
+// the main queue, so the manager can be captured by the queue's Sendable closures.
+final class GlucoseChartStateManager: ObservableObject, @unchecked Sendable {
 
     // MARK: - Published State
 
@@ -681,7 +683,7 @@ final class GlucoseChartStateManager: ObservableObject {
             treatmentPoints.notes.append(
                 GlucoseChartTreatmentPoint(
                     date: treatment.date,
-                    yValue: closestYAxisValue(treatmentDate: treatment.date, bgReadings: sortedBgReadings) + (treatmentOffset * 0.5),
+                    yValue: closestYAxisValue(treatmentDate: treatment.date, bgReadings: sortedBgReadings) + (treatmentOffset * ConstantsGlucoseChart.noteLabelOffsetMultiplier),
                     treatmentValue: treatment.value,
                     label: GlucoseChartTreatmentStyle.noteLabel(treatment.notes),
                     notes: treatment.notes,

@@ -236,7 +236,7 @@ enum GlucoseChartTreatmentStyle {
     // Use a light pink to keep basal injections distinct from the red BG check.
     static let basalInjectionColor = Color(red: 1, green: 0.72, blue: 0.88)
     /// Relative size of the double-triangle basal injection marker.
-    static let basalInjectionScale = 1.15
+    static let basalInjectionScale = 1.6
     /// Small-bolus row and filter scale. Chart dose sizing is independent of this preference.
     static let smallBolusScale = 0.6
 
@@ -260,16 +260,11 @@ enum GlucoseChartTreatmentStyle {
 
     static let noteColor = Color(white: 0.9)
     static let noteSymbol = "note.text"
-    /// Keep ordinary Note markers unobtrusive beside dose symbols.
-    static let noteSymbolScale = 0.65
-    /// Add one point at every zoom level without changing the relative scale.
-    static let noteSymbolSizeAdjustment = 1.0
-    /// Extra clearance between the note marker and the leading edge of its vertical label.
-    static let noteLabelExtraSpacing = 2.0
-
     /// Keep note labels short enough to read vertically above their markers.
     static let noteLabelCharacterLimit = 16
     static let noteLabelFontSize = 13.0
+    /// Extra space above the glucose point before the vertical note text begins.
+    static let noteLabelExtraSpacing = 3.0
 
     /// Collapse line breaks for the chart and truncate by Character so emoji remain intact.
     static func noteLabel(_ notes: String?) -> String? {
