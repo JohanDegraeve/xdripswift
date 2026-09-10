@@ -2,7 +2,7 @@ import Foundation
 
 /// Operations exposed by BluetoothPeripheralManager to the SwiftUI Bluetooth views.
 protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
-    
+
     /// to scan for a new BluetoothPeripheral - callback will be called when a new BluetoothPeripheral is found and connected
     /// - parameters:
     ///     - transmitterId : only for devices that need a transmitterID (currently only Dexcom)
@@ -10,20 +10,20 @@ protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
     ///     - callBackForScanningResult : to be called with result of startScanning
     ///     - bluetoothTransmitterDelegate : optional
     func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, dexcomG6BluetoothSlot: DexcomG6BluetoothSlot, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?, callBackForScanningResult: ((BluetoothTransmitter.startScanningResult) -> Void)?, callback: @escaping (BluetoothPeripheral) -> Void)
-    
+
     /// stops scanning for new device
     func stopScanningForNewDevice()
-    
+
     /// to know if bluetoothperipheralmanager is currently scanning for a new device
     func isScanning() -> Bool
-    
+
     /// try to connect to the M5Stack
     func connect(to bluetoothPeripheral: BluetoothPeripheral)
 
     /// Persists whether the app should maintain this peripheral and resets the current
     /// activation's successful-connection marker when the choice changes.
     func setConnectionEnabled(_ enabled: Bool, for bluetoothPeripheral: BluetoothPeripheral)
-    
+
     /// returns the BluetoothTransmitter for the specified bluetoothPeripheral
     /// - parameters:
     ///     - for : the bluetoothPeripheral, for which bluetoothTransmitter should be returned
@@ -36,22 +36,22 @@ protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
     /// - returns:
     ///     - bluetoothPeripheral for the transmitter, can be nil (example if called while scanning)
     func getBluetoothPeripheral(for bluetoothTransmitter: BluetoothTransmitter) -> BluetoothPeripheral?
-    
+
     /// deletes the BluetoothPeripheral in coredata, and also the corresponding BluetoothTransmitter if there is one will be deleted
     func deleteBluetoothPeripheral(bluetoothPeripheral: BluetoothPeripheral)
-    
+
     /// - returns: the BluetoothPeripheral's managed by this BluetoothPeripheralManager
     func getBluetoothPeripherals() -> [BluetoothPeripheral]
-    
+
     /// - returns: the BluetoothTransmittersl's managed by this BluetoothPeripheralManager
     func getBluetoothTransmitters() -> [BluetoothTransmitter]
-    
+
     /// bluetoothtransmitter for this bluetoothperiheral will be deleted, as a result this will also disconnect the bluetoothtransmitter
     func setBluetoothTransmitterToNil(forBluetoothPeripheral bluetoothPeripheral: BluetoothPeripheral)
-    
+
     /// bluetoothtransmitter may need pairing, but app is in background. Notification will be sent to user, user will open the app, at that moment initiatePairing will be called
     func initiatePairing()
-    
+
     /// to pass new value off nonFixedSlopeEnabled
     ///
     /// when user changes the nonFixed value in the Bluetooth peripheral detail view, this function will be called
@@ -61,12 +61,18 @@ protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
     ///
     /// when user changes webOOP values in the Bluetooth peripheral detail view, this function will be called
     func receivedNewValue(webOOPEnabled: Bool, for bluetoothPeripheral: BluetoothPeripheral)
-    
+
     /// - returns the currently in use CGMTransmitter, nil if non in use.
     /// - in use means : created, and shouldconnect = true
     func getCGMTransmitter() -> CGMTransmitter?
-    
+
     /// only applicable for Libre transmitters. To request a new reading.
     func requestNewReading()
-    
+
+    /// Aidex: factory reset sensor (CLEAR_STORAGE + unpair bond). Use before transferring to another phone.
+    func aidexResetSensor()
+
+    /// Aidex: unpair sensor (remove SMP bond at OS level + clear stored keys).
+    func aidexUnpairSensor()
+
 }

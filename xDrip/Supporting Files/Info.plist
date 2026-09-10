@@ -48,6 +48,8 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>DisableLoopShare</key>
+	<string>$(DISABLE_LOOP_SHARE)</string>
 	<key>INAlternativeAppNames</key>
 	<array>
 		<dict>
@@ -67,8 +69,6 @@
 	<false/>
 	<key>IgnoreFollowerTypes</key>
 	<string>$(IGNORE_FOLLOWER_TYPES)</string>
-	<key>DisableLoopShare</key>
-	<string>$(DISABLE_LOOP_SHARE)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
@@ -97,28 +97,6 @@
 	<string>Store bloodglucose readings</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
-	<key>UTExportedTypeDeclarations</key>
-	<array>
-		<dict>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.data</string>
-			</array>
-			<key>UTTypeDescription</key>
-			<string>xDrip Backup</string>
-			<key>UTTypeIdentifier</key>
-			<string>com.xdripswift.backup</string>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>public.filename-extension</key>
-				<array>
-					<string>xdripbackup</string>
-				</array>
-				<key>public.mime-type</key>
-				<string>application/x-xdrip-backup</string>
-			</dict>
-		</dict>
-	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
@@ -165,6 +143,28 @@
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>xDrip Backup</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.xdripswift.backup</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>xdripbackup</string>
+				</array>
+				<key>public.mime-type</key>
+				<string>application/x-xdrip-backup</string>
+			</dict>
+		</dict>
+	</array>
 	<key>view controller-based status bar</key>
 	<false/>
 </dict>

@@ -625,6 +625,9 @@ final class RootHomeStateModel: ObservableObject {
                 ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis
                 : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6
             warmUpMinutes = sensorAgeInMinutes < requiredMinutes ? requiredMinutes : nil
+        } else if UserDefaults.standard.isMaster,
+                  cgmTransmitter?.cgmTransmitterType() == .Aidex {
+            warmUpMinutes = sensorAgeInMinutes < ConstantsAidex.warmupMinutes ? ConstantsAidex.warmupMinutes : nil
         } else {
             warmUpMinutes = nil
         }

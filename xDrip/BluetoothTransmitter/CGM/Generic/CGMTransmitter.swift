@@ -106,6 +106,9 @@ enum CGMTransmitterType:String, CaseIterable {
     /// Keep this raw value stable because it is persisted in UserDefaults.
     case medtrumTouchCareNano = "Medtrum Nano"
 
+    /// Aidex / Linx / LumiFlex CGM sensor
+    case Aidex = "AiDex/Linx/Lumiflex"
+
     /// Direct Medtrum Nano glucose is already consumed by the connected pump and must not be
     /// exported as an independent CGM source to another OS-AID system.
     var osAidSharingPolicy: OSAidSharingPolicy {
@@ -130,6 +133,9 @@ enum CGMTransmitterType:String, CaseIterable {
 
         case .medtrumTouchCareNano:
             return .Medtrum
+
+        case .Aidex:
+            return .Aidex
 
         }
         
@@ -164,6 +170,9 @@ enum CGMTransmitterType:String, CaseIterable {
             // its internal sensor record from the sensorAge we pass with each reading.
             return true
 
+        case .Aidex:
+            return true
+
         }
     }
     
@@ -185,6 +194,9 @@ enum CGMTransmitterType:String, CaseIterable {
 
         case .medtrumTouchCareNano:
             // EasyPatch owns sensor lifecycle; xDrip should not offer a manual start UI.
+            return false
+
+        case .Aidex:
             return false
 
         }
@@ -214,6 +226,9 @@ enum CGMTransmitterType:String, CaseIterable {
             // No pump-battery surface in xDrip; reuse the generic threshold so the UI has a sane default.
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelLibre2
 
+        case .Aidex:
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelLibre2
+
         }
     }
     
@@ -239,6 +254,9 @@ enum CGMTransmitterType:String, CaseIterable {
 
         case .medtrumTouchCareNano:
             return ""
+
+        case .Aidex:
+            return "mV"
 
         }
     }

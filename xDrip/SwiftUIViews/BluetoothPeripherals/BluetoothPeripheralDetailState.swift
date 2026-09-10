@@ -35,6 +35,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     @Published private(set) var category = BluetoothPeripheralCategory.CGM
     @Published private(set) var canDeletePeripheral = false
     @Published var pendingAlert: BluetoothPeripheralDetailAlert?
+    /// Discovered Aidex sensors awaiting user selection — set by aidexDidFinishScanning.
+    @Published var discoveredAidexDevices: [DiscoveredAidexSensor]? = nil
 
     // MARK: - Dependencies
 
@@ -104,6 +106,15 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             .resolvedDexcomG6BluetoothSlot() ?? .defaultSlot
 
         super.init()
+
+        if expectedBluetoothPeripheralType == .AidexType {
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleAidexScanResults(_:)),
+                name: .aidexDidFinishScanning,
+                object: nil
+            )
+        }
 
         configureTransmitterDelegates()
         refresh()
@@ -417,6 +428,9 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             return makeBubbleSections(bluetoothPeripheral: bluetoothPeripheral)
         case .MedtrumTouchCareNanoType:
             return makeMedtrumTouchCareNanoSections(bluetoothPeripheral: bluetoothPeripheral)
+        case .AidexType:
+            let aidexTx = bluetoothPeripheralManager?.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false) as? CGMAidexTransmitter
+            return makeAidexSections(bluetoothPeripheral: bluetoothPeripheral, aidexTransmitter: aidexTx)
         case .M5StackType:
             return makeM5StackSections(bluetoothPeripheral: bluetoothPeripheral, includesSpecificM5StackSection: true)
         case .M5StickCType:
@@ -2291,6 +2305,100 @@ private extension BluetoothPeripheralDetailState {
             )
         ]
     }
+
+    func makeAidexSections(bluetoothPeripheral: BluetoothPeripheral, aidexTransmitter: CGMAidexTransmitter?) -> [BluetoothPeripheralDetailSection] {
+        guard let aidex = bluetoothPeripheral as? Aidex else { return [] }
+
+        var infoRows: [BluetoothPeripheralDetailRow] = []
+
+        if let fw = aidex.firmwareVersion, !fw.isEmpty {
+            infoRows.append(row(id: "aidex-firmware", title: Texts_Common.firmware, detail: fw))
+        }
+        if let model = aidex.modelName, !model.isEmpty {
+            infoRows.append(row(id: "aidex-model", title: Texts_Common.model, detail: model))
+        }
+
+        // Battery level (from transmitter)
+        if let tx = aidexTransmitter, tx.batteryMillivolts > 0 {
+            let volts = String(format: "%.2f", Double(tx.batteryMillivolts) / 1000.0)
+            infoRows.append(row(id: "aidex-battery", title: "Battery", detail: "\(volts) V"))
+        }
+
+        // Sensor age / remaining (from transmitter)
+        if let tx = aidexTransmitter {
+            let ageHours = tx.sensorAgeHours
+            let remainingHours = tx.sensorRemainingHours
+            if ageHours > 0 {
+                infoRows.append(row(id: "aidex-age", title: "Sensor Age", detail: "\(ageHours)h"))
+            }
+            if remainingHours > 0 {
+                infoRows.append(row(id: "aidex-remaining", title: "Sensor Remaining", detail: "\(remainingHours)h"))
+            }
+        }
+
+        let isConnected = bluetoothPeripheral.blePeripheral.shouldconnect
+        var actionRows: [BluetoothPeripheralDetailRow] = []
+
+        // Reset Sensor (factory reset) — available when connected
+        actionRows.append(row(
+            id: "aidex-reset",
+            title: "Reset Sensor",
+            detail: "Factory reset (CLEAR_STORAGE + unpair). Use before transferring to another phone.",
+            isEnabled: isConnected,
+            action: { [weak self] in
+                self?.pendingAlert = BluetoothPeripheralDetailAlert(
+                    title: "Reset Sensor",
+                    message: "This will factory-reset the sensor (CLEAR_STORAGE + unpair bond). Use this before transferring to another phone. Continue?",
+                    primaryButtonTitle: "Reset",
+                    primaryAction: { [weak self] in
+                        self?.bluetoothPeripheralManager?.aidexResetSensor()
+                        self?.refresh()
+                    },
+                    secondaryButtonTitle: Texts_Common.Cancel
+                )
+            }
+        ))
+
+        // Unpair Sensor — available when connected
+        actionRows.append(row(
+            id: "aidex-unpair",
+            title: "Unpair Sensor",
+            detail: "Remove SMP bond at OS level + clear stored keys.",
+            isEnabled: isConnected,
+            action: { [weak self] in
+                self?.pendingAlert = BluetoothPeripheralDetailAlert(
+                    title: "Unpair Sensor",
+                    message: "This will remove the SMP bond and clear stored keys. The sensor will need re-pairing to reconnect. Continue?",
+                    primaryButtonTitle: "Unpair",
+                    primaryAction: { [weak self] in
+                        self?.bluetoothPeripheralManager?.aidexUnpairSensor()
+                        self?.refresh()
+                    },
+                    secondaryButtonTitle: Texts_Common.Cancel
+                )
+            }
+        ))
+
+        var sections: [BluetoothPeripheralDetailSection] = []
+
+        if !infoRows.isEmpty {
+            sections.append(BluetoothPeripheralDetailSection(
+                id: "aidex-info",
+                title: BluetoothPeripheralType.AidexType.bluetoothPeripheralDisplayTitle,
+                rows: infoRows
+            ))
+        }
+
+        if !actionRows.isEmpty {
+            sections.append(BluetoothPeripheralDetailSection(
+                id: "aidex-actions",
+                title: "Actions",
+                rows: actionRows
+            ))
+        }
+
+        return sections
+    }
 }
 
 private struct BluetoothPeripheralScanPreparationNotice {
@@ -2579,6 +2687,8 @@ private extension BluetoothPeripheralDetailState {
             cGMMiaoMiaoTransmitter.cGMMiaoMiaoTransmitterDelegate = self
         } else if let cGMBubbleTransmitter = bluetoothTransmitter as? CGMBubbleTransmitter {
             cGMBubbleTransmitter.cGMBubbleTransmitterDelegate = self
+        } else if let cGMAidexTransmitter = bluetoothTransmitter as? CGMAidexTransmitter {
+            cGMAidexTransmitter.cGMAidexTransmitterDelegate = self
         }
     }
 
@@ -2604,6 +2714,8 @@ private extension BluetoothPeripheralDetailState {
             cGMMiaoMiaoTransmitter.cGMMiaoMiaoTransmitterDelegate = bluetoothPeripheralManager as? CGMMiaoMiaoTransmitterDelegate
         } else if let cGMBubbleTransmitter = bluetoothTransmitter as? CGMBubbleTransmitter {
             cGMBubbleTransmitter.cGMBubbleTransmitterDelegate = bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate
+        } else if let cGMAidexTransmitter = bluetoothTransmitter as? CGMAidexTransmitter {
+            cGMAidexTransmitter.cGMAidexTransmitterDelegate = bluetoothPeripheralManager as? CGMAidexTransmitterDelegate
         }
     }
 
@@ -2875,5 +2987,99 @@ extension BluetoothPeripheralDetailState: CGMBubbleTransmitterDelegate {
     func received(libreSensorType: LibreSensorType, from cGMBubbleTransmitter: CGMBubbleTransmitter) {
         (bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate)?.received(libreSensorType: libreSensorType, from: cGMBubbleTransmitter)
         refreshOnMain()
+    }
+}
+
+// MARK: - CGMAidexTransmitterDelegate
+
+extension BluetoothPeripheralDetailState: CGMAidexTransmitterDelegate {
+
+    func received(serialNumber: String, from cGMAidexTransmitter: CGMAidexTransmitter) {
+        (bluetoothPeripheralManager as? CGMAidexTransmitterDelegate)?.received(serialNumber: serialNumber, from: cGMAidexTransmitter)
+    }
+
+    func received(sensorStartTimeMs: Int64, from cGMAidexTransmitter: CGMAidexTransmitter) {
+        (bluetoothPeripheralManager as? CGMAidexTransmitterDelegate)?.received(sensorStartTimeMs: sensorStartTimeMs, from: cGMAidexTransmitter)
+    }
+
+    func received(wearDays: Int, from cGMAidexTransmitter: CGMAidexTransmitter) {
+        (bluetoothPeripheralManager as? CGMAidexTransmitterDelegate)?.received(wearDays: wearDays, from: cGMAidexTransmitter)
+    }
+
+    func received(batteryMillivolts: Int, from cGMAidexTransmitter: CGMAidexTransmitter) {
+        (bluetoothPeripheralManager as? CGMAidexTransmitterDelegate)?.received(batteryMillivolts: batteryMillivolts, from: cGMAidexTransmitter)
+    }
+
+    func aidexNeedsPairing(from cGMAidexTransmitter: CGMAidexTransmitter) {
+        (bluetoothPeripheralManager as? CGMAidexTransmitterDelegate)?.aidexNeedsPairing(from: cGMAidexTransmitter)
+    }
+
+    func received(firmwareVersion: String, from cGMAidexTransmitter: CGMAidexTransmitter) {
+        (bluetoothPeripheralManager as? CGMAidexTransmitterDelegate)?.received(firmwareVersion: firmwareVersion, from: cGMAidexTransmitter)
+        refreshOnMain()
+    }
+
+    func received(modelName: String, from cGMAidexTransmitter: CGMAidexTransmitter) {
+        (bluetoothPeripheralManager as? CGMAidexTransmitterDelegate)?.received(modelName: modelName, from: cGMAidexTransmitter)
+        refreshOnMain()
+    }
+
+    func aidexDidFinishScanning(devices: [DiscoveredAidexSensor], from cGMAidexTransmitter: CGMAidexTransmitter) {
+        (bluetoothPeripheralManager as? CGMAidexTransmitterDelegate)?.aidexDidFinishScanning(devices: devices, from: cGMAidexTransmitter)
+        discoveredAidexDevices = devices
+    }
+
+    func selectAidexDevice(_ discovered: DiscoveredAidexSensor) {
+        discoveredAidexDevices = nil
+        if let bluetoothPeripheral,
+           let transmitter = bluetoothPeripheralManager?
+            .getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false)
+                as? CGMAidexTransmitter {
+            transmitter.connectToDiscoveredDevice(discovered)
+        } else {
+            // For new device scan: use the temp transmitter stored in BluetoothPeripheralManager
+            (bluetoothPeripheralManager as? BluetoothPeripheralManager)?
+                .tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral
+                .flatMap { ($0 as? CGMAidexTransmitter)?.connectToDiscoveredDevice(discovered) }
+        }
+    }
+
+    func aidexDidConnect(_ sensor: AidexSensor, from cGMAidexTransmitter: CGMAidexTransmitter) {
+        (bluetoothPeripheralManager as? CGMAidexTransmitterDelegate)?.aidexDidConnect(sensor, from: cGMAidexTransmitter)
+    }
+
+    func aidexDidDisconnect(_ sensor: AidexSensor, from cGMAidexTransmitter: CGMAidexTransmitter) {
+        (bluetoothPeripheralManager as? CGMAidexTransmitterDelegate)?.aidexDidDisconnect(sensor, from: cGMAidexTransmitter)
+    }
+
+    func received(snapShot: SensorSnapshot?, from cGMAidexTransmitter: CGMAidexTransmitter) {
+        (bluetoothPeripheralManager as? CGMAidexTransmitterDelegate)?.received(snapShot: snapShot, from: cGMAidexTransmitter)
+    }
+
+    // MARK: - Notification handler
+
+    @objc private func handleAidexScanResults(_ notification: Notification) {
+        trace("AidexUI: handleAidexScanResults fired", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .info)
+
+        guard let userInfo = notification.userInfo,
+              let devices = userInfo["devices"] as? [DiscoveredAidexSensor] else {
+            trace("AidexUI: handleAidexScanResults — failed to extract devices from userInfo", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .error)
+            return
+        }
+
+        trace("AidexUI: handleAidexScanResults — received %{public}d device(s)", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .info, devices.count)
+
+        guard devices.count > 0 else {
+            trace("AidexUI: no Aidex sensors found, showing alert", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .info)
+            pendingAlert = BluetoothPeripheralDetailAlert(
+                title: "No Sensors Found",
+                message: "No Aidex sensors were found nearby. Make sure the sensor is active and within range."
+            )
+            refresh()
+            return
+        }
+
+        trace("AidexUI: setting discoveredAidexDevices = %{public}d devices", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .info, devices.count)
+        discoveredAidexDevices = devices
     }
 }

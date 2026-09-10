@@ -39,6 +39,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// Keep this raw value stable because it is persisted with Bluetooth peripheral records.
     case MedtrumTouchCareNanoType = "Medtrum Nano"
 
+    /// Aidex / Linx / LumiFlex CGM sensor
+    case AidexType = "AiDex/Linx/Lumiflex"
+
     func createNewBluetoothPeripheral(withAddress address: String, withName name: String, nsManagedObjectContext: NSManagedObjectContext) -> BluetoothPeripheral {
         
         switch self {
@@ -81,6 +84,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .MedtrumTouchCareNanoType:
             return MedtrumTouchCareNano(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
 
+        case .AidexType:
+            return Aidex(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+
         }
 
     }
@@ -93,7 +99,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .M5StackType, .M5StickCType:
             return .M5Stack
             
-        case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type, .MedtrumTouchCareNanoType:
+        case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type, .MedtrumTouchCareNanoType, .AidexType:
             return .CGM
 
         case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:

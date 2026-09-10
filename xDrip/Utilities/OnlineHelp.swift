@@ -96,6 +96,7 @@ enum OnlineHelpTopic: CaseIterable, Hashable {
     case libre2
     case libreTransmitters
     case medtrumNano
+    case aidex
     case followerHeartbeat
     case m5Stack
 
@@ -167,6 +168,8 @@ enum OnlineHelpTopic: CaseIterable, Hashable {
             return "connect/libreTransmitters/"
         case .medtrumNano:
             return "connect/medtrum/"
+        case .aidex:
+            return "connect/aidex/"
         case .followerHeartbeat:
             return "connect/followerHeartbeat/"
         case .m5Stack:
@@ -396,6 +399,8 @@ extension BluetoothPeripheralType {
             return .followerHeartbeat
         case .MedtrumTouchCareNanoType:
             return .medtrumNano
+        case .AidexType:
+            return .aidex
         }
     }
 }

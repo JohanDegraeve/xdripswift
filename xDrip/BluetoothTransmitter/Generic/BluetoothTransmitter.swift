@@ -24,10 +24,10 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     private var shouldReconnectOnNextDisconnect = true
     
     /// the address of the transmitter. If nil then transmitter never connected, so we don't know the address.
-    private(set) var deviceAddress:String?
+    internal(set) var deviceAddress:String?
     
     /// the name of the transmitter. If nil then transmitter never connected, so we don't know the name
-    private(set) var deviceName:String?
+    internal(set) var deviceName:String?
     
     /// uuid used for scanning, can be empty string, if empty string then scan all devices - only possible if app is in foreground
     private let CBUUID_Advertisement:String?

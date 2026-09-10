@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24901" systemVersion="25F71" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Aidex" representedClassName=".Aidex" syncable="YES">
+        <attribute name="firmwareVersion" optional="YES" attributeType="String"/>
+        <attribute name="modelName" optional="YES" attributeType="String"/>
+        <attribute name="peripheralIdentifier" optional="YES" attributeType="String"/>
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BLEPeripheral" inverseName="aidex" inverseEntity="BLEPeripheral"/>
+    </entity>
     <entity name="AlertEntry" representedClassName=".AlertEntry" syncable="YES">
         <attribute name="alertkind" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="isDisabled" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
@@ -67,6 +73,7 @@
         <attribute name="shouldconnect" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="transmitterId" optional="YES" attributeType="String"/>
         <attribute name="webOOPEnabled" attributeType="Boolean" usesScalarValueType="YES"/>
+        <relationship name="aidex" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Aidex" inverseName="blePeripheral" inverseEntity="Aidex"/>
         <relationship name="bubble" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Bubble" inverseName="blePeripheral" inverseEntity="Bubble"/>
         <relationship name="dexcomG5" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="DexcomG5" inverseName="blePeripheral" inverseEntity="DexcomG5"/>
         <relationship name="dexcomG7" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DexcomG7" inverseName="blePeripheral" inverseEntity="DexcomG7"/>

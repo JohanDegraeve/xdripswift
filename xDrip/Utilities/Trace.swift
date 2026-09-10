@@ -692,6 +692,18 @@ class Trace {
                                 traceInfo.appendStringAndNewLine("        Firmware: " + firmware)
                             }
                         }
+
+                    case .AidexType:
+                        if let aidex = blePeripheral.aidex {
+
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            if let fw = aidex.firmwareVersion {
+                                traceInfo.appendStringAndNewLine("        Firmware: " + fw)
+                            }
+                            if let model = aidex.modelName {
+                                traceInfo.appendStringAndNewLine("        Model: " + model)
+                            }
+                        }
                     }
                 }
                 

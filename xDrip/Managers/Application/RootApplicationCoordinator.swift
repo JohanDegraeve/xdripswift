@@ -1018,18 +1018,25 @@ import AppIntents
             return
         }
 
-        guard cgmTransmitter.cgmTransmitterType() == .dexcomG7 else { return }
-
         let sensorStartDateTolerance = TimeInterval(minutes: 5)
-        guard abs(activeSensor.startDate.timeIntervalSince(detectedStartDate)) > sensorStartDateTolerance else { return }
+        let delta = abs(activeSensor.startDate.timeIntervalSince(detectedStartDate))
+        guard delta > sensorStartDateTolerance else { return }
+
+        // Aidex sensors report a factory start time via 0x21 that may differ from
+        // the effective activation time (e.g. after CLEAR_STORAGE + SET_NEW_SENSOR).
+        // Allow ongoing correction as the transmitter refines its sensorAge estimate.
+        let supportedTypes: Set<CGMTransmitterType> = [.dexcomG7, .Aidex]
+        guard supportedTypes.contains(cgmTransmitter.cgmTransmitterType()) else { return }
 
         trace(
-            "in synchronizeDetectedSensorStartDate, correcting Dexcom G7/ONE+/Stelo active sensor start date from %{public}@ to %{public}@ using transmitter sensor age",
+            "in synchronizeDetectedSensorStartDate, correcting %{public}@ active sensor start date from %{public}@ to %{public}@ (delta=%{public}.0fs) using transmitter sensor age",
             log: log,
             category: ConstantsLog.categoryRootView,
             type: .info,
+            cgmTransmitter.cgmTransmitterType().rawValue,
             activeSensor.startDate.description(with: .current),
-            detectedStartDate.description(with: .current)
+            detectedStartDate.description(with: .current),
+            delta
         )
 
         activeSensor.startDate = detectedStartDate
@@ -1790,6 +1797,10 @@ import AppIntents
         case .medtrumTouchCareNano:
             // Values arrive already calibrated to mg/dL. The transmitter applies the Medtrum per-sensor
             // calibration factor decoded from each packet, so xDrip should not run its own calibrator.
+            calibrator = NoCalibrator()
+
+        case .Aidex:
+            // Aidex sends calibrated data — no xDrip-side calibration needed
             calibrator = NoCalibrator()
 
         }
