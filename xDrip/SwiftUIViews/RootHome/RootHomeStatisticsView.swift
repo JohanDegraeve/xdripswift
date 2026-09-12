@@ -55,7 +55,8 @@ struct RootHomeStatisticsView: View {
                     RootHomePieChartView(
                         low: state.lowPercentage,
                         inRange: state.inRangePercentage,
-                        high: state.highPercentage
+                        high: state.highPercentage,
+                        easterEgg: state.easterEgg
                     )
 
                     if state.showsActivityIndicator {
@@ -169,10 +170,19 @@ struct RootHomePieChartView: View {
     let low: Double
     let inRange: Double
     let high: Double
+    var easterEgg: RootHomeStatisticsEasterEgg?
 
     var body: some View {
         ZStack {
-            if total > 0 {
+            if let easterEgg {
+                // leave a 16pt inner radius for the emoji, matching the original easter egg
+                Circle()
+                    .strokeBorder(ConstantsAppColors.statisticsInRange, lineWidth: 10)
+                Text(easterEgg.rawValue)
+                    .font(.system(size: 26))
+                    .accessibilityHidden(true)
+                    .allowsHitTesting(false)
+            } else if total > 0 {
                 RootHomePieSlice(startAngle: .degrees(referenceAngle), endAngle: .degrees(referenceAngle + inRangeAngle))
                     .fill(ConstantsAppColors.statisticsInRange)
 

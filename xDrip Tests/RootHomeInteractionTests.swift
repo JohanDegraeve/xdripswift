@@ -97,3 +97,117 @@ final class RootHomeInteractionTests: XCTestCase {
         }
     }
 }
+
+final class RootHomeStatisticsEasterEggTests: XCTestCase {
+    private var calendar: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Europe/Madrid")!
+        return calendar
+    }
+
+    private func date(_ month: Int, _ day: Int, hour: Int = 16, minute: Int = 0, year: Int = 2026) -> Date {
+        calendar.date(from: DateComponents(year: year, month: month, day: day, hour: hour, minute: minute))!
+    }
+
+    private func easterEgg(_ date: Date, days: Int = 0, low: Double = 0, inRange: Double = 100,
+                            high: Double = 0, enabled: Bool = true) -> RootHomeStatisticsEasterEgg? {
+        RootHomeStatisticsEasterEggPolicy.easterEgg(low: low, inRange: inRange, high: high,
+            days: days, now: date, calendar: calendar, enabled: enabled)
+    }
+
+    func testRequiresExactInRangeData() {
+        let now = date(9, 10)
+        XCTAssertEqual(easterEgg(now), .sunglasses)
+        XCTAssertNil(easterEgg(now, low: 0.1, inRange: 99.9))
+        XCTAssertNil(easterEgg(now, inRange: 99.9, high: 0.1))
+        XCTAssertNil(easterEgg(now, inRange: 0))
+        XCTAssertNil(easterEgg(now, inRange: .nan))
+        XCTAssertNil(easterEgg(now, enabled: false))
+    }
+
+    func testTodayThresholdAndMidnight() {
+        XCTAssertNil(easterEgg(date(9, 10, hour: 15, minute: 59)))
+        XCTAssertEqual(easterEgg(date(9, 10)), .sunglasses)
+        XCTAssertEqual(easterEgg(date(9, 10, hour: 23, minute: 59)), .sunglasses)
+        XCTAssertNil(easterEgg(date(9, 11, hour: 0)))
+        for days in [1, 7, 30, 90] {
+            XCTAssertEqual(easterEgg(date(9, 10, hour: 0), days: days), .sunglasses)
+        }
+    }
+
+    func testSeasonalDatesAndAdjacentDays() {
+        for (month, day, expected) in [
+            (1, 1, RootHomeStatisticsEasterEgg.newYear),
+            (1, 2, .sunglasses),
+            (10, 30, .sunglasses), (10, 31, .halloween), (11, 1, .sunglasses),
+            (12, 22, .sunglasses), (12, 23, .christmas), (12, 31, .christmas)
+        ] {
+            XCTAssertEqual(easterEgg(date(month, day)), expected)
+            XCTAssertNil(easterEgg(date(month, day, hour: 15)))
+            XCTAssertEqual(easterEgg(date(month, day, hour: 0), days: 7), expected)
+        }
+        XCTAssertEqual(easterEgg(date(1, 1, year: 2027), days: 7), .newYear)
+    }
+
+    func testThresholdUsesWallClockAcrossDaylightSavingChanges() {
+        for (month, day) in [(3, 29), (10, 25)] {
+            XCTAssertNil(easterEgg(date(month, day, hour: 15, minute: 59)))
+            XCTAssertEqual(easterEgg(date(month, day)), .sunglasses)
+        }
+        var utc = Calendar(identifier: .gregorian)
+        utc.timeZone = TimeZone(secondsFromGMT: 0)!
+        XCTAssertNil(RootHomeStatisticsEasterEggPolicy.easterEgg(low: 0, inRange: 100, high: 0,
+            days: 0, now: date(9, 10), calendar: utc))
+    }
+
+    func testLoadingClearsEasterEggAndTimeRefreshDoesNotRestoreIt() {
+        let model = RootHomeStateModel()
+        model.updateStatistics(StatisticsManager.Statistics(lowStatisticValue: 0, highStatisticValue: 0,
+            inRangeStatisticValue: 100, averageStatisticValue: 100, a1CStatisticValue: 5,
+            cVStatisticValue: 0, lowLimitForTIR: 70, highLimitForTIR: 180, numberOfDaysUsed: 1))
+        model.updateStatisticsEasterEgg(days: 0, now: date(9, 10), calendar: calendar)
+        XCTAssertEqual(model.state.statistics.easterEgg, .sunglasses)
+        model.setStatisticsLoading()
+        XCTAssertNil(model.state.statistics.easterEgg)
+        model.updateStatisticsEasterEgg(days: 0, now: date(9, 10), calendar: calendar)
+        XCTAssertNil(model.state.statistics.easterEgg)
+    }
+
+    func testTimeRefreshHandlesForegroundReturnAndSeasonChange() {
+        let model = RootHomeStateModel()
+        model.updateStatistics(StatisticsManager.Statistics(lowStatisticValue: 0, highStatisticValue: 0,
+            inRangeStatisticValue: 100, averageStatisticValue: 100, a1CStatisticValue: 5,
+            cVStatisticValue: 0, lowLimitForTIR: 70, highLimitForTIR: 180, numberOfDaysUsed: 1))
+        model.updateStatisticsEasterEgg(days: 0, now: date(9, 10, hour: 15), calendar: calendar)
+        XCTAssertNil(model.state.statistics.easterEgg)
+        model.updateStatisticsEasterEgg(days: 0, now: date(9, 10), calendar: calendar)
+        XCTAssertEqual(model.state.statistics.easterEgg, .sunglasses)
+        model.updateStatisticsEasterEgg(days: 0, now: date(9, 11, hour: 0), calendar: calendar)
+        XCTAssertNil(model.state.statistics.easterEgg)
+        model.updateStatisticsEasterEgg(days: 7, now: date(12, 31), calendar: calendar)
+        XCTAssertEqual(model.state.statistics.easterEgg, .christmas)
+        model.updateStatisticsEasterEgg(days: 7, now: date(1, 1, hour: 0, year: 2027), calendar: calendar)
+        XCTAssertEqual(model.state.statistics.easterEgg, .newYear)
+    }
+
+    func testRequestContextRejectsChangedPeriodRangeDayAndTimeZone() {
+        func context(days: Int = 0, range: Int = 0, low: Double = 70, high: Double = 180,
+                     now: Date, calendar: Calendar) -> RootHomeStatisticsContext {
+            RootHomeStatisticsContext(days: days, range: range, lowLimit: low, highLimit: high,
+                isMgDl: true, now: now, calendar: calendar)
+        }
+        let now = date(9, 10)
+        let original = context(now: now, calendar: calendar)
+        XCTAssertEqual(original, context(now: date(9, 10, hour: 23), calendar: calendar))
+        XCTAssertNotEqual(original, context(now: date(9, 11, hour: 0), calendar: calendar))
+        XCTAssertNotEqual(original, context(days: 7, now: now, calendar: calendar))
+        XCTAssertNotEqual(original, context(range: 1, now: now, calendar: calendar))
+        XCTAssertNotEqual(original, context(high: 140, now: now, calendar: calendar))
+        XCTAssertNotEqual(original, context(low: 80, now: now, calendar: calendar))
+        var utc = calendar
+        utc.timeZone = TimeZone(secondsFromGMT: 0)!
+        XCTAssertNotEqual(original, context(now: now, calendar: utc))
+        XCTAssertEqual(context(days: 7, now: now, calendar: calendar),
+                       context(days: 7, now: date(9, 11), calendar: calendar))
+    }
+}

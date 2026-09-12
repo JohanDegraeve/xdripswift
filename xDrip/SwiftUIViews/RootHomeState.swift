@@ -71,6 +71,67 @@ struct RootHomeLoopState {
     var isHistorical = false
 }
 
+// we removed the original easter egg during the SwiftUI migration, but users asked for it back.
+// let's bring back the sunglasses and Christmas present, with a few more seasonal surprises.
+/// a little surprise when all available readings are in range
+enum RootHomeStatisticsEasterEgg: String, CaseIterable {
+    case sunglasses = "😎"
+    case newYear = "🥳"
+    case halloween = "🎃"
+    case christmas = "🎁"
+}
+
+/// checks when we can show the easter egg and which emoji to use
+enum RootHomeStatisticsEasterEggPolicy {
+    static func easterEgg(low: Double, inRange: Double, high: Double, days: Int,
+                           now: Date, calendar: Calendar,
+                           enabled: Bool = ConstantsStatistics.showInRangeEasterEgg,
+                           minimumHour: Double = ConstantsStatistics.minimumHoursInDayBeforeShowingEasterEgg) -> RootHomeStatisticsEasterEgg? {
+        // use the exact values, as a rounded 100% can still include a few readings outside the range
+        guard enabled, low == 0, high == 0, inRange.isFinite, inRange > 0 else { return nil }
+
+        // Today waits until 16:00 local time, even on days when the clocks change. Longer periods don't need to wait.
+        let components = calendar.dateComponents([.hour, .minute, .second], from: now)
+        let hour = Double(components.hour ?? 0) + Double(components.minute ?? 0) / 60 + Double(components.second ?? 0) / 3600
+        guard days > 0 || hour >= minimumHour else { return nil }
+        return seasonalEasterEgg(now: now, calendar: calendar)
+    }
+
+    /// use today's date for the seasonal surprise, regardless of the selected statistics period
+    static func seasonalEasterEgg(now: Date, calendar: Calendar) -> RootHomeStatisticsEasterEgg {
+        var gregorian = Calendar(identifier: .gregorian)
+        gregorian.timeZone = calendar.timeZone
+        let date = gregorian.dateComponents([.month, .day], from: now)
+        if date.month == 1 && date.day == 1 { return .newYear }
+        if date.month == 10 && date.day == 31 { return .halloween }
+        if date.month == 12, let day = date.day, (23...31).contains(day) { return .christmas }
+        return .sunglasses
+    }
+}
+
+/// keeps track of the settings and local day used when we requested the statistics
+struct RootHomeStatisticsContext: Equatable {
+    let days: Int
+    let range: Int
+    let lowLimit: Double
+    let highLimit: Double
+    let isMgDl: Bool
+    let day: Date?
+    let timeZone: String
+
+    init(days: Int, range: Int, lowLimit: Double, highLimit: Double, isMgDl: Bool,
+         now: Date, calendar: Calendar) {
+        self.days = days
+        self.range = range
+        self.lowLimit = lowLimit
+        self.highLimit = highLimit
+        self.isMgDl = isMgDl
+        // only Today needs a new calculation when we cross midnight
+        day = days == 0 ? calendar.startOfDay(for: now) : nil
+        timeZone = calendar.timeZone.identifier
+    }
+}
+
 /// Calculated statistics and their loading state for the selected period.
 struct RootHomeStatisticsState {
     var low = RootHomeMetricState(title: Texts_Common.lowStatistics, value: "-")
@@ -86,6 +147,7 @@ struct RootHomeStatisticsState {
     var lowLimitText = ""
     var highLimitText = ""
     var showsActivityIndicator = false
+    var easterEgg: RootHomeStatisticsEasterEgg?
 }
 
 /// Picker values and labels for the selected statistics calculation period.
@@ -313,6 +375,7 @@ final class RootHomeStateModel: ObservableObject {
 
     func setStatisticsLoading() {
         updateState { state in
+            state.statistics.easterEgg = nil
             state.statistics.showsActivityIndicator = state.statistics.average.value != "-"
             state.statistics.low.value = "-"
             state.statistics.inRange.value = "-"
@@ -363,6 +426,17 @@ final class RootHomeStateModel: ObservableObject {
                 lowLimitText: "(<\(self.formattedLimit(statistics.lowLimitForTIR, isMgDl: isMgDl)))",
                 highLimitText: "(>\(self.formattedLimit(statistics.highLimitForTIR, isMgDl: isMgDl)))",
                 showsActivityIndicator: false
+            )
+        }
+    }
+
+    /// recheck the easter egg when the time changes, without recalculating the statistics
+    func updateStatisticsEasterEgg(days: Int, now: Date, calendar: Calendar) {
+        updateState { state in
+            let statistics = state.statistics
+            state.statistics.easterEgg = statistics.showsActivityIndicator ? nil : RootHomeStatisticsEasterEggPolicy.easterEgg(
+                low: statistics.lowPercentage, inRange: statistics.inRangePercentage,
+                high: statistics.highPercentage, days: days, now: now, calendar: calendar
             )
         }
     }

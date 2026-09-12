@@ -162,6 +162,11 @@ import AppIntents
     
     /// statisticsManager instance
     private var statisticsManager: StatisticsManager?
+
+    /// lets us ignore an older calculation when a newer one has already been requested
+    private var statisticsRequestGeneration = 0
+    /// settings and local day for the latest request, including one which is still calculating
+    private var statisticsContext: RootHomeStatisticsContext?
     
     /// watchManager instance
     private var watchManager: WatchManager?
@@ -2033,6 +2038,8 @@ import AppIntents
         
         guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
 
+        refreshStatisticsEasterEgg(overrideApplicationState: overrideApplicationState)
+
         if forceReset {
             rootHomeStateModel.resetChartsToNow()
         }
@@ -2102,6 +2109,30 @@ import AppIntents
     }
     
     
+    /// capture the selected period and range so we can recognise a result which is no longer wanted
+    private func currentStatisticsContext(now: Date, calendar: Calendar) -> RootHomeStatisticsContext {
+        let range = UserDefaults.standard.timeInRangeType
+        return RootHomeStatisticsContext(
+            days: UserDefaults.standard.daysToUseStatistics, range: range.rawValue,
+            lowLimit: range.lowerLimitInMgDl, highLimit: range.higherLimitInMgDl,
+            isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, now: now, calendar: calendar
+        )
+    }
+
+    /// use the existing foreground timer to check for 16:00, midnight and seasonal changes
+    private func refreshStatisticsEasterEgg(overrideApplicationState: Bool) {
+        guard UserDefaults.standard.showStatistics else { return }
+        let now = Date()
+        let calendar = Calendar.current
+        let context = currentStatisticsContext(now: now, calendar: calendar)
+        // a new day or changed settings needs fresh statistics. Otherwise, just recheck the emoji.
+        if statisticsContext != context {
+            updateStatistics(overrideApplicationState: overrideApplicationState)
+        } else {
+            rootHomeStateModel.updateStatisticsEasterEgg(days: context.days, now: now, calendar: calendar)
+        }
+    }
+
     /// helper function to calculate statistics and publish them into the SwiftUI home state
     /// - Parameters:
     ///   - animate: requests animation where the current statistics presentation supports it
@@ -2120,19 +2151,30 @@ import AppIntents
         }
         
         // declare constants/variables
-        let daysToUseStatistics = UserDefaults.standard.daysToUseStatistics
+        let now = Date()
+        let calendar = Calendar.current
+        let context = currentStatisticsContext(now: now, calendar: calendar)
+        statisticsContext = context
+        statisticsRequestGeneration += 1
+        let generation = statisticsRequestGeneration
+        let daysToUseStatistics = context.days
         let fromDate: Date
         
         // if the user has selected 0 (to chose "today") then set the fromDate to the previous midnight
         if daysToUseStatistics == 0 {
-            fromDate = Calendar(identifier: .gregorian).startOfDay(for: Date())
+            fromDate = calendar.startOfDay(for: now)
         } else {
             fromDate = Date(timeIntervalSinceNow: -3600.0 * 24.0 * Double(daysToUseStatistics))
         }
 
         rootHomeStateModel.setStatisticsLoading()
         statisticsManager?.calculateStatistics(fromDate: fromDate, toDate: nil) { [weak self] statistics in
-            self?.rootHomeStateModel.updateStatistics(statistics)
+            // don't let an older result bring back the emoji after changing periods or crossing midnight
+            guard let self, UserDefaults.standard.showStatistics,
+                  generation == self.statisticsRequestGeneration,
+                  context == self.currentStatisticsContext(now: Date(), calendar: .current) else { return }
+            self.rootHomeStateModel.updateStatistics(statistics)
+            self.rootHomeStateModel.updateStatisticsEasterEgg(days: context.days, now: Date(), calendar: .current)
         }
         return
     }
