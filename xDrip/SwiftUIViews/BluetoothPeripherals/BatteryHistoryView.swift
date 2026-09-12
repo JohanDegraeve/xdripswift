@@ -144,6 +144,14 @@ struct BatteryHistoryView: View {
     @State private var selectedPoint: BatteryHistoryPoint?
     @State private var now = Date()
 
+    private var emptyBatterySystemImage: String {
+        // The percent-suffixed battery symbols require iOS 17; keep the empty state visible on iOS 16.
+        if #available(iOS 17.0, *) {
+            return "battery.0percent"
+        }
+        return "minus.plus.batteryblock.slash"
+    }
+
     // MARK: - view
 
     var body: some View {
@@ -163,7 +171,7 @@ struct BatteryHistoryView: View {
                 Section {
                     if points.isEmpty {
                         VStack(spacing: 10) {
-                            Image(systemName: "battery.0percent")
+                            Image(systemName: emptyBatterySystemImage)
                                 .font(.largeTitle)
                             Text(Texts_BluetoothPeripheralView.batteryHistoryNoData)
                                 .font(.headline)

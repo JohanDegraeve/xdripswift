@@ -390,7 +390,11 @@ extension TreatmentType {
         case .SensorStart:
             return "sensor.tag.radiowaves.forward.fill"
         case .PumpBatteryChange:
-            return "battery.100percent"
+            // Match the existing battery fallback because the percent-suffixed symbol requires iOS 17.
+            if #available(iOS 17.0, *) {
+                return "battery.100percent"
+            }
+            return "minus.plus.batteryblock.fill"
         case .Note:
             return GlucoseChartTreatmentStyle.noteSymbol
         }

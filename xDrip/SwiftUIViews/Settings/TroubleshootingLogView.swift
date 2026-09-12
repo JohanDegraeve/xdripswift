@@ -372,7 +372,11 @@ struct TroubleshootingLogView: View {
             case .failed, .permissionDenied:
                 return "exclamationmark.applewatch"
             case .succeeded, .recovered:
-                return "checkmark.applewatch"
+                // The checked Watch symbol requires iOS 17; the event text still describes success on iOS 16.
+                if #available(iOS 17.0, *) {
+                    return "checkmark.applewatch"
+                }
+                return "applewatch"
             case .started, .noData, .restarted, .ended:
                 return "applewatch"
             }

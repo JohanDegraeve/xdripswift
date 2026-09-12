@@ -605,9 +605,15 @@ extension BluetoothPeripheralCategory {
     func systemImage(for connectionStatus: BluetoothPeripheralDisplayStatus = .notScanning) -> String {
         switch self {
         case .CGM:
+            // The intended sensor symbols require iOS 26; use the older sensor tag on earlier versions.
+            if #available(iOS 26.0, *) {
+                return connectionStatus == .connected
+                    ? "sensor.radiowaves.left.and.right.fill"
+                    : "sensor.radiowaves.left.and.right"
+            }
             return connectionStatus == .connected
-                ? "sensor.radiowaves.left.and.right.fill"
-                : "sensor.radiowaves.left.and.right"
+                ? "sensor.tag.radiowaves.forward.fill"
+                : "sensor.tag.radiowaves.forward"
         case .M5Stack:
             return connectionStatus == .connected ? "tv.fill" : "tv"
         case .HeartBeat:

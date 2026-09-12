@@ -604,7 +604,8 @@ private struct DexcomConnectionModeDiagram: View {
 
                 // In Coexistence mode the sensor spans both app rows so both connections stay straight.
                 VStack(spacing: 5) {
-                    Image(systemName: "sensor.radiowaves.left.and.right")
+                    // Share the category's iOS version fallback so the diagram also works before iOS 26.
+                    Image(systemName: BluetoothPeripheralCategory.CGM.systemImage())
                         .font(.system(size: 18))
                         .foregroundStyle(Color.green)
                     Text(verbatim: "Dexcom")

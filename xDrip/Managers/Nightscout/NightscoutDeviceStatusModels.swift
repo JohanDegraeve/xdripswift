@@ -146,11 +146,13 @@ struct NightscoutDeviceStatus: Codable, Sendable {
     
     func uploaderBatteryImageRVCStatusView() -> (batteryImageSystemName: String, batteryImageColor: UIColor)? {
         if let uploaderBatteryPercent, let uploaderIsCharging, !uploaderIsCharging {
+            // Reuse the shared iOS 17 symbol fallback so this legacy warning also supports iOS 16.
+            guard let indicator = ConstantsHomeView.batteryIndicator(percent: uploaderBatteryPercent) else { return nil }
             switch uploaderBatteryPercent {
             case 0...10:
-                return ("battery.0percent", UIColor(.red))
+                return (indicator.systemImage, UIColor(.red))
             case 11...25:
-                return ("battery.25percent", UIColor(.yellow))
+                return (indicator.systemImage, UIColor(.yellow))
             default:
                 return nil
             }
