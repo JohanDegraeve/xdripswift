@@ -718,9 +718,10 @@ struct GlucoseChartView: View {
                 // Note labels sit above basal lines and below dose treatments.
                 treatmentSymbolMarks(points: visibleTreatmentPoints.notes, systemImage: nil, size: { _ in 0 }, color: GlucoseChartTreatmentStyle.noteColor, labelPosition: .top, verticalLabel: true)
 
+                // Draw basal injections first so overlapping carbs and boluses remain in front.
+                treatmentSymbolMarks(points: visibleTreatmentPoints.basalInjections, systemImage: GlucoseChartTreatmentStyle.basalInjectionSymbol, size: { _ in treatmentSymbolSize() * GlucoseChartTreatmentStyle.basalInjectionScale }, color: GlucoseChartTreatmentStyle.basalInjectionColor, labelPosition: .bottom)
                 treatmentSymbolMarks(points: visibleTreatmentPoints.carbs, systemImage: GlucoseChartTreatmentStyle.carbsSymbol, size: GlucoseChartTreatmentStyle.carbsSymbolSizing.size, color: GlucoseChartTreatmentStyle.carbsColor, labelPosition: .top)
                 treatmentSymbolMarks(points: visibleTreatmentPoints.boluses, systemImage: GlucoseChartTreatmentStyle.bolusSymbol, size: GlucoseChartTreatmentStyle.bolusSymbolSizing.size, color: GlucoseChartTreatmentStyle.bolusColor, labelPosition: .bottom)
-                treatmentSymbolMarks(points: visibleTreatmentPoints.basalInjections, systemImage: GlucoseChartTreatmentStyle.basalInjectionSymbol, size: { _ in treatmentSymbolSize() * GlucoseChartTreatmentStyle.basalInjectionScale }, color: GlucoseChartTreatmentStyle.basalInjectionColor, labelPosition: .bottom)
             }
 
             // Extra glucose-like data sets, such as original/raw glucose values, can provide lines, points or bordered points.

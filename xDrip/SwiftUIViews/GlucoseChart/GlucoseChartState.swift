@@ -228,14 +228,15 @@ enum GlucoseChartTreatmentStyle {
     // the fill suffix when excluded, rather than using a different treatment symbol.
     static let bolusSymbol = "arrowtriangle.down.fill"
     static let carbsSymbol = "arrowtriangle.up.fill"
-    static let basalInjectionSymbol = "arrowtriangle.down.2.fill"
+    // Use the single triangle on every iOS version; pink and fixed chart sizing distinguish basal injections.
+    static let basalInjectionSymbol = "arrowtriangle.down.fill"
     static let treatmentIconSize = 17.0
     /// Small chart-only halo to separate treatment symbols from similarly coloured data.
     static let symbolHaloRadius = 1.0
     static let bolusColor = Color.blue
     // Use a light pink to keep basal injections distinct from the red BG check.
     static let basalInjectionColor = Color(red: 1, green: 0.72, blue: 0.88)
-    /// Relative size of the double-triangle basal injection marker.
+    /// Fixed basal injection marker scale, independent of the injected dose.
     static let basalInjectionScale = 1.6
     /// Small-bolus row and filter scale. Chart dose sizing is independent of this preference.
     static let smallBolusScale = 0.6

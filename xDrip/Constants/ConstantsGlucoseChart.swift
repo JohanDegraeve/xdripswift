@@ -38,7 +38,7 @@ enum ConstantsGlucoseChart {
     /// bolus Treatment marker colour
     static let bolusTreatmentColor = Color.blue
 
-    /// Long-acting injections use a pink double triangle and sit further below the glucose curve.
+    /// Long-acting injections use a pink triangle and sit further below the glucose curve.
     static let basalInjectionTreatmentColor = GlucoseChartTreatmentStyle.basalInjectionColor
     static let basalInjectionOffsetMultiplier: Double = 2.2
     

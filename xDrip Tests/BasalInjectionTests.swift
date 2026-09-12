@@ -146,7 +146,7 @@ final class BasalInjectionTests: XCTestCase {
             XCTAssertEqual(snapshot.valueText, "20")
             XCTAssertEqual(snapshot.unitText, "U")
             XCTAssertNil(snapshot.secondaryText)
-            XCTAssertEqual(snapshot.iconSystemName, "arrowtriangle.down.2.fill")
+            XCTAssertEqual(snapshot.iconSystemName, "arrowtriangle.down.fill")
             model.toggleBasalInjectionFilter()
             XCTAssertTrue(model.filteredTreatments.isEmpty)
             model.toggleNoteFilter()
