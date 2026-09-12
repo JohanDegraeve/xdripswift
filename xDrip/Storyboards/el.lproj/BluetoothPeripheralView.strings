@@ -80,7 +80,7 @@
 "nfcScanFailedScanAgainButton" = "Scan Again";
 
 /// Tell the user the scan was successful and to just wait now for connection
-"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 
 /// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
 "readSuccessLast24Hours" = "Τελευταίες 24 ώρες";
@@ -163,3 +163,14 @@
 "batteryHistoryRangeExplanation" = "Τα σταθερά εύρη εκτείνονται από τώρα έως τον επιλεγμένο αριθμό ημερών στο παρελθόν. Τα κενά δείχνουν περιόδους χωρίς ένδειξη.";
 
 "connectionDiagramOtherApp" = "Άλλη εφαρμογή";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Ισχύς σήματος";
+
+"signalStrengthChartExplanation" = "Ζωντανό σήμα των τελευταίων δύο λεπτών. Νέες μετρήσεις λαμβάνονται περίπου κάθε δευτερόλεπτο όσο υπάρχει σύνδεση.";
+
+"signalStrengthWeak" = "Ασθενές";
+"signalStrengthStrong" = "Ισχυρό";
+"signalStrengthLastMeasurement" = "Τελευταία μέτρηση";
+
+"signalStrengthDisconnected" = "Αποσυνδέθηκε";

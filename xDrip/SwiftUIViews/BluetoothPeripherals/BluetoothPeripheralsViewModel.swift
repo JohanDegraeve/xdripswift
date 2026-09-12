@@ -81,6 +81,10 @@ final class BluetoothPeripheralsRouter: ObservableObject {
         path.append(BluetoothPeripheralsRoute(.selectionList(selectionList)))
     }
 
+    func showSignalStrength(peripheral: BluetoothPeripheral) {
+        path.append(BluetoothPeripheralsRoute(.signalStrength(peripheral)))
+    }
+
     func showBatteryHistory(peripheralObjectID: NSManagedObjectID) {
         path.append(BluetoothPeripheralsRoute(.batteryHistory(peripheralObjectID)))
     }
@@ -112,6 +116,7 @@ struct BluetoothPeripheralsRoute: Hashable {
         case selectionList(BluetoothPeripheralSelectionList)
         case readSuccess(TransmitterReadSuccessDisplay, String)
         case batteryHistory(NSManagedObjectID)
+        case signalStrength(BluetoothPeripheral)
     }
 
     let id = UUID()

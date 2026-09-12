@@ -173,3 +173,14 @@
 "batteryHistoryRangeExplanation" = "Les périodes fixes vont de maintenant au nombre de jours sélectionné dans le passé. Les interruptions indiquent des périodes sans mesure.";
 
 "connectionDiagramOtherApp" = "Autre app";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Puissance du signal";
+
+"signalStrengthChartExplanation" = "Signal en direct des deux dernières minutes. Une mesure arrive environ toutes les secondes lorsque l’appareil est connecté.";
+
+"signalStrengthWeak" = "Faible";
+"signalStrengthStrong" = "Fort";
+"signalStrengthLastMeasurement" = "Dernière mesure";
+
+"signalStrengthDisconnected" = "Déconnecté";

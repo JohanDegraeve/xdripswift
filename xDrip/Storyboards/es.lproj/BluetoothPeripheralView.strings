@@ -78,7 +78,7 @@
 "nfcScanFailedScanAgainButton" = "Scan Again";
 
 /// Tell the user the scan was successful and to just wait now for connection
-"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 
 
 "nativeAlgorithm" = "Algoritmo nativo";
@@ -170,3 +170,14 @@
 "batteryHistoryRangeExplanation" = "Los intervalos fijos van desde ahora hasta el número de días seleccionado. Los espacios muestran periodos sin lecturas.";
 
 "connectionDiagramOtherApp" = "Otra app";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Intensidad de señal";
+
+"signalStrengthChartExplanation" = "Señal en directo de los últimos dos minutos. Se reciben nuevas mediciones aproximadamente cada segundo mientras está conectado.";
+
+"signalStrengthWeak" = "Débil";
+"signalStrengthStrong" = "Fuerte";
+"signalStrengthLastMeasurement" = "Última medición";
+
+"signalStrengthDisconnected" = "Desconectado";

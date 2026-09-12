@@ -173,3 +173,14 @@
 "batteryHistoryRangeExplanation" = "Fasta intervall går från nu och tillbaka det valda antalet dagar. Luckor visar perioder utan avläsning.";
 
 "connectionDiagramOtherApp" = "Annan app";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Signalstyrka";
+
+"signalStrengthChartExplanation" = "Livesignal för de senaste två minuterna. Nya mätningar tas emot ungefär varje sekund när enheten är ansluten.";
+
+"signalStrengthWeak" = "Svag";
+"signalStrengthStrong" = "Stark";
+"signalStrengthLastMeasurement" = "Senaste mätning";
+
+"signalStrengthDisconnected" = "Frånkopplad";

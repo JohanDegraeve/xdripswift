@@ -301,6 +301,7 @@
 		4D7B00023014000200000001 /* CGMG5SensorSessionDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */; };
 		4D7C00023015000100000001 /* CalibrationReadinessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7C00013015000100000001 /* CalibrationReadinessTests.swift */; };
 		4D7D00023016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */; };
+		B1E511022026091100000001 /* BluetoothSignalStrengthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */; };
 		4D7E00023017000200000001 /* DexcomG6BluetoothSlotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E00013017000200000001 /* DexcomG6BluetoothSlotTests.swift */; };
 		4D7F00023018000100000001 /* DexcomG7CalibrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7F00013018000100000001 /* DexcomG7CalibrationTests.swift */; };
 		4D7F00043018000100000001 /* DexcomG7CalibrationMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7F00033018000100000001 /* DexcomG7CalibrationMessages.swift */; };
@@ -332,6 +333,7 @@
 		4F3100023007000100000001 /* BatteryHistorySample+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3100123007000100000001 /* BatteryHistorySample+CoreDataProperties.swift */; };
 		4F3100033007000100000001 /* BatteryHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3100133007000100000001 /* BatteryHistoryManager.swift */; };
 		4F3100043007000100000001 /* BatteryHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3100143007000100000001 /* BatteryHistoryView.swift */; };
+		B1E511042026091100000001 /* BluetoothSignalStrengthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */; };
 		4F3100053007000100000001 /* BatteryHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3100153007000100000001 /* BatteryHistoryTests.swift */; };
 		4F3200013008000100000001 /* BgReadingTrendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3200023008000100000001 /* BgReadingTrendTests.swift */; };
 		4F67A33C4EC32A86ABC85882 /* CareLinkFollowerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBC8BB898BFD4C30858ED5D /* CareLinkFollowerSettings.swift */; };
@@ -1205,6 +1207,7 @@
 		4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG5SensorSessionDetectionTests.swift; sourceTree = "<group>"; };
 		4D7C00013015000100000001 /* CalibrationReadinessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationReadinessTests.swift; sourceTree = "<group>"; };
 		4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDisplayStatusTests.swift; sourceTree = "<group>"; };
+		B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothSignalStrengthTests.swift; sourceTree = "<group>"; };
 		4D7E00013017000200000001 /* DexcomG6BluetoothSlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG6BluetoothSlotTests.swift; sourceTree = "<group>"; };
 		4D7F00013018000100000001 /* DexcomG7CalibrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG7CalibrationTests.swift; sourceTree = "<group>"; };
 		4D7F00033018000100000001 /* DexcomG7CalibrationMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG7CalibrationMessages.swift; sourceTree = "<group>"; };
@@ -1257,6 +1260,7 @@
 		4F3100123007000100000001 /* BatteryHistorySample+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "BatteryHistorySample+CoreDataProperties.swift"; path = "xDrip/Core Data/Extensions/BatteryHistorySample+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		4F3100133007000100000001 /* BatteryHistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryHistoryManager.swift; sourceTree = "<group>"; };
 		4F3100143007000100000001 /* BatteryHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryHistoryView.swift; sourceTree = "<group>"; };
+		B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothSignalStrengthView.swift; sourceTree = "<group>"; };
 		4F3100153007000100000001 /* BatteryHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryHistoryTests.swift; sourceTree = "<group>"; };
 		4F3100313007000100000001 /* xdrip v31.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v31.xcdatamodel"; sourceTree = "<group>"; };
 		4F3200023008000100000001 /* BgReadingTrendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingTrendTests.swift; sourceTree = "<group>"; };
@@ -2481,6 +2485,7 @@
 			isa = PBXGroup;
 			children = (
 				4F3100143007000100000001 /* BatteryHistoryView.swift */,
+				B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */,
 				4C2000062F65000100000001 /* BluetoothPeripheralDetailState.swift */,
 				4C2000082F65000100000001 /* BluetoothPeripheralDetailView.swift */,
 				4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */,
@@ -2617,6 +2622,7 @@
 				4F3100153007000100000001 /* BatteryHistoryTests.swift */,
 				4F3200023008000100000001 /* BgReadingTrendTests.swift */,
 				4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */,
+				B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */,
 				4D7C00013015000100000001 /* CalibrationReadinessTests.swift */,
 				ABA4DE8668C9A16DFF21A411 /* CareLinkTests.swift */,
 				50E2401E5ED94424A2FEC5E8 /* TherapyMetricsTests.swift */,
@@ -4412,6 +4418,7 @@
 				5A0100043015000100000001 /* GlucoseRangeDistributionTests.swift in Sources */,
 				4F3100053007000100000001 /* BatteryHistoryTests.swift in Sources */,
 				4D7D00023016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift in Sources */,
+				B1E511022026091100000001 /* BluetoothSignalStrengthTests.swift in Sources */,
 				4D800004301F000100000001 /* Libre2FrameAssemblerTests.swift in Sources */,
 				4D7C00023015000100000001 /* CalibrationReadinessTests.swift in Sources */,
 				4D7B00023014000200000001 /* CGMG5SensorSessionDetectionTests.swift in Sources */,
@@ -4881,6 +4888,7 @@
 				4F3100023007000100000001 /* BatteryHistorySample+CoreDataProperties.swift in Sources */,
 				4F3100033007000100000001 /* BatteryHistoryManager.swift in Sources */,
 				4F3100043007000100000001 /* BatteryHistoryView.swift in Sources */,
+				B1E511042026091100000001 /* BluetoothSignalStrengthView.swift in Sources */,
 				47D2DB3B2B14F6D000C8EE6B /* ScreenLockDimmingType.swift in Sources */,
 				F8A1584D22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift in Sources */,
 				F8A2BC3525DB0D6D001D1E78 /* BluetoothPeripheralManager+BluetoothTransmitterDelegate.swift in Sources */,

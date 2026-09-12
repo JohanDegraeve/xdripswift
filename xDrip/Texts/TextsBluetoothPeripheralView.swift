@@ -3,6 +3,13 @@ import Foundation
 class Texts_BluetoothPeripheralView {
     
     static private let filename = "BluetoothPeripheralView"
+
+    static let signalStrengthDisconnected = NSLocalizedString("signalStrengthDisconnected", tableName: filename, bundle: .main, value: "Disconnected", comment: "Signal value replacement while an always-on device is disconnected")
+    static let signalStrength = NSLocalizedString("signalStrength", tableName: filename, bundle: .main, value: "Signal Strength", comment: "Bluetooth signal strength row")
+    static let signalStrengthLastMeasurement = NSLocalizedString("signalStrengthLastMeasurement", tableName: filename, bundle: .main, value: "Last measurement", comment: "Elapsed time since RSSI measurement for intermittent devices")
+    static let signalStrengthWeak = NSLocalizedString("signalStrengthWeak", tableName: filename, bundle: .main, value: "Weak", comment: "Weak reception end of RSSI gauge")
+    static let signalStrengthStrong = NSLocalizedString("signalStrengthStrong", tableName: filename, bundle: .main, value: "Strong", comment: "Strong reception end of RSSI gauge")
+    static let signalStrengthChartExplanation = NSLocalizedString("signalStrengthChartExplanation", tableName: filename, bundle: .main, value: "Live signal over the last two minutes. New measurements arrive about every second while connected.", comment: "Live RSSI chart timing and gaps")
     
     static let address: String = {
         return NSLocalizedString("address", tableName: filename, bundle: Bundle.main, value: "Address:", comment: "when M5Stack is shown, title of the cell with the address")

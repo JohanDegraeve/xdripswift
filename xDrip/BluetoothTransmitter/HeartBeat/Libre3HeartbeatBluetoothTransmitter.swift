@@ -117,6 +117,10 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter, StandardBattery
     }
 
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        // This override bypasses the base value callback, so share its RSSI cadence explicitly.
+        if error == nil, characteristic.value != nil {
+            requestSignalStrengthForTraceIfNeeded(from: peripheral)
+        }
 
         // trace the received value and uuid
         if let value = characteristic.value {

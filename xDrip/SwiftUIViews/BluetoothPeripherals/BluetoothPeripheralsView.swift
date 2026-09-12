@@ -130,6 +130,9 @@ struct BluetoothPeripheralsNavigationView: View {
         case let .readSuccess(display, transmitterTitle):
             TransmitterReadSuccessView(display: display, transmitterTitle: transmitterTitle)
 
+        case let .signalStrength(peripheral):
+            BluetoothSignalStrengthView(peripheral: peripheral, manager: bluetoothPeripheralManager)
+
         case let .batteryHistory(peripheralObjectID):
             BatteryHistoryView(
                 peripheralObjectID: peripheralObjectID,
@@ -207,7 +210,8 @@ private struct BluetoothPeripheralDetailContainerView: View {
             presentTextEntryView: router.showTextEntry,
             presentSelectionListView: router.showSelectionList,
             presentReadSuccessView: router.showReadSuccess,
-            presentBatteryHistoryView: router.showBatteryHistory
+            presentBatteryHistoryView: router.showBatteryHistory,
+            presentSignalStrengthView: router.showSignalStrength
         ))
     }
 
@@ -762,43 +766,12 @@ private struct BluetoothPeripheralSectionHeaderView: View {
 }
 
 private extension BluetoothPeripheralDisplayStatus {
-    var tintColor: Color {
-        switch self {
-        case .notScanning:
-            return Color(.colorTertiary)
-        case .discovering, .connecting, .reconnecting:
-            return Color(.systemYellow)
-        case .waitingForNextReading, .connected:
-            return .green
-        }
-    }
-
     var isActive: Bool {
         switch self {
         case .notScanning:
             return false
         case .discovering, .connecting, .reconnecting, .waitingForNextReading, .connected:
             return true
-        }
-    }
-
-    var rowBackgroundColor: Color {
-        switch self {
-        case .notScanning:
-            return Color(.secondarySystemGroupedBackground)
-        case .discovering, .connecting, .reconnecting:
-            return ConstantsUI.connectingRowBackgroundColor
-        case .waitingForNextReading, .connected:
-            return ConstantsUI.activeRowBackgroundColor
-        }
-    }
-
-    var antennaSystemImage: String {
-        switch self {
-        case .notScanning:
-            return "antenna.radiowaves.left.and.right.slash"
-        case .discovering, .connecting, .reconnecting, .waitingForNextReading, .connected:
-            return "antenna.radiowaves.left.and.right"
         }
     }
 

@@ -724,13 +724,15 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
         }
     }
 
-    override func peripheral(_: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         if let error {
             trace("G7 value update failed for %{public}@: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .error, characteristic.uuid.uuidString, error.localizedDescription)
             return
         }
         guard let value = characteristic.value,
               let characteristicUUID = CharacteristicUUID(rawValue: characteristic.uuid.uuidString) else { return }
+        // This override bypasses the base value callback, so share its RSSI cadence explicitly.
+        requestSignalStrengthForTraceIfNeeded(from: peripheral)
 
         switch characteristicUUID {
         case .writeControl:

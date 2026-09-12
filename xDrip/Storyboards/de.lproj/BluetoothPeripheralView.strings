@@ -232,3 +232,14 @@
 "batteryHistoryRangeExplanation" = "Feste Zeiträume reichen von jetzt bis zur ausgewählten Anzahl von Tagen zurück. Lücken zeigen Zeiträume ohne Messwert.";
 
 "connectionDiagramOtherApp" = "Andere App";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Signalstärke";
+
+"signalStrengthChartExplanation" = "Live-Signal der letzten zwei Minuten. Bei bestehender Verbindung kommen etwa jede Sekunde neue Messungen.";
+
+"signalStrengthWeak" = "Schwach";
+"signalStrengthStrong" = "Stark";
+"signalStrengthLastMeasurement" = "Letzte Messung";
+
+"signalStrengthDisconnected" = "Getrennt";

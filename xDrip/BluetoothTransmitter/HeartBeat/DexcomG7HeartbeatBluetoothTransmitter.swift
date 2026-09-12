@@ -80,7 +80,10 @@ class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter, StandardBatte
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
 
-        //super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
+        if error == nil, characteristic.value != nil {
+            // This override bypasses the base value callback, so share its RSSI cadence explicitly.
+            requestSignalStrengthForTraceIfNeeded(from: peripheral)
+        }
 
         // trace the received value and uuid
         if let value = characteristic.value {

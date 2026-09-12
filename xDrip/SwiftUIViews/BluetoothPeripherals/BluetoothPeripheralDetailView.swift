@@ -10,10 +10,12 @@ import SwiftUI
 
 /// Native detail screen for an existing or newly configured Bluetooth peripheral.
 struct BluetoothPeripheralDetailView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @ObservedObject var state: BluetoothPeripheralDetailState
 
     var body: some View {
         List {
+            // The connection banner identifies this section for every peripheral type.
             Section {
                 BluetoothPeripheralStatusBannerView(state: state)
                     .listRowInsets(ConstantsUI.bluetoothPeripheralStatusBannerRowInsets)
@@ -29,9 +31,6 @@ struct BluetoothPeripheralDetailView: View {
                 .disabled(!state.connectButtonIsEnabled)
                 .listRowInsets(ConstantsUI.bluetoothPeripheralStatusButtonRowInsets)
                 .listRowBackground(state.connectionStatus.rowBackgroundColor)
-            } header: {
-                Text(Texts_BluetoothPeripheralView.status)
-                    .foregroundStyle(ConstantsUI.tableViewHeaderTextColor)
             } footer: {
                 if let statusFooterText = state.statusFooterText {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
@@ -94,7 +93,14 @@ struct BluetoothPeripheralDetailView: View {
             }
         }
         .alert(item: $state.pendingAlert, content: makeAlert)
-        .onAppear(perform: state.start)
+        .onAppear {
+            state.start()
+            state.setSignalStrengthVisible(true)
+        }
+        .onDisappear { state.setSignalStrengthVisible(false) }
+        .onChange(of: scenePhase) { phase in
+            state.updateSignalStrengthPolling(active: phase == .active)
+        }
         .frame(maxWidth: UIDevice.current.userInterfaceIdiom == .pad ? 780 : .infinity)
         .frame(maxWidth: .infinity)
     }
@@ -143,7 +149,8 @@ struct BluetoothPeripheralDetailView: View {
     }
 }
 
-private extension BluetoothPeripheralDisplayStatus {
+// Shared by the parent banner and signal screen so connection symbols and colours stay consistent.
+extension BluetoothPeripheralDisplayStatus {
     var tintColor: Color {
         switch self {
         case .notScanning:

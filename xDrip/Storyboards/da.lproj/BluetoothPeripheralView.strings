@@ -80,7 +80,7 @@
 "nfcScanFailedScanAgainButton" = "Scan Again";
 
 /// Tell the user the scan was successful and to just wait now for connection
-"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 
 /// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
 "readSuccessLast24Hours" = "Seneste 24 timer";
@@ -163,3 +163,14 @@
 "batteryHistoryRangeExplanation" = "Faste perioder går fra nu og tilbage til det valgte antal dage. Huller viser perioder uden en aflæsning.";
 
 "connectionDiagramOtherApp" = "Anden app";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Signalstyrke";
+
+"signalStrengthChartExplanation" = "Livesignal fra de seneste to minutter. Nye målinger modtages cirka hvert sekund, mens enheden er tilsluttet.";
+
+"signalStrengthWeak" = "Svag";
+"signalStrengthStrong" = "Stærk";
+"signalStrengthLastMeasurement" = "Seneste måling";
+
+"signalStrengthDisconnected" = "Afbrudt";

@@ -170,3 +170,14 @@
 "batteryHistoryRangeExplanation" = "Vaste periodes lopen vanaf nu terug tot het geselecteerde aantal dagen. Onderbrekingen tonen periodes zonder meting.";
 
 "connectionDiagramOtherApp" = "Andere app";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Signaalsterkte";
+
+"signalStrengthChartExplanation" = "Live signaal van de afgelopen twee minuten. Bij verbinding komen ongeveer elke seconde nieuwe metingen binnen.";
+
+"signalStrengthWeak" = "Zwak";
+"signalStrengthStrong" = "Sterk";
+"signalStrengthLastMeasurement" = "Laatste meting";
+
+"signalStrengthDisconnected" = "Verbinding verbroken";

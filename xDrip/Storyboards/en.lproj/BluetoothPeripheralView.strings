@@ -147,3 +147,14 @@
 "batteryHistoryRangeExplanation" = "Fixed ranges run from now back to the selected number of days. Gaps show periods without a reading.";
 
 "connectionDiagramOtherApp" = "Other App";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Signal Strength";
+
+"signalStrengthChartExplanation" = "Live signal over the last two minutes. New measurements arrive about every second while connected.";
+
+"signalStrengthWeak" = "Weak";
+"signalStrengthStrong" = "Strong";
+"signalStrengthLastMeasurement" = "Last measurement";
+
+"signalStrengthDisconnected" = "Disconnected";
