@@ -406,13 +406,18 @@ enum CGMTransmitterType:String, CaseIterable {
 /// G7, ONE+, or Stelo. Keeping this choice in one place prevents the device list, detail view, and
 /// Sensor Management from showing different product names for the same physical sensor.
 enum DexcomProductNameResolver {
+    // Display name for the UI and shared metadata. Keep stored source names and reporting unchanged.
+    static let anubisTitle = "Anubis G6"
+
     static func title(
         transmitterType: CGMTransmitterType,
         transmitterID: String?,
-        bluetoothName: String?
+        bluetoothName: String?,
+        isAnubis: Bool = false
     ) -> String? {
         switch transmitterType {
         case .dexcom:
+            if isAnubis { return anubisTitle }
             guard let transmitterID, !transmitterID.isEmpty else { return nil }
 
             let title = transmitterType.detailedDescription(transmitterID: transmitterID)

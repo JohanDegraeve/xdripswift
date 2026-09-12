@@ -678,7 +678,7 @@ final class RootHomeStateModel: ObservableObject {
         }
 
         return RootHomeSensorState(
-            title: description + (cgmTransmitter?.isAnubisG6() == true ? " (Anubis)" : ""),
+            title: cgmTransmitter?.isAnubisG6() == true ? DexcomProductNameResolver.anubisTitle : description,
             currentAge: currentAge,
             maxAge: maximumAge,
             currentAgeColor: sensorAgeColor(timeLeftInMinutes: timeLeftInMinutes),

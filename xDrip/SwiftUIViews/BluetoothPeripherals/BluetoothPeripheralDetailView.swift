@@ -37,6 +37,7 @@ struct BluetoothPeripheralDetailView: View {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         if let statusFooterSystemImage = state.statusFooterSystemImage {
                             Image(systemName: statusFooterSystemImage)
+                                .foregroundStyle(state.statusFooterSymbolColor)
                         }
 
                         Text(statusFooterText)
@@ -59,6 +60,7 @@ struct BluetoothPeripheralDetailView: View {
                             ForEach(section.footerLines) { footerLine in
                                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                                     Image(systemName: footerLine.systemImage)
+                                        .foregroundStyle(footerLine.symbolColor)
                                     Text(footerLine.text)
                                 }
                                 .foregroundStyle(footerLine.isActive ? ConstantsUI.listSectionFooterTextColor : Color(.colorTertiary))
@@ -260,6 +262,7 @@ struct BluetoothPeripheralTextEntryView: View {
 
     @State private var text: String
     @State private var validationMessage: String?
+    @State private var hasSubmitted = false
 
     init(textEntry: BluetoothPeripheralTextEntry, close: @escaping () -> Void) {
         self.textEntry = textEntry
@@ -306,7 +309,7 @@ struct BluetoothPeripheralTextEntryView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button(textEntry.actionTitle, action: submit)
                     .tint(ConstantsAppColors.toolbarAction)
-                    .disabled(!actionIsEnabled)
+                    .disabled(!actionIsEnabled || hasSubmitted)
             }
         }
         .colorScheme(.dark)
@@ -317,15 +320,19 @@ struct BluetoothPeripheralTextEntryView: View {
     }
 
     private func submit() {
-        guard actionIsEnabled else { return }
+        guard actionIsEnabled, !hasSubmitted else { return }
 
         if let validationMessage = textEntry.inputValidator?(text) {
             self.validationMessage = validationMessage
             return
         }
 
+        // Ignore another tap while the next screen is opening.
+        hasSubmitted = true
         textEntry.actionHandler(text)
-        close()
+        if textEntry.dismissAfterSubmit {
+            close()
+        }
     }
 }
 

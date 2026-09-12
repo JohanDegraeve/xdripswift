@@ -739,4 +739,4 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Graf";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Osnovno";
 "settingsviews_liveActivitySectionTitle" = "Dejavnost v živo";
-"settingsviews_dexcomG7Message" = "Pustite ime Bluetooth prazno in tapnite V redu za nadaljevanje. Na naslednjem zaslonu tapnite Skeniraj za samodejno iskanje senzorja.\n\nČe je bil senzor že prikazan v Nastavitve > Bluetooth, lahko njegovo ime Bluetooth vnesete ročno.";
+"settingsviews_dexcomG7Message" = "Pustite ime Bluetooth prazno. Na naslednjem zaslonu tapnite Skeniraj za samodejno iskanje senzorja.\n\nČe je bil senzor že prikazan v Nastavitve > Bluetooth, lahko njegovo ime Bluetooth vnesete ročno.";

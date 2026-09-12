@@ -142,13 +142,12 @@
 "dexcomCoexistenceMode" = "تعايش";
 "dexcomPrimaryModePickerOption" = "الوضع الأساسي";
 "dexcomCoexistenceModePickerOption" = "وضع التعايش";
-"dexcomG6ModeSelectionFooter" = "يمكنك تغيير وضع الاتصال لاحقًا في إعدادات جهاز الإرسال.";
-"dexcomG7ModeSelectionFooter" = "لا يمكن تغيير وضع الاتصال المحدد لاحقًا. احذف المستشعر وأضفه مرة أخرى لاختيار وضع مختلف.";
+"dexcomG6ModeSelectionFooter" = "يمكنك تغيير وضع اتصال G6 لاحقًا في إعدادات جهاز الإرسال.";
 "dexcomConnectionModeSelectionExplanation" = "يربط الوضع الأساسي هذا التطبيق مباشرة ويتطلب إغلاق أي تطبيق آخر يتصل بجهاز Dexcom.\n\nيعتمد وضع التعايش على تطبيق آخر للحفاظ على اتصال Dexcom وتلقي القراءات.";
 "dexcomBluetoothChannelSelectionExplanation" = "اختر قناة Bluetooth التي سيستخدمها هذا التطبيق. اختر تطبيق الهاتف المحمول ما لم تكن بحاجة إلى ترك هذه القناة متاحة لاتصال آخر.";
 "dexcomG6CoexistenceModeSelectionMessage" = "تم تحديد وضع التعايش. يجب أن يتصل تطبيق آخر، مثل Dexcom G6 أو CamAPS، بجهاز إرسال G6 ويصادق عليه.\n\nاترك التطبيق الآخر قيد التشغيل في الخلفية وإلا فلن يتلقى %@ القراءات.";
 "dexcomG6PrimaryModeSelectionMessage" = "تم تحديد الوضع الأساسي. يجب أن يكون %@ التطبيق الوحيد الذي يتصل بجهاز إرسال G6 ويصادق عليه.\n\nأغلق أي تطبيق آخر يتصل بجهاز الإرسال أو عطّل إذن Bluetooth الخاص به. وإلا فقد لا يتلقى %@ أو التطبيق الآخر القراءات.";
-"dexcomPrimaryModeAddFlowMessage" = "اتصل مباشرة باعتباره التطبيق الأساسي. أغلق أي تطبيق آخر يتصل بجهاز Dexcom هذا.";
+"dexcomPrimaryModeAddFlowMessage" = "اتصل مباشرة باعتباره التطبيق الأساسي. افصل أي تطبيق آخر عن Dexcom هذا.";
 "dexcomCoexistenceModeAddFlowMessage" = "شارك الاتصال مع تطبيق آخر. أبقِ تطبيق Dexcom أو CamAPS يعمل بشكل صحيح في الخلفية.";
 "dexcomG7NoSensorLabelFound" = "لم يتم العثور على ملصق مستشعر Dexcom G7 في الصورة.";
 "dexcomG7InvalidSensorLabelFound" = "تم العثور على رمز Data Matrix، لكنه ليس ملصقًا صالحًا لمستشعر Dexcom G7.";
@@ -162,3 +161,5 @@
 "batteryHistoryRange" = "النطاق";
 "batteryHistoryRangeAccessibility" = "نطاق سجل البطارية";
 "batteryHistoryRangeExplanation" = "تمتد النطاقات الثابتة من الآن إلى عدد الأيام المحدد في الماضي. تشير الفجوات إلى فترات لم تتوفر فيها قراءة.";
+
+"connectionDiagramOtherApp" = "تطبيق آخر";

@@ -473,6 +473,7 @@ struct SensorManagementView: View {
             HStack(spacing: 4) {
                 if let mode = dexcomConnectionMode {
                     Image(systemName: mode.systemImage)
+                        .foregroundStyle(mode.color)
                         .accessibilityLabel(dexcomModeAccessibilityLabel(mode))
                 }
 

@@ -144,13 +144,12 @@
 "dexcomCoexistenceMode" = "Coexistência";
 "dexcomPrimaryModePickerOption" = "Modo principal";
 "dexcomCoexistenceModePickerOption" = "Modo de coexistência";
-"dexcomG6ModeSelectionFooter" = "Pode alterar o modo de ligação mais tarde nas definições do transmissor.";
-"dexcomG7ModeSelectionFooter" = "O modo de ligação selecionado não pode ser alterado mais tarde. Remova e adicione novamente o sensor para escolher outro modo.";
+"dexcomG6ModeSelectionFooter" = "Pode alterar o modo de ligação do G6 mais tarde nas definições do transmissor.";
 "dexcomConnectionModeSelectionExplanation" = "O modo principal liga esta app diretamente e exige que qualquer outra app que se ligue ao dispositivo Dexcom seja fechada.\n\nO modo de coexistência depende de outra app para manter a ligação Dexcom e receber leituras.";
 "dexcomBluetoothChannelSelectionExplanation" = "Escolha o canal Bluetooth que esta app irá utilizar. Selecione App móvel, salvo se precisar de deixar esse canal disponível para outra ligação.";
 "dexcomG6CoexistenceModeSelectionMessage" = "O modo de coexistência foi selecionado. Outra app, como Dexcom G6 ou CamAPS, deve ligar-se ao transmissor G6 e autenticá-lo.\n\nMantenha a outra app em execução em segundo plano, caso contrário %@ não receberá leituras.";
 "dexcomG6PrimaryModeSelectionMessage" = "O modo principal foi selecionado. %@ deve ser a única app a ligar-se ao transmissor G6 e a autenticá-lo.\n\nFeche qualquer outra app que se ligue ao transmissor ou desative a respetiva permissão de Bluetooth. Caso contrário, %@ ou a outra app poderão não receber leituras.";
-"dexcomPrimaryModeAddFlowMessage" = "Ligue diretamente como app principal. Feche qualquer outra app que se ligue a este dispositivo Dexcom.";
+"dexcomPrimaryModeAddFlowMessage" = "Ligue diretamente como app principal. Desligue qualquer outra app deste Dexcom.";
 "dexcomCoexistenceModeAddFlowMessage" = "Partilhe a ligação com outra app. Mantenha a app Dexcom ou CamAPS a funcionar corretamente em segundo plano.";
 "dexcomG7NoSensorLabelFound" = "Não foi encontrada qualquer etiqueta de sensor Dexcom G7 na fotografia.";
 "dexcomG7InvalidSensorLabelFound" = "Foi encontrado um Data Matrix, mas não correspondia a uma etiqueta de sensor Dexcom G7 válida.";
@@ -164,3 +163,5 @@
 "batteryHistoryRange" = "Intervalo";
 "batteryHistoryRangeAccessibility" = "Intervalo do histórico da bateria";
 "batteryHistoryRangeExplanation" = "Os intervalos fixos vão de agora até ao número de dias selecionado. As lacunas mostram períodos sem leitura.";
+
+"connectionDiagramOtherApp" = "Outra app";

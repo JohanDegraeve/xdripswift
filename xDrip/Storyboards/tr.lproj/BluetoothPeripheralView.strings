@@ -142,13 +142,12 @@
 "dexcomCoexistenceMode" = "Birlikte Çalışma";
 "dexcomPrimaryModePickerOption" = "Birincil Mod";
 "dexcomCoexistenceModePickerOption" = "Birlikte Çalışma Modu";
-"dexcomG6ModeSelectionFooter" = "Bağlantı modunu daha sonra verici ayarlarından değiştirebilirsiniz.";
-"dexcomG7ModeSelectionFooter" = "Seçilen bağlantı modu daha sonra değiştirilemez. Farklı bir mod seçmek için sensörü kaldırıp yeniden ekleyin.";
+"dexcomG6ModeSelectionFooter" = "G6 bağlantı modunu daha sonra verici ayarlarından değiştirebilirsiniz.";
 "dexcomConnectionModeSelectionExplanation" = "Birincil Mod bu uygulamayı doğrudan bağlar ve Dexcom cihazına bağlanan diğer tüm uygulamaların kapatılmasını gerektirir.\n\nBirlikte Çalışma Modu, Dexcom bağlantısını sürdürmek ve ölçümleri almak için başka bir uygulamaya ihtiyaç duyar.";
 "dexcomBluetoothChannelSelectionExplanation" = "Bu uygulamanın kullanacağı Bluetooth kanalını seçin. Bu kanalı başka bir bağlantı için boş bırakmanız gerekmiyorsa Mobil Uygulama seçeneğini seçin.";
 "dexcomG6CoexistenceModeSelectionMessage" = "Birlikte Çalışma Modu seçildi. Dexcom G6 veya CamAPS gibi başka bir uygulama G6 vericisine bağlanmalı ve kimlik doğrulaması yapmalıdır.\n\nDiğer uygulamayı arka planda çalışır durumda tutun, aksi takdirde %@ ölçüm alamaz.";
 "dexcomG6PrimaryModeSelectionMessage" = "Birincil Mod seçildi. %@, G6 vericisine bağlanan ve kimlik doğrulaması yapan tek uygulama olmalıdır.\n\nVericiye bağlanan diğer uygulamaları kapatın veya Bluetooth izinlerini devre dışı bırakın. Aksi takdirde %@ ya da diğer uygulama ölçüm alamayabilir.";
-"dexcomPrimaryModeAddFlowMessage" = "Ana uygulama olarak doğrudan bağlanın. Bu Dexcom cihazına bağlanan diğer tüm uygulamaları kapatın.";
+"dexcomPrimaryModeAddFlowMessage" = "Ana uygulama olarak doğrudan bağlanın. Diğer tüm uygulamaların bu Dexcom ile bağlantısını kesin.";
 "dexcomCoexistenceModeAddFlowMessage" = "Bağlantıyı başka bir uygulamayla paylaşın. Dexcom veya CamAPS uygulamasını arka planda düzgün çalışır durumda tutun.";
 "dexcomG7NoSensorLabelFound" = "Fotoğrafta Dexcom G7 sensör etiketi bulunamadı.";
 "dexcomG7InvalidSensorLabelFound" = "Bir Data Matrix bulundu, ancak geçerli bir Dexcom G7 sensör etiketi değildi.";
@@ -162,3 +161,5 @@
 "batteryHistoryRange" = "Aralık";
 "batteryHistoryRangeAccessibility" = "Pil geçmişi aralığı";
 "batteryHistoryRangeExplanation" = "Sabit aralıklar şu andan seçilen gün sayısı kadar geriye uzanır. Boşluklar okuma olmayan dönemleri gösterir.";
+
+"connectionDiagramOtherApp" = "Diğer uygulama";

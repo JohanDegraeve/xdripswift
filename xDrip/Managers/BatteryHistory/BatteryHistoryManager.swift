@@ -213,7 +213,8 @@ final class BatteryHistoryManager {
                 transmitterDescription = DexcomProductNameResolver.title(
                     transmitterType: .dexcom,
                     transmitterID: peripheral.transmitterId,
-                    bluetoothName: peripheral.name
+                    bluetoothName: peripheral.name,
+                    isAnubis: dexcomG5.isAnubis
                 ) ?? BluetoothPeripheralType.DexcomType.bluetoothPeripheralDisplayTitle
                 transmitterLifetime = dexcomG5.transmitterStartDate.map { max(0, now.timeIntervalSince($0)) }
                 currentReading = dexcomG5.voltageB > 0 ? .voltageB(rawValue: Int(dexcomG5.voltageB)) : nil

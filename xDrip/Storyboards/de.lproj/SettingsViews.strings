@@ -714,4 +714,4 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Diagramm";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Einfach";
 "settingsviews_liveActivitySectionTitle" = "Live-Aktivität";
-"settingsviews_dexcomG7Message" = "Lasse den Bluetooth-Namen leer und tippe auf OK, um fortzufahren. Tippe im nächsten Bildschirm auf Scannen, um automatisch nach dem Sensor zu suchen.\n\nWenn der Sensor bereits unter Einstellungen > Bluetooth angezeigt wurde, kannst du seinen Bluetooth-Namen manuell eingeben.";
+"settingsviews_dexcomG7Message" = "Lasse den Bluetooth-Namen leer. Tippe im nächsten Bildschirm auf Scannen, um automatisch nach dem Sensor zu suchen.\n\nWenn der Sensor bereits unter Einstellungen > Bluetooth angezeigt wurde, kannst du seinen Bluetooth-Namen manuell eingeben.";

@@ -149,13 +149,12 @@
 "dexcomCoexistenceMode" = "Co-existentie";
 "dexcomPrimaryModePickerOption" = "Primaire modus";
 "dexcomCoexistenceModePickerOption" = "Co-existentiemodus";
-"dexcomG6ModeSelectionFooter" = "U kunt de verbindingsmodus later wijzigen in de zenderinstellingen.";
-"dexcomG7ModeSelectionFooter" = "De gekozen verbindingsmodus kan later niet worden gewijzigd. Verwijder de sensor en voeg deze opnieuw toe om een andere modus te kiezen.";
+"dexcomG6ModeSelectionFooter" = "U kunt de G6-verbindingsmodus later wijzigen in de zenderinstellingen.";
 "dexcomConnectionModeSelectionExplanation" = "In de primaire modus maakt deze app rechtstreeks verbinding en moeten alle andere apps die verbinding maken met het Dexcom-apparaat worden gesloten.\n\nDe co-existentiemodus is afhankelijk van een andere app om de Dexcom-verbinding te onderhouden en metingen te ontvangen.";
 "dexcomBluetoothChannelSelectionExplanation" = "Kies het Bluetooth-kanaal dat deze app zal gebruiken. Selecteer Mobiele app, tenzij u dat kanaal beschikbaar moet houden voor een andere verbinding.";
 "dexcomG6CoexistenceModeSelectionMessage" = "De co-existentiemodus is geselecteerd. Een andere app, zoals Dexcom G6 of CamAPS, moet verbinding maken met de G6-zender en deze verifiëren.\n\nLaat de andere app op de achtergrond actief, anders ontvangt %@ geen metingen.";
 "dexcomG6PrimaryModeSelectionMessage" = "De primaire modus is geselecteerd. %@ moet de enige app zijn die verbinding maakt met de G6-zender en deze verifieert.\n\nSluit elke andere app die verbinding maakt met de zender of schakel de Bluetooth-toestemming uit. Anders ontvangen %@ of de andere app mogelijk geen metingen.";
-"dexcomPrimaryModeAddFlowMessage" = "Maak rechtstreeks verbinding als hoofdapp. Sluit elke andere app die verbinding maakt met dit Dexcom-apparaat.";
+"dexcomPrimaryModeAddFlowMessage" = "Maak rechtstreeks verbinding als hoofdapp. Verbreek de verbinding van elke andere app met deze Dexcom.";
 "dexcomCoexistenceModeAddFlowMessage" = "Deel de verbinding met een andere app. Zorg dat de Dexcom- of CamAPS-app correct op de achtergrond blijft werken.";
 "dexcomG7NoSensorLabelFound" = "Er is geen Dexcom G7-sensorlabel in de foto gevonden.";
 "dexcomG7InvalidSensorLabelFound" = "Er is een Data Matrix gevonden, maar dit was geen geldig Dexcom G7-sensorlabel.";
@@ -169,3 +168,5 @@
 "batteryHistoryRange" = "Periode";
 "batteryHistoryRangeAccessibility" = "Periode van batterijgeschiedenis";
 "batteryHistoryRangeExplanation" = "Vaste periodes lopen vanaf nu terug tot het geselecteerde aantal dagen. Onderbrekingen tonen periodes zonder meting.";
+
+"connectionDiagramOtherApp" = "Andere app";

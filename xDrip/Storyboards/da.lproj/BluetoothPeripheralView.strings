@@ -142,13 +142,12 @@
 "dexcomCoexistenceMode" = "Sameksistens";
 "dexcomPrimaryModePickerOption" = "Primær tilstand";
 "dexcomCoexistenceModePickerOption" = "Sameksistenstilstand";
-"dexcomG6ModeSelectionFooter" = "Du kan ændre forbindelsestilstanden senere i senderens indstillinger.";
-"dexcomG7ModeSelectionFooter" = "Den valgte forbindelsestilstand kan ikke ændres senere. Fjern sensoren, og tilføj den igen for at vælge en anden tilstand.";
+"dexcomG6ModeSelectionFooter" = "Du kan ændre G6-forbindelsestilstanden senere i senderens indstillinger.";
 "dexcomConnectionModeSelectionExplanation" = "Primær tilstand forbinder denne app direkte og kræver, at alle andre apps, der opretter forbindelse til Dexcom-enheden, lukkes.\n\nSameksistenstilstand er afhængig af en anden app til at opretholde Dexcom-forbindelsen og modtage målinger.";
 "dexcomBluetoothChannelSelectionExplanation" = "Vælg den Bluetooth-kanal, som denne app skal bruge. Vælg Mobilapp, medmindre kanalen skal være ledig til en anden forbindelse.";
 "dexcomG6CoexistenceModeSelectionMessage" = "Sameksistenstilstand er valgt. En anden app, f.eks. Dexcom G6 eller CamAPS, skal oprette forbindelse til og godkende G6-senderen.\n\nLad den anden app køre i baggrunden, ellers modtager %@ ingen målinger.";
 "dexcomG6PrimaryModeSelectionMessage" = "Primær tilstand er valgt. %@ skal være den eneste app, der opretter forbindelse til og godkender G6-senderen.\n\nLuk alle andre apps, der forbinder til senderen, eller deaktiver deres Bluetooth-tilladelse. Ellers modtager %@ eller den anden app muligvis ingen målinger.";
-"dexcomPrimaryModeAddFlowMessage" = "Opret direkte forbindelse som den primære app. Luk alle andre apps, der opretter forbindelse til denne Dexcom-enhed.";
+"dexcomPrimaryModeAddFlowMessage" = "Opret direkte forbindelse som den primære app. Afbryd forbindelsen mellem alle andre apps og denne Dexcom.";
 "dexcomCoexistenceModeAddFlowMessage" = "Del forbindelsen med en anden app. Sørg for, at Dexcom- eller CamAPS-appen fungerer korrekt i baggrunden.";
 "dexcomG7NoSensorLabelFound" = "Der blev ikke fundet en Dexcom G7-sensoretiket på billedet.";
 "dexcomG7InvalidSensorLabelFound" = "Der blev fundet en Data Matrix, men den var ikke en gyldig Dexcom G7-sensoretiket.";
@@ -162,3 +161,5 @@
 "batteryHistoryRange" = "Periode";
 "batteryHistoryRangeAccessibility" = "Periode for batterihistorik";
 "batteryHistoryRangeExplanation" = "Faste perioder går fra nu og tilbage til det valgte antal dage. Huller viser perioder uden en aflæsning.";
+
+"connectionDiagramOtherApp" = "Anden app";

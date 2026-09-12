@@ -217,13 +217,12 @@
 "dexcomCoexistenceMode" = "Coesistenza";
 "dexcomPrimaryModePickerOption" = "Modalità principale";
 "dexcomCoexistenceModePickerOption" = "Modalità coesistenza";
-"dexcomG6ModeSelectionFooter" = "Puoi cambiare la modalità di connessione in seguito nelle impostazioni del trasmettitore.";
-"dexcomG7ModeSelectionFooter" = "La modalità di connessione selezionata non può essere cambiata in seguito. Rimuovi e aggiungi nuovamente il sensore per scegliere un'altra modalità.";
+"dexcomG6ModeSelectionFooter" = "Puoi cambiare la modalità di connessione del G6 in seguito nelle impostazioni del trasmettitore.";
 "dexcomConnectionModeSelectionExplanation" = "La modalità primaria collega direttamente questa app e richiede la chiusura di qualsiasi altra app che si connette al dispositivo Dexcom.\n\nLa modalità coesistenza dipende da un’altra app per mantenere la connessione Dexcom e ricevere le letture.";
 "dexcomBluetoothChannelSelectionExplanation" = "Scegli il canale Bluetooth che verrà usato da questa app. Seleziona App mobile a meno che tu non debba lasciare libero questo canale per un’altra connessione.";
 "dexcomG6CoexistenceModeSelectionMessage" = "È stata selezionata la modalità coesistenza. Un’altra app, come Dexcom G6 o CamAPS, deve connettersi al trasmettitore G6 e autenticarlo.\n\nMantieni l’altra app in esecuzione in background, altrimenti %@ non riceverà letture.";
 "dexcomG6PrimaryModeSelectionMessage" = "È stata selezionata la modalità primaria. %@ deve essere l’unica app che si connette al trasmettitore G6 e lo autentica.\n\nChiudi qualsiasi altra app che si connette al trasmettitore o disattiva la relativa autorizzazione Bluetooth. In caso contrario, %@ o l’altra app potrebbero non ricevere letture.";
-"dexcomPrimaryModeAddFlowMessage" = "Connettiti direttamente come app principale. Chiudi qualsiasi altra app che si connette a questo dispositivo Dexcom.";
+"dexcomPrimaryModeAddFlowMessage" = "Connettiti direttamente come app principale. Disconnetti qualsiasi altra app da questo Dexcom.";
 "dexcomCoexistenceModeAddFlowMessage" = "Condividi la connessione con un’altra app. Mantieni l’app Dexcom o CamAPS correttamente attiva in background.";
 "dexcomG7NoSensorLabelFound" = "Nella foto non è stata trovata alcuna etichetta del sensore Dexcom G7.";
 "dexcomG7InvalidSensorLabelFound" = "È stato trovato un Data Matrix, ma non era un’etichetta valida del sensore Dexcom G7.";
@@ -237,3 +236,5 @@
 "batteryHistoryRange" = "Intervallo";
 "batteryHistoryRangeAccessibility" = "Intervallo della cronologia batteria";
 "batteryHistoryRangeExplanation" = "Gli intervalli fissi vanno da ora al numero di giorni selezionato nel passato. Gli spazi indicano periodi senza letture.";
+
+"connectionDiagramOtherApp" = "Altra app";

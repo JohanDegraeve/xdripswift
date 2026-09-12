@@ -22,11 +22,7 @@ final class BluetoothPeripheralsRouter: ObservableObject {
         type: BluetoothPeripheralType,
         dexcomConfiguration: DexcomAddConfiguration? = nil
     ) {
-        // A peripheral detail is the final destination of both normal device selection and the
-        // add-device flow. Category, type, connection mode, and sensor code screens are setup steps
-        // only and must not remain underneath it. Replacing the complete path here means the detail
-        // is created once in its final navigation position and its back button always returns
-        // directly to the Bluetooth peripherals list.
+        // Return directly to the peripheral list when leaving this detail screen.
         path = [BluetoothPeripheralsRoute(.peripheral(bluetoothPeripheral, type, dexcomConfiguration))]
     }
 
@@ -42,8 +38,31 @@ final class BluetoothPeripheralsRouter: ObservableObject {
         path.append(BluetoothPeripheralsRoute(.manualSensorCodeEntry(entry)))
     }
 
-    func finishDexcomG7Onboarding(_ configuration: DexcomAddConfiguration) {
-        path.append(BluetoothPeripheralsRoute(.peripheral(nil, .DexcomG7Type, configuration)))
+    // Collect the identifier before creating the detail screen. See README.md for the full flow.
+    func showDexcomTransmitterID(type: BluetoothPeripheralType, configuration: DexcomAddConfiguration) {
+        let isG6 = type == .DexcomType
+        var entry = BluetoothPeripheralTextEntry(
+            title: Texts_SettingsView.labelTransmitterId,
+            message: isG6 ? Texts_SettingsView.labelGiveTransmitterId : Texts_SettingsView.dexcomG7Message,
+            keyboardType: .alphabet,
+            textInputAutocapitalization: isG6 ? .characters : .words,
+            text: nil,
+            placeholder: isG6 ? "000000" : "DX0000",
+            actionTitle: Texts_HomeView.sensorCodeContinue,
+            cancelTitle: Texts_Common.Cancel,
+            actionHandler: { [weak self] transmitterID in
+                var updatedConfiguration = configuration
+                let identifier = isG6 ? transmitterID.uppercased() : transmitterID
+                updatedConfiguration.transmitterID = identifier.toNilIfLength0()
+                    ?? ConstantsBluetoothPairing.dummyDexcomG7TypeTransmitterId
+                // Keep the setup screen in the stack to avoid a back-and-forward transition.
+                self?.path.append(BluetoothPeripheralsRoute(.peripheral(nil, type, updatedConfiguration)))
+            },
+            actionIsEnabled: { !isG6 || $0.count == 6 },
+            inputValidator: { type.validateTransmitterId(transmitterId: $0) }
+        )
+        entry.dismissAfterSubmit = false
+        showTextEntry(entry)
     }
 
     func showAddPeripheralCategories() {
@@ -66,8 +85,8 @@ final class BluetoothPeripheralsRouter: ObservableObject {
         path.append(BluetoothPeripheralsRoute(.batteryHistory(peripheralObjectID)))
     }
 
-    func showReadSuccess(_ display: TransmitterReadSuccessDisplay, type: BluetoothPeripheralType) {
-        path.append(BluetoothPeripheralsRoute(.readSuccess(display, type)))
+    func showReadSuccess(_ display: TransmitterReadSuccessDisplay, transmitterTitle: String) {
+        path.append(BluetoothPeripheralsRoute(.readSuccess(display, transmitterTitle)))
     }
 
     func closeCurrentView() {
@@ -91,7 +110,7 @@ struct BluetoothPeripheralsRoute: Hashable {
         case peripheral(BluetoothPeripheral?, BluetoothPeripheralType, DexcomAddConfiguration?)
         case textEntry(BluetoothPeripheralTextEntry)
         case selectionList(BluetoothPeripheralSelectionList)
-        case readSuccess(TransmitterReadSuccessDisplay, BluetoothPeripheralType)
+        case readSuccess(TransmitterReadSuccessDisplay, String)
         case batteryHistory(NSManagedObjectID)
     }
 
@@ -113,6 +132,8 @@ struct BluetoothPeripheralsRoute: Hashable {
 
 struct DexcomAddConfiguration {
     let useOtherApp: Bool
+    // Nil means it has not been entered. G7 stores the scan placeholder when left blank.
+    var transmitterID: String?
     var sensorLabel: DexcomG6SensorLabel?
     var g6BluetoothSlot: DexcomG6BluetoothSlot = .defaultSlot
     var g7BluetoothSlot: DexcomG7BluetoothSlot = .defaultSlot
@@ -402,7 +423,8 @@ struct BluetoothPeripheralListRow: Identifiable {
             return DexcomProductNameResolver.title(
                 transmitterType: .dexcom,
                 transmitterID: dexcomG5.blePeripheral.transmitterId,
-                bluetoothName: dexcomG5.blePeripheral.name
+                bluetoothName: dexcomG5.blePeripheral.name,
+                isAnubis: dexcomG5.isAnubis
             ) ?? bluetoothPeripheral.bluetoothPeripheralType().bluetoothPeripheralDisplayTitle
         }
         if let dexcomG7 = bluetoothPeripheral as? DexcomG7 {

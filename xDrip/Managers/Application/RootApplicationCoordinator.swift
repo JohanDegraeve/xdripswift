@@ -2500,7 +2500,11 @@ import AppIntents
                     bgReadingDates.append(bgReading.timeStamp)
                 }
                 
-                let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.description
+                // Change the displayed source without changing the stored name used by integrations.
+                let sensorDescription = bluetoothPeripheralManager?.getCGMTransmitter()?.isAnubisG6() == true
+                    ? DexcomProductNameResolver.anubisTitle
+                    : UserDefaults.standard.activeSensorDescription ?? ""
+                let dataSourceDescription = UserDefaults.standard.isMaster ? sensorDescription : UserDefaults.standard.followerDataSourceType.description
                 var sensorNoiseStateRawValue: Int?
 
                 if UserDefaults.standard.isMaster,

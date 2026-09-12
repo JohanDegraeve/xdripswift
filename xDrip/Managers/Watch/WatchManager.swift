@@ -201,6 +201,17 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
         status.highLimitInMgDl = UserDefaults.standard.highMarkValue
         status.urgentHighLimitInMgDl = UserDefaults.standard.urgentHighMarkValue
         status.activeSensorDescription = UserDefaults.standard.activeSensorDescription
+        if UserDefaults.standard.isMaster {
+            // Use the selected transmitter, not an inactive Anubis saved in the device list.
+            coreDataManager.mainManagedObjectContext.performAndWait {
+                let peripheral = BLEPeripheralAccessor(coreDataManager: coreDataManager)
+                    .getBLEPeripherals()
+                    .first(where: { $0.shouldconnect && $0.dexcomG5 != nil })
+                if peripheral?.dexcomG5?.isAnubis == true {
+                    status.activeSensorDescription = DexcomProductNameResolver.anubisTitle
+                }
+            }
+        }
         status.preferSensorCountdown = UserDefaults.standard.preferSensorCountdown
         status.isMaster = UserDefaults.standard.isMaster
         status.followerDataSourceTypeRawValue = UserDefaults.standard.followerDataSourceType.rawValue

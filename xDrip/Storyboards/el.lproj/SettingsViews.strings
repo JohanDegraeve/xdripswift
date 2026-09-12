@@ -458,4 +458,4 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Γράφημα";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Βασικό";
 "settingsviews_liveActivitySectionTitle" = "Ζωντανή δραστηριότητα";
-"settingsviews_dexcomG7Message" = "Αφήστε κενό το όνομα Bluetooth και πατήστε OK για να συνεχίσετε. Στην επόμενη οθόνη, πατήστε Σάρωση για αυτόματη αναζήτηση του αισθητήρα.\n\nΕάν ο αισθητήρας έχει εμφανιστεί προηγουμένως στις Ρυθμίσεις > Bluetooth, μπορείτε να εισαγάγετε το όνομα Bluetooth χειροκίνητα.";
+"settingsviews_dexcomG7Message" = "Αφήστε κενό το όνομα Bluetooth. Στην επόμενη οθόνη, πατήστε Σάρωση για αυτόματη αναζήτηση του αισθητήρα.\n\nΕάν ο αισθητήρας έχει εμφανιστεί προηγουμένως στις Ρυθμίσεις > Bluetooth, μπορείτε να εισαγάγετε το όνομα Bluetooth χειροκίνητα.";

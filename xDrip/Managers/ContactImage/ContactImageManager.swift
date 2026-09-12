@@ -150,7 +150,19 @@ class ContactImageManager: NSObject {
             
             // we're going to use the app name as the given name of the contact we want to use/create/update
             let keyToFetch = [CNContactGivenNameKey, CNContactFamilyNameKey, CNContactOrganizationNameKey, CNContactImageDataKey] as [CNKeyDescriptor]
-            let updatedString = (UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "Updated" : UserDefaults.standard.followerDataSourceType.description) + ": \(Date().formatted(date: .omitted, time: .shortened))"
+            var sensorDescription = UserDefaults.standard.activeSensorDescription ?? "Updated"
+            if UserDefaults.standard.isMaster {
+                // Only the Organization field uses the sensor name. The contact keeps the app name.
+                self.coreDataManager.mainManagedObjectContext.performAndWait {
+                    let peripheral = BLEPeripheralAccessor(coreDataManager: self.coreDataManager)
+                        .getBLEPeripherals()
+                        .first(where: { $0.shouldconnect && $0.dexcomG5 != nil })
+                    if peripheral?.dexcomG5?.isAnubis == true {
+                        sensorDescription = DexcomProductNameResolver.anubisTitle
+                    }
+                }
+            }
+            let updatedString = (UserDefaults.standard.isMaster ? sensorDescription : UserDefaults.standard.followerDataSourceType.description) + ": \(Date().formatted(date: .omitted, time: .shortened))"
 
             // 1) Try identifier match first
             let storedIdentifier = UserDefaults.standard.string(forKey: self.contactIdentifierKey)

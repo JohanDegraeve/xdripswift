@@ -151,13 +151,12 @@
 "dexcomCoexistenceMode" = "Rinnakkaistila";
 "dexcomPrimaryModePickerOption" = "Ensisijainen tila";
 "dexcomCoexistenceModePickerOption" = "Rinnakkaistila";
-"dexcomG6ModeSelectionFooter" = "Voit vaihtaa yhteystilaa myöhemmin lähettimen asetuksissa.";
-"dexcomG7ModeSelectionFooter" = "Valittua yhteystilaa ei voi vaihtaa myöhemmin. Poista anturi ja lisää se uudelleen valitaksesi toisen tilan.";
+"dexcomG6ModeSelectionFooter" = "Voit vaihtaa G6:n yhteystilaa myöhemmin lähettimen asetuksissa.";
 "dexcomConnectionModeSelectionExplanation" = "Ensisijainen tila yhdistää tämän sovelluksen suoraan ja edellyttää, että kaikki muut Dexcom-laitteeseen yhdistyvät sovellukset suljetaan.\n\nRinnakkaistila käyttää toista sovellusta Dexcom-yhteyden ylläpitämiseen ja lukemien vastaanottamiseen.";
 "dexcomBluetoothChannelSelectionExplanation" = "Valitse tämän sovelluksen käyttämä Bluetooth-kanava. Valitse Mobiilisovellus, ellei kanavaa tarvitse jättää vapaaksi toiselle yhteydelle.";
 "dexcomG6CoexistenceModeSelectionMessage" = "Rinnakkaistila on valittu. Toisen sovelluksen, kuten Dexcom G6:n tai CamAPSin, on yhdistettävä G6-lähettimeen ja todennettava se.\n\nPidä toinen sovellus käynnissä taustalla, tai %@ ei vastaanota lukemia.";
 "dexcomG6PrimaryModeSelectionMessage" = "Ensisijainen tila on valittu. Sovelluksen %@ on oltava ainoa G6-lähettimeen yhdistävä ja sen todentava sovellus.\n\nSulje kaikki muut lähettimeen yhdistävät sovellukset tai poista niiden Bluetooth-oikeus käytöstä. Muuten %@ tai toinen sovellus ei ehkä vastaanota lukemia.";
-"dexcomPrimaryModeAddFlowMessage" = "Yhdistä suoraan ensisijaisena sovelluksena. Sulje kaikki muut tähän Dexcom-laitteeseen yhdistyvät sovellukset.";
+"dexcomPrimaryModeAddFlowMessage" = "Yhdistä suoraan ensisijaisena sovelluksena. Katkaise kaikkien muiden sovellusten yhteys tähän Dexcomiin.";
 "dexcomCoexistenceModeAddFlowMessage" = "Jaa yhteys toisen sovelluksen kanssa. Pidä Dexcom- tai CamAPS-sovellus toiminnassa taustalla.";
 "dexcomG7NoSensorLabelFound" = "Kuvasta ei löytynyt Dexcom G7 -sensorin etikettiä.";
 "dexcomG7InvalidSensorLabelFound" = "Data Matrix löytyi, mutta se ei ollut kelvollinen Dexcom G7 -sensorin etiketti.";
@@ -171,3 +170,5 @@
 "batteryHistoryRange" = "Aikaväli";
 "batteryHistoryRangeAccessibility" = "Akkuhistorian aikaväli";
 "batteryHistoryRangeExplanation" = "Kiinteät aikavälit ulottuvat nykyhetkestä valitun päivämäärän verran taaksepäin. Aukot osoittavat ajanjaksot, joilta lukema puuttuu.";
+
+"connectionDiagramOtherApp" = "Muu sovellus";

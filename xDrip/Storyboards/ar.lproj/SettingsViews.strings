@@ -494,4 +494,4 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "مخطط";
 "settingsviews_carPlayLiveActivityTypeBasic" = "أساسي";
 "settingsviews_liveActivitySectionTitle" = "النشاط المباشر";
-"settingsviews_dexcomG7Message" = "اترك اسم Bluetooth فارغًا واضغط على موافق للمتابعة. في الشاشة التالية، اضغط على مسح للبحث عن المستشعر تلقائيًا.\n\nإذا سبق أن ظهر المستشعر في الإعدادات > Bluetooth، يمكنك إدخال اسم Bluetooth الخاص به يدويًا.";
+"settingsviews_dexcomG7Message" = "اترك اسم Bluetooth فارغًا. في الشاشة التالية، اضغط على مسح للبحث عن المستشعر تلقائيًا.\n\nإذا سبق أن ظهر المستشعر في الإعدادات > Bluetooth، يمكنك إدخال اسم Bluetooth الخاص به يدويًا.";

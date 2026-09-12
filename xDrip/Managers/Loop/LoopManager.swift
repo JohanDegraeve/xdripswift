@@ -98,6 +98,7 @@ enum XDripCGMMetadataBuilder {
         let expectedInterval = defaults.isMaster ? directExpectedInterval(transmitterType) : followerExpectedInterval(defaults.followerDataSourceType)
         let startDate = context.activeSensor?.startDate ?? defaults.activeSensorStartDate
         let model = defaults.activeSensorDescription ?? transmitterType?.detailedDescription()
+        let isAnubis = defaults.isMaster && context.transmitter?.isAnubisG6() == true
         let maxAgeInDays = context.transmitter?.maxSensorAgeInDays() ?? defaults.activeSensorMaxSensorAgeInDays
         let warmupEnd = startDate.map { $0.addingTimeInterval(warmupDuration(transmitter: context.transmitter, defaults: defaults)) }
 
@@ -234,7 +235,8 @@ enum XDripCGMMetadataBuilder {
                 sessionIdentifier: sessionIdentifier,
                 state: state,
                 type: sensorType,
-                model: model,
+                // Trio uses this description as well as transmitter.model. Keep the session identity unchanged.
+                model: isAnubis ? DexcomProductNameResolver.anubisTitle : model,
                 serialNumber: defaults.activeSensorSerialNumber,
                 startedAt: startDate?.timeIntervalSince1970,
                 warmupEndsAt: warmupEnd?.timeIntervalSince1970,
@@ -248,7 +250,7 @@ enum XDripCGMMetadataBuilder {
         }()
         let transmitterMetadata: XDripCGMMetadataEnvelope.Transmitter? = {
             let identifier = defaults.activeSensorTransmitterId
-            let transmitterModel = transmitterType?.detailedDescription()
+            let transmitterModel = isAnubis ? DexcomProductNameResolver.anubisTitle : transmitterType?.detailedDescription()
             guard identifier != nil || transmitterModel != nil || battery != nil else { return nil }
             return .init(identifier: identifier, model: transmitterModel, battery: battery)
         }()

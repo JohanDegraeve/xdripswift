@@ -694,4 +694,4 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Графік";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Базовий";
 "settingsviews_liveActivitySectionTitle" = "Дія наживо";
-"settingsviews_dexcomG7Message" = "Залиште ім’я Bluetooth порожнім і натисніть OK, щоб продовжити. На наступному екрані натисніть Сканувати для автоматичного пошуку сенсора.\n\nЯкщо сенсор уже відображався в Параметри > Bluetooth, його ім’я Bluetooth можна ввести вручну.";
+"settingsviews_dexcomG7Message" = "Залиште ім’я Bluetooth порожнім. На наступному екрані натисніть Сканувати для автоматичного пошуку сенсора.\n\nЯкщо сенсор уже відображався в Параметри > Bluetooth, його ім’я Bluetooth можна ввести вручну.";

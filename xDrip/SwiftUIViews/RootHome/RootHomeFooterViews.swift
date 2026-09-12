@@ -255,8 +255,8 @@ struct RootHomeDataSourceView: View {
 
                 if let mode = state.dexcomConnectionMode {
                     Image(systemName: mode.systemImage)
+                        .foregroundStyle(mode.color)
                         .font(.system(size: 14))
-                        .foregroundStyle(ConstantsAppColors.secondaryText)
                         .accessibilityLabel(dexcomModeAccessibilityLabel(mode))
                 }
 

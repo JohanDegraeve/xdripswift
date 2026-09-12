@@ -218,13 +218,12 @@
 "dexcomCoexistenceMode" = "共存";
 "dexcomPrimaryModePickerOption" = "主模式";
 "dexcomCoexistenceModePickerOption" = "共存模式";
-"dexcomG6ModeSelectionFooter" = "您可以稍后在发射器设置中更改连接模式。";
-"dexcomG7ModeSelectionFooter" = "所选连接模式之后无法更改。要选择其他模式，请移除传感器并重新添加。";
+"dexcomG6ModeSelectionFooter" = "您可以稍后在发射器设置中更改 G6 连接模式。";
 "dexcomConnectionModeSelectionExplanation" = "主要模式会直接连接此应用，并要求关闭连接到 Dexcom 设备的任何其他应用。\n\n共存模式依靠另一个应用来维持 Dexcom 连接并接收读数。";
 "dexcomBluetoothChannelSelectionExplanation" = "选择此应用要使用的蓝牙通道。除非需要为其他连接保留该通道，否则请选择移动应用。";
 "dexcomG6CoexistenceModeSelectionMessage" = "已选择共存模式。另一个应用（例如 Dexcom G6 或 CamAPS）必须连接到 G6 发射器并完成身份验证。\n\n请让另一个应用在后台保持运行，否则 %@ 将无法接收读数。";
 "dexcomG6PrimaryModeSelectionMessage" = "已选择主要模式。%@ 必须是唯一连接到 G6 发射器并完成身份验证的应用。\n\n请关闭连接到发射器的任何其他应用，或禁用其蓝牙权限。否则，%@ 或另一个应用可能无法接收读数。";
-"dexcomPrimaryModeAddFlowMessage" = "作为主要应用直接连接。关闭连接到此 Dexcom 设备的所有其他应用。";
+"dexcomPrimaryModeAddFlowMessage" = "作为主要应用直接连接。断开所有其他应用与此 Dexcom 的连接。";
 "dexcomCoexistenceModeAddFlowMessage" = "与另一个应用共享连接。确保 Dexcom 或 CamAPS 应用在后台正常运行。";
 "dexcomG7NoSensorLabelFound" = "照片中未找到 Dexcom G7 传感器标签。";
 "dexcomG7InvalidSensorLabelFound" = "找到了 Data Matrix，但它不是有效的 Dexcom G7 传感器标签。";
@@ -238,3 +237,5 @@
 "batteryHistoryRange" = "范围";
 "batteryHistoryRangeAccessibility" = "电池历史记录范围";
 "batteryHistoryRangeExplanation" = "固定范围从现在回溯到所选天数。空白表示没有读数的时段。";
+
+"connectionDiagramOtherApp" = "其他应用";

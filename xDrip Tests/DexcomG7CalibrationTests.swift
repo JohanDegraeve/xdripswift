@@ -147,6 +147,39 @@ final class DexcomG7CalibrationTests: XCTestCase {
         XCTAssertEqual(CGMTransmitterType.dexcomG7.detailedDescription(transmitterID: nil), "Dexcom G7")
     }
 
+    func testAnubisDisplayNameUsesEachDevicesOwnFlag() {
+        for isAnubis in [true, false] {
+            XCTAssertEqual(
+                DexcomProductNameResolver.title(
+                    transmitterType: .dexcom,
+                    transmitterID: "812345",
+                    bluetoothName: nil,
+                    isAnubis: isAnubis
+                ),
+                isAnubis ? "Anubis G6" : "Dexcom G6"
+            )
+        }
+
+        // UI naming must not change the source description used outside the UI.
+        XCTAssertEqual(CGMTransmitterType.dexcom.detailedDescription(transmitterID: "812345"), "Dexcom G6")
+    }
+
+    func testAnubisDisplayNameDoesNotChangeOtherDexcomFamilies() {
+        XCTAssertEqual(
+            DexcomProductNameResolver.title(transmitterType: .dexcom, transmitterID: "C12345", bluetoothName: nil),
+            "Dexcom ONE"
+        )
+        XCTAssertEqual(
+            DexcomProductNameResolver.title(transmitterType: .dexcomG7, transmitterID: "DXCM12", bluetoothName: nil, isAnubis: true),
+            "Dexcom G7"
+        )
+        XCTAssertNil(DexcomProductNameResolver.title(transmitterType: .dexcom, transmitterID: nil, bluetoothName: nil))
+        XCTAssertEqual(
+            DexcomProductNameResolver.title(transmitterType: .dexcom, transmitterID: nil, bluetoothName: nil, isAnubis: true),
+            "Anubis G6"
+        )
+    }
+
     func testDexcomProductNameResolverUsesBluetoothNameForAutomaticG7Discovery() {
         // `DX0000` is only the value that asks Core Bluetooth to discover any G7-family sensor.
         // The advertised name is therefore the first value that can distinguish the product.

@@ -524,4 +524,4 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Kaavio";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Perus";
 "settingsviews_liveActivitySectionTitle" = "Live-toiminto";
-"settingsviews_dexcomG7Message" = "Jätä Bluetooth-nimi tyhjäksi ja jatka napauttamalla OK. Napauta seuraavassa näkymässä Skannaa, jotta sensoria etsitään automaattisesti.\n\nJos sensori on näkynyt aiemmin kohdassa Asetukset > Bluetooth, voit syöttää sen Bluetooth-nimen käsin.";
+"settingsviews_dexcomG7Message" = "Jätä Bluetooth-nimi tyhjäksi. Napauta seuraavassa näkymässä Skannaa, jotta sensoria etsitään automaattisesti.\n\nJos sensori on näkynyt aiemmin kohdassa Asetukset > Bluetooth, voit syöttää sen Bluetooth-nimen käsin.";

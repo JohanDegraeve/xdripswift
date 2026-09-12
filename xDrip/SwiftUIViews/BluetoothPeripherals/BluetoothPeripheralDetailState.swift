@@ -49,7 +49,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     private let closeDetailView: () -> Void
     private let presentTextEntryView: (BluetoothPeripheralTextEntry) -> Void
     private let presentSelectionListView: (BluetoothPeripheralSelectionList) -> Void
-    private let presentReadSuccessView: (TransmitterReadSuccessDisplay, BluetoothPeripheralType) -> Void
+    private let presentReadSuccessView: (TransmitterReadSuccessDisplay, String) -> Void
     private let presentBatteryHistoryView: (NSManagedObjectID) -> Void
 
     var onlineHelpTopic: OnlineHelpTopic {
@@ -92,7 +92,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         closeDetailView: @escaping () -> Void,
         presentTextEntryView: @escaping (BluetoothPeripheralTextEntry) -> Void,
         presentSelectionListView: @escaping (BluetoothPeripheralSelectionList) -> Void,
-        presentReadSuccessView: @escaping (TransmitterReadSuccessDisplay, BluetoothPeripheralType) -> Void,
+        presentReadSuccessView: @escaping (TransmitterReadSuccessDisplay, String) -> Void,
         presentBatteryHistoryView: @escaping (NSManagedObjectID) -> Void
     ) {
         self.bluetoothPeripheral = bluetoothPeripheral
@@ -107,7 +107,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         self.presentSelectionListView = presentSelectionListView
         self.presentReadSuccessView = presentReadSuccessView
         self.presentBatteryHistoryView = presentBatteryHistoryView
-        self.transmitterIdTempValue = bluetoothPeripheral?.blePeripheral.transmitterId
+        // New Dexcom devices already have their identifier from the setup screen.
+        self.transmitterIdTempValue = bluetoothPeripheral?.blePeripheral.transmitterId ?? dexcomConfiguration?.transmitterID
         self.dexcomG6BluetoothSlot = (bluetoothPeripheral as? DexcomG5)?
             .resolvedDexcomG6BluetoothSlot() ?? dexcomConfiguration?.g6BluetoothSlot ?? .defaultSlot
         self.dexcomG7BluetoothSlot = (bluetoothPeripheral as? DexcomG7)?
@@ -145,7 +146,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             return DexcomProductNameResolver.title(
                 transmitterType: .dexcom,
                 transmitterID: bluetoothPeripheral?.blePeripheral.transmitterId,
-                bluetoothName: bluetoothPeripheral?.blePeripheral.name
+                bluetoothName: bluetoothPeripheral?.blePeripheral.name,
+                isAnubis: (bluetoothPeripheral as? DexcomG5)?.isAnubis == true
             ) ?? expectedBluetoothPeripheralType.bluetoothPeripheralDisplayTitle
 
         case .DexcomG7Type:
@@ -168,6 +170,13 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         return bluetoothPeripheral?.blePeripheral.name ?? screenTitle
     }
 
+    var statusFooterSymbolColor: Color {
+        guard let useOtherApp = dexcomUseOtherAppForStatusFooter() else {
+            return ConstantsUI.listSectionFooterTextColor
+        }
+        return DexcomConnectionMode(useOtherApp: useOtherApp).color
+    }
+
     func start() {
         // Match the EmaLink/OrangeLink device screens in RileyLinkKit by requesting one fresh
         // battery value whenever this detail screen appears. There is deliberately no polling
@@ -184,7 +193,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         updateTransmitterReadSuccess()
         startTransmitterReadSuccessTimer()
 
-        if bluetoothPeripheral == nil, expectedBluetoothPeripheralType.needsTransmitterId() {
+        if bluetoothPeripheral == nil, expectedBluetoothPeripheralType.needsTransmitterId(), transmitterIdTempValue == nil {
             DispatchQueue.main.async { [weak self] in
                 self?.requestTransmitterId()
             }
@@ -1024,7 +1033,11 @@ private extension BluetoothPeripheralDetailState {
     func showReadSuccessView() {
         guard let cachedTransmitterReadSuccessDisplay else { return }
 
-        presentReadSuccessView(cachedTransmitterReadSuccessDisplay, expectedBluetoothPeripheralType)
+        // Keep the footer tied to this transmitter, including saved inactive devices.
+        let transmitterTitle = (bluetoothPeripheral as? DexcomG5)?.isAnubis == true
+            ? DexcomProductNameResolver.anubisTitle
+            : expectedBluetoothPeripheralType.bluetoothPeripheralDisplayTitle
+        presentReadSuccessView(cachedTransmitterReadSuccessDisplay, transmitterTitle)
     }
 
     func transmitterReadSuccessDetailIndicator() -> SettingsIndicator? {
@@ -1756,6 +1769,7 @@ struct BluetoothPeripheralDetailSection: Identifiable {
 struct BluetoothPeripheralDetailFooterLine: Identifiable {
     let id = UUID()
     let systemImage: String
+    let symbolColor: Color
     let text: String
     // Used to mute the mode description that does not match the current switch state.
     let isActive: Bool
@@ -1865,6 +1879,8 @@ struct BluetoothPeripheralDetailAlert: Identifiable {
 
 /// Text-entry route supplied by transmitter-specific configuration logic.
 struct BluetoothPeripheralTextEntry: Identifiable {
+    // Setup opens the next screen instead of closing the entry screen.
+    var dismissAfterSubmit = true
     let id = UUID()
     let title: String?
     let message: String?
@@ -1941,7 +1957,11 @@ private extension BluetoothPeripheralDetailState {
         var sections = [
             BluetoothPeripheralDetailSection(
                 id: "dexcom-g5",
-                title: dexcomTitle,
+                title: DexcomProductNameResolver.title(
+                    transmitterType: .dexcom,
+                    transmitterID: dexcomG5.blePeripheral.transmitterId,
+                    bluetoothName: dexcomG5.blePeripheral.name
+                ) ?? expectedBluetoothPeripheralType.bluetoothPeripheralDisplayTitle,
                 headerDetail: dexcomG5.isAnubis ? "Anubis" : nil,
                 headerSymbol: dexcomG5.isAnubis ? BluetoothPeripheralDetailSymbol(systemName: "checkmark.circle.fill", color: .green) : nil,
                 rows: makeDexcomG5CommonRows(dexcomG5: dexcomG5)
@@ -2082,6 +2102,7 @@ private extension BluetoothPeripheralDetailState {
     func dexcomG5ConnectionModeFooterLines(dexcomG5: DexcomG5) -> [BluetoothPeripheralDetailFooterLine] {
         [BluetoothPeripheralDetailFooterLine(
             systemImage: dexcomModeSystemImage(useOtherApp: dexcomG5.useOtherApp),
+            symbolColor: DexcomConnectionMode(useOtherApp: dexcomG5.useOtherApp).color,
             text: dexcomG5.useOtherApp
                 ? Texts_BluetoothPeripheralView.dexcomG6CoexistenceModeFooter
                 : Texts_BluetoothPeripheralView.dexcomG6PrimaryModeFooter,

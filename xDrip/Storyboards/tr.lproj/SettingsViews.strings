@@ -486,4 +486,4 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Grafik";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Temel";
 "settingsviews_liveActivitySectionTitle" = "Canlı Etkinlik";
-"settingsviews_dexcomG7Message" = "Bluetooth adını boş bırakın ve devam etmek için Tamam’a dokunun. Sonraki ekranda sensörü otomatik olarak aramak için Tara’ya dokunun.\n\nSensör daha önce Ayarlar > Bluetooth bölümünde göründüyse Bluetooth adını elle girebilirsiniz.";
+"settingsviews_dexcomG7Message" = "Bluetooth adını boş bırakın. Sonraki ekranda sensörü otomatik olarak aramak için Tara’ya dokunun.\n\nSensör daha önce Ayarlar > Bluetooth bölümünde göründüyse Bluetooth adını elle girebilirsiniz.";

@@ -664,4 +664,4 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "图表";
 "settingsviews_carPlayLiveActivityTypeBasic" = "基础";
 "settingsviews_liveActivitySectionTitle" = "实时活动";
-"settingsviews_dexcomG7Message" = "将蓝牙名称留空，然后轻点“好”继续。在下一个屏幕中，轻点“扫描”以自动搜索传感器。\n\n如果传感器之前曾出现在“设置”>“蓝牙”中，您可以手动输入其蓝牙名称。";
+"settingsviews_dexcomG7Message" = "将蓝牙名称留空。在下一个屏幕中，轻点“扫描”以自动搜索传感器。\n\n如果传感器之前曾出现在“设置”>“蓝牙”中，您可以手动输入其蓝牙名称。";

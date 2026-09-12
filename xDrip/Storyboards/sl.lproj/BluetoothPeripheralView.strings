@@ -218,13 +218,12 @@
 "dexcomCoexistenceMode" = "Soobstoj";
 "dexcomPrimaryModePickerOption" = "Primarni način";
 "dexcomCoexistenceModePickerOption" = "Način soobstoja";
-"dexcomG6ModeSelectionFooter" = "Način povezave lahko pozneje spremenite v nastavitvah oddajnika.";
-"dexcomG7ModeSelectionFooter" = "Izbranega načina povezave pozneje ni mogoče spremeniti. Odstranite senzor in ga znova dodajte, da izberete drug način.";
+"dexcomG6ModeSelectionFooter" = "Način povezave G6 lahko pozneje spremenite v nastavitvah oddajnika.";
 "dexcomConnectionModeSelectionExplanation" = "Primarni način poveže to aplikacijo neposredno in zahteva, da zaprete vse druge aplikacije, ki se povezujejo z napravo Dexcom.\n\nNačin soobstoja uporablja drugo aplikacijo za vzdrževanje povezave Dexcom in prejemanje odčitkov.";
 "dexcomBluetoothChannelSelectionExplanation" = "Izberite kanal Bluetooth, ki ga bo uporabljala ta aplikacija. Izberite Mobilna aplikacija, razen če mora ta kanal ostati na voljo za drugo povezavo.";
 "dexcomG6CoexistenceModeSelectionMessage" = "Izbran je način soobstoja. Druga aplikacija, na primer Dexcom G6 ali CamAPS, se mora povezati z oddajnikom G6 in ga preveriti.\n\nDruga aplikacija mora ostati zagnana v ozadju, sicer %@ ne bo prejemal odčitkov.";
 "dexcomG6PrimaryModeSelectionMessage" = "Izbran je primarni način. %@ mora biti edina aplikacija, ki se poveže z oddajnikom G6 in ga preveri.\n\nZaprite vse druge aplikacije, ki se povezujejo z oddajnikom, ali jim onemogočite dovoljenje Bluetooth. Sicer %@ ali druga aplikacija morda ne bo prejemala odčitkov.";
-"dexcomPrimaryModeAddFlowMessage" = "Povežite se neposredno kot glavna aplikacija. Zaprite vse druge aplikacije, ki se povezujejo s to napravo Dexcom.";
+"dexcomPrimaryModeAddFlowMessage" = "Povežite se neposredno kot glavna aplikacija. Prekinite povezavo vseh drugih aplikacij s tem Dexcomom.";
 "dexcomCoexistenceModeAddFlowMessage" = "Delite povezavo z drugo aplikacijo. Aplikacija Dexcom ali CamAPS mora pravilno delovati v ozadju.";
 "dexcomG7NoSensorLabelFound" = "Na fotografiji ni bila najdena oznaka senzorja Dexcom G7.";
 "dexcomG7InvalidSensorLabelFound" = "Najdena je bila koda Data Matrix, vendar ni bila veljavna oznaka senzorja Dexcom G7.";
@@ -238,3 +237,5 @@
 "batteryHistoryRange" = "Obdobje";
 "batteryHistoryRangeAccessibility" = "Obdobje zgodovine baterije";
 "batteryHistoryRangeExplanation" = "Fiksna obdobja segajo od zdaj nazaj za izbrano število dni. Vrzeli prikazujejo obdobja brez odčitka.";
+
+"connectionDiagramOtherApp" = "Druga aplikacija";
