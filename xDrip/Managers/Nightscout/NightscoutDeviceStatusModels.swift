@@ -210,19 +210,12 @@ struct NightscoutDeviceStatus: Codable, Sendable {
         aidStatus.presentation(referenceDate: referenceDate).title
     }
 
-    func deviceStatusIconImage() -> Image {
-        Image(systemName: deviceStatusIconSystemName())
+    /// The AID detail banner uses the shared renderer and supplies its own font size and color.
+    /// Preserve the existing slashed-circle fallback when Loop has no symbol to display.
+    func deviceStatusIconImage() -> AIDStatusSymbolImage {
+        AIDStatusSymbolImage(symbol: aidStatus.presentation().symbol ?? .loopUnavailable)
     }
 
-    func deviceStatusIconUIImage() -> UIImage {
-        UIImage(systemName: deviceStatusIconSystemName()) ?? UIImage()
-    }
-
-    func deviceStatusIconSystemName(referenceDate: Date = .now) -> String {
-        aidStatus.presentation(referenceDate: referenceDate).systemImage
-            ?? ConstantsHomeView.loopStatusNoDataSystemImage
-    }
-    
     func pumpReservoirColor() -> Color? {
         if let pumpReservoir {
             if pumpReservoir < ConstantsHomeView.pumpReservoirUrgent {

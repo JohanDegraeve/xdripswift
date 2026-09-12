@@ -3,7 +3,7 @@
 "settingsviews_transmitterid_text_for_button" = "Zender-ID";
 
 "settingsviews_settingstitle" = "Instellingen";
-"settingsviews_glucoseDisplaySectionTitle" = "Weergave";
+"settingsviews_glucoseDisplaySectionTitle" = "Algemeen";
 "settingsviews_glucoseRangesSectionTitle" = "Glucosebereiken";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarmen en meldingen";
 "settingsviews_sharingAndServicesSectionTitle" = "Delen en diensten";
@@ -539,3 +539,30 @@
 "settingsviews_carPlayLiveActivityTypeBasic" = "Basis";
 "settingsviews_liveActivitySectionTitle" = "Liveactiviteit";
 "settingsviews_dexcomG7Message" = "Laat de Bluetooth-naam leeg. Tik in het volgende scherm op Scannen om automatisch naar de sensor te zoeken.\n\nAls de sensor eerder is verschenen in Instellingen > Bluetooth, kunt u de Bluetooth-naam handmatig invoeren.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Koolhydraatduur";
+"therapy.local" = "Lokaal berekend";
+
+"settingsviews_showOriginalBGReadings" = "Oorspronkelijke Waarden Tonen";
+
+"therapy.insulinType" = "Insulinetype";
+
+"therapy.showIOBCOB" = "IOB/COB tonen";
+
+"therapy.treatmentSettings" = "Behandelingen";
+
+"therapy.settingsHelp" = "Gebruikt om resterende insuline en koolhydraten uit geregistreerde behandelingen te schatten.";
+
+"therapy.settingsLocal" = "Deze instellingen schatten IOB en COB uit geregistreerde behandelingen alleen wanneer een AID-systeem deze waarden niet levert.";
+"therapy.settingsExternal" = "Deze opties zijn uitgeschakeld omdat uw op %@ gebaseerde AID-systeem IOB en COB levert.";
+"therapy.settingsMixed" = "%@ levert IOB, dus het insulinetype is automatisch. De koolhydraatduur schat COB lokaal uit geregistreerde maaltijden.";
+"therapy.insulinModel" = "Insulinemodel %@ geselecteerd. Insulinewerkingsduur (DIA): %@. Tijd tot insulinepiek: %@.";
+"therapy.carbFast" = "Snellere koolhydraatopname. Inclusief 10 minuten vertraging voor de opname begint.";
+"therapy.carbNormal" = "Normale koolhydraatopname. Inclusief 10 minuten vertraging voor de opname begint.";
+"therapy.carbLong" = "Langere koolhydraatopname. Kan nuttig zijn wanneer GLP-1-medicatie de spijsvertering vertraagt. Inclusief 10 minuten vertraging voor de opname begint.";
+"therapy.automatic" = "Automatisch";
+
+"therapy.liveActivityMetricsFooter" = "Toon beschikbare IOB en COB in de grote toegangsschermweergave en de grafiekweergave van CarPlay/Slimme stapel.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB vereist geregistreerde insuline- of koolhydraatbehandelingen, of gegevens van een verbonden AID-systeem.";

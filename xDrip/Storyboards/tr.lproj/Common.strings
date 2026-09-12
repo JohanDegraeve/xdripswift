@@ -58,3 +58,7 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Tahmini aktif insülin";
+"therapy.estimatedCOB" = "Tahmini aktif karbonhidrat";

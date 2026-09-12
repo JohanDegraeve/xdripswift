@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Settings";
-"settingsviews_glucoseDisplaySectionTitle" = "Visning";
+"settingsviews_glucoseDisplaySectionTitle" = "Generelt";
 "settingsviews_glucoseRangesSectionTitle" = "Glukoseområder";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarmer og notifikationer";
 "settingsviews_sharingAndServicesSectionTitle" = "Deling og tjenester";
@@ -483,3 +483,30 @@
 "settingsviews_carPlayLiveActivityTypeBasic" = "Enkel";
 "settingsviews_liveActivitySectionTitle" = "Liveaktivitet";
 "settingsviews_dexcomG7Message" = "Lad Bluetooth-navnet være tomt. På den næste skærm skal du trykke på Scan for automatisk at søge efter sensoren.\n\nHvis sensoren tidligere har været vist under Indstillinger > Bluetooth, kan du indtaste dens Bluetooth-navn manuelt.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Kulhydratvarighed";
+"therapy.local" = "Beregnet lokalt";
+
+"settingsviews_showOriginalBGReadings" = "Vis Oprindelige Værdier";
+
+"therapy.insulinType" = "Insulintype";
+
+"therapy.showIOBCOB" = "Vis IOB/COB";
+
+"therapy.treatmentSettings" = "Behandlinger";
+
+"therapy.settingsHelp" = "Bruges til at estimere resterende insulin og kulhydrater fra dine registrerede behandlinger.";
+
+"therapy.settingsLocal" = "Disse indstillinger estimerer IOB og COB fra registrerede behandlinger, kun når værdierne ikke leveres af et AID-system.";
+"therapy.settingsExternal" = "Disse muligheder er deaktiveret, fordi dit %@-baserede AID-system leverer IOB og COB.";
+"therapy.settingsMixed" = "%@ leverer IOB, så insulintypen er automatisk. Kulhydratvarigheden bruges til at estimere COB lokalt fra registrerede måltider.";
+"therapy.insulinModel" = "Insulinmodel %@ valgt. Insulinens virkningsvarighed (DIA): %@. Tid til maksimal insulinvirkning: %@.";
+"therapy.carbFast" = "Hurtigere kulhydratoptagelse. Inkluderer 10 minutters forsinkelse før optagelsen begynder.";
+"therapy.carbNormal" = "Normal kulhydratoptagelse. Inkluderer 10 minutters forsinkelse før optagelsen begynder.";
+"therapy.carbLong" = "Længere kulhydratoptagelse. Kan være nyttigt, når GLP-1-medicin forsinker fordøjelsen. Inkluderer 10 minutters forsinkelse før optagelsen begynder.";
+"therapy.automatic" = "Automatisk";
+
+"therapy.liveActivityMetricsFooter" = "Vis tilgængelig IOB og COB i det store låseskærmlayout og i graflayoutet for CarPlay/Smart stak.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB kræver registrerede insulin- eller kulhydratbehandlinger eller data fra et tilsluttet AID-system.";

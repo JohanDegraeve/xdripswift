@@ -13,6 +13,53 @@ enum ConstantsGlucoseChartSwiftUI {
     // ------------------------------------------
     // ----- SwiftUI Glucose Chart --------------
     // ------------------------------------------
+    // Display-only therapy styling and relative scale. This ratio is not used for calculations.
+    static let therapyPlotMaximumIOB: Double = 15
+    static let therapyPlotMaximumCOB: Double = 70
+    static let therapyPlotReferenceHeightInMgDl: Double = 100
+    static let minimumChartValueWithBasal: Double = -10
+    static let minimumChartValueWithBasal24Hours: Double = 0
+
+    /// Shared bottom space for basal data and visible therapy plots.
+    static func minimumChartValueWithBottomSpace(hours: Double) -> Double {
+        hours >= 24 ? minimumChartValueWithBasal24Hours : minimumChartValueWithBasal
+    }
+
+    static let therapyPlotLineOpacity: Double = 1.0
+    static let therapyPlotCarbsPerInsulinUnit: Double = 7
+
+    static func xAxisDates(from startDate: Date, to endDate: Date, everyHours: Int) -> [Date] {
+        // Keep labels anchored to real clock hours so a small scroll cannot switch between odd and
+        // even hour labels.
+        let hourInterval = max(everyHours, 1)
+        let calendar = Calendar.current
+        let startOfVisibleHourComponents = calendar.dateComponents([.year, .month, .day, .hour], from: startDate)
+
+        guard var date = calendar.date(from: startOfVisibleHourComponents) else { return [] }
+
+        if date < startDate, let nextHourDate = calendar.date(byAdding: .hour, value: 1, to: date) {
+            date = nextHourDate
+        }
+
+        var dates = [Date]()
+
+        while date <= endDate {
+            let hour = calendar.component(.hour, from: date)
+
+            if hourInterval == 1 || hour % hourInterval == 0 {
+                dates.append(date)
+            }
+
+            guard let nextDate = calendar.date(byAdding: .hour, value: 1, to: date), nextDate > date else {
+                break
+            }
+
+            date = nextDate
+        }
+
+        return dates
+    }
+
     // shared chart defaults
     static let yAxisLineSize: Double = 0.8
     static let yAxisAbsoluteMinimumChartValueInMgDl: Double = 38

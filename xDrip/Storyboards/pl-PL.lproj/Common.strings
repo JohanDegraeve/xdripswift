@@ -169,3 +169,7 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Szacowana aktywna insulina";
+"therapy.estimatedCOB" = "Szacowane aktywne węglowodany";

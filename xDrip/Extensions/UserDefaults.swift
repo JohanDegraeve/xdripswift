@@ -124,6 +124,7 @@ extension UserDefaults {
         case liveActivityType = "liveActivityType"
         /// which layout should the small Live Activity family use?
         case carPlayLiveActivityType = "carPlayLiveActivityType"
+        case liveActivityShowIOBCOB = "liveActivityShowIOBCOB"
         /// should BG adjustment be enabled?
         case enableAdjustment = "enableAdjustment"
         /// should BG smoothing be enabled?
@@ -1014,6 +1015,12 @@ extension UserDefaults {
         set {
             set(newValue.rawValue, forKey: Key.carPlayLiveActivityType.rawValue)
         }
+    }
+
+    /// Shared visibility preference for Lock Screen, CarPlay and Smart Stack therapy metrics.
+    @objc dynamic var liveActivityShowIOBCOB: Bool {
+        get { object(forKey: Key.liveActivityShowIOBCOB.rawValue) as? Bool ?? true }
+        set { set(newValue, forKey: Key.liveActivityShowIOBCOB.rawValue) }
     }
 
     /// should adjustment be enabled?

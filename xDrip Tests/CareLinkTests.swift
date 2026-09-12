@@ -89,7 +89,7 @@ final class CareLinkTests: XCTestCase {
         var checkingSnapshot = CareLinkStatusSnapshot()
         checkingSnapshot.pump.isReported = true
         let checking = try XCTUnwrap(checkingSnapshot.aidStatus).presentation(referenceDate: now)
-        XCTAssertEqual(checking.systemImage, ConstantsHomeView.careLinkSmartGuardSystemImage)
+        XCTAssertEqual(checking.symbol, .smartGuard)
         XCTAssertEqual(checking.color, Color("colorSecondary"))
 
         var snapshot = CareLinkStatusSnapshot(status: .active)
@@ -97,24 +97,24 @@ final class CareLinkTests: XCTestCase {
         snapshot.pump.observedAt = now
         snapshot.pump.algorithmState = "AUTO_BASAL"
         var presentation = try XCTUnwrap(snapshot.aidStatus).presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkSmartGuardSystemImage)
+        XCTAssertEqual(presentation.symbol, .smartGuard)
         XCTAssertEqual(presentation.color, .green)
 
         snapshot.pump.isSuspended = true
         presentation = try XCTUnwrap(snapshot.aidStatus).presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkSuspendedSystemImage)
+        XCTAssertEqual(presentation.symbol, .suspended)
         XCTAssertEqual(presentation.color, .yellow)
 
         snapshot.pump.isSuspended = false
         snapshot.pump.isCommunicating = false
         presentation = try XCTUnwrap(snapshot.aidStatus).presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkDisconnectedSystemImage)
+        XCTAssertEqual(presentation.symbol, .disconnected)
         XCTAssertEqual(presentation.color, .red)
 
         snapshot.pump.isCommunicating = true
         snapshot.pump.observedAt = now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes - 1)
         presentation = try XCTUnwrap(snapshot.aidStatus).presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkStaleSystemImage)
+        XCTAssertEqual(presentation.symbol, .stale)
         XCTAssertEqual(presentation.color, .yellow)
         XCTAssertEqual(presentation.title, Texts_SettingsView.careLinkNoData)
     }
@@ -127,22 +127,22 @@ final class CareLinkTests: XCTestCase {
 
         var presentation = deviceStatus.aidStatus.presentation(referenceDate: now)
         XCTAssertTrue(deviceStatus.aidStatus.supportsCOB)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.loopStatusRecentSystemImage)
+        XCTAssertEqual(presentation.symbol, .loop)
         XCTAssertEqual(presentation.color, .green)
 
         deviceStatus.lastLoopDate = now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes - 1)
         presentation = deviceStatus.aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.loopStatusAcceptableSystemImage)
+        XCTAssertEqual(presentation.symbol, .loop)
         XCTAssertEqual(presentation.color, .yellow)
 
         deviceStatus.lastLoopDate = now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes - 1)
         presentation = deviceStatus.aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.loopStatusNotLoopingSystemImage)
+        XCTAssertEqual(presentation.symbol, .loopUnavailable)
         XCTAssertEqual(presentation.color, .red)
 
         deviceStatus.createdAt = now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes - 1)
         presentation = deviceStatus.aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.loopStatusNoDataSystemImage)
+        XCTAssertEqual(presentation.symbol, .loopUnavailable)
         XCTAssertEqual(presentation.color, .gray)
     }
 
@@ -170,7 +170,7 @@ final class CareLinkTests: XCTestCase {
         snapshot.pump.isInRange = false
         XCTAssertNil(snapshot.aidStatus)
         XCTAssertNil(snapshot.pump.homeDeviceStatus(metadata: snapshot.metadata, checkedAt: now))
-        XCTAssertNil(RootHomeStateModel().careLinkLoopState(snapshot: snapshot, referenceDate: now).statusSystemImage)
+        XCTAssertNil(RootHomeStateModel().careLinkLoopState(snapshot: snapshot, referenceDate: now).statusSymbol)
 
         snapshot.pump.activeInsulin = 1.25
         snapshot.pump.activeInsulinAt = now
@@ -180,21 +180,21 @@ final class CareLinkTests: XCTestCase {
         XCTAssertFalse(aidStatus.supportsCOB)
 
         var presentation = aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkPumpSystemImage)
+        XCTAssertEqual(presentation.symbol, .pump)
         XCTAssertEqual(presentation.color, .green)
         XCTAssertTrue(presentation.hasFreshData)
 
         snapshot.pump.activeInsulinAt = now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes - 1)
         aidStatus = try XCTUnwrap(snapshot.aidStatus)
         presentation = aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkPumpSystemImage)
+        XCTAssertEqual(presentation.symbol, .pump)
         XCTAssertEqual(presentation.color, .yellow)
         XCTAssertTrue(presentation.hasFreshData)
 
         snapshot.pump.activeInsulinAt = now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes - 1)
         aidStatus = try XCTUnwrap(snapshot.aidStatus)
         presentation = aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkPumpSystemImage)
+        XCTAssertEqual(presentation.symbol, .pump)
         XCTAssertEqual(presentation.color, .red)
         XCTAssertFalse(presentation.hasFreshData)
         XCTAssertEqual(presentation.title, Texts_SettingsView.careLinkNoData)
@@ -596,7 +596,7 @@ final class CareLinkTests: XCTestCase {
 
         var snapshot = CareLinkStatusSnapshot(status: .active, lastReadingAt: now, pump: pump)
         let presentation = try XCTUnwrap(snapshot.aidStatus).presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkPumpSystemImage)
+        XCTAssertEqual(presentation.symbol, .pump)
         XCTAssertEqual(presentation.title, Texts_Common.Ok)
         XCTAssertEqual(presentation.color, .green)
 
@@ -1181,6 +1181,8 @@ final class CareLinkTests: XCTestCase {
 
     @MainActor
     func testBlockedTherapyImportCannotBlockGlucoseOrAnotherPoll() async throws {
+        // This manager uses the wall clock, unlike the parser tests with an injected date.
+        URLProtocolStub.usesCurrentGlucoseTime = true
         let defaultsSnapshot = CareLinkDefaultsSnapshot(keys: [
             .isMaster,
             .followerDataSourceType,
@@ -1913,6 +1915,7 @@ private final class URLProtocolStub: URLProtocol {
     static var refreshCount = 0
     static var directPeriodicUnavailable = false
     static var emptyPersonalAccount = false
+    static var usesCurrentGlucoseTime = false
     static var pumpOnly = false
     static var logoutDelay: TimeInterval = 0
     static var refreshDelay: TimeInterval = 0
@@ -1923,6 +1926,7 @@ private final class URLProtocolStub: URLProtocol {
     static var requestBodies: [[String: String]] = []
 
     static func reset() {
+        usesCurrentGlucoseTime = false
         lock.lock()
         role = "PATIENT_OUS"
         route = .periodic
@@ -2104,7 +2108,7 @@ private final class URLProtocolStub: URLProtocol {
     private func glucose(wrapped: Bool = false) {
         let payload: [String: Any] = Self.pumpOnly
             ? ["activeInsulin": ["amount": 1.25, "datetime": 1_800_000_000_000]]
-            : ["lastSG": ["sg": 123, "timestamp": 1_800_000_000_000]]
+            : ["lastSG": ["sg": 123, "timestamp": Self.usesCurrentGlucoseTime ? Date().timeIntervalSince1970 * 1000 : 1_800_000_000_000]]
         respond(200, wrapped ? ["patientData": payload] : payload)
     }
 

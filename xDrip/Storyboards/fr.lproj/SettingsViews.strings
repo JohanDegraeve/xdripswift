@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Réglages";
-"settingsviews_glucoseDisplaySectionTitle" = "Affichage";
+"settingsviews_glucoseDisplaySectionTitle" = "Général";
 "settingsviews_glucoseRangesSectionTitle" = "Plages de glucose";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alertes et notifications";
 "settingsviews_sharingAndServicesSectionTitle" = "Partage et services";
@@ -555,3 +555,30 @@
 "settingsviews_carPlayLiveActivityTypeBasic" = "Simple";
 "settingsviews_liveActivitySectionTitle" = "Activité en direct";
 "settingsviews_dexcomG7Message" = "Laissez le nom Bluetooth vide. Sur l’écran suivant, touchez Scanner pour rechercher automatiquement le capteur.\n\nSi le capteur est déjà apparu dans Réglages > Bluetooth, vous pouvez saisir son nom Bluetooth manuellement.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Durée des Glucides";
+"therapy.local" = "Calculé localement";
+
+"settingsviews_showOriginalBGReadings" = "Afficher les Valeurs Originales";
+
+"therapy.insulinType" = "Type d’Insuline";
+
+"therapy.showIOBCOB" = "Afficher l’IOB/COB";
+
+"therapy.treatmentSettings" = "Traitements";
+
+"therapy.settingsHelp" = "Utilisés pour estimer l’insuline et les glucides restants à partir des traitements enregistrés.";
+
+"therapy.settingsLocal" = "Ces réglages estiment l’IOB et les COB à partir des traitements enregistrés uniquement lorsque ces valeurs ne sont pas fournies par un système AID.";
+"therapy.settingsExternal" = "Ces options sont désactivées car votre système AID basé sur %@ fournit l’IOB et les COB.";
+"therapy.settingsMixed" = "%@ fournit l’IOB, donc le type d’insuline est automatique. La durée des glucides sert à estimer les COB localement à partir des repas enregistrés.";
+"therapy.insulinModel" = "Modèle d’insuline %@ sélectionné. Durée d’action de l’insuline (DIA) : %@. Temps jusqu’au pic d’insuline : %@.";
+"therapy.carbFast" = "Absorption des glucides plus rapide. Comprend un délai de 10 minutes avant le début.";
+"therapy.carbNormal" = "Absorption normale des glucides. Comprend un délai de 10 minutes avant le début.";
+"therapy.carbLong" = "Absorption des glucides plus longue. Peut être utile lorsque les médicaments GLP-1 ralentissent la digestion. Comprend un délai de 10 minutes avant le début.";
+"therapy.automatic" = "Automatique";
+
+"therapy.liveActivityMetricsFooter" = "Afficher les valeurs IOB et COB disponibles dans la grande présentation de l’écran verrouillé et la présentation avec graphique de CarPlay/Pile intelligente.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB nécessite des traitements d’insuline ou de glucides enregistrés, ou les données d’un système AID connecté.";

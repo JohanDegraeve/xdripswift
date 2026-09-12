@@ -118,9 +118,10 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         )
 
         let mainChartRows = [
+            mainChartHoursRow,
+            SettingsRow(id: "homeScreen.showIOBCOB", title: TherapyTexts.text("showIOBCOB"), control: .toggle(isOn: { UserDefaults.standard.showIOBCOB }, setIsOn: { UserDefaults.standard.showIOBCOB = $0 })),
             nativeSettingsRow(id: "homeScreen.showOriginalBGReadings", index: Setting.showOriginalBGReadings.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "homeScreen.showSensorNoise", index: Setting.showSensorNoise.rawValue, sectionID: sectionID),
-            mainChartHoursRow
+            nativeSettingsRow(id: "homeScreen.showSensorNoise", index: Setting.showSensorNoise.rawValue, sectionID: sectionID)
         ]
 
         let miniChartRows = [

@@ -44,7 +44,7 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
-"settingsviews_glucoseDisplaySectionTitle" = "Prikaz";
+"settingsviews_glucoseDisplaySectionTitle" = "Splošno";
 "settingsviews_glucoseRangesSectionTitle" = "Razponi glukoze";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarmi in obvestila";
 "settingsviews_sharingAndServicesSectionTitle" = "Deljenje in storitve";
@@ -740,3 +740,30 @@
 "settingsviews_carPlayLiveActivityTypeBasic" = "Osnovno";
 "settingsviews_liveActivitySectionTitle" = "Dejavnost v živo";
 "settingsviews_dexcomG7Message" = "Pustite ime Bluetooth prazno. Na naslednjem zaslonu tapnite Skeniraj za samodejno iskanje senzorja.\n\nČe je bil senzor že prikazan v Nastavitve > Bluetooth, lahko njegovo ime Bluetooth vnesete ročno.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Trajanje Ogljikovih Hidratov";
+"therapy.local" = "Izračunano lokalno";
+
+"settingsviews_showOriginalBGReadings" = "Prikaži Izvirne Vrednosti";
+
+"therapy.insulinType" = "Vrsta Inzulina";
+
+"therapy.showIOBCOB" = "Prikaži IOB/COB";
+
+"therapy.treatmentSettings" = "Zdravljenja";
+
+"therapy.settingsHelp" = "Uporabljajo se za oceno preostalega inzulina in ogljikovih hidratov iz zabeleženih zdravljenj.";
+
+"therapy.settingsLocal" = "Te nastavitve ocenijo IOB in COB iz zabeleženih zdravljenj samo, ko teh vrednosti ne zagotavlja sistem AID.";
+"therapy.settingsExternal" = "Te možnosti so onemogočene, ker vaš sistem AID na osnovi %@ zagotavlja IOB in COB.";
+"therapy.settingsMixed" = "%@ zagotavlja IOB, zato je vrsta inzulina samodejna. Trajanje ogljikovih hidratov se uporablja za lokalno oceno COB iz zabeleženih obrokov.";
+"therapy.insulinModel" = "Izbran je inzulinski model %@. Trajanje delovanja inzulina (DIA): %@. Čas do največjega učinka inzulina: %@.";
+"therapy.carbFast" = "Hitrejša absorpcija ogljikovih hidratov. Vključuje 10-minutni zamik pred začetkom.";
+"therapy.carbNormal" = "Običajna absorpcija ogljikovih hidratov. Vključuje 10-minutni zamik pred začetkom.";
+"therapy.carbLong" = "Daljša absorpcija ogljikovih hidratov. Lahko je koristna, ko zdravila GLP-1 upočasnijo prebavo. Vključuje 10-minutni zamik pred začetkom.";
+"therapy.automatic" = "Samodejno";
+
+"therapy.liveActivityMetricsFooter" = "Prikaži razpoložljiva IOB in COB v veliki postavitvi zaklenjenega zaslona ter postavitvi z grafom CarPlay/Pametni sklad.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB zahteva zabeležene odmerke inzulina ali ogljikovih hidratov ali podatke povezanega sistema AID.";

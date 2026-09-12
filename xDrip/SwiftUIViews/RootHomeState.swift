@@ -59,8 +59,12 @@ struct RootHomeLoopState {
     var iob = RootHomeMetricState(title: "IOB", value: "- U")
     var cob = RootHomeMetricState(title: "COB", value: "- g")
     var showsCOB = true
+    var showsIOB = true
+    var showsAIDStatus = true
+    var therapyMetrics: TherapyMetricsSnapshot? = nil
     var statusTitle = "-"
-    var statusSystemImage: String?
+    // Carry the shared symbol into the Home strip, landscape and night-lock views without string lookups.
+    var statusSymbol: AIDStatusSymbol?
     var statusColor = ConstantsAppColors.secondaryText
     var statusTimeAgo = ""
     var showsStatusTimeAgo = false
@@ -331,6 +335,8 @@ final class RootHomeStateModel: ObservableObject {
         newState.isScreenLocked = isScreenLocked
         newState.usesScreenLockNightLayout = usesScreenLockNightLayout
 
+        applyTherapyMetrics(to: &newState.loop)
+        newState.visibility.showsLoop = !usesScreenLockNightLayout && (newState.loop.showsIOB || newState.loop.showsCOB || newState.visibility.showsLoop)
         publish(newState)
     }
 
@@ -370,7 +376,19 @@ final class RootHomeStateModel: ObservableObject {
             } else {
                 state.loop = RootHomeLoopState()
             }
+            self.applyTherapyMetrics(to: &state.loop)
+            state.visibility.showsLoop = !state.usesScreenLockNightLayout && (state.loop.showsIOB || state.loop.showsCOB || state.loop.showsAIDStatus)
         }
+    }
+
+    func applyTherapyMetrics(to loop: inout RootHomeLoopState, at date: Date = .now, external: AIDStatus? = nil, historical: Bool = false) {
+        let metrics = TherapyMetricsManager.shared.snapshot(at: date, external: external, historical: historical)
+        loop.therapyMetrics = metrics
+        loop.showsIOB = metrics.iob.isVisible(at: date)
+        loop.showsCOB = metrics.cob.isVisible(at: date)
+        loop.showsAIDStatus = UserDefaults.standard.dataFlowPolicy.showsTherapyStatus
+        loop.iob.value = metrics.iob.formatted(isIOB: true, at: date)
+        loop.cob.value = metrics.cob.formatted(isIOB: false, at: date)
     }
 
     func setStatisticsLoading() {
@@ -666,7 +684,7 @@ final class RootHomeStateModel: ObservableObject {
             // metric for Nightscout loops, whose device status contains algorithm-calculated COB.
             showsCOB: aidStatus.supportsCOB,
             statusTitle: presentation.title,
-            statusSystemImage: presentation.systemImage,
+            statusSymbol: presentation.symbol,
             statusColor: presentation.color,
             statusTimeAgo: statusTimeAgo,
             showsStatusTimeAgo: !statusTimeAgo.isEmpty,

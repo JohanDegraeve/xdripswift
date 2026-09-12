@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Asetukset";
-"settingsviews_glucoseDisplaySectionTitle" = "Näyttö";
+"settingsviews_glucoseDisplaySectionTitle" = "Yleiset";
 "settingsviews_glucoseRangesSectionTitle" = "Glukoosialueet";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Hälytykset ja ilmoitukset";
 "settingsviews_sharingAndServicesSectionTitle" = "Jakaminen ja palvelut";
@@ -525,3 +525,30 @@
 "settingsviews_carPlayLiveActivityTypeBasic" = "Perus";
 "settingsviews_liveActivitySectionTitle" = "Live-toiminto";
 "settingsviews_dexcomG7Message" = "Jätä Bluetooth-nimi tyhjäksi. Napauta seuraavassa näkymässä Skannaa, jotta sensoria etsitään automaattisesti.\n\nJos sensori on näkynyt aiemmin kohdassa Asetukset > Bluetooth, voit syöttää sen Bluetooth-nimen käsin.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Hiilihydraattien Kesto";
+"therapy.local" = "Laskettu paikallisesti";
+
+"settingsviews_showOriginalBGReadings" = "Näytä Alkuperäiset Arvot";
+
+"therapy.insulinType" = "Insuliinityyppi";
+
+"therapy.showIOBCOB" = "Näytä IOB/COB";
+
+"therapy.treatmentSettings" = "Hoidot";
+
+"therapy.settingsHelp" = "Käytetään jäljellä olevan insuliinin ja hiilihydraattien arvioimiseen kirjatuista hoidoista.";
+
+"therapy.settingsLocal" = "Nämä asetukset arvioivat IOB- ja COB-arvot kirjatuista hoidoista vain, kun AID-järjestelmä ei toimita niitä.";
+"therapy.settingsExternal" = "Nämä valinnat on poistettu käytöstä, koska %@-pohjainen AID-järjestelmäsi toimittaa IOB- ja COB-arvot.";
+"therapy.settingsMixed" = "%@ toimittaa IOB-arvon, joten insuliinityyppi on automaattinen. Hiilihydraattien kesto arvioi COB-arvon paikallisesti kirjatuista aterioista.";
+"therapy.insulinModel" = "Insuliinimalli %@ valittu. Insuliinin vaikutusaika (DIA): %@. Aika insuliinin huippuvaikutukseen: %@.";
+"therapy.carbFast" = "Nopeampi hiilihydraattien imeytyminen. Sisältää 10 minuutin viiveen ennen imeytymisen alkua.";
+"therapy.carbNormal" = "Normaali hiilihydraattien imeytyminen. Sisältää 10 minuutin viiveen ennen imeytymisen alkua.";
+"therapy.carbLong" = "Pidempi hiilihydraattien imeytyminen. Voi olla hyödyllinen, kun GLP-1-lääkitys hidastaa ruoansulatusta. Sisältää 10 minuutin viiveen ennen imeytymisen alkua.";
+"therapy.automatic" = "Automaattinen";
+
+"therapy.liveActivityMetricsFooter" = "Näytä käytettävissä olevat IOB- ja COB-arvot lukitusnäytön suuressa asettelussa ja CarPlayn/Älykkään pinon kaavioasettelussa.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB edellyttää kirjattuja insuliini- tai hiilihydraattihoitoja tai tietoja yhdistetystä AID-järjestelmästä.";

@@ -135,3 +135,7 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "估算的活性胰岛素";
+"therapy.estimatedCOB" = "估算的活性碳水化合物";

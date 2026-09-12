@@ -124,3 +124,7 @@
 "common_report_notIncluded" = "Not Included";
 "common_statistics_tempBasalDelta" = "Temp Basal Delta";
 "common_statistics_waitingForGlucoseData" = "Waiting for glucose data...";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Estimated insulin on board";
+"therapy.estimatedCOB" = "Estimated carbohydrates on board";

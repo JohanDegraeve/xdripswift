@@ -157,3 +157,7 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Оцінений активний інсулін";
+"therapy.estimatedCOB" = "Оцінені активні вуглеводи";

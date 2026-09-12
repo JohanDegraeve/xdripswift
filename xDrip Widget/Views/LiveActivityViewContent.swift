@@ -111,24 +111,37 @@ struct LiveActivityViewContentState: View {
             // Detailed presentation with full chart and metadata.
             ZStack {
                 VStack(spacing: 0) {
-                    HStack(alignment: .center) {
+                    HStack(alignment: .center, spacing: 10) {
                         Text("\(state.bgValueStringInUserChosenUnit()) \(state.trendArrow())")
                             .font(.largeTitle).fontWeight(.bold)
                             .foregroundStyle(state.bgTextColor())
                             .lineLimit(1)
                             .minimumScaleFactor(0.5)
 
-                        Spacer()
-
-                        HStack(alignment: .center, spacing: 10) {
-                            deltaAndUnitText(font: .title)
+                        if let deviceStatusIconImage = state.deviceStatusIconImage(), let deviceStatusColor = state.deviceStatusColor() {
+                            deltaText(font: .title)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.5)
 
-                            if let deviceStatusIconImage = state.deviceStatusIconImage(), let deviceStatusColor = state.deviceStatusColor() {
-                                deviceStatusIconImage
-                                    .font(.title3).bold()
-                                    .foregroundStyle(deviceStatusColor)
+                            Spacer(minLength: 6)
+
+                            if state.showsTherapyMetrics {
+                                aidMetrics()
+                            }
+
+                            deviceStatusIconImage
+                                .font(.title3).bold()
+                                .foregroundStyle(deviceStatusColor)
+                        } else {
+                            Spacer()
+
+                            if state.showsTherapyMetrics {
+                                deltaText(font: .title)
+                                aidMetrics()
+                            } else {
+                                deltaAndUnitText(font: .title)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.5)
                             }
                         }
                     }
@@ -199,6 +212,49 @@ struct LiveActivityViewContentState: View {
             + Text(" \(state.bgUnitString)")
             .font(font)
             .foregroundColor(Color("colorTertiary"))
+    }
+
+    private func aidMetrics() -> some View {
+        // Match the delta size, with room to adapt on narrower screens.
+        ViewThatFits(in: .horizontal) {
+            aidMetricsRow(font: .title)
+            aidMetricsRow(font: .system(size: 26))
+            aidMetricsRow(font: .system(size: 24))
+        }
+    }
+
+    private func aidMetricsRow(font: Font) -> some View {
+        TimelineView(.periodic(from: .now, by: 60)) { context in
+            let metrics = state.resolvedTherapyMetrics
+            HStack(alignment: .center, spacing: 12) {
+                if metrics.iob.isVisible(at: context.date) {
+                    let iobValue = metrics.iob.value(at: context.date)?.formatted(.number.precision(.fractionLength(1))) ?? "-"
+                    aidMetric(value: iobValue, unit: "U", font: font)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(metrics.iob.accessibilityName(isIOB: true))
+                        .accessibilityValue("\(iobValue) U")
+                }
+                if metrics.cob.isVisible(at: context.date) {
+                    aidMetric(value: metrics.cob.number(isIOB: false, at: context.date), unit: "g", font: font)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(metrics.cob.accessibilityName(isIOB: false))
+                        .accessibilityValue(metrics.cob.formatted(isIOB: false, at: context.date))
+                }
+            }
+            .fixedSize(horizontal: true, vertical: false)
+            .lineLimit(1)
+        }
+    }
+
+    private func aidMetric(value: String, unit: String, font: Font) -> some View {
+        HStack(alignment: .center, spacing: 2) {
+            Text(value)
+                .fontWeight(.regular)
+
+            Text(unit)
+        }
+        .font(font)
+        .foregroundColor(Color("colorSecondary"))
     }
 
     private func openAppWarning(_ text: String) -> some View {

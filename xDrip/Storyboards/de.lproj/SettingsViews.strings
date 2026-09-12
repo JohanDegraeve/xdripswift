@@ -50,7 +50,7 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Einstellungen";
-"settingsviews_glucoseDisplaySectionTitle" = "Anzeige";
+"settingsviews_glucoseDisplaySectionTitle" = "Allgemein";
 "settingsviews_glucoseRangesSectionTitle" = "Glukosebereiche";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarme und Mitteilungen";
 "settingsviews_sharingAndServicesSectionTitle" = "Teilen und Dienste";
@@ -715,3 +715,30 @@
 "settingsviews_carPlayLiveActivityTypeBasic" = "Einfach";
 "settingsviews_liveActivitySectionTitle" = "Live-Aktivität";
 "settingsviews_dexcomG7Message" = "Lasse den Bluetooth-Namen leer. Tippe im nächsten Bildschirm auf Scannen, um automatisch nach dem Sensor zu suchen.\n\nWenn der Sensor bereits unter Einstellungen > Bluetooth angezeigt wurde, kannst du seinen Bluetooth-Namen manuell eingeben.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Kohlenhydratdauer";
+"therapy.local" = "Lokal berechnet";
+
+"settingsviews_showOriginalBGReadings" = "Originalwerte Anzeigen";
+
+"therapy.insulinType" = "Insulintyp";
+
+"therapy.showIOBCOB" = "IOB/COB anzeigen";
+
+"therapy.treatmentSettings" = "Behandlungen";
+
+"therapy.settingsHelp" = "Dienen zur Schätzung des verbleibenden Insulins und der Kohlenhydrate aus aufgezeichneten Behandlungen.";
+
+"therapy.settingsLocal" = "Diese Einstellungen schätzen IOB und COB aus erfassten Behandlungen nur, wenn kein AID-System diese Werte liefert.";
+"therapy.settingsExternal" = "Diese Optionen sind deaktiviert, da Ihr auf %@ basierendes AID-System IOB und COB liefert.";
+"therapy.settingsMixed" = "%@ liefert IOB, daher ist der Insulintyp automatisch. Die Kohlenhydratdauer dient zur lokalen COB-Schätzung aus erfassten Mahlzeiten.";
+"therapy.insulinModel" = "Insulinmodell %@ ausgewählt. Insulinwirkdauer (DIA): %@. Zeit bis zum Insulinwirkmaximum: %@.";
+"therapy.carbFast" = "Schnellere Kohlenhydrataufnahme. Enthält eine Verzögerung von 10 Minuten vor Beginn.";
+"therapy.carbNormal" = "Normale Kohlenhydrataufnahme. Enthält eine Verzögerung von 10 Minuten vor Beginn.";
+"therapy.carbLong" = "Längere Kohlenhydrataufnahme. Kann hilfreich sein, wenn GLP-1-Medikamente die Verdauung verlangsamen. Enthält eine Verzögerung von 10 Minuten vor Beginn.";
+"therapy.automatic" = "Automatisch";
+
+"therapy.liveActivityMetricsFooter" = "Verfügbare IOB- und COB-Werte im großen Sperrbildschirm-Layout und im Diagramm-Layout von CarPlay/Smart-Stapel anzeigen.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB erfordert erfasste Insulin- oder Kohlenhydratbehandlungen oder Daten eines verbundenen AID-Systems.";

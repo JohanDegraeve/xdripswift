@@ -117,3 +117,7 @@
 "common_statistics_averageCarbs" = "Carbohidratos medios";
 "common_statistics_tempBasalDelta" = "Delta Basal Temporal";
 "common_statistics_waitingForGlucoseData" = "Esperando datos de glucosa...";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Insulina activa estimada";
+"therapy.estimatedCOB" = "Carbohidratos activos estimados";

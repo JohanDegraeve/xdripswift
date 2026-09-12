@@ -21,7 +21,7 @@ class Texts_SettingsView {
     }()
 
     static let glucoseDisplaySectionTitle: String = {
-        return NSLocalizedString("settingsviews_glucoseDisplaySectionTitle", tableName: filename, bundle: Bundle.main, value: "Display", comment: "settings group title for display options")
+        return NSLocalizedString("settingsviews_glucoseDisplaySectionTitle", tableName: filename, bundle: Bundle.main, value: "General", comment: "settings group title for general options")
     }()
 
     static let glucoseRangesSectionTitle: String = {

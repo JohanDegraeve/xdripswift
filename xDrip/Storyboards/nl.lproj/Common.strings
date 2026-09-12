@@ -120,3 +120,7 @@
 "common_statistics_averageCarbs" = "Gem. koolhydraten";
 "common_statistics_tempBasalDelta" = "Tijdelijke basaal-delta";
 "common_statistics_waitingForGlucoseData" = "Wachten op glucosegegevens...";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Geschatte actieve insuline";
+"therapy.estimatedCOB" = "Geschatte actieve koolhydraten";

@@ -88,3 +88,7 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Arvioitu aktiivinen insuliini";
+"therapy.estimatedCOB" = "Arvioidut aktiiviset hiilihydraatit";

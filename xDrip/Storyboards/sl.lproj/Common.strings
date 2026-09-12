@@ -169,3 +169,7 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Ocenjeni aktivni inzulin";
+"therapy.estimatedCOB" = "Ocenjeni aktivni ogljikovi hidrati";

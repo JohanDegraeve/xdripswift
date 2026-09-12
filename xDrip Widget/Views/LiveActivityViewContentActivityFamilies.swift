@@ -67,10 +67,10 @@ struct LiveActivityViewContentActivityFamiliesState: View {
                 Spacer(minLength: 6)
 
                 Group {
-                    if let aidStatus = state.aidStatus {
+                    if state.aidStatus != nil || state.showsTherapyMetrics {
                         HStack(alignment: .center, spacing: 8) {
-                            if aidStatus.iob != nil || aidStatus.cob != nil {
-                                aidMetrics(iob: aidStatus.iob, cob: aidStatus.cob)
+                            if state.showsTherapyMetrics {
+                                aidMetrics()
                             }
 
                             deviceStatusIcon
@@ -136,50 +136,56 @@ struct LiveActivityViewContentActivityFamiliesState: View {
     }
 
     @ViewBuilder
+    // CarPlay and Smart Stack share this view. Keep the symbol at 15 pt while the shared renderer
+    // supplies black weight for circle-based symbols and retains bold for the other AID symbols.
     private var deviceStatusIcon: some View {
         if let deviceStatusIconImage = state.deviceStatusIconImage(), let deviceStatusColor = state.deviceStatusColor() {
             deviceStatusIconImage
-                .font(.headline.bold())
+                .font(.system(size: 15, weight: .bold))
                 .foregroundStyle(deviceStatusColor)
         }
     }
 
-    private func aidMetrics(iob: Double?, cob: Double?) -> some View {
+    private func aidMetrics() -> some View {
         // Keep both metrics at the same size while adapting to the limited CarPlay width.
         ViewThatFits(in: .horizontal) {
-            aidMetricsRow(iob: iob, cob: cob, font: .footnote)
-            aidMetricsRow(iob: iob, cob: cob, font: .system(size: 12))
-            aidMetricsRow(iob: iob, cob: cob, font: .system(size: 11))
-            aidMetricsRow(iob: iob, cob: cob, font: .system(size: 10))
-            aidMetricsRow(iob: iob, cob: cob, font: .system(size: 9))
+            aidMetricsRow(font: .system(size: 15))
+            aidMetricsRow(font: .system(size: 14))
+            aidMetricsRow(font: .footnote)
+            aidMetricsRow(font: .system(size: 12))
+            aidMetricsRow(font: .system(size: 11))
+            aidMetricsRow(font: .system(size: 10))
+            aidMetricsRow(font: .system(size: 9))
         }
     }
 
-    private func aidMetricsRow(iob: Double?, cob: Double?, font: Font) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            if let iob {
-                aidMetric(
-                    value: iob.formatted(.number.precision(.fractionLength(1))),
-                    unit: "U",
-                    font: font
-                )
+    private func aidMetricsRow(font: Font) -> some View {
+        TimelineView(.periodic(from: .now, by: 60)) { context in
+            let metrics = state.resolvedTherapyMetrics
+            HStack(alignment: .center, spacing: 12) {
+                if metrics.iob.isVisible(at: context.date) {
+                    let iobValue = metrics.iob.value(at: context.date)?.formatted(.number.precision(.fractionLength(1))) ?? "-"
+                    aidMetric(value: iobValue, unit: "U", font: font)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(metrics.iob.accessibilityName(isIOB: true))
+                        .accessibilityValue("\(iobValue) U")
+                }
+                if metrics.cob.isVisible(at: context.date) {
+                    aidMetric(value: metrics.cob.number(isIOB: false, at: context.date), unit: "g", font: font)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(metrics.cob.accessibilityName(isIOB: false))
+                        .accessibilityValue(metrics.cob.formatted(isIOB: false, at: context.date))
+                }
             }
-
-            if let cob {
-                aidMetric(
-                    value: cob.formatted(.number.precision(.fractionLength(0))),
-                    unit: "g",
-                    font: font
-                )
-            }
+            .fixedSize(horizontal: true, vertical: false)
+            .lineLimit(1)
         }
-        .fixedSize(horizontal: true, vertical: false)
     }
 
     private func aidMetric(value: String, unit: String, font: Font) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 2) {
+        HStack(alignment: .center, spacing: 1) {
             Text(value)
-                .fontWeight(.bold)
+                .fontWeight(.regular)
 
             Text(unit)
         }

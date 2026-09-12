@@ -419,11 +419,7 @@ final class GlucoseChartStateManager: ObservableObject, @unchecked Sendable {
             return ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
         }
 
-        if endDate.timeIntervalSince(startDate) >= .hours(24) {
-            return ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal24hrChart
-        }
-
-        return ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal
+        return ConstantsGlucoseChartSwiftUI.minimumChartValueWithBottomSpace(hours: endDate.timeIntervalSince(startDate) / 3600)
     }
 
     private func chartBackgroundBands(startDate: Date, endDate: Date) -> [GlucoseChartBackgroundBand]? {

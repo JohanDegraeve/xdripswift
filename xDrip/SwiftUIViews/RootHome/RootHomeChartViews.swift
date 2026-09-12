@@ -7,11 +7,13 @@
 //
 
 import SwiftUI
+import Charts
 
 /// Main interactive chart with loading state and the reading shown at the panned end date.
 struct RootHomeMainChartView: View {
     @Binding var selectedRange: RootHomeChartRange
     let showsTreatments: Bool
+    var allowsTherapyCharts = true
     let chartState: GlucoseChartState
     let isLoading: Bool
     let scrollCoordinator: GlucoseChartScrollCoordinator
@@ -19,8 +21,19 @@ struct RootHomeMainChartView: View {
     let updateChartStateIfNeeded: () -> Void
     let finishChartScroll: (_ forceReset: Bool, _ showsLoading: Bool) -> Void
 
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var rangeOverlay = ChartDelayedState(false)
     @State private var hasUpdatedRangeDuringPinch = false
+    @AppStorage("showIOBCOB") private var showIOBCOB = UserDefaults.standard.showIOBCOB
+    @State private var therapySeries = TherapyChartSeries()
+    @State private var therapyRevision = 0
+    private var hasIOB: Bool { allowsTherapyCharts && showIOBCOB && !therapySeries.iob.isEmpty }
+    private var hasCOB: Bool { allowsTherapyCharts && showIOBCOB && !therapySeries.cob.isEmpty }
+    // Reuse the glucose cache's buffered coverage, rounded outward so tiny pans do
+    // not dispatch another fetch and rebuild for each visible-range change.
+    private var therapyStart: Date { Date(timeIntervalSince1970: floor(chartState.dataStartDate.timeIntervalSince1970 / 3600) * 3600) }
+    private var therapyEnd: Date { Date(timeIntervalSince1970: ceil(chartState.dataEndDate.timeIntervalSince1970 / 3600) * 3600) }
+    private var seriesKey: String { scenePhase != .active ? "inactive" : "\(therapyStart)-\(therapyEnd)-\(showIOBCOB)-\(allowsTherapyCharts)-\(therapyRevision)-\(floor(Date().timeIntervalSince1970 / 60))" }
 
     private enum Layout {
         static let rangeOverlayTopInset: CGFloat = 8
@@ -54,6 +67,7 @@ struct RootHomeMainChartView: View {
                 .mainChartYAxisContext(
                     resetRevision: yAxisResetRevision
                 )
+                .therapyPlots(TherapyChartSeries(iob: hasIOB ? therapySeries.iob : [], cob: hasCOB ? therapySeries.cob : []))
                 .transaction { transaction in
                     transaction.animation = nil
                 }
@@ -112,6 +126,14 @@ struct RootHomeMainChartView: View {
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
         }
+        .task(id: seriesKey) {
+            guard scenePhase == .active else { return }
+            guard allowsTherapyCharts && showIOBCOB else { therapySeries = TherapyChartSeries(); return }
+            let result = await TherapyMetricsManager.shared.chart(from: therapyStart, to: therapyEnd)
+            guard !Task.isCancelled else { return }
+            therapySeries = result
+        }
+        .onReceive(NotificationCenter.default.publisher(for: TherapyMetricsManager.changed)) { _ in if scenePhase == .active { therapyRevision &+= 1 } }
         .onDisappear {
             rangeOverlay.cancel()
         }

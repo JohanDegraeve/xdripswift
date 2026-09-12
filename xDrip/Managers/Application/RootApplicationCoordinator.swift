@@ -198,6 +198,10 @@ import AppIntents
     
     /// initiate a Timer object that we will use keep the follower connection status updated every 30 seconds or so
     private var followerConnectionTimer: Timer?
+    private var therapyMetricsObserver: NSObjectProtocol?
+    private var lastTherapyPublication: TherapyMetricsSnapshot?
+    private var lastTherapyPublicationAt = Date.distantPast
+    private var pendingTherapyPublication: Task<Void, Never>?
     
     /// Last timestamp when a log line was produced by TransmitterReadSuccessManager
     private var transmitterReadSuccessTimeStampOfLastLogCreated: Date?
@@ -429,6 +433,7 @@ import AppIntents
         // if live action type is updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivityType.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.carPlayLiveActivityType.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivityShowIOBCOB.rawValue, options: .new, context: nil)
         
         // high mark , low mark , urgent high mark, urgent low mark. change requires redraw of chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentLowMarkValue.rawValue, options: .new, context: nil)
@@ -584,6 +589,7 @@ import AppIntents
         // launch nightscout treatment sync whenever the app comes to the foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyStartNightscoutTreatmentSync, closure: {
             self.setNightscoutSyncRequiredToTrue(forceNow: false)
+            self.publishTherapyMetricsIfNeeded()
         })
         
     }
@@ -674,6 +680,19 @@ import AppIntents
         migrateStoredAlertSnoozePeriodsToReducedOptionsIfNeeded(coreDataManager: coreDataManager)
         
         // get currently active sensor
+        TherapyMetricsManager.shared.configure(coreDataManager: coreDataManager) { [weak self] in
+            let policy = UserDefaults.standard.dataFlowPolicy
+            if policy.importsTherapyFromCareLink { return CareLinkAccountState.shared.snapshot.aidStatus }
+            return policy.importsStatusFromNightscout ? self?.nightscoutSyncManager?.deviceStatus.aidStatus : nil
+        }
+        if therapyMetricsObserver == nil {
+            therapyMetricsObserver = NotificationCenter.default.addObserver(forName: TherapyMetricsManager.changed, object: nil, queue: .main) { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    if UIApplication.shared.applicationState == .active { self?.publishRootHomeState() }
+                    self?.publishTherapyMetricsIfNeeded()
+                }
+            }
+        }
         activeSensor = SensorsAccessor.init(coreDataManager: coreDataManager).fetchActiveSensor()
         
         // instantiate bgReadingsAccessor
@@ -1345,7 +1364,7 @@ import AppIntents
             
             updateLiveActivityAndWidgets(forceRestart: false)
             
-        case UserDefaults.Key.liveActivityType, UserDefaults.Key.carPlayLiveActivityType, UserDefaults.Key.allowStandByHighContrast, UserDefaults.Key.forceStandByBigNumbers:
+        case UserDefaults.Key.liveActivityType, UserDefaults.Key.carPlayLiveActivityType, UserDefaults.Key.liveActivityShowIOBCOB, UserDefaults.Key.allowStandByHighContrast, UserDefaults.Key.forceStandByBigNumbers:
             // check and configure the live activity and widgets if applicable
             updateLiveActivityAndWidgets(forceRestart: false)
             
@@ -2029,8 +2048,39 @@ import AppIntents
     /// - parameters:
     ///     - overrideApplicationState : if true, then update will be done even if state is not .active
     ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture). This will also rescale the chart y-axis.
+    private func publishTherapyMetricsIfNeeded() {
+        let snapshot = TherapyMetricsManager.shared.snapshot()
+        let hasLocalMetrics = (snapshot.iob.source == .local && snapshot.iob.isVisible()) || (snapshot.cob.source == .local && snapshot.cob.isVisible())
+        guard hasLocalMetrics || lastTherapyPublication != nil else { return }
+        // Coalesce changing amounts too. Source/availability transitions remain immediate.
+        if let last = lastTherapyPublication,
+           last.iob.source == snapshot.iob.source, last.cob.source == snapshot.cob.source,
+           last.iob.reason == snapshot.iob.reason, last.cob.reason == snapshot.cob.reason,
+           last.iob.isVisible() == snapshot.iob.isVisible(), last.cob.isVisible() == snapshot.cob.isVisible() {
+            let remaining = 60 - Date().timeIntervalSince(lastTherapyPublicationAt)
+            if remaining > 0 {
+                if pendingTherapyPublication == nil {
+                    pendingTherapyPublication = Task { @MainActor [weak self] in
+                        try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
+                        guard !Task.isCancelled, let self else { return }
+                        self.pendingTherapyPublication = nil
+                        self.publishTherapyMetricsIfNeeded()
+                    }
+                }
+                return
+            }
+        }
+        pendingTherapyPublication?.cancel()
+        pendingTherapyPublication = nil
+        lastTherapyPublication = hasLocalMetrics ? snapshot : nil
+        lastTherapyPublicationAt = .now
+        watchManager?.updateTherapyMetrics(snapshot)
+        updateLiveActivityAndWidgets(forceRestart: false, therapyMetrics: snapshot)
+    }
+
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
         setNightscoutSyncRequiredToTrue(forceNow: false)
+        publishTherapyMetricsIfNeeded()
         
         // this is not really the nicest place to do this, but it works well
         // take advantage of the timer execution to update the AID status views
@@ -2481,7 +2531,7 @@ import AppIntents
     
     /// check if the conditions are correct to start a live activity, update it, or end it
     /// also update the widget data stored in user defaults
-    private func updateLiveActivityAndWidgets(forceRestart: Bool) {
+    private func updateLiveActivityAndWidgets(forceRestart: Bool, therapyMetrics: TherapyMetricsSnapshot? = nil) {
         let keepAliveDisabledMessage = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
             ? "\(Texts_SettingsView.labelfollowerKeepAliveType) \(Texts_SettingsView.followerKeepAliveTypeDisabled)"
             : ""
@@ -2581,12 +2631,14 @@ import AppIntents
                     aidStatus = nil
                 }
                 
+                let resolvedTherapyMetrics = therapyMetrics ?? TherapyMetricsManager.shared.snapshot()
                 // show the live activity if we're in master mode or (follower with a heartbeat) and only if the user has requested to show it
                 // if we should show it, then let's continue processing the lastReading array to create a valid contentState
                 if (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)) && UserDefaults.standard.liveActivityType != .disabled {
                     // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                    let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, carPlayLiveActivityType: UserDefaults.standard.carPlayLiveActivityType, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, sensorNoiseStateRawValue: sensorNoiseStateRawValue, aidStatus: aidStatus)
+                    var contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, carPlayLiveActivityType: UserDefaults.standard.carPlayLiveActivityType, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, sensorNoiseStateRawValue: sensorNoiseStateRawValue, aidStatus: aidStatus, therapyMetrics: resolvedTherapyMetrics)
                     
+                    contentState.showIOBCOB = UserDefaults.standard.liveActivityShowIOBCOB
                     LiveActivityManager.shared.update(contentState: contentState, forceRestart: forceRestart)
                 } else {
                     Task { await LiveActivityManager.shared.endAllActivities() }
@@ -2597,7 +2649,7 @@ import AppIntents
                     date.timeIntervalSince1970
                 }
                 
-                let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, aidStatus: aidStatus, allowStandByHighContrast: UserDefaults.standard.allowStandByHighContrast, forceStandByBigNumbers: UserDefaults.standard.forceStandByBigNumbers)
+                let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, aidStatus: aidStatus, therapyMetrics: resolvedTherapyMetrics, allowStandByHighContrast: UserDefaults.standard.allowStandByHighContrast, forceStandByBigNumbers: UserDefaults.standard.forceStandByBigNumbers)
                 
                 // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
                 // the user's device - this allows several copies of the app to be installed without cross-contamination of widget data

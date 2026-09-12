@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Settings";
-"settingsviews_glucoseDisplaySectionTitle" = "Display";
+"settingsviews_glucoseDisplaySectionTitle" = "General";
 "settingsviews_glucoseRangesSectionTitle" = "Glucose Ranges";
 "settingsviews_glucoseRangesSectionFooter" = "Glucose Ranges only affect the main chart display colours. They are not related to Alarm values.";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alerts and Notifications";
@@ -67,7 +67,7 @@
 "settingsviews_screenLockDimmingTypeDimmed" = "Dimmed";
 "settingsviews_screenLockDimmingTypeDark" = "Dark";
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
-"settingsviews_showOriginalBGReadings" = "Original Values";
+"settingsviews_showOriginalBGReadings" = "Show Original Values";
 "settingsviews_showSensorNoise" = "Show Sensor Noise";
 "settingsviews_sensorHealthNotifications" = "Sensor Health Warnings";
 "settingsviews_sensorHealthNotificationsFooter" = "Controls optional system notifications for prolonged sensor noise, a flat signal and temporary sensor issues. Sensor/Transmitter Failure is configured with the other alarms. The dismissible Home banner remains available.";
@@ -456,3 +456,28 @@
 "settingsviews_carPlayLiveActivityTypeBasic" = "Basic";
 "settingsviews_liveActivitySectionTitle" = "Live Activity";
 "settingsviews_dexcomG7Message" = "Leave the Bluetooth name empty. On the next screen, tap Scan to search for the sensor automatically.\n\nIf the sensor has previously appeared in Settings > Bluetooth, you can enter its Bluetooth name manually.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Carb Duration";
+"therapy.local" = "Calculated locally";
+
+"therapy.insulinType" = "Insulin Type";
+
+"therapy.showIOBCOB" = "Show IOB/COB";
+
+"therapy.treatmentSettings" = "Treatments";
+
+"therapy.settingsHelp" = "Used to estimate remaining insulin and carbs from your recorded treatments.";
+
+"therapy.settingsLocal" = "These settings are used to estimate IOB and COB from recorded treatments only when the values are not supplied by an AID system.";
+"therapy.settingsExternal" = "These options are disabled because IOB and COB are provided by your %@-based AID system.";
+"therapy.settingsMixed" = "IOB is provided by %@, so Insulin Type is automatic. Carb Duration is used to estimate COB locally from recorded meals.";
+"therapy.insulinModel" = "%@ insulin model selected. Duration of Insulin Action (DIA): %@. Insulin Peak Time: %@.";
+"therapy.carbFast" = "Faster carbohydrate absorption. Includes a 10-minute delay before absorption begins.";
+"therapy.carbNormal" = "Normal carbohydrate absorption. Includes a 10-minute delay before absorption begins.";
+"therapy.carbLong" = "Longer carbohydrate absorption. May be useful when GLP-1 medication slows digestion. Includes a 10-minute delay before absorption begins.";
+"therapy.automatic" = "Automatic";
+
+"therapy.liveActivityMetricsFooter" = "Show available IOB and COB in the Large Lock Screen layout and the CarPlay/Smart Stack Chart layout.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB requires recorded insulin or carbohydrate treatments, or data from a connected AID system.";

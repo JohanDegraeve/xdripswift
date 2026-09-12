@@ -129,3 +129,7 @@
 "common_statistics_averageCarbs" = "Glucides moyens";
 "common_statistics_tempBasalDelta" = "Delta basal temporaire";
 "common_statistics_waitingForGlucoseData" = "En attente des données de glucose...";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Insuline active estimée";
+"therapy.estimatedCOB" = "Glucides actifs estimés";

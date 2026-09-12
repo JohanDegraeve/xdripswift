@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Inställningar";
-"settingsviews_glucoseDisplaySectionTitle" = "Visning";
+"settingsviews_glucoseDisplaySectionTitle" = "Allmänt";
 "settingsviews_glucoseRangesSectionTitle" = "Glukosintervall";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Larm och notiser";
 "settingsviews_sharingAndServicesSectionTitle" = "Delning och tjänster";
@@ -513,3 +513,30 @@
 "settingsviews_carPlayLiveActivityTypeBasic" = "Grundläggande";
 "settingsviews_liveActivitySectionTitle" = "Liveaktivitet";
 "settingsviews_dexcomG7Message" = "Lämna Bluetooth-namnet tomt. På nästa skärm trycker du på Skanna för att automatiskt söka efter sensorn.\n\nOm sensorn tidigare har visats under Inställningar > Bluetooth kan du ange dess Bluetooth-namn manuellt.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Kolhydratduration";
+"therapy.local" = "Beräknat lokalt";
+
+"settingsviews_showOriginalBGReadings" = "Visa Ursprungliga Värden";
+
+"therapy.insulinType" = "Insulintyp";
+
+"therapy.showIOBCOB" = "Visa IOB/COB";
+
+"therapy.treatmentSettings" = "Behandlingar";
+
+"therapy.settingsHelp" = "Används för att uppskatta kvarvarande insulin och kolhydrater från registrerade behandlingar.";
+
+"therapy.settingsLocal" = "Dessa inställningar uppskattar IOB och COB från registrerade behandlingar endast när värdena inte tillhandahålls av ett AID-system.";
+"therapy.settingsExternal" = "Dessa alternativ är inaktiverade eftersom ditt %@-baserade AID-system tillhandahåller IOB och COB.";
+"therapy.settingsMixed" = "%@ tillhandahåller IOB, så insulintypen är automatisk. Kolhydratdurationen uppskattar COB lokalt från registrerade måltider.";
+"therapy.insulinModel" = "Insulinmodell %@ vald. Insulinets verkningstid (DIA): %@. Tid till maximal insulinverkan: %@.";
+"therapy.carbFast" = "Snabbare kolhydratupptag. Inkluderar 10 minuters fördröjning innan upptaget börjar.";
+"therapy.carbNormal" = "Normalt kolhydratupptag. Inkluderar 10 minuters fördröjning innan upptaget börjar.";
+"therapy.carbLong" = "Längre kolhydratupptag. Kan vara användbart när GLP-1-läkemedel bromsar matsmältningen. Inkluderar 10 minuters fördröjning innan upptaget börjar.";
+"therapy.automatic" = "Automatiskt";
+
+"therapy.liveActivityMetricsFooter" = "Visa tillgängligt IOB och COB i den stora låsskärmslayouten och i diagramlayouten för CarPlay/Smart trave.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB kräver registrerade insulin- eller kolhydratbehandlingar, eller data från ett anslutet AID-system.";

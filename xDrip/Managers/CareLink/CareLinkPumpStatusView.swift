@@ -62,7 +62,7 @@ struct CareLinkPumpStatusView: View {
                 .font(.title2)
                 .foregroundStyle(ConstantsAppColors.primaryText)
         } statusIcon: {
-            Image(systemName: statusImage)
+            AIDStatusSymbolImage(symbol: statusSymbol)
         }
     }
 
@@ -148,14 +148,16 @@ struct CareLinkPumpStatusView: View {
         return snapshot.status.title
     }
 
-    private var statusImage: String {
+    /// Keep the pump detail banner's existing state selection, but use the common symbol definitions.
+    /// The shared renderer applies the circle weight and preserves the shield and triangle styling.
+    private var statusSymbol: AIDStatusSymbol {
         // Keep the same freshness symbol used by Home, Watch, widgets and Live Activity.
         if !pump.isReported {
-            return snapshot.aidStatus?.presentation().systemImage ?? "checkmark.circle.fill"
+            return snapshot.aidStatus?.presentation().symbol ?? .pump
         }
-        if pump.isSuspended == true { return "pause.circle.fill" }
-        if pump.isCommunicating == false || pump.isInRange == false { return "exclamationmark.triangle.fill" }
-        return pump.reportsActiveSmartGuard ? "shield.lefthalf.filled" : "checkmark.circle.fill"
+        if pump.isSuspended == true { return .suspended }
+        if pump.isCommunicating == false || pump.isInRange == false { return .disconnected }
+        return pump.reportsActiveSmartGuard ? .smartGuard : .pump
     }
 
     private var statusColor: Color {

@@ -21,6 +21,7 @@ struct ShowHideItemsView: View {
     @State private var showOriginalBGReadings = UserDefaults.standard.showOriginalBGReadings
     @State private var showTreatmentsOnChart = UserDefaults.standard.showTreatmentsOnChart
     @State private var showSensorNoise = UserDefaults.standard.showSensorNoise
+    @AppStorage("showIOBCOB") private var showIOBCOB = UserDefaults.standard.showIOBCOB
     @State private var speakReadings = UserDefaults.standard.speakReadings
     @AppStorage(UserDefaults.Key.preferLargeSnoozeScreen.rawValue) private var preferLargeSnoozeScreen = true
     @AppStorage(UserDefaults.KeysCharts.chartWidthInHours.rawValue) private var chartWidthInHours = ConstantsGlucoseChart.defaultChartWidthInHours
@@ -37,6 +38,8 @@ struct ShowHideItemsView: View {
             VStack {
                 List {
                     Section(header: Text(Texts_HomeView.showHideGlucoseChartTitle)) {
+                        Toggle(TherapyTexts.text("showIOBCOB"), isOn: $showIOBCOB)
+
                         Toggle(Texts_SettingsView.showOriginalBGReadings, isOn: $showOriginalBGReadings)
                             .onChange(of: showOriginalBGReadings) { newValue in
                                 UserDefaults.standard.showOriginalBGReadings = newValue

@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "设置";
-"settingsviews_glucoseDisplaySectionTitle" = "显示";
+"settingsviews_glucoseDisplaySectionTitle" = "通用";
 "settingsviews_glucoseRangesSectionTitle" = "葡萄糖范围";
 "settingsviews_alertsAndNotificationsSectionTitle" = "警报和通知";
 "settingsviews_sharingAndServicesSectionTitle" = "共享和服务";
@@ -665,3 +665,30 @@
 "settingsviews_carPlayLiveActivityTypeBasic" = "基础";
 "settingsviews_liveActivitySectionTitle" = "实时活动";
 "settingsviews_dexcomG7Message" = "将蓝牙名称留空。在下一个屏幕中，轻点“扫描”以自动搜索传感器。\n\n如果传感器之前曾出现在“设置”>“蓝牙”中，您可以手动输入其蓝牙名称。";
+
+// Local therapy estimates
+"therapy.carbDuration" = "碳水吸收时长";
+"therapy.local" = "本地计算";
+
+"settingsviews_showOriginalBGReadings" = "显示原始值";
+
+"therapy.insulinType" = "胰岛素类型";
+
+"therapy.showIOBCOB" = "显示 IOB/COB";
+
+"therapy.treatmentSettings" = "治疗";
+
+"therapy.settingsHelp" = "用于根据已记录的治疗估算剩余胰岛素和碳水化合物。";
+
+"therapy.settingsLocal" = "仅在 AID 系统未提供数值时，这些设置才用于根据已记录的治疗估算 IOB 和 COB。";
+"therapy.settingsExternal" = "这些选项已停用，因为基于 %@ 的 AID 系统会提供 IOB 和 COB。";
+"therapy.settingsMixed" = "%@ 提供 IOB，因此胰岛素类型为自动。碳水吸收时长用于根据已记录的餐食在本地估算 COB。";
+"therapy.insulinModel" = "已选择 %@ 胰岛素模型。胰岛素作用时长（DIA）：%@。胰岛素达峰时间：%@。";
+"therapy.carbFast" = "较快的碳水吸收。吸收开始前有 10 分钟延迟。";
+"therapy.carbNormal" = "正常的碳水吸收。吸收开始前有 10 分钟延迟。";
+"therapy.carbLong" = "较长的碳水吸收。当 GLP-1 药物减慢消化时可能有用。吸收开始前有 10 分钟延迟。";
+"therapy.automatic" = "自动";
+
+"therapy.liveActivityMetricsFooter" = "在锁定屏幕的大布局和 CarPlay/智能叠放的图表布局中显示可用的 IOB 和 COB。";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB 需要已记录的胰岛素或碳水化合物治疗，或来自已连接 AID 系统的数据。";

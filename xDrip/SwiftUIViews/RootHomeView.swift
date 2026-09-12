@@ -428,7 +428,7 @@ struct RootHomeView: View {
             VStack(spacing: Layout.rowSpacing) {
                 glucoseStatusRow
 
-                if state.visibility.showsLoop {
+                if showsTherapyRow {
                     RootHomeLoopView(state: loopDisplayState, actions: actions)
                 }
 
@@ -562,7 +562,7 @@ struct RootHomeView: View {
     private var ipadGlanceCardHeight: CGFloat {
         let currentStatusHeight = Layout.glucoseStatusRowHeight
             + (Layout.ipadGlanceCardVerticalPadding * 2)
-            + (state.visibility.showsLoop ? Layout.ipadLoopRowSpacing + Layout.ipadLoopRowHeight : 0)
+            + (showsTherapyRow ? Layout.ipadLoopRowSpacing + Layout.ipadLoopRowHeight : 0)
 
         guard state.visibility.showsStatistics else { return currentStatusHeight }
 
@@ -607,7 +607,7 @@ struct RootHomeView: View {
         VStack(spacing: Layout.ipadLoopRowSpacing) {
             glucoseStatusRow(spacing: pumpGlucoseSpacing)
 
-            if state.visibility.showsLoop {
+            if showsTherapyRow {
                 RootHomeLoopView(state: loopDisplayState, actions: actions)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -710,6 +710,7 @@ struct RootHomeView: View {
         RootHomeMainChartView(
             selectedRange: $selectedRange,
             showsTreatments: showsTreatments,
+            allowsTherapyCharts: !state.isScreenLocked,
             chartState: chartState,
             isLoading: isLoadingChart,
             scrollCoordinator: scrollCoordinator,
@@ -927,6 +928,10 @@ struct RootHomeView: View {
         )
     }
 
+    private var showsTherapyRow: Bool {
+        !state.usesScreenLockNightLayout && (loopDisplayState.showsIOB || loopDisplayState.showsCOB || loopDisplayState.showsAIDStatus)
+    }
+
     private var loopDisplayState: RootHomeLoopState {
         guard !scrollCoordinator.isShowingCurrentTimeRange else {
             return state.loop
@@ -941,7 +946,7 @@ struct RootHomeView: View {
                 iob: RootHomeMetricState(title: "IOB", value: "- U", valueColor: ConstantsAppColors.secondaryText),
                 cob: RootHomeMetricState(title: "COB", value: "- g", valueColor: ConstantsAppColors.secondaryText),
                 statusTitle: loopStatusState.title,
-                statusSystemImage: loopStatusState.systemImage,
+                statusSymbol: loopStatusState.symbol,
                 statusColor: ConstantsAppColors.secondaryText
             ))
         }
@@ -964,10 +969,10 @@ struct RootHomeView: View {
     }
 
     private func historicalLoopState(_ loopState: RootHomeLoopState) -> RootHomeLoopState {
-        stateModel.historicalLoopState(
-            loopState,
-            aidAnalyticsSource: UserDefaults.standard.dataFlowPolicy.aidAnalyticsSource
-        )
+        var result = stateModel.historicalLoopState(loopState, aidAnalyticsSource: UserDefaults.standard.dataFlowPolicy.aidAnalyticsSource)
+        stateModel.applyTherapyMetrics(to: &result, at: historicalReferenceDate,
+            external: historicalDataCache.selection(at: historicalReferenceDate).deviceStatus?.aidStatus, historical: true)
+        return result
     }
 
     private var miniChartState: GlucoseChartState {
@@ -1078,7 +1083,7 @@ struct RootHomeView: View {
 
     private var nightLockStatus: RootHomeLoopState? {
         guard state.usesScreenLockNightLayout,
-              state.loop.statusSystemImage != nil || state.loop.showsActivityIndicator
+              state.loop.statusSymbol != nil || state.loop.showsActivityIndicator
         else { return nil }
 
         return state.loop

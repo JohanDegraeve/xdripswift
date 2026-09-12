@@ -30,6 +30,54 @@ enum DexcomConnectionMode: String, Codable, Hashable {
     }
 }
 
+/// Common AID status symbols for Home, AID details, Watch, widgets and Live Activities.
+/// Keep the symbol names and weight choices here so a change reaches every AID status view.
+/// Each view still chooses its own size and color to suit the space available.
+/// This enum is used for presentation only. The shared AIDStatus payload stays unchanged.
+enum AIDStatusSymbol: String, CaseIterable {
+    /// An active Loop status. Recent and aging loops use the same circle with different colors.
+    case loop = "circle"
+    /// A loop that has not run recently, or whose device status is no longer current.
+    case loopUnavailable = "circle.slash"
+    /// CareLink pump delivery without SmartGuard. Also used for accounts reporting IOB without a pump.
+    case pump = "checkmark.circle.fill"
+    /// CareLink SmartGuard status, including its initial checking state.
+    case smartGuard = "shield.lefthalf.filled"
+    /// CareLink has reported that insulin delivery is suspended.
+    case suspended = "pause.circle.fill"
+    /// CareLink has reported that the pump is disconnected or out of range.
+    case disconnected = "exclamationmark.triangle.fill"
+    /// CareLink pump data is no longer current.
+    case stale = "clock.badge.exclamationmark"
+
+    /// Circle-based symbols use the strongest weight so their outlines remain clear at small sizes.
+    /// Return nil for the other symbols to preserve the weight chosen by their containing view.
+    /// Black is the SF Symbol font weight here, not the symbol color.
+    var weight: Font.Weight? {
+        switch self {
+        case .loop, .loopUnavailable, .pump, .suspended: return .black
+        case .smartGuard, .disconnected, .stale: return nil
+        }
+    }
+
+}
+
+/// Draw an AID symbol using the common weight while inheriting the containing view's font size.
+/// Accept the enum directly so views cannot accidentally supply an unrelated SF Symbol name.
+/// Keep the weight modifier on the image itself so an outer bold modifier cannot replace it.
+struct AIDStatusSymbolImage: View {
+    let symbol: AIDStatusSymbol
+
+    var body: some View {
+        if let weight = symbol.weight {
+            Image(systemName: symbol.rawValue).fontWeight(weight)
+        } else {
+            // Do not apply fontWeight(nil) here. That would clear an inherited weight instead of keeping it.
+            Image(systemName: symbol.rawValue)
+        }
+    }
+}
+
 enum AIDStatusCondition: String, Codable, Hashable {
     case active
     case checking
@@ -84,7 +132,7 @@ struct AIDStatus: Codable, Hashable {
         case .checking:
             return AIDStatusPresentation(
                 title: statusTitle,
-                systemImage: style == .loop ? nil : ConstantsHomeView.careLinkSmartGuardSystemImage,
+                symbol: style == .loop ? nil : .smartGuard,
                 color: Color("colorSecondary"),
                 hasFreshData: false,
                 showsActivityAge: false,
@@ -93,7 +141,7 @@ struct AIDStatus: Codable, Hashable {
         case .suspended:
             return AIDStatusPresentation(
                 title: statusTitle,
-                systemImage: ConstantsHomeView.careLinkSuspendedSystemImage,
+                symbol: .suspended,
                 color: .yellow,
                 hasFreshData: hasFreshData,
                 showsActivityAge: lastActivityAt != nil,
@@ -102,7 +150,7 @@ struct AIDStatus: Codable, Hashable {
         case .disconnected:
             return AIDStatusPresentation(
                 title: statusTitle,
-                systemImage: ConstantsHomeView.careLinkDisconnectedSystemImage,
+                symbol: .disconnected,
                 color: .red,
                 hasFreshData: hasFreshData,
                 showsActivityAge: lastActivityAt != nil,
@@ -117,7 +165,7 @@ struct AIDStatus: Codable, Hashable {
                 )
                 return AIDStatusPresentation(
                     title: loopState.title,
-                    systemImage: loopState.systemImage,
+                    symbol: loopState.symbol,
                     color: loopState.color,
                     hasFreshData: hasFreshData,
                     showsActivityAge: loopState.showsLoopAge,
@@ -127,7 +175,7 @@ struct AIDStatus: Codable, Hashable {
 
             return AIDStatusPresentation(
                 title: hasFreshData ? statusTitle : staleStatusTitle,
-                systemImage: hasFreshData ? activeSystemImage : ConstantsHomeView.careLinkStaleSystemImage,
+                symbol: hasFreshData ? activeSymbol : .stale,
                 color: hasFreshData ? .green : .yellow,
                 hasFreshData: hasFreshData,
                 showsActivityAge: lastActivityAt != nil,
@@ -136,10 +184,10 @@ struct AIDStatus: Codable, Hashable {
         }
     }
 
-    private var activeSystemImage: String {
+    private var activeSymbol: AIDStatusSymbol {
         style == .careLinkSmartGuard
-            ? ConstantsHomeView.careLinkSmartGuardSystemImage
-            : ConstantsHomeView.careLinkPumpSystemImage
+            ? .smartGuard
+            : .pump
     }
 
     /// Active insulin from a non-pump CareLink response is data, not an AID state. Its single
@@ -166,7 +214,7 @@ struct AIDStatus: Codable, Hashable {
 
         return AIDStatusPresentation(
             title: hasFreshData ? statusTitle : staleStatusTitle,
-            systemImage: ConstantsHomeView.careLinkPumpSystemImage,
+            symbol: .pump,
             color: color,
             hasFreshData: hasFreshData,
             showsActivityAge: lastActivityAt != nil,
@@ -175,9 +223,12 @@ struct AIDStatus: Codable, Hashable {
     }
 }
 
+/// Resolved display state for the current AID reading, shared by all presentation surfaces.
+/// Carry the typed symbol through to the renderer instead of converting it to a string and back.
 struct AIDStatusPresentation {
     let title: String
-    let systemImage: String?
+    /// A checking Loop has no symbol and uses the activity indicator instead.
+    let symbol: AIDStatusSymbol?
     let color: Color
     let hasFreshData: Bool
     let showsActivityAge: Bool
@@ -252,16 +303,18 @@ enum LoopStatusState {
         }
     }
 
-    var systemImage: String {
+    /// Freshness changes the color, while missing or inactive loops use the slashed circle.
+    /// Weight comes from the shared symbol so these states look consistent in every view.
+    var symbol: AIDStatusSymbol {
         switch self {
         case .recent:
-            return ConstantsHomeView.loopStatusRecentSystemImage
+            return .loop
         case .aging:
-            return ConstantsHomeView.loopStatusAcceptableSystemImage
+            return .loop
         case .notLooping:
-            return ConstantsHomeView.loopStatusNotLoopingSystemImage
+            return .loopUnavailable
         case .noData:
-            return ConstantsHomeView.loopStatusNoDataSystemImage
+            return .loopUnavailable
         }
     }
 
@@ -358,24 +411,6 @@ enum ConstantsHomeView {
     /// Allows a small amount of clock skew in status timestamps supplied by remote systems.
     static let aidStatusFutureTolerance: TimeInterval = 60
 
-    /// symbol to show when the loop has run recently
-    static let loopStatusRecentSystemImage = "circle"
-
-    /// symbol to show when the loop is older but still within the acceptable window
-    static let loopStatusAcceptableSystemImage = "circle"
-
-    /// symbol to show when device status is current but there is no recent loop
-    static let loopStatusNotLoopingSystemImage = "circle.slash"
-
-    /// symbol to show when device status is stale or missing
-    static let loopStatusNoDataSystemImage = "circle.slash"
-
-    static let careLinkPumpSystemImage = "checkmark.circle.fill"
-    static let careLinkSmartGuardSystemImage = "shield.lefthalf.filled"
-    static let careLinkSuspendedSystemImage = "pause.circle.fill"
-    static let careLinkDisconnectedSystemImage = "exclamationmark.triangle.fill"
-    static let careLinkStaleSystemImage = "clock.badge.exclamationmark"
-    
     /// opacity level for the background of the AID status banner
     static let AIDStatusBannerBackgroundOpacity = 0.1
     

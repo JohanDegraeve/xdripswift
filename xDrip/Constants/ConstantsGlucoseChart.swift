@@ -10,11 +10,11 @@ enum ConstantsGlucoseChart {
     static let absoluteMinimumChartValueInMgdl: Double = 38
     
     /// what should the x-axis start with then showing the basal render?
-    static let minimumChartValueInMgdlWithBasal: Double = -10
+    static let minimumChartValueInMgdlWithBasal: Double = ConstantsGlucoseChartSwiftUI.minimumChartValueWithBasal
     
     /// what should the x-axis start with then showing the basal render whilst in the 24 hour chart?
     /// we should define a different "minimum value" to match the proportions and make the basal visible
-    static let minimumChartValueInMgdlWithBasal24hrChart: Double = 0
+    static let minimumChartValueInMgdlWithBasal24hrChart: Double = ConstantsGlucoseChartSwiftUI.minimumChartValueWithBasal24Hours
 
     // glucose circle/dot color and sizes
     

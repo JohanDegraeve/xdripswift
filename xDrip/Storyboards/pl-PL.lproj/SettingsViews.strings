@@ -44,7 +44,7 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
-"settingsviews_glucoseDisplaySectionTitle" = "Wyświetlanie";
+"settingsviews_glucoseDisplaySectionTitle" = "Ogólne";
 "settingsviews_glucoseRangesSectionTitle" = "Zakresy glukozy";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarmy i powiadomienia";
 "settingsviews_sharingAndServicesSectionTitle" = "Udostępnianie i usługi";
@@ -740,3 +740,30 @@
 "settingsviews_carPlayLiveActivityTypeBasic" = "Podstawowy";
 "settingsviews_liveActivitySectionTitle" = "Aktywność na żywo";
 "settingsviews_dexcomG7Message" = "Pozostaw nazwę Bluetooth pustą. Na następnym ekranie stuknij Skanuj, aby automatycznie wyszukać sensor.\n\nJeśli sensor był już widoczny w Ustawienia > Bluetooth, możesz ręcznie wpisać jego nazwę Bluetooth.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Czas Wchłaniania Węglowodanów";
+"therapy.local" = "Obliczane lokalnie";
+
+"settingsviews_showOriginalBGReadings" = "Pokaż Oryginalne Wartości";
+
+"therapy.insulinType" = "Rodzaj Insuliny";
+
+"therapy.showIOBCOB" = "Pokaż IOB/COB";
+
+"therapy.treatmentSettings" = "Terapia";
+
+"therapy.settingsHelp" = "Służą do szacowania pozostałej insuliny i węglowodanów na podstawie zapisanych dawek insuliny i posiłków.";
+
+"therapy.settingsLocal" = "Te ustawienia szacują IOB i COB z zapisanych dawek insuliny i posiłków tylko wtedy, gdy system AID nie dostarcza tych wartości.";
+"therapy.settingsExternal" = "Te opcje są wyłączone, ponieważ system AID oparty na %@ dostarcza IOB i COB.";
+"therapy.settingsMixed" = "%@ dostarcza IOB, więc rodzaj insuliny jest automatyczny. Czas wchłaniania węglowodanów służy do lokalnego szacowania COB z zapisanych posiłków.";
+"therapy.insulinModel" = "Wybrano model insuliny %@. Czas działania insuliny (DIA): %@. Czas do szczytu działania insuliny: %@.";
+"therapy.carbFast" = "Szybsze wchłanianie węglowodanów. Obejmuje 10 minut opóźnienia przed rozpoczęciem.";
+"therapy.carbNormal" = "Normalne wchłanianie węglowodanów. Obejmuje 10 minut opóźnienia przed rozpoczęciem.";
+"therapy.carbLong" = "Dłuższe wchłanianie węglowodanów. Może być przydatne, gdy leki GLP-1 spowalniają trawienie. Obejmuje 10 minut opóźnienia przed rozpoczęciem.";
+"therapy.automatic" = "Automatycznie";
+
+"therapy.liveActivityMetricsFooter" = "Pokazuj dostępne IOB i COB w dużym układzie ekranu blokady oraz w układzie z wykresem CarPlay/Stosu inteligentnego.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB wymaga zapisanych dawek insuliny lub węglowodanów albo danych z połączonego systemu AID.";

@@ -812,6 +812,14 @@
 		F8FDFEAD260DE1B90047597D /* ConstantsUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */; };
 		FBA100020000000000000001 /* FollowerBackgroundKeepAliveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA100010000000000000001 /* FollowerBackgroundKeepAliveManager.swift */; };
 		FBA100040000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */; };
+		451EDB22DE5243BAB691DBC1 /* TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */; };
+		7BA551B287B846F5BBA7B6D3 /* TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */; };
+		4374EA58DDB14111B1163758 /* TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */; };
+		DE59C307960F40F880724B66 /* TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */; };
+		27D7B1AFE8E34C2E8393D1E1 /* TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */; };
+		B3DBAE6F4DF8465BBF554DE4 /* TherapyMetricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F219EC5BAAF4D5E924415FA /* TherapyMetricsManager.swift */; };
+		C15D80D0E8DB47A6A9BE68DF /* TherapyMetricsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05272484BD024BDAAA341C1C /* TherapyMetricsSettingsView.swift */; };
+		0A51F9C534B04BD682E1EF4D /* TherapyMetricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E2401E5ED94424A2FEC5E8 /* TherapyMetricsTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2007,6 +2015,10 @@
 		F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsUI.swift; sourceTree = "<group>"; };
 		FBA100010000000000000001 /* FollowerBackgroundKeepAliveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBackgroundKeepAliveManager.swift; sourceTree = "<group>"; };
 		FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBackgroundKeepAliveManagerTests.swift; sourceTree = "<group>"; };
+		80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "xDrip/Constants/TherapyMetrics.swift"; sourceTree = SOURCE_ROOT; };
+		5F219EC5BAAF4D5E924415FA /* TherapyMetricsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "xDrip/Managers/Therapy/TherapyMetricsManager.swift"; sourceTree = SOURCE_ROOT; };
+		05272484BD024BDAAA341C1C /* TherapyMetricsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift"; sourceTree = SOURCE_ROOT; };
+		50E2401E5ED94424A2FEC5E8 /* TherapyMetricsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "xDrip Tests/TherapyMetricsTests.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2607,6 +2619,7 @@
 				4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */,
 				4D7C00013015000100000001 /* CalibrationReadinessTests.swift */,
 				ABA4DE8668C9A16DFF21A411 /* CareLinkTests.swift */,
+				50E2401E5ED94424A2FEC5E8 /* TherapyMetricsTests.swift */,
 				4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */,
 				4D7E00013017000200000001 /* DexcomG6BluetoothSlotTests.swift */,
 				4B0C00242F3B000100000001 /* DexcomG6SensorLabelTests.swift */,
@@ -3004,6 +3017,8 @@
 				47E3BEC62CD780D900B794A0 /* AIDStatusView.swift */,
 				4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */,
 				4D20C0012FF1000100000001 /* RootHomeState.swift */,
+				05272484BD024BDAAA341C1C /* TherapyMetricsSettingsView.swift */,
+				5F219EC5BAAF4D5E924415FA /* TherapyMetricsManager.swift */,
 				4D20C0032FF1000100000001 /* RootHomeView.swift */,
 				4D20C0092FF1000100000001 /* RootTabView.swift */,
 				475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */,
@@ -3404,6 +3419,7 @@
 				F8B955B6258D5E2000C06016 /* ConstantsHealthKit.swift */,
 				F8EE3EA12B68332200B27B96 /* ConstantsHeartBeat.swift */,
 				F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */,
+				80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */,
 				F8E5404B2522624800052CE5 /* ConstantsHousekeeping.swift */,
 				F8252866243E50FE0067AF77 /* ConstantsLibre.swift */,
 				47DB06E62A715EC500267BE3 /* ConstantsLibreLinkUp.swift */,
@@ -4243,6 +4259,7 @@
 				4746067E2B962FBD00AC9214 /* SystemLargeView.swift in Sources */,
 				4716A5052B40709E00419052 /* XDripWidgetAttributes.swift in Sources */,
 				47A6AC302B7D3E250047A4BA /* ConstantsHomeView.swift in Sources */,
+				4374EA58DDB14111B1163758 /* TherapyMetrics.swift in Sources */,
 				47F7B1C62C68BBE100609DA7 /* ConstantsCalibrationAlgorithms.swift in Sources */,
 				474606732B962B9500AC9214 /* XDripWidget+Entry.swift in Sources */,
 				47A6AC382B7D3E770047A4BA /* TextsHomeView.swift in Sources */,
@@ -4299,6 +4316,7 @@
 				474606892B9637F600AC9214 /* TextsSettingsView.swift in Sources */,
 				47EDD15A2BE01E9000C5A286 /* ConstantsWatchComplication.swift in Sources */,
 				478A923E2B8B64DE0084C394 /* ConstantsHomeView.swift in Sources */,
+				7BA551B287B846F5BBA7B6D3 /* TherapyMetrics.swift in Sources */,
 				4796C6072B9516FD00DE2210 /* Bundle.swift in Sources */,
 				47E91BBA2B9A43F20063181B /* FollowerBackgroundKeepAliveType.swift in Sources */,
 				476FA90E2BDC1EF80091866C /* TextsWatchComplication.swift in Sources */,
@@ -4327,6 +4345,7 @@
 				47A6AC392B7D3E770047A4BA /* TextsHomeView.swift in Sources */,
 				47CA61E72B97948000C2A597 /* FollowerDataSourceType.swift in Sources */,
 				47A6AC332B7D3E260047A4BA /* ConstantsHomeView.swift in Sources */,
+				DE59C307960F40F880724B66 /* TherapyMetrics.swift in Sources */,
 				4715C32F2C9ED5E10052215F /* LiveActivityType.swift in Sources */,
 				474606642B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift in Sources */,
 				474606902B963EA100AC9214 /* View.swift in Sources */,
@@ -4370,6 +4389,7 @@
 				473775822C14D8C100525B90 /* NotificationView.swift in Sources */,
 				4734FF562BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */,
 				473775882C14DD2200525B90 /* ConstantsHomeView.swift in Sources */,
+				451EDB22DE5243BAB691DBC1 /* TherapyMetrics.swift in Sources */,
 				4715C3312C9ED5E10052215F /* LiveActivityType.swift in Sources */,
 				473775832C14DCA500525B90 /* GlucoseChartType.swift in Sources */,
 				473775852C14DCC600525B90 /* GlucoseChartView.swift in Sources */,
@@ -4409,6 +4429,7 @@
 				A40000010000000000000001 /* FollowerSettingsTests.swift in Sources */,
 				4F2600013002000200000001 /* SensorNoisePersistenceTests.swift in Sources */,
 				377EBC0A484BFC8EA77C623C /* CareLinkTests.swift in Sources */,
+				0A51F9C534B04BD682E1EF4D /* TherapyMetricsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4678,6 +4699,7 @@
 				F855422C2B7182C60058CE09 /* LoopFollowManager.swift in Sources */,
 				F8F9722123A5915900C3F17D /* LibreSensorSerialNumber.swift in Sources */,
 				F8A1586722EDB8BF007F5B5D /* ConstantsHomeView.swift in Sources */,
+				27D7B1AFE8E34C2E8393D1E1 /* TherapyMetrics.swift in Sources */,
 				F8A1585922EDB7C6007F5B5D /* ConstantsDefaultAlertLevels.swift in Sources */,
 				F8A54AAD22D6859200934E7A /* SlopeParameters.swift in Sources */,
 				472596052B76301F00459D12 /* WatchManager.swift in Sources */,
@@ -4816,6 +4838,8 @@
 				4D10C0042FEF000100000001 /* GlucoseChartScrollCoordinator.swift in Sources */,
 				C8BA6BBA5746888144511D55 /* GlucoseChartStateManager.swift in Sources */,
 				4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */,
+				C15D80D0E8DB47A6A9BE68DF /* TherapyMetricsSettingsView.swift in Sources */,
+				B3DBAE6F4DF8465BBF554DE4 /* TherapyMetricsManager.swift in Sources */,
 				4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */,
 				4D21B0022FF8000100000001 /* RootHomeChartRange.swift in Sources */,
 				4D21B0032FF8000100000001 /* RootHomeToolbarView.swift in Sources */,

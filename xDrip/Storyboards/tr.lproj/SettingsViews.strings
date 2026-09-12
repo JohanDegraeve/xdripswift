@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Ayarlar";
-"settingsviews_glucoseDisplaySectionTitle" = "Görünüm";
+"settingsviews_glucoseDisplaySectionTitle" = "Genel";
 "settingsviews_glucoseRangesSectionTitle" = "Glikoz Aralıkları";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Uyarılar ve Bildirimler";
 "settingsviews_sharingAndServicesSectionTitle" = "Paylaşım ve Servisler";
@@ -487,3 +487,30 @@
 "settingsviews_carPlayLiveActivityTypeBasic" = "Temel";
 "settingsviews_liveActivitySectionTitle" = "Canlı Etkinlik";
 "settingsviews_dexcomG7Message" = "Bluetooth adını boş bırakın. Sonraki ekranda sensörü otomatik olarak aramak için Tara’ya dokunun.\n\nSensör daha önce Ayarlar > Bluetooth bölümünde göründüyse Bluetooth adını elle girebilirsiniz.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Karbonhidrat Süresi";
+"therapy.local" = "Yerel olarak hesaplanır";
+
+"settingsviews_showOriginalBGReadings" = "Orijinal Değerleri Göster";
+
+"therapy.insulinType" = "İnsülin Türü";
+
+"therapy.showIOBCOB" = "IOB/COB göster";
+
+"therapy.treatmentSettings" = "Tedaviler";
+
+"therapy.settingsHelp" = "Kaydedilen tedavilerden kalan insülin ve karbonhidrat miktarını tahmin etmek için kullanılır.";
+
+"therapy.settingsLocal" = "Bu ayarlar, yalnızca değerler bir AID sistemi tarafından sağlanmadığında kayıtlı tedavilerden IOB ve COB tahmini yapar.";
+"therapy.settingsExternal" = "IOB ve COB, %@ tabanlı AID sisteminiz tarafından sağlandığı için bu seçenekler devre dışıdır.";
+"therapy.settingsMixed" = "%@ IOB sağladığından insülin türü otomatiktir. Karbonhidrat süresi kayıtlı öğünlerden yerel COB tahmini için kullanılır.";
+"therapy.insulinModel" = "%@ insülin modeli seçildi. İnsülin Etki Süresi (DIA): %@. İnsülin Tepe Etkisine Kadar Geçen Süre: %@.";
+"therapy.carbFast" = "Daha hızlı karbonhidrat emilimi. Emilim başlamadan önce 10 dakikalık gecikme içerir.";
+"therapy.carbNormal" = "Normal karbonhidrat emilimi. Emilim başlamadan önce 10 dakikalık gecikme içerir.";
+"therapy.carbLong" = "Daha uzun karbonhidrat emilimi. GLP-1 ilaçları sindirimi yavaşlattığında yararlı olabilir. Emilim başlamadan önce 10 dakikalık gecikme içerir.";
+"therapy.automatic" = "Otomatik";
+
+"therapy.liveActivityMetricsFooter" = "Kullanılabilir IOB ve COB değerlerini büyük kilit ekranı düzeninde ve CarPlay/Akıllı Gruplama grafik düzeninde göster.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB için kaydedilmiş insülin veya karbonhidrat tedavileri ya da bağlı bir AID sisteminden gelen veriler gerekir.";

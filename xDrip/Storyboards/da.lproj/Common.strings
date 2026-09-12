@@ -58,3 +58,7 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Anslået aktivt insulin";
+"therapy.estimatedCOB" = "Anslåede aktive kulhydrater";

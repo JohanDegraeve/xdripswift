@@ -44,7 +44,7 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
-"settingsviews_glucoseDisplaySectionTitle" = "Visualizzazione";
+"settingsviews_glucoseDisplaySectionTitle" = "Generali";
 "settingsviews_glucoseRangesSectionTitle" = "Intervalli glucosio";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Avvisi e notifiche";
 "settingsviews_sharingAndServicesSectionTitle" = "Condivisione e servizi";
@@ -741,3 +741,30 @@
 "settingsviews_carPlayLiveActivityTypeBasic" = "Base";
 "settingsviews_liveActivitySectionTitle" = "Attività in tempo reale";
 "settingsviews_dexcomG7Message" = "Lascia vuoto il nome Bluetooth. Nella schermata successiva, tocca Scansiona per cercare automaticamente il sensore.\n\nSe il sensore è già apparso in Impostazioni > Bluetooth, puoi inserire manualmente il suo nome Bluetooth.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Durata dei Carboidrati";
+"therapy.local" = "Calcolato localmente";
+
+"settingsviews_showOriginalBGReadings" = "Mostra Valori Originali";
+
+"therapy.insulinType" = "Tipo di Insulina";
+
+"therapy.showIOBCOB" = "Mostra IOB/COB";
+
+"therapy.treatmentSettings" = "Trattamenti";
+
+"therapy.settingsHelp" = "Usate per stimare insulina e carboidrati residui dai trattamenti registrati.";
+
+"therapy.settingsLocal" = "Queste impostazioni stimano IOB e COB dai trattamenti registrati solo quando i valori non sono forniti da un sistema AID.";
+"therapy.settingsExternal" = "Queste opzioni sono disabilitate perché il sistema AID basato su %@ fornisce IOB e COB.";
+"therapy.settingsMixed" = "%@ fornisce IOB, quindi il tipo di insulina è automatico. La durata dei carboidrati serve a stimare COB localmente dai pasti registrati.";
+"therapy.insulinModel" = "Modello di insulina %@ selezionato. Durata d’azione dell’insulina (DIA): %@. Tempo al picco di insulina: %@.";
+"therapy.carbFast" = "Assorbimento dei carboidrati più rapido. Include un ritardo di 10 minuti prima dell’inizio.";
+"therapy.carbNormal" = "Assorbimento normale dei carboidrati. Include un ritardo di 10 minuti prima dell’inizio.";
+"therapy.carbLong" = "Assorbimento dei carboidrati più lungo. Può essere utile quando i farmaci GLP-1 rallentano la digestione. Include un ritardo di 10 minuti prima dell’inizio.";
+"therapy.automatic" = "Automatico";
+
+"therapy.liveActivityMetricsFooter" = "Mostra i valori IOB e COB disponibili nel layout grande della schermata di blocco e nel layout con grafico di CarPlay/Raccolta smart.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB richiede trattamenti di insulina o carboidrati registrati oppure dati da un sistema AID collegato.";

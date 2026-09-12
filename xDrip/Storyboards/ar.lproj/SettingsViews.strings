@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "الإعدادات";
-"settingsviews_glucoseDisplaySectionTitle" = "العرض";
+"settingsviews_glucoseDisplaySectionTitle" = "عام";
 "settingsviews_glucoseRangesSectionTitle" = "نطاقات الجلوكوز";
 "settingsviews_alertsAndNotificationsSectionTitle" = "التنبيهات والإشعارات";
 "settingsviews_sharingAndServicesSectionTitle" = "المشاركة والخدمات";
@@ -495,3 +495,30 @@
 "settingsviews_carPlayLiveActivityTypeBasic" = "أساسي";
 "settingsviews_liveActivitySectionTitle" = "النشاط المباشر";
 "settingsviews_dexcomG7Message" = "اترك اسم Bluetooth فارغًا. في الشاشة التالية، اضغط على مسح للبحث عن المستشعر تلقائيًا.\n\nإذا سبق أن ظهر المستشعر في الإعدادات > Bluetooth، يمكنك إدخال اسم Bluetooth الخاص به يدويًا.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "مدة امتصاص الكربوهيدرات";
+"therapy.local" = "يُحسب محليًا";
+
+"settingsviews_showOriginalBGReadings" = "إظهار القيم الأصلية";
+
+"therapy.insulinType" = "نوع الإنسولين";
+
+"therapy.showIOBCOB" = "إظهار IOB/COB";
+
+"therapy.treatmentSettings" = "العلاجات";
+
+"therapy.settingsHelp" = "تُستخدم لتقدير الإنسولين والكربوهيدرات المتبقية من العلاجات المسجلة.";
+
+"therapy.settingsLocal" = "تُستخدم هذه الإعدادات لتقدير IOB وCOB من العلاجات المسجلة فقط عندما لا يوفر نظام AID هذه القيم.";
+"therapy.settingsExternal" = "هذه الخيارات معطلة لأن نظام AID القائم على %@ يوفر قيم IOB وCOB.";
+"therapy.settingsMixed" = "يوفر %@ قيمة IOB، لذا يُحدد نوع الإنسولين تلقائيًا. تُستخدم مدة امتصاص الكربوهيدرات لتقدير COB محليًا من الوجبات المسجلة.";
+"therapy.insulinModel" = "تم اختيار نموذج الإنسولين %@. مدة عمل الإنسولين (DIA): %@. الوقت حتى ذروة عمل الإنسولين: %@.";
+"therapy.carbFast" = "امتصاص أسرع للكربوهيدرات. يتضمن تأخيرًا لمدة 10 دقائق قبل بدء الامتصاص.";
+"therapy.carbNormal" = "امتصاص عادي للكربوهيدرات. يتضمن تأخيرًا لمدة 10 دقائق قبل بدء الامتصاص.";
+"therapy.carbLong" = "امتصاص أطول للكربوهيدرات. قد يكون مفيدًا عندما تُبطئ أدوية GLP-1 الهضم. يتضمن تأخيرًا لمدة 10 دقائق قبل بدء الامتصاص.";
+"therapy.automatic" = "تلقائي";
+
+"therapy.liveActivityMetricsFooter" = "إظهار قيم IOB وCOB المتاحة في تخطيط شاشة القفل الكبير وتخطيط الرسم البياني في CarPlay/الحزمة المكدسة الذكية.";
+
+"therapy.liveActivityMetricsUnavailable" = "يتطلب IOB/COB تسجيل علاجات الأنسولين أو الكربوهيدرات، أو بيانات من نظام AID متصل.";

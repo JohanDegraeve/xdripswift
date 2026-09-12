@@ -72,6 +72,7 @@ struct GlucoseChartYAxisRetentionState {
 /// The view does not load or mutate chart data. `GlucoseChartState` is the boundary between the
 /// cached state manager and this renderer.
 struct GlucoseChartView: View {
+    private var therapySeries = TherapyChartSeries()
 
     // MARK: - Input Data
 
@@ -261,6 +262,12 @@ struct GlucoseChartView: View {
         return view
     }
 
+    func therapyPlots(_ series: TherapyChartSeries) -> Self {
+        var view = self
+        view.therapySeries = series
+        return view
+    }
+
     /// Blood glucose color dependant on the user defined limit values
     /// - Returns: a Color object either red, yellow or green
     func bgColor(bgValueInMgDl: Double) -> Color {
@@ -300,35 +307,7 @@ struct GlucoseChartView: View {
             return miniChartXAxisLabelDates()
         }
 
-        // Keep labels anchored to real clock hours so a small scroll cannot switch between odd and
-        // even hour labels.
-        let hourInterval = max(everyHours, 1)
-        let calendar = Calendar.current
-        let startOfVisibleHourComponents = calendar.dateComponents([.year, .month, .day, .hour], from: visibleStartDate)
-
-        guard var date = calendar.date(from: startOfVisibleHourComponents) else { return [] }
-
-        if date < visibleStartDate, let nextHourDate = calendar.date(byAdding: .hour, value: 1, to: date) {
-            date = nextHourDate
-        }
-
-        var dates = [Date]()
-
-        while date <= visibleEndDate {
-            let hour = calendar.component(.hour, from: date)
-
-            if hourInterval == 1 || hour % hourInterval == 0 {
-                dates.append(date)
-            }
-
-            guard let nextDate = calendar.date(byAdding: .hour, value: 1, to: date), nextDate > date else {
-                break
-            }
-
-            date = nextDate
-        }
-
-        return dates
+        return ConstantsGlucoseChartSwiftUI.xAxisDates(from: visibleStartDate, to: visibleEndDate, everyHours: everyHours)
     }
 
     private func miniChartXAxisLabelDates() -> [Date] {
@@ -566,6 +545,28 @@ struct GlucoseChartView: View {
         return nil
     }
 
+    @ChartContentBuilder
+    private func therapyPlotMarks(series: TherapyChartSeries, scale: TherapyChartScale) -> some ChartContent {
+        ForEach(series.iob) { point in
+            LineMark(x: .value("Time", point.date), y: .value("BG", scale.glucoseValue(amount: point.amount, isIOB: true)),
+                series: .value("Series", "therapy-iob-\(point.segment)"))
+                .interpolationMethod(.linear)
+                .foregroundStyle(GlucoseChartTreatmentStyle.bolusColor.opacity(ConstantsGlucoseChartSwiftUI.therapyPlotLineOpacity))
+                .lineStyle(StrokeStyle(lineWidth: 1.4))
+                .accessibilityLabel("IOB")
+                .accessibilityValue("\(point.amount.formatted(.number.precision(.fractionLength(0...2)))) U")
+        }
+        ForEach(series.cob) { point in
+            LineMark(x: .value("Time", point.date), y: .value("BG", scale.glucoseValue(amount: point.amount, isIOB: false)),
+                series: .value("Series", "therapy-cob-\(point.segment)"))
+                .interpolationMethod(.linear)
+                .foregroundStyle(GlucoseChartTreatmentStyle.carbsColor.opacity(ConstantsGlucoseChartSwiftUI.therapyPlotLineOpacity))
+                .lineStyle(StrokeStyle(lineWidth: 1.4))
+                .accessibilityLabel("COB")
+                .accessibilityValue("\(point.amount.formatted(.number.precision(.fractionLength(0)))) g")
+        }
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -576,9 +577,17 @@ struct GlucoseChartView: View {
         let visibleCalibrationPoints = chartState?.calibrationPoints.filter { $0.date >= visibleStartDate && $0.date <= visibleEndDate } ?? []
         let treatmentValues = visibleCalibrationPoints.map { $0.value } + visibleTreatmentPoints.allRenderableValues
         let allBgValues = bgReadingValues + additionalValues + treatmentValues
-        let effectiveMinimumChartValue = showsTreatments
+        let basalMinimumChartValue = showsTreatments
             ? chartState?.minimumChartValueInMgDl ?? ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl
             : ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl
+        let visibleTherapy = usesMainChartYAxisContext ? therapySeries.clipped(from: visibleStartDate, to: visibleEndDate) : TherapyChartSeries()
+        let hasTherapy = !visibleTherapy.iob.isEmpty || !visibleTherapy.cob.isEmpty
+        let therapyBaseline = ConstantsGlucoseChartSwiftUI.minimumChartValueWithBottomSpace(hours: hoursToShow)
+        let therapyScale = TherapyChartScale(series: visibleTherapy, baseline: therapyBaseline)
+        let therapyMinimum = (visibleTherapy.iob.map { therapyScale.glucoseValue(amount: $0.amount, isIOB: true) }
+            + visibleTherapy.cob.map { therapyScale.glucoseValue(amount: $0.amount, isIOB: false) }).min() ?? therapyBaseline
+        let effectiveMinimumChartValue = hasTherapy
+            ? min(basalMinimumChartValue, therapyBaseline, therapyMinimum) : basalMinimumChartValue
         let showsBasalDomain = effectiveMinimumChartValue < ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl
         let lowerDomainPadding = showsBasalDomain ? ConstantsGlucoseChartSwiftUI.yAxisBasalDomainPaddingInMgDl : ConstantsGlucoseChartSwiftUI.yAxisDomainPaddingInMgDl
         let minimumDomainValue = min((allBgValues.min() ?? 40), urgentLowLimitInMgDl, effectiveMinimumChartValue)
@@ -674,6 +683,10 @@ struct GlucoseChartView: View {
             .symbolSize(glucoseCircleDiameter)
             .foregroundStyle(.clear)
 
+            if chartState == nil {
+                therapyPlotMarks(series: visibleTherapy, scale: therapyScale)
+            }
+
             // Basal areas/lines and primary treatments are drawn below glucose points.
             //
             // The state manager has already produced scheduled and temporary basal step/fill points,
@@ -714,6 +727,9 @@ struct GlucoseChartView: View {
                     .lineStyle(StrokeStyle(lineWidth: GlucoseChartTreatmentStyle.scheduledBasalLineWidth, dash: [3, 2]))
                     .foregroundStyle(GlucoseChartTreatmentStyle.scheduledBasalLineColor)
                 }
+
+                // Therapy curves sit immediately above basal marks, below treatment symbols and glucose.
+                therapyPlotMarks(series: visibleTherapy, scale: therapyScale)
 
                 // Note labels sit above basal lines and below dose treatments.
                 treatmentSymbolMarks(points: visibleTreatmentPoints.notes, systemImage: nil, size: { _ in 0 }, color: GlucoseChartTreatmentStyle.noteColor, labelPosition: .top, verticalLabel: true)

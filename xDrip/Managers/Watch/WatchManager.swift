@@ -139,9 +139,17 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
         sessionActivationLock.unlock()
     }
 
-    private func processWatchUpdate(updateTypes: Set<WatchUpdateType>, forceComplicationUpdate: Bool) {
+    private func processWatchUpdate(updateTypes: Set<WatchUpdateType>, forceComplicationUpdate: Bool, therapyMetrics: TherapyMetricsSnapshot? = nil) {
+        // KVO and WatchConnectivity may enter on a background queue. Status providers
+        // and UI-owned state are read on main without blocking the notifying writer.
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in
+                self?.processWatchUpdate(updateTypes: updateTypes, forceComplicationUpdate: forceComplicationUpdate, therapyMetrics: therapyMetrics)
+            }
+            return
+        }
         if updateTypes.contains(.status) {
-            status = currentStatus()
+            status = currentStatus(therapyMetrics: therapyMetrics)
         }
 
         if updateTypes.contains(.bgReadings) {
@@ -191,7 +199,7 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
         return WatchBgReadings(generatedAt: Date().timeIntervalSince1970, hoursIncluded: hoursOfBgReadingsToSend, bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit)
     }
 
-    private func currentStatus() -> WatchStatus {
+    private func currentStatus(therapyMetrics: TherapyMetricsSnapshot? = nil) -> WatchStatus {
         var status = WatchStatus()
 
         status.generatedAt = Date().timeIntervalSince1970
@@ -275,6 +283,7 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
             status.aidStatus = nil
         }
 
+        status.therapyMetrics = therapyMetrics ?? TherapyMetricsManager.shared.snapshot()
         return status
     }
 
@@ -370,6 +379,10 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
     }
 
     // MARK: - Public functions
+
+    func updateTherapyMetrics(_ snapshot: TherapyMetricsSnapshot) {
+        processWatchUpdate(updateTypes: [.status], forceComplicationUpdate: false, therapyMetrics: snapshot)
+    }
 
     func updateWatchApp(forceComplicationUpdate: Bool) {
         processWatchUpdate(updateTypes: [.status, .bgReadings], forceComplicationUpdate: forceComplicationUpdate)
