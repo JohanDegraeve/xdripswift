@@ -37,8 +37,13 @@ final class FollowerSettingsSectionProvider: SettingsNativeSectionProvider {
             defaultsObserver = NotificationCenter.default.addObserver(
                 forName: UserDefaults.didChangeNotification,
                 object: UserDefaults.standard,
-                queue: .main
-            ) { [weak self] _ in self?.sectionReloadClosure?() }
+                queue: nil
+            ) { [weak self] _ in
+                // Defaults may be written on a queue that main is waiting for.
+                DispatchQueue.main.async { [weak self] in
+                    self?.sectionReloadClosure?()
+                }
+            }
         }
         if let refreshEvery {
             refreshTimer = Timer.scheduledTimer(withTimeInterval: refreshEvery, repeats: true) { [weak self] _ in
