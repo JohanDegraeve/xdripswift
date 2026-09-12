@@ -1200,8 +1200,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             trace("in getLatestTreatmentsNSResponses, %{public}@ treatmentEntries found that were updated at NS and updated locally", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfUpdatedTreatments.description)
                         }
                         
-                        // A bulk treatment download is not authoritative enough to infer remote deletion.
-                        // Keep explicit local deletes only. Otherwise a truncated or delayed Nightscout response can hide valid local treatments.
+                        // Bulk results may be truncated. Confirm missing records individually before
+                        // applying remote deletions to local treatments.
                         let totalActivity = amountOfNewTreatments + amountMarkedAsUploaded + amountOfUpdatedTreatments
                         if totalActivity > 0 {
                             trace("in getLatestTreatmentsNSResponses, Nightscout sync summary: new = %{public}@, markedUploaded = %{public}@, updated = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfNewTreatments.description, amountMarkedAsUploaded.description, amountOfUpdatedTreatments.description)
@@ -1209,8 +1209,24 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         
                         self.coreDataManager.saveChanges()
                         
-                        // call completion handler with success, if amount and/or amountOfNewTreatments > 0 then it's success with localchanges
-                        completionHandler(.success(amountOfUpdatedTreatments + amountOfNewTreatments))
+                        let siteURL = UserDefaults.standard.nightscoutUrl
+                        let sitePort = UserDefaults.standard.nightscoutPort
+                        self.reconcileRemoteTreatmentDeletions(treatments: treatmentsToSync, downloaded: treatmentNSResponses, lookup: { remoteID, finished in
+                            let queries = [URLQueryItem(name: "find[_id]", value: remoteID), URLQueryItem(name: "count", value: "1")]
+                            self.performHTTPRequest(path: self.nightscoutTreatmentPath, queries: queries, httpMethod: "GET") { data, result in
+                                // A response from a previous source must not remove current local data.
+                                guard UserDefaults.standard.nightscoutUrl == siteURL,
+                                      UserDefaults.standard.nightscoutPort == sitePort,
+                                      UserDefaults.standard.dataFlowPolicy.importsTreatmentsFromNightscout else {
+                                    finished(nil, false)
+                                    return
+                                }
+                                finished(data, result.successFull())
+                            }
+                        }) { deleted in
+                            // Include deletions so the normal sync completion refreshes the list and chart.
+                            completionHandler(.success(amountOfUpdatedTreatments + amountOfNewTreatments + deleted))
+                        }
                     }
                     
                 } else {
@@ -1297,6 +1313,53 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         return nil
     }
     
+    /// A missing bulk result is only a candidate for deletion. An exact-id GET must return an
+    /// empty array before we hide it locally. Keep failed lookups and pending local edits intact.
+    /// The lookup closure lets tests exercise reconciliation without contacting a real server.
+    func reconcileRemoteTreatmentDeletions(treatments: [TreatmentEntry], downloaded: [TreatmentNSResponse], lookup: @escaping (String, @escaping (Data?, Bool) -> Void) -> Void, completion: @escaping (Int) -> Void) {
+        let presentIDs = Set(downloaded.map(\.id))
+        // Use the same time window as the download. Older history is outside this sync pass.
+        let earliestDate = Date().addingTimeInterval(-ConstantsNightscout.maxHoursTreatmentsToDownload * 3600)
+        let candidates = treatments.filter {
+            $0.uploaded && !$0.treatmentdeleted && !$0.isDeleted && $0.id != TreatmentEntry.EmptyId
+                && $0.date >= earliestDate && !presentIDs.contains($0.id)
+        }
+        // A Nightscout record can have several local components. Check its id only once.
+        // Remove only our suffix so hyphens inside a remote UUID remain intact.
+        let grouped = Dictionary(grouping: candidates) { treatment in
+            String(treatment.id.dropLast(treatment.treatmentType.idExtension().count))
+        }
+        let remoteIDs = grouped.keys.filter { !$0.isEmpty }.sorted()
+        var deletedCount = 0
+
+        // Run lookups one at a time rather than starting a request for every missing entry at once.
+        func checkNext(_ index: Int) {
+            guard index < remoteIDs.count else {
+                completion(deletedCount)
+                return
+            }
+            let remoteID = remoteIDs[index]
+            lookup(remoteID) { data, succeeded in
+                self.coreDataManager.mainManagedObjectContext.performAndWait {
+                    if succeeded, let data,
+                       let records = try? JSONSerialization.jsonObject(with: data) as? [Any], records.isEmpty {
+                        for treatment in grouped[remoteID] ?? [] {
+                            // The user may have edited or deleted the entry while the request ran.
+                            guard !treatment.isDeleted, treatment.uploaded, !treatment.treatmentdeleted,
+                                  treatment.id == remoteID + treatment.treatmentType.idExtension() else { continue }
+                            // Keep uploaded true: the remote deletion is confirmed, so no DELETE is queued.
+                            treatment.treatmentdeleted = true
+                            deletedCount += 1
+                        }
+                        self.coreDataManager.saveChanges()
+                    }
+                    checkNext(index + 1)
+                }
+            }
+        }
+        checkNext(0)
+    }
+
     /// Backward-compatible callback-based HTTP request (replaces performHTTPRequest)
     private func performHTTPRequest(path: String, queries: [URLQueryItem], httpMethod: String?, completionHandler: @escaping ((Data?, NightscoutResult) -> Void)) {
         Task {

@@ -13,6 +13,81 @@ import UIKit
 final class BasalInjectionTests: XCTestCase {
     private let date = Date(timeIntervalSince1970: 1_788_804_000)
 
+    /// Use the reported Note verbatim through the same JSON parser and storage path as follower sync.
+    @MainActor func testReportedLantusNoteImportsAsBasalInjection() throws {
+        let notes = """
+        Basal injection: Lantus, 14 U
+
+        ---------
+        xDrip4iOS:BasalInjection:eyJpbnN1bGluRGVzY3JpcHRpb24iOiJMYW50dXMiLCJ1bml0cyI6MTQsInZlcnNpb24iOjF9
+        """
+        let data = try JSONSerialization.data(withJSONObject: [document(notes: notes)])
+        let responses = try XCTUnwrap(TreatmentNSResponse.arrayFromData(data))
+        XCTAssertEqual(responses.count, 1)
+        let response = try XCTUnwrap(responses.first)
+        XCTAssertEqual(response.eventType, .BasalInjection)
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let entry = try XCTUnwrap(response.asNewTreatmentEntry(nsManagedObjectContext: coreDataManager.mainManagedObjectContext))
+        let snapshot = TreatmentSnapshot(treatmentEntry: entry)
+        XCTAssertEqual(snapshot.treatmentType, .BasalInjection)
+        XCTAssertEqual(snapshot.valueText, "14")
+        XCTAssertEqual(snapshot.unitText, "U")
+        XCTAssertEqual(entry.notes, "Lantus")
+    }
+
+    /// Missing from a bulk download is not enough: only a successful empty exact-id result deletes.
+    @MainActor func testRemoteDeletionRequiresConfirmedAbsence() {
+        for (body, succeeded, shouldDelete) in [("[]", true, true), ("[]", false, false), ("[{\"_id\":\"still-present\"}]", true, false), ("{}", true, false), ("invalid", true, false)] {
+            let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+            let manager = NightscoutSyncManager(coreDataManager: coreDataManager, messageHandler: nil)
+            let remoteID = "6cd9bfc2-1eb0-4fdd-890d-59c47067d9e6"
+            let entry = TreatmentEntry(id: remoteID + "-note", date: Date(), value: 14, treatmentType: .BasalInjection, nightscoutEventType: "Note", enteredBy: "Test", notes: "Lantus", nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+            var completed = false
+            manager.reconcileRemoteTreatmentDeletions(treatments: [entry], downloaded: [], lookup: { id, finished in
+                XCTAssertEqual(id, remoteID)
+                finished(Data(body.utf8), succeeded)
+            }) { count in
+                completed = true
+                XCTAssertEqual(count, shouldDelete ? 1 : 0)
+            }
+            XCTAssertTrue(completed)
+            XCTAssertEqual(entry.treatmentdeleted, shouldDelete)
+            XCTAssertTrue(entry.uploaded)
+        }
+    }
+
+    /// Local edits remain authoritative while waiting for confirmation from Nightscout.
+    @MainActor func testRemoteDeletionPreservesAnEditMadeDuringLookup() {
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let manager = NightscoutSyncManager(coreDataManager: coreDataManager, messageHandler: nil)
+        let entry = TreatmentEntry(id: "basal-note", date: Date(), value: 14, treatmentType: .BasalInjection, nightscoutEventType: "Note", enteredBy: "Test", notes: "Lantus", nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+        manager.reconcileRemoteTreatmentDeletions(treatments: [entry], downloaded: [], lookup: { _, finished in
+            entry.value = 15
+            entry.uploaded = false
+            finished(Data("[]".utf8), true)
+        }) { count in
+            XCTAssertEqual(count, 0)
+        }
+        XCTAssertFalse(entry.treatmentdeleted)
+        XCTAssertFalse(entry.uploaded)
+    }
+
+    /// Present records and unsynced local entries do not need a remote absence check.
+    @MainActor func testRemoteDeletionDoesNotLookUpPresentOrUnsyncedTreatments() {
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let manager = NightscoutSyncManager(coreDataManager: coreDataManager, messageHandler: nil)
+        let present = TreatmentEntry(id: "present-note", date: Date(), value: 14, treatmentType: .BasalInjection, nightscoutEventType: "Note", enteredBy: "Test", notes: "Lantus", nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+        let local = TreatmentEntry(date: Date(), value: 14, treatmentType: .BasalInjection, nightscoutEventType: "Note", enteredBy: "Test", notes: "Lantus", nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+        let response = TreatmentNSResponse(id: present.id, createdAt: present.date, eventType: .BasalInjection, nightscoutEventType: "Note", value: 14, valueSecondary: nil, enteredBy: "Test", notes: "Lantus")
+        manager.reconcileRemoteTreatmentDeletions(treatments: [present, local], downloaded: [response], lookup: { _, _ in
+            XCTFail("No lookup should be needed")
+        }) { count in
+            XCTAssertEqual(count, 0)
+        }
+        XCTAssertFalse(present.treatmentdeleted)
+        XCTAssertFalse(local.treatmentdeleted)
+    }
+
     func testPayloadRoundTripIgnoresReadableSummary() throws {
         let payload = try XCTUnwrap(BasalInjectionPayload(units: 20, insulinDescription: "Tresiba"))
         let notes = try XCTUnwrap(payload.encodedNotes())
