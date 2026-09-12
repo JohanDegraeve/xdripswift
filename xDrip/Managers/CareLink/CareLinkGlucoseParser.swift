@@ -159,7 +159,7 @@ enum CareLinkGlucoseParser {
         return nil
     }
 
-    /// Parses a server/device clock without applying an offset; an unzoned device clock is a wall
+    /// Parses a server/device clock without applying an offset. An unzoned device clock is a wall
     /// clock represented in UTC solely so its difference from the absolute server clock is stable.
     private static func clockDate(_ value: Any?) -> Date? {
         if let number = number(value) {

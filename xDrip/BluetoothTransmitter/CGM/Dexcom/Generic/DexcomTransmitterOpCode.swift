@@ -14,7 +14,7 @@ enum DexcomTransmitterOpCode: UInt8 {
     case authRequestRx = 0x03
     case authChallengeTx = 0x04
     case authChallengeRx = 0x05
-    case keepAliveTx = 0x06 // auth; setAdvertisementParametersTx for control
+    case keepAliveTx = 0x06 // auth, setAdvertisementParametersTx for control
     case bondRequestTx = 0x07
     case pairRequestRx = 0x08 // comes in after having accepted the bluetooth pairing request
     

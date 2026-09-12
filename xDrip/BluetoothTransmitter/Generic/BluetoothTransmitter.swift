@@ -280,7 +280,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: - De-initialization
     
     deinit {
-        // Core Bluetooth delegates are weak. Clear them directly as a final safeguard; dispatching
+        // Core Bluetooth delegates are weak. Clear them directly as a final safeguard. Dispatching
         // synchronously from deinit could deadlock if main and Bluetooth are already waiting on one another.
         centralManager?.delegate = nil
         peripheral?.delegate = nil
@@ -289,7 +289,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: - public functions
     
     /// Hook for subclasses to clear Core Bluetooth delegates and connection-owned state before ARC
-    /// release. Cleanup is queued with the callbacks it protects; callers must never wait for the
+    /// release. Cleanup is queued with the callbacks it protects. Callers must never wait for the
     /// Bluetooth queue from main because a callback may itself be completing main-thread work.
     @objc func prepareForRelease() {
         runOnCentralQueue {
@@ -770,7 +770,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         let cgmTransmitter = self as? CGMTransmitter
         if cgmTransmitter != nil || now.timeIntervalSince(lastConnectLogAt) > 2.0 || lastConnectLogName != name {
             // The developer trace keeps the peripheral name. The consumer candidate is typed as a
-            // CGM connection only when this transmitter really is a CGM; this prevents an unrelated
+            // CGM connection only when this transmitter really is a CGM. This prevents an unrelated
             // display or heartbeat connection from falsely completing a pending Add CGM action. The
             // store still discards routine CGM radio cycles unless this completes a user request or
             // proves recovery from a retained connection problem. CGM callbacks deliberately bypass
@@ -892,7 +892,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             } else {
                 // Unexpected error
                 // Unlike the normal short CGM disconnect above, an unexpected Core Bluetooth error
-                // is a real loss of connectivity. Expose the state only; the error and device name
+                // is a real loss of connectivity. Expose the state only. The error and device name
                 // remain confined to the developer trace.
                 trace("in didDisconnectPeripheral, didDisconnect peripheral %{public}@ with error: %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error, troubleshooting: .standard(.bluetooth(.connectionFailed)), deviceName ?? "'unknown'", err.localizedDescription)
             }

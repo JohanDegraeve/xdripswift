@@ -613,7 +613,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             }
                             
                         case .authRequestRx:
-                            // In coexistence, do not participate in the authentication handshake; remain passive so the transmitter drops us quickly.
+                            // In coexistence, do not participate in the authentication handshake. Remain passive so the transmitter drops us quickly.
                             if useOtherApp {
                                 trace("in didUpdateValueFor characteristic, authRequestRx, coexistence mode, remaining passive (no AuthChallengeTx).", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
                                 return
@@ -894,7 +894,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
         // calling super.didConnect here to keep base setup (service discovery, timers, etc.)
         
-        // No predictive/quiet-window gating — keep it simple and reliable.
+        // No predictive/quiet-window gating: keep it simple and reliable.
         super.centralManager(central, didConnect: peripheral)
         
         timeStampLastConnection = Date()
@@ -1506,7 +1506,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
     /// - used by processGlucoseDataRxMessage and processGlucoseG6DataRxMessage
     /// - verifies the algorithmStatus and if ok, creates lastGlucoseInSensorDataRxReading
-    /// - parameters;
+    /// - parameters:
     ///     - calculatedValue : the value in the reading
     ///     - algorithmStatus : algorithm status
     ///     - timeStamp : timestamp in the reading

@@ -200,7 +200,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
     private var sensorSessionLength: TimeInterval?
 
     /// Protects the lifetime value consumed by main-thread presentation code. The full G7 state
-    /// machine remains on `bt.central`; copying only this value avoids making UI refreshes wait
+    /// machine remains on `bt.central`. Copying only this value avoids making UI refreshes wait
     /// synchronously for a Bluetooth callback that may already be notifying the main thread.
     private let maximumSensorAgeLock = NSLock()
     private var maximumSensorAgeInDaysSnapshot: Double
@@ -284,7 +284,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
     private var sensorAge: TimeInterval?
 
     /// Keeps the six-reading stalled-stream safeguard on the Bluetooth queue. UserDefaults is only
-    /// the persistence boundary between launches; writing it inside a Core Bluetooth callback can
+    /// the persistence boundary between launches. Writing it inside a Core Bluetooth callback can
     /// synchronously notify a main-thread observer and must never block protocol processing.
     private var recentRawGlucoseValues: [Int]
 
@@ -863,7 +863,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
     }
 
     /// Refreshes the one lifetime value that may be read outside `bt.central`. The lock is held only
-    /// while copying a `Double`; no delegate, persistence or queue operation can run while held.
+    /// while copying a `Double`. No delegate, persistence or queue operation can run while held.
     private func refreshMaximumSensorAgeSnapshot() {
         assertOnCentral()
         let value = maximumSensorAgeInDays
@@ -2157,7 +2157,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
     private func addGlucoseValueToUserDefaults(_ newValue: Int) {
         // Keep only the six values used by `hasSixIdenticalValues()`. This established shared store
         // lets the stalled-stream safeguard span app launches. Protocol decisions use the local
-        // queue-owned copy immediately; persistence is handed to main without blocking Bluetooth.
+        // queue-owned copy immediately. Persistence is handed to main without blocking Bluetooth.
         recentRawGlucoseValues.insert(newValue, at: 0)
         if recentRawGlucoseValues.count > 6 { recentRawGlucoseValues.removeLast() }
         let valuesToPersist = recentRawGlucoseValues

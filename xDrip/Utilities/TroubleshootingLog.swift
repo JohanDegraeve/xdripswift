@@ -15,7 +15,7 @@ import UIKit
 /// an accepted glucose reading. Detailed entries add useful supporting context, such as integration
 /// failures and recoveries, imports, backfills and sensor warm-up milestones. Both levels are always
 /// shown and exported. The level remains persisted so existing JSON-lines histories keep decoding and
-/// call sites continue to document why a fact is useful; it is not a user-facing visibility setting.
+/// call sites continue to document why a fact is useful. It is not a user-facing visibility setting.
 /// Routine scans, polls and repeated successes are rejected before storage because frequency is not
 /// diagnostic, even when a call site classifies the candidate as detailed.
 enum TroubleshootingLogLevel: String, Codable {
@@ -254,7 +254,7 @@ enum TroubleshootingCGMActivity: String, Codable {
     case nfcUnavailable
 }
 
-/// Safe follower milestones. Counts are allowed; response bodies and server errors are not.
+/// Safe follower milestones. Counts are allowed. Response bodies and server errors are not.
 enum TroubleshootingFollowerActivity: Codable, Equatable {
     case downloadStarted
     case loginStarted
@@ -787,7 +787,7 @@ enum TroubleshootingIntegrationActivity: Codable, Equatable {
 /// payload is normalized and length-limited above. That typed boundary keeps developer messages,
 /// hardware addresses and server responses out of reports that may be shared publicly.
 enum TroubleshootingLogKind: Codable, Equatable {
-    /// App lifecycle only; no scene, window or process diagnostics are retained.
+    /// App lifecycle only. No scene, window or process diagnostics are retained.
     case app(TroubleshootingAppActivity)
     /// Bluetooth state without a peripheral name or identifier.
     case bluetooth(TroubleshootingBluetoothActivity)
@@ -832,10 +832,10 @@ enum TroubleshootingLogKind: Codable, Equatable {
     case calibrationAccepted(mgDl: Double, readiness: TroubleshootingCalibrationReadiness?)
     /// A controlled transmitter-side G7 calibration transition. No packet or device identifier is retained.
     case transmitterCalibration(TroubleshootingTransmitterCalibrationActivity)
-    /// The persisted alert enum value is safe and compact; user-authored notification text is not.
+    /// The persisted alert enum value is safe and compact. User-authored notification text is not.
     case alert(kindRawValue: Int, activity: TroubleshootingAlertActivity)
     case integration(name: TroubleshootingIntegration, activity: TroubleshootingIntegrationActivity)
-    /// A real transmitter heartbeat received by the app; it contains no device identity or payload.
+    /// A real transmitter heartbeat received by the app. It contains no device identity or payload.
     case heartbeatReceived
     /// A typed user configuration change with no arbitrary or secret value.
     case configuration(TroubleshootingConfigurationActivity)
@@ -925,13 +925,13 @@ struct TroubleshootingLogEntry: Codable, Equatable, Identifiable {
     /// Creates a primary troubleshooting fact, such as a reading or user-visible failure.
     ///
     /// `timestamp` must always mean when the app recorded the activity. Source timestamps belong in
-    /// a typed payload such as `glucoseAccepted.measuredAt`; they must never be substituted here or
+    /// a typed payload such as `glucoseAccepted.measuredAt`. They must never be substituted here or
     /// the Activity Log will present a false causal sequence.
     static func standard(_ kind: TroubleshootingLogKind, timestamp: Date = Date()) -> TroubleshootingLogEntry {
         TroubleshootingLogEntry(timestamp: timestamp, level: .standard, kind: kind)
     }
 
-    /// Creates supporting diagnostic context. Both levels are now always shown and exported; the
+    /// Creates supporting diagnostic context. Both levels are now always shown and exported. The
     /// distinction remains to document call-site intent and decode histories written by older builds.
     /// The store still rejects routine timer noise regardless of this classification.
     static func detailed(_ kind: TroubleshootingLogKind, timestamp: Date = Date()) -> TroubleshootingLogEntry {
@@ -1084,7 +1084,7 @@ final class TroubleshootingLogStore {
         let encodedLine = encodeLine(entry)
 
         // The cheap append path is safe only when policy accepted exactly the supplied entry. A
-        // recovery can replace a generic success, and retention can remove older entries; both cases
+        // recovery can replace a generic success, and retention can remove older entries. Both cases
         // require an atomic rewrite so the file remains identical to the in-memory history.
         let persistenceSucceeded: Bool
         if persistenceNeedsRewrite
@@ -1223,7 +1223,7 @@ final class TroubleshootingLogStore {
         var result = [TroubleshootingLogEntry]()
 
         // Preserve append order while applying stateful noise reduction. Entry timestamps always
-        // describe when the app recorded the activity; sample measurement time is payload data only.
+        // describe when the app recorded the activity. Sample measurement time is payload data only.
         for entry in entries {
             switch entry.kind {
             case let .app(activity):
@@ -1256,7 +1256,7 @@ final class TroubleshootingLogStore {
                 case .connected:
                     // A generic device (for example, a display or heartbeat peripheral) may connect
                     // while the user is adding a CGM. Never let that unrelated callback complete the
-                    // pending CGM action; actual CGM connections arrive through the typed case below.
+                    // pending CGM action. Actual CGM connections arrive through the typed case below.
                     guard bluetoothHealth == .problem else { continue }
                     result.append(entry.replacingKind(.bluetooth(.connectionRestored)))
                     bluetoothHealth = .healthy
@@ -1288,7 +1288,7 @@ final class TroubleshootingLogStore {
                 case .connected:
                     // Every ordinary connection cycle may offer this named candidate. Retain it
                     // only when it completes the user's matching Connect action or proves recovery
-                    // from a visible failure; all healthy heartbeat cycles remain suppressed.
+                    // from a visible failure. All healthy heartbeat cycles remain suppressed.
                     if pendingBluetoothConnectionName == name {
                         result.append(entry)
                         pendingBluetoothConnectionName = nil
@@ -1511,7 +1511,7 @@ final class TroubleshootingLogStore {
                 if name == .nightscoutBackfill {
                     // A gap check normally starts and finds nothing. Persisting both bookends on every
                     // launch hides the lifecycle and glucose facts the report is meant to explain.
-                    // Keep a start only while it has no outcome; completion replaces it with one useful
+                    // Keep a start only while it has no outcome. Completion replaces it with one useful
                     // result, and an empty healthy check disappears. Replaying this policy also cleans
                     // the noisy start/no-data pairs written by earlier builds.
                     if let startIndex = result.lastIndex(where: {
@@ -1657,7 +1657,7 @@ final class TroubleshootingLogStore {
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
 
         var values = URLResourceValues()
-        // The history is short-lived support data that can be regenerated; it must not consume the
+        // The history is short-lived support data that can be regenerated. It must not consume the
         // user's iCloud backup allowance or unexpectedly survive through a backup restore.
         values.isExcludedFromBackup = true
         var mutableDirectory = directory
@@ -2262,7 +2262,7 @@ struct TroubleshootingLogReportBuilder {
     }
 
     private static func alertName(rawValue: Int) -> String {
-        // Convert the safe enum value to controlled wording; do not use custom alert or notification text.
+        // Convert the safe enum value to controlled wording. Do not use custom alert or notification text.
         guard let kind = AlertKind(rawValue: rawValue) else { return "Glucose" }
         switch kind {
         case .verylow: return "Urgent low"

@@ -274,7 +274,7 @@ enum CGMTransmitterType:String, CaseIterable {
             return false
 
         case .medtrumTouchCareNano:
-            // EasyPatch owns sensor lifecycle; xDrip should not offer a manual start UI.
+            // EasyPatch owns sensor lifecycle. xDrip should not offer a manual start UI.
             return false
 
         }
@@ -300,7 +300,7 @@ enum CGMTransmitterType:String, CaseIterable {
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG7
 
         case .medtrumTouchCareNano:
-            // No pump-battery surface in xDrip; reuse the generic threshold so the UI has a sane default.
+            // No pump-battery surface in xDrip. Reuse the generic threshold so the UI has a sane default.
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelLibre2
 
         }

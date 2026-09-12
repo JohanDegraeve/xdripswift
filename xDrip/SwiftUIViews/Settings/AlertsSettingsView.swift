@@ -282,7 +282,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
     }
 
     /// Returns the rows that should be visible for the current alarm state.
-    /// Disabled alarms show only the enabled switch; trigger rows appear only where required.
+    /// Disabled alarms show only the enabled switch. Trigger rows appear only where required.
     var rows: [AlertEntryEditorSetting] {
         if isDisabled {
             return [.isDisabled]
@@ -304,7 +304,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
     }
 
     /// Returns the navigation title for the editor.
-    /// Existing alarms use just the alert name; new alarms include the Add prefix.
+    /// Existing alarms use just the alert name. New alarms include the Add prefix.
     var title: String {
         switch mode {
         case .edit:
@@ -746,7 +746,7 @@ struct AlertEntryEditorView: View {
     }
 
     /// Builds the SwiftUI row for each alarm editor setting.
-    /// Toggle rows update editor state directly; value rows open the pushed
+    /// Toggle rows update editor state directly. Value rows open the pushed
     /// shared Settings editors.
     @ViewBuilder
     private func row(for setting: AlertEntryEditorSetting) -> some View {

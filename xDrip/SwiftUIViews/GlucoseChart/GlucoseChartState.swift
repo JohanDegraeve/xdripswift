@@ -92,7 +92,7 @@ struct GlucoseChartAGPPoint: Identifiable, Hashable {
 /// define the wider cached data range already loaded by `GlucoseChartStateManager`.
 ///
 /// This is intentionally a plain value type. The state manager owns loading, cache mutation and
-/// Core Data access; the chart view owns rendering and remains independent of database work.
+/// Core Data access. The chart view owns rendering and remains independent of database work.
 ///
 /// `overlayWindowStartDate`/`overlayWindowEndDate` optionally define a highlighted time window
 /// inside an overview chart. They are ignored unless both dates are supplied.
@@ -191,7 +191,7 @@ struct GlucoseChartPoint: Identifiable, Hashable {
 /// Dated treatment marker with its display y-value and optional treatment label/notes.
 ///
 /// `yValue` is already resolved by the state manager. For bolus, carbs and notes this means near the
-/// glucose line; the view only draws the supplied position.
+/// glucose line. The view only draws the supplied position.
 struct GlucoseChartTreatmentPoint: Identifiable, Hashable {
 
     let id: String
@@ -228,7 +228,7 @@ enum GlucoseChartTreatmentStyle {
     // the fill suffix when excluded, rather than using a different treatment symbol.
     static let bolusSymbol = "arrowtriangle.down.fill"
     static let carbsSymbol = "arrowtriangle.up.fill"
-    // Use the single triangle on every iOS version; pink and fixed chart sizing distinguish basal injections.
+    // Use the single triangle on every iOS version. Pink and fixed chart sizing distinguish basal injections.
     static let basalInjectionSymbol = "arrowtriangle.down.fill"
     static let treatmentIconSize = 17.0
     /// Small chart-only halo to separate treatment symbols from similarly coloured data.
@@ -242,7 +242,7 @@ enum GlucoseChartTreatmentStyle {
     static let smallBolusScale = 0.6
 
     /// Dose bounds and physical SF Symbol sizes in points. Values outside the bounds clamp
-    /// to the endpoint size; the actual dose and its label are never clamped.
+    /// to the endpoint size. The actual dose and its label are never clamped.
     static let bolusSymbolSizing = GlucoseChartTreatmentSizeRange(minimumValue: 0.5, maximumValue: 10, minimumSize: 9, maximumSize: 30)
     static let carbsSymbolSizing = GlucoseChartTreatmentSizeRange(minimumValue: 5, maximumValue: 70, minimumSize: 9, maximumSize: 30)
     static let treatmentSymbolSize3h = 18.0

@@ -458,7 +458,7 @@ public final class StatisticsManager: @unchecked Sendable {
 
         // TIR must use the same stored, cadence-approved samples as Statistics and reports. The
         // additional 4.5-minute filter below is retained only for the legacy Home average/A1C/CV
-        // calculation; applying it to TIR made otherwise identical app surfaces count different
+        // calculation. Applying it to TIR made otherwise identical app surfaces count different
         // readings.
         let rangeDistribution = GlucoseRangeDistribution(
             values: samples.map(\.valueMgDl),

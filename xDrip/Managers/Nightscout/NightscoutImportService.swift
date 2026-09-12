@@ -232,7 +232,7 @@ struct NightscoutImportCheckpoint: Codable, Sendable {
     }
 }
 
-/// Stores a single small checkpoint in UserDefaults; no credentials or downloaded medical data are stored.
+/// Stores a single small checkpoint in UserDefaults. No credentials or downloaded medical data are stored.
 final class NightscoutImportCheckpointStore: @unchecked Sendable {
     private static let key = "nightscoutHistoricalImportCheckpointV1"
     private let userDefaults: UserDefaults
@@ -405,7 +405,7 @@ private struct NightscoutTreatmentDocument: Decodable, Sendable {
         case notes
     }
 
-    /// Nightscout treatment documents are intentionally loose; validation happens after decoding.
+    /// Nightscout treatment documents are intentionally loose. Validation happens after decoding.
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = container.decodeLossyString(forKey: .id)
@@ -1757,7 +1757,7 @@ final class NightscoutImportService: @unchecked Sendable {
 }
 
 private extension DateInterval {
-    /// DateInterval.contains includes its end; API range queries deliberately do not.
+    /// DateInterval.contains includes its end. API range queries deliberately do not.
     func containsHalfOpen(_ date: Date) -> Bool {
         date >= start && date < end
     }

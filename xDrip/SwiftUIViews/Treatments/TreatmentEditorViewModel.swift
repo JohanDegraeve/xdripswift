@@ -244,7 +244,7 @@ import OSLog
 
                 // A treatment edit is an explicit user-provoked data change. Keep the developer
                 // trace useful while attaching only the controlled type and treatment date to the
-                // shareable log; never include the amount, note, entered-by value or server ID.
+                // shareable log. Never include the amount, note, entered-by value or server ID.
                 trace(
                     "edited %{public}@ treatment at %{public}@",
                     log: log,

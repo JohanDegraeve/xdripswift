@@ -42,7 +42,7 @@ struct GlucoseReportTimeInRangeBarView: View {
 
             GeometryReader { geometry in
                 // The printed bar uses exact normalized proportions. Zero spacing and no artificial
-                // minimum widths keep its geometry at exactly 100%; labels use the separately
+                // minimum widths keep its geometry at exactly 100%. Labels use the separately
                 // allocated whole percentages below.
                 HStack(spacing: 0) {
                     ForEach(buckets) { bucket in

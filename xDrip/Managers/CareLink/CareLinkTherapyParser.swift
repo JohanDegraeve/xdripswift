@@ -108,8 +108,8 @@ enum CareLinkTherapyParser {
             || maximumAutoBasalRate != nil
             || maximumBolusAmount != nil
 
-        // False communication/suspension flags describe an absent pump in Simplera-only payloads;
-        // only an explicitly positive state can therefore be used as pump evidence.
+        // False communication/suspension flags describe an absent pump in Simplera-only payloads.
+        // Only an explicitly positive state can therefore be used as pump evidence.
         let hasPositivePumpState = isSuspended == true || isCommunicating == true
 
         // Algorithm state and automatic-basal records are themselves pump-specific even when the

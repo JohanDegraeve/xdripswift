@@ -199,7 +199,7 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter, StandardBattery
     }
 
     /// Requests a fresh value from an already-connected EmaLink, OrangeLink or compatible generic
-    /// heartbeat device. Discovery remains responsible for the first read; this method is a no-op
+    /// heartbeat device. Discovery remains responsible for the first read. This method is a no-op
     /// when the device does not expose the standard Battery Level characteristic.
     func updateBatteryLevel() {
         runOnCentralQueue { [weak self] in

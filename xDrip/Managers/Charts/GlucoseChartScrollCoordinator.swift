@@ -250,7 +250,7 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
         let decelerationRate = Self.scrollDecelerationRate
         // This is the same integral-based deceleration calculation used by `GlucoseChartManager`.
         // Velocity decays by rate^t and the timer applies only the additional distance since the last
-        // tick. The coordinator publishes date-window changes; the state manager then appends or
+        // tick. The coordinator publishes date-window changes. The state manager then appends or
         // prepends data if that new window extends beyond the current cache.
         let initialDistanceConstant = Double(velocityWidth) / log(decelerationRate)
         let startTime = Date()

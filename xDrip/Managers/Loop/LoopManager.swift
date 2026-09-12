@@ -423,7 +423,7 @@ public class LoopManager: NSObject {
         guard UserDefaults.standard.loopShareType != .disabled else { return }
 
         // Apply the active source policy before reading or writing the shared app group. Direct
-        // Medtrum Nano is always blocked; EasyView retains its explicit consent requirement.
+        // Medtrum Nano is always blocked. EasyView retains its explicit consent requirement.
         guard Self.osAidSharingPermitted else {
             glucoseData.removeAll()
             clearBlockedSourceSharedData()

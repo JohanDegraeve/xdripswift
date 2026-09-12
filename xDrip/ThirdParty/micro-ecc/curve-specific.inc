@@ -450,7 +450,7 @@ uECC_Curve uECC_secp224r1(void) { return &curve_secp224r1; }
 
 
 #if uECC_SUPPORT_COMPRESSED_POINT
-/* Routine 3.2.4 RS;  from http://www.nsa.gov/ia/_files/nist-routines.pdf */
+/* Routine 3.2.4 RS, from http://www.nsa.gov/ia/_files/nist-routines.pdf */
 static void mod_sqrt_secp224r1_rs(uECC_word_t *d1,
                                   uECC_word_t *e1,
                                   uECC_word_t *f1,
@@ -468,7 +468,7 @@ static void mod_sqrt_secp224r1_rs(uECC_word_t *d1,
     uECC_vli_modAdd(f1, f1, f1, curve_secp224r1.p, num_words_secp224r1); /* f1 <-- f1 + f1 */
 }
 
-/* Routine 3.2.5 RSS;  from http://www.nsa.gov/ia/_files/nist-routines.pdf */
+/* Routine 3.2.5 RSS, from http://www.nsa.gov/ia/_files/nist-routines.pdf */
 static void mod_sqrt_secp224r1_rss(uECC_word_t *d1,
                                    uECC_word_t *e1,
                                    uECC_word_t *f1,
@@ -486,7 +486,7 @@ static void mod_sqrt_secp224r1_rss(uECC_word_t *d1,
     }
 }
 
-/* Routine 3.2.6 RM;  from http://www.nsa.gov/ia/_files/nist-routines.pdf */
+/* Routine 3.2.6 RM, from http://www.nsa.gov/ia/_files/nist-routines.pdf */
 static void mod_sqrt_secp224r1_rm(uECC_word_t *d2,
                                   uECC_word_t *e2,
                                   uECC_word_t *f2,
@@ -514,7 +514,7 @@ static void mod_sqrt_secp224r1_rm(uECC_word_t *d2,
     uECC_vli_set(d2, t2, num_words_secp224r1); /* d2 <-- t2 */
 }
 
-/* Routine 3.2.7 RP;  from http://www.nsa.gov/ia/_files/nist-routines.pdf */
+/* Routine 3.2.7 RP, from http://www.nsa.gov/ia/_files/nist-routines.pdf */
 static void mod_sqrt_secp224r1_rp(uECC_word_t *d1,
                                   uECC_word_t *e1,
                                   uECC_word_t *f1,
@@ -540,7 +540,7 @@ static void mod_sqrt_secp224r1_rp(uECC_word_t *d1,
 }
 
 /* Compute a = sqrt(a) (mod curve_p). */
-/* Routine 3.2.8 mp_mod_sqrt_224; from http://www.nsa.gov/ia/_files/nist-routines.pdf */
+/* Routine 3.2.8 mp_mod_sqrt_224, from http://www.nsa.gov/ia/_files/nist-routines.pdf */
 static void mod_sqrt_secp224r1(uECC_word_t *a, uECC_Curve curve) {
     bitcount_t i;
     uECC_word_t e1[num_words_secp224r1];
@@ -550,7 +550,7 @@ static void mod_sqrt_secp224r1(uECC_word_t *a, uECC_Curve curve) {
     uECC_word_t f0[num_words_secp224r1];
     uECC_word_t d1[num_words_secp224r1];
 
-    /* s = a; using constant instead of random value */
+    /* s = a, using a constant instead of a random value */
     mod_sqrt_secp224r1_rp(d0, e0, f0, a, a);           /* RP (d0, e0, f0, c, s) */
     mod_sqrt_secp224r1_rs(d1, e1, f1, d0, e0, f0);     /* RS (d1, e1, f1, d0, e0, f0) */
     for (i = 1; i <= 95; i++) {

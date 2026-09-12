@@ -1115,7 +1115,7 @@ final class GlucoseChartStateManager: ObservableObject, @unchecked Sendable {
         }
 
         // The symbol identifies the treatment on the chart. Keep labels compact with just the
-        // amount; the treatment list and editor still show their units.
+        // amount. The treatment list and editor still show their units.
         return formatted
     }
 

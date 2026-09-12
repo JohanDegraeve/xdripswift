@@ -74,7 +74,7 @@ enum ConstantsCareLink {
     static let pollingGracePeriod: TimeInterval = 30
     static let missedDataPollingInterval: TimeInterval = 60
     static let minimumPollingInterval: TimeInterval = 20
-    /// A local deadline check only; CareLink is contacted only when `nextPollAt` is due.
+    /// A local deadline check only. CareLink is contacted only when `nextPollAt` is due.
     static let schedulerCheckInterval = minimumPollingInterval
     static let staleReadingAge: TimeInterval = 20 * 60
     static let initialRetryBackoff: TimeInterval = 15

@@ -11,7 +11,7 @@ import UIKit
 
 /// Displays active alerts and controls individual or global snooze periods.
 ///
-/// Alert state and snooze actions remain in `SnoozeViewModel`; this view owns only presentation and
+/// Alert state and snooze actions remain in `SnoozeViewModel`. This view owns only presentation and
 /// dismissal of the picker used by configurable snooze periods.
 struct SnoozeView: View {
     @StateObject private var viewModel: SnoozeViewModel
@@ -183,7 +183,7 @@ struct SnoozeView: View {
         switch snoozeStatus {
         case .allSnoozed:
             if let snoozeAllAlertsUntilDate = UserDefaults.standard.snoozeAllAlertsUntilDate {
-                // Line 1 confirms all alarms are snoozed; line 2 shows the remaining time.
+                // Line 1 confirms all alarms are snoozed. Line 2 shows the remaining time.
                 snoozeAllSwitchIsOn = true
                 bannerText = Texts_HomeView.snoozeAllSnoozed
                     + "\n"

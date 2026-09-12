@@ -600,7 +600,7 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(presentation.title, Texts_Common.Ok)
         XCTAssertEqual(presentation.color, .green)
 
-        // The service connection remains healthy; absent-pump communication flags must not turn
+        // The service connection remains healthy. Absent-pump communication flags must not turn
         // either the service or the Home therapy strip into a red disconnected-pump warning.
         snapshot.status = CareLinkStatePolicy.status(hasGlucose: true, lastReadingAt: now, pump: pump, now: now)
         XCTAssertEqual(snapshot.status, .active)

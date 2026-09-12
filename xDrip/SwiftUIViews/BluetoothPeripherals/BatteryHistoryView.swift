@@ -145,7 +145,7 @@ struct BatteryHistoryView: View {
     @State private var now = Date()
 
     private var emptyBatterySystemImage: String {
-        // The percent-suffixed battery symbols require iOS 17; keep the empty state visible on iOS 16.
+        // The percent-suffixed battery symbols require iOS 17. Keep the empty state visible on iOS 16.
         if #available(iOS 17.0, *) {
             return "battery.0percent"
         }

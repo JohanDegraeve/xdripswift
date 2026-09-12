@@ -68,7 +68,7 @@ struct CareLinkPumpStatusView: View {
 
     private var therapySection: some View {
         Section(Texts_SettingsView.careLinkTherapy) {
-            // IOB remains useful without a pump; every other therapy row describes pump delivery.
+            // IOB remains useful without a pump. Every other therapy row describes pump delivery.
             if pump.isReported {
                 row(Texts_SettingsView.careLinkDelivery, readable(pump.algorithmState))
                 row(Texts_SettingsView.careLinkReadiness, readable(pump.algorithmReadiness))

@@ -403,7 +403,7 @@ extension Calibrator {
             x1 = thirdlatest.timeStamp.toMillisecondsAsDouble()
             
             //debuglogging("latest = " + latest.log(""))
-            //debuglogging("X3 = " + x3.description + ", Y 3 = " + y3.description + ",x2 = " + x2.description + ", y2 = " + y2.description + ", x1 = " + x1.description + ", y1 = " + y1.description);
+            //debuglogging("X3 = " + x3.description + ", Y 3 = " + y3.description + ",x2 = " + x2.description + ", y2 = " + y2.description + ", x1 = " + x1.description + ", y1 = " + y1.description)
             
             bgReading.a = y1/((x1-x2)*(x1-x3))+y2/((x2-x1)*(x2-x3))+y3/((x3-x1)*(x3-x2))
             bgReading.b = (-y1*(x2+x3)/((x1-x2)*(x1-x3))-y2*(x1+x3)/((x2-x1)*(x2-x3))-y3*(x1+x2)/((x3-x1)*(x3-x2)))

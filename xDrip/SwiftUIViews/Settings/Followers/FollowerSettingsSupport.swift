@@ -224,7 +224,7 @@ enum FollowerSettingsRows {
                         guard alias != UserDefaults.standard.followerPatientName else { return }
                         UserDefaults.standard.followerPatientName = alias
                         // The alias itself is private and may identify a patient. Record only whether
-                        // it was set or removed; never pass the entered text to trace or troubleshooting.
+                        // it was set or removed. Never pass the entered text to trace or troubleshooting.
                         trace(
                             "patient alias was %{public}@",
                             log: log,

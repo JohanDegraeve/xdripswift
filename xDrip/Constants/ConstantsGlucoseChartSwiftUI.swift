@@ -124,7 +124,7 @@ enum ConstantsGlucoseChartSwiftUI {
     static let yAxisUpperContextGridLinesInMgDl = [150.0, 200.0, 250.0, 300.0, 350.0, 400.0]
     static let yAxisMainChartObjectiveLabelFontSize: CGFloat = 15
     static let yAxisMainChartSecondaryLabelFontSize: CGFloat = 14
-    // the main y-axis keeps a fixed trailing lane for each unit; mmol/L needs room for
+    // the main y-axis keeps a fixed trailing lane for each unit. Values in mmol/L need room for
     // four-character labels such as "10.0", while mg/dL normally uses three digits
     static let yAxisMainChartLabelWidthInMgDl: CGFloat = 30
     static let yAxisMainChartLabelWidthInMmol: CGFloat = 38

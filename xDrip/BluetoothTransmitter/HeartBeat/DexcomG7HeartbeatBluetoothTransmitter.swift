@@ -33,7 +33,7 @@ class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter, StandardBatte
     /// when was the last heartbeat
     private var timeStampOfLastHeartBeat: Date
 
-    /// Optional standard Battery Service state; absence remains silent.
+    /// Optional standard Battery Service state. Absence remains silent.
     private(set) var batteryLevel: Int?
     private var batteryLevelCharacteristic: CBCharacteristic?
 

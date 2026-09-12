@@ -61,7 +61,7 @@ public enum TimeInRangeType: Int, CaseIterable {
     /// Statistics used to convert every reading into the display unit and compare it with rounded
     /// mmol/L limits such as 3.9. That can classify a stored value of exactly 70 mg/dL differently
     /// from report and landscape analytics, which compare in mg/dL. Calculations now remain in the
-    /// canonical unit; `lowerLimit` above is retained solely for user-facing text.
+    /// canonical unit. `lowerLimit` above is retained solely for user-facing text.
     var lowerLimitInMgDl: Double {
         switch self {
         case .standardRange, .tightRange:

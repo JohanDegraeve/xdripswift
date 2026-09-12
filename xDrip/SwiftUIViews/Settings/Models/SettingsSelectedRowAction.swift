@@ -83,12 +83,12 @@ enum SettingsSelectedRowAction {
  None. The cell does not have any accessory view. This is the default value.
  
  Disclosure indicator. Is a grey arrow, it usually opens a new table with settings
- When this element is present, users know they can tap anywhere in the row to see the next level in the hierarchy or the choices associated with the list item. Use a disclosure indicator in a row when selecting the row results in the display of another list. Don’t use a disclosure indicator to reveal detailed information about the list item; instead, use a detail disclosure button for this purpose.
+ When this element is present, users know they can tap anywhere in the row to see the next level in the hierarchy or the choices associated with the list item. Use a disclosure indicator in a row when selecting the row results in the display of another list. Don’t use a disclosure indicator to reveal detailed information about the list item. Instead, use a detail disclosure button for this purpose.
  
  Detail Button. Is an i in a circle
  
  Detail disclosure button. Is a grey arrow and an i in a cirlce (it's a button and a disclosure)
- Users tap this element to see detailed information about the list item. (Note that you can use this element in views other than table views, to reveal additional details about something; see “Detail Disclosure Buttons” for more information.) In a table view, use a detail disclosure button in a row to display details about the list item. Note that the detail disclosure button, unlike the disclosure indicator, can perform an action that is separate from the selection of the row. For example, in Phone Favorites, tapping the row initiates a call to the contact; tapping the detail disclosure button in the row reveals more information about the contact.
+ Users tap this element to see detailed information about the list item. (Note that you can use this element in views other than table views, to reveal additional details about something. See “Detail Disclosure Buttons” for more information.) In a table view, use a detail disclosure button in a row to display details about the list item. Note that the detail disclosure button, unlike the disclosure indicator, can perform an action that is separate from the selection of the row. For example, in Phone Favorites, tapping the row initiates a call to the contact. Tapping the detail disclosure button in the row reveals more information about the contact.
  
  Checkmark. It's just a checkmark, a kind of v
  */

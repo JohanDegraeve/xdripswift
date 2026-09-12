@@ -180,7 +180,7 @@ struct TroubleshootingLogView: View {
 
     /// Lives outside the `ScrollView` so the user can always refine or clear the query, including
     /// when the submitted text matches no entries. Editing does not repeatedly rebuild a covered
-    /// list; the keyboard Search action applies the completed query and then reveals the results.
+    /// list. The keyboard Search action applies the completed query and then reveals the results.
     private var filterField: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
@@ -372,7 +372,7 @@ struct TroubleshootingLogView: View {
             case .failed, .permissionDenied:
                 return "exclamationmark.applewatch"
             case .succeeded, .recovered:
-                // The checked Watch symbol requires iOS 17; the event text still describes success on iOS 16.
+                // The checked Watch symbol requires iOS 17. The event text still describes success on iOS 16.
                 if #available(iOS 17.0, *) {
                     return "checkmark.applewatch"
                 }
@@ -499,7 +499,7 @@ struct TroubleshootingLogView: View {
     }
 }
 
-/// Lightweight presentation grouping only; it is never persisted as a second history format.
+/// Lightweight presentation grouping only. It is never persisted as a second history format.
 private struct TroubleshootingLogDayGroup: Identifiable {
     let day: Date
     var entries: [TroubleshootingLogEntry]

@@ -268,7 +268,7 @@ public class HealthKitManager: NSObject {
     
     private func saveBgReadingInHealthKit(bgReading: BgReadingSnapshot, bloodGlucoseType: HKQuantityType, bloodGlucoseUnit: HKUnit, shouldUpdateLatestTimeStamp: Bool) {
         // Replacement queries also call this from HealthKit's callback queue.
-        // Keep bookkeeping on main; synchronously waiting for a queue that writes
+        // Keep bookkeeping on main. Synchronously waiting for a queue that writes
         // UserDefaults can deadlock against a main-queue defaults observer.
         if !Thread.isMainThread {
             DispatchQueue.main.async { [weak self] in

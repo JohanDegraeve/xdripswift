@@ -114,7 +114,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     private let client: CareLinkClient
     private let state: CareLinkAccountState
     private let therapyImporter: CareLinkTherapyImporting
-    /// The root-owned shared keep-alive engine; CareLink registers only after authentication and
+    /// The root-owned shared keep-alive engine. CareLink registers only after authentication and
     /// never connects an audio lifecycle event or replay tick to its polling API.
     private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
     /// Allows wiring tests to reconcile authenticated state without starting follower networking.
@@ -276,8 +276,8 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
             return
         }
         let now = Date()
-        // In Heartbeat mode recurring `download()` calls come from the root Bluetooth callback;
-        // foreground and user refreshes use `refreshNow()`. A real five-minute wake-up must not be
+        // In Heartbeat mode recurring `download()` calls come from the root Bluetooth callback.
+        // Foreground and user refreshes use `refreshNow()`. A real five-minute wake-up must not be
         // rejected by the scheduler's additional 30-second server-upload grace period.
         let isHeartbeatModePoll = !force && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat
         let regularPollIsDue = nextPollAt.map { now >= $0 } ?? true
@@ -359,7 +359,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
 
     // MARK: - Settings actions
 
-    /// Starts Medtronic's CarePartner OAuth login; stored fields are optional page prefill only.
+    /// Starts Medtronic's CarePartner OAuth login. Stored fields are optional page prefill only.
     func logIn() {
         trace(
             "user requested CareLink login",
@@ -702,7 +702,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
 
     /// Completes the glucose transaction before starting persistence that is not required to show
     /// the current reading or calculate the next request. Physical-device logs on 18 August 2026
-    /// showed valid CareLink responses waiting inside therapy import for up to 38 minutes; because
+    /// showed valid CareLink responses waiting inside therapy import for up to 38 minutes. Because
     /// that work still owned `pollTask`, heartbeat wakeups could not start the next due request.
     @MainActor
     private func publishSuccessfulPoll(
@@ -919,7 +919,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
     /// The first timestamp-aligned implementation recreated a one-shot `Timer` after every poll.
     /// Live background testing on 16 August 2026 showed one such timer disappear while unrelated
     /// app work continued. Keeping one scheduler alive means an early, delayed or missed check does
-    /// not discard the only future opportunity; the next check still observes the same deadline.
+    /// not discard the only future opportunity. The next check still observes the same deadline.
     @MainActor
     private func scheduleNewDownload(latestReadingAt: Date?, lastDataUpdateAt: Date?, generation: Int) {
         guard pollIsCurrentOnMain(generation) else { return }
@@ -941,7 +941,7 @@ final class CareLinkFollowManager: NSObject, CareLinkControlling {
         )
     }
 
-    /// Starts one persistent local scheduler; its checks never imply a CareLink request.
+    /// Starts one persistent local scheduler. Its checks never imply a CareLink request.
     ///
     /// `requestPoll` remains the sole network gate and compares `nextPollAt` before doing work. The
     /// scheduler therefore checks locally every 20 seconds while normal CareLink traffic remains

@@ -786,7 +786,7 @@ public class AlertManager: NSObject {
         let (alertNeeded, alertBody, alertTitle, delayInSeconds) = alertKind.alertNeeded(currentAlertEntry: currentAlertEntry, nextAlertEntry: nextAlertEntry, lastBgReading: lastBgReading, lastButOneBgReading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo, deviceStatus: deviceStatus)
 
         // A low initial Voltage B is not trustworthy during the configured initial period of Dexcom
-        // hardware life. G5/G6/ONE use the transmitter start date; G7/ONE+/Stelo use the sensor
+        // hardware life. G5/G6/ONE use the transmitter start date. G7/ONE+/Stelo use the sensor
         // start date. This gate affects only notification firing. The raw response remains available
         // to device details, Battery History, Loop metadata and Nightscout.
         if alertNeeded,

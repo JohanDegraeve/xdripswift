@@ -463,7 +463,7 @@ struct RootTabView: View {
             }
         }
         .sheet(item: $stateModel.pickerData) { pickerData in
-            // Root-level requests are alerts; the preference changes their scale, not their actions.
+            // Root-level requests are alerts. The preference changes their scale, not their actions.
             if UserDefaults.standard.preferLargeSnoozeScreen {
                 LargeSnoozePickerView(pickerData: pickerData)
                     .colorScheme(.dark)
@@ -867,7 +867,7 @@ private struct RootHomeTabView: View {
 ///
 /// Keeping the overlay mounted when visual dimming is disabled gives the transparent presentation
 /// exactly the same touch handling as the visibly dimmed presentations. iPhone landscape absorbs
-/// touches without unlocking; rotating back to portrait restores the established tap-to-unlock.
+/// touches without unlocking. Rotating back to portrait restores the established tap-to-unlock.
 private struct RootScreenLockOverlay: View {
     @ObservedObject var stateModel: RootHomeStateModel
     let allowsTapToUnlock: Bool

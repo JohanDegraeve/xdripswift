@@ -83,7 +83,7 @@ enum CareLinkConnectionStatus: String, Codable {
     }
 }
 
-/// Optional convenience values for Medtronic's page; OAuth never uses them in API requests.
+/// Optional convenience values for Medtronic's page. OAuth never uses them in API requests.
 struct CareLinkLoginPrefill: Equatable {
     let username: String?
     let password: String?

@@ -56,20 +56,20 @@ Refer to [LoopDocs: Make a Secrets Reference File](https://loopkit.github.io/loo
 
 ## Generate App Store Connect API Key
 
-This step is common for all GitHub Browser Builds; do this step only once. You will be saving 4 Secrets from your Apple Account in this step.
+This step is common for all GitHub Browser Builds. Do this step only once. You will be saving 4 Secrets from your Apple Account in this step.
 
 1. Sign in to the [Apple developer portal page](https://developer.apple.com/account/resources/certificates/list).
 1. Copy the Team ID from the upper right of the screen. Record this as your `TEAMID`.
 1. Go to the [App Store Connect](https://appstoreconnect.apple.com/access/api) interface, click the "Keys" tab, and create a new key with "Admin" access. Give it the name: "FastLane API Key".
-1. Record the issuer id; this will be used for `FASTLANE_ISSUER_ID`.
-1. Record the key id; this will be used for `FASTLANE_KEY_ID`.
+1. Record the issuer id. This will be used for `FASTLANE_ISSUER_ID`.
+1. Record the key id. This will be used for `FASTLANE_KEY_ID`.
 1. Download the API key itself, and open it in a text editor. The contents of this file will be used for `FASTLANE_KEY`. Copy the full text, including the "-----BEGIN PRIVATE KEY-----" and "-----END PRIVATE KEY-----" lines.
 
 ## Create GitHub Personal Access Token
 
 If you have previously built another app using the "browser build" method, you use the same personal access token (`GH_PAT`), so skip this step. If you use a free GitHub organization to build, you still use the same personal access token. This is created using your personal GitHub username.
 
-Log into your GitHub account to create a personal access token; this is one of two GitHub secrets needed for your build.
+Log into your GitHub account to create a personal access token. This is one of two GitHub secrets needed for your build.
 
 1. Create a [new personal access token](https://github.com/settings/tokens/new):
     * Enter a name for your token, use "FastLane Access Token".
@@ -86,7 +86,7 @@ The first time you build with the GitHub Browser Build method for any DIY app, y
 
 ## Setup GitHub Match-Secrets Repository
 
-A private Match-Secrets repository is automatically created under your GitHub username the first time you run a GitHub Action. Because it is a private repository - only you can see it. You will not take any direct actions with this repository; it needs to be there for GitHub to use as you progress through the steps.
+A private Match-Secrets repository is automatically created under your GitHub username the first time you run a GitHub Action. Because it is a private repository - only you can see it. You will not take any direct actions with this repository. It needs to be there for GitHub to use as you progress through the steps.
 
 ## Setup GitHub xdripswift Repository
 
@@ -146,7 +146,7 @@ If you have already built Trio or xDrip4iOS via Xcode using this Apple ID, you c
 
 Note 1 - If you previously built with Xcode, the `Names` listed below may be different, but the `Identifiers` will match. A table is provided below the steps to assist. The Add Identifier Action that you completed above generates 5 identifiers, and all 5 need to be modified as indicated in this step.
 
-Note 2 - Depending on your build history, you may find some of the Identifiers are already configured - and you are just verifying the status; but in other cases, you will need to configure the Identifiers.
+Note 2 - Depending on your build history, you may find some of the Identifiers are already configured - and you are just verifying the status, but in other cases, you will need to configure the Identifiers.
 
 1. Go to [Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources/identifiers/list) on the apple developer site.
 1. For each of the following identifier names:
@@ -183,7 +183,7 @@ If you have created a Xdrip4iOS app in App Store Connect before, you can skip th
     * Select a name: this will have to be unique, so you may have to try a few different names here, but it will not be the name you see on your phone, so it's not that important.
     * Select your primary language.
     * Choose the bundle ID that matches `com.TEAMID.xdripswift`, with TEAMID matching your team id.
-    * SKU can be anything; e.g. "123".
+    * SKU can be anything, e.g. "123".
     * Select "Full Access".
 1. Click Create
 
@@ -200,7 +200,7 @@ You do not need to fill out the next form. That is for submitting to the app sto
 >
 > * generates a new Distribution Certificate if needed, or uses the existing one
 > * generates new profiles if needed, or uses existing ones
-> * creates credentials used during building if needed, or uses existing ones; these are stored in your Match-Secrets repository using the your MATCH_PASSWORD as the passphrase
+> * creates credentials used during building if needed, or uses existing ones. These are stored in your Match-Secrets repository using the your MATCH_PASSWORD as the passphrase
 
 ### Annual Certificate Renewal
 
@@ -246,7 +246,7 @@ If a GitHub repository has no activity (no commits are made) in 60 days, then Gi
 
 The updated `build_xdrip.yml` file uses a special branch called `alive` and adds a dummy commit to the `alive` branch at regular intervals. This "trick" keeps the Actions enabled so the automated build works.
 
-The branch `alive` is created automatically for you. Do not delete or rename it! Do not modify `alive` yourself; it is not used for building the app.
+The branch `alive` is created automatically for you. Do not delete or rename it! Do not modify `alive` yourself. It is not used for building the app.
 
 ## OPTIONAL
 
@@ -308,9 +308,9 @@ Note that the weekly and monthly Build xDrip4iOS actions will continue, but the 
   
 Your build will run on the following conditions:
 - Default behaviour:
-    - Run weekly, every Wednesday at 08:00 UTC to check for changes; if there are changes, it will update your repository and build
-    - Run monthly, every first of the month at 06:00 UTC, if there are changes, it will update your repository; regardless of changes, it will build
+    - Run weekly, every Wednesday at 08:00 UTC to check for changes. If there are changes, it will update your repository and build
+    - Run monthly, every first of the month at 06:00 UTC, if there are changes, it will update your repository. Regardless of changes, it will build
     - Each time the action runs, it makes a keep-alive commit to the `alive` branch if necessary
 - If you disable any automation (both variables set to `false`), no updates, keep-alive or building happens when Build xDrip4iOS runs
-- If you disabled just scheduled synchronization (`SCHEDULED_SYNC` set to`false`), it will only run once a month, on the first of the month, no update will happen; keep-alive will run
-- If you disabled just scheduled build (`SCHEDULED_BUILD` set to`false`), it will run once weekly, every Wednesday, to check for changes; if there are changes, it will update and build; keep-alive will run
+- If you disabled just scheduled synchronization (`SCHEDULED_SYNC` set to`false`), it will only run once a month, on the first of the month, no update will happen. Keep-alive will run
+- If you disabled just scheduled build (`SCHEDULED_BUILD` set to`false`), it will run once weekly, every Wednesday, to check for changes. If there are changes, it will update and build. Keep-alive will run

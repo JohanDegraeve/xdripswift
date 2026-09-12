@@ -789,7 +789,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     private func updateComplicationData() {
         guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else { return }
 
-        // Do not leave stale glucose behind the warning when disabled; complications may remain
+        // Do not leave stale glucose behind the warning when disabled. Complications may remain
         // visible long after watchOS stops receiving updates from the phone.
         let complicationBgReadingValues = keepAliveIsDisabled ? [] : bgReadingValues
         let complicationBgReadingDates = keepAliveIsDisabled ? [] : bgReadingDates

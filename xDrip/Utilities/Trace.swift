@@ -72,7 +72,7 @@ fileprivate var traceFileName:URL?
 ///   - category: Category text retained in NSLog and trace-file output.
 ///   - type: Developer log severity.
 ///   - troubleshooting: Optional typed, consumer-safe fact. This is the only bridge to the consumer
-///     store; `message`, variadic arguments, URLs and `Error` values never cross that boundary.
+///     store. `message`, variadic arguments, URLs and `Error` values never cross that boundary.
 ///   - args: Developer formatting arguments, with the existing maximum of ten.
 ///
 /// Existing call sites need no changes. A call opts in only when it can construct a safe typed entry.

@@ -2891,7 +2891,7 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
     }
     
     /// Enforces the configured warm-up boundary independently of the value carried in a packet.
-    /// A G7 can expose positive internal glucose estimates before warm-up completes; those values
+    /// A G7 can expose positive internal glucose estimates before warm-up completes. Those values
     /// are not displayable readings and must not reach storage, alerts, widgets, Watch, or AID.
     static func shouldSuppressReadingDuringWarmup(
         sensorAgeInSeconds: TimeInterval,
@@ -2970,7 +2970,7 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
                     category: ConstantsLog.categoryRootView,
                     type: .info,
                     // Reuse the existing once-per-hour calculation. Only aggregate counts and the
-                    // bounded analysis window enter the shareable log; no transmitter identity does.
+                    // bounded analysis window enter the shareable log. No transmitter identity does.
                     troubleshooting: .standard(.transmitterReadSuccess(
                         percent: roundedSuccess,
                         missedReadings: missedReadings,

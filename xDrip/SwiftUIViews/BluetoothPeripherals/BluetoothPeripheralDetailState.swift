@@ -1012,7 +1012,7 @@ private extension BluetoothPeripheralDetailState {
         bluetoothPeripheralManager.deleteBluetoothPeripheral(bluetoothPeripheral: bluetoothPeripheral)
 
         // Deleting a configured CGM is a distinct user action from merely disconnecting it. CGMs use
-        // the controlled family name; other supported devices use the bounded display name requested
+        // the controlled family name. Other supported devices use the bounded display name requested
         // for the user-facing log. Addresses, aliases, and transmitter IDs remain developer-only.
         if let troubleshootingSource {
             trace(
@@ -3026,7 +3026,7 @@ extension BluetoothPeripheralDetailState: BluetoothTransmitterDelegate {
 
     func didUpdateBatteryLevel(_ batteryLevel: Int, bluetoothTransmitter: BluetoothTransmitter) {
         bluetoothPeripheralManager?.didUpdateBatteryLevel(batteryLevel, bluetoothTransmitter: bluetoothTransmitter)
-        // The manager persists the genuine reading against this peripheral; then rebuild the rows so
+        // The manager persists the genuine reading against this peripheral. Then rebuild the rows so
         // the optional Battery section appears as soon as a supported device returns a value.
         refreshOnMain()
     }

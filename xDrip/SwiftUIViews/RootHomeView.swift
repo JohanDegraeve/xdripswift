@@ -450,7 +450,7 @@ struct RootHomeView: View {
     }
 
     /// The iPad Home screen is a vertical clinical dashboard in every orientation. Rotation only
-    /// changes section proportions; it never trades chart width for an independent status rail.
+    /// changes section proportions. It never trades chart width for an independent status rail.
     @ViewBuilder
     private func ipadContent(size: CGSize) -> some View {
         if size.width > size.height {
