@@ -547,11 +547,39 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             return makeM5StackSections(bluetoothPeripheral: bluetoothPeripheral, includesSpecificM5StackSection: true)
         case .M5StickCType:
             return makeM5StackSections(bluetoothPeripheral: bluetoothPeripheral, includesSpecificM5StackSection: false)
-        case .Libre3HeartBeatType, .DexcomG7HeartBeatType:
+        case .Libre3HeartBeatType:
+            return makeHeartbeatBatterySections() + makeGenericHeartbeatSettingsSections()
+        case .DexcomG7HeartBeatType:
             return makeHeartbeatBatterySections()
         case .OmniPodHeartBeatType:
             return []
         }
+    }
+
+    /// Keep the device choice simple; subscription details remain available in the trace.
+    private func makeGenericHeartbeatSettingsSections() -> [BluetoothPeripheralDetailSection] {
+        guard let address = bluetoothPeripheral?.blePeripheral.address else { return [] }
+        let settings = GenericHeartbeatSettings.load(address)
+        let modes = GenericHeartbeatSettings.Mode.allCases
+        let rows = [row(id: "heartbeat-mode", title: heartbeatText("mode"), detail: settings.mode.title, showsDisclosure: true, action: { [weak self] in
+            self?.presentSelectionListView(BluetoothPeripheralSelectionList(title: heartbeatText("mode"), explanation: heartbeatText("simpleFooter"), data: modes.map(\.title), selectedRow: modes.firstIndex(of: settings.mode)) { [weak self] index in
+                var updated = GenericHeartbeatSettings.load(address)
+                updated.mode = modes[index]
+                self?.saveHeartbeatSettings(updated, address: address)
+            })
+        })]
+        return [BluetoothPeripheralDetailSection(id: "heartbeat-subscriptions", title: heartbeatText("title"), footer: settings.mode.explanation, rows: rows)]
+    }
+
+    /// Saving does not disturb the live Bluetooth session. The next connection reads the new mode.
+    private func saveHeartbeatSettings(_ settings: GenericHeartbeatSettings, address: String) {
+        let previous = GenericHeartbeatSettings.load(address)
+        guard settings != previous else { return }
+        settings.save(address)
+        // Record the saved choice in both support logs. The transmitter logs the applied mode
+        // separately when the next connection begins; saving here never triggers a reconnect.
+        trace("Generic heartbeat settings changed: %{public}@ -> %{public}@", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info, troubleshooting: .standard(.configuration(.heartbeatSubscriptionsChanged(previous: previous.mode.logDescription, updated: settings.mode.logDescription))), previous.mode.logDescription, settings.mode.logDescription)
+        refresh()
     }
 
     private func row(

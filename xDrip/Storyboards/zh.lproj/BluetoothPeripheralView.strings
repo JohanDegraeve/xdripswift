@@ -248,5 +248,13 @@
 "signalStrengthWeak" = "弱";
 "signalStrengthStrong" = "强";
 "signalStrengthLastMeasurement" = "上次测量";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "订阅";
+"heartbeat.mode" = "订阅模式";
+"heartbeat.mode.automatic" = "单一";
+"heartbeat.mode.all" = "全部";
+"heartbeat.footer.automatic" = "自动选择一个受支持的蓝牙通道来接收心跳更新，将订阅数量保持在最低限度。如果订阅失败，将尝试其他通道。";
+"heartbeat.footer.all" = "订阅所有受支持的蓝牙通道，使任意通道的更新都能提供心跳。";
+"heartbeat.simpleFooter" = "更改在下次连接时生效。";
 
 "signalStrengthDisconnected" = "已断开连接";

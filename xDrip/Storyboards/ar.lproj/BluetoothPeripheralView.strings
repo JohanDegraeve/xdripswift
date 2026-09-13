@@ -172,5 +172,13 @@
 "signalStrengthWeak" = "ضعيفة";
 "signalStrengthStrong" = "قوية";
 "signalStrengthLastMeasurement" = "آخر قياس";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "الاشتراكات";
+"heartbeat.mode" = "وضع الاشتراك";
+"heartbeat.mode.automatic" = "واحد";
+"heartbeat.mode.all" = "الكل";
+"heartbeat.footer.automatic" = "يختار تلقائيًا قناة Bluetooth مدعومة واحدة لتحديثات النبض، مع تقليل الاشتراكات إلى الحد الأدنى. إذا فشل الاشتراك، تُجرَّب قناة أخرى.";
+"heartbeat.footer.all" = "يشترك في جميع قنوات Bluetooth المدعومة، مما يسمح لتحديثات أي منها بتوفير نبض.";
+"heartbeat.simpleFooter" = "تُطبَّق التغييرات عند الاتصال التالي.";
 
 "signalStrengthDisconnected" = "غير متصل";

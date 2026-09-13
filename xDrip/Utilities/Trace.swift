@@ -675,6 +675,10 @@ class Trace {
                         if blePeripheral.libre2heartbeat != nil {
                             
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            // Report this device's saved choice; an existing connection may still use
+                            // the previous mode until it reconnects, as recorded in the session trace.
+                            let subscriptions = GenericHeartbeatSettings.load(blePeripheral.address).mode
+                            traceInfo.appendStringAndNewLine("        Heartbeat subscriptions (configured): " + subscriptions.logDescription)
                             
                         }
                         

@@ -406,6 +406,7 @@ struct TroubleshootingLogView: View {
             case .credentialChanged: return "key.fill"
             case .followerVersionChanged: return "number.circle.fill"
             case .postProcessingSettings: return "waveform.path.ecg.rectangle"
+            case .heartbeatSubscriptionsChanged: return "antenna.radiowaves.left.and.right"
             }
         case let .dataManagement(activity):
             switch activity {

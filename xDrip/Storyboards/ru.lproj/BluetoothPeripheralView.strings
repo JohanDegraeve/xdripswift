@@ -175,5 +175,13 @@
 "signalStrengthWeak" = "Слабый";
 "signalStrengthStrong" = "Сильный";
 "signalStrengthLastMeasurement" = "Последнее измерение";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Подписки";
+"heartbeat.mode" = "Режим подписки";
+"heartbeat.mode.automatic" = "Одна";
+"heartbeat.mode.all" = "Все";
+"heartbeat.footer.automatic" = "Автоматически выбирает один поддерживаемый канал Bluetooth для сигналов heartbeat, сводя число подписок к минимуму. Если подписка не удаётся, пробует другой канал.";
+"heartbeat.footer.all" = "Подписывается на все поддерживаемые каналы Bluetooth, чтобы обновления любого из них могли служить сигналом heartbeat.";
+"heartbeat.simpleFooter" = "Изменения вступят в силу при следующем подключении.";
 
 "signalStrengthDisconnected" = "Отключено";

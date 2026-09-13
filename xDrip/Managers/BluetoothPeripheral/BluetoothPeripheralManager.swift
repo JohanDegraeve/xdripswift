@@ -1321,6 +1321,11 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
             return
         }
 
+        // Remove the per-device subscription choice so re-adding this address starts with defaults.
+        if bluetoothPeripheral.bluetoothPeripheralType() == .Libre3HeartBeatType {
+            GenericHeartbeatSettings.remove(bluetoothPeripheral.blePeripheral.address)
+        }
+
         if let dexcomG7 = bluetoothPeripheral as? DexcomG7 {
             let transmitterIDs = Set([
                 dexcomG7.blePeripheral.name,

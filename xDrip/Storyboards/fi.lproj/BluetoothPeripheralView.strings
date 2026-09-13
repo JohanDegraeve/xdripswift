@@ -181,5 +181,13 @@
 "signalStrengthWeak" = "Heikko";
 "signalStrengthStrong" = "Voimakas";
 "signalStrengthLastMeasurement" = "Viimeisin mittaus";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Tilaukset";
+"heartbeat.mode" = "Tilaustila";
+"heartbeat.mode.automatic" = "Yksi";
+"heartbeat.mode.all" = "Kaikki";
+"heartbeat.footer.automatic" = "Valitsee automaattisesti yhden tuetun Bluetooth-kanavan heartbeat-päivityksiä varten ja pitää tilausten määrän pienenä. Jos tilaus epäonnistuu, kokeillaan toista kanavaa.";
+"heartbeat.footer.all" = "Tilaa kaikki tuetut Bluetooth-kanavat, jolloin minkä tahansa kanavan päivitys voi tuottaa heartbeat-signaalin.";
+"heartbeat.simpleFooter" = "Muutokset tulevat voimaan seuraavassa yhteydessä.";
 
 "signalStrengthDisconnected" = "Yhteys katkaistu";

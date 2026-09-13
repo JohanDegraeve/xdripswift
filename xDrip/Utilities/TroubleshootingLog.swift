@@ -544,6 +544,7 @@ enum TroubleshootingConfigurationActivity: Codable, Equatable {
     case credentialChanged(source: TroubleshootingLogSource, field: TroubleshootingCredentialField, isSet: Bool)
     case followerVersionChanged(source: TroubleshootingLogSource, previousVersion: String, newVersion: String)
     case postProcessingSettings(TroubleshootingPostProcessingSettings)
+    case heartbeatSubscriptionsChanged(previous: String, updated: String)
 }
 
 enum TroubleshootingDataManagementActivity: Codable, Equatable {
@@ -2162,6 +2163,8 @@ struct TroubleshootingLogReportBuilder {
                 return "\(source.name) \(fieldName) was \(isSet ? "changed" : "removed")."
             case let .followerVersionChanged(source, previousVersion, newVersion):
                 return "\(source.name) versions changed by user from \(previousVersion) to \(newVersion)."
+            case let .heartbeatSubscriptionsChanged(previous, updated):
+                return "Generic heartbeat subscriptions changed by user from \(previous) to \(updated)."
             case let .postProcessingSettings(settings):
                 let adjustment: String
                 if settings.adjustmentEnabled,

@@ -172,5 +172,13 @@
 "signalStrengthWeak" = "Zayıf";
 "signalStrengthStrong" = "Güçlü";
 "signalStrengthLastMeasurement" = "Son ölçüm";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Abonelikler";
+"heartbeat.mode" = "Abonelik modu";
+"heartbeat.mode.automatic" = "Tek";
+"heartbeat.mode.all" = "Tümü";
+"heartbeat.footer.automatic" = "Abonelikleri en aza indirerek heartbeat güncellemeleri için desteklenen bir Bluetooth kanalını otomatik seçer. Abonelik başarısız olursa başka bir kanal denenir.";
+"heartbeat.footer.all" = "Desteklenen tüm Bluetooth kanallarına abone olur; herhangi birinden gelen güncellemeler heartbeat sağlayabilir.";
+"heartbeat.simpleFooter" = "Değişiklikler sonraki bağlantıda uygulanır.";
 
 "signalStrengthDisconnected" = "Bağlantı kesildi";

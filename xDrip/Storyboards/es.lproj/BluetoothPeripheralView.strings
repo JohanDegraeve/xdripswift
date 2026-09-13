@@ -179,5 +179,13 @@
 "signalStrengthWeak" = "Débil";
 "signalStrengthStrong" = "Fuerte";
 "signalStrengthLastMeasurement" = "Última medición";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Suscripciones";
+"heartbeat.mode" = "Modo de suscripción";
+"heartbeat.mode.automatic" = "Única";
+"heartbeat.mode.all" = "Todas";
+"heartbeat.footer.automatic" = "Selecciona automáticamente un canal Bluetooth compatible para recibir latidos, manteniendo las suscripciones al mínimo. Si la suscripción falla, se prueba otro canal.";
+"heartbeat.footer.all" = "Se suscribe a todos los canales Bluetooth compatibles, permitiendo que las actualizaciones de cualquiera de ellos proporcionen un latido.";
+"heartbeat.simpleFooter" = "Los cambios se aplican en la próxima conexión.";
 
 "signalStrengthDisconnected" = "Desconectado";

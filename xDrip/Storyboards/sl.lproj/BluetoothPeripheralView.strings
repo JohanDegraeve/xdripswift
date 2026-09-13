@@ -248,5 +248,13 @@
 "signalStrengthWeak" = "Šibek";
 "signalStrengthStrong" = "Močan";
 "signalStrengthLastMeasurement" = "Zadnja meritev";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Naročnine";
+"heartbeat.mode" = "Način naročnine";
+"heartbeat.mode.automatic" = "Ena";
+"heartbeat.mode.all" = "Vse";
+"heartbeat.footer.automatic" = "Samodejno izbere en podprt kanal Bluetooth za posodobitve heartbeat in zmanjša število naročnin. Če naročnina ne uspe, poskusi drug kanal.";
+"heartbeat.footer.all" = "Naroči se na vse podprte kanale Bluetooth, tako da lahko posodobitve katerega koli od njih zagotovijo heartbeat.";
+"heartbeat.simpleFooter" = "Spremembe veljajo ob naslednji povezavi.";
 
 "signalStrengthDisconnected" = "Povezava prekinjena";

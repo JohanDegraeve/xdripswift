@@ -156,5 +156,13 @@
 "signalStrengthWeak" = "Weak";
 "signalStrengthStrong" = "Strong";
 "signalStrengthLastMeasurement" = "Last measurement";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Subscriptions";
+"heartbeat.mode" = "Subscription mode";
+"heartbeat.mode.automatic" = "Single";
+"heartbeat.mode.all" = "All";
+"heartbeat.footer.automatic" = "Automatically selects one supported Bluetooth channel for heartbeat updates, keeping subscriptions to a minimum. If subscribing fails, another channel is tried.";
+"heartbeat.footer.all" = "Subscribes to all supported Bluetooth channels, allowing updates from any of them to provide a heartbeat.";
+"heartbeat.simpleFooter" = "Changes apply on the next connection.";
 
 "signalStrengthDisconnected" = "Disconnected";

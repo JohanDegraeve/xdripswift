@@ -172,5 +172,13 @@
 "signalStrengthWeak" = "Ασθενές";
 "signalStrengthStrong" = "Ισχυρό";
 "signalStrengthLastMeasurement" = "Τελευταία μέτρηση";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Συνδρομές";
+"heartbeat.mode" = "Λειτουργία συνδρομής";
+"heartbeat.mode.automatic" = "Μία";
+"heartbeat.mode.all" = "Όλες";
+"heartbeat.footer.automatic" = "Επιλέγει αυτόματα ένα υποστηριζόμενο κανάλι Bluetooth για ενημερώσεις heartbeat, περιορίζοντας τις συνδρομές στο ελάχιστο. Αν η συνδρομή αποτύχει, δοκιμάζεται άλλο κανάλι.";
+"heartbeat.footer.all" = "Εγγράφεται σε όλα τα υποστηριζόμενα κανάλια Bluetooth, ώστε ενημερώσεις από οποιοδήποτε να παρέχουν heartbeat.";
+"heartbeat.simpleFooter" = "Οι αλλαγές ισχύουν στην επόμενη σύνδεση.";
 
 "signalStrengthDisconnected" = "Αποσυνδέθηκε";
