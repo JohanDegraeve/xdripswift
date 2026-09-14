@@ -48,7 +48,6 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     private let presentTextEntryView: (BluetoothPeripheralTextEntry) -> Void
     private let presentSelectionListView: (BluetoothPeripheralSelectionList) -> Void
     private let presentReadSuccessView: (TransmitterReadSuccessDisplay, BluetoothPeripheralType) -> Void
-    private let presentDangerousConfirmation: (BluetoothPeripheralDangerousConfirmation) -> Void
 
     var onlineHelpTopic: OnlineHelpTopic {
         expectedBluetoothPeripheralType.onlineHelpTopic
@@ -93,8 +92,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         closeDetailView: @escaping () -> Void,
         presentTextEntryView: @escaping (BluetoothPeripheralTextEntry) -> Void,
         presentSelectionListView: @escaping (BluetoothPeripheralSelectionList) -> Void,
-        presentReadSuccessView: @escaping (TransmitterReadSuccessDisplay, BluetoothPeripheralType) -> Void,
-        presentDangerousConfirmation: @escaping (BluetoothPeripheralDangerousConfirmation) -> Void
+        presentReadSuccessView: @escaping (TransmitterReadSuccessDisplay, BluetoothPeripheralType) -> Void
     ) {
         self.bluetoothPeripheral = bluetoothPeripheral
         self.expectedBluetoothPeripheralType = expectedBluetoothPeripheralType
@@ -106,7 +104,6 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         self.presentTextEntryView = presentTextEntryView
         self.presentSelectionListView = presentSelectionListView
         self.presentReadSuccessView = presentReadSuccessView
-        self.presentDangerousConfirmation = presentDangerousConfirmation
         self.transmitterIdTempValue = bluetoothPeripheral?.blePeripheral.transmitterId
         self.dexcomG6BluetoothSlot = (bluetoothPeripheral as? DexcomG5)?
             .resolvedDexcomG6BluetoothSlot() ?? .defaultSlot
@@ -1693,36 +1690,6 @@ struct BluetoothPeripheralDetailAlert: Identifiable {
 }
 
 /// Text-entry route supplied by transmitter-specific configuration logic.
-/// A warning screen for an action that can break something that works now, like stopping
-/// or re-activating a running sensor. The Confirm button is disabled for a few seconds and
-/// counts down, so nobody can tap through the warning without reading it, as happens with
-/// a normal "Continue?" alert.
-struct BluetoothPeripheralDangerousConfirmation: Identifiable {
-    let id = UUID()
-    let title: String
-    let message: String
-    let confirmTitle: String
-    let cancelTitle: String
-    let countdownSeconds: Int
-    let action: () -> Void
-
-    init(
-        title: String,
-        message: String,
-        confirmTitle: String = "Confirm",
-        cancelTitle: String = Texts_Common.Cancel,
-        countdownSeconds: Int = 5,
-        action: @escaping () -> Void
-    ) {
-        self.title = title
-        self.message = message
-        self.confirmTitle = confirmTitle
-        self.cancelTitle = cancelTitle
-        self.countdownSeconds = countdownSeconds
-        self.action = action
-    }
-}
-
 struct BluetoothPeripheralTextEntry: Identifiable {
     let id = UUID()
     let title: String?
@@ -2394,6 +2361,9 @@ private extension BluetoothPeripheralDetailState {
             accountDetail = "Tap to sign in"
         }
 
+        // The sensor's command byte is the truth about its state (-1 = not read yet).
+        let commandStatus = ottaiTransmitter(for: ottai)?.sensorCommandStatus ?? -1
+
         // After activation, show when the sensor started and until when it is valid.
         // The start is the confirmed activation time, or the provisional one (marked ~).
         var sensorInfoRows: [BluetoothPeripheralDetailRow] = []
@@ -2405,7 +2375,6 @@ private extension BluetoothPeripheralDetailState {
                 acceptedMaxActiveMs: OttaiRegistry.loadAcceptedMaxActive(sensorId)
             )
             let endDate = startDate.addingTimeInterval(Double(lifetimeMs) / 1000.0)
-            let commandStatus = ottaiTransmitter(for: ottai)?.sensorCommandStatus ?? -1
             let approximate = materials.activeTimeMs <= 0 ? "~ " : ""
 
             let activatedDetail = approximate + startDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
@@ -2475,7 +2444,7 @@ private extension BluetoothPeripheralDetailState {
                 row(
                     id: "ottai-activate",
                     title: "Start / activate sensor",
-                    detail: OttaiRegistry.loadActivationAttempted(sensorId) ? "Activation requested" : nil,
+                    detail: ottaiActivationRowDetail(commandStatus: commandStatus, sensorId: sensorId),
                     showsDisclosure: true,
                     action: { [weak self] in self?.requestOttaiActivation(for: ottai) }
                 )
@@ -2533,6 +2502,16 @@ private extension BluetoothPeripheralDetailState {
 
     func ottaiTransmitter(for ottai: Ottai) -> CGMOttaiTransmitter? {
         bluetoothPeripheralManager?.getBluetoothTransmitter(for: ottai, createANewOneIfNecesssary: false) as? CGMOttaiTransmitter
+    }
+
+    /// What the Activate row says. The sensor's command byte wins over the saved "activation
+    /// requested" flag: after a successful start the row has to say "active", not "requested".
+    /// A row that kept saying "requested" made a user tap Activate a second time, which ended
+    /// the running sensor.
+    func ottaiActivationRowDetail(commandStatus: Int, sensorId: String) -> String? {
+        if commandStatus == 3 { return "Sensor is active ✓" }
+        if commandStatus >= 4 { return "Sensor has ended" }
+        return OttaiRegistry.loadActivationAttempted(sensorId) ? "Activation requested" : nil
     }
 
     /// Full sensor detail — start, expiry, lifetime, firmware and state — shown when the
@@ -2870,28 +2849,19 @@ private extension BluetoothPeripheralDetailState {
     }
 
     func requestOttaiActivation(for ottai: Ottai) {
-        // Like Android's Advanced "Activate", this always sends the activation. Warn the user when
-        // the sensor is already active or has ended.
+        // Like Android's Advanced "Activate", this sends the activation on request. A running
+        // or ended sensor never gets one; the transmitter refuses those too.
         let status = ottaiTransmitter(for: ottai)?.sensorCommandStatus ?? -1
-        let confirmAndActivate: () -> Void = { [weak self] in
-            guard let self = self else { return }
-            self.ottaiTransmitter(for: ottai)?.startSensor(sensorCode: nil, startDate: Date())
-            OttaiRegistry.setActivationAttempted(self.ottaiCloudId(for: ottai), true)
-            self.refresh()
-        }
 
-        // Forcing activation on a running sensor is what killed a tester's working sensor:
-        // the second activation write failed (as a first one sometimes does) and the sensor
-        // reported "ended" less than a minute later. A simple "Continue?" alert is too easy
-        // to tap through, so this one has a countdown before Confirm can be tapped.
+        // A repeated activation ended two working sensors: the RTC was rewritten, the lifetime
+        // write came back "invalid handle", and the sensor reported "ended" on the next
+        // connection. A warning with a countdown was still tapped through, so there is no
+        // "force" any more, only this explanation.
         if status == 3 {
-            presentDangerousConfirmation(BluetoothPeripheralDangerousConfirmation(
-                title: "Sensor is already running",
-                message: "This sensor is already active and gives readings. Activating it again can change its lifetime. In one case it ended a working sensor. Only do this if you know what you are doing.",
-                confirmTitle: "Force activation anyway",
-                countdownSeconds: 5,
-                action: confirmAndActivate
-            ))
+            showInfo(
+                title: "Sensor is already active",
+                message: "This sensor is running and gives readings. It cannot be activated a second time: a repeated activation has ended working sensors, so the app does not send it. Nothing needs to be done."
+            )
             return
         }
         // An ended sensor cannot be started again: the sensor refused every try in the logs
@@ -2908,7 +2878,12 @@ private extension BluetoothPeripheralDetailState {
             title: "Activate sensor",
             message: "Activation cannot be undone and starts the sensor's lifetime. Continue?",
             primaryButtonTitle: "Activate",
-            primaryAction: confirmAndActivate,
+            primaryAction: { [weak self] in
+                guard let self = self else { return }
+                self.ottaiTransmitter(for: ottai)?.startSensor(sensorCode: nil, startDate: Date())
+                OttaiRegistry.setActivationAttempted(self.ottaiCloudId(for: ottai), true)
+                self.refresh()
+            },
             secondaryButtonTitle: Texts_Common.Cancel
         )
     }

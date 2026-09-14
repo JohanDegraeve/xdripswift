@@ -287,13 +287,22 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     /// The settings screen uses it to warn before a repeated activation.
     var sensorCommandStatus: Int { commandStatus }
 
-    /// Same as `requestForceActivation()` in JugglucoNG: the user's Activate button is
-    /// always a "force" request. It also runs on a sensor that is already active, so the
-    /// user can try to extend its lifetime (the settings screen warns first). A sensor that
-    /// has ended is refused: the sensor rejected every such restart in the logs we have.
+    /// Like `requestForceActivation()` in JugglucoNG, the user's Activate button bypasses the
+    /// "start time already known" guard, so a request that got lost half-way (command sent,
+    /// sensor still says 0..2) can be repeated. Two sensor states are refused no matter what:
+    /// - running (cmd 3): a repeated activation ended two working sensors. The RTC was
+    ///   rewritten, the lifetime write came back "invalid handle", and the sensor reported
+    ///   cmd 4 on the next connection. A running sensor cannot be activated again anyway.
+    /// - ended (cmd 4+): the sensor rejected every restart in the logs we have.
+    /// While the state is not known yet (no connection, or the command byte not read), the
+    /// request is kept and runs after the next status read, and only if that says 0..2.
     func startSensor(sensorCode: String?, startDate: Date) {
         workQueue.async { [weak self] in
             guard let self = self else { return }
+            if self.commandStatus == 3 {
+                trace("activation refused — the sensor is already running (cmd=3); a repeated activation ends a working sensor", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .error)
+                return
+            }
             if self.commandStatus >= 4 {
                 trace("activation refused — the sensor has ended (cmd=%{public}d) and cannot be started again", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .error, self.commandStatus)
                 return
@@ -303,10 +312,10 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
             }
             self.activationRequested = true
             OttaiRegistry.setActivationAttempted(self.sensorId, true)
-            if self.phase == .streaming, !self.sessionKeyHex.isEmpty {
+            if self.phase == .streaming, !self.sessionKeyHex.isEmpty, self.commandStatus >= 0 {
                 self.requestActivationWithRediscovery()
             } else {
-                trace("activation refused for now — not authenticated (phase=%{public}@); will run after the next login", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .info, "\(self.phase)")
+                trace("activation deferred — not authenticated or sensor state unknown (phase=%{public}@, cmd=%{public}d); will run after the next status read", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .info, "\(self.phase)", self.commandStatus)
             }
         }
     }
