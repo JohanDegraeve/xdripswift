@@ -19,6 +19,7 @@ Master mode currently includes:
 - Dexcom G7, ONE+ and Stelo
 - Libre 2 and Libre 2 Plus EU sensors over direct Bluetooth
 - Compatible Libre sensors through MiaoMiao or Nano/Bubble/Bubble Mini transmitters
+- Syai and Ottai
 
 Follower mode supports:
 
