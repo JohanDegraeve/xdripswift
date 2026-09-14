@@ -8,12 +8,14 @@
 //  The parser and the formula do not filter anything. This file throws away
 //  impossible values and single-sample spikes seen on real sensors.
 //
+//  Unlike the Kotlin, there is no raw < 1000 floor: such readings are passed
+//  on and show as LOW, so a weak sensor does not look like a dead connection.
+//
 
 import Foundation
 
 enum OttaiOutputFilter {
 
-    static let minRawCurrent = 1000
     static let maxTemperatureC = 45.0
     /// A sensor on the body is never this cold. Without a lower limit, a broken
     /// packet with a low temperature would pass.
@@ -29,7 +31,6 @@ enum OttaiOutputFilter {
     static func hardRejectReason(record: OttaiRecord, mmol: Float) -> String? {
         if !mmol.isFinite || mmol <= 0 { return "glucose=\(mmol)" }
         if mmol > maxGlucoseMmol { return "glucose=\(mmol)" }
-        if record.rawCurrent < minRawCurrent { return "raw=\(record.rawCurrent)" }
         if !record.temperatureC.isFinite ||
             record.temperatureC > maxTemperatureC ||
             record.temperatureC < minTemperatureC {
