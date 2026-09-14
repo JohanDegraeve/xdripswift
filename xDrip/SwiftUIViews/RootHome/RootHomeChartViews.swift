@@ -25,6 +25,7 @@ struct RootHomeMainChartView: View {
     @StateObject private var rangeOverlay = ChartDelayedState(false)
     @State private var hasUpdatedRangeDuringPinch = false
     @AppStorage("showIOBCOB") private var showIOBCOB = UserDefaults.standard.showIOBCOB
+    @AppStorage(UserDefaults.Key.renderBasalDownwards.rawValue) private var renderBasalDownwards = true
     @State private var therapySeries = TherapyChartSeries()
     @State private var therapyRevision = 0
     private var hasIOB: Bool { allowsTherapyCharts && showIOBCOB && !therapySeries.iob.isEmpty }
@@ -65,7 +66,7 @@ struct RootHomeMainChartView: View {
                     chartState: chartState
                 )
                 .mainChartYAxisContext(
-                    resetRevision: yAxisResetRevision
+                    resetRevision: yAxisResetRevision, renderBasalDownwards: renderBasalDownwards
                 )
                 .therapyPlots(TherapyChartSeries(iob: hasIOB ? therapySeries.iob : [], cob: hasCOB ? therapySeries.cob : []))
                 .transaction { transaction in

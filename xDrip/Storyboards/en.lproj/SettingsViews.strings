@@ -481,3 +481,5 @@
 "therapy.liveActivityMetricsFooter" = "Show available IOB and COB in the Large Lock Screen layout and the CarPlay/Smart Stack Chart layout.";
 
 "therapy.liveActivityMetricsUnavailable" = "IOB/COB requires recorded insulin or carbohydrate treatments, or data from a connected AID system.";
+
+"homeScreen.renderBasalDownwards" = "Render Basal Downwards";

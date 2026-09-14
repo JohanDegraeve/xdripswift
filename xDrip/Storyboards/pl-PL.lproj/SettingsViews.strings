@@ -767,3 +767,5 @@
 "therapy.liveActivityMetricsFooter" = "Pokazuj dostępne IOB i COB w dużym układzie ekranu blokady oraz w układzie z wykresem CarPlay/Stosu inteligentnego.";
 
 "therapy.liveActivityMetricsUnavailable" = "IOB/COB wymaga zapisanych dawek insuliny lub węglowodanów albo danych z połączonego systemu AID.";
+
+"homeScreen.renderBasalDownwards" = "Rysuj bazę w dół";

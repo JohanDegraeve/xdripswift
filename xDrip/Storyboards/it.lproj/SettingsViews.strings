@@ -768,3 +768,5 @@
 "therapy.liveActivityMetricsFooter" = "Mostra i valori IOB e COB disponibili nel layout grande della schermata di blocco e nel layout con grafico di CarPlay/Raccolta smart.";
 
 "therapy.liveActivityMetricsUnavailable" = "IOB/COB richiede trattamenti di insulina o carboidrati registrati oppure dati da un sistema AID collegato.";
+
+"homeScreen.renderBasalDownwards" = "Mostra basale verso il basso";

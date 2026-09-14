@@ -486,3 +486,5 @@
 "therapy.liveActivityMetricsFooter" = "Показывать доступные IOB и COB в большом макете экрана блокировки и в макете с графиком CarPlay/Смарт-стопки.";
 
 "therapy.liveActivityMetricsUnavailable" = "Для IOB/COB нужны записи введённого инсулина или углеводов либо данные подключённой системы AID.";
+
+"homeScreen.renderBasalDownwards" = "Отображать базальный инсулин вниз";

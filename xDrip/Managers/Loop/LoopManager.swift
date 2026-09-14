@@ -249,6 +249,10 @@ enum XDripCGMMetadataBuilder {
             return .init(glucoseAt: latestSharedGlucoseAt?.timeIntervalSince1970, qualityCode: qualityCode)
         }()
         let transmitterMetadata: XDripCGMMetadataEnvelope.Transmitter? = {
+            // The saved identifier can still belong to a previous local transmitter.
+            // Keep it for reconnection, but never attach it to follower data or a removed
+            // transmitter. This only omits optional metadata; legacy readings are unchanged.
+            guard defaults.isMaster, context.transmitter != nil else { return nil }
             let identifier = defaults.activeSensorTransmitterId
             let transmitterModel = isAnubis ? DexcomProductNameResolver.anubisTitle : transmitterType?.detailedDescription()
             guard identifier != nil || transmitterModel != nil || battery != nil else { return nil }

@@ -11,6 +11,93 @@ import XCTest
 
 final class GlucoseChartYAxisRetentionTests: XCTestCase {
 
+    func testBasalDirectionPreferenceDefaultsAndPersistence() throws {
+        let suite = "BasalDirectionTests-" + UUID().uuidString
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        XCTAssertTrue(defaults.renderBasalDownwards)
+        defaults.renderBasalDownwards = false
+        XCTAssertFalse(try XCTUnwrap(UserDefaults(suiteName: suite)).renderBasalDownwards)
+        XCTAssertEqual(defaults.persistentDomain(forName: suite)?[UserDefaults.Key.renderBasalDownwards.rawValue] as? Bool, false)
+        defaults.removeObject(forKey: UserDefaults.Key.renderBasalDownwards.rawValue)
+        XCTAssertTrue(defaults.renderBasalDownwards)
+    }
+
+    func testDownwardBasalAnchorsZeroAtTopAndPreservesHeight() {
+        let layout = GlucoseChartBasalLayout(cachedBaseline: -10, values: [-10, 14, 38],
+                                            rendersDownwards: true, contentTop: 258, chartTop: 258)
+        XCTAssertEqual(layout.topSpace, 48)
+        XCTAssertEqual(layout.baseline, 306)
+        XCTAssertEqual(layout.value(-10), 306)
+        XCTAssertEqual(layout.value(14), 282)
+        XCTAssertEqual(layout.value(38), 258)
+    }
+
+    func testBasalReusesAxisHeadroomWithoutReducingDepth() {
+        let spacious = GlucoseChartBasalLayout(cachedBaseline: -10, values: [38],
+                                              rendersDownwards: true, contentTop: 138, chartTop: 238)
+        XCTAssertEqual(spacious.topSpace, 0)
+        XCTAssertEqual(spacious.baseline, 238)
+        XCTAssertEqual(spacious.value(38), 190)
+        let partial = GlucoseChartBasalLayout(cachedBaseline: -10, values: [38],
+                                            rendersDownwards: true, contentTop: 218, chartTop: 238)
+        XCTAssertEqual(partial.topSpace, 28)
+        XCTAssertEqual(partial.value(38), 218)
+        // A short basal does not need the full maximum-rate band above the highest point.
+        let short = GlucoseChartBasalLayout(cachedBaseline: -10, values: [10],
+                                          rendersDownwards: true, contentTop: 238, chartTop: 238)
+        XCTAssertEqual(short.topSpace, 20)
+        XCTAssertEqual(short.value(10), 238)
+    }
+
+    func testBasalSpaceDependsOnDirectionAndVisibleData() {
+        for downwards in [false, true] {
+            let empty = GlucoseChartBasalLayout(cachedBaseline: -10, values: [],
+                                               rendersDownwards: downwards, contentTop: 258, chartTop: 258)
+            XCTAssertEqual(empty.topSpace, 0)
+        }
+        let upward = GlucoseChartBasalLayout(cachedBaseline: -10, values: [-10, 38],
+                                            rendersDownwards: false, contentTop: 258, chartTop: 258)
+        XCTAssertEqual(upward.topSpace, 0)
+        XCTAssertEqual(upward.baseline, -10)
+        XCTAssertEqual(upward.value(38), 38)
+        let day = GlucoseChartBasalLayout(cachedBaseline: 0, values: [0, 38],
+                                         rendersDownwards: true, contentTop: 258, chartTop: 258)
+        XCTAssertEqual(day.topSpace, 38)
+        let large = GlucoseChartBasalLayout(cachedBaseline: -10, values: [90],
+                                           rendersDownwards: true, contentTop: 258, chartTop: 258)
+        XCTAssertEqual(large.topSpace, 100)
+        XCTAssertEqual(large.value(90), 258)
+    }
+
+    func testCompleteBasalCeilingHoldsUntilResetWithoutAccumulating() {
+        var retention = GlucoseChartYAxisRetentionState()
+        // Axis context stays at 250 while basal clearance varies with visible glucose.
+        func candidate(_ glucose: Double) -> GlucoseChartBasalLayout {
+            GlucoseChartBasalLayout(cachedBaseline: -10, values: [38], rendersDownwards: true,
+                                   contentTop: glucose + 8, chartTop: 258)
+        }
+        for glucose in [250.0, 230, 200, 250, 190] {
+            let required = candidate(glucose)
+            let maximum = 250 + required.topSpace
+            retention.retain(maximumInMgDl: maximum)
+            let heldTop = retention.effectiveMaximum(for: maximum) + 8
+            XCTAssertEqual(heldTop, 306)
+            XCTAssertEqual(required.anchored(to: heldTop).value(38), 258)
+        }
+        let current = candidate(190)
+        // Both the idle timer and double tap replace the held ceiling with today's candidate.
+        retention.reset(to: 250 + current.topSpace)
+        XCTAssertEqual(retention.effectiveMaximum(for: 250), 250)
+        for _ in 0..<100 {
+            retention.retain(maximumInMgDl: 250 + current.topSpace)
+            XCTAssertEqual(retention.effectiveMaximum(for: 250), 250)
+        }
+        // A newly arriving high point must expand the chart immediately, before publication.
+        let higher = candidate(300)
+        XCTAssertEqual(retention.effectiveMaximum(for: 250 + higher.topSpace), 348)
+    }
+
     /// A finished load can still have a main-queue delivery pending when the chart disappears.
     @MainActor
     func testCleanupRejectsAlreadyQueuedPublication() async {

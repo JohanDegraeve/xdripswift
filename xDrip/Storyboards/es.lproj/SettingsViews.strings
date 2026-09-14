@@ -485,3 +485,5 @@
 "therapy.liveActivityMetricsFooter" = "Mostrar la IOB y los COB disponibles en el diseño grande de la pantalla de bloqueo y en el diseño con gráfico de CarPlay/Pila inteligente.";
 
 "therapy.liveActivityMetricsUnavailable" = "IOB/COB requiere tratamientos de insulina o carbohidratos registrados, o datos de un sistema AID conectado.";
+
+"homeScreen.renderBasalDownwards" = "Mostrar basal hacia abajo";

@@ -767,3 +767,5 @@
 "therapy.liveActivityMetricsFooter" = "Prikaži razpoložljiva IOB in COB v veliki postavitvi zaklenjenega zaslona ter postavitvi z grafom CarPlay/Pametni sklad.";
 
 "therapy.liveActivityMetricsUnavailable" = "IOB/COB zahteva zabeležene odmerke inzulina ali ogljikovih hidratov ali podatke povezanega sistema AID.";
+
+"homeScreen.renderBasalDownwards" = "Prikaži bazal navzdol";

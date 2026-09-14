@@ -522,3 +522,5 @@
 "therapy.liveActivityMetricsFooter" = "إظهار قيم IOB وCOB المتاحة في تخطيط شاشة القفل الكبير وتخطيط الرسم البياني في CarPlay/الحزمة المكدسة الذكية.";
 
 "therapy.liveActivityMetricsUnavailable" = "يتطلب IOB/COB تسجيل علاجات الأنسولين أو الكربوهيدرات، أو بيانات من نظام AID متصل.";
+
+"homeScreen.renderBasalDownwards" = "عرض الأنسولين القاعدي للأسفل";

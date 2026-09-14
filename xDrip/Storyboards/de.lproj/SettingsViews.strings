@@ -742,3 +742,5 @@
 "therapy.liveActivityMetricsFooter" = "Verfügbare IOB- und COB-Werte im großen Sperrbildschirm-Layout und im Diagramm-Layout von CarPlay/Smart-Stapel anzeigen.";
 
 "therapy.liveActivityMetricsUnavailable" = "IOB/COB erfordert erfasste Insulin- oder Kohlenhydratbehandlungen oder Daten eines verbundenen AID-Systems.";
+
+"homeScreen.renderBasalDownwards" = "Basalrate nach unten darstellen";

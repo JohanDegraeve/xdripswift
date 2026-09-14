@@ -152,6 +152,8 @@ extension UserDefaults {
 
         /// should the screen/chart be allowed to rotate?
         case showMiniChart = "showMiniChart"
+        /// Anchor basal to the top of the main chart.
+        case renderBasalDownwards = "renderBasalDownwards"
         /// hours to show on the mini-chart?
         case miniChartHoursToShow = "miniChartHoursToShow"
         /// should the screen/chart be allowed to rotate?
@@ -1511,6 +1513,12 @@ extension UserDefaults {
         set {
             set(newValue.rawValue, forKey: Key.screenLockDimmingType.rawValue)
         }
+    }
+
+    /// Default applies to new and upgraded installations until a preference is saved.
+    @objc dynamic var renderBasalDownwards: Bool {
+        get { object(forKey: Key.renderBasalDownwards.rawValue) == nil || bool(forKey: Key.renderBasalDownwards.rawValue) }
+        set { set(newValue, forKey: Key.renderBasalDownwards.rawValue) }
     }
 
     /// should the app show the original glucose values on the main chart when post processing is enabled?

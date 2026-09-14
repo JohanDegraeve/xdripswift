@@ -102,16 +102,35 @@ become unavailable. They are not extrapolated by the Watch or an extension.
 New optional payload fields preserve decoding of older payloads.
 
 Home therapy curves use the main glucose chart's plot, axes, gridlines and gestures.
-Visible curves enable the same bottom space as basal rendering, once for both: the
-existing -10 mg/dL baseline (0 on a 24-hour range). They remain independent of
-whether treatment markers are shown. Screen Lock omits them.
+Visible curves reserve the existing bottom space, with a -10 mg/dL baseline
+(0 on a 24-hour range). They remain independent of whether treatment markers
+are shown. Screen Lock omits them.
 
-Display constants set 15 U, 70 g and a 100 mg/dL reference height. From the shared
-baseline, 15 U reaches that height. The 7 g/U ratio is preserved, so 70 g sits lower.
+Render Basal Downwards in Home Screen settings defaults to on when unset, including
+upgrades. It anchors temporary basal, scheduled basal and automatic pulses to the
+chart top. Basal injection markers are unchanged. Visible basal data reserves a top
+band with the original basal depth. Existing headroom above actual glucose and
+treatment points is reused, adding only the missing clearance instead of a full
+band above the upper axis context. Visible IOB/COB keeps
+its bottom space. Turning the setting off returns basal to the shared bottom space.
+An empty basal layer reserves no additional space. The preference is stored as
+`renderBasalDownwards` in UserDefaults and participates in backup/restore.
+Only rendering coordinates change, so switching direction reuses cached history.
+The complete upper bound, including basal clearance, expands immediately and stays
+held until the existing ten-second idle reset or double tap. Clearance is calculated
+from current data before retention, so it cannot shrink independently or accumulate.
+
+Display constants set 15 U, 70 g and a 100 mg/dL reference height. The shared
+`therapyPlotHeightMultiplier` is 0.7, reducing both curves to 70% of their reference
+height above the zero baseline. The 7 g/U ratio is preserved, so 70 g sits lower.
 When either displayed maximum exceeds its limit, both curves are reduced by the
 same factor. Negative external IOB is preserved and extends the lower domain as
-needed. Glucose scaling at the top is unchanged. Lines use the bolus/carbohydrate treatment colors with opacity 1.0, immediately
-above basal marks and below treatment symbols and glucose.
+needed. Glucose scaling at the top is unchanged. Lines use the bolus/carbohydrate treatment colors with opacity 0.7,
+behind basal marks, treatment symbols and glucose. Matching fills use 0.17
+opacity between each curve and its zero baseline, preserving gaps between segments.
+When visible basal is rendered at the bottom, both therapy opacities are multiplied
+by 0.7, giving 0.49 for lines and 0.119 for fills. Basal at the top or an empty basal
+layer leaves the normal therapy opacities unchanged.
 
 Local curves include five-minute samples and treatment/end/visibility boundaries.
 Treatments have before/after points at the same timestamp for vertical jumps.

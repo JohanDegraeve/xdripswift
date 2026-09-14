@@ -540,3 +540,5 @@
 "therapy.liveActivityMetricsFooter" = "Visa tillgängligt IOB och COB i den stora låsskärmslayouten och i diagramlayouten för CarPlay/Smart trave.";
 
 "therapy.liveActivityMetricsUnavailable" = "IOB/COB kräver registrerade insulin- eller kolhydratbehandlingar, eller data från ett anslutet AID-system.";
+
+"homeScreen.renderBasalDownwards" = "Visa basal nedåt";

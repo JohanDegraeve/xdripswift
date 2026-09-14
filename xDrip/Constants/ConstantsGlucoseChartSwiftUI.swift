@@ -25,7 +25,12 @@ enum ConstantsGlucoseChartSwiftUI {
         hours >= 24 ? minimumChartValueWithBasal24Hours : minimumChartValueWithBasal
     }
 
-    static let therapyPlotLineOpacity: Double = 1.0
+    static let therapyPlotFillOpacity: Double = 0.17
+    static let therapyPlotLineOpacity: Double = 0.7
+    // Make therapy less prominent when it shares the bottom area with visible basal.
+    static let therapyPlotBottomBasalOpacityMultiplier: Double = 0.7
+    // Scale both curves and their fills around zero, preserving the shared carbs-to-insulin ratio.
+    static let therapyPlotHeightMultiplier: Double = 0.7
     static let therapyPlotCarbsPerInsulinUnit: Double = 7
 
     static func xAxisDates(from startDate: Date, to endDate: Date, everyHours: Int) -> [Date] {

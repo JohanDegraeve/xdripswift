@@ -566,3 +566,5 @@
 "therapy.liveActivityMetricsFooter" = "Toon beschikbare IOB en COB in de grote toegangsschermweergave en de grafiekweergave van CarPlay/Slimme stapel.";
 
 "therapy.liveActivityMetricsUnavailable" = "IOB/COB vereist geregistreerde insuline- of koolhydraatbehandelingen, of gegevens van een verbonden AID-systeem.";
+
+"homeScreen.renderBasalDownwards" = "Basaal naar beneden weergeven";

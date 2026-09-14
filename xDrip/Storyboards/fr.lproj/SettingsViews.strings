@@ -582,3 +582,5 @@
 "therapy.liveActivityMetricsFooter" = "Afficher les valeurs IOB et COB disponibles dans la grande présentation de l’écran verrouillé et la présentation avec graphique de CarPlay/Pile intelligente.";
 
 "therapy.liveActivityMetricsUnavailable" = "IOB/COB nécessite des traitements d’insuline ou de glucides enregistrés, ou les données d’un système AID connecté.";
+
+"homeScreen.renderBasalDownwards" = "Afficher le débit basal vers le bas";

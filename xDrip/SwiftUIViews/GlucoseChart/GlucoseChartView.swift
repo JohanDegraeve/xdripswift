@@ -64,6 +64,35 @@ struct GlucoseChartYAxisRetentionState {
     }
 }
 
+/// Reflect cached basal heights without changing treatment data or glucose-axis retention.
+/// Trio uses the same top-minus-height mapping in its Home ChartElements/BasalChart.swift.
+struct GlucoseChartBasalLayout {
+    let cachedBaseline: Double
+    let rendersDownwards: Bool
+    let topSpace: Double
+    private(set) var baseline: Double
+
+    init(cachedBaseline: Double, values: [Double], rendersDownwards: Bool, contentTop: Double, chartTop: Double) {
+        self.cachedBaseline = cachedBaseline
+        self.rendersDownwards = rendersDownwards && !values.isEmpty
+        let largestHeight = values.filter { $0.isFinite }.map { max(0, $0 - cachedBaseline) }.max() ?? 0
+        // Reuse headroom from axis context and retention before extending the domain.
+        // The depth of the marks stays unchanged, even when no extra space is needed.
+        topSpace = self.rendersDownwards ? max(0, contentTop + largestHeight - chartTop) : 0
+        baseline = self.rendersDownwards ? chartTop + topSpace : cachedBaseline
+    }
+
+    func anchored(to chartTop: Double) -> Self {
+        var layout = self
+        if rendersDownwards { layout.baseline = chartTop }
+        return layout
+    }
+
+    func value(_ cachedValue: Double) -> Double {
+        rendersDownwards ? baseline - max(0, cachedValue - cachedBaseline) : cachedValue
+    }
+}
+
 /// Swift Charts implementation for rendering glucose readings and related chart annotations.
 ///
 /// Lightweight callers can pass BG values and dates directly. Full-chart callers pass `chartState`,
@@ -73,6 +102,7 @@ struct GlucoseChartYAxisRetentionState {
 /// cached state manager and this renderer.
 struct GlucoseChartView: View {
     private var therapySeries = TherapyChartSeries()
+    private var renderBasalDownwards = false
 
     // MARK: - Input Data
 
@@ -254,10 +284,11 @@ struct GlucoseChartView: View {
     ///
     /// Compact charts intentionally stay adaptive by default so widgets, watch charts,
     /// notifications and live activities do not reserve unnecessary vertical space.
-    func mainChartYAxisContext(resetRevision: Int = 0) -> Self {
+    func mainChartYAxisContext(resetRevision: Int = 0, renderBasalDownwards: Bool = false) -> Self {
         var view = self
         view.usesMainChartYAxisContext = true
         view.mainChartYAxisResetRevision = resetRevision
+        view.renderBasalDownwards = renderBasalDownwards
 
         return view
     }
@@ -546,12 +577,31 @@ struct GlucoseChartView: View {
     }
 
     @ChartContentBuilder
-    private func therapyPlotMarks(series: TherapyChartSeries, scale: TherapyChartScale) -> some ChartContent {
+    private func therapyPlotMarks(series: TherapyChartSeries, scale: TherapyChartScale, opacityMultiplier: Double) -> some ChartContent {
+        // Draw both fills before either outline. Separate segment identities preserve data gaps.
+        ForEach(series.iob) { point in
+            AreaMark(x: .value("Time", point.date),
+                     yStart: .value("BG", scale.baseline),
+                     yEnd: .value("BG", scale.glucoseValue(amount: point.amount, isIOB: true)),
+                     series: .value("Series", "therapy-iob-fill-\(point.segment)"))
+                .interpolationMethod(.linear)
+                .foregroundStyle(GlucoseChartTreatmentStyle.bolusColor.opacity(ConstantsGlucoseChartSwiftUI.therapyPlotFillOpacity * opacityMultiplier))
+                .accessibilityHidden(true)
+        }
+        ForEach(series.cob) { point in
+            AreaMark(x: .value("Time", point.date),
+                     yStart: .value("BG", scale.baseline),
+                     yEnd: .value("BG", scale.glucoseValue(amount: point.amount, isIOB: false)),
+                     series: .value("Series", "therapy-cob-fill-\(point.segment)"))
+                .interpolationMethod(.linear)
+                .foregroundStyle(GlucoseChartTreatmentStyle.carbsColor.opacity(ConstantsGlucoseChartSwiftUI.therapyPlotFillOpacity * opacityMultiplier))
+                .accessibilityHidden(true)
+        }
         ForEach(series.iob) { point in
             LineMark(x: .value("Time", point.date), y: .value("BG", scale.glucoseValue(amount: point.amount, isIOB: true)),
                 series: .value("Series", "therapy-iob-\(point.segment)"))
                 .interpolationMethod(.linear)
-                .foregroundStyle(GlucoseChartTreatmentStyle.bolusColor.opacity(ConstantsGlucoseChartSwiftUI.therapyPlotLineOpacity))
+                .foregroundStyle(GlucoseChartTreatmentStyle.bolusColor.opacity(ConstantsGlucoseChartSwiftUI.therapyPlotLineOpacity * opacityMultiplier))
                 .lineStyle(StrokeStyle(lineWidth: 1.4))
                 .accessibilityLabel("IOB")
                 .accessibilityValue("\(point.amount.formatted(.number.precision(.fractionLength(0...2)))) U")
@@ -560,7 +610,7 @@ struct GlucoseChartView: View {
             LineMark(x: .value("Time", point.date), y: .value("BG", scale.glucoseValue(amount: point.amount, isIOB: false)),
                 series: .value("Series", "therapy-cob-\(point.segment)"))
                 .interpolationMethod(.linear)
-                .foregroundStyle(GlucoseChartTreatmentStyle.carbsColor.opacity(ConstantsGlucoseChartSwiftUI.therapyPlotLineOpacity))
+                .foregroundStyle(GlucoseChartTreatmentStyle.carbsColor.opacity(ConstantsGlucoseChartSwiftUI.therapyPlotLineOpacity * opacityMultiplier))
                 .lineStyle(StrokeStyle(lineWidth: 1.4))
                 .accessibilityLabel("COB")
                 .accessibilityValue("\(point.amount.formatted(.number.precision(.fractionLength(0)))) g")
@@ -575,9 +625,13 @@ struct GlucoseChartView: View {
             ? chartState?.treatmentPoints.filter(from: visibleStartDate, to: visibleEndDate) ?? GlucoseChartTreatmentPoints()
             : GlucoseChartTreatmentPoints()
         let visibleCalibrationPoints = chartState?.calibrationPoints.filter { $0.date >= visibleStartDate && $0.date <= visibleEndDate } ?? []
-        let treatmentValues = visibleCalibrationPoints.map { $0.value } + visibleTreatmentPoints.allRenderableValues
+        let basalValues = visibleTreatmentPoints.basalRenderableValues
+        let downwardBasal = usesMainChartYAxisContext && renderBasalDownwards
+        let treatmentValues = visibleCalibrationPoints.map { $0.value } + visibleTreatmentPoints.nonBasalRenderableValues
+            + (downwardBasal ? [] : basalValues)
         let allBgValues = bgReadingValues + additionalValues + treatmentValues
-        let basalMinimumChartValue = showsTreatments
+        let cachedBasalBaseline = chartState?.minimumChartValueInMgDl ?? ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl
+        let basalMinimumChartValue = showsTreatments && !basalValues.isEmpty && !downwardBasal
             ? chartState?.minimumChartValueInMgDl ?? ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl
             : ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl
         let visibleTherapy = usesMainChartYAxisContext ? therapySeries.clipped(from: visibleStartDate, to: visibleEndDate) : TherapyChartSeries()
@@ -595,7 +649,15 @@ struct GlucoseChartView: View {
         let calculatedYAxisContextMarks = mainChartYAxisContextMarks(maximumRenderableValue: maximumRenderableValue)
         let calculatedYAxisContextValues = calculatedYAxisContextMarks.labeledValues + calculatedYAxisContextMarks.gridOnlyValues
         let calculatedMaximumContextValue = calculatedYAxisContextValues.max() ?? maximumRenderableValue
-        let calculatedMaximumDomainValue = max(maximumRenderableValue, calculatedMaximumContextValue)
+        let contentMaximumDomainValue = max(maximumRenderableValue, calculatedMaximumContextValue)
+        let upperDomainPadding = usesMainChartYAxisContext ? ConstantsGlucoseChartSwiftUI.yAxisMainChartContextTopPaddingInMgDl : ConstantsGlucoseChartSwiftUI.yAxisDomainPaddingInMgDl
+        // Calculate clearance from current data, then retain the complete upper bound.
+        // Using a retained bound here would feed previous clearance back into the next candidate.
+        let requiredBasalLayout = GlucoseChartBasalLayout(cachedBaseline: cachedBasalBaseline, values: basalValues,
+                                                         rendersDownwards: downwardBasal,
+                                                         contentTop: (allBgValues.max() ?? minimumDomainValue) + upperDomainPadding,
+                                                         chartTop: contentMaximumDomainValue + upperDomainPadding)
+        let calculatedMaximumDomainValue = contentMaximumDomainValue + requiredBasalLayout.topSpace
         let maximumDomainValue = usesMainChartYAxisContext
             ? yAxisRetentionState.effectiveMaximum(for: calculatedMaximumDomainValue)
             : calculatedMaximumDomainValue
@@ -603,7 +665,7 @@ struct GlucoseChartView: View {
         // the upper domain itself is being held steady.
         let yAxisContextMarks = mainChartYAxisContextMarks(maximumRenderableValue: maximumDomainValue)
         let yAxisContextValues = yAxisContextMarks.labeledValues + yAxisContextMarks.gridOnlyValues
-        let upperDomainPadding = usesMainChartYAxisContext ? ConstantsGlucoseChartSwiftUI.yAxisMainChartContextTopPaddingInMgDl : ConstantsGlucoseChartSwiftUI.yAxisDomainPaddingInMgDl
+        let basalLayout = requiredBasalLayout.anchored(to: maximumDomainValue + upperDomainPadding)
         let domain = (minimumDomainValue - lowerDomainPadding) ... (maximumDomainValue + upperDomainPadding)
         let xAxisLabelEveryHours = xAxisLabelEveryHours()
         let xAxisLabelDates = xAxisLabelDates(everyHours: xAxisLabelEveryHours)
@@ -683,26 +745,27 @@ struct GlucoseChartView: View {
             .symbolSize(glucoseCircleDiameter)
             .foregroundStyle(.clear)
 
-            if chartState == nil {
-                therapyPlotMarks(series: visibleTherapy, scale: therapyScale)
-            }
+            // Therapy fills and outlines sit behind basal in either rendering direction.
+            therapyPlotMarks(series: visibleTherapy, scale: therapyScale,
+                             opacityMultiplier: !basalValues.isEmpty && !downwardBasal
+                                ? ConstantsGlucoseChartSwiftUI.therapyPlotBottomBasalOpacityMultiplier : 1)
 
             // Basal areas/lines and primary treatments are drawn below glucose points.
             //
             // The state manager has already produced scheduled and temporary basal step/fill points,
             // so the view only chooses the mark type and visual style.
-            if let chartState = chartState {
+            if chartState != nil {
                 ForEach(visibleTreatmentPoints.basalRateFill) { point in
                     AreaMark(x: .value("Time", point.date),
-                             yStart: .value("BG", chartState.minimumChartValueInMgDl),
-                             yEnd: .value("BG", point.value))
+                             yStart: .value("BG", basalLayout.baseline),
+                             yEnd: .value("BG", basalLayout.value(point.value)))
                     .interpolationMethod(.stepStart)
                     .foregroundStyle(GlucoseChartTreatmentStyle.basalFillColor)
                 }
 
                 ForEach(visibleTreatmentPoints.basalRates) { point in
                     LineMark(x: .value("Time", point.date),
-                             y: .value("BG", point.value),
+                             y: .value("BG", basalLayout.value(point.value)),
                              series: .value("Series", "tempBasal"))
                     .interpolationMethod(.stepStart)
                     .lineStyle(StrokeStyle(lineWidth: GlucoseChartTreatmentStyle.basalLineWidth))
@@ -713,23 +776,20 @@ struct GlucoseChartView: View {
                     RectangleMark(
                         xStart: .value("Start", pulse.startDate),
                         xEnd: .value("End", pulse.endDate),
-                        yStart: .value("BG", chartState.minimumChartValueInMgDl),
-                        yEnd: .value("BG", pulse.value)
+                        yStart: .value("BG", basalLayout.baseline),
+                        yEnd: .value("BG", basalLayout.value(pulse.value))
                     )
                     .foregroundStyle(GlucoseChartTreatmentStyle.automaticBasalPulseColor)
                 }
 
                 ForEach(visibleTreatmentPoints.scheduledBasalRates) { point in
                     LineMark(x: .value("Time", point.date),
-                             y: .value("BG", point.value),
+                             y: .value("BG", basalLayout.value(point.value)),
                              series: .value("Series", "scheduledBasal"))
                     .interpolationMethod(.stepStart)
                     .lineStyle(StrokeStyle(lineWidth: GlucoseChartTreatmentStyle.scheduledBasalLineWidth, dash: [3, 2]))
                     .foregroundStyle(GlucoseChartTreatmentStyle.scheduledBasalLineColor)
                 }
-
-                // Therapy curves sit immediately above basal marks, below treatment symbols and glucose.
-                therapyPlotMarks(series: visibleTherapy, scale: therapyScale)
 
                 // Note labels sit above basal lines and below dose treatments.
                 treatmentSymbolMarks(points: visibleTreatmentPoints.notes, systemImage: nil, size: { _ in 0 }, color: GlucoseChartTreatmentStyle.noteColor, labelPosition: .top, verticalLabel: true)
@@ -999,6 +1059,11 @@ struct GlucoseChartView: View {
             retainYAxisMaximum(calculatedMaximumDomainValue)
             scheduleYAxisAutoReset(to: calculatedMaximumDomainValue)
         }
+        .onCompatibleChange(of: renderBasalDownwards) { _ in
+            guard usesMainChartYAxisContext else { return }
+
+            resetRetainedYAxisMaximum(to: calculatedMaximumDomainValue)
+        }
         .onCompatibleChange(of: mainChartYAxisResetRevision) { _ in
             guard usesMainChartYAxisContext else { return }
 
@@ -1185,7 +1250,7 @@ private extension GlucoseChartTreatmentPoints {
         )
     }
 
-    var allRenderableValues: [Double] {
+    var nonBasalRenderableValues: [Double] {
         // Append each series explicitly. A long chain of overloaded array additions becomes
         // expensive for the Swift type checker as new treatment series are added.
         var values = boluses.map { $0.yValue }
@@ -1193,7 +1258,11 @@ private extension GlucoseChartTreatmentPoints {
         values.append(contentsOf: carbs.map { $0.yValue })
         values.append(contentsOf: bgChecks.map { $0.yValue })
         values.append(contentsOf: notes.map { $0.yValue })
-        values.append(contentsOf: scheduledBasalRates.map { $0.value })
+        return values
+    }
+
+    var basalRenderableValues: [Double] {
+        var values = scheduledBasalRates.map { $0.value }
         values.append(contentsOf: basalRates.map { $0.value })
         values.append(contentsOf: basalRateFill.map { $0.value })
         values.append(contentsOf: automaticBasalPulses.map { $0.value })

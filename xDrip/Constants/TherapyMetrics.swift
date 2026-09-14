@@ -255,6 +255,7 @@ struct TherapyChartScale {
     func glucoseValue(amount: Double, isIOB: Bool) -> Double {
         let units = isIOB ? amount : amount / ConstantsGlucoseChartSwiftUI.therapyPlotCarbsPerInsulinUnit
         return baseline + (ConstantsGlucoseChartSwiftUI.therapyPlotReferenceHeightInMgDl - baseline)
+            * ConstantsGlucoseChartSwiftUI.therapyPlotHeightMultiplier
             * units / ConstantsGlucoseChartSwiftUI.therapyPlotMaximumIOB / reduction
     }
 }

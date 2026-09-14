@@ -496,8 +496,9 @@ final class TherapyMetricsTests: XCTestCase {
             XCTAssertEqual(baseline, hours >= 24 ? 0 : -10)
             let scale = TherapyChartScale(series: TherapyChartSeries(iob: [point(15)], cob: [point(70)]), baseline: baseline)
             XCTAssertEqual(scale.glucoseValue(amount: 0, isIOB: true), baseline)
-            XCTAssertEqual(scale.glucoseValue(amount: 15, isIOB: true), 100, accuracy: 1e-10)
-            XCTAssertLessThan(scale.glucoseValue(amount: 70, isIOB: false), 100)
+            let expectedMaximum = hours >= 24 ? 70.0 : 67.0
+            XCTAssertEqual(scale.glucoseValue(amount: 15, isIOB: true), expectedMaximum, accuracy: 1e-10)
+            XCTAssertLessThan(scale.glucoseValue(amount: 70, isIOB: false), expectedMaximum)
             XCTAssertLessThan(scale.glucoseValue(amount: -2, isIOB: true), baseline)
             for units in [1.0, 2, 4] {
                 XCTAssertEqual(scale.glucoseValue(amount: units, isIOB: true), scale.glucoseValue(amount: units * 7, isIOB: false), accuracy: 1e-10)
@@ -506,8 +507,8 @@ final class TherapyMetricsTests: XCTestCase {
                 let reduced = TherapyChartScale(series: series, baseline: baseline)
                 XCTAssertEqual(reduced.reduction, 2)
                 XCTAssertEqual(reduced.glucoseValue(amount: 2, isIOB: true), reduced.glucoseValue(amount: 14, isIOB: false), accuracy: 1e-10)
-                XCTAssertLessThanOrEqual(reduced.glucoseValue(amount: series.iob[0].amount, isIOB: true), 100)
-                XCTAssertLessThanOrEqual(reduced.glucoseValue(amount: series.cob[0].amount, isIOB: false), 100)
+                XCTAssertLessThanOrEqual(reduced.glucoseValue(amount: series.iob[0].amount, isIOB: true), expectedMaximum)
+                XCTAssertLessThanOrEqual(reduced.glucoseValue(amount: series.cob[0].amount, isIOB: false), expectedMaximum)
             }
         }
     }
@@ -517,28 +518,33 @@ final class TherapyMetricsTests: XCTestCase {
         let end = now.addingTimeInterval(4 * 3600)
         let series = TherapyMetricsManager.chartSeries(entries: [entry(4), entry(30, isIOB: false)], statuses: [], policy: policy(), settings: settings, start: start, end: end)
         for width in [320.0, 768.0] {
-            for withBasal in [false, true] {
-                var state = GlucoseChartState.empty(startDate: start, endDate: end)
-                state.bgReadingDates = stride(from: start.timeIntervalSince1970, through: end.timeIntervalSince1970, by: 300).map { Date(timeIntervalSince1970: $0) }
-                state.bgReadingValues = state.bgReadingDates.enumerated().map { 110 + 20 * sin(Double($0.offset) / 8) }
-                if withBasal {
-                    state.minimumChartValueInMgDl = ConstantsGlucoseChartSwiftUI.minimumChartValueWithBottomSpace(hours: 5)
-                    state.treatmentPoints.basalRates = [GlucoseChartPoint(date: start, value: 10, idPrefix: "basal"), GlucoseChartPoint(date: end, value: 10, idPrefix: "basal")]
-                    state.treatmentPoints.basalRateFill = state.treatmentPoints.basalRates
+            for configuration in [(false, false), (true, false), (false, true), (true, true)] {
+                let (withBasal, withTherapy) = configuration
+                for downwards in [false, true] {
+                    var state = GlucoseChartState.empty(startDate: start, endDate: end)
+                    state.bgReadingDates = stride(from: start.timeIntervalSince1970, through: end.timeIntervalSince1970, by: 300).map { Date(timeIntervalSince1970: $0) }
+                    state.bgReadingValues = state.bgReadingDates.enumerated().map { 110 + 20 * sin(Double($0.offset) / 8) }
+                    if withBasal {
+                        state.minimumChartValueInMgDl = ConstantsGlucoseChartSwiftUI.minimumChartValueWithBottomSpace(hours: 5)
+                        state.treatmentPoints.basalRates = [GlucoseChartPoint(date: start, value: 10, idPrefix: "basal"), GlucoseChartPoint(date: end, value: 10, idPrefix: "basal")]
+                        state.treatmentPoints.basalRateFill = state.treatmentPoints.basalRates
+                        state.treatmentPoints.scheduledBasalRates = [GlucoseChartPoint(date: start, value: 20, idPrefix: "scheduled"), GlucoseChartPoint(date: end, value: 20, idPrefix: "scheduled")]
+                        state.treatmentPoints.automaticBasalPulses = [GlucoseChartBasalPulse(startDate: start.addingTimeInterval(1800), endDate: start.addingTimeInterval(2400), value: 38)]
+                    }
+                    let content = GlucoseChartView(glucoseChartType: .widgetSystemLarge, bgReadingValues: nil, bgReadingDates: nil,
+                        isMgDl: width == 320, urgentLowLimitInMgDl: 55, lowLimitInMgDl: 70, highLimitInMgDl: 180, urgentHighLimitInMgDl: 230,
+                        liveActivityType: nil, hoursToShowScalingHours: 5, glucoseCircleDiameterScalingHours: 5,
+                        showsTreatments: withBasal, overrideChartHeight: 300, overrideChartWidth: width,
+                        highContrast: nil, chartState: state)
+                        .mainChartYAxisContext(renderBasalDownwards: downwards).therapyPlots(withTherapy ? series : TherapyChartSeries())
+                        .frame(width: width, height: 300).background(Color.black).environment(\.colorScheme, .dark)
+                    let renderer = ImageRenderer(content: content)
+                    renderer.scale = 2
+                    let attachment = XCTAttachment(image: try XCTUnwrap(renderer.uiImage))
+                    attachment.name = "Integrated therapy \(Int(width))pt basal=\(withBasal) therapy=\(withTherapy) downwards=\(downwards)"
+                    attachment.lifetime = .keepAlways
+                    add(attachment)
                 }
-                let content = GlucoseChartView(glucoseChartType: .widgetSystemLarge, bgReadingValues: nil, bgReadingDates: nil,
-                    isMgDl: true, urgentLowLimitInMgDl: 55, lowLimitInMgDl: 70, highLimitInMgDl: 180, urgentHighLimitInMgDl: 230,
-                    liveActivityType: nil, hoursToShowScalingHours: 5, glucoseCircleDiameterScalingHours: 5,
-                    showsTreatments: withBasal, overrideChartHeight: 300, overrideChartWidth: width,
-                    highContrast: nil, chartState: state)
-                    .mainChartYAxisContext().therapyPlots(series)
-                    .frame(width: width, height: 300).background(Color.black).environment(\.colorScheme, .dark)
-                let renderer = ImageRenderer(content: content)
-                renderer.scale = 2
-                let attachment = XCTAttachment(image: try XCTUnwrap(renderer.uiImage))
-                attachment.name = "Integrated therapy \(Int(width))pt basal=\(withBasal)"
-                attachment.lifetime = .keepAlways
-                add(attachment)
             }
         }
     }

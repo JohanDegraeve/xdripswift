@@ -552,3 +552,5 @@
 "therapy.liveActivityMetricsFooter" = "Näytä käytettävissä olevat IOB- ja COB-arvot lukitusnäytön suuressa asettelussa ja CarPlayn/Älykkään pinon kaavioasettelussa.";
 
 "therapy.liveActivityMetricsUnavailable" = "IOB/COB edellyttää kirjattuja insuliini- tai hiilihydraattihoitoja tai tietoja yhdistetystä AID-järjestelmästä.";
+
+"homeScreen.renderBasalDownwards" = "Näytä basaali alaspäin";

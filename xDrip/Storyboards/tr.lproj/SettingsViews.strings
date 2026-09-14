@@ -514,3 +514,5 @@
 "therapy.liveActivityMetricsFooter" = "Kullanılabilir IOB ve COB değerlerini büyük kilit ekranı düzeninde ve CarPlay/Akıllı Gruplama grafik düzeninde göster.";
 
 "therapy.liveActivityMetricsUnavailable" = "IOB/COB için kaydedilmiş insülin veya karbonhidrat tedavileri ya da bağlı bir AID sisteminden gelen veriler gerekir.";
+
+"homeScreen.renderBasalDownwards" = "Bazalı Aşağı Doğru Göster";

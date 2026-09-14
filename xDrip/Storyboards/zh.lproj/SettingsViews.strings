@@ -692,3 +692,5 @@
 "therapy.liveActivityMetricsFooter" = "在锁定屏幕的大布局和 CarPlay/智能叠放的图表布局中显示可用的 IOB 和 COB。";
 
 "therapy.liveActivityMetricsUnavailable" = "IOB/COB 需要已记录的胰岛素或碳水化合物治疗，或来自已连接 AID 系统的数据。";
+
+"homeScreen.renderBasalDownwards" = "向下绘制基础胰岛素";
