@@ -13,6 +13,12 @@ class Texts_Common {
         return NSLocalizedString("common_cancel", tableName: filename, bundle: Bundle.main, value: "Cancel", comment: "literally 'Cancel'")
     }()
 
+    // Actions used when leaving an editor with changes that have not been saved.
+    static let unsavedChanges = NSLocalizedString("common_unsavedChanges", tableName: filename, bundle: .main, value: "Unsaved Changes", comment: "title when leaving an editor with unsaved changes")
+    static let save = NSLocalizedString("common_save", tableName: filename, bundle: .main, value: "Save", comment: "save editor changes")
+    static let discardChanges = NSLocalizedString("common_discardChanges", tableName: filename, bundle: .main, value: "Discard Changes", comment: "leave the editor without saving changes")
+    static let back = NSLocalizedString("common_back", tableName: filename, bundle: .main, value: "Back", comment: "accessibility label for the navigation back button")
+
     static let dismiss = {
         return NSLocalizedString(
             "common_dismiss",

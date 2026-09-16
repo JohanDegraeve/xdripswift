@@ -62,3 +62,9 @@
 // Local therapy accessibility
 "therapy.estimatedIOB" = "الإنسولين النشط المقدّر";
 "therapy.estimatedCOB" = "الكربوهيدرات النشطة المقدّرة";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "تغييرات غير محفوظة";
+"common_save" = "حفظ";
+"common_discardChanges" = "تجاهل التغييرات";
+"common_back" = "رجوع";

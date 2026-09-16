@@ -256,7 +256,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
                 value: alertEntry.value,
                 triggerValue: alertEntry.triggerValue,
                 alertKind: alertEntry.alertkind,
-                alertTypeName: alertEntry.alertType.name
+                alertTypeID: alertEntry.alertType.objectID
             )
 
         case let .new(alertKind, minimumStart, maximumStart):
@@ -276,7 +276,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
                 value: Int16(alertKind.defaultAlertValue()),
                 triggerValue: Int16(alertKind.defaultAlertTriggerValue()),
                 alertKind: Int16(alertKind.rawValue),
-                alertTypeName: defaultAlertType.name
+                alertTypeID: defaultAlertType.objectID
             )
         }
     }
@@ -523,14 +523,14 @@ final class AlertEntryEditorViewModel: ObservableObject {
     }
 
     /// Compares the current editor state with the original alarm so toolbar buttons
-    /// can apply the enable and disable rules.
-    private var hasChanges: Bool {
+    /// can apply the enable and disable rules and Back can protect unsaved edits.
+    var hasChanges: Bool {
         isDisabled != original.isDisabled ||
             start != original.start ||
             value != original.value ||
             triggerValue != original.triggerValue ||
             alertKind != original.alertKind ||
-            alertType.name != original.alertTypeName
+            alertType.objectID != original.alertTypeID
     }
 
     /// Returns the correct trigger value label for fast drop and fast rise alarms.
@@ -666,11 +666,15 @@ private struct AlertEntrySnapshot {
     let value: Int16
     let triggerValue: Int16
     let alertKind: Int16
-    let alertTypeName: String
+    // Compare the selected type itself, since different types can share a name.
+    let alertTypeID: NSManagedObjectID
 }
 
 struct AlertEntryEditorView: View {
     @StateObject private var viewModel: AlertEntryEditorViewModel
+    @State private var showsUnsavedChanges = false
+
+    let close: () -> Void
 
     let openNewAlert: (AlertEntryEditorMode) -> Void
 
@@ -688,6 +692,7 @@ struct AlertEntryEditorView: View {
             close: close
         ))
         self.openNewAlert = openNewAlert
+        self.close = close
     }
 
     var body: some View {
@@ -699,6 +704,10 @@ struct AlertEntryEditorView: View {
             }
         }
         .settingsListStyle(title: viewModel.title, titleDisplayMode: .inline)
+        // Only replace Back while the draft differs from the original. Hiding the native
+        // button also prevents a swipe or its history menu from silently discarding edits.
+        // Child pickers keep their normal navigation and return to this same draft.
+        .navigationBarBackButtonHidden(viewModel.hasChanges)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 if viewModel.showsScheduleActions {
@@ -718,7 +727,25 @@ struct AlertEntryEditorView: View {
                     .disabled(!viewModel.canSave)
             }
 
-            ToolbarItem(placement: .navigationBarLeading) {
+            ToolbarItemGroup(placement: .navigationBarLeading) {
+                if viewModel.hasChanges {
+                    Button {
+                        showsUnsavedChanges = true
+                    } label: {
+                        Image(systemName: "chevron.backward")
+                    }
+                    .accessibilityLabel(Texts_Common.back)
+                    // Specify both alert buttons explicitly so SwiftUI does not add Cancel
+                    // alongside the destructive action. Keep this separate from the delete alert.
+                    .alert(isPresented: $showsUnsavedChanges) {
+                        Alert(
+                            title: Text(Texts_Common.unsavedChanges),
+                            primaryButton: .default(Text(Texts_Common.save), action: viewModel.save),
+                            secondaryButton: .destructive(Text(Texts_Common.discardChanges), action: close)
+                        )
+                    }
+                }
+
                 if viewModel.showsScheduleActions {
                     Button(role: .destructive, action: viewModel.requestDelete) {
                         Image(systemName: "trash")

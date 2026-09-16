@@ -62,3 +62,9 @@
 // Local therapy accessibility
 "therapy.estimatedIOB" = "Tahmini aktif insülin";
 "therapy.estimatedCOB" = "Tahmini aktif karbonhidrat";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Kaydedilmemiş Değişiklikler";
+"common_save" = "Kaydet";
+"common_discardChanges" = "Değişiklikleri Sil";
+"common_back" = "Geri";

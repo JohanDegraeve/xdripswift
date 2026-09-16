@@ -62,3 +62,9 @@
 // Local therapy accessibility
 "therapy.estimatedIOB" = "Anslået aktivt insulin";
 "therapy.estimatedCOB" = "Anslåede aktive kulhydrater";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Ikke-gemte ændringer";
+"common_save" = "Gem";
+"common_discardChanges" = "Kassér ændringer";
+"common_back" = "Tilbage";

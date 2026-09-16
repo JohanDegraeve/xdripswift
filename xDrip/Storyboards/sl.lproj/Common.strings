@@ -173,3 +173,9 @@
 // Local therapy accessibility
 "therapy.estimatedIOB" = "Ocenjeni aktivni inzulin";
 "therapy.estimatedCOB" = "Ocenjeni aktivni ogljikovi hidrati";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Neshranjene spremembe";
+"common_save" = "Shrani";
+"common_discardChanges" = "Zavrzi spremembe";
+"common_back" = "Nazaj";

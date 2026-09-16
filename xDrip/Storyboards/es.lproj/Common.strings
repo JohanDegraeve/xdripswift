@@ -121,3 +121,9 @@
 // Local therapy accessibility
 "therapy.estimatedIOB" = "Insulina activa estimada";
 "therapy.estimatedCOB" = "Carbohidratos activos estimados";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Cambios sin guardar";
+"common_save" = "Guardar";
+"common_discardChanges" = "Descartar cambios";
+"common_back" = "Atrás";

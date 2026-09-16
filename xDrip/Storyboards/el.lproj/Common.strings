@@ -62,3 +62,9 @@
 // Local therapy accessibility
 "therapy.estimatedIOB" = "Εκτιμώμενη ενεργή ινσουλίνη";
 "therapy.estimatedCOB" = "Εκτιμώμενοι ενεργοί υδατάνθρακες";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Μη αποθηκευμένες αλλαγές";
+"common_save" = "Αποθήκευση";
+"common_discardChanges" = "Απόρριψη αλλαγών";
+"common_back" = "Πίσω";

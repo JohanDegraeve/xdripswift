@@ -92,3 +92,9 @@
 // Local therapy accessibility
 "therapy.estimatedIOB" = "Arvioitu aktiivinen insuliini";
 "therapy.estimatedCOB" = "Arvioidut aktiiviset hiilihydraatit";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Tallentamattomat muutokset";
+"common_save" = "Tallenna";
+"common_discardChanges" = "Hylkää muutokset";
+"common_back" = "Takaisin";

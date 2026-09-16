@@ -124,3 +124,9 @@
 // Local therapy accessibility
 "therapy.estimatedIOB" = "Geschatte actieve insuline";
 "therapy.estimatedCOB" = "Geschatte actieve koolhydraten";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Niet-opgeslagen wijzigingen";
+"common_save" = "Opslaan";
+"common_discardChanges" = "Wijzigingen verwerpen";
+"common_back" = "Terug";
