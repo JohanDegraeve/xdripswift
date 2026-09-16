@@ -2123,8 +2123,6 @@ import AppIntents
     private func checkAlertsCreateNotificationAndSetAppBadge() {
         // unwrap alerts and check alerts
         if let alertManager = alertManager {
-            createNotificationImages()
-
             // check if an immediate alert went off that shows the current reading
             let immediateGlucoseNotificationCreated = alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds)
 
@@ -2666,42 +2664,6 @@ import AppIntents
             }
         }
         WidgetCenter.shared.reloadAllTimelines()
-    }
-    
-    /// store notification glucose chart images in the app container documents folder
-    private func createNotificationImages() {
-        // create a small thumbnail glucose chart image to show in the standard iOS notification banner
-        createNotificationImage(glucoseChartType: .notificationImageThumbnail)
-        
-        /// create an image based upon a glucose chart view and save it to the app container documents directory
-        /// - Parameter glucoseChartType: the type of glucose chart type we want to generate (i.e. thumbnail or full notification chart)
-        func createNotificationImage(glucoseChartType: GlucoseChartType) {
-            if let bgReadingsAccessor = self.bgReadingsAccessor {
-                let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * glucoseChartType.hoursToShow(liveActivityType: .normal)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-                
-                if bgReadings.count > 0 {
-                    var bgReadingValues: [Double] = []
-                    var bgReadingDates: [Date] = []
-                    
-                    for bgReading in bgReadings {
-                        bgReadingValues.append(bgReading.finalValue)
-                        bgReadingDates.append(bgReading.timeStamp)
-                    }
-                    
-                    // create a chart view with just bg reading values and dates
-                    let glucoseChartView = GlucoseChartView(glucoseChartType: glucoseChartType, bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: .normal, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
-                    
-                    // render the glucose chart view as an image object
-                    guard let notificationImage = ImageRenderer(content: glucoseChartView).uiImage else { return }
-                    
-                    // try and save the image to the documents directory in the app container
-                    if let imageToSave = notificationImage.pngData() {
-                        let fileUrl = URL.documentsDirectory.appendingPathComponent("\(glucoseChartType.filename()).png")
-                        try? imageToSave.write(to: fileUrl)
-                    }
-                }
-            }
-        }
     }
     
     // updates the toolbar UI to show the current snooze status of the app

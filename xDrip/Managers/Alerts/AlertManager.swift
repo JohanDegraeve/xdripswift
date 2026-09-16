@@ -2,6 +2,7 @@ import AudioToolbox
 import Foundation
 import os
 import UserNotifications
+import SwiftUI
 
 /// has a function to check if an alert needs to be raised, and also raised the alert notification if needed.
 ///
@@ -14,6 +15,9 @@ public class AlertManager: NSObject {
     
     /// snoozeCategoryIdentifier for alert notification
     private let snoozeCategoryIdentifier = "snoozeCategoryIdentifier"
+
+    /// Keeps Snooze and dismissal handling without invoking the chart content extension.
+    private let textOnlySnoozeCategoryIdentifier = "textOnlySnoozeCategoryIdentifier"
 
     /// Category used when an alert has no Snooze button but dismissal still needs to be observed.
     private let dismissCategoryIdentifier = "dismissCategoryIdentifier"
@@ -721,6 +725,14 @@ public class AlertManager: NSObject {
     /// - remove any pending missed reading alert
     /// - create a new one repeating, repeat time will be equal to delay of first alert (that's what iOS allows us to do)
     private func scheduleMissedReadingAlert(snoozePeriodInMinutes: Int, content: UNNotificationContent) {
+        // Missed-reading alerts report missing data, so they do not need a generated trend image.
+        // Keep snoozed alerts text-only too, including notifications created by an older build.
+        guard let content = content.mutableCopy() as? UNMutableNotificationContent else { return }
+        content.attachments = []
+        if content.categoryIdentifier == snoozeCategoryIdentifier {
+            content.categoryIdentifier = textOnlySnoozeCategoryIdentifier
+        }
+
         // remove any planned missed reading alerts
         uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: [AlertKind.missedreading.notificationIdentifier()])
         
@@ -734,10 +746,10 @@ public class AlertManager: NSObject {
         uNUserNotificationCenter.add(notificationRequest) { error in
             if let error = error {
                 trace("Unable to Add Notification Request %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
+            } else {
+                trace("Scheduled missed reading alert with delay (and repeat) %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, snoozePeriodInMinutes.description)
             }
         }
-        
-        trace("Scheduled missed reading alert with delay (and repeat) %{public}@ minutes", log: log, category: ConstantsLog.categoryAlertManager, type: .info, snoozePeriodInMinutes.description)
     }
     
     /// will check if the alert of type alertKind needs to be fired and also fires it, plays the sound, and if yes returns true, otherwise false
@@ -863,17 +875,27 @@ public class AlertManager: NSObject {
                 }
             }
             
+            // Only glucose thresholds and rate-of-change alerts need glucose context.
+            // Device, calibration and missing-data warnings remain text-only.
+            let includesGlucose: Bool
+            switch alertKind {
+            case .verylow, .low, .high, .veryhigh, .fastdrop, .fastrise:
+                includesGlucose = true
+            case .missedreading, .calibration, .batterylow, .phonebatterylow, .notlooping,
+                 .sensorTransmitterFailure, .dexcomG5BatteryLow, .dexcomG7BatteryLow:
+                includesGlucose = false
+            }
+
             // now let's start creating the custom content
             var alertNotificationDictionary = AlertNotificationDictionary()
             
             alertNotificationDictionary.alertTitle = alertKind.alertTitle().uppercased()
             alertNotificationDictionary.alertUrgencyTypeRawValue = alertKind.alertUrgencyType().rawValue
             
-            // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
-            // this is needed due to the not being able to pass structs that are not codable/hashable
+            // Supply glucose values and timestamps only to alerts that use the expanded chart.
             let hoursOfBgReadingsToSend: Double = ConstantsGlucoseChartSwiftUI.hoursToShowNotificationExpanded
             
-            let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+            let bgReadings = includesGlucose ? bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false) : []
             
             if bgReadings.count > 0 {
                 alertNotificationDictionary.isMgDl = isMgDl
@@ -921,22 +943,36 @@ public class AlertManager: NSObject {
                 content.userInfo = userInfo
             }
             
-            // Add the chart thumbnail only when the rendered file is already
-            // available. Some alerts can fire outside the BG reading pipeline.
-            let thumbnailURL = URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationThumbnailImage).png")
-            if FileManager.default.fileExists(atPath: thumbnailURL.path) {
-                do {
-                    let thumbnailAttachment = try UNNotificationAttachment(identifier: "thumbnail", url: thumbnailURL, options: [UNNotificationAttachmentOptionsThumbnailHiddenKey: false])
-                    content.attachments = [thumbnailAttachment]
-                } catch {
-                    trace("in checkAlerts, failed to attach notification thumbnail: %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
+            // Render only for a glucose alert that will actually be submitted. A failed render
+            // must omit the thumbnail rather than attach an image from an earlier reading.
+            // Rendering is optional: never block a background caller waiting for the UI thread.
+            if includesGlucose, !bgReadings.isEmpty, Thread.isMainThread {
+                // Reuse the expanded-chart fetch, but retain the thumbnail's shorter history window.
+                let thumbnailStart = Date().addingTimeInterval(-3600 * ConstantsGlucoseChartSwiftUI.hoursToShowNotificationThumbnailImage)
+                let thumbnailReadings = bgReadings.filter { $0.timeStamp >= thumbnailStart }
+                let chart = GlucoseChartView(glucoseChartType: .notificationImageThumbnail,
+                    bgReadingValues: thumbnailReadings.map(\.finalValue), bgReadingDates: thumbnailReadings.map(\.timeStamp),
+                    isMgDl: isMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue,
+                    lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue,
+                    urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: .normal,
+                    hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil,
+                    overrideChartWidth: nil, highContrast: nil)
+                let imageData = thumbnailReadings.isEmpty ? nil : MainActor.assumeIsolated { ImageRenderer(content: chart).uiImage?.pngData() }
+                if let imageData {
+                    let thumbnailURL = URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationThumbnailImage).png")
+                    do {
+                        try imageData.write(to: thumbnailURL)
+                        content.attachments = [try UNNotificationAttachment(identifier: "thumbnail", url: thumbnailURL, options: [UNNotificationAttachmentOptionsThumbnailHiddenKey: false])]
+                    } catch {
+                        trace("in checkAlerts, failed to create notification thumbnail: %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
+                    }
                 }
             }
-            
+
             // Every alert category requests dismissal callbacks so an explicit swipe-away can enter
             // the Activity Log. Alerts configured for snooze additionally expose the Snooze action.
             content.categoryIdentifier = applicableAlertType.snooze
-                ? snoozeCategoryIdentifier
+                ? (includesGlucose ? snoozeCategoryIdentifier : textOnlySnoozeCategoryIdentifier)
                 : dismissCategoryIdentifier
 
             // The sound
@@ -1118,6 +1154,7 @@ public class AlertManager: NSObject {
         )
         
         // add the category to the UNUserNotificationCenter
+        mutableExistingCategories.insert(UNNotificationCategory(identifier: textOnlySnoozeCategoryIdentifier, actions: [action], intentIdentifiers: [], options: [.customDismissAction]))
         mutableExistingCategories.insert(generalCategory)
         mutableExistingCategories.insert(dismissCategory)
         
