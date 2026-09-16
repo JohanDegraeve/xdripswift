@@ -26,6 +26,9 @@ struct TherapyMetricState: Codable, Hashable, Sendable {
     var reason: TherapyMetricUnavailableReason?
 
     func isVisible(at date: Date = .now) -> Bool {
+        // A local cache miss or failed read is not evidence that treatments exist.
+        // Only a confirmed treatment window may create the row, including unavailable values.
+        if source == .local && visibilityDeadline == nil { return false }
         if let visibilityDeadline, date >= visibilityDeadline { return false }
         return reason != .disabled && reason != .noTreatments
     }

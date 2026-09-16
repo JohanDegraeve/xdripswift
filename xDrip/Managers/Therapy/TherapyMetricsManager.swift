@@ -139,8 +139,12 @@ final class TherapyMetricsManager {
         let currentDate = currentDate ?? date
         let window = TherapyModelSettings.visibilityInterval
         var state = TherapyMetricState(source: .local, referenceDate: date, reason: .noTreatments)
-        guard isIOB ? settings.validInsulin : settings.validCarbs else { state.reason = .invalidSettings; return state }
-        guard let entries, let recentEntries else { state.reason = .readFailed; return state }
+        let validSettings = isIOB ? settings.validInsulin : settings.validCarbs
+        let inputsAvailable = entries != nil && recentEntries != nil
+        if !validSettings { state.reason = .invalidSettings }
+        else if !inputsAvailable { state.reason = .readFailed }
+        // A loaded recent window can prove visibility while the historical window is loading.
+        // Keep the amount unavailable until both reads complete, never infer zero from a miss.
         // One pass avoids allocating several filtered treatment arrays for every chart sample.
         // Either treatment type enables both metrics, but only matching past entries add amount.
         var deadline: Date?
@@ -154,20 +158,21 @@ final class TherapyMetricsManager {
                 deadline = max(deadline ?? .distantPast, recentDeadline)
             }
         }
-        for entry in entries where entry.amount.isFinite && entry.amount > 0 && entry.date <= currentDate {
+        for entry in entries ?? [] where entry.amount.isFinite && entry.amount > 0 && entry.date <= currentDate {
             includeVisibility(entry, nearby: true)
-            guard entry.isIOB == isIOB, entry.date <= date, entry.date > date.addingTimeInterval(-window) else { continue }
+            guard validSettings, inputsAvailable, entry.isIOB == isIOB, entry.date <= date, entry.date > date.addingTimeInterval(-window) else { continue }
             let minutes = date.timeIntervalSince(entry.date) / 60
             amount += isIOB
                 ? TherapyCalculations.insulinRemaining(units: entry.amount, minutes: minutes, duration: settings.insulinDuration, peak: settings.insulinPeak)
                 : TherapyCalculations.carbsRemaining(grams: entry.amount, minutes: minutes, duration: settings.carbDuration)
         }
-        for entry in recentEntries where entry.amount.isFinite && entry.amount > 0 && entry.date <= currentDate {
+        for entry in recentEntries ?? [] where entry.amount.isFinite && entry.amount > 0 && entry.date <= currentDate {
             includeVisibility(entry, nearby: false)
         }
         guard let deadline else { return state }
-        state.amount = amount.isFinite ? amount : nil
         state.visibilityDeadline = deadline
+        guard validSettings, inputsAvailable else { return state }
+        state.amount = amount.isFinite ? amount : nil
         state.expiresAt = min(date.addingTimeInterval(TherapyModelSettings.freshnessInterval), deadline)
         state.reason = state.amount?.isFinite == true ? nil : .invalidSettings
         return state

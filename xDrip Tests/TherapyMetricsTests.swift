@@ -177,6 +177,41 @@ final class TherapyMetricsTests: XCTestCase {
         XCTAssertEqual(failed.reason, .readFailed)
     }
 
+    func testUnconfirmedLocalHistoryNeverShowsTheRow() {
+        for isIOB in [true, false] {
+            for entries: [TherapyTreatment]? in [nil, [], nil, []] {
+                let state = metric(entries, isIOB: isIOB)
+                XCTAssertFalse(state.isVisible(at: now))
+                XCTAssertNil(state.value(at: now))
+            }
+            let missingRecent = TherapyMetricsManager.localMetric(entries: [], isIOB: isIOB,
+                date: now, settings: settings, currentDate: now, recentEntries: nil)
+            XCTAssertFalse(missingRecent.isVisible(at: now))
+            XCTAssertEqual(missingRecent.reason, .readFailed)
+        }
+    }
+
+    func testConfirmedLocalWindowStaysVisibleDuringIncompleteReads() {
+        let historicalDate = now.addingTimeInterval(-10 * TherapyModelSettings.visibilityInterval)
+        for isIOB in [true, false] {
+            let loading = TherapyMetricsManager.localMetric(entries: nil, isIOB: isIOB,
+                date: historicalDate, settings: settings, currentDate: now,
+                recentEntries: [entry(20, isIOB: false)])
+            XCTAssertTrue(loading.isVisible(at: historicalDate))
+            XCTAssertNil(loading.value(at: historicalDate))
+            XCTAssertEqual(loading.reason, .readFailed)
+            let loaded = TherapyMetricsManager.localMetric(entries: [], isIOB: isIOB,
+                date: historicalDate, settings: settings, currentDate: now,
+                recentEntries: [entry(20, isIOB: false)])
+            XCTAssertTrue(loaded.isVisible(at: historicalDate))
+            XCTAssertEqual(loaded.value(at: historicalDate), 0)
+            let missingRecent = TherapyMetricsManager.localMetric(entries: [entry(2)], isIOB: isIOB,
+                date: now, settings: settings, currentDate: now, recentEntries: nil)
+            XCTAssertTrue(missingRecent.isVisible(at: now))
+            XCTAssertNil(missingRecent.value(at: now))
+        }
+    }
+
     func testLocalValuesHaveNoApproximationSymbol() {
         XCTAssertEqual(metric([entry(2)]).formatted(isIOB: true, at: now), "2 U")
         XCTAssertEqual(metric([entry(20, isIOB: false)], isIOB: false).formatted(isIOB: false, at: now), "20 g")

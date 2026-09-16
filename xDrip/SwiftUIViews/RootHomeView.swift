@@ -422,14 +422,16 @@ struct RootHomeView: View {
     /// The original iPhone hierarchy remains isolated here so the tablet composition cannot alter
     /// phone sizing, ordering, or gesture behaviour.
     private func phoneContent() -> some View {
-        VStack(spacing: Layout.sectionSpacing) {
+        // Resolve once so an asynchronous cache completion cannot disagree with row contents.
+        let loop = loopDisplayState
+        return VStack(spacing: Layout.sectionSpacing) {
             homeHeader
 
             VStack(spacing: Layout.rowSpacing) {
                 glucoseStatusRow
 
-                if showsTherapyRow {
-                    RootHomeLoopView(state: loopDisplayState, actions: actions)
+                if showsTherapyRow(loop) {
+                    RootHomeLoopView(state: loop, actions: actions)
                 }
 
                 mainChart
@@ -526,9 +528,12 @@ struct RootHomeView: View {
     }
 
     @ViewBuilder private func ipadGlanceBand(availableWidth: CGFloat) -> some View {
+        // Card height, visibility and contents must use the same resolved snapshot.
+        let loop = loopDisplayState
+        let cardHeight = ipadGlanceCardHeight(loop)
         if availableWidth < 720 || dynamicTypeSize.isAccessibilitySize {
             VStack(spacing: 12) {
-                ipadCurrentStatusCard()
+                ipadCurrentStatusCard(loop: loop)
 
                 if state.visibility.showsStatistics {
                     ipadStatisticsCard()
@@ -542,7 +547,8 @@ struct RootHomeView: View {
 
             HStack(alignment: .top, spacing: Layout.ipadGlanceCardSpacing) {
                 ipadCurrentStatusCard(
-                    height: ipadGlanceCardHeight,
+                    loop: loop,
+                    height: cardHeight,
                     horizontalPadding: currentStatusHorizontalPadding,
                     pumpGlucoseSpacing: ipadPumpGlucoseSpacing(
                         for: cardWidth,
@@ -552,17 +558,17 @@ struct RootHomeView: View {
                     .frame(width: cardWidth)
 
                 if state.visibility.showsStatistics {
-                    ipadStatisticsCard(height: ipadGlanceCardHeight)
+                    ipadStatisticsCard(height: cardHeight)
                         .frame(width: cardWidth)
                 }
             }
         }
     }
 
-    private var ipadGlanceCardHeight: CGFloat {
+    private func ipadGlanceCardHeight(_ loop: RootHomeLoopState) -> CGFloat {
         let currentStatusHeight = Layout.glucoseStatusRowHeight
             + (Layout.ipadGlanceCardVerticalPadding * 2)
-            + (showsTherapyRow ? Layout.ipadLoopRowSpacing + Layout.ipadLoopRowHeight : 0)
+            + (showsTherapyRow(loop) ? Layout.ipadLoopRowSpacing + Layout.ipadLoopRowHeight : 0)
 
         guard state.visibility.showsStatistics else { return currentStatusHeight }
 
@@ -600,6 +606,7 @@ struct RootHomeView: View {
     }
 
     private func ipadCurrentStatusCard(
+        loop: RootHomeLoopState,
         height: CGFloat? = nil,
         horizontalPadding: CGFloat = Layout.ipadGlanceCardHorizontalPadding,
         pumpGlucoseSpacing: CGFloat = Layout.ipadPumpGlucoseSpacing
@@ -607,8 +614,8 @@ struct RootHomeView: View {
         VStack(spacing: Layout.ipadLoopRowSpacing) {
             glucoseStatusRow(spacing: pumpGlucoseSpacing)
 
-            if showsTherapyRow {
-                RootHomeLoopView(state: loopDisplayState, actions: actions)
+            if showsTherapyRow(loop) {
+                RootHomeLoopView(state: loop, actions: actions)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -928,8 +935,8 @@ struct RootHomeView: View {
         )
     }
 
-    private var showsTherapyRow: Bool {
-        !state.usesScreenLockNightLayout && (loopDisplayState.showsIOB || loopDisplayState.showsCOB || loopDisplayState.showsAIDStatus)
+    private func showsTherapyRow(_ loop: RootHomeLoopState) -> Bool {
+        !state.usesScreenLockNightLayout && (loop.showsIOB || loop.showsCOB || loop.showsAIDStatus)
     }
 
     private var loopDisplayState: RootHomeLoopState {
@@ -948,7 +955,7 @@ struct RootHomeView: View {
                 statusTitle: loopStatusState.title,
                 statusSymbol: loopStatusState.symbol,
                 statusColor: ConstantsAppColors.secondaryText
-            ))
+            ), at: referenceDate, external: nil)
         }
 
         return historicalLoopState(
@@ -957,7 +964,7 @@ struct RootHomeView: View {
                 referenceDate: referenceDate,
                 usesRelativeStatusTime: false,
                 defaultTextColor: ConstantsAppColors.secondaryText
-            )
+            ), at: referenceDate, external: snapshot.aidStatus
         )
     }
 
@@ -968,10 +975,9 @@ struct RootHomeView: View {
         return pumpState
     }
 
-    private func historicalLoopState(_ loopState: RootHomeLoopState) -> RootHomeLoopState {
+    private func historicalLoopState(_ loopState: RootHomeLoopState, at date: Date, external: AIDStatus?) -> RootHomeLoopState {
         var result = stateModel.historicalLoopState(loopState, aidAnalyticsSource: UserDefaults.standard.dataFlowPolicy.aidAnalyticsSource)
-        stateModel.applyTherapyMetrics(to: &result, at: historicalReferenceDate,
-            external: historicalDataCache.selection(at: historicalReferenceDate).deviceStatus?.aidStatus, historical: true)
+        stateModel.applyTherapyMetrics(to: &result, at: date, external: external, historical: true)
         return result
     }
 
