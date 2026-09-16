@@ -80,7 +80,7 @@
 "common_statistics_cvTrend" = "Tendência CV";
 "common_statistics_dailyPattern" = "Padrão Diário";
 "common_statistics_averageFormat" = "Média %@";
-"common_statistics_dailyPatternFooter" = "As barras mostram a percentagem diária no intervalo 70-180 mg/dL. A linha tracejada marca o alvo clínico de 70%.";
+"common_statistics_dailyPatternFooter" = "As barras mostram a percentagem diária no intervalo %@. A linha tracejada marca o alvo clínico de 70%%.";
 "common_statistics_dailySummary" = "Resumo Diário";
 "common_statistics_bestDay" = "Melhor Dia";
 "common_statistics_mostLow" = "Mais Baixo";

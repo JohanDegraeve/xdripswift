@@ -81,7 +81,7 @@
 "common_statistics_cvTrend" = "CV trend";
 "common_statistics_dailyPattern" = "Daily Pattern";
 "common_statistics_averageFormat" = "Average %@";
-"common_statistics_dailyPatternFooter" = "Bars show daily percentage in 70-180 mg/dL range. The dashed line marks the 70% clinical target.";
+"common_statistics_dailyPatternFooter" = "Bars show daily percentage in %@ range. The dashed line marks the 70%% clinical target.";
 "common_statistics_dailySummary" = "Daily Summary";
 "common_statistics_bestDay" = "Best Day";
 "common_statistics_mostLow" = "Most Low";

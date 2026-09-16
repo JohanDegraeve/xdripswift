@@ -90,7 +90,7 @@
 "common_statistics_cvTrend" = "Tendance CV";
 "common_statistics_dailyPattern" = "Profil Quotidien";
 "common_statistics_averageFormat" = "Moyenne %@";
-"common_statistics_dailyPatternFooter" = "Les barres indiquent le pourcentage quotidien dans la plage 70-180 mg/dL. La ligne pointillée marque l'objectif clinique de 70%.";
+"common_statistics_dailyPatternFooter" = "Les barres indiquent le pourcentage quotidien dans la plage %@. La ligne pointillée marque l'objectif clinique de 70%%.";
 "common_statistics_dailySummary" = "Résumé Quotidien";
 "common_statistics_bestDay" = "Meilleur Jour";
 "common_statistics_mostLow" = "Plus Bas";

@@ -739,11 +739,19 @@ private struct StatisticsDailyPatternCard: View {
                 }
             }
 
-            Text(Texts_Common.statisticsDailyPatternFooter)
+            Text(dailyPatternFooter)
                 .font(.caption2)
                 .foregroundStyle(Color(.colorSecondary))
                 .padding(.horizontal, 12)
         }
+    }
+
+    /// Format the fixed clinical range in the same units as the rest of this report.
+    private var dailyPatternFooter: String {
+        let low = GlucoseReportClinicalConstants.timeInRangeLowMgDl.mgDlToMmolAndToString(mgDl: analytics.usesMgDl)
+        let high = GlucoseReportClinicalConstants.timeInRangeHighMgDl.mgDlToMmolAndToString(mgDl: analytics.usesMgDl)
+        let unit = analytics.usesMgDl ? Texts_Common.mgdl : Texts_Common.mmol
+        return Texts_Common.statisticsDailyPatternFooter(range: "\(low)-\(high) \(unit)")
     }
 
     private var overallInRangePercentage: Double {

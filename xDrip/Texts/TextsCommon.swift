@@ -332,9 +332,11 @@ class Texts_Common {
         return NSLocalizedString("common_statistics_averageFormat", tableName: filename, bundle: Bundle.main, value: "Average %@", comment: "statistics average value format")
     }()
 
-    static let statisticsDailyPatternFooter = {
-        return NSLocalizedString("common_statistics_dailyPatternFooter", tableName: filename, bundle: Bundle.main, value: "Bars show daily percentage in 70-180 mg/dL range. The dashed line marks the 70% clinical target.", comment: "statistics daily pattern chart footer")
-    }()
+    /// The caller supplies the clinical range in the report's selected units.
+    static func statisticsDailyPatternFooter(range: String) -> String {
+        let format = NSLocalizedString("common_statistics_dailyPatternFooter", tableName: filename, bundle: Bundle.main, value: "Bars show daily percentage in %@ range. The dashed line marks the 70%% clinical target.", comment: "statistics daily pattern chart footer; %@ is the glucose range with units")
+        return String(format: format, range)
+    }
 
     static let statisticsAverageTDD = {
         return NSLocalizedString("common_statistics_averageTDD", tableName: filename, bundle: Bundle.main, value: "Average TDD", comment: "statistics AID average total daily dose title")

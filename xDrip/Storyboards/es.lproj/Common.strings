@@ -78,7 +78,7 @@
 "common_statistics_cvTrend" = "Tendencia de CV";
 "common_statistics_dailyPattern" = "Patrón Diario";
 "common_statistics_averageFormat" = "Media %@";
-"common_statistics_dailyPatternFooter" = "Las barras muestran el porcentaje diario en el rango 70-180 mg/dL. La línea discontinua marca el objetivo clínico del 70%.";
+"common_statistics_dailyPatternFooter" = "Las barras muestran el porcentaje diario en el rango %@. La línea discontinua marca el objetivo clínico del 70%%.";
 "common_statistics_dailySummary" = "Resumen Diario";
 "common_statistics_bestDay" = "Mejor Día";
 "common_statistics_mostLow" = "Más Bajo";

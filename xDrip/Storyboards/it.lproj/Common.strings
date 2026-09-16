@@ -191,7 +191,7 @@
 "common_statistics_cvTrend" = "Tendenza CV";
 "common_statistics_dailyPattern" = "Andamento Giornaliero";
 "common_statistics_averageFormat" = "Media %@";
-"common_statistics_dailyPatternFooter" = "Le barre mostrano la percentuale giornaliera nell'intervallo 70-180 mg/dL. La linea tratteggiata indica l'obiettivo clinico del 70%.";
+"common_statistics_dailyPatternFooter" = "Le barre mostrano la percentuale giornaliera nell'intervallo %@. La linea tratteggiata indica l'obiettivo clinico del 70%%.";
 "common_statistics_dailySummary" = "Riepilogo Giornaliero";
 "common_statistics_bestDay" = "Giorno Migliore";
 "common_statistics_mostLow" = "Più Basso";

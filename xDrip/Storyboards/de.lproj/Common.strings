@@ -157,7 +157,7 @@
 "common_statistics_cvTrend" = "CV-Trend";
 "common_statistics_dailyPattern" = "Tagesmuster";
 "common_statistics_averageFormat" = "Durchschnitt %@";
-"common_statistics_dailyPatternFooter" = "Balken zeigen den täglichen Prozentanteil im Bereich 70-180 mg/dL. Die gestrichelte Linie markiert das klinische Ziel von 70%.";
+"common_statistics_dailyPatternFooter" = "Balken zeigen den täglichen Prozentanteil im Bereich %@. Die gestrichelte Linie markiert das klinische Ziel von 70%%.";
 "common_statistics_dailySummary" = "Tagesübersicht";
 "common_statistics_bestDay" = "Bester Tag";
 "common_statistics_mostLow" = "Meiste Niedrig";

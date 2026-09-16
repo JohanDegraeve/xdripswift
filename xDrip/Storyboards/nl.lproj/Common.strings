@@ -81,7 +81,7 @@
 "common_statistics_cvTrend" = "CV-trend";
 "common_statistics_dailyPattern" = "Dagpatroon";
 "common_statistics_averageFormat" = "Gemiddeld %@";
-"common_statistics_dailyPatternFooter" = "Balken tonen het dagelijkse percentage binnen 70-180 mg/dL. De stippellijn markeert het klinische doel van 70%.";
+"common_statistics_dailyPatternFooter" = "Balken tonen het dagelijkse percentage binnen %@. De stippellijn markeert het klinische doel van 70%%.";
 "common_statistics_dailySummary" = "Dagsamenvatting";
 "common_statistics_bestDay" = "Beste Dag";
 "common_statistics_mostLow" = "Meeste Laag";
