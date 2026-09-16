@@ -310,6 +310,9 @@ struct LandscapeChartView: View {
     @ObservedObject var stateModel: LandscapeChartStateModel
     let presentation: Presentation
 
+    // The badge and AGP share one selection so their clinical boundaries always agree.
+    @State private var rangeMode = LandscapeTIRBadge.RangeMode.timeInRange
+
     private enum Layout {
         static let screenPadding: CGFloat = 6
         static let contentSpacing: CGFloat = 8
@@ -404,7 +407,8 @@ struct LandscapeChartView: View {
             canMoveForward: stateModel.canMoveForward,
             moveBackOneDay: stateModel.moveBackOneDay,
             moveForwardOneDay: stateModel.moveForwardOneDay,
-            selectToday: stateModel.selectToday
+            selectToday: stateModel.selectToday,
+            usesTightRange: rangeMode == .timeInTightRange
         )
     }
 
@@ -430,7 +434,8 @@ struct LandscapeChartView: View {
 
             LandscapeTIRBadge(
                 rangeSummary: stateModel.rangeSummary,
-                isExpandedIPad: presentation == .expandedIPad
+                isExpandedIPad: presentation == .expandedIPad,
+                rangeMode: $rangeMode
             )
         }
         .padding(.horizontal, 14)
@@ -677,6 +682,7 @@ private struct LandscapeAGPComparisonChart: View {
     let moveBackOneDay: () -> Void
     let moveForwardOneDay: () -> Void
     let selectToday: () -> Void
+    var usesTightRange = false
 
     @State private var hasTriggeredSwipe = false
     @State private var contentWidth: CGFloat = 0
@@ -688,7 +694,8 @@ private struct LandscapeAGPComparisonChart: View {
             presentation: .landscapeComparison,
             glucosePoints: agpGlucosePoints,
             showsNowRule: Calendar.current.isDateInToday(displayedDate),
-            emptyMessage: Texts_Common.statisticsWaitingForGlucoseData
+            emptyMessage: Texts_Common.statisticsWaitingForGlucoseData,
+            usesTightRange: usesTightRange
         )
         .padding(.horizontal, 6)
         .padding(.top, 2)
@@ -854,7 +861,7 @@ private struct LandscapeGlucosePoint: Identifiable {
 
 private struct LandscapeTIRBadge: View {
 
-    private enum RangeMode: CaseIterable {
+    enum RangeMode: CaseIterable {
         case timeInRange
         case timeInTightRange
 
@@ -873,7 +880,7 @@ private struct LandscapeTIRBadge: View {
     let rangeSummary: GlucoseClinicalRangeSummary
     var isExpandedIPad = false
 
-    @State private var rangeMode = RangeMode.timeInRange
+    @Binding var rangeMode: RangeMode
 
     var body: some View {
         HStack(spacing: isExpandedIPad ? 22 : 8) {
