@@ -123,10 +123,13 @@ enum CareLinkTherapyParser {
     }
 
     /// Converts only the three marker families that have unambiguous treatment semantics.
+    /// CareLink can shift historical `timestamp` values between polls while `displayTime` stays
+    /// fixed. Prefer the event display time so unchanged deliveries retain their fallback identity.
     private static func marker(_ marker: [String: Any], patientID: String, offset: TimeInterval, now: Date) -> CareLinkTherapyRecord? {
         guard let markerType = string(marker["type"]),
               markerType != "AUTO_BASAL_DELIVERY",
-              let date = date(marker["timestamp"] ?? marker["dateTime"] ?? marker["displayTime"], offset: offset),
+              let date = (date(marker["displayTime"], offset: offset)
+                  ?? date(marker["timestamp"] ?? marker["dateTime"], offset: offset)),
               date <= now.addingTimeInterval(5 * 60),
               date >= now.addingTimeInterval(-48 * 60 * 60)
         else {
@@ -170,6 +173,7 @@ enum CareLinkTherapyParser {
     }
 
     /// Stores each native auto-basal amount and retains the interval to the next marker as metadata.
+    /// As with boluses and meals, prefer stable `displayTime` over the poll-dependent `timestamp`.
     ///
     /// The interval calculation was adapted from Nocturne's CareLink treatment mapper:
     /// https://github.com/nightscout/nocturne/blob/7df0daaabe59e3430c375272e86695423c885dfa/src/Connectors/Nocturne.Connectors.CareLink/Mappers/CareLinkTreatmentMapper.cs
@@ -177,7 +181,8 @@ enum CareLinkTherapyParser {
         var seen = Set<String>()
         let values = markers.compactMap { marker -> (date: Date, amount: Double, id: String?)? in
             guard string(marker["type"])?.caseInsensitiveCompare("AUTO_BASAL_DELIVERY") == .orderedSame,
-                  let date = date(marker["timestamp"] ?? marker["dateTime"] ?? marker["displayTime"], offset: offset),
+                  let date = (date(marker["displayTime"], offset: offset)
+                      ?? date(marker["timestamp"] ?? marker["dateTime"], offset: offset)),
                   date <= now.addingTimeInterval(5 * 60),
                   date >= now.addingTimeInterval(-48 * 60 * 60),
                   let amount = number(field("bolusAmount", marker: marker)),

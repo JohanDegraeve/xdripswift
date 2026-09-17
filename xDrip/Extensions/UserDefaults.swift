@@ -103,6 +103,10 @@ extension UserDefaults {
         case careLinkRegion = "careLinkRegion"
         /// Non-secret stable identifier for the personal CareLink account represented as a patient.
         case careLinkSelectedPatientID = "careLinkSelectedPatientID"
+        /// Store-wide historical repair completed and saved successfully.
+        case careLinkTimestampRepairCompleted = "careLinkTimestampRepairCompleted"
+        /// Corroborated patient namespaces used to deduplicate future imports.
+        case careLinkPatientAliases = "careLinkPatientAliases"
         /// CarePartner mobile app version used for discovery and data requests.
         case careLinkVersion = "careLinkVersion"
         /// Flag indicating if the last connections fetch failed (to show error in UI)
