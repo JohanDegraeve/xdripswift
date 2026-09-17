@@ -1122,32 +1122,40 @@ struct GlucoseChartView: View {
         .allowsHitTesting(false)
     }
 
-    /// Native SF Symbols are the actual chart points, with dose labels anchored separately.
-    private func treatmentSymbolMarks(points: [GlucoseChartTreatmentPoint], systemImage: String?, size: @escaping (Double) -> Double, color: Color, labelPosition: AnnotationPosition?, verticalLabel: Bool = false) -> some ChartContent {
+    /// Keep labels in the symbol's coordinate space. With the iOS 27 SDK, Charts annotations
+    /// on custom symbols can be displaced from the mark. An overlay preserves the symbol's
+    /// size and data position while anchoring the label to its actual top or bottom edge.
+    private func treatmentSymbolMarks(points: [GlucoseChartTreatmentPoint], systemImage: String?, size: @escaping (Double) -> Double, color: Color, labelPosition: VerticalAlignment?, verticalLabel: Bool = false) -> some ChartContent {
         ForEach(points) { point in
             PointMark(x: .value("Time", point.date), y: .value("BG", point.yValue))
                 .symbol {
-                    if let systemImage {
-                        ChartTreatmentSymbol(systemImage: systemImage, size: size(point.treatmentValue), color: color)
-                    } else {
-                        // A zero-size anchor places note labels directly above the glucose value.
-                        Color.clear.frame(width: size(point.treatmentValue), height: size(point.treatmentValue))
-                    }
-                }
-                .annotation(position: labelPosition ?? .overlay) {
-                    if labelPosition != nil, let label = point.label {
-                        if verticalLabel {
-                            // Rotating counter-clockwise puts the text's leading edge at the bottom,
-                            // immediately above the note anchor, and lets the remaining text read upward.
-                            VerticalChartLabelLayout {
-                                // The leading arrow points down toward the reading after rotation.
-                                treatmentLabel("← \(label)", fontSize: GlucoseChartTreatmentStyle.noteLabelFontSize, color: Color(.colorSecondary))
-                                    .fixedSize()
-                                    .rotationEffect(.degrees(-90))
-                            }
-                            .padding(.bottom, GlucoseChartTreatmentStyle.noteLabelExtraSpacing)
+                    Group {
+                        if let systemImage {
+                            ChartTreatmentSymbol(systemImage: systemImage, size: size(point.treatmentValue), color: color)
                         } else {
-                            treatmentLabel(label)
+                            // A zero-size anchor places note labels directly above the glucose value.
+                            Color.clear.frame(width: 0, height: 0)
+                        }
+                    }
+                    .overlay(alignment: labelPosition == .bottom ? .bottom : .top) {
+                        if let labelPosition, let label = point.label {
+                            Group {
+                                if verticalLabel {
+                                    // The leading arrow points down toward the reading after rotation.
+                                    VerticalChartLabelLayout {
+                                        treatmentLabel("← \(label)", fontSize: GlucoseChartTreatmentStyle.noteLabelFontSize, color: Color(.colorSecondary))
+                                            .fixedSize()
+                                            .rotationEffect(.degrees(-90))
+                                    }
+                                    .padding(.bottom, GlucoseChartTreatmentStyle.noteLabelExtraSpacing)
+                                } else {
+                                    treatmentLabel(label)
+                                }
+                            }
+                            .fixedSize()
+                            // Place the label outside the symbol without enlarging its layout bounds.
+                            .frame(height: 0, alignment: labelPosition == .bottom ? .top : .bottom)
+                            .offset(y: labelPosition == .bottom ? 4 : -4)
                         }
                     }
                 }

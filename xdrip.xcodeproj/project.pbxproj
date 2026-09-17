@@ -8,13 +8,17 @@
 
 /* Begin PBXBuildFile section */
 		07ECB18D91AE096E637D1393 /* AlertsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */; };
+		0A51F9C534B04BD682E1EF4D /* xDrip Tests/TherapyMetricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E2401E5ED94424A2FEC5E8 /* xDrip Tests/TherapyMetricsTests.swift */; };
 		111352851C2F8F73108A3A62 /* CareLinkAccountState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F081BB1D5F106F950C4A8EA4 /* CareLinkAccountState.swift */; };
 		16A7F56E1D1ED24F03F2070F /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
 		1E83ECCFB4B5916FC5738267 /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
+		27D7B1AFE8E34C2E8393D1E1 /* xDrip/Constants/TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* xDrip/Constants/TherapyMetrics.swift */; };
 		2BB9AEE4FF9AF41B59A1AA52 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C75EA5D78E3497AC44D3C8 /* SettingsView.swift */; };
 		360BF345E424B38E3822AA76 /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
 		377EBC0A484BFC8EA77C623C /* CareLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA4DE8668C9A16DFF21A411 /* CareLinkTests.swift */; };
 		3A28B7171D22DFBFB68828A4 /* CareLinkModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A32F780DBE240AE91ECDBB /* CareLinkModels.swift */; };
+		4374EA58DDB14111B1163758 /* xDrip/Constants/TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* xDrip/Constants/TherapyMetrics.swift */; };
+		451EDB22DE5243BAB691DBC1 /* xDrip/Constants/TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* xDrip/Constants/TherapyMetrics.swift */; };
 		47037B8E2C072346000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
 		47037B8F2C072973000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
 		47037B902C072974000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
@@ -301,7 +305,6 @@
 		4D7B00023014000200000001 /* CGMG5SensorSessionDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */; };
 		4D7C00023015000100000001 /* CalibrationReadinessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7C00013015000100000001 /* CalibrationReadinessTests.swift */; };
 		4D7D00023016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */; };
-		B1E511022026091100000001 /* BluetoothSignalStrengthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */; };
 		4D7E00023017000200000001 /* DexcomG6BluetoothSlotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E00013017000200000001 /* DexcomG6BluetoothSlotTests.swift */; };
 		4D7F00023018000100000001 /* DexcomG7CalibrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7F00013018000100000001 /* DexcomG7CalibrationTests.swift */; };
 		4D7F00043018000100000001 /* DexcomG7CalibrationMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7F00033018000100000001 /* DexcomG7CalibrationMessages.swift */; };
@@ -333,7 +336,6 @@
 		4F3100023007000100000001 /* BatteryHistorySample+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3100123007000100000001 /* BatteryHistorySample+CoreDataProperties.swift */; };
 		4F3100033007000100000001 /* BatteryHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3100133007000100000001 /* BatteryHistoryManager.swift */; };
 		4F3100043007000100000001 /* BatteryHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3100143007000100000001 /* BatteryHistoryView.swift */; };
-		B1E511042026091100000001 /* BluetoothSignalStrengthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */; };
 		4F3100053007000100000001 /* BatteryHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3100153007000100000001 /* BatteryHistoryTests.swift */; };
 		4F3200013008000100000001 /* BgReadingTrendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3200023008000100000001 /* BgReadingTrendTests.swift */; };
 		4F67A33C4EC32A86ABC85882 /* CareLinkFollowerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBC8BB898BFD4C30858ED5D /* CareLinkFollowerSettings.swift */; };
@@ -342,6 +344,7 @@
 		5A0100043015000100000001 /* GlucoseRangeDistributionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0100033015000100000001 /* GlucoseRangeDistributionTests.swift */; };
 		618287B9087F5CD4BAB62085 /* CareLinkTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBDAD3BFBEF70B1B2A1AFAD /* CareLinkTokenStore.swift */; };
 		745981A52E1F1B0F85780B06 /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
+		7BA551B287B846F5BBA7B6D3 /* xDrip/Constants/TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* xDrip/Constants/TherapyMetrics.swift */; };
 		7DDD89BD4ECFCE7BDA8D3AE2 /* SettingsSharedUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */; };
 		A10000000000000000000001 /* FollowerSettingsScreenFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* FollowerSettingsScreenFactory.swift */; };
 		A10000000000000000000002 /* NightscoutFollowerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* NightscoutFollowerSettings.swift */; };
@@ -362,6 +365,9 @@
 		A40000010000000000000001 /* FollowerSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40000020000000000000001 /* FollowerSettingsTests.swift */; };
 		A50000010000000000000001 /* OnlineHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50000020000000000000001 /* OnlineHelp.swift */; };
 		A50000030000000000000001 /* OnlineHelpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50000040000000000000001 /* OnlineHelpTests.swift */; };
+		B1E511022026091100000001 /* BluetoothSignalStrengthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */; };
+		B1E511042026091100000001 /* BluetoothSignalStrengthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */; };
+		B3DBAE6F4DF8465BBF554DE4 /* xDrip/Managers/Therapy/TherapyMetricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F219EC5BAAF4D5E924415FA /* xDrip/Managers/Therapy/TherapyMetricsManager.swift */; };
 		BA0000010000000000000001 /* BackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000011 /* BackupModels.swift */; };
 		BA0000010000000000000002 /* BackupCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000012 /* BackupCrypto.swift */; };
 		BA0000010000000000000003 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000013 /* BackupService.swift */; };
@@ -375,7 +381,9 @@
 		BA0000020000000000000001 /* NightscoutFollowerGapFillService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000020000000000000011 /* NightscoutFollowerGapFillService.swift */; };
 		BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */; };
 		BA0709260000000000000001 /* BasalInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0709260000000000000002 /* BasalInjectionTests.swift */; };
+		C15D80D0E8DB47A6A9BE68DF /* xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05272484BD024BDAAA341C1C /* xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift */; };
 		C2385D0CA6579919114B060A /* AlertTypesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */; };
+		C606CA18273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606CA17273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift */; };
 		C8BA6BBA5746888144511D55 /* GlucoseChartStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685B5F8D633F5492574F0567 /* GlucoseChartStateManager.swift */; };
 		CA1E00010000000000000001 /* CareLinkTherapyImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1E00020000000000000001 /* CareLinkTherapyImporter.swift */; };
 		CA1E00030000000000000001 /* CareLinkPumpStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1E00040000000000000001 /* CareLinkPumpStatusView.swift */; };
@@ -391,7 +399,9 @@
 		D4FD899727772F9100689788 /* TreatmentEntryAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */; };
 		DAF100012E7A000100000001 /* DataFlowPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF100022E7A000100000001 /* DataFlowPolicy.swift */; };
 		DB718DBF9805AC4B21C95739 /* TimeScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */; };
+		DE59C307960F40F880724B66 /* xDrip/Constants/TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* xDrip/Constants/TherapyMetrics.swift */; };
 		E4C006212B3DE8EC00D59303 /* GlucoseIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C006202B3DE8EC00D59303 /* GlucoseIntent.swift */; };
+		E4D530632B418FF80018C6A4 /* AppShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D530622B418FF80018C6A4 /* AppShortcuts.swift */; };
 		F227BF192B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF182B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift */; };
 		F227BF1C2B9E426B00CEEAAD /* ContactImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */; };
 		F51B9F7D24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */; };
@@ -708,7 +718,6 @@
 		F8CB59C42739D1CD00BA199E /* DexcomBackfillTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59C32739D1CD00BA199E /* DexcomBackfillTxMessage.swift */; };
 		F8CB59C6273ECFE500BA199E /* DexcomG6GlucoseDataRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59C5273ECFE500BA199E /* DexcomG6GlucoseDataRxMessage.swift */; };
 		F8CB59C8273EF9F800BA199E /* DexcomAlgorithmState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59C7273EF9F800BA199E /* DexcomAlgorithmState.swift */; };
-		C606CA18273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606CA17273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift */; };
 		F8CB59CA27405A6800BA199E /* DexcomCalibrationTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59C927405A6800BA199E /* DexcomCalibrationTxMessage.swift */; };
 		F8CB59CC2744471100BA199E /* DexcomSessionStartResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59CB2744471000BA199E /* DexcomSessionStartResponse.swift */; };
 		F8CB59CE27444D6300BA199E /* DexcomSessionStopResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59CD27444D6300BA199E /* DexcomSessionStopResponse.swift */; };
@@ -814,14 +823,6 @@
 		F8FDFEAD260DE1B90047597D /* ConstantsUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */; };
 		FBA100020000000000000001 /* FollowerBackgroundKeepAliveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA100010000000000000001 /* FollowerBackgroundKeepAliveManager.swift */; };
 		FBA100040000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */; };
-		451EDB22DE5243BAB691DBC1 /* TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */; };
-		7BA551B287B846F5BBA7B6D3 /* TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */; };
-		4374EA58DDB14111B1163758 /* TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */; };
-		DE59C307960F40F880724B66 /* TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */; };
-		27D7B1AFE8E34C2E8393D1E1 /* TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */; };
-		B3DBAE6F4DF8465BBF554DE4 /* TherapyMetricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F219EC5BAAF4D5E924415FA /* TherapyMetricsManager.swift */; };
-		C15D80D0E8DB47A6A9BE68DF /* TherapyMetricsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05272484BD024BDAAA341C1C /* TherapyMetricsSettingsView.swift */; };
-		0A51F9C534B04BD682E1EF4D /* TherapyMetricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E2401E5ED94424A2FEC5E8 /* TherapyMetricsTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -910,6 +911,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		05272484BD024BDAAA341C1C /* xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift; sourceTree = SOURCE_ROOT; };
 		102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertTypesSettingsView.swift; sourceTree = "<group>"; };
 		198D44C4260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Alerts.strings; sourceTree = "<group>"; };
 		198D44C5260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
@@ -1207,7 +1209,6 @@
 		4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG5SensorSessionDetectionTests.swift; sourceTree = "<group>"; };
 		4D7C00013015000100000001 /* CalibrationReadinessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationReadinessTests.swift; sourceTree = "<group>"; };
 		4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDisplayStatusTests.swift; sourceTree = "<group>"; };
-		B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothSignalStrengthTests.swift; sourceTree = "<group>"; };
 		4D7E00013017000200000001 /* DexcomG6BluetoothSlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG6BluetoothSlotTests.swift; sourceTree = "<group>"; };
 		4D7F00013018000100000001 /* DexcomG7CalibrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG7CalibrationTests.swift; sourceTree = "<group>"; };
 		4D7F00033018000100000001 /* DexcomG7CalibrationMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG7CalibrationMessages.swift; sourceTree = "<group>"; };
@@ -1260,17 +1261,19 @@
 		4F3100123007000100000001 /* BatteryHistorySample+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "BatteryHistorySample+CoreDataProperties.swift"; path = "xDrip/Core Data/Extensions/BatteryHistorySample+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		4F3100133007000100000001 /* BatteryHistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryHistoryManager.swift; sourceTree = "<group>"; };
 		4F3100143007000100000001 /* BatteryHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryHistoryView.swift; sourceTree = "<group>"; };
-		B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothSignalStrengthView.swift; sourceTree = "<group>"; };
 		4F3100153007000100000001 /* BatteryHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryHistoryTests.swift; sourceTree = "<group>"; };
 		4F3100313007000100000001 /* xdrip v31.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v31.xcdatamodel"; sourceTree = "<group>"; };
 		4F3200023008000100000001 /* BgReadingTrendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingTrendTests.swift; sourceTree = "<group>"; };
+		50E2401E5ED94424A2FEC5E8 /* xDrip Tests/TherapyMetricsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "xDrip Tests/TherapyMetricsTests.swift"; sourceTree = SOURCE_ROOT; };
 		5A0100013015000100000001 /* GlucoseRangeDistribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseRangeDistribution.swift; sourceTree = "<group>"; };
 		5A0100033015000100000001 /* GlucoseRangeDistributionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseRangeDistributionTests.swift; sourceTree = "<group>"; };
+		5F219EC5BAAF4D5E924415FA /* xDrip/Managers/Therapy/TherapyMetricsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDrip/Managers/Therapy/TherapyMetricsManager.swift; sourceTree = SOURCE_ROOT; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xDrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xDrip/Version.xcconfig; sourceTree = "<group>"; };
 		685B5F8D633F5492574F0567 /* GlucoseChartStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartStateManager.swift; sourceTree = "<group>"; };
 		763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertsSettingsView.swift; sourceTree = "<group>"; };
 		7C0FD9F50417D2E4B3ABA2D6 /* CareLinkFollowManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkFollowManager.swift; sourceTree = "<group>"; };
+		80CB0A0412324311A4F99E46 /* xDrip/Constants/TherapyMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDrip/Constants/TherapyMetrics.swift; sourceTree = SOURCE_ROOT; };
 		A20000000000000000000001 /* FollowerSettingsScreenFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerSettingsScreenFactory.swift; sourceTree = "<group>"; };
 		A20000000000000000000002 /* NightscoutFollowerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowerSettings.swift; sourceTree = "<group>"; };
 		A20000000000000000000003 /* LibreLinkUpFollowerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreLinkUpFollowerSettings.swift; sourceTree = "<group>"; };
@@ -1290,6 +1293,8 @@
 		A50000020000000000000001 /* OnlineHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineHelp.swift; sourceTree = "<group>"; };
 		A50000040000000000000001 /* OnlineHelpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineHelpTests.swift; sourceTree = "<group>"; };
 		ABA4DE8668C9A16DFF21A411 /* CareLinkTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkTests.swift; sourceTree = "<group>"; };
+		B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothSignalStrengthTests.swift; sourceTree = "<group>"; };
+		B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothSignalStrengthView.swift; sourceTree = "<group>"; };
 		B7A32F780DBE240AE91ECDBB /* CareLinkModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkModels.swift; sourceTree = "<group>"; };
 		BA0000010000000000000011 /* BackupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupModels.swift; sourceTree = "<group>"; };
 		BA0000010000000000000012 /* BackupCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupCrypto.swift; sourceTree = "<group>"; };
@@ -1304,6 +1309,7 @@
 		BA0000020000000000000011 /* NightscoutFollowerGapFillService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowerGapFillService.swift; sourceTree = "<group>"; };
 		BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowerGapFillTests.swift; sourceTree = "<group>"; };
 		BA0709260000000000000002 /* BasalInjectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasalInjectionTests.swift; sourceTree = "<group>"; };
+		C606CA17273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG6InitialCalibrationPolicy.swift; sourceTree = "<group>"; };
 		CA1E00020000000000000001 /* CareLinkTherapyImporter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkTherapyImporter.swift; sourceTree = "<group>"; };
 		CA1E00040000000000000001 /* CareLinkPumpStatusView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkPumpStatusView.swift; sourceTree = "<group>"; };
 		CA1E00060000000000000001 /* AIDStatusBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIDStatusBanner.swift; sourceTree = "<group>"; };
@@ -1871,7 +1877,6 @@
 		F8CB59C32739D1CD00BA199E /* DexcomBackfillTxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomBackfillTxMessage.swift; sourceTree = "<group>"; };
 		F8CB59C5273ECFE500BA199E /* DexcomG6GlucoseDataRxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG6GlucoseDataRxMessage.swift; sourceTree = "<group>"; };
 		F8CB59C7273EF9F800BA199E /* DexcomAlgorithmState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomAlgorithmState.swift; sourceTree = "<group>"; };
-		C606CA17273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG6InitialCalibrationPolicy.swift; sourceTree = "<group>"; };
 		F8CB59C927405A6800BA199E /* DexcomCalibrationTxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomCalibrationTxMessage.swift; sourceTree = "<group>"; };
 		F8CB59CB2744471000BA199E /* DexcomSessionStartResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStartResponse.swift; sourceTree = "<group>"; };
 		F8CB59CD27444D6300BA199E /* DexcomSessionStopResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStopResponse.swift; sourceTree = "<group>"; };
@@ -2019,10 +2024,6 @@
 		F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsUI.swift; sourceTree = "<group>"; };
 		FBA100010000000000000001 /* FollowerBackgroundKeepAliveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBackgroundKeepAliveManager.swift; sourceTree = "<group>"; };
 		FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBackgroundKeepAliveManagerTests.swift; sourceTree = "<group>"; };
-		80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "xDrip/Constants/TherapyMetrics.swift"; sourceTree = SOURCE_ROOT; };
-		5F219EC5BAAF4D5E924415FA /* TherapyMetricsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "xDrip/Managers/Therapy/TherapyMetricsManager.swift"; sourceTree = SOURCE_ROOT; };
-		05272484BD024BDAAA341C1C /* TherapyMetricsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift"; sourceTree = SOURCE_ROOT; };
-		50E2401E5ED94424A2FEC5E8 /* TherapyMetricsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "xDrip Tests/TherapyMetricsTests.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2625,7 +2626,7 @@
 				B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */,
 				4D7C00013015000100000001 /* CalibrationReadinessTests.swift */,
 				ABA4DE8668C9A16DFF21A411 /* CareLinkTests.swift */,
-				50E2401E5ED94424A2FEC5E8 /* TherapyMetricsTests.swift */,
+				50E2401E5ED94424A2FEC5E8 /* xDrip Tests/TherapyMetricsTests.swift */,
 				4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */,
 				4D7E00013017000200000001 /* DexcomG6BluetoothSlotTests.swift */,
 				4B0C00242F3B000100000001 /* DexcomG6SensorLabelTests.swift */,
@@ -2721,9 +2722,9 @@
 		E4C0061F2B3DE8C100D59303 /* AppIntents */ = {
 			isa = PBXGroup;
 			children = (
-				47A0E6432D4E262A00B31C21 /* LiveActivityIntent.swift */,
 				E4D530622B418FF80018C6A4 /* AppShortcuts.swift */,
 				E4C006202B3DE8EC00D59303 /* GlucoseIntent.swift */,
+				47A0E6432D4E262A00B31C21 /* LiveActivityIntent.swift */,
 			);
 			name = AppIntents;
 			sourceTree = "<group>";
@@ -3023,8 +3024,8 @@
 				47E3BEC62CD780D900B794A0 /* AIDStatusView.swift */,
 				4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */,
 				4D20C0012FF1000100000001 /* RootHomeState.swift */,
-				05272484BD024BDAAA341C1C /* TherapyMetricsSettingsView.swift */,
-				5F219EC5BAAF4D5E924415FA /* TherapyMetricsManager.swift */,
+				05272484BD024BDAAA341C1C /* xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift */,
+				5F219EC5BAAF4D5E924415FA /* xDrip/Managers/Therapy/TherapyMetricsManager.swift */,
 				4D20C0032FF1000100000001 /* RootHomeView.swift */,
 				4D20C0092FF1000100000001 /* RootTabView.swift */,
 				475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */,
@@ -3425,7 +3426,7 @@
 				F8B955B6258D5E2000C06016 /* ConstantsHealthKit.swift */,
 				F8EE3EA12B68332200B27B96 /* ConstantsHeartBeat.swift */,
 				F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */,
-				80CB0A0412324311A4F99E46 /* TherapyMetrics.swift */,
+				80CB0A0412324311A4F99E46 /* xDrip/Constants/TherapyMetrics.swift */,
 				F8E5404B2522624800052CE5 /* ConstantsHousekeeping.swift */,
 				F8252866243E50FE0067AF77 /* ConstantsLibre.swift */,
 				47DB06E62A715EC500267BE3 /* ConstantsLibreLinkUp.swift */,
@@ -4265,7 +4266,7 @@
 				4746067E2B962FBD00AC9214 /* SystemLargeView.swift in Sources */,
 				4716A5052B40709E00419052 /* XDripWidgetAttributes.swift in Sources */,
 				47A6AC302B7D3E250047A4BA /* ConstantsHomeView.swift in Sources */,
-				4374EA58DDB14111B1163758 /* TherapyMetrics.swift in Sources */,
+				4374EA58DDB14111B1163758 /* xDrip/Constants/TherapyMetrics.swift in Sources */,
 				47F7B1C62C68BBE100609DA7 /* ConstantsCalibrationAlgorithms.swift in Sources */,
 				474606732B962B9500AC9214 /* XDripWidget+Entry.swift in Sources */,
 				47A6AC382B7D3E770047A4BA /* TextsHomeView.swift in Sources */,
@@ -4322,7 +4323,7 @@
 				474606892B9637F600AC9214 /* TextsSettingsView.swift in Sources */,
 				47EDD15A2BE01E9000C5A286 /* ConstantsWatchComplication.swift in Sources */,
 				478A923E2B8B64DE0084C394 /* ConstantsHomeView.swift in Sources */,
-				7BA551B287B846F5BBA7B6D3 /* TherapyMetrics.swift in Sources */,
+				7BA551B287B846F5BBA7B6D3 /* xDrip/Constants/TherapyMetrics.swift in Sources */,
 				4796C6072B9516FD00DE2210 /* Bundle.swift in Sources */,
 				47E91BBA2B9A43F20063181B /* FollowerBackgroundKeepAliveType.swift in Sources */,
 				476FA90E2BDC1EF80091866C /* TextsWatchComplication.swift in Sources */,
@@ -4351,7 +4352,7 @@
 				47A6AC392B7D3E770047A4BA /* TextsHomeView.swift in Sources */,
 				47CA61E72B97948000C2A597 /* FollowerDataSourceType.swift in Sources */,
 				47A6AC332B7D3E260047A4BA /* ConstantsHomeView.swift in Sources */,
-				DE59C307960F40F880724B66 /* TherapyMetrics.swift in Sources */,
+				DE59C307960F40F880724B66 /* xDrip/Constants/TherapyMetrics.swift in Sources */,
 				4715C32F2C9ED5E10052215F /* LiveActivityType.swift in Sources */,
 				474606642B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift in Sources */,
 				474606902B963EA100AC9214 /* View.swift in Sources */,
@@ -4395,7 +4396,7 @@
 				473775822C14D8C100525B90 /* NotificationView.swift in Sources */,
 				4734FF562BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */,
 				473775882C14DD2200525B90 /* ConstantsHomeView.swift in Sources */,
-				451EDB22DE5243BAB691DBC1 /* TherapyMetrics.swift in Sources */,
+				451EDB22DE5243BAB691DBC1 /* xDrip/Constants/TherapyMetrics.swift in Sources */,
 				4715C3312C9ED5E10052215F /* LiveActivityType.swift in Sources */,
 				473775832C14DCA500525B90 /* GlucoseChartType.swift in Sources */,
 				473775852C14DCC600525B90 /* GlucoseChartView.swift in Sources */,
@@ -4436,7 +4437,7 @@
 				A40000010000000000000001 /* FollowerSettingsTests.swift in Sources */,
 				4F2600013002000200000001 /* SensorNoisePersistenceTests.swift in Sources */,
 				377EBC0A484BFC8EA77C623C /* CareLinkTests.swift in Sources */,
-				0A51F9C534B04BD682E1EF4D /* TherapyMetricsTests.swift in Sources */,
+				0A51F9C534B04BD682E1EF4D /* xDrip Tests/TherapyMetricsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4706,7 +4707,7 @@
 				F855422C2B7182C60058CE09 /* LoopFollowManager.swift in Sources */,
 				F8F9722123A5915900C3F17D /* LibreSensorSerialNumber.swift in Sources */,
 				F8A1586722EDB8BF007F5B5D /* ConstantsHomeView.swift in Sources */,
-				27D7B1AFE8E34C2E8393D1E1 /* TherapyMetrics.swift in Sources */,
+				27D7B1AFE8E34C2E8393D1E1 /* xDrip/Constants/TherapyMetrics.swift in Sources */,
 				F8A1585922EDB7C6007F5B5D /* ConstantsDefaultAlertLevels.swift in Sources */,
 				F8A54AAD22D6859200934E7A /* SlopeParameters.swift in Sources */,
 				472596052B76301F00459D12 /* WatchManager.swift in Sources */,
@@ -4829,6 +4830,7 @@
 				F855422E2B756DF40058CE09 /* OmniPodHeartbeatBluetoothTransmitter.swift in Sources */,
 				F821CF5E229BF43A005C1E43 /* BgReading+Nightscout.swift in Sources */,
 				E4C006212B3DE8EC00D59303 /* GlucoseIntent.swift in Sources */,
+				E4D530632B418FF80018C6A4 /* AppShortcuts.swift in Sources */,
 				F8CB59CA27405A6800BA199E /* DexcomCalibrationTxMessage.swift in Sources */,
 				4D7F00043018000100000001 /* DexcomG7CalibrationMessages.swift in Sources */,
 				4D8000023019000100000001 /* DexcomG7ExtendedVersionMessage.swift in Sources */,
@@ -4845,8 +4847,8 @@
 				4D10C0042FEF000100000001 /* GlucoseChartScrollCoordinator.swift in Sources */,
 				C8BA6BBA5746888144511D55 /* GlucoseChartStateManager.swift in Sources */,
 				4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */,
-				C15D80D0E8DB47A6A9BE68DF /* TherapyMetricsSettingsView.swift in Sources */,
-				B3DBAE6F4DF8465BBF554DE4 /* TherapyMetricsManager.swift in Sources */,
+				C15D80D0E8DB47A6A9BE68DF /* xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift in Sources */,
+				B3DBAE6F4DF8465BBF554DE4 /* xDrip/Managers/Therapy/TherapyMetricsManager.swift in Sources */,
 				4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */,
 				4D21B0022FF8000100000001 /* RootHomeChartRange.swift in Sources */,
 				4D21B0032FF8000100000001 /* RootHomeToolbarView.swift in Sources */,

@@ -584,6 +584,36 @@ final class TherapyMetricsTests: XCTestCase {
         }
     }
 
+    /// Keep a visual regression fixture for custom-symbol labels, including zero-size note anchors.
+    /// Xcode 27 displaced Charts annotations even though the treatment coordinates were unchanged.
+    @MainActor func testRenderTreatmentLabelsAtDifferentChartSizes() throws {
+        let start = now.addingTimeInterval(-3 * 3600)
+        for width in [320.0, 768.0] {
+            var state = GlucoseChartState.empty(startDate: start, endDate: now)
+            state.bgReadingDates = [start, now]
+            state.bgReadingValues = [100, 100]
+            for (index, amount) in [5.0, 30, 70].enumerated() {
+                let date = start.addingTimeInterval(Double(index + 1) * 2400)
+                state.treatmentPoints.carbs.append(GlucoseChartTreatmentPoint(date: date, yValue: 130, treatmentValue: amount, label: "\(Int(amount))", notes: nil, idPrefix: "carb"))
+                state.treatmentPoints.boluses.append(GlucoseChartTreatmentPoint(date: date, yValue: 80, treatmentValue: amount / 10, label: "\(amount / 10)", notes: nil, idPrefix: "bolus"))
+            }
+            state.treatmentPoints.notes = [GlucoseChartTreatmentPoint(date: now.addingTimeInterval(-1200), yValue: 105, treatmentValue: 0, label: "Note", notes: nil, idPrefix: "note")]
+            state.treatmentPoints.basalInjections = [GlucoseChartTreatmentPoint(date: start.addingTimeInterval(1200), yValue: 65, treatmentValue: 12, label: "12", notes: nil, idPrefix: "injection")]
+            let content = GlucoseChartView(glucoseChartType: .widgetSystemLarge, bgReadingValues: nil, bgReadingDates: nil,
+                isMgDl: width == 320, urgentLowLimitInMgDl: 55, lowLimitInMgDl: 70, highLimitInMgDl: 180, urgentHighLimitInMgDl: 230,
+                liveActivityType: nil, hoursToShowScalingHours: 3, glucoseCircleDiameterScalingHours: 3,
+                showsTreatments: true, overrideChartHeight: 300, overrideChartWidth: width,
+                highContrast: nil, chartState: state)
+                .frame(width: width, height: 300).background(Color.black).environment(\.colorScheme, .dark)
+            let renderer = ImageRenderer(content: content)
+            renderer.scale = 2
+            let attachment = XCTAttachment(image: try XCTUnwrap(renderer.uiImage))
+            attachment.name = "Treatment label alignment \(Int(width))pt"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+    }
+
     @MainActor func testImportedSourceSelectionAndLocallyNamedUploadRoundTrip() async throws {
         let core = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
         let manager = TherapyMetricsManager()

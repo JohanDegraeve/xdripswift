@@ -142,7 +142,7 @@ class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol 
         case .dexcomShareAccountName:
             return Texts_SettingsView.labelDexcomShareAccountName
         case .useSchedule:
-            return Texts_SettingsView.useSchedule
+            return Texts_SettingsView.enableSchedule
         case .schedule:
             return Texts_SettingsView.schedule
         }

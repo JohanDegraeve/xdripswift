@@ -696,6 +696,14 @@ struct SettingsListView: View {
         }
         .settingsListStyle(title: title, titleDisplayMode: titleDisplayMode)
         .settingsPresentation(presenter: presenter)
+        // Attach refresh behavior to the List, never around a Section: a container such as
+        // TimelineView makes List render that entire section as one cell.
+        .modifier(SpeakReadingsSettingsRefresh(
+            isRelevant: listModel.sections.contains { section in
+                section.section().rows.contains { $0.id == "speak.schedule" || $0.id == "sharingServices.speakReadings" }
+            },
+            refresh: { listModel.reload(.all) }
+        ))
     }
 }
 

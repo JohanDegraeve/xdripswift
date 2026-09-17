@@ -670,7 +670,7 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         case .token:
             return Texts_SettingsView.nightscoutToken
         case .useSchedule:
-            return Texts_SettingsView.useSchedule
+            return Texts_SettingsView.enableSchedule
         case .schedule:
             return Texts_SettingsView.schedule
         case .uploadSensorStartTime:

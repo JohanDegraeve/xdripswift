@@ -383,6 +383,9 @@ extension UserDefaults {
 
         /// speak readings
         case speakReadings = "speakReadings"
+        case speakReadingsScheduleEnabled = "speakReadingsScheduleEnabled"
+        case speakReadingsStartMinute = "speakReadingsStartMinute"
+        case speakReadingsEndMinute = "speakReadingsEndMinute"
         /// speak reading language
         case speakReadingLanguageCode = "speakReadingLanguageCode"
         /// speak delta
@@ -2329,6 +2332,39 @@ extension UserDefaults {
         set {
             set(newValue, forKey: Key.speakReadings.rawValue)
         }
+    }
+
+    /// An optional daily limit on speech. Enabling it does not turn on the master switch.
+    var speakReadingsScheduleEnabled: Bool {
+        get { bool(forKey: Key.speakReadingsScheduleEnabled.rawValue) }
+        set { set(newValue, forKey: Key.speakReadingsScheduleEnabled.rawValue) }
+    }
+
+    /// Wall-clock minutes, not absolute dates: the daily window follows the phone's local time zone.
+    var speakReadingsStartMinute: Int {
+        get { object(forKey: Key.speakReadingsStartMinute.rawValue) as? Int ?? 9 * 60 }
+        set { set(newValue, forKey: Key.speakReadingsStartMinute.rawValue) }
+    }
+
+    /// End of the daily window, excluded from the speaking period. Defaults to 22:00.
+    var speakReadingsEndMinute: Int {
+        get { object(forKey: Key.speakReadingsEndMinute.rawValue) as? Int ?? 22 * 60 }
+        set { set(newValue, forKey: Key.speakReadingsEndMinute.rawValue) }
+    }
+
+    /// The schedule only restricts speech; it never changes the master switch used by Siri,
+    /// Home Screen actions, and Settings. Evaluate at each reading rather than relying on a
+    /// background timer. Calendar components follow local time, including daylight-saving changes.
+    func shouldSpeakReadings(at date: Date = Date(), calendar: Calendar = .current) -> Bool {
+        guard speakReadings else { return false }
+        guard speakReadingsScheduleEnabled else { return true }
+        let start = speakReadingsStartMinute
+        let end = speakReadingsEndMinute
+        // The UI rejects equal times. Treat invalid imported values as a closed window too.
+        guard (0..<1440).contains(start), (0..<1440).contains(end), start != end else { return false }
+        let minute = calendar.component(.hour, from: date) * 60 + calendar.component(.minute, from: date)
+        // Include the enable minute and exclude the disable minute, also across midnight.
+        return start < end ? (minute >= start && minute < end) : (minute >= start || minute < end)
     }
 
     /// speakReading languageCode, eg "en" or "en-US"

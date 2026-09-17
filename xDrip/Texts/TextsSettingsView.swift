@@ -725,8 +725,8 @@ class Texts_SettingsView {
         return NSLocalizedString("nightscoutFollowTypeOpenAPSExpanded", tableName: filename, bundle: Bundle.main, value: "OpenAPS/Trio/iAPS/AAPS", comment: "nightscout settings, openaps based follower type explanation")
     }()
     
-    static let useSchedule = {
-        return NSLocalizedString("settingsviews_useSchedule", tableName: filename, bundle: Bundle.main, value: "Use Upload Schedule", comment: "nightscout settings, where user can select to use schedule or not")
+    static let enableSchedule = {
+        return NSLocalizedString("settingsviews_enableSchedule", tableName: filename, bundle: Bundle.main, value: "Enable Schedule", comment: "Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate.")
     }()
     
     static let schedule = {
@@ -782,6 +782,16 @@ class Texts_SettingsView {
     }()
 
     // MARK: - Section Speak
+
+    static let speakScheduleActive = NSLocalizedString("speak.schedule.active", tableName: filename, bundle: .main, value: "Active", comment: "Speech is enabled and allowed at the current time; not a promise that audio is currently playing.")
+    static let speakScheduleInactive = NSLocalizedString("speak.schedule.inactive", tableName: filename, bundle: .main, value: "Inactive", comment: "Speech is enabled but paused outside its daily schedule.")
+
+    static let speakScheduleSection = NSLocalizedString("speak.schedule.section", tableName: filename, bundle: .main, value: "Schedule", comment: "Daily speech schedule section title.")
+
+    static let speakScheduleStart = NSLocalizedString("speak.schedule.start", tableName: filename, bundle: .main, value: "Enable at", comment: "Start of the daily speech window.")
+    static let speakScheduleEnd = NSLocalizedString("speak.schedule.end", tableName: filename, bundle: .main, value: "Disable at", comment: "End of the daily speech window; may be on the following morning.")
+    static let speakScheduleExplanation = NSLocalizedString("speak.schedule.explanation", tableName: filename, bundle: .main, value: "When Speak Glucose is on, readings are spoken only within these hours. The schedule repeats daily in your phone’s local time and can cross midnight. Shortcuts change only the Speak Glucose switch.", comment: "Explain the separate master switch and daily speech schedule.")
+    static let speakScheduleDifferentTimes = NSLocalizedString("speak.schedule.differentTimes", tableName: filename, bundle: .main, value: "Choose different enable and disable times.", comment: "Validation message when both speech schedule times are equal.")
     
     static let sectionTitleSpeak: String = {
         return NSLocalizedString("settingsviews_speakBgReadings", tableName: filename, bundle: Bundle.main, value: "Speak Glucose", comment: "speak settings, where user can enable or disable speak readings")

@@ -828,13 +828,19 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     id: "sharingServices.speakReadings",
                     title: Texts_SettingsView.sectionTitleSpeak,
                     detail: {
-                        groupedStatusDetail(isEnabled: UserDefaults.standard.speakReadings)
+                        UserDefaults.standard.speakReadings ? Texts_Common.enabled : Texts_Common.disabled
+                    },
+                    detailIndicator: {
+                        SettingsIndicator(color: SettingsViewSpeakSettingsViewModel.speechStatus(isParent: true).color)
                     },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleSpeak,
                             onlineHelpTopic: .speakGlucose,
-                            providers: { [SettingsViewSpeakSettingsViewModel()] }
+                            makeSections: { presenter in
+                                SettingsListFactory.makeSections(providers: [SettingsViewSpeakSettingsViewModel()], presenter: presenter)
+                                    + [SettingsSectionModel(id: 1) { SettingsViewSpeakSettingsViewModel.scheduleSection() }]
+                            }
                         )
                     }
                 ),
@@ -876,7 +882,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
     private static func calendarShareStatusDetail() -> String? {
         guard calendarShareRowIsEnabled() else { return Texts_Common.disabled }
         guard UserDefaults.standard.createCalendarEvent else { return nil }
-        return calendarShareStatus().description
+        // Match the other parent rows for normal operation, while retaining useful problem states.
+        let status = calendarShareStatus()
+        return status == .active ? Texts_Common.enabled : status.description
     }
 
     /// Adds the same status dot used by the Calendar Share child status row.
