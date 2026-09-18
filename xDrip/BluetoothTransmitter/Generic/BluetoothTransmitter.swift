@@ -124,7 +124,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
 
     /// set the connection options
     private var connectOptions: [String: Any] {
+        #if os(watchOS)
+        // Match the Watch prototype: do not request system background connection alerts.
+        // Bluetooth permission and pairing prompts are controlled separately by the system.
+        [:]
+        #else
         [CBConnectPeripheralOptionNotifyOnConnectionKey: true, CBConnectPeripheralOptionNotifyOnDisconnectionKey: true]
+        #endif
     }
     
     /// Returns true if the given device name is currently under temporary rejection cooldown

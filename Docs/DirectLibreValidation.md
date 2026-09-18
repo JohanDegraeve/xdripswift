@@ -480,3 +480,21 @@ Device check: double-tap while connected and while orange/pending; expect orange
 then green on connection, followed by a fresh reading. Test with the phone
 unreachable as well. Confirm a prepared/returning session cannot be restarted
 and normal phone-relay double-tap still refreshes the display.
+
+### Device result and Watch system connection alerts
+
+The user successfully installed the updated Watch build and switched collection
+to Watch and back without cycling phone Bluetooth. This confirms both directions
+for that test; the remaining restart, signal-loss and reset checks are still needed.
+
+The user also identified an intermittent system connection popup when the Watch
+app is backgrounded, followed by an instruction to open xDrip to reconnect. The
+shared phone collector had enabled CoreBluetooth connection/disconnection alerts
+on Watch as well. Watch now passes empty connection options, matching the
+prototype's default behavior; phone options are unchanged. This suppresses the
+requested background connection alerts, not system permission or pairing prompts.
+It does not provide background runtime: keep Watch visible for this checkpoint.
+
+The actual Watch collector/coordinator dependency closure passes watchOS SDK
+typechecking after this change. Device confirmation that the popup no longer
+appears remains pending.
