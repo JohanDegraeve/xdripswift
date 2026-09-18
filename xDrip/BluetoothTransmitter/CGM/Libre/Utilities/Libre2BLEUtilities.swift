@@ -1,13 +1,16 @@
 import Foundation
-import OSLog
-
-/// for trace
-fileprivate let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLibre2BLEUtilities)
 
 /// - utilities for Libre 2 data processing, here it's for the case where data is read via bluetooth
 /// - if read via NFC or other transmitter, go to PreLibre2
 /// -  this is not the handling of bluetooth itself, this is done in class CGMLibre2Transmitter
 class Libre2BLEUtilities {
+
+    /// History for one sensor. The caller decides whether to keep it in memory or persist it.
+    struct ParserState: Equatable {
+        var previousRawGlucoseValues: [Int]?
+        var previousRawTemperatureValues: [Int]?
+        var previousTemperatureAdjustmentValues: [Int]?
+    }
 
     /// this used to store 70 previous values because the old upstream Libre smoothing path reused a much longer raw history across BLE sessions
     ///
@@ -108,7 +111,7 @@ class Libre2BLEUtilities {
     ///     - restricts to reading 8 values from data, the 8th value differens only 1 minute from its previous value. (while the others differ 2 minutes). This allows us to sync with previously stored values
     ///     - will extend the result with values from previous reading sessions - if possible. This is only possible of the maximum difference between two reading sessions is 8 minutes
     ///     - sensor time in minutes
-    public static func parseBLEData( _ data: Data, libre1DerivedAlgorithmParameters : Libre1DerivedAlgorithmParameters?) -> (bleGlucose: [GlucoseData], sensorTimeInMinutes: UInt16) {
+    static func parseBLEData(_ data: Data, libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters?, state: inout ParserState, date: Date = Date()) -> (bleGlucose: [GlucoseData], sensorTimeInMinutes: UInt16) {
         
         // how many values to store in rawGlucoseValues, which is not equal to the amount of values read
         // because Libre 2 gives reading every 2 minutes, then 15
@@ -158,10 +161,10 @@ class Libre2BLEUtilities {
         }
         
         // append previous rawvalues
-        appendPreviousValues(to: &rawGlucoseValues, rawTemperatureValues: &rawTemperatureValues, temperatureAdjustmentValues: &temperatureAdjustmentValues)
+        appendPreviousValues(to: &rawGlucoseValues, rawTemperatureValues: &rawTemperatureValues, temperatureAdjustmentValues: &temperatureAdjustmentValues, state: state)
         
         // check if the rawGlucoseValues and the previousRawGlucoseValues have at least 5 equal values, if so this is an expired sensor that keeps sending the same values, in that case no further processing
-        if let previousRawGlucoseValues = UserDefaults.standard.previousRawGlucoseValues {
+        if let previousRawGlucoseValues = state.previousRawGlucoseValues {
             if rawGlucoseValues.hasEqualValues(howManyToCheck: 5, otherArray: previousRawGlucoseValues) {
                 
                 return ([GlucoseData](), wearTimeMinutes)
@@ -169,15 +172,15 @@ class Libre2BLEUtilities {
             }
         }
         
-        // store current values (appended with previous values) in userdefaults previous values
-        UserDefaults.standard.previousRawGlucoseValues = Array(rawGlucoseValues[0..<(min(rawGlucoseValues.count, amountOfPreviousRawValuesToStore))])
-        UserDefaults.standard.previousTemperatureAdjustmentValues = Array(temperatureAdjustmentValues[0..<(min(rawGlucoseValues.count, amountOfPreviousRawValuesToStore))])
-        UserDefaults.standard.previousRawTemperatureValues = Array(rawTemperatureValues[0..<(min(rawGlucoseValues.count, amountOfPreviousRawValuesToStore))])
+        // Retain the same bounded raw history for the next frame.
+        state.previousRawGlucoseValues = Array(rawGlucoseValues[0..<(min(rawGlucoseValues.count, amountOfPreviousRawValuesToStore))])
+        state.previousTemperatureAdjustmentValues = Array(temperatureAdjustmentValues[0..<(min(rawGlucoseValues.count, amountOfPreviousRawValuesToStore))])
+        state.previousRawTemperatureValues = Array(rawTemperatureValues[0..<(min(rawGlucoseValues.count, amountOfPreviousRawValuesToStore))])
         
         // create glucosedata for each known rawglucose and add to returnvallue
         for (index, _) in rawGlucoseValues.enumerated() {
             
-            let libreMeasurement = LibreMeasurement(rawGlucose: rawGlucoseValues[index], rawTemperature: rawTemperatureValues[index], minuteCounter: 0, date: Date().addingTimeInterval(-Double(60 * index)), temperatureAdjustment: temperatureAdjustmentValues[index], libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
+            let libreMeasurement = LibreMeasurement(rawGlucose: rawGlucoseValues[index], rawTemperature: rawTemperatureValues[index], minuteCounter: 0, date: date.addingTimeInterval(-Double(60 * index)), temperatureAdjustment: temperatureAdjustmentValues[index], libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
             
             let newGlucoseValue = GlucoseData(timeStamp: libreMeasurement.date, glucoseLevelRaw: (libreMeasurement.temperatureAlgorithmGlucose > 0 ? libreMeasurement.temperatureAlgorithmGlucose : Double(libreMeasurement.rawGlucose) * ConstantsBloodGlucose.libreMultiplier))
             
@@ -226,10 +229,10 @@ class Libre2BLEUtilities {
     }
     
     /// compares rawGlucoseValues and rawTemperatureValues to previously stored values, and tries to extend/complete the range using previously stored values
-    private static func appendPreviousValues(to rawGlucoseValues: inout [Int], rawTemperatureValues: inout [Int], temperatureAdjustmentValues: inout [Int]) {
+    private static func appendPreviousValues(to rawGlucoseValues: inout [Int], rawTemperatureValues: inout [Int], temperatureAdjustmentValues: inout [Int], state: ParserState) {
         
         // unwrap stored previous values, if nil then it means it was never used before, nothing to append
-        guard let previousRawGlucoseValues = UserDefaults.standard.previousRawGlucoseValues, let previousRawTemperatureValues = UserDefaults.standard.previousRawTemperatureValues, let previousTemperatureAdjustmentValues = UserDefaults.standard.previousTemperatureAdjustmentValues else {return}
+        guard let previousRawGlucoseValues = state.previousRawGlucoseValues, let previousRawTemperatureValues = state.previousRawTemperatureValues, let previousTemperatureAdjustmentValues = state.previousTemperatureAdjustmentValues else {return}
         
         // size of each array of stored values should be the same, check that to avoid crashes
         guard previousRawGlucoseValues.count == previousRawTemperatureValues.count, previousRawTemperatureValues.count == previousTemperatureAdjustmentValues.count else {return}

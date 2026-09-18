@@ -112,3 +112,36 @@ usual signing setup. In Xcode, review the project Build Locations before buildin
 if output resolves to `/Debug-iphoneos`; use local output locations rather than
 committing personal paths. Keep signing and local Xcode settings out of feature
 commits.
+
+## Shared protocol checkpoint
+
+The parser now accepts `Libre2BLEUtilities.ParserState` explicitly. A phone-only
+`Libre2BLEUtilities+UserDefaults` overload preserves the existing history keys and
+phone call site. It saves changed state after parsing; repeated frames leave the
+cache untouched. Each frame now uses one timestamp anchor rather than sampling
+`Date()` separately for every historical value.
+
+The original database-array helpers and logged FRAM helpers have moved into
+`Array+BgReading` and `LibreSensorType+Data`. Their bodies are unchanged. The
+UInt16 time-formatting helper moved beside its Int implementation so byte helpers
+can compile without UI constants. Unused log declarations were removed from
+crypto/protocol files. No duplicate crypto or glucose algorithm was introduced.
+
+Validation:
+
+- 10 committed `Libre2ProtocolTests` pass in a temporary macOS host package using
+  actual production protocol, calibration, model and array source files. Only
+  the relevant real phone UserDefaults accessors are extracted to avoid importing
+  the whole app; Foundation persistence is not mocked.
+- All 176 captured upstream frames match develop in both calibrated and raw
+  modes: decrypted bytes, glucose values, sensor ages and retained history.
+  Timestamp comparisons allow elapsed execution time between the two parsers.
+- The complete 12-file shared protocol dependency closure typechecks for iOS 16.2
+  and watchOS 10.0 with their real SDKs and no stand-in types.
+- Database/FRAM helper extraction was checked against the original method bodies.
+
+Test/audit runners and logs live outside the checkout in
+`validation/integrated-protocol`. The committed tests are registered with the
+existing `xdripTests` target. No Watch source membership or connection behaviour
+changes are made at this checkpoint. A full device build and ordinary readings
+check remain necessary after these edits.
