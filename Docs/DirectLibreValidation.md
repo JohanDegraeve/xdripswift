@@ -253,3 +253,125 @@ and unlock writes, followed by confirmed release before activating the other
 device. Preserve the ordinary phone path when the experiment is not in use.
 Validate counter changes during preparation, interrupted transactions and NFC
 reset before enabling direct collection through the phone's experimental page.
+
+## Phone-controlled switching checkpoint
+
+### Implemented transaction
+
+The phone's Advanced Settings now contains **Direct Libre (Experimental)**.
+The page has a device switch, preparation checklist, progress/error text and a
+cancel action while a transfer is pending. It requires a connected Libre with a
+BLE reading less than three minutes old, matching native-algorithm parameters,
+unlock transmission enabled and a reachable Watch before starting a transfer.
+No additional refresh requests or background polling are sent by the checklist.
+Its state refreshes on readings, reachability changes and page entry; the switch
+rechecks freshness when pressed.
+
+Forward transfer:
+
+1. Phone persists a preparation record and sends PREPARE with credentials/counter.
+   Its existing sensor connection remains active while Watch prepares.
+2. Watch validates and saves the session, then returns READY without starting BLE.
+3. Phone persists Watch selection, suspends scanning/reconnect/subscription/write
+   paths, and waits for confirmed disconnect (or a confirmed absence of a link).
+4. It snapshots the final counter. If that changed during preparation, it refreshes
+   the prepared Watch before sending ACTIVATE. Watch persists active selection
+   before constructing the collector and acknowledging activation.
+
+Return is also initiated on the phone. The wire sequence intentionally freezes
+Watch collection **before** reporting the final counter, avoiding a counter change
+between preparation and disconnection:
+
+1. Phone persists return intent and sends RETURN_PREPARE. Its BLE remains disabled.
+2. Watch persists return intent, disables new attempts, confirms release, and replies
+   READY with final counter M. A restarted, interrupted return recreates a disabled
+   collector to query/release its remembered peripheral before replying.
+3. Phone saves M durably and sends RETURN_COMMIT. Watch persists phone selection
+   and acknowledges. Only then does phone restore its counter and resume BLE.
+   The next attempt advances to M+1 (or beyond if the phone already reserved more).
+
+Duplicate activation/commit messages are idempotent within the current transaction;
+retired IDs and wrong-phase requests are rejected. Cancel interrupts the local
+operation, not the other device's ownership. Lost replies leave the phone disabled
+where Watch may have activated; retry the return or provision with NFC. Counter
+exhaustion on return requires NFC rather than resuming into an overflow.
+
+A successful ordinary NFC enable-streaming retires the experimental selection
+without waiting for Watch connectivity. Starting NFC also cancels any in-flight
+local transfer. Cancelled/failed NFC does not grant phone ownership. Reset IDs are
+sent live when reachable and retained in WatchConnectivity application context.
+An unreachable Watch cannot be physically disconnected by the phone: it stops
+when the reset reaches it. Test this recovery explicitly on hardware. Outside an
+existing experimental selection, the NFC commands, callbacks, code/counter reset
+and original scanning/retry path retain their prior behaviour.
+
+### Shared BLE and display boundary
+
+The generic Bluetooth class has an opt-in suspension operation and a default-on
+connection guard. Only Libre adapters add persisted-selection guards. Queued
+writes and late notification callbacks recheck the guard; suspension waits for
+release and does not change ordinary timeout/cancel/reconnect choices. Watch uses
+the existing local Bluetooth identity keys to reuse its known peripheral after a
+restart; it never treats the phone's peripheral UUID as a Watch UUID. Its central
+restoration identifier is stable from the sensor UID even before first discovery;
+ordinary phone restoration identifiers keep their existing behaviour.
+
+Direct Watch readings enter the existing chart/complication update path. Relayed
+phone glucose is ignored while Watch owns collection, and older queued phone
+values cannot overwrite newer displayed direct values after a return. The antenna
+is green for an actual radio connection, orange while direct mode is selected
+without a connection. Reading age remains independently visible. This initial
+display shows values and a five-minute delta; direct trend computation, full
+settings persistence, detailed indicator states and double-tap restart are still
+part of the later readings/interface milestones.
+
+Direct readings are currently local, with in-memory chart history. There is no
+Watch-to-phone reading synchronisation or additional continuous background runtime
+in this integrated checkpoint. Phone graphs, uploads/sharing and missed-reading
+handling therefore do not yet consume Watch readings. Keep the Watch app visible
+for these connection tests.
+
+### Validation
+
+- 26 host XCTest cases pass using actual shared sources/preferences: the previous
+  17 protocol/counter cases plus 9 selection/persistence cases. New coverage includes
+  ordinary no-file defaults, prepared/active/return guards, persistence across
+  restart, duplicate commits, stale IDs, NFC retirement, delayed old revocations,
+  corrupt state and failed saves. These tests do not simulate CoreBluetooth or
+  WatchConnectivity delivery.
+- The actual Watch collector/coordinator/transport and the WatchStateModel/direct
+  indicator dependency closure pass watchOS SDK typechecking. The display check
+  uses Xcode-generated asset symbols; unrelated macro-bearing screens are excluded.
+- The actual phone coordinator, settings page, Libre/NFC adapter and transport pass
+  iOS SDK typechecking, with compile-only stand-ins for unrelated app dependencies.
+- Full iPhone and Watch builds were attempted and still stop in existing extension
+  SwiftUI macro expansion because this environment cannot start the compiler plugin
+  sandbox. Full device builds and radio tests remain required in the user's Xcode.
+- Build outputs are outside the checkout under `/tmp`; scoped checks and logs are
+  in the workspace's `validation/integrated-switching` directory. Personal signing,
+  scheme and phone Info.plist edits remain separate from feature commits.
+
+### Physical-device gate
+
+Install the matching integrated build on **both** devices, with the old prototype
+collector stopped. Use the ordinary phone NFC path and wait for a fresh BLE reading.
+
+1. Open both apps. On the phone, open Advanced Settings → Direct Libre (Experimental).
+   Check the prerequisites and press **Switch to Watch**. Expect an orange antenna
+   followed by green when connected, then fresh Watch glucose/chart/complication.
+   The phone must stop receiving its own BLE frames before Watch activation.
+2. Press **Return to iPhone** on that same phone page. Expect Watch release first,
+   then fresh phone readings without NFC or Bluetooth cycling. Repeat both ways.
+3. While Watch owns collection, restart each app separately. Phone must stay disabled;
+   Watch should resume its saved session/counter. Test a 2–3 minute signal loss and
+   automatic recovery while the Watch is visible.
+4. Interrupt preparation/activation/return by closing an app or losing reachability.
+   Reopen both apps and retry the available switch/return. Cancel must not silently
+   re-enable phone BLE after uncertain activation. If recovery cannot finish, use
+   the ordinary NFC path and report the displayed state/error.
+5. With Watch selected, perform a successful ordinary phone NFC scan, including
+   with Watch unreachable. Confirm phone glucose returns. Reopen/reconnect Watch
+   and confirm it retires the old session and does not resume direct collection.
+   Also check that cancelling NFC alone does not reclaim an active Watch session.
+6. Repeat ordinary phone scan/cancel/retry and signal-loss recovery after returning
+   to the phone. Report any deviations and which device/app was open at the time.

@@ -827,6 +827,10 @@
 		C1A0041F03908C44462706CD /* Libre2ConnectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A004744B7749DE2AE1A5D8 /* Libre2ConnectionStore.swift */; };
 		C1A004C8DEEA88E4DECC41EF /* Libre2ConnectionMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A004C1BBE310A930DA61DB /* Libre2ConnectionMessage.swift */; };
 		C1A004404FA2DB35F696F6E2 /* Libre2ConnectionMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A004C1BBE310A930DA61DB /* Libre2ConnectionMessage.swift */; };
+		C1A0041FF945BDAC95C72A94 /* Libre2PhoneConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A00431259410F06F8B907C /* Libre2PhoneConnection.swift */; };
+		C1A0049BE5B6B1819FB44C7B /* Libre2WatchConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A00482B3C6B707F02D3D07 /* Libre2WatchConnection.swift */; };
+		C1A0044F967FDE67A3ABB86F /* Libre2ConnectionIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A004002EF6F841D2F744B6 /* Libre2ConnectionIndicator.swift */; };
+		C1A0044E9D9644F0F9F8E94B /* DirectLibreSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A004F3803FC4EA0AC82298 /* DirectLibreSettingsView.swift */; };
 		C1A00448870C513BD92A29E0 /* Libre2ConnectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A004774205ED8DF67AFAFF /* Libre2ConnectionTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -2000,6 +2004,10 @@
 		C1A0039D4EAD2BAE3B2C752A /* Libre2CollectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Libre2CollectorTests.swift"; sourceTree = "<group>"; };
 		C1A004744B7749DE2AE1A5D8 /* Libre2ConnectionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2ConnectionStore.swift; sourceTree = "<group>"; };
 		C1A004C1BBE310A930DA61DB /* Libre2ConnectionMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2ConnectionMessage.swift; sourceTree = "<group>"; };
+		C1A00431259410F06F8B907C /* Libre2PhoneConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2PhoneConnection.swift; sourceTree = "<group>"; };
+		C1A00482B3C6B707F02D3D07 /* Libre2WatchConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2WatchConnection.swift; sourceTree = "<group>"; };
+		C1A004002EF6F841D2F744B6 /* Libre2ConnectionIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2ConnectionIndicator.swift; sourceTree = "<group>"; };
+		C1A004F3803FC4EA0AC82298 /* DirectLibreSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectLibreSettingsView.swift; sourceTree = "<group>"; };
 		C1A004774205ED8DF67AFAFF /* Libre2ConnectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2ConnectionTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -2325,6 +2333,7 @@
 		47DE41B72B87B2510041DA19 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C1A004002EF6F841D2F744B6 /* Libre2ConnectionIndicator.swift */,
 				474822432C0108EA0052D4FB /* NotificationView.swift */,
 				4787058D2C4D76FE001C3170 /* RootView.swift */,
 				478705902C4D7B6F001C3170 /* BigNumberView */,
@@ -2995,6 +3004,7 @@
 		F866974E2867A97000025441 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				C1A004F3803FC4EA0AC82298 /* DirectLibreSettingsView.swift */,
 				763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */,
 				102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */,
 				BA0000010000000000000016 /* DataDeletionView.swift */,
@@ -3785,6 +3795,7 @@
 		C1A003AF8276808677BA187B /* BluetoothTransmitter */ = {
 			isa = PBXGroup;
 			children = (
+				C1A00482B3C6B707F02D3D07 /* Libre2WatchConnection.swift */,
 				C1A003C3ED14C60DD9D02E83 /* Libre2WatchTransmitter.swift */,
 			);
 			path = BluetoothTransmitter;
@@ -3801,6 +3812,7 @@
 		C1A00462F324A1AC80579A16 /* Libre2 */ = {
 			isa = PBXGroup;
 			children = (
+				C1A00431259410F06F8B907C /* Libre2PhoneConnection.swift */,
 				C1A004C1BBE310A930DA61DB /* Libre2ConnectionMessage.swift */,
 				C1A004744B7749DE2AE1A5D8 /* Libre2ConnectionStore.swift */,
 			);
@@ -4301,6 +4313,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1A0044F967FDE67A3ABB86F /* Libre2ConnectionIndicator.swift in Sources */,
+				C1A0049BE5B6B1819FB44C7B /* Libre2WatchConnection.swift in Sources */,
 				C1A004404FA2DB35F696F6E2 /* Libre2ConnectionMessage.swift in Sources */,
 				C1A0041F03908C44462706CD /* Libre2ConnectionStore.swift in Sources */,
 				C1A003B7BDB327BB463775A5 /* ConstantsLog.swift in Sources */,
@@ -4420,6 +4434,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1A0044E9D9644F0F9F8E94B /* DirectLibreSettingsView.swift in Sources */,
+				C1A0041FF945BDAC95C72A94 /* Libre2PhoneConnection.swift in Sources */,
 				C1A004C8DEEA88E4DECC41EF /* Libre2ConnectionMessage.swift in Sources */,
 				C1A004E7964ED4BB1728F13A /* Libre2ConnectionStore.swift in Sources */,
 				C1A0031ADE185D272DA5F16E /* Libre2WatchSensor.swift in Sources */,

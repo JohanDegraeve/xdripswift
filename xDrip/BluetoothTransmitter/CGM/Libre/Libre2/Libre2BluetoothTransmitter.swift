@@ -36,9 +36,9 @@ class Libre2BluetoothTransmitter: BluetoothTransmitter {
     private var startDate = Date()
     private static let maxWaitForpacketInSeconds = 3.0
 
-    init(addressAndName: DeviceAddressAndName, sensor: Libre2SensorDataSource, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
+    init(addressAndName: DeviceAddressAndName, sensor: Libre2SensorDataSource, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, restorationIdentifier: String? = nil) {
         self.sensor = sensor
-        super.init(addressAndName: addressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Libre2)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Libre2, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Libre2, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
+        super.init(addressAndName: addressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Libre2)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Libre2, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Libre2, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate, restorationIdentifier: restorationIdentifier)
     }
 
     /// Called on main. Platform adapters deliver readings to their own model.

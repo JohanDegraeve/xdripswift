@@ -301,6 +301,7 @@ struct SettingsAccessibility {
 }
 
 enum SettingsRowAction {
+    case directLibre
     case textEntry(() -> SettingsTextEntryContent)
     case selectionList(() -> SettingsSelectionListContent)
     case settingsScreen(() -> SettingsScreen)
@@ -313,7 +314,7 @@ enum SettingsRowAction {
 
     var prefersDisclosure: Bool {
         switch self {
-        case .textEntry, .selectionList, .settingsScreen, .dataManagement, .troubleshootingLog:
+        case .textEntry, .selectionList, .settingsScreen, .dataManagement, .troubleshootingLog, .directLibre:
             return true
         case .legacy, .run, .showMessage, .sendTraceEmail:
             return false
@@ -524,6 +525,10 @@ final class SettingsActionPresenter: ObservableObject {
             },
             cancel: nil
         )
+    }
+
+    func showDirectLibre() {
+        router.show(.custom(title: "Direct Libre (Experimental)", content: { _ in AnyView(DirectLibreSettingsView()) }))
     }
 
     func showTroubleshootingLog() {
@@ -1081,6 +1086,8 @@ private struct SettingsNativeRowView: View {
             presenter.showMessage(title: title, message: message)
         case .sendTraceEmail:
             presenter.requestTraceEmail()
+        case .directLibre:
+            presenter.showDirectLibre()
         case .troubleshootingLog:
             presenter.showTroubleshootingLog()
         case nil:

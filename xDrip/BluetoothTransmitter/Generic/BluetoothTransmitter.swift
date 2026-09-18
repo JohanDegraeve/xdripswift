@@ -76,6 +76,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// centralManager
     private var centralManager: CBCentralManager?
+    private let restorationIdentifier: String?
     
     /// peripheral, gets value during connect
     private var peripheral: CBPeripheral?
@@ -156,7 +157,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     ///     - CBUUID_ReceiveCharacteristic: receive characteristic uuid
     ///     - CBUUID_WriteCharacteristic: write characteristic uuid
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
-    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, servicesCBUUIDs:[CBUUID]?, CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
+    init(addressAndName:BluetoothTransmitter.DeviceAddressAndName, CBUUID_Advertisement:String?, servicesCBUUIDs:[CBUUID]?, CBUUID_ReceiveCharacteristic:String, CBUUID_WriteCharacteristic:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, restorationIdentifier: String? = nil) {
+        self.restorationIdentifier = restorationIdentifier
         
         switch addressAndName {
             
@@ -868,6 +870,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         releaseConnectionIfPossible()
+        if central.state == .poweredOn && !isConnectionAllowed && releaseCompletions.isEmpty {
+            disconnectOnCentralQueue()
+        }
         
         timeStampLastStatusUpdate = Date()
         trace("in centralManagerDidUpdateState, for peripheral with name %{public}@, new state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", "\(central.state.toString())")
@@ -1053,7 +1058,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                     self.peripheral = restored
                     restored.delegate = self
                 }
-                central.cancelPeripheralConnection(restored)
+                if central.state == .poweredOn { central.cancelPeripheralConnection(restored) }
             }
             return
         }
@@ -1130,7 +1135,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         var cBCentralManagerOptionRestoreIdentifierKeyToUse: String?
         let applicationName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "unknown"
         
-        if let deviceAddress = deviceAddress {
+        if let restorationIdentifier = restorationIdentifier {
+            cBCentralManagerOptionRestoreIdentifierKeyToUse = restorationIdentifier
+        } else if let deviceAddress = deviceAddress {
             
             trace("in initialize, creating centralManager for peripheral with address %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceAddress)
             

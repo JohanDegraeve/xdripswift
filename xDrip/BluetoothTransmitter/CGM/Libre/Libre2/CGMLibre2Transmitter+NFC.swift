@@ -27,6 +27,7 @@ extension CGMLibre2Transmitter {
                 // NFC session creation must be on main thread
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
+                    if Libre2PhoneConnection.shared.busy { Libre2PhoneConnection.shared.cancelTransfer() }
                     let libreNFC = LibreNFC(libreNFCDelegate: self)
                     self.libreNFC = libreNFC
                     libreNFC.startSession()
@@ -116,8 +117,19 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
 
             // A previous installation may have saved a different code. Adopt the one
             // that this NFC scan actually provisioned before BLE sends its next unlock.
-            UserDefaults.standard.libreActiveSensorUnlockCode = unlockCode
-            UserDefaults.standard.libreActiveSensorUnlockCount = 0
+            if Libre2ConnectionStore.shared.snapshot?.sessionID != nil || Libre2ConnectionStore.shared.snapshot == nil {
+                // Serialize the experimental reset with transfer replies. Ordinary provisioning
+                // keeps its original path and does not create experimental state or send messages.
+                let reset = {
+                    UserDefaults.standard.libreActiveSensorUnlockCode = unlockCode
+                    UserDefaults.standard.libreActiveSensorUnlockCount = 0
+                    Libre2PhoneConnection.shared.sensorProvisioned()
+                }
+                if Thread.isMainThread { reset() } else { DispatchQueue.main.sync(execute: reset) }
+            } else {
+                UserDefaults.standard.libreActiveSensorUnlockCode = unlockCode
+                UserDefaults.standard.libreActiveSensorUnlockCount = 0
+            }
 
         } else {
             trace("received streaming enabled message from NFC with result unsuccessful", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)

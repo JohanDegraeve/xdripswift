@@ -393,6 +393,8 @@ extension WatchManager: WCSessionDelegate {
         // send the update that was deferred while the session was activating
         DispatchQueue.main.async { [weak self] in
             self?.processWatchUpdate(updateTypes: [.status, .bgReadings], forceComplicationUpdate: false)
+            Libre2PhoneConnection.shared.refresh()
+            Libre2PhoneConnection.shared.publishRevocations()
         }
     }
 
@@ -437,6 +439,10 @@ extension WatchManager: WCSessionDelegate {
     func session(_: WCSession, didReceiveMessageData _: Data) {}
 
     func sessionReachabilityDidChange(_ session: WCSession) {
+        DispatchQueue.main.async {
+            Libre2PhoneConnection.shared.refresh()
+            if session.isReachable { Libre2PhoneConnection.shared.publishRevocations() }
+        }
         if session.isReachable {
             DispatchQueue.main.async {
                 self.processWatchUpdate(updateTypes: [.status, .bgReadings], forceComplicationUpdate: false)

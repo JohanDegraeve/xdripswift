@@ -4,6 +4,10 @@ import os
 
 @objcMembers
 class CGMLibre2Transmitter: Libre2BluetoothTransmitter, CGMTransmitter {
+    override var isConnectionAllowed: Bool {
+        super.isConnectionAllowed && Libre2ConnectionStore.shared.snapshot?.allowsPhone == true
+    }
+
     // MARK: - properties
     
     /// will be used to pass back bluetooth and cgm related events
@@ -70,7 +74,15 @@ class CGMLibre2Transmitter: Libre2BluetoothTransmitter, CGMTransmitter {
         // initialize nonFixedSlopeEnabled
         self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
         
+        // A committed return must restore the durable Watch counter before the first BLE attempt.
+        let selection = Libre2ConnectionStore.shared.snapshot
+        if selection?.phase == .phone, let id = selection?.sessionID,
+           let returned = try? Libre2WatchSession.load(from: Libre2ConnectionStore.shared.sessionURL),
+           returned.id == id, returned.sensorUID == UserDefaults.standard.libreSensorUID {
+            UserDefaults.standard.libreActiveSensorUnlockCount = max(UserDefaults.standard.libreActiveSensorUnlockCount, returned.unlockCount)
+        }
         super.init(addressAndName: newAddressAndName, sensor: phoneSensor, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
+        Libre2PhoneConnection.shared.transmitter = self
     }
     
     // MARK: - overriden  BluetoothTransmitter functions
@@ -90,6 +102,7 @@ class CGMLibre2Transmitter: Libre2BluetoothTransmitter, CGMTransmitter {
 
     override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         super.centralManager(central, didConnect: peripheral)
+        guard isConnectionAllowed else { return }
         
         if let sensorSerialNumber = tempSensorSerialNumber {
             // we need to send the sensorSerialNumber here. Possibly this is a new transmitter being scanned for, in which case the call to cGMLibre2TransmitterDelegate?.received(sensorSerialNumber: ..) in NFCTagReaderSessionDelegate functions wouldn't have stored the status in coredata, because it' doesn't find the transmitter, so let's store it again, at each connect, if not nil
@@ -157,9 +170,26 @@ class CGMLibre2Transmitter: Libre2BluetoothTransmitter, CGMTransmitter {
     }
     
     override func received(glucoseData: [GlucoseData], sensorTimeInMinutes: UInt16) {
+        Libre2PhoneConnection.shared.received(glucoseData, from: self)
         var copy = glucoseData
         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: TimeInterval(minutes: Double(sensorTimeInMinutes)))
         cGMLibre2TransmitterDelegate?.received(sensorTimeInMinutes: Int(sensorTimeInMinutes), from: self)
+    }
+
+    func watchSession(id: UUID) throws -> Libre2WatchSession {
+        guard let uid = UserDefaults.standard.libreSensorUID,
+              let patchInfo = UserDefaults.standard.librePatchInfo,
+              let serial = sensorSerialNumber, let name = deviceName,
+              let parameters = UserDefaults.standard.libre1DerivedAlgorithmParameters,
+              isWebOOPEnabled(), !UserDefaults.standard.suppressUnLockPayLoad else {
+            throw Libre2ConnectionError("Libre Native Algorithm and unlock payload must be enabled for a provisioned sensor.")
+        }
+        let session = Libre2WatchSession(id: id, sensorUID: uid, patchInfo: patchInfo,
+            serialNumber: serial, bluetoothName: name,
+            unlockCode: UserDefaults.standard.libreActiveSensorUnlockCode,
+            unlockCount: UserDefaults.standard.libreActiveSensorUnlockCount, algorithmParameters: parameters)
+        try session.validate()
+        return session
     }
 
     // MARK: - CGMTransmitter protocol functions

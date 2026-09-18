@@ -137,6 +137,9 @@ final class WatchStateModel: NSObject, ObservableObject {
         self.session = session
         super.init()
 
+        Libre2WatchConnection.shared.readingsReceived = { [weak self] readings, age in
+            self?.receiveDirectLibre(readings, sensorAge: age)
+        }
         session.delegate = self
         session.activate()
     }
@@ -616,6 +619,24 @@ final class WatchStateModel: NSObject, ObservableObject {
         }
     }
 
+    /// Reuse the existing chart/complication update path for the direct collector.
+    private func receiveDirectLibre(_ readings: [GlucoseData], sensorAge: UInt16) {
+        var values = Dictionary(zip(bgReadingDates.map { $0.timeIntervalSince1970 }, bgReadingValues), uniquingKeysWith: { _, latest in latest })
+        for reading in readings where reading.glucoseLevelRaw > 0 {
+            values[reading.timeStamp.timeIntervalSince1970] = reading.glucoseLevelRaw
+        }
+        let dates = values.keys.filter { $0 > Date().addingTimeInterval(-12 * 3600).timeIntervalSince1970 }.sorted(by: >)
+        guard let latestDate = dates.first, let latestValue = values[latestDate] else { return }
+        let previousDate = dates.first { latestDate - $0 >= 5 * 60 && latestDate - $0 <= 6 * 60 }
+        let delta = previousDate.flatMap { values[$0] }.map { latestValue - $0 } ?? 0
+        let processed = processBgReadingsFromDictionary(dictionary: [
+            "bgReadingDatesAsDouble": dates, "bgReadingValues": dates.compactMap { values[$0] },
+            "slopeOrdinal": 0, "deltaValueInUserUnit": delta.mgDlToMmol(mgDl: isMgDl), "generatedAt": Date().timeIntervalSince1970
+        ])
+        sensorAgeInMinutes = Double(sensorAge)
+        if processed { updateComplicationData() }
+    }
+
     // MARK: - Private functions used to interact with the WCSession and prepare internal data
 
     private func processWatchPayloadFromDictionary(dictionary: [String: Any]) {
@@ -625,7 +646,8 @@ final class WatchStateModel: NSObject, ObservableObject {
             processedUpdate = processStatusFromDictionary(dictionary: statusDictionary)
         }
 
-        if let bgReadingsDictionary = dictionary["bgReadings"] as? [String: Any] {
+        if Libre2ConnectionStore.shared.snapshot?.allowsWatch != true,
+           let bgReadingsDictionary = dictionary["bgReadings"] as? [String: Any] {
             processedUpdate = processBgReadingsFromDictionary(dictionary: bgReadingsDictionary) || processedUpdate
         }
 
@@ -642,6 +664,10 @@ final class WatchStateModel: NSObject, ObservableObject {
 
     private func processBgReadingsFromDictionary(dictionary: [String: Any]) -> Bool {
         let bgReadingDatesFromDictionary: [Double] = dictionary["bgReadingDatesAsDouble"] as? [Double] ?? [0]
+        // After direct collection, a queued phone payload must not replace a newer Watch reading.
+        if Libre2ConnectionStore.shared.snapshot?.sessionID != nil,
+           let incoming = bgReadingDatesFromDictionary.first, let displayed = bgReadingDates.first,
+           incoming < displayed.timeIntervalSince1970 { return false }
 
         // let's make a quick check to see if the data about to be processed is from within the last hour
         // this is to avoid long delays when re-opening a Watch app for the first time in days and waiting
@@ -820,6 +846,7 @@ extension WatchStateModel: WCSessionDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self = self, activationState == .activated else { return }
 
+            Libre2WatchConnection.shared.restore()
             self.requestWatchStateUpdate()
             // if the AGP tab requested data while activation was pending, send it now
             self.sendPendingAGPRequestIfPossible()
@@ -831,6 +858,22 @@ extension WatchStateModel: WCSessionDelegate {
             // retry AGP requests that were made before the phone became reachable
             self.sendPendingAGPRequestIfPossible()
         }
+    }
+
+    func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+        DispatchQueue.main.async {
+            if message[Libre2ConnectionMessage.key] != nil {
+                Libre2WatchConnection.shared.receive(message, reply: replyHandler)
+            } else {
+                self.processWatchPayloadFromDictionary(dictionary: message)
+                replyHandler([:])
+            }
+        }
+    }
+
+    func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+        guard applicationContext[Libre2ConnectionMessage.key] != nil else { return }
+        DispatchQueue.main.async { Libre2WatchConnection.shared.receive(applicationContext, reply: { _ in }) }
     }
 
     func session(_: WCSession, didReceiveMessageData _: Data) {}

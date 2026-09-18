@@ -26,15 +26,18 @@ installation. Shared protocol dependencies are now separated and checked against
 upstream frames and both SDKs. NFC success now stores the code actually sent by
 the scan. The user passed the second phone device checkpoint: all requested tests
 passed, with automatic reconnection in under 30 seconds and no manual intervention.
-The shared collector now belongs to both targets. The phone retains its NFC and
-CGM adapters; the Watch adapter loads a validated session and reserves counters
-on disk before unlocking. Its complete dependency closure typechecks against the
-Watch SDK. It is deliberately not instantiated by the Watch app yet: activation
-requires the phone-controlled release/activate transaction in milestone 5.
-The milestone 4 Watch device gate therefore remains pending until that transaction
-provides a safe way to activate the collector. The user has now confirmed that
-phone NFC, fresh readings and signal-loss recovery all pass after the collector
-extraction (`58f621a8`). Next: implement switching and test direct Watch collection.
+The shared collector belongs to both targets. The user passed phone NFC,
+fresh-reading and signal-loss recovery checks after its extraction (`58f621a8`).
+Phone-controlled switching is now implemented, with persisted selection, confirmed
+BLE release, final-counter transfer, interrupted-transfer recovery and successful
+NFC reset. Advanced Settings contains the initial test controls; the Watch can
+show direct values using its existing chart/complication path.
+
+Next: complete the milestone 4/5 device gate for direct collection, both transfer
+directions, restarts, interrupted transfers and NFC reset. History synchronisation,
+full display/settings persistence, the final interface and optional background
+features remain later milestones. This checkpoint is not yet feature-equivalent
+to the reference prototype.
 
 An installation over the prototype disconnected until the app was reinstalled.
 A retained unlock-code mismatch is a plausible code-supported explanation, not a
