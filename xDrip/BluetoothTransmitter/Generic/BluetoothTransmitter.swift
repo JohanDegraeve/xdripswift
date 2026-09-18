@@ -720,11 +720,14 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         timeStampLastStatusUpdate = Date()
         
-        // devicename needed unwrapped for logging
-        var deviceName = "unknown"
-        if let temp = peripheral.name {
-            deviceName = temp
-        }
+        #if os(watchOS)
+        // On first discovery the cached name may be missing; use the advertised name,
+        // as the Direct Libre prototype did. Keep the phone's matching policy intact.
+        let discoveredName = advertisementData[CBAdvertisementDataLocalNameKey] as? String ?? peripheral.name
+        #else
+        let discoveredName = peripheral.name
+        #endif
+        let deviceName = discoveredName ?? "unknown"
         trace("in didDiscover, found peripheral with name: %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, String(describing: deviceName))
         
         // check if stored address not nil, in which case we already connected before and we expect a full match with the already known device name
@@ -745,8 +748,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             // do we expect a specific device name ?
             if let expectedName = expectedName {
                 // so it's a new device, we need to see if it matches the specifically expected device name
-                if (peripheral.name?.range(of: expectedName, options: .caseInsensitive)) != nil {
-                    // peripheral.name is not nil and contains expectedName
+                if (discoveredName?.range(of: expectedName, options: .caseInsensitive)) != nil {
+                    // discovered name is not nil and contains expectedName
                     // Skip recently rejected devices for a short cooldown period to avoid latching on the same stale DX transmitter repeatedly
                     if let discoveredName = peripheral.name, isDexcomG7StyleName(discoveredName), isTemporarilyRejected(discoveredName) {
                         trace("in didDiscover, discovery skip: %{public}@ is within temporary rejection cooldown, keep scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, discoveredName)
@@ -755,7 +758,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                     trace("in didDiscover, new peripheral has expected device name, will try to connect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
                     stopScanAndconnect(to: peripheral)
                 } else {
-                    // peripheral.name is nil or does not contain expectedName
+                    // discovered name is nil or does not contain expectedName
                     trace("in didDiscover, new peripheral doesn't have device name as expected (%{public}@), ignoring this device", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, expectedName)
                 }
             } else {

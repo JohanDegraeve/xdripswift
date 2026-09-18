@@ -397,3 +397,54 @@ actual Watch collector/coordinator SDK check and the scoped phone SDK check
 (with unrelated app dependencies stubbed). These tests do not exercise physical
 disconnection or callback timing. Full Xcode builds were not repeated; the
 previous compiler-plugin sandbox limitation still applies to this environment.
+
+### Prototype comparison: Watch selected, antenna remains orange
+
+Compared integrated `d30fd18d` with the local working prototype `ef9926b` in
+`xdripswift-github`. The user reports that the phone reaches “Watch selected”,
+the Watch stays orange, and cycling phone Bluetooth does not help. The phone
+only shows that success after Watch acknowledges ACTIVATE, so the live transfer
+has passed preparation and activation. This does not prove a radio connection.
+An orange antenna alone cannot distinguish scanning, a pending connection,
+Bluetooth unavailable, or a connection that subsequently dropped.
+
+| Step | Working prototype | Integrated implementation / finding |
+| --- | --- | --- |
+| Preparation | Validates and persists credentials before READY; no Watch BLE yet | Same ordering, new message/selection types |
+| Phone authentication during preparation | Freezes authentication when preparing | Phone can still reserve a counter until READY; the final snapshot refreshes Watch preparation if needed |
+| Phone release | Waits for disconnect callback before ACTIVATE | Since `d30fd18d`, suspends collection and requests cancellation without waiting, at the user's request |
+| Activation | Persists Watch ownership, starts collector, acknowledges | Same ordering; acknowledgement means activation accepted, not connected |
+| Scan filter | Scans for Libre service FDE3 | Inherited phone scan with no service filter; changed to FDE3 on Watch only |
+| First discovery name | Advertised local name, falling back to peripheral name; exact case-insensitive match | Used only cached peripheral name; now uses the same name source on Watch. Shared matching still uses the phone's case-insensitive substring rule |
+| Known peripheral | Uses a locally saved Watch identifier, leaves its connection pending | Same basic reuse policy; different local storage. Neither imports the phone's peripheral identifier |
+| BLE setup | Discovers FDE3, subscribes F002, persists N+1 before writing F001 | Same service, characteristics, payload algorithm and counter ordering, through the shared collector |
+| Unlock callback | Once per connection; validates F002 and a write characteristic | Uses the original phone callback behavior. This difference occurs after connection and does not explain failure to establish a link |
+| Runtime | Prototype includes optional location runtime and foreground recovery | Not yet ported; perform this checkpoint with Watch visibly active |
+
+The service-filter and name-source changes restore discovery choices that were
+lost when adopting the phone collector. They are plausible causes, not a confirmed
+device diagnosis. Apple's [scan documentation](https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/scanforperipherals(withservices:options:))
+recommends explicit service filters; its [watchOS Bluetooth guidance](https://developer.apple.com/videos/play/wwdc2022/10135/)
+also uses service-filtered scanning for background discovery. An unfiltered scan
+is not, by itself, proof that foreground discovery must fail.
+
+The ordinary phone scan, NFC path, reconnect timing and unlock algorithm are
+unchanged by this correction. Bluetooth permission text is present in the Watch
+Info.plist. The integrated collector uses a serial Bluetooth queue and central
+restoration options, unlike the prototype's main-queue central without options;
+these are additional differences, but no observed callback trace implicates them.
+
+Device check: install the updated Watch build, reopen it with the current Watch
+selection, keep it visible and confirm the antenna turns green followed by a new
+reading. If it remains orange, retain the Watch Xcode/system log from launch.
+The existing BluetoothTransmitter messages distinguish powered-on state, scan
+start, discovered/matching names, connection attempts/timeouts, and didConnect.
+A log showing the last completed step is needed before changing timers, central
+options or authentication.
+
+Validation: the actual Watch collector/coordinator dependency closure and the
+WatchStateModel/indicator closure pass watchOS SDK typechecking. The scoped phone
+iOS SDK check also passes, using stand-ins for unrelated app dependencies.
+The 26 host tests were not repeated for these platform discovery changes; they
+do not simulate Bluetooth discovery. Full device build/radio validation remains
+required; this environment's full-build compiler-plugin sandbox limitation remains.

@@ -38,7 +38,13 @@ class Libre2BluetoothTransmitter: BluetoothTransmitter {
 
     init(addressAndName: DeviceAddressAndName, sensor: Libre2SensorDataSource, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, restorationIdentifier: String? = nil) {
         self.sensor = sensor
-        super.init(addressAndName: addressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Libre2)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Libre2, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Libre2, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate, restorationIdentifier: restorationIdentifier)
+        #if os(watchOS)
+        // Retain the prototype's service-filtered Watch scan; phone scanning is unchanged.
+        let advertisementUUID: String? = CBUUID_Service_Libre2
+        #else
+        let advertisementUUID: String? = nil
+        #endif
+        super.init(addressAndName: addressAndName, CBUUID_Advertisement: advertisementUUID, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Libre2)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Libre2, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Libre2, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate, restorationIdentifier: restorationIdentifier)
     }
 
     /// Called on main. Platform adapters deliver readings to their own model.

@@ -1,6 +1,6 @@
 import Foundation
 
-/// The switching coordinator must construct this only after the phone releases its connection.
+/// The switching coordinator constructs this after the phone suspends collection and sends ACTIVATE.
 /// The Watch connection manager checks the persisted selection before constructing it.
 final class Libre2WatchTransmitter: Libre2BluetoothTransmitter {
     override var isConnectionAllowed: Bool {
