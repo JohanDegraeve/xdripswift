@@ -34,10 +34,40 @@ integrated. They remain scheduled in [the roadmap](DirectLibreRoadmap.md).
 
 Unmodified generic iPhone/Watch builds fail in existing extension macro expansion:
 Xcode's plugin sandbox cannot start in the agent's execution environment. The
-post-refactor iPhone build encounters the same blocker. No successful linked app
-build or hosted XCTest run is claimed. Full builds and device checks remain open.
+post-refactor iPhone build encounters the same blocker. Agent-driven full builds
+and hosted XCTest execution remain unavailable. The user subsequently confirmed
+a successful build in Xcode and the phone checks below on a clean installation.
 Detailed logs and the one-off audit scripts are in the workspace's sibling
 `validation/integrated-develop` directory, outside the source checkout.
+
+### Device result and upgrade finding
+
+The user confirmed that this checkout builds in Xcode and that ordinary NFC
+scanning, fresh readings, cancellation/retry and reconnection work after removing
+the installed app and installing this version. This clears the first phone device
+checkpoint for a clean installation. It does not establish upgrade compatibility.
+
+Installing over the previous Direct Libre prototype initially caused immediate
+sensor disconnection. Collection had already been returned to the phone and the
+Watch collector stopped. The saved state and failing trace were not captured
+before removal, so the exact cause cannot be confirmed retrospectively.
+
+Code inspection identified a specific credential mismatch that could explain it:
+
+- The prototype's experimental NFC reset can persist a non-default unlock code
+  in `UserDefaults.standard.libreActiveSensorUnlockCode`.
+- Develop's `LibreNFC` provisions streaming with the fixed code `42`.
+- Develop's BLE transmitter uses the saved unlock code; its NFC-success callback
+  resets the counter but does not replace that code.
+- With a non-default value left by the prototype, the two paths therefore use
+  different credentials. Without that saved override, the getter returns `42`.
+
+The integration must keep NFC-provisioned and BLE-used credentials consistent.
+Carry this into the configuration/persistence work and add a retained-non-default-
+code regression case. Distinguish normal upstream upgrades from the experimental
+prototype transition; do not add a broad data wipe or make reinstallation part
+of the supported workflow. No scan behaviour or recovery code was changed in
+response to this report.
 
 ### Physical-device checks
 

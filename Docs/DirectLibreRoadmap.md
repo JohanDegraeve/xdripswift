@@ -18,6 +18,18 @@ Each milestone gets coherent commits. Separate structural changes from behaviour
 changes, keep validation alongside the relevant change, and exclude incidental
 Xcode metadata/signing changes. Physical-device checks gate further integration.
 
+## Current checkpoint
+
+The phone NFC extraction is committed. The user confirmed a successful Xcode
+build and ordinary NFC/readings/cancellation/reconnection checks on a clean
+installation. Next: shared protocol dependencies and explicit configuration.
+
+An installation over the prototype disconnected until the app was reinstalled.
+A retained unlock-code mismatch is a plausible code-supported explanation, not a
+confirmed diagnosis. Preserve this as an upgrade/configuration regression case;
+see [validation findings](DirectLibreValidation.md). Existing user Xcode/signing
+adjustments remain local and separate from feature commits.
+
 ## Milestones and acceptance
 
 1. **Baseline and dependency audit.** Record the upstream revision, build targets,
