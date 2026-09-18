@@ -32,8 +32,9 @@ on disk before unlocking. Its complete dependency closure typechecks against the
 Watch SDK. It is deliberately not instantiated by the Watch app yet: activation
 requires the phone-controlled release/activate transaction in milestone 5.
 The milestone 4 Watch device gate therefore remains pending until that transaction
-provides a safe way to activate the collector. Next: verify the phone after this
-extraction, then implement switching and test direct Watch collection.
+provides a safe way to activate the collector. The user has now confirmed that
+phone NFC, fresh readings and signal-loss recovery all pass after the collector
+extraction (`58f621a8`). Next: implement switching and test direct Watch collection.
 
 An installation over the prototype disconnected until the app was reinstalled.
 A retained unlock-code mismatch is a plausible code-supported explanation, not a

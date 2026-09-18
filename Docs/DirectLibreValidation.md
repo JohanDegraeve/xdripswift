@@ -238,3 +238,18 @@ included. On the phone, install over the last tested integrated build and repeat
 ordinary NFC scan/cancel/retry, fresh readings and 2–3 minute signal-loss recovery.
 Keep the old prototype Watch collector stopped. Direct Watch collection and its
 reconnection test follow after safe phone-controlled activation is implemented.
+
+### Shared collector phone device result
+
+The user confirmed that the phone's NFC, fresh-reading and signal-loss recovery
+checks all pass after commit `58f621a8`. This clears the phone regression gate
+for the shared collector extraction. No new recovery-time measurement was
+reported, and this result does not establish direct Watch collection or switching.
+
+The next implementation checkpoint is phone-controlled switching. The shared
+Bluetooth class normally reconnects after a disconnect, so the transaction needs
+an explicit collection suspension that guards scanning, reconnects, subscription
+and unlock writes, followed by confirmed release before activating the other
+device. Preserve the ordinary phone path when the experiment is not in use.
+Validate counter changes during preparation, interrupted transactions and NFC
+reset before enabling direct collection through the phone's experimental page.
