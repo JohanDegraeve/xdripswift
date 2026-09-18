@@ -7,7 +7,10 @@ struct Libre2ConnectionIndicator: View {
 
     var body: some View {
         Image(systemName: connection.direct ? "antenna.radiowaves.left.and.right" : ConstantsAppleWatch.requestingDataIconSFSymbolName)
-            .font(.system(size: ConstantsAppleWatch.requestingDataIconFontSize, weight: .heavy))
+            .font(connection.direct
+                  ? .system(size: ConstantsAppleWatch.isSmallScreen() ? 14 : 16)
+                  : .system(size: ConstantsAppleWatch.requestingDataIconFontSize, weight: .heavy))
+            .padding(.top, connection.direct ? 0 : 4)
             .foregroundStyle(connection.direct ? (connection.connected ? Color.green : Color.orange) : relayColor)
             .accessibilityLabel(connection.direct ? connection.status : "Phone update")
     }

@@ -99,7 +99,6 @@ struct BigNumberView: View {
             
             HStack(alignment: .center, spacing: 3) {
                 Libre2ConnectionIndicator(relayColor: watchState.requestingDataIconColor)
-                    .padding(.top, 4)
                     .padding(.trailing, 2)
                 
                 Text(watchState.lastUpdatedMinsAgoString())
