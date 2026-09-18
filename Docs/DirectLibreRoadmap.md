@@ -23,8 +23,9 @@ Xcode metadata/signing changes. Physical-device checks gate further integration.
 The phone NFC extraction is committed. The user confirmed a successful Xcode
 build and ordinary NFC/readings/cancellation/reconnection checks on a clean
 installation. Shared protocol dependencies are now separated and checked against
-upstream frames and both SDKs. Next: provisioning consistency, followed by the
-phone device checkpoint before integrating the shared collector into Watch.
+upstream frames and both SDKs. NFC success now stores the code actually sent by
+the scan. Next: the phone device checkpoint before integrating the shared collector
+into Watch.
 
 An installation over the prototype disconnected until the app was reinstalled.
 A retained unlock-code mismatch is a plausible code-supported explanation, not a

@@ -110,10 +110,13 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         UserDefaults.standard.librePatchInfo = patchInfo
     }
 
-    func streamingEnabled(successful: Bool) {
+    func streamingEnabled(successful: Bool, unlockCode: UInt32) {
         if successful {
             trace("received streaming enabled message from NFC with result successful, setting unlockCount to 0", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
 
+            // A previous installation may have saved a different code. Adopt the one
+            // that this NFC scan actually provisioned before BLE sends its next unlock.
+            UserDefaults.standard.libreActiveSensorUnlockCode = unlockCode
             UserDefaults.standard.libreActiveSensorUnlockCount = 0
 
         } else {

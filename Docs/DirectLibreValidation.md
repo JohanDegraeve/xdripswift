@@ -145,3 +145,25 @@ Test/audit runners and logs live outside the checkout in
 existing `xdripTests` target. No Watch source membership or connection behaviour
 changes are made at this checkpoint. A full device build and ordinary readings
 check remain necessary after these edits.
+
+### NFC credential consistency
+
+The NFC delegate now reports the unlock code sent by the scan. On success the
+phone stores that code before resetting the unlock counter; on failure it leaves
+both values unchanged. NFC commands still use the original code `42`, and scan
+ordering, cancellation/retry, messages and Bluetooth reconnection are unchanged.
+This closes the code mismatch identified after the prototype installation, but
+does not retrospectively prove the cause of that particular disconnection.
+
+Three host checks passed for the actual result-handler body: replacing a retained
+prototype code after success, preserving credentials after failure, and adopting
+a reported non-default code. The next unlock payload uses the reported code plus
+counter one. These checks extract the handler for macOS execution with a logging
+stand-in and real Foundation preferences; they do not simulate CoreNFC or BLE.
+The updated transmitter/NFC delegate boundary also passes limited SDK typechecks.
+
+For the next physical checkpoint, install over the current working installation
+without deleting its data. Check several readings and graph updates before and
+after an ordinary NFC scan, cancellation/retry, and reconnection. If immediate
+disconnection recurs, retain the failure log before resetting or reinstalling.
+The Watch remains the ordinary upstream relayed app until the next milestone.
