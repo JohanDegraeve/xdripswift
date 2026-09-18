@@ -1104,6 +1104,7 @@ import AppIntents
             
             // was a new reading created or not ?
             var newReadingCreated = false
+            var acceptedReadings: [(reading: BgReading, acceptedAt: Date)] = []
             
             // assign value of timeStampLastBgReading
             var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
@@ -1161,28 +1162,14 @@ import AppIntents
                             activeSensor.noiseHistoryIsComplete = false
                         }
                         
-                        // Every accepted reading belongs in the consumer history, including one-minute
-                        // sources and backfills. The entry timestamp intentionally defaults to now,
-                        // because it describes when xDripswift accepted the value. The sensor's distinct
-                        // measurement time remains in the typed payload and is shown in every reading.
-                        // This preserves causality around connection and sensor lifecycle rows.
+                        // Keep the acceptance time, but snapshot the Activity Log values only after
+                        // adjustment and smoothing have completed for the incoming batch.
+                        acceptedReadings.append((newReading, Date()))
                         trace(
                             "in processNewGlucoseData, new reading created, timestamp = %{public}@, calculatedValue = %{public}@",
                             log: self.log,
                             category: ConstantsLog.categoryRootView,
                             type: .debug,
-                            troubleshooting: .standard(
-                                // Persist the controlled CGM description with the reading. A generic
-                                // "direct sensor" label does not identify which acquisition path was
-                                // active, while the typed mapping still excludes transmitter IDs.
-                                .glucoseAccepted(
-                                    mgDl: newReading.calculatedValue,
-                                    source: TroubleshootingLogSource(
-                                        directTransmitterType: cgmTransmitter.cgmTransmitterType()
-                                    ),
-                                    measuredAt: newReading.timeStamp
-                                )
-                            ),
                             newReading.timeStamp.description(with: .current),
                             newReading.calculatedValue.description.replacingOccurrences(of: ".", with: ",")
                         )
@@ -1227,6 +1214,14 @@ import AppIntents
             // if a new reading is created, create either initial calibration request or bgreading notification - upload to nightscout and check alerts
             if newReadingCreated {
                 _ = bgPostProcessingManager?.processLatestReadings()
+                for accepted in acceptedReadings {
+                    TroubleshootingLogStore.shared.record(.standard(.glucoseAccepted(
+                        mgDl: accepted.reading.finalValue,
+                        source: TroubleshootingLogSource(directTransmitterType: cgmTransmitter.cgmTransmitterType()),
+                        measuredAt: accepted.reading.timeStamp,
+                        originalMgDl: accepted.reading.calculatedValue
+                    ), timestamp: accepted.acceptedAt))
+                }
                 sensorNoiseManager?.update(activeSensor: activeSensor)
 
                 // Publish the final stored value before optional downstream consumers perform their work.
@@ -3116,6 +3111,7 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
             let previousTimeStampLastBgReading = timeStampLastBgReading
             
             var firstCreatedBgReadingTimeStamp: Date?
+            var acceptedReadings: [(reading: BgReading, acceptedAt: Date)] = []
 
             let duplicateReadingWindow = TimeInterval(minutes: 2.5)
             let oldestIncomingTimeStamp = followGlucoseDataArray.map { $0.timeStamp }.min()
@@ -3177,20 +3173,13 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                     }
 
                     if let newReading = newReading {
-                        // Record only after a manager has accepted and created the reading. The row
-                        // timestamp defaults to this actual acceptance time. `measuredAt` is retained
-                        // separately so a restored value can explain when the glucose was measured
-                        // without being sorted before the login or poll that retrieved it.
+                        // Keep every accepted sample, including backfills, for logging after processing.
+                        acceptedReadings.append((newReading, Date()))
                         trace(
                             "in followerInfoReceived, created new bgreading: value = %{public}@ %{public}@, timestamp = %{public}@",
                             log: self.log,
                             category: ConstantsLog.categoryRootView,
                             type: .info,
-                            troubleshooting: .standard(.glucoseAccepted(
-                                mgDl: followGlucoseData.sgv,
-                                source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType),
-                                measuredAt: followGlucoseData.timeStamp
-                            )),
                             followGlucoseData.sgv.mgDlToMmol(mgDl: isMgDl).bgValueToString(mgDl: isMgDl),
                             isMgDl ? Texts_Common.mgdl : Texts_Common.mmol,
                             followGlucoseData.timeStamp.toStringForTrace(timeStyle: .long, dateStyle: .long)
@@ -3227,6 +3216,15 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                     }
                 } else {
                     _ = bgPostProcessingManager?.processLatestReadings()
+                }
+
+                for accepted in acceptedReadings {
+                    TroubleshootingLogStore.shared.record(.standard(.glucoseAccepted(
+                        mgDl: accepted.reading.finalValue,
+                        source: TroubleshootingLogSource(UserDefaults.standard.followerDataSourceType),
+                        measuredAt: accepted.reading.timeStamp,
+                        originalMgDl: accepted.reading.calculatedValue
+                    ), timestamp: accepted.acceptedAt))
                 }
 
                 // Publish the final stored value before optional downstream consumers perform their work.

@@ -516,7 +516,7 @@ final class TroubleshootingLogTests: XCTestCase {
         }
 
         let values = fixture.store.snapshot().compactMap { entry -> Double? in
-            guard case let .glucoseAccepted(mgDl, _, _) = entry.kind else { return nil }
+            guard case let .glucoseAccepted(mgDl, _, _, _) = entry.kind else { return nil }
             return mgDl
         }
         XCTAssertEqual(values, [107, 106, 105])
@@ -974,10 +974,10 @@ final class TroubleshootingLogTests: XCTestCase {
         XCTAssertEqual(entries[0].timestamp, recordedTime)
         XCTAssertEqual(
             report.message(for: entries[0]),
-            "New reading: 75 mg/dL at 07:50:00."
+            "New reading: 75 at 07:50:00."
         )
         XCTAssertTrue(report.reportText.contains(
-            "08:00:00  New reading: 75 mg/dL at 07:50:00."
+            "08:00:00  New reading: 75 at 07:50:00."
         ))
         let readingRange = try XCTUnwrap(report.reportText.range(of: "New reading:"))
         let loginRange = try XCTUnwrap(report.reportText.range(of: "CareLink signed in successfully."))
@@ -1308,10 +1308,47 @@ final class TroubleshootingLogTests: XCTestCase {
         let mgDlReport = makeReport(entries: [entry], usesMgDl: true, timeZone: timeZone)
         let mmolReport = makeReport(entries: [entry], usesMgDl: false, timeZone: timeZone)
 
-        XCTAssertTrue(mgDlReport.reportText.contains("180 mg/dL"))
-        XCTAssertTrue(mmolReport.reportText.contains("10.0 mmol/L"))
-        XCTAssertTrue(mgDlReport.reportText.contains("New reading: 180 mg/dL at 09:00:00."))
+        XCTAssertTrue(mgDlReport.reportText.contains("New reading: 180 at"))
+        XCTAssertTrue(mmolReport.reportText.contains("New reading: 10.0 at"))
+        XCTAssertTrue(mgDlReport.reportText.contains("New reading: 180 at 09:00:00."))
         XCTAssertTrue(mgDlReport.reportText.contains("Friday, 15 January 2027"))
+    }
+
+    func testReadingShowsOriginalOnlyWhenDifferentAtDisplayPrecision() {
+        let cases: [(Double, Double, Bool, String)] = [
+            (58, 60, false, "3.2 (orig: 3.3)"),
+            (112, 117, true, "112 (orig: 117)"),
+            (58, 58.1, false, "3.2"),
+            (112.1, 112.2, true, "112"),
+            (112, 112, true, "112")
+        ]
+        for (finalValue, originalValue, usesMgDl, expected) in cases {
+            let entry = TroubleshootingLogEntry.standard(
+                .glucoseAccepted(mgDl: finalValue, source: .dexcomG6, measuredAt: referenceDate, originalMgDl: originalValue),
+                timestamp: referenceDate
+            )
+            let report = makeReport(entries: [entry], usesMgDl: usesMgDl, timeZone: TimeZone(secondsFromGMT: 3_600)!)
+            XCTAssertEqual(report.message(for: entry), "New reading: \(expected) at 09:00:00.")
+        }
+    }
+
+    func testReadingOriginalValueRoundTripsAndOlderEntriesStillDecode() throws {
+        let kind = TroubleshootingLogKind.glucoseAccepted(
+            mgDl: 112, source: .dexcomG6, measuredAt: referenceDate, originalMgDl: 117
+        )
+        let encoded = try JSONEncoder().encode(kind)
+        XCTAssertEqual(try JSONDecoder().decode(TroubleshootingLogKind.self, from: encoded), kind)
+
+        // Reproduce the persisted payload before the optional original value was introduced.
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        var payload = try XCTUnwrap(object["glucoseAccepted"] as? [String: Any])
+        payload.removeValue(forKey: "originalMgDl")
+        object["glucoseAccepted"] = payload
+        let legacyData = try JSONSerialization.data(withJSONObject: object)
+        XCTAssertEqual(
+            try JSONDecoder().decode(TroubleshootingLogKind.self, from: legacyData),
+            .glucoseAccepted(mgDl: 112, source: .dexcomG6, measuredAt: referenceDate)
+        )
     }
 
     func testDirectReadingSourceUsesOnlyWhitelistedCGMDescriptions() {

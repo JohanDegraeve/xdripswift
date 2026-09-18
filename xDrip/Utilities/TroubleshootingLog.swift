@@ -804,10 +804,14 @@ enum TroubleshootingLogKind: Codable, Equatable {
     /// records when xDripswift accepted it. Keeping those clocks separate is essential: using a
     /// historical sample time as the row time can falsely place a backfill before the login or
     /// connection that actually retrieved it.
+    ///
+    /// The optional original value keeps existing persisted entries readable. New entries snapshot
+    /// both values after processing; later smoothing must not rewrite an earlier event.
     case glucoseAccepted(
         mgDl: Double,
         source: TroubleshootingLogSource,
-        measuredAt: Date
+        measuredAt: Date,
+        originalMgDl: Double? = nil
     )
     case sensor(TroubleshootingSensorActivity)
     /// A user-initiated sensor-label scan outcome with its decoded label metadata when available.
@@ -1394,7 +1398,7 @@ final class TroubleshootingLogStore {
                     followerHealth[source] = .problem
                 }
 
-            case let .glucoseAccepted(_, source, _):
+            case let .glucoseAccepted(_, source, _, _):
                 // An accepted follower reading is stronger evidence of recovery than a successful HTTP
                 // status. Record that transition once, with a distinct row identity, then retain the
                 // reading itself without suppression. These are two facts derived from one event and
@@ -1995,10 +1999,10 @@ struct TroubleshootingLogReportBuilder {
             case .recovered: return "\(source.name) recovered and glucose information is being received again."
             }
 
-        case let .glucoseAccepted(mgDl, _, measuredAt):
+        case let .glucoseAccepted(mgDl, _, measuredAt, originalMgDl):
             // The current CGM/follower type is already prominent in the copied/shared report header.
             // Keep it in the typed entry for recovery filtering, but do not repeat it on every row.
-            return "New reading: \(glucoseText(mgDl: mgDl)) at \(measurementTimeText(measuredAt, recordedAt: entry.timestamp))."
+            return "New reading: \(glucoseText(mgDl: mgDl, originalMgDl: originalMgDl, includeUnit: false)) at \(measurementTimeText(measuredAt, recordedAt: entry.timestamp))."
 
         case let .sensor(activity):
             switch activity {
@@ -2246,11 +2250,19 @@ struct TroubleshootingLogReportBuilder {
         Self.dayFormatter(timeZone: timeZone).string(from: entry.timestamp)
     }
 
-    private func glucoseText(mgDl: Double) -> String {
+    private func glucoseText(mgDl: Double, originalMgDl: Double? = nil, includeUnit: Bool = true) -> String {
         // Persistence remains unit-neutral by storing canonical mg/dL. Conversion at presentation time
         // means an existing history follows the user's current display-unit preference immediately.
         let value = mgDl.mgDlToMmol(mgDl: usesMgDl).bgValueRounded(mgDl: usesMgDl).bgValueToString(mgDl: usesMgDl)
-        return value + " " + (usesMgDl ? "mg/dL" : "mmol/L")
+        var originalText = ""
+        if let originalMgDl {
+            let originalValue = originalMgDl.mgDlToMmol(mgDl: usesMgDl).bgValueRounded(mgDl: usesMgDl).bgValueToString(mgDl: usesMgDl)
+            // Only show a difference the user can actually see in the selected unit.
+            if originalValue != value {
+                originalText = " (orig: \(originalValue))"
+            }
+        }
+        return value + originalText + (includeUnit ? " " + (usesMgDl ? "mg/dL" : "mmol/L") : "")
     }
 
     /// Keeps same-day measurement times compact while retaining the date when a reading was measured
