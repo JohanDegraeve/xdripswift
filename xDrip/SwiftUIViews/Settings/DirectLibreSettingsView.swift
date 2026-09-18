@@ -7,7 +7,7 @@ struct DirectLibreSettingsView: View {
     var body: some View {
         Form {
             Section("Collection") {
-                Text(connection.phase == .phone ? "Selected device: iPhone" : "Selected device: Watch / transfer pending")
+                Text(selectionTitle)
                 Text(connection.status).font(.footnote)
                 if connection.phase == .phone || connection.phase == .preparingWatch {
                     Button("Switch to Watch") { connection.switchToWatch() }
@@ -28,12 +28,23 @@ struct DirectLibreSettingsView: View {
                 check("Unlock payload enabled", !UserDefaults.standard.suppressUnLockPayLoad)
             }
             Section("Recovery") {
+                Text("If the Watch cannot connect after switching, cycle Bluetooth in iPhone Settings to release the sensor.")
                 Text("Keep both apps open while switching. If a transfer is interrupted, retry Return to iPhone. A successful ordinary sensor NFC scan on the phone resets the selection, including when the Watch is unreachable. The Watch stops when it receives the reset.")
                 Text("This checkpoint displays direct Watch readings locally. History synchronisation to the phone is not implemented yet.")
                     .font(.footnote)
             }
         }
         .onAppear { connection.refresh() }
+    }
+
+    private var selectionTitle: String {
+        switch connection.phase {
+        case .phone: return "Selected device: iPhone"
+        case .preparingWatch: return "Preparing Watch"
+        case .watch: return "Selected device: Watch"
+        case .returningToPhone: return "Returning to iPhone"
+        case nil: return "Selection unavailable"
+        }
     }
 
     private func check(_ title: String, _ passed: Bool) -> some View {

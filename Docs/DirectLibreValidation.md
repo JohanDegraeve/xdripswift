@@ -273,7 +273,9 @@ Forward transfer:
    Its existing sensor connection remains active while Watch prepares.
 2. Watch validates and saves the session, then returns READY without starting BLE.
 3. Phone persists Watch selection, suspends scanning/reconnect/subscription/write
-   paths, and waits for confirmed disconnect (or a confirmed absence of a link).
+   paths, and requests disconnection on the BLE queue. It does not wait for the
+   disconnect callback before proceeding. The final counter snapshot follows that
+   queued suspension, so pending phone callbacks cannot reserve another counter.
 4. It snapshots the final counter. If that changed during preparation, it refreshes
    the prepared Watch before sending ACTIVATE. Watch persists active selection
    before constructing the collector and acknowledging activation.
@@ -309,8 +311,9 @@ and original scanning/retry path retain their prior behaviour.
 
 The generic Bluetooth class has an opt-in suspension operation and a default-on
 connection guard. Only Libre adapters add persisted-selection guards. Queued
-writes and late notification callbacks recheck the guard; suspension waits for
-release and does not change ordinary timeout/cancel/reconnect choices. Watch uses
+writes and late notification callbacks recheck the guard. Suspension waits for
+release by default; forward transfer explicitly skips that wait. Ordinary
+timeout/cancel/reconnect choices are unchanged. Watch uses
 the existing local Bluetooth identity keys to reuse its known peripheral after a
 restart; it never treats the phone's peripheral UUID as a Watch UUID. Its central
 restoration identifier is stable from the sensor UID even before first discovery;
@@ -359,7 +362,9 @@ collector stopped. Use the ordinary phone NFC path and wait for a fresh BLE read
 1. Open both apps. On the phone, open Advanced Settings → Direct Libre (Experimental).
    Check the prerequisites and press **Switch to Watch**. Expect an orange antenna
    followed by green when connected, then fresh Watch glucose/chart/complication.
-   The phone must stop receiving its own BLE frames before Watch activation.
+   The phone must stop processing its own BLE frames before Watch activation.
+   If the physical phone link persists, cycle Bluetooth in iPhone Settings.
+   Watch selection alone does not confirm a Watch radio connection.
 2. Press **Return to iPhone** on that same phone page. Expect Watch release first,
    then fresh phone readings without NFC or Bluetooth cycling. Repeat both ways.
 3. While Watch owns collection, restart each app separately. Phone must stay disabled;
@@ -375,3 +380,20 @@ collector stopped. Use the ordinary phone NFC path and wait for a fresh BLE read
    Also check that cancelling NFC alone does not reclaim an active Watch session.
 6. Repeat ordinary phone scan/cancel/retry and signal-loss recovery after returning
    to the phone. Report any deviations and which device/app was open at the time.
+
+### Forward-transfer callback wait removed
+
+The first switching test reported “Watch / transfer pending” and a need to cycle
+iPhone Bluetooth. That header also appeared after successful activation, so it
+could not identify where the transaction was waiting. It now distinguishes
+preparation, Watch selection and return; the separate status text shows progress.
+At the user's request, forward transfer no longer waits for a disconnect callback.
+The phone still disables collection before activating Watch and requests radio
+release, but does not claim the system released the physical link. Return to phone
+retains confirmed Watch release. Hardware validation of this revision is pending.
+
+Validation after removing the wait: all 26 existing host tests pass, as do the
+actual Watch collector/coordinator SDK check and the scoped phone SDK check
+(with unrelated app dependencies stubbed). These tests do not exercise physical
+disconnection or callback timing. Full Xcode builds were not repeated; the
+previous compiler-plugin sandbox limitation still applies to this environment.

@@ -212,15 +212,22 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     private var connectionSuspended = false
     private var releaseCompletions: [() -> Void] = []
 
-    /// Stop this app's BLE use and acknowledge only a confirmed disconnect (or no connection).
-    func suspendConnection(completion: @escaping () -> Void) {
+    /// Stop this app's BLE use. By default, completion waits for confirmed release.
+    /// Without that wait, completion follows the cancellation request on the BLE queue;
+    /// collection is suspended, but the system may still hold the physical connection.
+    func suspendConnection(waitForDisconnect: Bool = true, completion: @escaping () -> Void) {
         centralQueue.async {
             self.connectionSuspended = true
             self.cancelConnectionTimer()
             self.cancelConnectionSetupTimeout()
             self.centralManager?.stopScan()
-            self.releaseCompletions.append(completion)
-            self.releaseConnectionIfPossible()
+            if waitForDisconnect {
+                self.releaseCompletions.append(completion)
+                self.releaseConnectionIfPossible()
+            } else {
+                self.disconnectOnCentralQueue()
+                DispatchQueue.main.async(execute: completion)
+            }
         }
     }
 

@@ -69,9 +69,9 @@ final class Libre2PhoneConnection: ObservableObject {
                 let reply = try result.get()
                 guard reply.kind == .ready, reply.id == session.id else { throw Libre2ConnectionError("Unexpected preparation reply.") }
                 try self.store.select(.watch, sessionID: session.id)
-                self.status = "Disconnecting iPhone"
+                self.status = "Stopping iPhone collection"
                 self.refresh()
-                transmitter.suspendConnection { [weak self, weak transmitter] in
+                transmitter.suspendConnection(waitForDisconnect: false) { [weak self, weak transmitter] in
                     guard let self = self, let transmitter = transmitter, self.current(session.id, operation) else { return }
                     do {
                         let final = try transmitter.watchSession(id: session.id)
