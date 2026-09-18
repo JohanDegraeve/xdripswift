@@ -3,20 +3,8 @@ import Foundation
 import os
 
 @objcMembers
-class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
+class CGMLibre2Transmitter: Libre2BluetoothTransmitter, CGMTransmitter {
     // MARK: - properties
-    
-    /// service to be discovered
-    private let CBUUID_Service_Libre2: String = "FDE3"
-    
-    /// receive characteristic
-    private let CBUUID_ReceiveCharacteristic_Libre2: String = "F002"
-    
-    /// write characteristic
-    private let CBUUID_WriteCharacteristic_Libre2: String = "F001"
-    
-    /// how many bytes should we receive from Libre 2
-    private let expectedBufferSize = 46
     
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate: CGMTransmitterDelegate?
@@ -27,26 +15,14 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     /// is nonFixed enabled for the transmitter or not
     private var nonFixedSlopeEnabled: Bool
     
-    /// for trace
-    let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMLibre2)
-    
-    /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
-    private var emptyArray: [GlucoseData] = []
-
-    /// used when processing Libre 2 data packet
-    private var startDate: Date
-    
-    /// receive buffer for Libre 2 packets
-    private var rxBuffer: Data
-    
-    /// how long to wait for next packet before resetting the rxBuffer
-    private static let maxWaitForpacketInSeconds = 3.0
-
-    /// is the transmitter oop web enabled or not
-    private var webOOPEnabled: Bool
+    /// Phone preferences and native-algorithm configuration.
+    private let phoneSensor: Libre2PhoneSensor
     
     /// current sensor serial number, if nil then it's not known yet
-    var sensorSerialNumber: String?
+    var sensorSerialNumber: String? {
+        get { phoneSensor.serialNumber }
+        set { phoneSensor.serialNumber = newValue }
+    }
     
     /// temp storage of libreSensorSerialNumber, value will be stored after NFC scanning, but possible there's no transmitter created yet (if this is a first scan for a new transmitter), so we can't store the serial number yet in coredata. As soon as transmitter is connected,  and if tempSensorSerialNumber is not nil, it will be sent to the delegate
     var tempSensorSerialNumber: LibreSensorSerialNumber?
@@ -83,7 +59,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         }
         
         // initialize sensorSerialNumber
-        self.sensorSerialNumber = sensorSerialNumber
+        phoneSensor = Libre2PhoneSensor(serialNumber: sensorSerialNumber, webOOPEnabled: webOOPEnabled ?? false)
 
         // assign CGMTransmitterDelegate
         cgmTransmitterDelegate = cGMTransmitterDelegate
@@ -94,16 +70,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         // initialize nonFixedSlopeEnabled
         self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
         
-        // initialize rxbuffer
-        rxBuffer = Data()
-        
-        // initialize startDate
-        startDate = Date()
-        
-        // initialize webOOPEnabled
-        self.webOOPEnabled = webOOPEnabled ?? false
-
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Libre2)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Libre2, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Libre2, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
+        super.init(addressAndName: newAddressAndName, sensor: phoneSensor, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
     }
     
     // MARK: - overriden  BluetoothTransmitter functions
@@ -151,71 +118,11 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         }
     }
 
-    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
-        
-        // there should be already stored a value for libreSensorUID in the userdefaults at this moment, otherwise processing is not possible
-        guard let libreSensorUID = UserDefaults.standard.libreSensorUID else {
-            trace("in peripheral didUpdateValueFor but libreSensorUID is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
-            
-            return
-        }
-        
-        if let value = characteristic.value {
-            processValue(value: value, sensorUID: libreSensorUID)
-            
-        } else {
-            trace("in peripheral didUpdateValueFor, value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
-        }
-    }
-    
-    override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
-        super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
-        
-        // there should be already stored a value for libreSensorUID in the userdefaults at this moment, otherwise processing is not possible
-        guard let libreSensorUID = UserDefaults.standard.libreSensorUID else {
-            trace("in peripheral didUpdateNotificationStateFor but libreSensorUID is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
-            
-            return
-        }
-        
-        // there should be already stored a value for librePatchInfo in the userdefaults at this moment, otherwise processing is not possible
-        guard let librePatchInfo = UserDefaults.standard.librePatchInfo else {
-            trace("in peripheral didUpdateNotificationStateFor but librePatchInfo is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
-            
-            return
-        }
-
-        // the unlock algorithm reads 6 bytes directly, so invalid restored sensor metadata must be rejected before creating the payload
-        guard libreSensorUID.count >= 6, librePatchInfo.count >= 6 else {
-            trace("in peripheral didUpdateNotificationStateFor but the stored sensor metadata is incomplete, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
-
-            return
-        }
-        
-        if error == nil && characteristic.isNotifying {
-            UserDefaults.standard.libreActiveSensorUnlockCount += 1
-            
-            trace("sensorid as data =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.hexEncodedString(), librePatchInfo.hexEncodedString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
-            
-            let unLockPayLoad = Data(Libre2BLEUtilities.streamingUnlockPayload(sensorUID: libreSensorUID, info: librePatchInfo, enableTime: UserDefaults.standard.libreActiveSensorUnlockCode, unlockCount: UserDefaults.standard.libreActiveSensorUnlockCount))
-            
-            trace("in peripheral didUpdateNotificationStateFor, writing streaming unlock payload: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, unLockPayLoad.hexEncodedString())
-                
-            // user may have chosen to run xDrip4iOS in parallel with other apps, in this case suppress sending unlockpayload
-            if !UserDefaults.standard.suppressUnLockPayLoad {
-                _ = writeDataToPeripheral(data: unLockPayLoad, type: .withResponse)
-            }
-        }
-    }
-    
     override func prepareForRelease() {
         // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
         super.prepareForRelease()
         // Libre2-specific transient state cleanup
         let tearDown = {
-            self.rxBuffer = Data()
-            self.startDate = Date()
             self.tempSensorSerialNumber = nil
             #if canImport(CoreNFC)
             self.libreNFC = nil
@@ -230,18 +137,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         }
     }
 
-    deinit {
-        // Defensive: clear transient buffers
-        rxBuffer = Data()
-    }
-
     // MARK: - helpers
-    
-    /// reset rxBuffer, reset startDate, stop packetRxMonitorTimer, set resendPacketCounter to 0
-    private func resetRxBuffer() {
-        rxBuffer = Data()
-        startDate = Date()
-    }
 
     /// Returns nil when the connected peripheral cannot be validated. A missing identifier must
     /// not be reported as a wrong sensor because connection and payload authentication still
@@ -260,64 +156,10 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         return serialNumber.serialNumber.suffix(9).uppercased() == deviceName.suffix(9).uppercased()
     }
     
-    /// process value received from transmitter
-    public func processValue(value: Data, sensorUID: Data) {
-        // check if buffer needs to be reset
-        if Date() > startDate.addingTimeInterval(CGMLibre2Transmitter.maxWaitForpacketInSeconds) {
-            trace("in peripheral didUpdateValueFor, more than %{public}@ seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug, CGMLibre2Transmitter.maxWaitForpacketInSeconds.description)
-            
-            resetRxBuffer()
-        }
-        
-        // add new value to rxBuffer
-        rxBuffer.append(value)
-        
-        // check if enough bytes are received, and if yes start processing
-        if rxBuffer.count == expectedBufferSize {
-            // Log once per completed Libre2 frame (moved from didUpdateValueFor to avoid per-fragment duplication)
-            do {
-                var libre1DerivedAlgorithmParametersAsString: String!
-                if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters {
-                    libre1DerivedAlgorithmParametersAsString = libre1DerivedAlgorithmParameters.description
-                } else {
-                    libre1DerivedAlgorithmParametersAsString = "unknown"
-                }
-                trace("in peripheral didUpdateValueFor libreSensorUID = %{public}@, libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug, sensorUID.hexEncodedString(), libre1DerivedAlgorithmParametersAsString)
-            }
-            
-            do {
-                // if libre1DerivedAlgorithmParameters not nil, but not matching serial number, then assign to nil (copied from LibreDataParser)
-                // if weboopenabled, then don't proceed, because weboop needs libre1DerivedAlgorithmParameters
-                // if libre1DerivedAlgorithmParameters is nil, but not weboopenabled, then also no further processing
-                // this may happen in case the serialNumber is not correctly read from NFC or stored in coredata - if all goes well this shouldn't occur
-                if isWebOOPEnabled() {
-                    guard let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber == sensorSerialNumber else {
-                        trace("web oop enabled but libre1DerivedAlgorithmParameters is nil or libre1DerivedAlgorithmParameters.serialNumber != sensorSerialNumber, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
-                        
-                        return
-                    }
-                }
-                
-                // decrypt buffer and parse
-                // if oop web not enabled, then don't pass libre1DerivedAlgorithmParameters
-                let parsedBLEData = try Libre2BLEUtilities.parseBLEData(Data(Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: rxBuffer)), libre1DerivedAlgorithmParameters: isWebOOPEnabled() ? UserDefaults.standard.libre1DerivedAlgorithmParameters : nil)
-                
-                // deliver glucose data and sensor age to delegates on main; use local copy for inout
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    var copy = parsedBLEData.bleGlucose
-                    self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: TimeInterval(minutes: Double(parsedBLEData.sensorTimeInMinutes)))
-                    self.cGMLibre2TransmitterDelegate?.received(sensorTimeInMinutes: Int(parsedBLEData.sensorTimeInMinutes), from: self)
-                }
-                
-                // TODO: add sensor start date -> userdefaults
-                
-            } catch {
-                trace("in peripheral didUpdateValueFor, error while parsing/decrypting data =  %{public}@ ", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, error.localizedDescription)
-                
-                resetRxBuffer()
-            }
-        }
+    override func received(glucoseData: [GlucoseData], sensorTimeInMinutes: UInt16) {
+        var copy = glucoseData
+        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: TimeInterval(minutes: Double(sensorTimeInMinutes)))
+        cGMLibre2TransmitterDelegate?.received(sensorTimeInMinutes: Int(sensorTimeInMinutes), from: self)
     }
 
     // MARK: - CGMTransmitter protocol functions
@@ -330,8 +172,8 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     /// set webOOPEnabled value
     func setWebOOPEnabled(enabled: Bool) {
-        if webOOPEnabled != enabled {
-            webOOPEnabled = enabled
+        if phoneSensor.webOOPEnabled != enabled {
+            phoneSensor.webOOPEnabled = enabled
         }
     }
     
@@ -340,7 +182,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     }
     
     func isWebOOPEnabled() -> Bool {
-        return webOOPEnabled
+        return phoneSensor.webOOPEnabled
     }
     
     func isNonFixedSlopeEnabled() -> Bool {

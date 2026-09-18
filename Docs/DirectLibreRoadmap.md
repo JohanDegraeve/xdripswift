@@ -26,7 +26,14 @@ installation. Shared protocol dependencies are now separated and checked against
 upstream frames and both SDKs. NFC success now stores the code actually sent by
 the scan. The user passed the second phone device checkpoint: all requested tests
 passed, with automatic reconnection in under 30 seconds and no manual intervention.
-Next: integrate the shared collector into the Watch target.
+The shared collector now belongs to both targets. The phone retains its NFC and
+CGM adapters; the Watch adapter loads a validated session and reserves counters
+on disk before unlocking. Its complete dependency closure typechecks against the
+Watch SDK. It is deliberately not instantiated by the Watch app yet: activation
+requires the phone-controlled release/activate transaction in milestone 5.
+The milestone 4 Watch device gate therefore remains pending until that transaction
+provides a safe way to activate the collector. Next: verify the phone after this
+extraction, then implement switching and test direct Watch collection.
 
 An installation over the prototype disconnected until the app was reinstalled.
 A retained unlock-code mismatch is a plausible code-supported explanation, not a

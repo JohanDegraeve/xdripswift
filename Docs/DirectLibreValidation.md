@@ -178,3 +178,63 @@ second phone checkpoint and permits shared Watch collector integration.
 This is a measured result for the reported test, not a reconnect-time guarantee.
 It does not independently reproduce the old prototype's retained non-default-code
 scenario or establish the cause of the earlier installation failure.
+
+## Shared collector checkpoint
+
+`Libre2BluetoothTransmitter` now contains the existing F001/F002 notification,
+unlock and 46-byte frame assembly path. Both platform adapters inherit the same
+`BluetoothTransmitter` scanning, discovery, connection timeout, peripheral reuse,
+disconnection and retry code. No reconnect policy or NFC commands changed here.
+
+The boundary is intentionally small:
+
+- `CGMLibre2Transmitter` retains NFC, the phone CGM interface and reading delegates.
+  `Libre2PhoneSensor` uses the existing preferences, calibration guard and parser
+  history. Suppressed unlocks still advance the phone counter, as in develop.
+- `Libre2WatchSession` carries the session ID, sensor identity/credentials, native
+  algorithm parameters and last reserved counter. `Libre2WatchSensor` loads it,
+  saves each counter increment atomically before returning an unlock reservation,
+  rejects replaced sessions, and owns a separate parser state. No raw-value Watch
+  display path is introduced; the session requires matching native calibration.
+- `Libre2WatchTransmitter` delivers readings through a main-thread callback. No
+  Watch app startup, interface or connectivity handler constructs it yet. Session
+  creation/replacement and collector activation will belong to the switching
+  coordinator, not to the storage adapter. The stored ID check alone is not an
+  ownership protocol or a complete stale-message guard.
+
+Phone consumer-log submissions in `BluetoothTransmitter` are now iOS-only; their
+order and entries are preserved. Watch uses system logging. The restoration name
+reads the same bundle display-name value directly rather than depending on home
+view constants. The shared Libre unlock trace reports the reserved counter;
+phone metadata/calibration and generic Bluetooth write traces remain available.
+The Watch target includes the shared dependency files and Bluetooth usage text.
+This does not introduce a new background execution mode.
+
+### Automated results
+
+- 17 XCTest cases passed in a temporary host package using the actual shared
+  collector/protocol sources and actual extracted phone preference accessors:
+  10 existing protocol cases plus 7 collector/session cases. The new cases cover
+  JSON restoration, persistence before returning an unlock, increment after a
+  restart without readings, replaced-session rejection, atomic-save failure,
+  exhaustion/overflow, invalid sensor metadata and phone suppression semantics.
+  These tests do not simulate the Bluetooth radio or validate a handoff.
+- The complete Watch collector and dependency closure typecheck against the real
+  watchOS SDK without stand-ins. Phone collector/NFC adaptation also passes an
+  iOS SDK typecheck with compile-only stand-ins for unrelated app dependencies.
+- Target membership was checked for missing/duplicate dependencies and unintended
+  phone/NFC sources in the Watch target. Project plist validation passed.
+- Full generic iPhone and Watch builds were attempted. Both still stop in existing
+  extension SwiftUI macro expansion because the compiler plugin sandbox cannot
+  start here. A complete app build and device execution are not established by
+  the scoped compiler checks. Build outputs are under `/tmp`; audit scripts/logs
+  are outside the checkout in `validation/integrated-collector`.
+
+### Next physical checkpoint
+
+Build both apps in Xcode. The Watch should retain its ordinary relayed behaviour
+and should not request Bluetooth permission merely because these files are now
+included. On the phone, install over the last tested integrated build and repeat
+ordinary NFC scan/cancel/retry, fresh readings and 2–3 minute signal-loss recovery.
+Keep the old prototype Watch collector stopped. Direct Watch collection and its
+reconnection test follow after safe phone-controlled activation is implemented.
