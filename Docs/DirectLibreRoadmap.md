@@ -24,8 +24,9 @@ The phone NFC extraction is committed. The user confirmed a successful Xcode
 build and ordinary NFC/readings/cancellation/reconnection checks on a clean
 installation. Shared protocol dependencies are now separated and checked against
 upstream frames and both SDKs. NFC success now stores the code actually sent by
-the scan. Next: the phone device checkpoint before integrating the shared collector
-into Watch.
+the scan. The user passed the second phone device checkpoint: all requested tests
+passed, with automatic reconnection in under 30 seconds and no manual intervention.
+Next: integrate the shared collector into the Watch target.
 
 An installation over the prototype disconnected until the app was reinstalled.
 A retained unlock-code mismatch is a plausible code-supported explanation, not a

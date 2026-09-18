@@ -143,8 +143,8 @@ Validation:
 Test/audit runners and logs live outside the checkout in
 `validation/integrated-protocol`. The committed tests are registered with the
 existing `xdripTests` target. No Watch source membership or connection behaviour
-changes are made at this checkpoint. A full device build and ordinary readings
-check remain necessary after these edits.
+changes are made at this checkpoint. The user subsequently reported that all
+requested device tests passed, as recorded below.
 
 ### NFC credential consistency
 
@@ -167,3 +167,14 @@ without deleting its data. Check several readings and graph updates before and
 after an ordinary NFC scan, cancellation/retry, and reconnection. If immediate
 disconnection recurs, retain the failure log before resetting or reinstalling.
 The Watch remains the ordinary upstream relayed app until the next milestone.
+
+### Second device result
+
+The user reported all requested tests passed after the shared-protocol and NFC
+credential changes, including cancellation/retry and reconnection. Automatic
+recovery took under 30 seconds, with no manual intervention. This clears the
+second phone checkpoint and permits shared Watch collector integration.
+
+This is a measured result for the reported test, not a reconnect-time guarantee.
+It does not independently reproduce the old prototype's retained non-default-code
+scenario or establish the cause of the earlier installation failure.
