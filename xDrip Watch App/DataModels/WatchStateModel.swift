@@ -478,6 +478,15 @@ final class WatchStateModel: NSObject, ObservableObject {
 
     // MARK: - helper functions not related with the class structure
 
+    /// Explicit double tap retries the selected source; routine refreshes never restart BLE.
+    func retryReadingConnection() {
+        if Libre2WatchConnection.shared.direct {
+            Libre2WatchConnection.shared.restartConnection()
+        } else {
+            requestWatchStateUpdate()
+        }
+    }
+
     /// request a state update from the iOS companion app
     func requestWatchStateUpdate() {
         guard session.activationState == .activated else {

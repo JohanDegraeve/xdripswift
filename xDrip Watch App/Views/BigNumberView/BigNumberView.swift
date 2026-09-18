@@ -57,7 +57,7 @@ struct BigNumberView: View {
                 }
                 .onTapGesture(count: 2) {
                     watchState.updateBigNumberViewDate = Date()
-                    watchState.requestWatchStateUpdate()
+                    watchState.retryReadingConnection()
                 }
             
             HStack(alignment: .center, spacing: 10) {

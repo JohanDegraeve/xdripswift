@@ -75,7 +75,7 @@ struct MainView: View {
                     .id(refreshView)
                     .onTapGesture(count: 2) {
                         watchState.updateMainViewDate = Date()
-                        watchState.requestWatchStateUpdate()
+                        watchState.retryReadingConnection()
                     }
 
                 if watchState.aidStatusIconImage() != nil {

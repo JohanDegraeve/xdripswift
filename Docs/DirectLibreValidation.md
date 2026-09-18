@@ -325,8 +325,8 @@ values cannot overwrite newer displayed direct values after a return. The antenn
 is green for an actual radio connection, orange while direct mode is selected
 without a connection. Reading age remains independently visible. This initial
 display shows values and a five-minute delta; direct trend computation, full
-settings persistence, detailed indicator states and double-tap restart are still
-part of the later readings/interface milestones.
+settings persistence and detailed indicator states remain part of the later
+readings/interface milestones. Double-tap restart is now implemented below.
 
 Direct readings are currently local, with in-memory chart history. There is no
 Watch-to-phone reading synchronisation or additional continuous background runtime
@@ -448,3 +448,35 @@ iOS SDK check also passes, using stand-ins for unrelated app dependencies.
 The 26 host tests were not repeated for these platform discovery changes; they
 do not simulate Bluetooth discovery. Full device build/radio validation remains
 required; this environment's full-build compiler-plugin sandbox limitation remains.
+
+### Direct Watch double-tap restart
+
+Double-tap the large glucose value or the chart's value/header area to restart
+the Watch collector while Watch owns collection. It marks the link disconnected
+(orange antenna), suspends the old collector on its Bluetooth queue, requests
+cancellation without waiting for the disconnect callback, then releases that
+collector and creates a fresh one with remembered-peripheral reuse disabled.
+This deliberately scans for the sensor again, including when the previous link
+was connected or its connection attempt was pending. Ordinary automatic recovery
+continues using the existing shared collector's peripheral-reuse behavior.
+
+The session ID, credentials and last reserved unlock counter are retained. The
+new collector reloads the saved counter and reserves the next value before its
+next unlock write. Rapid taps during the queued suspension share one restart.
+A return or NFC revocation which overtakes the reset prevents restarting; those
+operations retain their confirmed-release cleanup. A tap cannot activate a
+prepared session or undo phone selection. Relay-mode double-tap still requests
+the existing phone update; routine display refreshes never restart Bluetooth.
+
+Validation: scoped Watch collector and Watch model SDK checks pass. A host
+control-flow harness using the actual coordinator with radio/storage substitutes
+passes checks for non-Watch selection guards, tap coalescing, collector replacement,
+unchanged session/counter, ignored old connection callbacks, and return/NFC-reset
+races. Harness/log: workspace `validation/integrated-restart`. It does not simulate
+CoreBluetooth radio behavior or validate on-device reconnect timing. Full Xcode
+build remains subject to the previously recorded compiler-plugin sandbox limit.
+
+Device check: double-tap while connected and while orange/pending; expect orange
+then green on connection, followed by a fresh reading. Test with the phone
+unreachable as well. Confirm a prepared/returning session cannot be restarted
+and normal phone-relay double-tap still refreshes the display.

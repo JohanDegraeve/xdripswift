@@ -11,11 +11,12 @@ final class Libre2WatchTransmitter: Libre2BluetoothTransmitter {
     let sessionID: UUID
     private let readingsReceived: ([GlucoseData], UInt16) -> Void
 
-    init(sessionURL: URL, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, readingsReceived: @escaping ([GlucoseData], UInt16) -> Void) throws {
+    init(sessionURL: URL, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, reuseKnownPeripheral: Bool = true, readingsReceived: @escaping ([GlucoseData], UInt16) -> Void) throws {
         let sensor = try Libre2WatchSensor(sessionURL: sessionURL)
         sessionID = sensor.session.id
         self.readingsReceived = readingsReceived
-        let device = BluetoothTransmitter.rememberedDevice(named: sensor.session.bluetoothName) ?? .notYetConnected(expectedName: sensor.session.bluetoothName)
+        let remembered = reuseKnownPeripheral ? BluetoothTransmitter.rememberedDevice(named: sensor.session.bluetoothName) : nil
+        let device = remembered ?? .notYetConnected(expectedName: sensor.session.bluetoothName)
         super.init(addressAndName: device, sensor: sensor, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate, restorationIdentifier: "DirectLibre-" + sensor.session.sensorUID.hexEncodedString())
     }
 
