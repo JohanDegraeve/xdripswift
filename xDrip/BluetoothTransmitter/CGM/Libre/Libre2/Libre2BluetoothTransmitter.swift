@@ -45,6 +45,7 @@ class Libre2BluetoothTransmitter: BluetoothTransmitter {
     func received(glucoseData: [GlucoseData], sensorTimeInMinutes: UInt16) {}
 
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        guard isConnectionAllowed else { return }
         super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
 
         // Sensor credentials must already be available before notifications are processed.
@@ -63,6 +64,7 @@ class Libre2BluetoothTransmitter: BluetoothTransmitter {
     }
 
     override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        guard isConnectionAllowed else { return }
         super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
 
         // Sensor credentials must already be available before notifications are processed.

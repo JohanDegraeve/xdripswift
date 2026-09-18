@@ -204,6 +204,72 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     // MARK: - public functions
+
+    /// Ordinary transmitters remain enabled. Direct Libre also checks its persisted selection.
+    var isConnectionAllowed: Bool { !connectionSuspended }
+    private var connectionSuspended = false
+    private var releaseCompletions: [() -> Void] = []
+
+    /// Stop this app's BLE use and acknowledge only a confirmed disconnect (or no connection).
+    func suspendConnection(completion: @escaping () -> Void) {
+        centralQueue.async {
+            self.connectionSuspended = true
+            self.cancelConnectionTimer()
+            self.cancelConnectionSetupTimeout()
+            self.centralManager?.stopScan()
+            self.releaseCompletions.append(completion)
+            self.releaseConnectionIfPossible()
+        }
+    }
+
+    /// A collector recreated to finish an interrupted release must first query its known handle.
+    private func releaseConnectionIfPossible() {
+        guard connectionSuspended, !releaseCompletions.isEmpty else { return }
+        guard let central = centralManager else { completeConnectionRelease(); return }
+        if central.state == .poweredOff || central.state == .unauthorized || central.state == .unsupported {
+            completeConnectionRelease()
+            return
+        }
+        guard central.state == .poweredOn else { return }
+        if peripheral == nil, let address = deviceAddress, let id = UUID(uuidString: address) {
+            peripheral = central.retrievePeripherals(withIdentifiers: [id]).first
+            peripheral?.delegate = self
+        }
+        if peripheral == nil || peripheral?.state == .disconnected {
+            completeConnectionRelease()
+        } else {
+            disconnectOnCentralQueue()
+        }
+    }
+
+    /// Watch collection has no phone Core Data peripheral record to restore from.
+    func rememberDevice() {
+        guard let address = deviceAddress, let name = deviceName else { return }
+        UserDefaults.standard.set(address, forKey: DefaultsKey.lastKnownDeviceAddress)
+        UserDefaults.standard.set(name, forKey: DefaultsKey.lastKnownDeviceName)
+    }
+
+    /// Reuse the identity already saved by this class; identifiers are local to each device.
+    static func rememberedDevice(named name: String) -> DeviceAddressAndName? {
+        guard let savedName = UserDefaults.standard.string(forKey: DefaultsKey.lastKnownDeviceName),
+              savedName.caseInsensitiveCompare(name) == .orderedSame,
+              let address = UserDefaults.standard.string(forKey: DefaultsKey.lastKnownDeviceAddress),
+              UUID(uuidString: address) != nil else { return nil }
+        return .alreadyConnectedBefore(address: address, name: savedName)
+    }
+
+    func resumeConnection(startConnecting: Bool = true) {
+        centralQueue.async {
+            self.connectionSuspended = false
+            if startConnecting { self.connect() }
+        }
+    }
+
+    private func completeConnectionRelease() {
+        let completions = releaseCompletions
+        releaseCompletions.removeAll()
+        for completion in completions { DispatchQueue.main.async(execute: completion) }
+    }
     
     /// Hook for subclasses to clear CoreBluetooth delegates/timers before ARC release.
     /// Default clears CoreBluetooth delegates on the main thread synchronously to avoid races with CB callbacks.
@@ -222,7 +288,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// will try to connect to the device, first by calling retrievePeripherals, if peripheral not known, then by calling startScanning
     func connect() {
         centralQueue.async { [weak self] in
-            guard let self = self else { return }
+            guard let self = self, self.isConnectionAllowed else { return }
             if let centralManager = self.centralManager, !self.retrievePeripherals(centralManager) {
                 _ = self.startScanning()
             }
@@ -232,6 +298,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// Reconnect after an unexpected disconnect. Subclasses can override the
     /// policy without duplicating the disconnect bookkeeping in this base class.
     func reconnectAfterDisconnect(_ central: CBCentralManager) {
+        guard isConnectionAllowed else { return }
         if let ownPeripheral = self.peripheral {
             central.connect(ownPeripheral, options: connectOptions)
         }
@@ -318,6 +385,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// start bluetooth scanning for device
     func startScanning() -> BluetoothTransmitter.startScanningResult {
         return runOnCentralQueueSync {
+            guard isConnectionAllowed else { return .other(reason: "Collection is selected on the other device") }
             //assign default returnvalue
             var returnValue = BluetoothTransmitter.startScanningResult.unknown
             
@@ -404,6 +472,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             trace("in writeDataToPeripheral, for peripheral with name %{public}@, characteristic = %{public}@, data = %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", writeCharacteristic.uuid.uuidString, data.hexEncodedString())
             
             centralQueue.async {
+                guard self.isConnectionAllowed else { return }
                 peripheral.writeValue(data, for: writeCharacteristic, type: type)
             }
             return true
@@ -429,6 +498,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             trace("in writeDataToPeripheral, for peripheral with name %{public}@, for characteristic %{public}@, data = %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", characteristicToWriteTo.uuid.description, data.hexEncodedString())
             
             centralQueue.async {
+                guard self.isConnectionAllowed else { return }
                 peripheral.writeValue(data, for: characteristicToWriteTo, type: type)
             }
             
@@ -445,6 +515,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// calls setNotifyValue for characteristic with value enabled
     func setNotifyValue(_ enabled: Bool, for characteristic: CBCharacteristic) {
+        guard !enabled || isConnectionAllowed else { return }
         if let peripheral = peripheral {
             trace("in setNotifyValue, for peripheral with name %{public}@, setting notify for characteristic %{public}@, to %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, deviceName ?? "'unknown'", characteristic.uuid.uuidString, enabled.description)
 
@@ -455,6 +526,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 peripheral.setNotifyValue(enabled, for: characteristic)
             } else {
                 centralQueue.async {
+                    guard !enabled || self.isConnectionAllowed else { return }
                     peripheral.setNotifyValue(enabled, for: characteristic)
                 }
             }
@@ -506,6 +578,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// stops scanning and connect. To be called after diddiscover
     fileprivate func stopScanAndconnect(to peripheral: CBPeripheral) {
+        guard isConnectionAllowed else { return }
         
         self.centralManager?.stopScan()
         let forgetDeviceOnTimeout = deviceAddress != peripheral.identifier.uuidString
@@ -602,6 +675,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     ///
     /// the result of the attempt to try to find such device, is returned
     fileprivate func retrievePeripherals(_ central:CBCentralManager) -> Bool {
+        guard isConnectionAllowed else { return false }
         if let deviceAddress = deviceAddress {
             trace("in retrievePeripherals, deviceaddress is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceAddress)
             if let uuid = UUID(uuidString: deviceAddress) {
@@ -689,6 +763,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        guard isConnectionAllowed else { central.cancelPeripheralConnection(peripheral); return }
         
         cancelConnectionTimer()
         scheduleConnectionSetupTimeout()
@@ -771,6 +846,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        if peripheral.identifier == self.peripheral?.identifier && peripheral.state == .disconnected { completeConnectionRelease() }
+        guard isConnectionAllowed else { return }
         
         timeStampLastStatusUpdate = Date()
         if let error = error {
@@ -790,6 +867,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        releaseConnectionIfPossible()
         
         timeStampLastStatusUpdate = Date()
         trace("in centralManagerDidUpdateState, for peripheral with name %{public}@, new state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", "\(central.state.toString())")
@@ -813,6 +891,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        if peripheral.identifier == self.peripheral?.identifier && peripheral.state == .disconnected { completeConnectionRelease() }
         
         timeStampLastStatusUpdate = Date()
         cancelConnectionTimer()
@@ -823,6 +902,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             self.bluetoothTransmitterDelegate?.didDisconnectFrom(bluetoothTransmitter: self)
         }
         
+        guard isConnectionAllowed else { return }
+
         // Replace your current disconnect logging block with this:
         if let err = error {
             if let cbErr = err as? CBError, cbErr.code == .peripheralDisconnected {
@@ -882,6 +963,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        guard isConnectionAllowed else { return }
         
         timeStampLastStatusUpdate = Date()
         cancelConnectionSetupTimeout()
@@ -902,6 +984,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        guard isConnectionAllowed else { return }
         
         timeStampLastStatusUpdate = Date()
         trace("in didDiscoverCharacteristicsFor, for peripheral with name %{public}@, for service with uuid %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, deviceName ?? "'unknown'", String(describing:service.uuid))
@@ -964,6 +1047,16 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func centralManager(_ central: CBCentralManager, willRestoreState dict: [String : Any]) {
+        guard isConnectionAllowed else {
+            for restored in dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] ?? [] {
+                if self.peripheral == nil {
+                    self.peripheral = restored
+                    restored.delegate = self
+                }
+                central.cancelPeripheralConnection(restored)
+            }
+            return
+        }
         trace("in willRestoreState", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
         
         // Attempt to reuse the restored peripheral (if any) without forcing a rescan.
