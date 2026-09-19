@@ -733,3 +733,21 @@ a full app build is not claimed. Checks are in workspace `validation/integrated-
 Device check pending: transfer to Watch, cycle Watch Bluetooth off/on with xDrip visible,
 and confirm automatic reconnection. Also verify double-tap discovery and return to phone.
 Optional background runtime support remains a separate milestone.
+
+## Milestone 8: background location
+
+Restored the prototype's opt-in location helper with live request/reply controls,
+100 m / 1 km / 3 km accuracy choices and event-driven selection/foreground updates.
+It does not change the shared BLE protocol or the ordinary phone NFC path.
+
+- 60 host protocol/collector/selection/history tests passed, including new location
+  message validation and durable selection-change notification coverage.
+- 11 production-location-helper scenarios passed with framework doubles: default
+  off, non-Watch selection, foreground-only start, authorization, persistence,
+  transient failure, disable/reset/return, and accuracy changes without restart.
+- Real watchOS SDK type-check passed. Phone settings views are also SDK-checked
+  using temporary property-wrapper substitutes for the known sandbox-blocked
+  SwiftUI State macro; this does not validate rendering or a complete build.
+- [Physical runtime checks](DirectLibreRuntime.md#device-checkpoint) remain pending.
+
+Local validation artifacts: `validation/integrated-runtime` outside the checkout.

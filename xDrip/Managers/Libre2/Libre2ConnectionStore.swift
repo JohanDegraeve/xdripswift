@@ -13,6 +13,7 @@ final class Libre2ConnectionStore {
     }
 
     static let shared = Libre2ConnectionStore(directory: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("DirectLibre", isDirectory: true))
+    static let didChange = Notification.Name("Libre2ConnectionStoreDidChange")
     let sessionURL: URL
     private let selectionURL: URL
     private let lock = NSLock()
@@ -89,6 +90,10 @@ final class Libre2ConnectionStore {
         try FileManager.default.createDirectory(at: selectionURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         try JSONEncoder().encode(next).write(to: selectionURL, options: .atomic)
         selection = next
+        // Observers may read snapshot. Deliver after releasing the store lock.
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: Self.didChange, object: self)
+        }
     }
 }
 

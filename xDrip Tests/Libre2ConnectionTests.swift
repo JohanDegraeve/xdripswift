@@ -10,6 +10,33 @@ final class Libre2ConnectionTests: XCTestCase {
     }
     override func tearDownWithError() throws { try FileManager.default.removeItem(at: directory) }
 
+    func testRuntimeRequestsRoundTripAndRejectInvalidAccuracy() throws {
+        let requests: [Libre2LocationRequest] = [.inspect, .setEnabled(true), .setEnabled(false),
+            .setAccuracy(.hundredMeters), .setAccuracy(.kilometer), .setAccuracy(.threeKilometers)]
+        for request in requests {
+            XCTAssertEqual(try Libre2LocationRequest.decode(request.dictionary), request)
+        }
+        XCTAssertThrowsError(try Libre2LocationRequest.decode([Libre2LocationRequest.key: true]))
+        let encoded = try JSONEncoder().encode(Libre2LocationRequest.setAccuracy(.hundredMeters))
+        let invalid = String(decoding: encoded, as: UTF8.self).replacingOccurrences(of: "100", with: "-1")
+        XCTAssertThrowsError(try Libre2LocationRequest.decode([Libre2LocationRequest.key: Data(invalid.utf8)]))
+    }
+
+    func testSelectionNotificationCanReadDurableSnapshotWithoutLocking() throws {
+        let store = Libre2ConnectionStore(directory: directory)
+        let changed = expectation(description: "selection change")
+        let observer = NotificationCenter.default.addObserver(forName: Libre2ConnectionStore.didChange,
+                                                               object: nil, queue: .main) { notification in
+            guard let source = notification.object as? Libre2ConnectionStore, source === store else { return }
+            XCTAssertEqual(store.snapshot?.phase, .preparingWatch)
+            XCTAssertEqual(Libre2ConnectionStore(directory: self.directory).snapshot?.phase, .preparingWatch)
+            changed.fulfill()
+        }
+        defer { NotificationCenter.default.removeObserver(observer) }
+        try store.select(.preparingWatch, sessionID: UUID())
+        wait(for: [changed], timeout: 2)
+    }
+
     func testOrdinaryPhoneSelectionDoesNotCreateFiles() throws {
         let store = Libre2ConnectionStore(directory: directory)
         XCTAssertEqual(store.snapshot?.allowsPhone, true)

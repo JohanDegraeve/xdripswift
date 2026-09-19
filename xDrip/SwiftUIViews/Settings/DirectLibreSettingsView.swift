@@ -12,6 +12,7 @@ struct DirectLibreSettingsView: View {
         Form {
             collectionSection
             checklistSection
+            DirectLibreRuntimeSettingsView()
             if needsRecovery { recoverySection }
             if connection.hasExperiment { readingsSection }
             activitySection

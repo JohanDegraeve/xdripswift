@@ -54,7 +54,9 @@ unresolved-reading controls and bounded recent activity. Readiness uses existing
 connection events and one local reading-expiry update while the page is visible;
 there is no Watch polling. Interface device checks are pending (see validation).
 Interrupted transfer still needs a controlled test; background delivery timing and
-optional runtime features remain separate work. This checkpoint is not
+optional runtime features are being restored in milestone 8. Opt-in background
+location and its three accuracy choices are implemented; physical runtime checks
+are pending. See [runtime options](DirectLibreRuntime.md). This checkpoint is not
 yet feature-equivalent to the reference prototype.
 
 An installation over the prototype disconnected until the app was reinstalled.
