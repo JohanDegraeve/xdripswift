@@ -792,7 +792,7 @@ struct GlucoseChartView: View {
                 }
 
                 // Note labels sit above basal lines and below dose treatments.
-                treatmentSymbolMarks(points: visibleTreatmentPoints.notes, systemImage: nil, size: { _ in 0 }, color: GlucoseChartTreatmentStyle.noteColor, labelPosition: .top, verticalLabel: true)
+                noteTreatmentMarks(points: visibleTreatmentPoints.notes)
 
                 // Draw basal injections first so overlapping carbs and boluses remain in front.
                 treatmentSymbolMarks(points: visibleTreatmentPoints.basalInjections, systemImage: GlucoseChartTreatmentStyle.basalInjectionSymbol, size: { _ in treatmentSymbolSize() * GlucoseChartTreatmentStyle.basalInjectionScale }, color: GlucoseChartTreatmentStyle.basalInjectionColor, labelPosition: .bottom)
@@ -1122,6 +1122,41 @@ struct GlucoseChartView: View {
         .allowsHitTesting(false)
     }
 
+    private var usesNoteSymbolOverlay: Bool {
+        if #available(iOS 27.0, watchOS 27.0, *) { return true }
+        return false
+    }
+
+    @ChartContentBuilder
+    private func noteTreatmentMarks(points: [GlucoseChartTreatmentPoint]) -> some ChartContent {
+        // Use the runtime version, including when a newer Xcode builds for older devices.
+        // Keep the original note annotations below OS 27 rather than relying on overlays
+        // outside an empty symbol. OS 27 needs the overlay to avoid displaced annotations.
+        if usesNoteSymbolOverlay {
+            treatmentSymbolMarks(points: points, systemImage: nil, size: { _ in 0 }, color: GlucoseChartTreatmentStyle.noteColor, labelPosition: .top, verticalLabel: true)
+        } else {
+            ForEach(points) { point in
+                PointMark(x: .value("Time", point.date), y: .value("BG", point.yValue))
+                    .symbol { Color.clear.frame(width: 0, height: 0) }
+                    .annotation(position: .top) {
+                        if let label = point.label {
+                            verticalTreatmentLabel(label)
+                        }
+                    }
+            }
+        }
+    }
+
+    private func verticalTreatmentLabel(_ label: String) -> some View {
+        // The leading arrow points down toward the reading after rotation.
+        VerticalChartLabelLayout {
+            treatmentLabel("← \(label)", fontSize: GlucoseChartTreatmentStyle.noteLabelFontSize, color: Color(.colorSecondary))
+                .fixedSize()
+                .rotationEffect(.degrees(-90))
+        }
+        .padding(.bottom, GlucoseChartTreatmentStyle.noteLabelExtraSpacing)
+    }
+
     /// Keep labels in the symbol's coordinate space. With the iOS 27 SDK, Charts annotations
     /// on custom symbols can be displaced from the mark. An overlay preserves the symbol's
     /// size and data position while anchoring the label to its actual top or bottom edge.
@@ -1141,13 +1176,7 @@ struct GlucoseChartView: View {
                         if let labelPosition, let label = point.label {
                             Group {
                                 if verticalLabel {
-                                    // The leading arrow points down toward the reading after rotation.
-                                    VerticalChartLabelLayout {
-                                        treatmentLabel("← \(label)", fontSize: GlucoseChartTreatmentStyle.noteLabelFontSize, color: Color(.colorSecondary))
-                                            .fixedSize()
-                                            .rotationEffect(.degrees(-90))
-                                    }
-                                    .padding(.bottom, GlucoseChartTreatmentStyle.noteLabelExtraSpacing)
+                                    verticalTreatmentLabel(label)
                                 } else {
                                     treatmentLabel(label)
                                 }
