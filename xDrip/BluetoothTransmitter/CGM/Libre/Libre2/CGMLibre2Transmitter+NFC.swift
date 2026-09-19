@@ -1,4 +1,3 @@
-#if canImport(CoreNFC)
 import CoreNFC
 import Foundation
 import os
@@ -187,4 +186,3 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         updateExpectedDeviceName(name: expectedBluetoothName)
     }
 }
-#endif

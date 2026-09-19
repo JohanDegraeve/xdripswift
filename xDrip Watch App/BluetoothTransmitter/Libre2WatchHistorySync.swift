@@ -20,7 +20,7 @@ final class Libre2WatchHistorySync {
         self.queue = queue
         self.now = now
         activationObserver = NotificationCenter.default.addObserver(
-            forName: WKExtension.applicationDidBecomeActiveNotification, object: nil, queue: .main
+            forName: WKApplication.didBecomeActiveNotification, object: nil, queue: .main
         ) { [weak self] _ in self?.resume() }
     }
 
@@ -53,10 +53,12 @@ final class Libre2WatchHistorySync {
             lastLatestAttempt = nil
         }
         lastReachability = reachable
-        do { try publishLatestReadingContext() } catch { report(error) }
         do {
-            // Latest delivery is independent of every history batch and its callbacks.
-            if reachable { try sendLatestReading() }
+            // Context failure cannot block live latest or history; neither latest reply releases history.
+            if let latest = try outbox().state.pending.max(by: { $0.date < $1.date }) {
+                do { try publishLatestReadingContext(latest) } catch { report(error) }
+                if reachable { try sendLatestReading(latest) }
+            }
             guard let batch = try outbox().nextBatch() else { return }
             guard sendingBatchID == nil else { return }
             // Leave an existing background transfer to WatchConnectivity. Restored
@@ -102,23 +104,15 @@ final class Libre2WatchHistorySync {
     /// Keep only the newest pending value in the background context, independently of
     /// history acknowledgements and live reachability. WCSession retains this context
     /// across launches; comparing it also prevents older remaining history replacing it.
-    private func publishLatestReadingContext() throws {
-        guard let reading = try outbox().state.pending.max(by: { $0.date < $1.date }) else { return }
+    private func publishLatestReadingContext(_ reading: Libre2HistoryReading) throws {
         let session = WCSession.default
         if session.applicationContext[Libre2HistoryBatch.latestKey] as? Bool == true,
             let published = try? Libre2HistoryBatch.decode(session.applicationContext).readings.first,
             published.date >= reading.date { return }
-        do {
-            try session.updateApplicationContext(Libre2HistoryBatch(readings: [reading]).latestDictionary)
-        } catch {
-            report(error)
-            // A failed context update must not prevent live delivery or history submission.
-            // The next existing delivery event can retry; the journal remains untouched.
-        }
+        try session.updateApplicationContext(Libre2HistoryBatch(readings: [reading]).latestDictionary)
     }
 
-    private func sendLatestReading() throws {
-        guard let reading = try outbox().state.pending.max(by: { $0.date < $1.date }) else { return }
+    private func sendLatestReading(_ reading: Libre2HistoryReading) throws {
         // Repeated frames/events may describe the same sensor minute. New measurements
         // bypass this retry throttle, even if a previous live reply never arrives.
         if let lastLatestAttempt, lastLatestAttempt.id == reading.id,

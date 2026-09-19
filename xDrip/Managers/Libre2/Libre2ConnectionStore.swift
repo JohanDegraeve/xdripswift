@@ -63,16 +63,14 @@ final class Libre2ConnectionStore {
     }
 
     /// NFC is authoritative. A reset also works when an old selection file is unreadable.
-    @discardableResult func resetToPhone(retiring ids: Set<UUID> = []) throws -> Set<UUID> {
+    func resetToPhone() throws {
         lock.lock(); defer { lock.unlock() }
         var next = selection ?? Selection()
-        next.retiredIDs.formUnion(ids)
         if let id = next.sessionID { next.retiredIDs.insert(id) }
         if let session = try? Libre2WatchSession.load(from: sessionURL) { next.retiredIDs.insert(session.id) }
         next.phase = .phone
         next.sessionID = nil
         try save(next)
-        return next.retiredIDs
     }
 
     /// Receiving an old revocation must not stop a newer, unrelated session.

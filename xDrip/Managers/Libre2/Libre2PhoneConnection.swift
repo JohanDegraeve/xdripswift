@@ -142,7 +142,7 @@ final class Libre2PhoneConnection: ObservableObject {
         if recentReading != recent { recentReading = recent }
     }
 
-    var canSwitchToWatch: Bool {
+    private var canSwitchToWatch: Bool {
         recentReading && reachable && phoneConnected && nativeAlgorithmEnabled && unlockPayloadEnabled
     }
 
@@ -152,11 +152,11 @@ final class Libre2PhoneConnection: ObservableObject {
         refresh()
     }
 
-    func switchToWatch() {
+    private func switchToWatch() {
         refresh()
-        guard !busy, canSwitchToWatch, let transmitter = transmitter else { return }
+        guard !busy, phase == .phone, canSwitchToWatch, let transmitter = transmitter else { return }
         do {
-            let id = store.snapshot?.phase == .preparingWatch ? store.snapshot?.sessionID ?? UUID() : UUID()
+            let id = UUID()
             let session = try transmitter.watchSession(id: id)
             try store.select(.preparingWatch, sessionID: id)
             try session.save(to: store.sessionURL)
@@ -219,7 +219,7 @@ final class Libre2PhoneConnection: ObservableObject {
         }
     }
 
-    func returnToPhone() {
+    private func returnToPhone() {
         guard !busy, let id = store.snapshot?.sessionID else { return }
         operationID = UUID()
         let operation = operationID!

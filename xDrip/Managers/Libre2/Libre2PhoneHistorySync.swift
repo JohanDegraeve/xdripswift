@@ -225,11 +225,7 @@ final class Libre2PhoneHistorySync {
     /// belonging to both this batch and the currently active phone sensor.
     @MainActor
     private func currentReadingDate(in batch: Libre2HistoryBatch) -> Date? {
-        guard UserDefaults.standard.isMaster,
-            let activeSensor = SensorsAccessor(coreDataManager: coreDataManager).fetchActiveSensor(),
-            let latest = BgReadingsAccessor(coreDataManager: coreDataManager).getLatestBgReadings(
-                limit: 1, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false).first,
-            latest.sensor?.id == activeSensor.id,
+        guard let latest = Libre2PhoneReadingProcessing.latestActiveReading(coreDataManager: coreDataManager),
             batch.readings.contains(where: { $0.id == latest.id })
         else { return nil }
         return latest.timeStamp

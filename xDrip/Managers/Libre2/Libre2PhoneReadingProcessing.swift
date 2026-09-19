@@ -31,15 +31,21 @@ enum Libre2PhoneReadingProcessing {
         return changedSensors
     }
 
-    /// Optional post processing can suppress a newly imported value. Recheck before live effects.
-    static func isCurrentReading(_ date: Date?, coreDataManager: CoreDataManager?, now: Date = Date()) -> Bool {
-        guard let date, let coreDataManager, UserDefaults.standard.isMaster,
-            date <= now, now.timeIntervalSince(date) < ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds,
+    /// Both import notification and post-processing use the latest visible active-sensor reading.
+    static func latestActiveReading(coreDataManager: CoreDataManager?) -> BgReading? {
+        guard let coreDataManager, UserDefaults.standard.isMaster,
             let sensor = SensorsAccessor(coreDataManager: coreDataManager).fetchActiveSensor(),
             let latest = BgReadingsAccessor(coreDataManager: coreDataManager).getLatestBgReadings(
-                limit: 1, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false).first
-        else { return false }
-        return latest.timeStamp == date && latest.sensor?.id == sensor.id
+                limit: 1, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false).first,
+            latest.sensor?.id == sensor.id else { return nil }
+        return latest
+    }
+
+    /// Optional post processing can suppress a newly imported value. Recheck before live effects.
+    static func isCurrentReading(_ date: Date?, coreDataManager: CoreDataManager?, now: Date = Date()) -> Bool {
+        guard let date, date <= now,
+            now.timeIntervalSince(date) < ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds else { return false }
+        return latestActiveReading(coreDataManager: coreDataManager)?.timeStamp == date
     }
 
     /// The existing delayed-sharing path reads a per-minute buffer instead of fetching glucose.

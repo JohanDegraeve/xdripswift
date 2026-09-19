@@ -30,11 +30,8 @@ class CGMLibre2Transmitter: Libre2BluetoothTransmitter, CGMTransmitter {
     
     /// temp storage of libreSensorSerialNumber, value will be stored after NFC scanning, but possible there's no transmitter created yet (if this is a first scan for a new transmitter), so we can't store the serial number yet in coredata. As soon as transmitter is connected,  and if tempSensorSerialNumber is not nil, it will be sent to the delegate
     var tempSensorSerialNumber: LibreSensorSerialNumber?
-    
-    #if canImport(CoreNFC)
     /// Retains the phone's provisioning session; accessed by the NFC extension.
-    var libreNFC: NSObject?
-    #endif
+    var libreNFC: LibreNFC?
     
     /// sensor type
     var libreSensorType: LibreSensorType?
@@ -88,11 +85,7 @@ class CGMLibre2Transmitter: Libre2BluetoothTransmitter, CGMTransmitter {
     // MARK: - overriden  BluetoothTransmitter functions
     
     override func startScanning() -> BluetoothTransmitter.startScanningResult {
-        #if canImport(CoreNFC)
         return startNFCScanning()
-        #else
-        return super.startScanning()
-        #endif
     }
 
     /// Start BLE discovery after provisioning, without opening an NFC session.
@@ -137,9 +130,7 @@ class CGMLibre2Transmitter: Libre2BluetoothTransmitter, CGMTransmitter {
         // Libre2-specific transient state cleanup
         let tearDown = {
             self.tempSensorSerialNumber = nil
-            #if canImport(CoreNFC)
             self.libreNFC = nil
-            #endif
             self.libreSensorType = nil
             self.expectedBluetoothNameFromNFC = nil
         }
