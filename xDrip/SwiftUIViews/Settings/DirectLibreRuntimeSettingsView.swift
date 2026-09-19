@@ -34,6 +34,7 @@ struct DirectLibreRuntimeSettingsView: View {
                 .font(.footnote).foregroundStyle(.secondary)
             Button("Refresh runtime status") { request(.inspect) }
                 .disabled(isBusy || !connection.reachable)
+            DirectLibreNotificationTestButton()
         } header: {
             HStack {
                 Text("Background connection")
@@ -87,5 +88,63 @@ struct DirectLibreRuntimeSettingsView: View {
         enabled = nil
         accuracy = nil
         status = "Could not confirm the Watch setting. Open both apps and refresh runtime status."
+    }
+}
+
+/// One explicit test; a lost reply never causes an automatic resend.
+private struct DirectLibreNotificationTestButton: View {
+    @ObservedObject private var connection = Libre2PhoneConnection.shared
+    @State private var isScheduling = false
+    @State private var status = ""
+    @State private var showsHelp = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Button("Test Watch notification") { schedule() }
+                    .disabled(isScheduling || !connection.reachable)
+                if isScheduling { ProgressView() }
+                Spacer()
+                Button { showsHelp = true } label: { Image(systemName: "info.circle") }
+                    .accessibilityLabel("About the notification test")
+            }
+            .buttonStyle(.borderless)
+            Text("May restore immediate phone updates when the Watch is collecting but the phone lags. Schedules one Watch notification in 30 seconds.")
+                .font(.footnote).foregroundStyle(.secondary)
+            if !status.isEmpty { Text(status).font(.footnote) }
+        }
+        .alert("Test Watch notification", isPresented: $showsHelp) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("In prototype testing, a notification appearing on the Watch restored immediate delivery of new readings while both apps stayed in the background. Updates continued after the notification closed, without tapping it. This is an experimental workaround, not a guaranteed connection.\n\nOpen both apps to schedule the test. After confirmation, return to the watch face and lock the phone. Let the notification appear on the Watch and check subsequent reading times without opening either app. Notification settings and Focus may affect presentation. Another press replaces the pending test.")
+        }
+    }
+
+    private func schedule() {
+        let session = WCSession.default
+        guard !isScheduling, session.activationState == .activated, session.isReachable else { return }
+        isScheduling = true
+        status = ""
+        session.sendMessage([Libre2NotificationTest.requestKey: true], replyHandler: { reply in
+            DispatchQueue.main.async {
+                isScheduling = false
+                if let error = reply["error"] as? String {
+                    status = error
+                } else if let timestamp = reply[Libre2NotificationTest.scheduledAtKey] as? Double,
+                          timestamp.isFinite, timestamp > 0 {
+                    let date = Date(timeIntervalSince1970: timestamp).formatted(date: .omitted, time: .standard)
+                    status = "Watch test scheduled for \(date). Return to the watch face and lock the phone."
+                    connection.recordActivity(status)
+                } else {
+                    unconfirmed()
+                }
+            }
+        }, errorHandler: { _ in
+            DispatchQueue.main.async { isScheduling = false; unconfirmed() }
+        })
+    }
+
+    private func unconfirmed() {
+        status = "Watch scheduling was not confirmed. A notification may still appear. Open both apps before retrying."
     }
 }

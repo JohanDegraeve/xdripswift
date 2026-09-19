@@ -75,6 +75,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     var session: WCSession
 
     private let directLibreLocation = Libre2WatchLocationSession()
+    private lazy var directLibreNotification = Libre2WatchNotificationTest()
 
     // set timer to automatically refresh the view
     // https://www.hackingwithswift.com/quick-start/swiftui/how-to-use-a-timer-with-swiftui
@@ -920,6 +921,7 @@ extension WatchStateModel: WCSessionDelegate {
     func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
         DispatchQueue.main.async {
             if self.directLibreLocation.receive(message, reply: replyHandler) { return }
+            if self.directLibreNotification.receive(message, reply: replyHandler) { return }
             if Libre2WatchHistorySync.shared.receiveCleanup(message, reply: replyHandler) { return }
             if Libre2WatchHistorySync.shared.receive(message) { replyHandler([:]); return }
             if message[Libre2ConnectionMessage.key] != nil {

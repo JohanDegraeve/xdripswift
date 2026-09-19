@@ -54,10 +54,11 @@ unresolved-reading controls and bounded recent activity. Readiness uses existing
 connection events and one local reading-expiry update while the page is visible;
 there is no Watch polling. Interface device checks are pending (see validation).
 Interrupted transfer still needs a controlled test; background delivery timing and
-optional runtime features are being restored in milestone 8. Opt-in background
-location and its three accuracy choices are implemented; physical runtime checks
-are pending. See [runtime options](DirectLibreRuntime.md). This checkpoint is not
-yet feature-equivalent to the reference prototype.
+milestone 8 now restores opt-in location with three accuracy choices, minimal
+underwater foreground support/manual Water Lock and the manual delivery-test
+notification in separate commits. See [runtime options and device checks](DirectLibreRuntime.md).
+Physical runtime checks and milestone 9 diagnostics remain pending; this checkpoint
+is not yet fully feature-equivalent to the reference prototype.
 
 An installation over the prototype disconnected until the app was reinstalled.
 A retained unlock-code mismatch is a plausible code-supported explanation, not a

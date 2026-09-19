@@ -758,3 +758,28 @@ Restored only `WKBackgroundModes = [underwater-depth]` on the Watch app.
 Property-list validation passed. No depth manager, automatic Water Lock, workout,
 Motion & Fitness prompt or restricted entitlement was added. Underwater foreground
 behaviour remains a physical-device check.
+
+### Manual background-delivery notification test
+
+Restored a separate Watch notification category/view and live scheduling request.
+The phone displays confirmed scheduling and the prototype's observed delivery
+benefit under Background connection. It never schedules automatically or changes
+real alarms, BLE recovery or selection.
+
+- Five production-helper scenarios passed with notification-service doubles:
+  one-shot scheduling/replacement, service failure, denied/quiet alerts, foreground
+  permission, and malformed/overlapping requests.
+- Six existing Watch coordinator/antenna/power-state test groups passed.
+- Final Watch non-UI dependency closure plus the new notification view passed the
+  real watchOS SDK type-check. Both phone settings views passed the iOS SDK check
+  with the temporary State-wrapper substitution described above.
+- Unsigned iPhone and Watch scheme builds were attempted. Both still fail in
+  existing extension/chart SwiftUI macros (`SwiftUIMacros.StateMacro` / preview
+  plugin malformed response; `sandbox_apply: Operation not permitted`). This
+  does not establish a complete build; the next checkpoint needs Xcode and devices.
+- Build outputs remain under `/tmp`; personal signing and scheme changes are
+  excluded from feature commits. No ordinary NFC or shared Bluetooth source changed
+  during the runtime restoration.
+
+Milestone 8 implementation is complete. Its physical-device acceptance remains
+pending; use the [runtime workflow](DirectLibreRuntime.md) to test all three options.

@@ -106,3 +106,6 @@ Background delivery remains scheduled by watchOS/iOS. Optional location runtime,
 notification testing and explicit WatchConnectivity background-task handling are
 later runtime work, not part of this checkpoint. Neither timely background
 collection nor a fixed delivery latency is established by the host tests.
+
+Optional runtime support and the notification's observed benefit for delayed
+background delivery are covered in [runtime options](DirectLibreRuntime.md).

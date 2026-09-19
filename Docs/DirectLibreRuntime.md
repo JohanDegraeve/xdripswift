@@ -54,6 +54,34 @@ read depth/motion data, request Motion & Fitness permission, or start a workout 
 extended runtime session. No additional restricted entitlement is requested.
 See Apple's [submersion setup](https://developer.apple.com/documentation/coremotion/accessing-submersion-data).
 
+## Background-delivery test notification
+
+Use **Test Watch notification** if the Watch collects fresh values but the phone
+lags while both apps are backgrounded. In prototype testing, an alert actually
+appearing on the Watch restored immediate delivery of subsequent readings; updates
+continued after it closed without tapping it. This observed workaround is not a
+WatchConnectivity priority setting, a delivery guarantee or proof of the underlying
+cause. The integrated version needs the same physical check.
+
+1. Open both apps and press the test button in Background connection. Allow Watch
+   notifications if asked. Wait for the phone to confirm scheduling.
+2. Return to the Watch face and lock the phone. One Watch-local notification is
+   scheduled for 30 seconds later; its content explicitly identifies a test.
+3. Let it appear on the Watch. Compare subsequent Watch and phone reading times
+   while both apps remain backgrounded, without tapping the alert or opening xDrip.
+   Check notification settings and Focus if no alert appears.
+
+The Watch replies only after the notification service accepts the request. That
+confirms scheduling, not presentation. A lost reply is reported as unconfirmed and
+may still result in an alert. Another explicit press replaces the same pending test;
+there are no queued commands, automatic notifications, loops or resends. Real
+alarms are unchanged. Confirmed scheduling is recorded in the phone's Recent activity.
+
+`Libre2WatchNotificationTest` handles the live request and its dedicated notification
+category/view. `WatchStateModel` routes the request, and `xDripWatchApp` registers the
+notification scene. This uses `WKApplication`, appropriate for the modern Watch app;
+it does not instantiate the legacy `WKExtension` singleton.
+
 ## Device checkpoint
 
 - With location off, verify ordinary phone scanning and both transfer directions.
@@ -64,6 +92,8 @@ See Apple's [submersion setup](https://developer.apple.com/documentation/coremot
 - Re-enable, return collection to phone, then refresh: location must be waiting for
   Watch selection, rather than receiving updates. Repeat with a phone NFC reset
   delivered to the Watch.
+- Run the notification test with both apps backgrounded. Confirm the alert appears
+  on Watch, then compare subsequent reading timestamps without opening either app.
 - With Water Lock enabled, check that visible xDrip stays frontmost under water.
   Repeat with location off and on. Check BLE recovery separately after leaving
   water; staying visible does not establish radio connectivity.

@@ -66,7 +66,7 @@ final class Libre2PhoneConnection: ObservableObject {
         refresh()
     }
 
-    private func recordActivity(_ message: String) {
+    func recordActivity(_ message: String) {
         let message = String(message.prefix(300))
         guard activity.last?.message != message else { return }
         activity = Array((activity + [Activity(id: UUID(), date: Date(), message: message)]).suffix(Self.maximumActivityEntries))
