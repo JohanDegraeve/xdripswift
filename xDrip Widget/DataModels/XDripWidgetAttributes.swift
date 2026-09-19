@@ -57,6 +57,12 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var dataSourceDescription: String
         var followerPatientName: String?
         var sensorNoiseStateRawValue: Int?
+        // optional so existing activities without warm-up information still decode
+        var sensorWarmupEndDate: Date?
+
+        var isSensorWarmingUp: Bool {
+            sensorWarmupEndDate.map { $0 > Date() } ?? false
+        }
         
         var aidStatus: AIDStatus?
         var therapyMetrics: TherapyMetricsSnapshot? = nil

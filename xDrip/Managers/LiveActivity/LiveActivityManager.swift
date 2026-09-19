@@ -154,6 +154,8 @@ extension LiveActivityManager {
         let endRevision = commandRevision
         shouldRun = false
         pendingUpdate = nil
+        // clear the warm-up state so heartbeats don't keep updating an ended activity
+        persistentContentState.sensorWarmupEndDate = nil
         await endActivities()
 
         // A newer update may arrive while ActivityKit is ending the previous activity. Requeue the

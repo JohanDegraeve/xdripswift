@@ -240,3 +240,7 @@
 "common_save" = "Salva";
 "common_discardChanges" = "Scarta modifiche";
 "common_back" = "Indietro";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Sensore in riscaldamento";
+"common_sensorWarmupUntilFormat" = "Fino alle %@";

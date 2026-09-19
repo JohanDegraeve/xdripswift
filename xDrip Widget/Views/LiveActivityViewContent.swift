@@ -24,6 +24,17 @@ struct LiveActivityViewContentState: View {
     let state: XDripWidgetAttributes.ContentState
 
     var body: some View {
+        if state.liveActivityType != .disabled, state.isSensorWarmingUp, let endDate = state.sensorWarmupEndDate {
+            LiveActivitySensorWarmupView(endDate: endDate)
+                .padding(.vertical, 16)
+                .activityBackgroundTint(.black)
+        } else {
+            normalContent
+        }
+    }
+
+    @ViewBuilder
+    private var normalContent: some View {
         switch state.liveActivityType {
         case .minimal:
             // Minimal presentation with no chart.
@@ -265,5 +276,99 @@ struct LiveActivityViewContentState: View {
             .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10))
             .background(.cyan).opacity(0.9)
             .cornerRadius(10)
+    }
+}
+
+/// shared warm-up view for the Lock Screen, Dynamic Island, CarPlay and Smart Stack
+struct LiveActivitySensorWarmupView: View {
+    let endDate: Date
+    var compactWidth: CGFloat? = nil
+
+    var body: some View {
+        if let compactWidth {
+            compactContent(width: compactWidth)
+        } else {
+            phoneContent
+        }
+    }
+
+    private var phoneContent: some View {
+        HStack(spacing: 40) {
+            Image("AppIconPreview")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 48, height: 48)
+                .clipShape(RoundedRectangle(cornerRadius: 11))
+                .accessibilityLabel(ConstantsHomeView.applicationName)
+
+            HStack(spacing: 8) {
+                Image(systemName: "hourglass")
+                    .font(.title2)
+                    .foregroundStyle(.orange)
+                    .fixedSize()
+                    .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(Texts_Common.sensorWarmingUp)
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                    Text(String(format: Texts_Common.sensorWarmupUntilFormat, endDate.formatted(date: .omitted, time: .shortened)))
+                        .font(.subheadline)
+                        .foregroundStyle(Color("colorSecondary"))
+                }
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        // keep the horizontal padding here to avoid adding it again in the containing view
+        .padding(.leading, 24)
+        .padding(.trailing, 8)
+        .accessibilityElement(children: .combine)
+    }
+
+    private func compactContent(width: CGFloat) -> some View {
+        let roomy = width >= 280
+        let iconSize: CGFloat = roomy ? 40 : 32
+
+        return HStack(spacing: roomy ? 20 : 12) {
+            Image("AppIconPreview")
+                .resizable()
+                .scaledToFit()
+                .frame(width: iconSize, height: iconSize)
+                .clipShape(RoundedRectangle(cornerRadius: roomy ? 9 : 7))
+                .accessibilityLabel(ConstantsHomeView.applicationName)
+
+            HStack(spacing: roomy ? 8 : 6) {
+                Image(systemName: "hourglass")
+                    .font(.system(size: roomy ? 18 : 16))
+                    .foregroundStyle(.orange)
+                    .fixedSize()
+                    .accessibilityHidden(true)
+
+                // fit both lines together so "Until" doesn't become larger than the title
+                ViewThatFits(in: .horizontal) {
+                    compactText(titleSize: roomy ? 16 : 14, timeSize: roomy ? 14 : 12)
+                    compactText(titleSize: 12, timeSize: 10)
+                    compactText(titleSize: 10, timeSize: 9)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, roomy ? 12 : 10)
+        .accessibilityElement(children: .combine)
+    }
+
+    private func compactText(titleSize: CGFloat, timeSize: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(Texts_Common.sensorWarmingUp)
+                .font(.system(size: titleSize, weight: .semibold))
+                .foregroundStyle(.white)
+            Text(String(format: Texts_Common.sensorWarmupUntilFormat, endDate.formatted(date: .omitted, time: .shortened)))
+                .font(.system(size: timeSize))
+                .foregroundStyle(Color("colorSecondary"))
+        }
+        .lineLimit(1)
+        .fixedSize(horizontal: true, vertical: false)
     }
 }

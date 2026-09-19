@@ -1427,6 +1427,10 @@ import AppIntents
             
         case UserDefaults.Key.timeStampOfLastHeartBeat:
             updateDataSourceInfo()
+            // warm-up can start or finish without a new glucose reading
+            if liveActivitySensorWarmupEndDate() != nil || LiveActivityManager.shared.contentStateForPreview?.sensorWarmupEndDate != nil {
+                updateLiveActivityAndWidgets(forceRestart: false)
+            }
             
         case UserDefaults.Key.updateSnoozeStatus:
             updateSnoozeStatus()
@@ -2408,6 +2412,7 @@ import AppIntents
         activeSensor = newSensor
         sensorNoiseManager?.update(activeSensor: newSensor)
         loopManager?.shareMetadata(clearReadings: true, clearSensorState: true)
+        updateLiveActivityAndWidgets(forceRestart: false)
     }
     
     private func stopSensor(cGMTransmitter: CGMTransmitter?, sendToTransmitter: Bool) {
@@ -2522,9 +2527,50 @@ import AppIntents
         )
     }
     
+    /// use the same warm-up durations as Home, only for sources with known sensor timing
+    private func liveActivitySensorWarmupEndDate(sensorStartDate: Date? = nil) -> Date? {
+        let now = Date()
+        let transmitter = bluetoothPeripheralManager?.getCGMTransmitter()
+        let duration: Double
+        var startDate: Date?
+
+        if UserDefaults.standard.isMaster {
+            startDate = activeSensor?.startDate
+            if let transmitter = transmitter as? CGMG7Transmitter,
+               let peripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: transmitter) as? DexcomG7 {
+                startDate = peripheral.sensorStartDate ?? startDate
+            }
+            startDate = sensorStartDate ?? startDate
+            switch transmitter?.cgmTransmitterType().sensorType() {
+            case .Libre:
+                duration = ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
+            case .Dexcom:
+                if transmitter?.cgmTransmitterType() == .dexcomG7 {
+                    duration = ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG7
+                } else {
+                    duration = transmitter?.isAnubisG6() == true
+                        ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis
+                        : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6
+                }
+            default:
+                return nil
+            }
+        } else if UserDefaults.standard.followerDataSourceType == .libreLinkUp {
+            startDate = UserDefaults.standard.activeSensorStartDate
+            duration = ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre
+        } else {
+            return nil
+        }
+
+        guard let startDate, startDate <= now else { return nil }
+        let endDate = startDate.addingTimeInterval(duration * 60)
+        return endDate > now ? endDate : nil
+    }
+
     /// check if the conditions are correct to start a live activity, update it, or end it
     /// also update the widget data stored in user defaults
-    private func updateLiveActivityAndWidgets(forceRestart: Bool, therapyMetrics: TherapyMetricsSnapshot? = nil) {
+    private func updateLiveActivityAndWidgets(forceRestart: Bool, therapyMetrics: TherapyMetricsSnapshot? = nil, sensorStartDate: Date? = nil) {
+        let sensorWarmupEndDate = liveActivitySensorWarmupEndDate(sensorStartDate: sensorStartDate)
         let keepAliveDisabledMessage = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
             ? "\(Texts_SettingsView.labelfollowerKeepAliveType) \(Texts_SettingsView.followerKeepAliveTypeDisabled)"
             : ""
@@ -2560,8 +2606,8 @@ import AppIntents
             // Chart payload reduction must never change these values.
             let latestBgReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4)
             
-            if bgReadings.count > 0, let latestBgReading = latestBgReadings.first {
-                let slopeOrdinal = latestBgReading.slopeOrdinal()
+            if (bgReadings.count > 0 && !latestBgReadings.isEmpty) || sensorWarmupEndDate != nil {
+                let slopeOrdinal = latestBgReadings.first?.slopeOrdinal() ?? 0
                 var deltaValueInUserUnit: Double = 0
                 var bgReadingValues: [Double] = []
                 var bgReadingDates: [Date] = []
@@ -2569,7 +2615,7 @@ import AppIntents
                 // add delta if available
                 if latestBgReadings.count > 1 {
                     var previousValueInUserUnit: Double = latestBgReadings[1].finalValue.mgDlToMmol(mgDl: isMgDl)
-                    var actualValueInUserUnit: Double = latestBgReading.finalValue.mgDlToMmol(mgDl: isMgDl)
+                    var actualValueInUserUnit: Double = latestBgReadings[0].finalValue.mgDlToMmol(mgDl: isMgDl)
                     
                     // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation
                     if !isMgDl {
@@ -2632,6 +2678,7 @@ import AppIntents
                     var contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, carPlayLiveActivityType: UserDefaults.standard.carPlayLiveActivityType, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, sensorNoiseStateRawValue: sensorNoiseStateRawValue, aidStatus: aidStatus, therapyMetrics: resolvedTherapyMetrics)
                     
                     contentState.showIOBCOB = UserDefaults.standard.liveActivityShowIOBCOB
+                    contentState.sensorWarmupEndDate = sensorWarmupEndDate
                     LiveActivityManager.shared.update(contentState: contentState, forceRestart: forceRestart)
                 } else {
                     Task { await LiveActivityManager.shared.endAllActivities() }
@@ -2646,7 +2693,7 @@ import AppIntents
                 
                 // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
                 // the user's device - this allows several copies of the app to be installed without cross-contamination of widget data
-                if let widgetData = try? JSONEncoder().encode(widgetSharedUserDefaultsModel) {
+                if !bgReadingValues.isEmpty, let widgetData = try? JSONEncoder().encode(widgetSharedUserDefaultsModel) {
                     UserDefaults.storeInSharedUserDefaults(
                         value: widgetData,
                         forKey: WidgetSharedUserDefaultsModel.widgetDataKey(
@@ -2797,6 +2844,7 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
         
         UserDefaults.standard.activeSensorStartDate = nil
         UserDefaults.standard.activeSensorDescription = nil
+        updateLiveActivityAndWidgets(forceRestart: false)
     }
     
     func newSensorDetected(sensorStartDate: Date?) {
@@ -2858,6 +2906,16 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
     }
 
     func cgmTransmitterInfoReceived(glucoseData: inout [GlucoseData], transmitterBatteryInfo: TransmitterBatteryInfo?, sensorAge: TimeInterval?) {
+        // use the packet timestamp, as delayed readings must not move the warm-up end time
+        let sensorStartDate = sensorAge.flatMap { age in
+            age.isFinite && age >= 0 ? (glucoseData.map { $0.timeStamp }.max() ?? Date()).addingTimeInterval(-age) : nil
+        }
+        // update warm-up even when this packet doesn't produce a stored glucose reading
+        defer {
+            if liveActivitySensorWarmupEndDate(sensorStartDate: sensorStartDate) != nil || LiveActivityManager.shared.contentStateForPreview?.sensorWarmupEndDate != nil {
+                updateLiveActivityAndWidgets(forceRestart: false, sensorStartDate: sensorStartDate)
+            }
+        }
         trace("in cgmTransmitterInfoReceived, transmitterBatteryInfo %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, transmitterBatteryInfo?.description ?? "not received")
         trace("in cgmTransmitterInfoReceived, sensor time in days %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, sensorAge?.days.round(toDecimalPlaces: 1).description ?? "not received")
         trace("in cgmTransmitterInfoReceived, glucoseData array size = %{public}@ values", log: log, category: ConstantsLog.categoryRootView, type: .info, glucoseData.count.description)

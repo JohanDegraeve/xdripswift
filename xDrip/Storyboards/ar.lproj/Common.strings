@@ -68,3 +68,7 @@
 "common_save" = "حفظ";
 "common_discardChanges" = "تجاهل التغييرات";
 "common_back" = "رجوع";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "جارٍ إحماء المستشعر";
+"common_sensorWarmupUntilFormat" = "حتى %@";

@@ -134,3 +134,7 @@
 "common_save" = "Save";
 "common_discardChanges" = "Discard Changes";
 "common_back" = "Back";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Sensor warming up";
+"common_sensorWarmupUntilFormat" = "Until %@";

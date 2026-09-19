@@ -3,6 +3,9 @@ import Foundation
 // all common texts 
 class Texts_Common {
     static private let filename = "Common"
+
+    static let sensorWarmingUp = NSLocalizedString("common_sensorWarmingUp", tableName: filename, bundle: .main, value: "Sensor warming up", comment: "Live Activity sensor warm-up title")
+    static let sensorWarmupUntilFormat = NSLocalizedString("common_sensorWarmupUntilFormat", tableName: filename, bundle: .main, value: "Until %@", comment: "Warm-up completion time; %@ is a localized time")
     
     static let Ok = {
         return NSLocalizedString("common_Ok", tableName: filename, bundle: Bundle.main, value: "OK", comment: "literally 'OK'")

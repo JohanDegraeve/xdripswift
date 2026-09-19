@@ -39,11 +39,19 @@ struct LiveActivityViewContentActivityFamiliesState: View {
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color.black.opacity(0.4))
 
-            switch carPlayLiveActivityType {
-            case .chart:
-                chartContent
-            case .basic:
-                basicContent
+            if state.isSensorWarmingUp, let endDate = state.sensorWarmupEndDate {
+                GeometryReader { geometry in
+                    LiveActivitySensorWarmupView(endDate: endDate, compactWidth: geometry.size.width)
+                        .padding(.vertical, 10)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            } else {
+                switch carPlayLiveActivityType {
+                case .chart:
+                    chartContent
+                case .basic:
+                    basicContent
+                }
             }
         }
         .activityBackgroundTint(.clear)

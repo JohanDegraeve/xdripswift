@@ -98,3 +98,7 @@
 "common_save" = "Tallenna";
 "common_discardChanges" = "Hylkää muutokset";
 "common_back" = "Takaisin";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Sensori lämpenee";
+"common_sensorWarmupUntilFormat" = "Päättyy klo %@";

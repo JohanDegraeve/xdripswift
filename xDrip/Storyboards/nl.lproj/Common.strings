@@ -130,3 +130,7 @@
 "common_save" = "Opslaan";
 "common_discardChanges" = "Wijzigingen verwerpen";
 "common_back" = "Terug";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Sensor warmt op";
+"common_sensorWarmupUntilFormat" = "Tot %@";

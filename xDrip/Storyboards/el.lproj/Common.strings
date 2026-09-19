@@ -68,3 +68,7 @@
 "common_save" = "Αποθήκευση";
 "common_discardChanges" = "Απόρριψη αλλαγών";
 "common_back" = "Πίσω";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Ο αισθητήρας προθερμαίνεται";
+"common_sensorWarmupUntilFormat" = "Έως %@";

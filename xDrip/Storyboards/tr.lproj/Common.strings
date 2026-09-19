@@ -68,3 +68,7 @@
 "common_save" = "Kaydet";
 "common_discardChanges" = "Değişiklikleri Sil";
 "common_back" = "Geri";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Sensör ısınıyor";
+"common_sensorWarmupUntilFormat" = "Bitiş: %@";

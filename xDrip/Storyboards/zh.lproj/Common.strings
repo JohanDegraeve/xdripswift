@@ -145,3 +145,7 @@
 "common_save" = "保存";
 "common_discardChanges" = "放弃更改";
 "common_back" = "返回";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "传感器预热中";
+"common_sensorWarmupUntilFormat" = "至 %@";

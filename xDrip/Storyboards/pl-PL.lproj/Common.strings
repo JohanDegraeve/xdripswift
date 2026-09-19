@@ -179,3 +179,7 @@
 "common_save" = "Zapisz";
 "common_discardChanges" = "Odrzuć zmiany";
 "common_back" = "Wstecz";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Sensor się rozgrzewa";
+"common_sensorWarmupUntilFormat" = "Do %@";
