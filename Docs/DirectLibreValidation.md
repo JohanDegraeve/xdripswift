@@ -533,3 +533,29 @@ connection are confounding factors. Removing/re-adding the sensor is recorded
 as this test's setup, not a requirement for normal switching. It does not yet
 validate recovery of older saved state, interrupted handoffs, or NFC reset while
 Watch owns an active connection. Those device checks remain outstanding.
+
+### Device checkpoint: recovery checks pass; timing remains unmeasured
+
+The user reports that all requested checks passed except interrupted transfer,
+which completed too quickly to interrupt manually. This covers the requested
+phone/Watch restarts, signal-loss recovery and double-tap fallback, and ordinary
+NFC reclaim (including delayed Watch notification and cancelled scan behavior).
+No per-step timings were provided. Interrupted transfer is **untested**, not failed.
+
+The user also perceives slower Watch connections than the working prototype.
+Code comparison identifies a plausible startup difference: the prototype retains
+its collector/CBCentralManager across handoffs and local reset, whereas the
+integrated coordinator releases it on return and replaces it on double-tap.
+Normal integrated signal-loss reconnects retain the existing collector. Both
+implementations reuse a known peripheral, scan for FDE3 otherwise, retry without
+intentional backoff, and time out scan-discovered connect attempts after five
+seconds. Both wait for local phone release before Watch activation.
+
+The integrated startup also has overlapping connect entry points: explicit
+startup, the shared powered-on callback's known-peripheral retrieval, and the
+Watch delegate's powered-on connect. This differs from the prototype's guarded
+start. No captured timings establish that either difference causes the reported
+delay. Separate transfer time, time to didConnect/green antenna, and time to first
+fresh reading before changing connection behavior. Keep the Watch visibly active
+and other sensor connections stopped for comparisons. No runtime changes were
+made for this performance observation.
