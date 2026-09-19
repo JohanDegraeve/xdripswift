@@ -273,9 +273,10 @@ Forward transfer:
    Its existing sensor connection remains active while Watch prepares.
 2. Watch validates and saves the session, then returns READY without starting BLE.
 3. Phone persists Watch selection, suspends scanning/reconnect/subscription/write
-   paths, and requests disconnection on the BLE queue. It does not wait for the
-   disconnect callback before proceeding. The final counter snapshot follows that
-   queued suspension, so pending phone callbacks cannot reserve another counter.
+   paths, and requests disconnection on the BLE queue. It waits for confirmation
+   that xDrip has released its local connection before proceeding. Another app
+   may still hold the physical phone-to-sensor link; this is not a radio-release
+   guarantee for the entire phone.
 4. It snapshots the final counter. If that changed during preparation, it refreshes
    the prepared Watch before sending ACTIVATE. Watch persists active selection
    before constructing the collector and acknowledging activation.
@@ -312,7 +313,8 @@ and original scanning/retry path retain their prior behaviour.
 The generic Bluetooth class has an opt-in suspension operation and a default-on
 connection guard. Only Libre adapters add persisted-selection guards. Queued
 writes and late notification callbacks recheck the guard. Suspension waits for
-release by default; forward transfer explicitly skips that wait. Ordinary
+local release in both transfer directions; manual Watch double-tap reset skips
+that wait. Ordinary
 timeout/cancel/reconnect choices are unchanged. Watch uses
 the existing local Bluetooth identity keys to reuse its known peripheral after a
 restart; it never treats the phone's peripheral UUID as a Watch UUID. Its central
@@ -363,7 +365,7 @@ collector stopped. Use the ordinary phone NFC path and wait for a fresh BLE read
    Check the prerequisites and press **Switch to Watch**. Expect an orange antenna
    followed by green when connected, then fresh Watch glucose/chart/complication.
    The phone must stop processing its own BLE frames before Watch activation.
-   If the physical phone link persists, cycle Bluetooth in iPhone Settings.
+   Stop other apps' sensor connections before testing; repeat without Bluetooth cycling.
    Watch selection alone does not confirm a Watch radio connection.
 2. Press **Return to iPhone** on that same phone page. Expect Watch release first,
    then fresh phone readings without NFC or Bluetooth cycling. Repeat both ways.
@@ -381,13 +383,14 @@ collector stopped. Use the ordinary phone NFC path and wait for a fresh BLE read
 6. Repeat ordinary phone scan/cancel/retry and signal-loss recovery after returning
    to the phone. Report any deviations and which device/app was open at the time.
 
-### Forward-transfer callback wait removed
+### Earlier experiment: forward-transfer callback wait removed (superseded)
 
 The first switching test reported “Watch / transfer pending” and a need to cycle
 iPhone Bluetooth. That header also appeared after successful activation, so it
 could not identify where the transaction was waiting. It now distinguishes
 preparation, Watch selection and return; the separate status text shows progress.
-At the user's request, forward transfer no longer waits for a disconnect callback.
+At that checkpoint, forward transfer stopped waiting for a disconnect callback.
+The wait has since been restored; see the later checkpoint below.
 The phone still disables collection before activating Watch and requests radio
 release, but does not claim the system released the physical link. Return to phone
 retains confirmed Watch release. Hardware validation of this revision is pending.
@@ -412,7 +415,7 @@ Bluetooth unavailable, or a connection that subsequently dropped.
 | --- | --- | --- |
 | Preparation | Validates and persists credentials before READY; no Watch BLE yet | Same ordering, new message/selection types |
 | Phone authentication during preparation | Freezes authentication when preparing | Phone can still reserve a counter until READY; the final snapshot refreshes Watch preparation if needed |
-| Phone release | Waits for disconnect callback before ACTIVATE | Since `d30fd18d`, suspends collection and requests cancellation without waiting, at the user's request |
+| Phone release | Waits for disconnect callback before ACTIVATE | At `d30fd18d`, requested cancellation without waiting; local disconnect confirmation is now restored |
 | Activation | Persists Watch ownership, starts collector, acknowledges | Same ordering; acknowledgement means activation accepted, not connected |
 | Scan filter | Scans for Libre service FDE3 | Inherited phone scan with no service filter; changed to FDE3 on Watch only |
 | First discovery name | Advertised local name, falling back to peripheral name; exact case-insensitive match | Used only cached peripheral name; now uses the same name source on Watch. Shared matching still uses the phone's case-insensitive substring rule |
@@ -498,3 +501,21 @@ It does not provide background runtime: keep Watch visible for this checkpoint.
 The actual Watch collector/coordinator dependency closure passes watchOS SDK
 typechecking after this change. Device confirmation that the popup no longer
 appears remains pending.
+
+### Forward-transfer disconnect confirmation restored
+
+The user identified another app connected to the sensor during earlier tests.
+That may explain why the phone retained its physical link despite xDrip releasing
+its local connection; the earlier observations do not establish that the callback
+wait or discovery behavior caused the failure. At the user's request, forward
+transfer again waits for xDrip's local disconnect confirmation (or no local link)
+before taking the final counter snapshot and sending ACTIVATE. Progress now says
+“Disconnecting iPhone” during that wait. The page advises stopping other apps'
+sensor connections before switching.
+
+Watch service-filtered scanning, advertised-name lookup, double-tap reset and
+system-alert suppression remain unchanged. In particular, double-tap local
+recovery still requests cancellation without waiting; it is not a handoff.
+The scoped phone SDK check and all 26 existing host tests pass. These tests do
+not simulate disconnect callbacks. Device validation should repeat both transfer
+directions with other sensor connections stopped, without cycling Bluetooth.

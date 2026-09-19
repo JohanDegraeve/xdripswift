@@ -28,7 +28,7 @@ struct DirectLibreSettingsView: View {
                 check("Unlock payload enabled", !UserDefaults.standard.suppressUnLockPayLoad)
             }
             Section("Recovery") {
-                Text("If the Watch cannot connect after switching, cycle Bluetooth in iPhone Settings to release the sensor.")
+                Text("Stop sensor connections in other iPhone apps before switching. xDrip can release only its own connection.")
                 Text("Keep both apps open while switching. If a transfer is interrupted, retry Return to iPhone. A successful ordinary sensor NFC scan on the phone resets the selection, including when the Watch is unreachable. The Watch stops when it receives the reset.")
                 Text("This checkpoint displays direct Watch readings locally. History synchronisation to the phone is not implemented yet.")
                     .font(.footnote)

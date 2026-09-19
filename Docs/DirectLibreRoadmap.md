@@ -29,9 +29,10 @@ passed, with automatic reconnection in under 30 seconds and no manual interventi
 The shared collector belongs to both targets. The user passed phone NFC,
 fresh-reading and signal-loss recovery checks after its extraction (`58f621a8`).
 Phone-controlled switching is now implemented, with persisted selection, phone
-collection suspension, confirmed Watch release on return, final-counter transfer,
-interrupted-transfer recovery and successful NFC reset. Advanced Settings contains the initial test controls; the Watch can
-show direct values using its existing chart/complication path.
+collection suspension, confirmed local release in both directions, final-counter
+transfer, interrupted-transfer recovery and successful NFC reset. Advanced Settings
+contains the initial test controls; the Watch can show direct values using its
+existing chart/complication path.
 
 Next: complete the milestone 4/5 device gate for direct collection, both transfer
 directions, restarts, interrupted transfers and NFC reset. History synchronisation,
@@ -68,9 +69,9 @@ adjustments remain local and separate from feature commits.
    and phone collection remains unchanged.
 5. **Phone-controlled switching.** Persist selected device, session identifier,
    credentials and counter. Prepare/acknowledge before releasing the old collector;
-   activate Watch after phone collection is suspended and cancellation requested.
-   Return to phone still waits for confirmed Watch release. Reserve/persist counters
-   before unlock writes. Reject obsolete transactions. A successful ordinary NFC
+   activate Watch after xDrip confirms its local phone connection is released.
+   Return to phone likewise waits for confirmed local Watch release. Reserve/persist
+   counters before unlock writes. Reject obsolete transactions. A successful ordinary NFC
    provisioning retires an existing experimental session without making the phone
    wait for an unreachable Watch. **Device gate:** both switching directions,
    interrupted transactions, restarts and NFC reset.
