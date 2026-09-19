@@ -519,3 +519,17 @@ recovery still requests cancellation without waiting; it is not a handoff.
 The scoped phone SDK check and all 26 existing host tests pass. These tests do
 not simulate disconnect callbacks. Device validation should repeat both transfer
 directions with other sensor connections stopped, without cycling Bluetooth.
+
+### Device checkpoint: confirmed-release transfers pass
+
+After `ef110c2b`, the user reports successful phone-to-Watch and Watch-to-phone
+transfers without cycling Bluetooth. Before testing, the sensor was removed and
+re-added in the phone app to establish a clean test. This validates both transfer
+directions with the local disconnect wait restored under fresh provisioning.
+
+Keep confirmed local release and the Watch discovery improvements. This result
+does not isolate the earlier failure's cause: provisioning and the other app's
+connection are confounding factors. Removing/re-adding the sensor is recorded
+as this test's setup, not a requirement for normal switching. It does not yet
+validate recovery of older saved state, interrupted handoffs, or NFC reset while
+Watch owns an active connection. Those device checks remain outstanding.

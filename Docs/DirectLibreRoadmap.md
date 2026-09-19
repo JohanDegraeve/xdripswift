@@ -32,10 +32,13 @@ Phone-controlled switching is now implemented, with persisted selection, phone
 collection suspension, confirmed local release in both directions, final-counter
 transfer, interrupted-transfer recovery and successful NFC reset. Advanced Settings
 contains the initial test controls; the Watch can show direct values using its
-existing chart/complication path.
+existing chart/complication path. The user passed both transfer directions with
+local disconnect confirmation restored (`ef110c2b`), without cycling Bluetooth,
+after removing and re-adding the sensor on the phone.
 
-Next: complete the milestone 4/5 device gate for direct collection, both transfer
-directions, restarts, interrupted transfers and NFC reset. History synchronisation,
+Next: complete the remaining milestone 4/5 device checks for restarts, signal-loss
+recovery, interrupted transfers and NFC reset of an active Watch session. The
+latest clean provisioning test does not establish recovery of older saved state. History synchronisation,
 full display/settings persistence, the final interface and optional background
 features remain later milestones. This checkpoint is not yet feature-equivalent
 to the reference prototype.
