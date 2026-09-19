@@ -28,11 +28,13 @@ public class HealthKitManager: NSObject {
     /// reference to HKHealthStore, should be used only if we're sure HealthKit is supported on the device
     private lazy var healthStore = HKHealthStore()
     
-    /// set of timestamps currently being written to HealthKit to prevent overlap across runs
+    /// set of timestamps currently being written to HealthKit to prevent overlap across runs, guarded by inFlightLock
     private var timeStampsOfBgReadingsCurrentlyBeingSaved = Set<Date>()
-    
-    /// serial queue to ensure atomic updates of the latest HealthKit store timestamp
-    /// the idea is to use this and force all updates to be done
+
+    private let inFlightLock = NSLock()
+
+    /// serial queue for the UserDefaults read-modify-write of the latest HealthKit store timestamp.
+    /// async only - main must never .sync onto it (a UserDefaults write can wait for main)
     private let healthKitTimestampUpdateQueue = DispatchQueue(label: "HealthKitManager.timestampUpdate")
     
     /// metadata key used to identify individual BG readings in HealthKit
@@ -122,7 +124,7 @@ public class HealthKitManager: NSObject {
         
         // snapshot of the latest saved timestamp (strict boundary) and in-flight timestamps (to avoid re-saving while previous saves are not completed)
         let strictLatestHealthKitStoredTimeStamp = UserDefaults.standard.timeStampLatestHealthKitStoreBgReading ?? Date.distantPast
-        let timeStampsCurrentlyInFlight: Set<Date> = healthKitTimestampUpdateQueue.sync { timeStampsOfBgReadingsCurrentlyBeingSaved }
+        let timeStampsCurrentlyInFlight: Set<Date> = inFlightLock.withLock { timeStampsOfBgReadingsCurrentlyBeingSaved }
         
         // user setting to allow more frequent HealthKit writes (e.g. Libre 2 Direct 60-second cadence)
         let storeFrequentReadingsInHealthKit = UserDefaults.standard.storeFrequentReadingsInHealthKit
@@ -239,27 +241,31 @@ public class HealthKitManager: NSObject {
         let sample = HKQuantitySample(type: bloodGlucoseType, quantity: quantity, start: bgReading.timeStamp, end: bgReading.timeStamp, metadata: metadata)
         let timeStampLastReadingToUpload = bgReading.timeStamp
         
-        healthKitTimestampUpdateQueue.sync {
+        inFlightLock.withLock {
             _ = timeStampsOfBgReadingsCurrentlyBeingSaved.insert(timeStampLastReadingToUpload)
         }
-        
+
         healthStore.save(sample, withCompletion: { [weak self]
             (success: Bool, error: Error?) in
                 guard let self = self else { return }
                 if success {
                     trace("stored reading in HealthKit", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .debug, troubleshooting: .detailed(.integration(name: .healthKit, activity: .succeeded(itemCount: 1))))
                     self.healthKitTimestampUpdateQueue.async {
-                        self.timeStampsOfBgReadingsCurrentlyBeingSaved.remove(timeStampLastReadingToUpload)
-                        
                         if shouldUpdateLatestTimeStamp {
                             let existingTimeStampLatestHealthKitStoreBgReading = UserDefaults.standard.timeStampLatestHealthKitStoreBgReading ?? Date.distantPast
                             let newTimeStampLatestHealthKitStoreBgReading = max(existingTimeStampLatestHealthKitStoreBgReading, timeStampLastReadingToUpload)
                             UserDefaults.standard.timeStampLatestHealthKitStoreBgReading = newTimeStampLatestHealthKitStoreBgReading
                         }
+                        // leave the in-flight set only after the timestamp covers this reading
+                        self.inFlightLock.withLock {
+                            _ = self.timeStampsOfBgReadingsCurrentlyBeingSaved.remove(timeStampLastReadingToUpload)
+                        }
                     }
                 } else if let error = error {
                     self.healthKitTimestampUpdateQueue.async {
-                        self.timeStampsOfBgReadingsCurrentlyBeingSaved.remove(timeStampLastReadingToUpload)
+                        self.inFlightLock.withLock {
+                            _ = self.timeStampsOfBgReadingsCurrentlyBeingSaved.remove(timeStampLastReadingToUpload)
+                        }
                     }
                     trace("failed store reading in healthkit, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, troubleshooting: .detailed(.integration(name: .healthKit, activity: .failed)), error.localizedDescription)
                 }

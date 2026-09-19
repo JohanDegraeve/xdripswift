@@ -34,11 +34,14 @@ final class FollowerSettingsSectionProvider: SettingsNativeSectionProvider {
         rowsProvider = rows
 
         if observeDefaults {
+            // queue: .main would make every background UserDefaults writer wait for main (deadlock risk)
             defaultsObserver = NotificationCenter.default.addObserver(
                 forName: UserDefaults.didChangeNotification,
                 object: UserDefaults.standard,
-                queue: .main
-            ) { [weak self] _ in self?.sectionReloadClosure?() }
+                queue: nil
+            ) { [weak self] _ in
+                DispatchQueue.main.async { self?.sectionReloadClosure?() }
+            }
         }
         if let refreshEvery {
             refreshTimer = Timer.scheduledTimer(withTimeInterval: refreshEvery, repeats: true) { [weak self] _ in
