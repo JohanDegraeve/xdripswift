@@ -38,6 +38,22 @@ is added. These are experimental runtime aids, not guaranteed continuous monitor
 See Apple's [background location guidance](https://developer.apple.com/documentation/corelocation/handling-location-updates-in-the-background)
 and [`allowsBackgroundLocationUpdates`](https://developer.apple.com/documentation/corelocation/cllocationmanager/allowsbackgroundlocationupdates).
 
+## Underwater foreground support
+
+The `underwater-depth` declaration restores the prototype's minimal foreground
+support on compatible watches. Apple documents 30 minutes frontmost after launch
+from this declaration alone; extended dive sessions are a separate mechanism. This
+implementation does not start or retain those sessions, so it does not promise
+unlimited underwater foreground time or automatic recovery after suspension. It
+is an app-wide declaration, also applying while displaying relayed phone readings;
+it is not a background-location switch or a promise of uninterrupted BLE reception.
+
+Open xDrip, enable Water Lock manually before entering water, and disable Water Lock
+manually when finished. xDrip does not automatically engage or release Water Lock,
+read depth/motion data, request Motion & Fitness permission, or start a workout or
+extended runtime session. No additional restricted entitlement is requested.
+See Apple's [submersion setup](https://developer.apple.com/documentation/coremotion/accessing-submersion-data).
+
 ## Device checkpoint
 
 - With location off, verify ordinary phone scanning and both transfer directions.
@@ -48,6 +64,9 @@ and [`allowsBackgroundLocationUpdates`](https://developer.apple.com/documentatio
 - Re-enable, return collection to phone, then refresh: location must be waiting for
   Watch selection, rather than receiving updates. Repeat with a phone NFC reset
   delivered to the Watch.
+- With Water Lock enabled, check that visible xDrip stays frontmost under water.
+  Repeat with location off and on. Check BLE recovery separately after leaving
+  water; staying visible does not establish radio connectivity.
 - Relaunch Watch with the option enabled. Confirm foreground restart; also test
   denied permission and recovery after restoring permission in Settings.
 

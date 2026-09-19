@@ -751,3 +751,10 @@ It does not change the shared BLE protocol or the ordinary phone NFC path.
 - [Physical runtime checks](DirectLibreRuntime.md#device-checkpoint) remain pending.
 
 Local validation artifacts: `validation/integrated-runtime` outside the checkout.
+
+### Minimal underwater foreground support
+
+Restored only `WKBackgroundModes = [underwater-depth]` on the Watch app.
+Property-list validation passed. No depth manager, automatic Water Lock, workout,
+Motion & Fitness prompt or restricted entitlement was added. Underwater foreground
+behaviour remains a physical-device check.
