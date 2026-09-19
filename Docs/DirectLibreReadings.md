@@ -4,6 +4,10 @@ The shared Libre collector supplies the same converted `GlucoseData` on both
 platforms. On Watch, each frame updates the existing display/complication path.
 Only its newest actual measurement is added to the upload queue; interpolated
 points used for the Watch graph are not uploaded as additional measurements.
+Direct Watch trend arrows use the shared phone slope calculation and arrow
+thresholds, based on the newest two readings. Equal timestamps, insufficient
+history or gaps over 21 minutes leave the trend unknown. Existing stale-display
+rules still apply.
 
 ## Delivery
 

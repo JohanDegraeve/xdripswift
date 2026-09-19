@@ -661,9 +661,15 @@ final class WatchStateModel: NSObject, ObservableObject {
         guard let latestDate = dates.first, let latestValue = values[latestDate] else { return }
         let previousDate = dates.first { latestDate - $0 >= 5 * 60 && latestDate - $0 <= 6 * 60 }
         let delta = previousDate.flatMap { values[$0] }.map { latestValue - $0 } ?? 0
+        var trend = 0
+        if let previousDate = dates.dropFirst().first, let previousValue = values[previousDate] {
+            let (slope, hidden) = GlucoseTrend.slope(currentValue: latestValue, currentDate: Date(timeIntervalSince1970: latestDate),
+                                                   previousValue: previousValue, previousDate: Date(timeIntervalSince1970: previousDate))
+            trend = GlucoseTrend.ordinal(slope: slope, hideSlope: hidden)
+        }
         let processed = processBgReadingsFromDictionary(dictionary: [
             "bgReadingDatesAsDouble": dates, "bgReadingValues": dates.compactMap { values[$0] },
-            "slopeOrdinal": 0, "deltaValueInUserUnit": delta.mgDlToMmol(mgDl: isMgDl), "generatedAt": Date().timeIntervalSince1970
+            "slopeOrdinal": trend, "deltaValueInUserUnit": delta.mgDlToMmol(mgDl: isMgDl), "generatedAt": Date().timeIntervalSince1970
         ])
         sensorAgeInMinutes = Double(sensorAge)
         keepAliveIsDisabled = false

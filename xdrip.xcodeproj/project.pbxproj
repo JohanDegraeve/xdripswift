@@ -846,6 +846,10 @@
 		C1A006333D45A906725BE1F0 /* Libre2HistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A0065DAD578BBD5AEF6369 /* Libre2HistoryTests.swift */; };
 		C1A00636354D258259995812 /* Libre2PhoneHistorySyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A0069EB668790F177FD94F /* Libre2PhoneHistorySyncTests.swift */; };
 		C1A0067B621E4F222EEC41F2 /* Libre2PhoneHistoryUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A0064EB6FBC550159A1281 /* Libre2PhoneHistoryUpdateTests.swift */; };
+		C1A007FA9751C4E5B1FBB91D /* GlucoseTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A007514B52AF0FC8A7CD03 /* GlucoseTrend.swift */; };
+		C1A007373F68D8D63B5F948E /* GlucoseTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A007514B52AF0FC8A7CD03 /* GlucoseTrend.swift */; };
+		C1A00710254B5722606DD66F /* GlucoseTrendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A007696076FBF758AA070D /* GlucoseTrendTests.swift */; };
+		C1A00789820C749C2F0875AD /* ConstantsBGGraphBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2034,6 +2038,8 @@
 		C1A0065DAD578BBD5AEF6369 /* Libre2HistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2HistoryTests.swift; sourceTree = "<group>"; };
 		C1A0069EB668790F177FD94F /* Libre2PhoneHistorySyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2PhoneHistorySyncTests.swift; sourceTree = "<group>"; };
 		C1A0064EB6FBC550159A1281 /* Libre2PhoneHistoryUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2PhoneHistoryUpdateTests.swift; sourceTree = "<group>"; };
+		C1A007514B52AF0FC8A7CD03 /* GlucoseTrend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseTrend.swift; sourceTree = "<group>"; };
+		C1A007696076FBF758AA070D /* GlucoseTrendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseTrendTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2612,6 +2618,7 @@
 		4F2600213002000200000001 /* xDrip Tests */ = {
 			isa = PBXGroup;
 			children = (
+				C1A007696076FBF758AA070D /* GlucoseTrendTests.swift */,
 				C1A0064EB6FBC550159A1281 /* Libre2PhoneHistoryUpdateTests.swift */,
 				C1A0069EB668790F177FD94F /* Libre2PhoneHistorySyncTests.swift */,
 				C1A0065DAD578BBD5AEF6369 /* Libre2HistoryTests.swift */,
@@ -3762,6 +3769,7 @@
 		F8F971F023A5915900C3F17D /* Generic */ = {
 			isa = PBXGroup;
 			children = (
+				C1A007514B52AF0FC8A7CD03 /* GlucoseTrend.swift */,
 				F8C9784C2428052D00A09483 /* CGMSensorType.swift */,
 				F8F971F123A5915900C3F17D /* CGMTransmitter.swift */,
 				F8F971F323A5915900C3F17D /* CGMTransmitterDelegate.swift */,
@@ -4349,6 +4357,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1A00789820C749C2F0875AD /* ConstantsBGGraphBuilder.swift in Sources */,
+				C1A007373F68D8D63B5F948E /* GlucoseTrend.swift in Sources */,
 				C1A0067682CAFCC6A0D5A175 /* Libre2WatchHistorySync.swift in Sources */,
 				C1A006CF4213D954D9DDDDDF /* Libre2JournalFile.swift in Sources */,
 				C1A0061C528002AD471EFEEE /* Libre2HistoryQueue.swift in Sources */,
@@ -4449,6 +4459,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1A00710254B5722606DD66F /* GlucoseTrendTests.swift in Sources */,
 				C1A0067B621E4F222EEC41F2 /* Libre2PhoneHistoryUpdateTests.swift in Sources */,
 				C1A00636354D258259995812 /* Libre2PhoneHistorySyncTests.swift in Sources */,
 				C1A006333D45A906725BE1F0 /* Libre2HistoryTests.swift in Sources */,
@@ -4477,6 +4488,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1A007FA9751C4E5B1FBB91D /* GlucoseTrend.swift in Sources */,
 				C1A00654DE70E772CE5F9431 /* Libre2PhoneReadingProcessing.swift in Sources */,
 				C1A006C47D304D3973B3F328 /* Libre2PhoneHistorySync.swift in Sources */,
 				C1A006A70F880B9AED73C198 /* Libre2PhoneHistoryUpdate.swift in Sources */,

@@ -595,3 +595,20 @@ Local check scripts/results are in the workspace's `validation/integrated-histor
 Physical-device checks, real export behavior and background delivery remain pending;
 follow [the milestone workflow](DirectLibreReadings.md#milestone-6-device-check).
 Personal signing, plist and scheme edits are excluded from feature commits.
+
+
+### Direct Watch trend arrows
+
+The direct display path still supplied `slopeOrdinal = 0` (unknown). It now
+calculates the trend from its newest two values. The existing phone slope and
+ordinal functions were extracted to `GlucoseTrend`, shared with Watch; both the
+phone database reading and snapshot delegate to it. There is no second set of
+thresholds, and NFC/Bluetooth/selection logic is unchanged.
+
+Four focused trend tests pass, including every arrow boundary, elapsed-time
+scaling, flat values and the exact 21-minute cutoff. An executable comparison of
+1,288 slope cases preserves the previous phone results and both ordinal methods.
+The actual Watch display-mapping method also passes arrow/complication-routing
+checks with presentation doubles. Phone and Watch SDK typechecking passes. Full Xcode and
+physical-display verification remain subject to the milestone's existing build
+and device gate.

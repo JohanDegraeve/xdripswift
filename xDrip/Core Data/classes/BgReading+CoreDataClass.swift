@@ -87,26 +87,7 @@ public class BgReading: NSManagedObject {
     }
     
     func slopeOrdinal() -> Int {
-        let slope_by_minute = calculatedValueSlope * 60000
-        var ordinal = 0
-        if(!hideSlope) {
-            if (slope_by_minute <= (-3.5)) {
-                ordinal = 7
-            } else if (slope_by_minute <= (-2)) {
-                ordinal = 6
-            } else if (slope_by_minute <= (-1)) {
-                ordinal = 5
-            } else if (slope_by_minute <= (1)) {
-                ordinal = 4
-            } else if (slope_by_minute <= (2)) {
-                ordinal = 3
-            } else if (slope_by_minute <= (3.5)) {
-                ordinal = 2
-            } else {
-                ordinal = 1
-            }
-        }
-        return ordinal
+        return GlucoseTrend.ordinal(slope: calculatedValueSlope, hideSlope: hideSlope)
     }
     
     /// creates string with bg value in correct unit or "HIGH" or "LOW", or other like ???
@@ -242,11 +223,8 @@ public class BgReading: NSManagedObject {
     /// - returns:
     ///     - calculated slope and hideSlope
     func calculateSlope(lastBgReading:BgReading) -> (Double, Bool) {
-        if timeStamp == lastBgReading.timeStamp || timeStamp.toMillisecondsAsDouble() - lastBgReading.timeStamp.toMillisecondsAsDouble() > Double(ConstantsBGGraphBuilder.maxSlopeInMinutes * 60 * 1000) {
-            return (0, true)
-        }
-        
-        return ((lastBgReading.finalValue - finalValue) / (lastBgReading.timeStamp.toMillisecondsAsDouble() - timeStamp.toMillisecondsAsDouble()), false)
+        return GlucoseTrend.slope(currentValue: finalValue, currentDate: timeStamp,
+                                 previousValue: lastBgReading.finalValue, previousDate: lastBgReading.timeStamp)
     }
 
     var finalValue: Double {
@@ -328,28 +306,7 @@ public struct BgReadingSnapshot: Sendable, Hashable {
     }
 
     public func slopeOrdinal() -> Int {
-        var ordinal = 0
-        let slopeByMinute = calculatedValueSlope * 60000
-
-        if !hideSlope {
-            if slopeByMinute <= (-3.5) {
-                ordinal = 7
-            } else if slopeByMinute <= (-2) {
-                ordinal = 6
-            } else if slopeByMinute <= (-1) {
-                ordinal = 5
-            } else if slopeByMinute <= 1 {
-                ordinal = 4
-            } else if slopeByMinute <= 2 {
-                ordinal = 3
-            } else if slopeByMinute <= 3.5 {
-                ordinal = 2
-            } else {
-                ordinal = 1
-            }
-        }
-
-        return ordinal
+        return GlucoseTrend.ordinal(slope: calculatedValueSlope, hideSlope: hideSlope)
     }
     
     func bgRangeDescription() -> BgRangeDescription {
