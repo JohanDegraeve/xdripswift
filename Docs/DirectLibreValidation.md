@@ -592,8 +592,9 @@ Validation:
   claimed. No app-source workaround was made for this environment limitation.
 
 Local check scripts/results are in the workspace's `validation/integrated-history`.
-Physical-device checks, real export behavior and background delivery remain pending;
-follow [the milestone workflow](DirectLibreReadings.md#milestone-6-device-check).
+The user subsequently passed the requested device gate (see acceptance below).
+Background delivery timing remains a separate investigation; retain
+[the milestone workflow](DirectLibreReadings.md#milestone-6-device-check) for regression checks.
 Personal signing, plist and scheme edits are excluded from feature commits.
 
 
@@ -609,9 +610,9 @@ Four focused trend tests pass, including every arrow boundary, elapsed-time
 scaling, flat values and the exact 21-minute cutoff. An executable comparison of
 1,288 slope cases preserves the previous phone results and both ordinal methods.
 The actual Watch display-mapping method also passes arrow/complication-routing
-checks with presentation doubles. Phone and Watch SDK typechecking passes. Full Xcode and
-physical-display verification remain subject to the milestone's existing build
-and device gate.
+checks with presentation doubles. Phone and Watch SDK typechecking passes.
+Physical-display verification subsequently passed in the user's device gate below;
+the automated full-build environment limitation remains.
 
 ### Antenna animation restoration
 
@@ -625,5 +626,24 @@ The actual Watch coordinator/animation-predicate harness passes the scan/connect
 restart, late callback, return/NFC race and Bluetooth-off cases. Phone and Watch
 SDK typechecks pass. Removing the added presentation notifications reproduces the
 prior radio source exactly: no connection, cancellation, timeout or retry policy
-was changed. There is no new polling timer. Check the visible pulse on-device;
-full builds retain the previously documented compiler-plugin limitation here.
+was changed. There is no new polling timer. The user subsequently passed the
+antenna device check below; automated full builds retain the previously documented
+compiler-plugin limitation here.
+
+
+### Milestone 6 device acceptance (2026-09-19)
+
+After pushing through `8f0b3897`, the user reported **all requested tests passed**:
+
+- New phone-to-Watch transfer and live Watch-to-phone reading synchronisation.
+- Configured uploads/sharing and missed-reading behaviour while fresh values arrive.
+- Collection with the phone unavailable, followed by latest delivery and history
+  recovery without duplicate graph points.
+- Watch restart with the phone unavailable, retaining units, limits and recent data.
+- Trend arrows, antenna behaviour and return to phone collection.
+
+This records the user's physical-device result, not an automated measurement of
+latency. The earlier controlled interrupted-transfer check remains outstanding.
+Both-apps-backgrounded delivery timing and optional runtime features were excluded
+from this gate and are not established by this result. Proceed to the interface
+milestone; keep the Bluetooth-manager lifetime investigation paused.

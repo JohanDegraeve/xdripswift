@@ -45,9 +45,13 @@ lifetime and reconnect policy are unchanged. Milestone 6 now adds durable Watch
 history, independent latest delivery, sensor-specific phone import, shared ordinary
 post-storage processing, explicit unresolved-reading deletion and restoration of
 Watch display preferences/cache. See [readings and device checks](DirectLibreReadings.md).
-The milestone 6 device gate is pending. Interrupted transfer still needs a controlled
-test. Final interface polish and optional background features remain later milestones;
-this checkpoint is not yet feature-equivalent to the reference prototype.
+The user reports that all requested milestone 6 device checks passed on the pushed
+checkpoint `8f0b3897`: live synchronisation, configured downstream services, offline
+history recovery, Watch display persistence, trend/antenna behaviour and return to
+phone. Milestone 6 is accepted. Next is milestone 7: finish the Advanced Settings
+interface. Interrupted transfer still needs a controlled test; background delivery
+timing and optional runtime features remain separate work. This checkpoint is not
+yet feature-equivalent to the reference prototype.
 
 An installation over the prototype disconnected until the app was reinstalled.
 A retained unlock-code mismatch is a plausible code-supported explanation, not a
