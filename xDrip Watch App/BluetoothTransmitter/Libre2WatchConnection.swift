@@ -189,7 +189,11 @@ final class Libre2WatchConnection: NSObject, ObservableObject, BluetoothTransmit
     }
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
         guard transmitter === bluetoothTransmitter else { return }
-        if state == .poweredOn && store.snapshot?.allowsWatch == true { bluetoothTransmitter.connect() }
+        // Like the phone delegate, start discovery only for an unknown peripheral.
+        // The shared Bluetooth manager already reconnects known peripherals on power-on.
+        if state == .poweredOn && store.snapshot?.allowsWatch == true && bluetoothTransmitter.deviceAddress == nil {
+            _ = bluetoothTransmitter.startScanning()
+        }
         if state != .poweredOn { connected = false; activity = nil; status = "Bluetooth unavailable" }
     }
     func error(message: String) { status = message }

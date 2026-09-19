@@ -713,3 +713,23 @@ Validation:
 The Watch antenna, double-tap restart, history transport and normal phone NFC/BLE
 behaviour are unchanged in this milestone. Optional runtime features remain the
 next milestone after this device gate.
+
+### Watch power-on alignment (2026-09-19)
+
+The Watch Bluetooth-state delegate now mirrors the phone's division of responsibility:
+start discovery only when no device address is known. The shared Bluetooth manager
+already reconnects known peripherals when powered on, so the Watch delegate no longer
+adds a second retrieval/connection request. Explicit collector activation is unchanged.
+Authentication, late-callback policy, retry timing, manager lifetime, phone/NFC code and
+transfer guards are unchanged. This removes a request overlap, not a proven cause of
+the reported connection instability.
+
+Six actual-coordinator test groups pass, including known/unknown power-on, Bluetooth-off,
+selection and retired-collector guards, manual reset, return/NFC races and antenna state.
+The Watch coordinator and its dependencies pass watchOS SDK typechecking; existing
+WatchKit deprecation warnings remain. Macro-bearing screens are excluded, as before;
+a full app build is not claimed. Checks are in workspace `validation/integrated-power-on`.
+
+Device check pending: transfer to Watch, cycle Watch Bluetooth off/on with xDrip visible,
+and confirm automatic reconnection. Also verify double-tap discovery and return to phone.
+Optional background runtime support remains a separate milestone.
