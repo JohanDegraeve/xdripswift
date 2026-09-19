@@ -40,11 +40,14 @@ The user subsequently passed the remaining requested restart, signal-loss,
 double-tap and NFC-reclaim checks. Interrupted transfer remains untested because
 the transaction completed before the app could be closed. The user also reports
 possibly slower Watch connections than the prototype; timing is not yet measured.
-Next: investigate connection timing and verify interrupted-transfer recovery with
-a controlled test. History synchronisation,
-full display/settings persistence, the final interface and optional background
-features remain later milestones. This checkpoint is not yet feature-equivalent
-to the reference prototype.
+Connection-timing investigation is paused at the user's request; Bluetooth manager
+lifetime and reconnect policy are unchanged. Milestone 6 now adds durable Watch
+history, independent latest delivery, sensor-specific phone import, shared ordinary
+post-storage processing, explicit unresolved-reading deletion and restoration of
+Watch display preferences/cache. See [readings and device checks](DirectLibreReadings.md).
+The milestone 6 device gate is pending. Interrupted transfer still needs a controlled
+test. Final interface polish and optional background features remain later milestones;
+this checkpoint is not yet feature-equivalent to the reference prototype.
 
 An installation over the prototype disconnected until the app was reinstalled.
 A retained unlock-code mismatch is a plausible code-supported explanation, not a

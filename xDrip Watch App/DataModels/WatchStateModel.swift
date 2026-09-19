@@ -137,6 +137,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         self.session = session
         super.init()
 
+        restoreComplicationState()
         Libre2WatchConnection.shared.readingsReceived = { [weak self] readings, age in
             self?.receiveDirectLibre(readings, sensorAge: age)
         }
@@ -628,9 +629,31 @@ final class WatchStateModel: NSObject, ObservableObject {
         }
     }
 
+    /// The existing complication cache already persists readings, units and limits together.
+    /// Restore it before a status-only reply can publish an empty/default complication.
+    private func restoreComplicationState() {
+        guard let defaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName),
+              let data = defaults.data(forKey: "complicationSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)"),
+              let cached = try? JSONDecoder().decode(ComplicationSharedUserDefaultsModel.self, from: data) else { return }
+        isMgDl = cached.isMgDl
+        urgentLowLimitInMgDl = cached.urgentLowLimitInMgDl
+        lowLimitInMgDl = cached.lowLimitInMgDl
+        highLimitInMgDl = cached.highLimitInMgDl
+        urgentHighLimitInMgDl = cached.urgentHighLimitInMgDl
+        if Libre2ConnectionStore.shared.snapshot?.sessionID != nil,
+           cached.bgReadingValues.count == cached.bgReadingDatesAsDouble.count {
+            _ = processBgReadingsFromDictionary(dictionary: [
+                "bgReadingValues": cached.bgReadingValues, "bgReadingDatesAsDouble": cached.bgReadingDatesAsDouble,
+                "slopeOrdinal": cached.slopeOrdinal, "deltaValueInUserUnit": cached.deltaValueInUserUnit
+            ])
+        }
+    }
+
     /// Reuse the existing chart/complication update path for the direct collector.
     private func receiveDirectLibre(_ readings: [GlucoseData], sensorAge: UInt16) {
-        var values = Dictionary(zip(bgReadingDates.map { $0.timeIntervalSince1970 }, bgReadingValues), uniquingKeysWith: { _, latest in latest })
+        guard let oldestFrameDate = readings.map({ $0.timeStamp }).min() else { return }
+        let olderHistory = zip(bgReadingDates, bgReadingValues).filter { $0.0 < oldestFrameDate }
+        var values = Dictionary(olderHistory.map { ($0.0.timeIntervalSince1970, $0.1) }, uniquingKeysWith: { _, latest in latest })
         for reading in readings where reading.glucoseLevelRaw > 0 {
             values[reading.timeStamp.timeIntervalSince1970] = reading.glucoseLevelRaw
         }
@@ -643,6 +666,8 @@ final class WatchStateModel: NSObject, ObservableObject {
             "slopeOrdinal": 0, "deltaValueInUserUnit": delta.mgDlToMmol(mgDl: isMgDl), "generatedAt": Date().timeIntervalSince1970
         ])
         sensorAgeInMinutes = Double(sensorAge)
+        keepAliveIsDisabled = false
+        sensorNoiseStateRawValue = nil
         if processed { updateComplicationData() }
     }
 
@@ -717,14 +742,20 @@ final class WatchStateModel: NSObject, ObservableObject {
             return false
         }
 
-        isMgDl = dictionary["isMgDl"] as? Bool ?? true
-        urgentLowLimitInMgDl = dictionary["urgentLowLimitInMgDl"] as? Double ?? 60
-        lowLimitInMgDl = dictionary["lowLimitInMgDl"] as? Double ?? 70
-        highLimitInMgDl = dictionary["highLimitInMgDl"] as? Double ?? 180
-        urgentHighLimitInMgDl = dictionary["urgentHighLimitInMgDl"] as? Double ?? 250
+        let previousUnits = isMgDl
+        isMgDl = dictionary["isMgDl"] as? Bool ?? isMgDl
+        if Libre2ConnectionStore.shared.snapshot?.allowsWatch == true, previousUnits != isMgDl {
+            deltaValueInUserUnit = isMgDl ? deltaValueInUserUnit.mmolToMgdl() : deltaValueInUserUnit.mgDlToMmol()
+        }
+        urgentLowLimitInMgDl = dictionary["urgentLowLimitInMgDl"] as? Double ?? urgentLowLimitInMgDl
+        lowLimitInMgDl = dictionary["lowLimitInMgDl"] as? Double ?? lowLimitInMgDl
+        highLimitInMgDl = dictionary["highLimitInMgDl"] as? Double ?? highLimitInMgDl
+        urgentHighLimitInMgDl = dictionary["urgentHighLimitInMgDl"] as? Double ?? urgentHighLimitInMgDl
         updatedDate = Date(timeIntervalSince1970: generatedAt)
         activeSensorDescription = dictionary["activeSensorDescription"] as? String ?? ""
-        sensorAgeInMinutes = dictionary["sensorAgeInMinutes"] as? Double ?? 0
+        if Libre2ConnectionStore.shared.snapshot?.allowsWatch != true {
+            sensorAgeInMinutes = dictionary["sensorAgeInMinutes"] as? Double ?? 0
+        }
         sensorMaxAgeInMinutes = dictionary["sensorMaxAgeInMinutes"] as? Double ?? 0
         preferSensorCountdown = dictionary["preferSensorCountdown"] as? Bool ?? false
         sensorNoiseStateRawValue = dictionary["sensorNoiseStateRawValue"] as? Int
@@ -746,6 +777,13 @@ final class WatchStateModel: NSObject, ObservableObject {
             aidStatus = nil
         }
 
+        if Libre2ConnectionStore.shared.snapshot?.allowsWatch == true {
+            if let sensor = try? Libre2WatchSession.load(from: Libre2ConnectionStore.shared.sessionURL) {
+                activeSensorDescription = "Libre 2 " + sensor.serialNumber
+            }
+            sensorNoiseStateRawValue = nil
+            keepAliveIsDisabled = false
+        }
         return true
     }
 

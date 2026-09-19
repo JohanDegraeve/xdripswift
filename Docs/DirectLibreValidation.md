@@ -559,3 +559,39 @@ delay. Separate transfer time, time to didConnect/green antenna, and time to fir
 fresh reading before changing connection behavior. Keep the Watch visibly active
 and other sensor connections stopped for comparisons. No runtime changes were
 made for this performance observation.
+
+
+## Milestone 6 — readings and synchronisation (2026-09-19)
+
+Reused the prototype's acknowledged-history/latest-message design with the
+integrated collector and selection model. No old ownership records or message
+migration was added. The new registry must be created by a new transfer. Ordinary
+NFC and Bluetooth lifecycle sources are unchanged in this milestone.
+
+Validation:
+
+- 58 shared protocol/collector/selection/history/current-reading tests passed.
+- 27 Watch delivery cases and 8 phone scheduling cases passed using the actual
+  transport code with WatchConnectivity/storage doubles. These cover independent
+  latest delivery, context updates, immutable acknowledgements, save failure,
+  unresolved batches and cleanup. They do not simulate Apple's scheduling.
+- 96 ordinary phone processing combinations matched the previous implementation's
+  downstream call order and arguments. Current versus historical imports,
+  post-processing suppression and unrelated sensor history also passed.
+- The existing restart/return/NFC race harness passed with the history callback
+  dependency supplied as a test double. No manager-lifetime policy was changed.
+- Watch model, history transport and collector dependencies passed watchOS SDK
+  typechecking (macro-bearing screens excluded).
+- Phone managers, importer, shared downstream coordinator and hosted Core Data
+  tests passed iOS SDK typechecking against the real app dependency graph.
+  The Core Data tests are in the Xcode test target, but were not executed here.
+- Full unsigned phone and Watch builds were attempted with all outputs under
+  `/tmp/libre-integrated-history-*`. Both remain blocked by the existing SwiftUI
+  compiler-plugin sandbox failure in extension targets. The new settings view's
+  `@State` likewise needs the working macro environment; a full build is not
+  claimed. No app-source workaround was made for this environment limitation.
+
+Local check scripts/results are in the workspace's `validation/integrated-history`.
+Physical-device checks, real export behavior and background delivery remain pending;
+follow [the milestone workflow](DirectLibreReadings.md#milestone-6-device-check).
+Personal signing, plist and scheme edits are excluded from feature commits.
