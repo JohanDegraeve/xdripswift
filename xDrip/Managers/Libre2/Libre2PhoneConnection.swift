@@ -10,6 +10,7 @@ final class Libre2PhoneConnection: ObservableObject {
     weak var transmitter: CGMLibre2Transmitter? {
         didSet { lastReading = nil; refresh() }
     }
+    var registerHistorySession: ((Libre2WatchSession, @escaping (Result<Void, Error>) -> Void) -> Void)?
     private var lastReading: Date?
     private var operationID: UUID?
     @Published private(set) var phase: Libre2ConnectionStore.Phase?
@@ -17,6 +18,33 @@ final class Libre2PhoneConnection: ObservableObject {
     @Published private(set) var reachable = false
     @Published private(set) var busy = false
     @Published private(set) var recentReading = false
+    @Published private(set) var historyStatus = ""
+    @Published private(set) var unresolvedReadings: Libre2UnresolvedReadings?
+
+    func inspectUnresolvedReadings() { requestHistoryCleanup(.inspect) }
+    func deleteUnresolvedReadings(_ confirmed: Libre2UnresolvedReadings) { requestHistoryCleanup(.delete(confirmed)) }
+
+    private func requestHistoryCleanup(_ request: Libre2HistoryCleanupRequest) {
+        guard WCSession.default.activationState == .activated, WCSession.default.isReachable else {
+            historyStatus = "Open the Watch app to inspect or delete unresolved readings."
+            return
+        }
+        do {
+            let message = try request.dictionary
+            WCSession.default.sendMessage(message, replyHandler: { reply in
+                DispatchQueue.main.async {
+                    do {
+                        if let error = reply["error"] as? String { throw Libre2ConnectionError(error) }
+                        let unresolved = try Libre2UnresolvedReadings.decode(reply)
+                        self.unresolvedReadings = unresolved
+                        self.historyStatus = "Unresolved readings on Watch: \(unresolved.count)"
+                    } catch { self.historyStatus = error.localizedDescription }
+                }
+            }, errorHandler: { error in
+                DispatchQueue.main.async { self.historyStatus = error.localizedDescription }
+            })
+        } catch { historyStatus = error.localizedDescription }
+    }
 
     private init() {
         phase = store.snapshot?.phase
@@ -58,7 +86,15 @@ final class Libre2PhoneConnection: ObservableObject {
             busy = true
             status = "Preparing Watch"
             refresh()
-            prepare(session, transmitter: transmitter, operation: operationID!)
+            guard let registerHistorySession = registerHistorySession else { throw Libre2HistoryError.unavailable }
+            let operation = operationID!
+            registerHistorySession(session) { [weak self, weak transmitter] result in
+                guard let self = self, let transmitter = transmitter, self.current(session.id, operation) else { return }
+                do {
+                    try result.get()
+                    self.prepare(session, transmitter: transmitter, operation: operation)
+                } catch { self.failed(error) }
+            }
         } catch { failed(error) }
     }
 

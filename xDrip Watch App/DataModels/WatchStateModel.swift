@@ -856,6 +856,7 @@ extension WatchStateModel: WCSessionDelegate {
             guard let self = self, activationState == .activated else { return }
 
             Libre2WatchConnection.shared.restore()
+            Libre2WatchHistorySync.shared.resume()
             self.requestWatchStateUpdate()
             // if the AGP tab requested data while activation was pending, send it now
             self.sendPendingAGPRequestIfPossible()
@@ -864,6 +865,7 @@ extension WatchStateModel: WCSessionDelegate {
 
     func sessionReachabilityDidChange(_: WCSession) {
         DispatchQueue.main.async {
+            Libre2WatchHistorySync.shared.flush()
             // retry AGP requests that were made before the phone became reachable
             self.sendPendingAGPRequestIfPossible()
         }
@@ -871,6 +873,8 @@ extension WatchStateModel: WCSessionDelegate {
 
     func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
         DispatchQueue.main.async {
+            if Libre2WatchHistorySync.shared.receiveCleanup(message, reply: replyHandler) { return }
+            if Libre2WatchHistorySync.shared.receive(message) { replyHandler([:]); return }
             if message[Libre2ConnectionMessage.key] != nil {
                 Libre2WatchConnection.shared.receive(message, reply: replyHandler)
             } else {
@@ -889,6 +893,7 @@ extension WatchStateModel: WCSessionDelegate {
 
     func session(_: WCSession, didReceiveMessage message: [String: Any]) {
         DispatchQueue.main.async {
+            guard !Libre2WatchHistorySync.shared.receive(message) else { return }
             self.processWatchPayloadFromDictionary(dictionary: message)
             self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorActive
 
@@ -902,6 +907,7 @@ extension WatchStateModel: WCSessionDelegate {
 
     func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
         DispatchQueue.main.async {
+            guard !Libre2WatchHistorySync.shared.receive(userInfo) else { return }
             self.processWatchPayloadFromDictionary(dictionary: userInfo)
         }
     }

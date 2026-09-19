@@ -130,12 +130,16 @@ final class Libre2WatchConnection: NSObject, ObservableObject, BluetoothTransmit
         direct = true
         guard transmitter == nil else { return }
         let expectedID = store.snapshot?.sessionID
-        guard try Libre2WatchSession.load(from: store.sessionURL).id == expectedID else {
+        let session = try Libre2WatchSession.load(from: store.sessionURL)
+        guard session.id == expectedID else {
             throw Libre2ConnectionError("Saved Watch session does not match the selected transfer.")
         }
         transmitter = try Libre2WatchTransmitter(sessionURL: store.sessionURL, bluetoothTransmitterDelegate: self, reuseKnownPeripheral: reuseKnownPeripheral) { [weak self] readings, age in
             guard let self = self, self.store.snapshot?.allowsWatch == true,
                   self.store.snapshot?.sessionID == expectedID else { return }
+            if let latest = readings.max(by: { $0.timeStamp < $1.timeStamp }) {
+                Libre2WatchHistorySync.shared.collect(latest, sensorMinute: age, session: session)
+            }
             self.readingsReceived?(readings, age)
         }
         status = "Connecting"
