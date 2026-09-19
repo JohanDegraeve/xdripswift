@@ -65,7 +65,7 @@ storage succeeds.
 
 A batch containing an unknown/deleted phone sensor is rejected only for those
 measurements. The Watch saves them separately as unresolved and continues with
-other sensors. **Advanced Settings → Direct Libre (Experimental) → Watch readings**
+other sensors. **Advanced Settings → Direct Libre (Experimental) → Unresolved Watch readings**
 can inspect and explicitly delete unresolved readings while the Watch is
 reachable. Confirmation applies to exactly the inspected revision/count; a
 restart or newly unresolved readings requires inspection again. It never deletes

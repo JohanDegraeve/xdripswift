@@ -48,9 +48,13 @@ Watch display preferences/cache. See [readings and device checks](DirectLibreRea
 The user reports that all requested milestone 6 device checks passed on the pushed
 checkpoint `8f0b3897`: live synchronisation, configured downstream services, offline
 history recovery, Watch display persistence, trend/antenna behaviour and return to
-phone. Milestone 6 is accepted. Next is milestone 7: finish the Advanced Settings
-interface. Interrupted transfer still needs a controlled test; background delivery
-timing and optional runtime features remain separate work. This checkpoint is not
+phone. Milestone 6 is accepted. Milestone 7 now streamlines Advanced Settings with
+one device switch, a selection-aware checklist, conditional recovery, collapsed
+unresolved-reading controls and bounded recent activity. Readiness uses existing
+connection events and one local reading-expiry update while the page is visible;
+there is no Watch polling. Interface device checks are pending (see validation).
+Interrupted transfer still needs a controlled test; background delivery timing and
+optional runtime features remain separate work. This checkpoint is not
 yet feature-equivalent to the reference prototype.
 
 An installation over the prototype disconnected until the app was reinstalled.

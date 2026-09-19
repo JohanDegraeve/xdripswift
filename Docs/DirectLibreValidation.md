@@ -647,3 +647,69 @@ latency. The earlier controlled interrupted-transfer check remains outstanding.
 Both-apps-backgrounded delivery timing and optional runtime features were excluded
 from this gate and are not established by this result. Proceed to the interface
 milestone; keep the Bluetooth-manager lifetime investigation paused.
+
+
+## Milestone 7 — Advanced Settings interface (2026-09-19)
+
+The configuration entry remains **Advanced Settings → Direct Libre (Experimental)**.
+The page contains:
+
+- **Collection:** selected device and one switch button. Progress/errors appear
+  during a transfer; Cancel appears only while a transfer is in progress. An
+  interrupted preparation uses Return to iPhone, preserving the normal return
+  acknowledgement before phone collection resumes.
+- **Connection checklist:** sensor/configuration, phone connection and a BLE
+  reading within three minutes when the phone is selected, followed by Watch
+  reachability. When Watch collection or return is selected, it instead shows
+  the phone collection policy as paused. This is not a claim that iOS Bluetooth
+  settings will show the physical link disconnected.
+- **Recovery:** shown for a failed/interrupted transfer or an unreachable selected
+  Watch. Recovery uses the ordinary successful NFC scan; no extra scan path,
+  verification routine or sensor popup was added.
+- **Unresolved Watch readings:** a collapsed inspection/deletion control after
+  experimental use. The existing exact-revision confirmation remains required.
+- **Recent activity:** newest five events, Show more/less, up to 80 persisted
+  entries with 300 characters per message. Transfer status and connection changes
+  are recorded, not individual glucose readings. Corrupt/unwritable diagnostic
+  storage cannot block collection.
+
+Checklist updates come from existing WatchConnectivity callbacks, phone Bluetooth
+callbacks, readings and visible-page preference/foreground changes. One cancellable
+local task expires the fresh-reading check at three minutes. It is cancelled when
+hidden/backgrounded or superseded by a new reading. No additional Watch refresh
+requests, periodic polling or Bluetooth lifecycle changes were introduced.
+
+Validation:
+
+- Five executable test groups using the actual phone coordinator with transport
+  and sensor doubles passed: readiness/zero refresh traffic; stale/configuration/
+  identity guards; confirmed-release switching order; cancelled preparation and
+  late replies; bounded log persistence, corruption and write failure. The log
+  restore check caught and corrected an unwanted startup status event.
+- The phone coordinator and modified Bluetooth delegate pass iOS SDK typechecking
+  against the real app dependency graph. The SwiftUI screen still hits this
+  environment's previously documented unavailable `SwiftUIMacros.StateMacro`.
+  Its view code passes SDK typechecking with only `@State` replaced in a temporary
+  validation copy. This is not a full build or rendered-interface test.
+- Transfer, counter, NFC reset and cleanup method bodies are unchanged apart from
+  presentation flags. The only original Bluetooth manager edits forward three
+  existing callbacks to the identity-guarded checklist refresh.
+- Local scripts/results: workspace `validation/integrated-interface`. No build
+  outputs or personal signing/plist/scheme changes are included in the commit.
+
+**Device gate (pending):** build in Xcode, then check the following on the phone:
+
+1. Open the experimental page with a recent phone reading. Confirm the checklist
+   and single switch button, then switch to Watch and back with both apps open.
+2. Confirm Watch reachability and phone sensor disconnection change their checklist
+   rows without reopening the page. With phone collection selected, let the last
+   BLE reading become older than three minutes; the freshness check must clear.
+3. Check the activity order and Show more/less after several transfers. Reopen the
+   app and confirm the history is retained without a new synthetic transfer event.
+4. Where an interrupted/unreachable transfer can be reproduced, confirm Recovery
+   appears and return/NFC reset still works. Unresolved-reading deletion must
+   remain explicitly confirmed. Do not delete wanted readings just for this check.
+
+The Watch antenna, double-tap restart, history transport and normal phone NFC/BLE
+behaviour are unchanged in this milestone. Optional runtime features remain the
+next milestone after this device gate.

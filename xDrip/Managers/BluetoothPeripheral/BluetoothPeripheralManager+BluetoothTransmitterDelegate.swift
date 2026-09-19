@@ -144,6 +144,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     }
     
     func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
+        Libre2PhoneConnection.shared.connectionChanged(from: bluetoothTransmitter)
         
         // before exiting save the changes
         defer {
@@ -302,6 +303,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
+        Libre2PhoneConnection.shared.connectionChanged(from: bluetoothTransmitter)
         
         trace("in deviceDidUpdateBluetoothState", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
         
@@ -337,6 +339,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     }
     
     func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
+        Libre2PhoneConnection.shared.connectionChanged(from: bluetoothTransmitter)
         
         trace("in didDisconnectFrom", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .debug)
         
