@@ -257,3 +257,6 @@
 "heartbeat.simpleFooter" = "Le modifiche si applicano alla prossima connessione.";
 
 "signalStrengthDisconnected" = "Disconnesso";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "Scade";

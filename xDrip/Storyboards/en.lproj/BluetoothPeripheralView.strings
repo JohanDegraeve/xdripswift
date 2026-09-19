@@ -166,3 +166,6 @@
 "heartbeat.simpleFooter" = "Changes apply on the next connection.";
 
 "signalStrengthDisconnected" = "Disconnected";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "Expires";

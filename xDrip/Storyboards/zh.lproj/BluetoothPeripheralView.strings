@@ -258,3 +258,6 @@
 "heartbeat.simpleFooter" = "更改在下次连接时生效。";
 
 "signalStrengthDisconnected" = "已断开连接";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "到期";

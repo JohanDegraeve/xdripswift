@@ -191,3 +191,6 @@
 "heartbeat.simpleFooter" = "Muutokset tulevat voimaan seuraavassa yhteydessä.";
 
 "signalStrengthDisconnected" = "Yhteys katkaistu";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "Vanhenee";

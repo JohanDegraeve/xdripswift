@@ -182,3 +182,6 @@
 "heartbeat.simpleFooter" = "Οι αλλαγές ισχύουν στην επόμενη σύνδεση.";
 
 "signalStrengthDisconnected" = "Αποσυνδέθηκε";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "Λήγει";

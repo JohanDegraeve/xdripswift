@@ -241,6 +241,8 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("transmittterExpiryDate", tableName: filename, bundle: Bundle.main, value: "Transmitter Expires", comment: "cell text, transmitter expiry date")
     }()
 
+    static let transmitterExpiresLabel = NSLocalizedString("transmitterExpiresLabel", tableName: filename, bundle: .main, value: "Expires", comment: "Label before the transmitter expiry date in its information message")
+
     static let sensorStartDate: String = {
         return NSLocalizedString("sensorStartDate", tableName: filename, bundle: Bundle.main, value: "Sensor Started", comment: "cell text, sensor start time")
     }()
