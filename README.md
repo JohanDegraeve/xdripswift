@@ -64,6 +64,8 @@ The maintained [installation documentation](https://xdrip4ios.readthedocs.io/en/
 
 ## Documentation and support
 
+This development branch includes experimental [Direct Libre on Apple Watch](Docs/DirectLibre.md): setup, usage, architecture and current limitations.
+
 - [User documentation](https://xdrip4ios.readthedocs.io/en/latest/)
 - [Installation and setup](https://xdrip4ios.readthedocs.io/en/latest/install/install/)
 - [Troubleshooting](https://xdrip4ios.readthedocs.io/en/latest/troubleshoot/)

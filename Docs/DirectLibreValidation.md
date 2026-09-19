@@ -1,785 +1,97 @@
 # Direct Libre validation
 
-## First device checkpoint: NFC separation
+Current implementation and setup: [Direct Libre guide](DirectLibre.md).
+Baseline: upstream `develop` at `83009198dc5091398333f83aa832bbe3d99e3441`.
+Historical milestone notes and superseded experiments remain in Git history; this
+file records current evidence and pending acceptance only.
 
-This branch currently contains a structural phone refactor only. Direct Watch
-switching, Watch collection and the prototype's optional features are not yet
-integrated. They remain scheduled in [the roadmap](DirectLibreRoadmap.md).
+## Established checkpoints
 
-### Changes under review
+| Area | Evidence | Limit |
+| --- | --- | --- |
+| Phone NFC/protocol extraction | Ordinary NFC, fresh readings, cancellation and signal-loss recovery passed on device; later recovery under 30 seconds | Earlier prototype-upgrade disconnect required reinstall; cause not conclusively established |
+| Shared protocol | Upstream unlock/decryption fixtures and 176 captured frame comparisons matched calibrated/raw parsing | Does not establish other Libre variant support |
+| Switching | Both directions passed with confirmed local disconnect, without Bluetooth cycling; restart, double-tap and NFC reset passed | Controlled interruption remains untested because transfer completed too quickly |
+| Readings, milestone 6 (`8f0b3897`) | User passed live sync, configured downstream services, offline history recovery, units/limits/cache, trend/antenna and return to phone | No fixed background-delivery deadline established |
+| Runtime (`2e6ff63f`) | 60 core tests; 11 location, 5 notification and 6 coordinator/antenna test groups passed; targeted SDK checks passed | Foreground/background/water/battery behaviour awaits devices |
 
-- `CGMLibre2Transmitter+NFC.swift` contains the original NFC session entry and NFC
-  delegate methods. Only the phone target compiles this file.
-- `CGMLibre2Transmitter.swift` retains BLE handling. Its phone scan entry forwards
-  to the NFC extension, while the separate BLE entry still calls the superclass.
-- The old empty non-CoreNFC placeholder is removed. This exposes the implementation
-  for future sharing; the remaining phone dependencies are not yet decoupled.
-- Six stored members become module-visible for the companion extension. Their
-  storage and lifecycle are unchanged; no new state machine is introduced.
-- Project edits only register the extension in the existing Libre2 group and
-  phone Sources phase. Watch target membership and shared schemes are unchanged.
+## Consolidation checks
 
-### Validation completed
+The cleanup removes obsolete non-NFC compilation fallback from the phone-only
+adapter, an unused reset argument/result, preparation-ID reuse no longer reachable
+through the UI, duplicate latest-reading work and deprecated Watch lifecycle naming.
+Runtime payloads and history notification types/tests are grouped with related code.
+No protocol phase, wire key, saved field, reading-retention rule or counter safeguard
+is removed. NFC session method bodies remain unchanged.
 
-- Compared all 24 original method bodies with develop: equivalent after accounting
-  for the renamed NFC entry point and the iOS-only cleanup guard.
-- Confirmed byte-identical NFC engine/delegate, generic Bluetooth lifecycle,
-  unlock crypto and parsing utilities.
-- Checked NFC target membership and project plist validity.
-- Parsed the two transmitter files using the iOS and watchOS SDKs.
-- Typechecked the actual transmitter, extension and NFC/Libre delegates against
-  both SDKs with compile-only stand-ins for other app dependencies. This checks
-  file access and conditional compilation, not full-app compatibility or radio
-  behaviour. The stand-ins are validation artefacts outside the project.
+Run the committed `GlucoseTrendTests`, `Libre2ProtocolTests`, `Libre2CollectorTests`,
+`Libre2ConnectionTests`, `Libre2HistoryTests` (including the current-reading tests in
+that file), and hosted `Libre2PhoneHistorySyncTests` through the `xdrip` test scheme.
+Hosted Core Data tests require the app test host; portable tests do not prove iOS
+persistence, UI rendering or Watch scheduling.
 
-Unmodified generic iPhone/Watch builds fail in existing extension macro expansion:
-Xcode's plugin sandbox cannot start in the agent's execution environment. The
-post-refactor iPhone build encounters the same blocker. Agent-driven full builds
-and hosted XCTest execution remain unavailable. The user subsequently confirmed
-a successful build in Xcode and the phone checks below on a clean installation.
-Detailed logs and the one-off audit scripts are in the workspace's sibling
-`validation/integrated-develop` directory, outside the source checkout.
+Cleanup verification passed: all 60 portable core tests, 27 Watch / 8 phone delivery
+scenarios, 96 ordinary-phone processing combinations, 5 phone-control and 6 Watch
+coordinator/antenna groups. Real iOS SDK checks passed for the changed phone code
+and hosted test sources; the Watch dependency closure also type-checked. NFC method
+bodies, shared BLE/authentication, wire payloads and runtime helpers were compared
+with the prior commit and are unchanged. Both full scheme builds still encounter
+the compiler-plugin blocker below. No hosted Core Data test execution is claimed.
+Local harnesses and logs are in workspace `validation/integrated-cleanup`, outside
+the checkout.
 
-### Device result and upgrade finding
+## Build environment
 
-The user confirmed that this checkout builds in Xcode and that ordinary NFC
-scanning, fresh readings, cancellation/retry and reconnection work after removing
-the installed app and installing this version. This clears the first phone device
-checkpoint for a clean installation. It does not establish upgrade compatibility.
+Xcode 27.0 (27A266a) here cannot run the SwiftUI compiler-plugin sandbox:
+`sandbox_apply: Operation not permitted` and malformed `SwiftUIMacros.StateMacro` /
+preview plugin responses. Unchanged baseline and current unsigned phone/Watch
+scheme builds encounter this blocker in existing extension/chart sources. CoreSimulator
+services are also unavailable in this execution environment. Successful targeted
+SDK type-checks are not complete builds. UI checks using temporary State-wrapper
+substitutes establish types only, not macro expansion or rendering.
 
-Installing over the previous Direct Libre prototype initially caused immediate
-sensor disconnection. Collection had already been returned to the phone and the
-Watch collector stopped. The saved state and failing trace were not captured
-before removal, so the exact cause cannot be confirmed retrospectively.
-
-Code inspection identified a specific credential mismatch that could explain it:
-
-- The prototype's experimental NFC reset can persist a non-default unlock code
-  in `UserDefaults.standard.libreActiveSensorUnlockCode`.
-- Develop's `LibreNFC` provisions streaming with the fixed code `42`.
-- Develop's BLE transmitter uses the saved unlock code; its NFC-success callback
-  resets the counter but does not replace that code.
-- With a non-default value left by the prototype, the two paths therefore use
-  different credentials. Without that saved override, the getter returns `42`.
-
-The integration must keep NFC-provisioned and BLE-used credentials consistent.
-Carry this into the configuration/persistence work and add a retained-non-default-
-code regression case. Distinguish normal upstream upgrades from the experimental
-prototype transition; do not add a broad data wipe or make reinstallation part
-of the supported workflow. No scan behaviour or recovery code was changed in
-response to this report.
-
-### Physical-device checks
-
-Before replacing an installed prototype, return collection to the phone and stop
-Direct Libre collection on the Watch. This intermediate branch does not contain
-switching or revocation logic and cannot manage the old Watch collector.
-
-Use your normal signing team and app-group setup. First confirm an unmodified
-`develop` build on the device if it has not been tested on this setup. Then test
-this branch with the same sensor and settings:
-
-1. Build and launch the phone app; ensure the ordinary relayed Watch app builds.
-2. Run the ordinary Libre NFC scan. Confirm the expected identity and existing
-   messages, followed by BLE connection and fresh glucose readings.
-3. Observe several subsequent readings, graph updates and the configured upload
-   or sharing path. No new Direct Libre UI should appear at this stage.
-4. Cancel a scan and retry through the ordinary interface. Compare with develop;
-   the refactor intentionally does not fix pre-existing scan/retry behaviour.
-5. Reopen the app and test normal reconnection after a brief signal loss. Confirm
-   subsequent readings rather than relying only on Bluetooth's connected state.
-6. Report build errors or a behavioural difference before the next milestone.
-
-### Build locations
-
-Upstream's Debug and Release project settings have empty OBJROOT and SYMROOT.
-They are intentionally not changed by the NFC refactor. For command-line checks,
-provide absolute output locations along with DerivedData, for example from the
-checkout root:
+Use normal Xcode device builds for acceptance. Keep personal signing/scheme changes
+out of feature commits. For command-line compile checks, use explicit output paths
+because upstream empty OBJROOT/SYMROOT settings can produce root/repository artifacts:
 
 ```sh
-xcodebuild -project xdrip.xcodeproj -scheme xdrip \
-  -configuration Debug -destination 'generic/platform=iOS' \
-  -derivedDataPath /tmp/xdrip-integrated-check \
-  OBJROOT=/tmp/xdrip-integrated-check/Build/Intermediates.noindex \
-  SYMROOT=/tmp/xdrip-integrated-check/Build/Products \
+xcodebuild -project xdrip.xcodeproj -scheme xdrip -configuration Debug \
+  -destination 'generic/platform=iOS' -derivedDataPath /tmp/direct-libre-phone \
+  OBJROOT=/tmp/direct-libre-phone/Intermediates SYMROOT=/tmp/direct-libre-phone/Products \
+  CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+
+xcodebuild -project xdrip.xcodeproj -scheme 'xDrip Watch App' -configuration Debug \
+  -destination 'generic/platform=watchOS' -derivedDataPath /tmp/direct-libre-watch \
+  OBJROOT=/tmp/direct-libre-watch/Intermediates SYMROOT=/tmp/direct-libre-watch/Products \
   CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
 ```
 
-Use the `xDrip Watch App` scheme and `generic/platform=watchOS` for the Watch.
-The unsigned command checks compilation only; device installation requires your
-usual signing setup. In Xcode, review the project Build Locations before building
-if output resolves to `/Debug-iphoneos`; use local output locations rather than
-committing personal paths. Keep signing and local Xcode settings out of feature
-commits.
-
-## Shared protocol checkpoint
-
-The parser now accepts `Libre2BLEUtilities.ParserState` explicitly. A phone-only
-`Libre2BLEUtilities+UserDefaults` overload preserves the existing history keys and
-phone call site. It saves changed state after parsing; repeated frames leave the
-cache untouched. Each frame now uses one timestamp anchor rather than sampling
-`Date()` separately for every historical value.
-
-The original database-array helpers and logged FRAM helpers have moved into
-`Array+BgReading` and `LibreSensorType+Data`. Their bodies are unchanged. The
-UInt16 time-formatting helper moved beside its Int implementation so byte helpers
-can compile without UI constants. Unused log declarations were removed from
-crypto/protocol files. No duplicate crypto or glucose algorithm was introduced.
-
-Validation:
-
-- 10 committed `Libre2ProtocolTests` pass in a temporary macOS host package using
-  actual production protocol, calibration, model and array source files. Only
-  the relevant real phone UserDefaults accessors are extracted to avoid importing
-  the whole app; Foundation persistence is not mocked.
-- All 176 captured upstream frames match develop in both calibrated and raw
-  modes: decrypted bytes, glucose values, sensor ages and retained history.
-  Timestamp comparisons allow elapsed execution time between the two parsers.
-- The complete 12-file shared protocol dependency closure typechecks for iOS 16.2
-  and watchOS 10.0 with their real SDKs and no stand-in types.
-- Database/FRAM helper extraction was checked against the original method bodies.
-
-Test/audit runners and logs live outside the checkout in
-`validation/integrated-protocol`. The committed tests are registered with the
-existing `xdripTests` target. No Watch source membership or connection behaviour
-changes are made at this checkpoint. The user subsequently reported that all
-requested device tests passed, as recorded below.
-
-### NFC credential consistency
-
-The NFC delegate now reports the unlock code sent by the scan. On success the
-phone stores that code before resetting the unlock counter; on failure it leaves
-both values unchanged. NFC commands still use the original code `42`, and scan
-ordering, cancellation/retry, messages and Bluetooth reconnection are unchanged.
-This closes the code mismatch identified after the prototype installation, but
-does not retrospectively prove the cause of that particular disconnection.
-
-Three host checks passed for the actual result-handler body: replacing a retained
-prototype code after success, preserving credentials after failure, and adopting
-a reported non-default code. The next unlock payload uses the reported code plus
-counter one. These checks extract the handler for macOS execution with a logging
-stand-in and real Foundation preferences; they do not simulate CoreNFC or BLE.
-The updated transmitter/NFC delegate boundary also passes limited SDK typechecks.
-
-For the next physical checkpoint, install over the current working installation
-without deleting its data. Check several readings and graph updates before and
-after an ordinary NFC scan, cancellation/retry, and reconnection. If immediate
-disconnection recurs, retain the failure log before resetting or reinstalling.
-The Watch remains the ordinary upstream relayed app until the next milestone.
-
-### Second device result
-
-The user reported all requested tests passed after the shared-protocol and NFC
-credential changes, including cancellation/retry and reconnection. Automatic
-recovery took under 30 seconds, with no manual intervention. This clears the
-second phone checkpoint and permits shared Watch collector integration.
-
-This is a measured result for the reported test, not a reconnect-time guarantee.
-It does not independently reproduce the old prototype's retained non-default-code
-scenario or establish the cause of the earlier installation failure.
-
-## Shared collector checkpoint
-
-`Libre2BluetoothTransmitter` now contains the existing F001/F002 notification,
-unlock and 46-byte frame assembly path. Both platform adapters inherit the same
-`BluetoothTransmitter` scanning, discovery, connection timeout, peripheral reuse,
-disconnection and retry code. No reconnect policy or NFC commands changed here.
-
-The boundary is intentionally small:
-
-- `CGMLibre2Transmitter` retains NFC, the phone CGM interface and reading delegates.
-  `Libre2PhoneSensor` uses the existing preferences, calibration guard and parser
-  history. Suppressed unlocks still advance the phone counter, as in develop.
-- `Libre2WatchSession` carries the session ID, sensor identity/credentials, native
-  algorithm parameters and last reserved counter. `Libre2WatchSensor` loads it,
-  saves each counter increment atomically before returning an unlock reservation,
-  rejects replaced sessions, and owns a separate parser state. No raw-value Watch
-  display path is introduced; the session requires matching native calibration.
-- `Libre2WatchTransmitter` delivers readings through a main-thread callback. No
-  Watch app startup, interface or connectivity handler constructs it yet. Session
-  creation/replacement and collector activation will belong to the switching
-  coordinator, not to the storage adapter. The stored ID check alone is not an
-  ownership protocol or a complete stale-message guard.
-
-Phone consumer-log submissions in `BluetoothTransmitter` are now iOS-only; their
-order and entries are preserved. Watch uses system logging. The restoration name
-reads the same bundle display-name value directly rather than depending on home
-view constants. The shared Libre unlock trace reports the reserved counter;
-phone metadata/calibration and generic Bluetooth write traces remain available.
-The Watch target includes the shared dependency files and Bluetooth usage text.
-This does not introduce a new background execution mode.
-
-### Automated results
-
-- 17 XCTest cases passed in a temporary host package using the actual shared
-  collector/protocol sources and actual extracted phone preference accessors:
-  10 existing protocol cases plus 7 collector/session cases. The new cases cover
-  JSON restoration, persistence before returning an unlock, increment after a
-  restart without readings, replaced-session rejection, atomic-save failure,
-  exhaustion/overflow, invalid sensor metadata and phone suppression semantics.
-  These tests do not simulate the Bluetooth radio or validate a handoff.
-- The complete Watch collector and dependency closure typecheck against the real
-  watchOS SDK without stand-ins. Phone collector/NFC adaptation also passes an
-  iOS SDK typecheck with compile-only stand-ins for unrelated app dependencies.
-- Target membership was checked for missing/duplicate dependencies and unintended
-  phone/NFC sources in the Watch target. Project plist validation passed.
-- Full generic iPhone and Watch builds were attempted. Both still stop in existing
-  extension SwiftUI macro expansion because the compiler plugin sandbox cannot
-  start here. A complete app build and device execution are not established by
-  the scoped compiler checks. Build outputs are under `/tmp`; audit scripts/logs
-  are outside the checkout in `validation/integrated-collector`.
-
-### Next physical checkpoint
-
-Build both apps in Xcode. The Watch should retain its ordinary relayed behaviour
-and should not request Bluetooth permission merely because these files are now
-included. On the phone, install over the last tested integrated build and repeat
-ordinary NFC scan/cancel/retry, fresh readings and 2–3 minute signal-loss recovery.
-Keep the old prototype Watch collector stopped. Direct Watch collection and its
-reconnection test follow after safe phone-controlled activation is implemented.
-
-### Shared collector phone device result
-
-The user confirmed that the phone's NFC, fresh-reading and signal-loss recovery
-checks all pass after commit `58f621a8`. This clears the phone regression gate
-for the shared collector extraction. No new recovery-time measurement was
-reported, and this result does not establish direct Watch collection or switching.
-
-The next implementation checkpoint is phone-controlled switching. The shared
-Bluetooth class normally reconnects after a disconnect, so the transaction needs
-an explicit collection suspension that guards scanning, reconnects, subscription
-and unlock writes, followed by confirmed release before activating the other
-device. Preserve the ordinary phone path when the experiment is not in use.
-Validate counter changes during preparation, interrupted transactions and NFC
-reset before enabling direct collection through the phone's experimental page.
-
-## Phone-controlled switching checkpoint
-
-### Implemented transaction
-
-The phone's Advanced Settings now contains **Direct Libre (Experimental)**.
-The page has a device switch, preparation checklist, progress/error text and a
-cancel action while a transfer is pending. It requires a connected Libre with a
-BLE reading less than three minutes old, matching native-algorithm parameters,
-unlock transmission enabled and a reachable Watch before starting a transfer.
-No additional refresh requests or background polling are sent by the checklist.
-Its state refreshes on readings, reachability changes and page entry; the switch
-rechecks freshness when pressed.
-
-Forward transfer:
-
-1. Phone persists a preparation record and sends PREPARE with credentials/counter.
-   Its existing sensor connection remains active while Watch prepares.
-2. Watch validates and saves the session, then returns READY without starting BLE.
-3. Phone persists Watch selection, suspends scanning/reconnect/subscription/write
-   paths, and requests disconnection on the BLE queue. It waits for confirmation
-   that xDrip has released its local connection before proceeding. Another app
-   may still hold the physical phone-to-sensor link; this is not a radio-release
-   guarantee for the entire phone.
-4. It snapshots the final counter. If that changed during preparation, it refreshes
-   the prepared Watch before sending ACTIVATE. Watch persists active selection
-   before constructing the collector and acknowledging activation.
-
-Return is also initiated on the phone. The wire sequence intentionally freezes
-Watch collection **before** reporting the final counter, avoiding a counter change
-between preparation and disconnection:
-
-1. Phone persists return intent and sends RETURN_PREPARE. Its BLE remains disabled.
-2. Watch persists return intent, disables new attempts, confirms release, and replies
-   READY with final counter M. A restarted, interrupted return recreates a disabled
-   collector to query/release its remembered peripheral before replying.
-3. Phone saves M durably and sends RETURN_COMMIT. Watch persists phone selection
-   and acknowledges. Only then does phone restore its counter and resume BLE.
-   The next attempt advances to M+1 (or beyond if the phone already reserved more).
-
-Duplicate activation/commit messages are idempotent within the current transaction;
-retired IDs and wrong-phase requests are rejected. Cancel interrupts the local
-operation, not the other device's ownership. Lost replies leave the phone disabled
-where Watch may have activated; retry the return or provision with NFC. Counter
-exhaustion on return requires NFC rather than resuming into an overflow.
-
-A successful ordinary NFC enable-streaming retires the experimental selection
-without waiting for Watch connectivity. Starting NFC also cancels any in-flight
-local transfer. Cancelled/failed NFC does not grant phone ownership. Reset IDs are
-sent live when reachable and retained in WatchConnectivity application context.
-An unreachable Watch cannot be physically disconnected by the phone: it stops
-when the reset reaches it. Test this recovery explicitly on hardware. Outside an
-existing experimental selection, the NFC commands, callbacks, code/counter reset
-and original scanning/retry path retain their prior behaviour.
-
-### Shared BLE and display boundary
-
-The generic Bluetooth class has an opt-in suspension operation and a default-on
-connection guard. Only Libre adapters add persisted-selection guards. Queued
-writes and late notification callbacks recheck the guard. Suspension waits for
-local release in both transfer directions; manual Watch double-tap reset skips
-that wait. Ordinary
-timeout/cancel/reconnect choices are unchanged. Watch uses
-the existing local Bluetooth identity keys to reuse its known peripheral after a
-restart; it never treats the phone's peripheral UUID as a Watch UUID. Its central
-restoration identifier is stable from the sensor UID even before first discovery;
-ordinary phone restoration identifiers keep their existing behaviour.
-
-Direct Watch readings enter the existing chart/complication update path. Relayed
-phone glucose is ignored while Watch owns collection, and older queued phone
-values cannot overwrite newer displayed direct values after a return. The antenna
-is green for an actual radio connection, orange while direct mode is selected
-without a connection. Reading age remains independently visible. This initial
-display shows values and a five-minute delta; direct trend computation, full
-settings persistence and detailed indicator states remain part of the later
-readings/interface milestones. Double-tap restart is now implemented below.
-
-Direct readings are currently local, with in-memory chart history. There is no
-Watch-to-phone reading synchronisation or additional continuous background runtime
-in this integrated checkpoint. Phone graphs, uploads/sharing and missed-reading
-handling therefore do not yet consume Watch readings. Keep the Watch app visible
-for these connection tests.
-
-### Validation
-
-- 26 host XCTest cases pass using actual shared sources/preferences: the previous
-  17 protocol/counter cases plus 9 selection/persistence cases. New coverage includes
-  ordinary no-file defaults, prepared/active/return guards, persistence across
-  restart, duplicate commits, stale IDs, NFC retirement, delayed old revocations,
-  corrupt state and failed saves. These tests do not simulate CoreBluetooth or
-  WatchConnectivity delivery.
-- The actual Watch collector/coordinator/transport and the WatchStateModel/direct
-  indicator dependency closure pass watchOS SDK typechecking. The display check
-  uses Xcode-generated asset symbols; unrelated macro-bearing screens are excluded.
-- The actual phone coordinator, settings page, Libre/NFC adapter and transport pass
-  iOS SDK typechecking, with compile-only stand-ins for unrelated app dependencies.
-- Full iPhone and Watch builds were attempted and still stop in existing extension
-  SwiftUI macro expansion because this environment cannot start the compiler plugin
-  sandbox. Full device builds and radio tests remain required in the user's Xcode.
-- Build outputs are outside the checkout under `/tmp`; scoped checks and logs are
-  in the workspace's `validation/integrated-switching` directory. Personal signing,
-  scheme and phone Info.plist edits remain separate from feature commits.
-
-### Physical-device gate
-
-Install the matching integrated build on **both** devices, with the old prototype
-collector stopped. Use the ordinary phone NFC path and wait for a fresh BLE reading.
-
-1. Open both apps. On the phone, open Advanced Settings → Direct Libre (Experimental).
-   Check the prerequisites and press **Switch to Watch**. Expect an orange antenna
-   followed by green when connected, then fresh Watch glucose/chart/complication.
-   The phone must stop processing its own BLE frames before Watch activation.
-   Stop other apps' sensor connections before testing; repeat without Bluetooth cycling.
-   Watch selection alone does not confirm a Watch radio connection.
-2. Press **Return to iPhone** on that same phone page. Expect Watch release first,
-   then fresh phone readings without NFC or Bluetooth cycling. Repeat both ways.
-3. While Watch owns collection, restart each app separately. Phone must stay disabled;
-   Watch should resume its saved session/counter. Test a 2–3 minute signal loss and
-   automatic recovery while the Watch is visible.
-4. Interrupt preparation/activation/return by closing an app or losing reachability.
-   Reopen both apps and retry the available switch/return. Cancel must not silently
-   re-enable phone BLE after uncertain activation. If recovery cannot finish, use
-   the ordinary NFC path and report the displayed state/error.
-5. With Watch selected, perform a successful ordinary phone NFC scan, including
-   with Watch unreachable. Confirm phone glucose returns. Reopen/reconnect Watch
-   and confirm it retires the old session and does not resume direct collection.
-   Also check that cancelling NFC alone does not reclaim an active Watch session.
-6. Repeat ordinary phone scan/cancel/retry and signal-loss recovery after returning
-   to the phone. Report any deviations and which device/app was open at the time.
-
-### Earlier experiment: forward-transfer callback wait removed (superseded)
-
-The first switching test reported “Watch / transfer pending” and a need to cycle
-iPhone Bluetooth. That header also appeared after successful activation, so it
-could not identify where the transaction was waiting. It now distinguishes
-preparation, Watch selection and return; the separate status text shows progress.
-At that checkpoint, forward transfer stopped waiting for a disconnect callback.
-The wait has since been restored; see the later checkpoint below.
-The phone still disables collection before activating Watch and requests radio
-release, but does not claim the system released the physical link. Return to phone
-retains confirmed Watch release. Hardware validation of this revision is pending.
-
-Validation after removing the wait: all 26 existing host tests pass, as do the
-actual Watch collector/coordinator SDK check and the scoped phone SDK check
-(with unrelated app dependencies stubbed). These tests do not exercise physical
-disconnection or callback timing. Full Xcode builds were not repeated; the
-previous compiler-plugin sandbox limitation still applies to this environment.
-
-### Prototype comparison: Watch selected, antenna remains orange
-
-Compared integrated `d30fd18d` with the local working prototype `ef9926b` in
-`xdripswift-github`. The user reports that the phone reaches “Watch selected”,
-the Watch stays orange, and cycling phone Bluetooth does not help. The phone
-only shows that success after Watch acknowledges ACTIVATE, so the live transfer
-has passed preparation and activation. This does not prove a radio connection.
-An orange antenna alone cannot distinguish scanning, a pending connection,
-Bluetooth unavailable, or a connection that subsequently dropped.
-
-| Step | Working prototype | Integrated implementation / finding |
-| --- | --- | --- |
-| Preparation | Validates and persists credentials before READY; no Watch BLE yet | Same ordering, new message/selection types |
-| Phone authentication during preparation | Freezes authentication when preparing | Phone can still reserve a counter until READY; the final snapshot refreshes Watch preparation if needed |
-| Phone release | Waits for disconnect callback before ACTIVATE | At `d30fd18d`, requested cancellation without waiting; local disconnect confirmation is now restored |
-| Activation | Persists Watch ownership, starts collector, acknowledges | Same ordering; acknowledgement means activation accepted, not connected |
-| Scan filter | Scans for Libre service FDE3 | Inherited phone scan with no service filter; changed to FDE3 on Watch only |
-| First discovery name | Advertised local name, falling back to peripheral name; exact case-insensitive match | Used only cached peripheral name; now uses the same name source on Watch. Shared matching still uses the phone's case-insensitive substring rule |
-| Known peripheral | Uses a locally saved Watch identifier, leaves its connection pending | Same basic reuse policy; different local storage. Neither imports the phone's peripheral identifier |
-| BLE setup | Discovers FDE3, subscribes F002, persists N+1 before writing F001 | Same service, characteristics, payload algorithm and counter ordering, through the shared collector |
-| Unlock callback | Once per connection; validates F002 and a write characteristic | Uses the original phone callback behavior. This difference occurs after connection and does not explain failure to establish a link |
-| Runtime | Prototype includes optional location runtime and foreground recovery | Not yet ported; perform this checkpoint with Watch visibly active |
-
-The service-filter and name-source changes restore discovery choices that were
-lost when adopting the phone collector. They are plausible causes, not a confirmed
-device diagnosis. Apple's [scan documentation](https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/scanforperipherals(withservices:options:))
-recommends explicit service filters; its [watchOS Bluetooth guidance](https://developer.apple.com/videos/play/wwdc2022/10135/)
-also uses service-filtered scanning for background discovery. An unfiltered scan
-is not, by itself, proof that foreground discovery must fail.
-
-The ordinary phone scan, NFC path, reconnect timing and unlock algorithm are
-unchanged by this correction. Bluetooth permission text is present in the Watch
-Info.plist. The integrated collector uses a serial Bluetooth queue and central
-restoration options, unlike the prototype's main-queue central without options;
-these are additional differences, but no observed callback trace implicates them.
-
-Device check: install the updated Watch build, reopen it with the current Watch
-selection, keep it visible and confirm the antenna turns green followed by a new
-reading. If it remains orange, retain the Watch Xcode/system log from launch.
-The existing BluetoothTransmitter messages distinguish powered-on state, scan
-start, discovered/matching names, connection attempts/timeouts, and didConnect.
-A log showing the last completed step is needed before changing timers, central
-options or authentication.
-
-Validation: the actual Watch collector/coordinator dependency closure and the
-WatchStateModel/indicator closure pass watchOS SDK typechecking. The scoped phone
-iOS SDK check also passes, using stand-ins for unrelated app dependencies.
-The 26 host tests were not repeated for these platform discovery changes; they
-do not simulate Bluetooth discovery. Full device build/radio validation remains
-required; this environment's full-build compiler-plugin sandbox limitation remains.
-
-### Direct Watch double-tap restart
-
-Double-tap the large glucose value or the chart's value/header area to restart
-the Watch collector while Watch owns collection. It marks the link disconnected
-(orange antenna), suspends the old collector on its Bluetooth queue, requests
-cancellation without waiting for the disconnect callback, then releases that
-collector and creates a fresh one with remembered-peripheral reuse disabled.
-This deliberately scans for the sensor again, including when the previous link
-was connected or its connection attempt was pending. Ordinary automatic recovery
-continues using the existing shared collector's peripheral-reuse behavior.
-
-The session ID, credentials and last reserved unlock counter are retained. The
-new collector reloads the saved counter and reserves the next value before its
-next unlock write. Rapid taps during the queued suspension share one restart.
-A return or NFC revocation which overtakes the reset prevents restarting; those
-operations retain their confirmed-release cleanup. A tap cannot activate a
-prepared session or undo phone selection. Relay-mode double-tap still requests
-the existing phone update; routine display refreshes never restart Bluetooth.
-
-Validation: scoped Watch collector and Watch model SDK checks pass. A host
-control-flow harness using the actual coordinator with radio/storage substitutes
-passes checks for non-Watch selection guards, tap coalescing, collector replacement,
-unchanged session/counter, ignored old connection callbacks, and return/NFC-reset
-races. Harness/log: workspace `validation/integrated-restart`. It does not simulate
-CoreBluetooth radio behavior or validate on-device reconnect timing. Full Xcode
-build remains subject to the previously recorded compiler-plugin sandbox limit.
-
-Device check: double-tap while connected and while orange/pending; expect orange
-then green on connection, followed by a fresh reading. Test with the phone
-unreachable as well. Confirm a prepared/returning session cannot be restarted
-and normal phone-relay double-tap still refreshes the display.
-
-### Device result and Watch system connection alerts
-
-The user successfully installed the updated Watch build and switched collection
-to Watch and back without cycling phone Bluetooth. This confirms both directions
-for that test; the remaining restart, signal-loss and reset checks are still needed.
-
-The user also identified an intermittent system connection popup when the Watch
-app is backgrounded, followed by an instruction to open xDrip to reconnect. The
-shared phone collector had enabled CoreBluetooth connection/disconnection alerts
-on Watch as well. Watch now passes empty connection options, matching the
-prototype's default behavior; phone options are unchanged. This suppresses the
-requested background connection alerts, not system permission or pairing prompts.
-It does not provide background runtime: keep Watch visible for this checkpoint.
-
-The actual Watch collector/coordinator dependency closure passes watchOS SDK
-typechecking after this change. Device confirmation that the popup no longer
-appears remains pending.
-
-### Forward-transfer disconnect confirmation restored
-
-The user identified another app connected to the sensor during earlier tests.
-That may explain why the phone retained its physical link despite xDrip releasing
-its local connection; the earlier observations do not establish that the callback
-wait or discovery behavior caused the failure. At the user's request, forward
-transfer again waits for xDrip's local disconnect confirmation (or no local link)
-before taking the final counter snapshot and sending ACTIVATE. Progress now says
-“Disconnecting iPhone” during that wait. The page advises stopping other apps'
-sensor connections before switching.
-
-Watch service-filtered scanning, advertised-name lookup, double-tap reset and
-system-alert suppression remain unchanged. In particular, double-tap local
-recovery still requests cancellation without waiting; it is not a handoff.
-The scoped phone SDK check and all 26 existing host tests pass. These tests do
-not simulate disconnect callbacks. Device validation should repeat both transfer
-directions with other sensor connections stopped, without cycling Bluetooth.
-
-### Device checkpoint: confirmed-release transfers pass
-
-After `ef110c2b`, the user reports successful phone-to-Watch and Watch-to-phone
-transfers without cycling Bluetooth. Before testing, the sensor was removed and
-re-added in the phone app to establish a clean test. This validates both transfer
-directions with the local disconnect wait restored under fresh provisioning.
-
-Keep confirmed local release and the Watch discovery improvements. This result
-does not isolate the earlier failure's cause: provisioning and the other app's
-connection are confounding factors. Removing/re-adding the sensor is recorded
-as this test's setup, not a requirement for normal switching. It does not yet
-validate recovery of older saved state, interrupted handoffs, or NFC reset while
-Watch owns an active connection. Those device checks remain outstanding.
-
-### Device checkpoint: recovery checks pass; timing remains unmeasured
-
-The user reports that all requested checks passed except interrupted transfer,
-which completed too quickly to interrupt manually. This covers the requested
-phone/Watch restarts, signal-loss recovery and double-tap fallback, and ordinary
-NFC reclaim (including delayed Watch notification and cancelled scan behavior).
-No per-step timings were provided. Interrupted transfer is **untested**, not failed.
-
-The user also perceives slower Watch connections than the working prototype.
-Code comparison identifies a plausible startup difference: the prototype retains
-its collector/CBCentralManager across handoffs and local reset, whereas the
-integrated coordinator releases it on return and replaces it on double-tap.
-Normal integrated signal-loss reconnects retain the existing collector. Both
-implementations reuse a known peripheral, scan for FDE3 otherwise, retry without
-intentional backoff, and time out scan-discovered connect attempts after five
-seconds. Both wait for local phone release before Watch activation.
-
-The integrated startup also has overlapping connect entry points: explicit
-startup, the shared powered-on callback's known-peripheral retrieval, and the
-Watch delegate's powered-on connect. This differs from the prototype's guarded
-start. No captured timings establish that either difference causes the reported
-delay. Separate transfer time, time to didConnect/green antenna, and time to first
-fresh reading before changing connection behavior. Keep the Watch visibly active
-and other sensor connections stopped for comparisons. No runtime changes were
-made for this performance observation.
-
-
-## Milestone 6 — readings and synchronisation (2026-09-19)
-
-Reused the prototype's acknowledged-history/latest-message design with the
-integrated collector and selection model. No old ownership records or message
-migration was added. The new registry must be created by a new transfer. Ordinary
-NFC and Bluetooth lifecycle sources are unchanged in this milestone.
-
-Validation:
-
-- 58 shared protocol/collector/selection/history/current-reading tests passed.
-- 27 Watch delivery cases and 8 phone scheduling cases passed using the actual
-  transport code with WatchConnectivity/storage doubles. These cover independent
-  latest delivery, context updates, immutable acknowledgements, save failure,
-  unresolved batches and cleanup. They do not simulate Apple's scheduling.
-- 96 ordinary phone processing combinations matched the previous implementation's
-  downstream call order and arguments. Current versus historical imports,
-  post-processing suppression and unrelated sensor history also passed.
-- The existing restart/return/NFC race harness passed with the history callback
-  dependency supplied as a test double. No manager-lifetime policy was changed.
-- Watch model, history transport and collector dependencies passed watchOS SDK
-  typechecking (macro-bearing screens excluded).
-- Phone managers, importer, shared downstream coordinator and hosted Core Data
-  tests passed iOS SDK typechecking against the real app dependency graph.
-  The Core Data tests are in the Xcode test target, but were not executed here.
-- Full unsigned phone and Watch builds were attempted with all outputs under
-  `/tmp/libre-integrated-history-*`. Both remain blocked by the existing SwiftUI
-  compiler-plugin sandbox failure in extension targets. The new settings view's
-  `@State` likewise needs the working macro environment; a full build is not
-  claimed. No app-source workaround was made for this environment limitation.
-
-Local check scripts/results are in the workspace's `validation/integrated-history`.
-The user subsequently passed the requested device gate (see acceptance below).
-Background delivery timing remains a separate investigation; retain
-[the milestone workflow](DirectLibreReadings.md#milestone-6-device-check) for regression checks.
-Personal signing, plist and scheme edits are excluded from feature commits.
-
-
-### Direct Watch trend arrows
-
-The direct display path still supplied `slopeOrdinal = 0` (unknown). It now
-calculates the trend from its newest two values. The existing phone slope and
-ordinal functions were extracted to `GlucoseTrend`, shared with Watch; both the
-phone database reading and snapshot delegate to it. There is no second set of
-thresholds, and NFC/Bluetooth/selection logic is unchanged.
-
-Four focused trend tests pass, including every arrow boundary, elapsed-time
-scaling, flat values and the exact 21-minute cutoff. An executable comparison of
-1,288 slope cases preserves the previous phone results and both ordinal methods.
-The actual Watch display-mapping method also passes arrow/complication-routing
-checks with presentation doubles. Phone and Watch SDK typechecking passes.
-Physical-display verification subsequently passed in the user's device gate below;
-the automated full-build environment limitation remains.
-
-### Antenna animation restoration
-
-The prototype's orange pulse is restored for scanning and manual restart. Actual
-scan/connect progress comes through an optional Bluetooth delegate callback;
-known-peripheral reconnects show solid orange, and connection remains solid green
-without waiting for glucose. Disconnected inactive/unavailable states are grey.
-The pulse respects scene activity, Always On dimming and Reduce Motion.
-
-The actual Watch coordinator/animation-predicate harness passes the scan/connect,
-restart, late callback, return/NFC race and Bluetooth-off cases. Phone and Watch
-SDK typechecks pass. Removing the added presentation notifications reproduces the
-prior radio source exactly: no connection, cancellation, timeout or retry policy
-was changed. There is no new polling timer. The user subsequently passed the
-antenna device check below; automated full builds retain the previously documented
-compiler-plugin limitation here.
-
-
-### Milestone 6 device acceptance (2026-09-19)
-
-After pushing through `8f0b3897`, the user reported **all requested tests passed**:
-
-- New phone-to-Watch transfer and live Watch-to-phone reading synchronisation.
-- Configured uploads/sharing and missed-reading behaviour while fresh values arrive.
-- Collection with the phone unavailable, followed by latest delivery and history
-  recovery without duplicate graph points.
-- Watch restart with the phone unavailable, retaining units, limits and recent data.
-- Trend arrows, antenna behaviour and return to phone collection.
-
-This records the user's physical-device result, not an automated measurement of
-latency. The earlier controlled interrupted-transfer check remains outstanding.
-Both-apps-backgrounded delivery timing and optional runtime features were excluded
-from this gate and are not established by this result. Proceed to the interface
-milestone; keep the Bluetooth-manager lifetime investigation paused.
-
-
-## Milestone 7 — Advanced Settings interface (2026-09-19)
-
-The configuration entry remains **Advanced Settings → Direct Libre (Experimental)**.
-The page contains:
-
-- **Collection:** selected device and one switch button. Progress/errors appear
-  during a transfer; Cancel appears only while a transfer is in progress. An
-  interrupted preparation uses Return to iPhone, preserving the normal return
-  acknowledgement before phone collection resumes.
-- **Connection checklist:** sensor/configuration, phone connection and a BLE
-  reading within three minutes when the phone is selected, followed by Watch
-  reachability. When Watch collection or return is selected, it instead shows
-  the phone collection policy as paused. This is not a claim that iOS Bluetooth
-  settings will show the physical link disconnected.
-- **Recovery:** shown for a failed/interrupted transfer or an unreachable selected
-  Watch. Recovery uses the ordinary successful NFC scan; no extra scan path,
-  verification routine or sensor popup was added.
-- **Unresolved Watch readings:** a collapsed inspection/deletion control after
-  experimental use. The existing exact-revision confirmation remains required.
-- **Recent activity:** newest five events, Show more/less, up to 80 persisted
-  entries with 300 characters per message. Transfer status and connection changes
-  are recorded, not individual glucose readings. Corrupt/unwritable diagnostic
-  storage cannot block collection.
-
-Checklist updates come from existing WatchConnectivity callbacks, phone Bluetooth
-callbacks, readings and visible-page preference/foreground changes. One cancellable
-local task expires the fresh-reading check at three minutes. It is cancelled when
-hidden/backgrounded or superseded by a new reading. No additional Watch refresh
-requests, periodic polling or Bluetooth lifecycle changes were introduced.
-
-Validation:
-
-- Five executable test groups using the actual phone coordinator with transport
-  and sensor doubles passed: readiness/zero refresh traffic; stale/configuration/
-  identity guards; confirmed-release switching order; cancelled preparation and
-  late replies; bounded log persistence, corruption and write failure. The log
-  restore check caught and corrected an unwanted startup status event.
-- The phone coordinator and modified Bluetooth delegate pass iOS SDK typechecking
-  against the real app dependency graph. The SwiftUI screen still hits this
-  environment's previously documented unavailable `SwiftUIMacros.StateMacro`.
-  Its view code passes SDK typechecking with only `@State` replaced in a temporary
-  validation copy. This is not a full build or rendered-interface test.
-- Transfer, counter, NFC reset and cleanup method bodies are unchanged apart from
-  presentation flags. The only original Bluetooth manager edits forward three
-  existing callbacks to the identity-guarded checklist refresh.
-- Local scripts/results: workspace `validation/integrated-interface`. No build
-  outputs or personal signing/plist/scheme changes are included in the commit.
-
-**Device gate (pending):** build in Xcode, then check the following on the phone:
-
-1. Open the experimental page with a recent phone reading. Confirm the checklist
-   and single switch button, then switch to Watch and back with both apps open.
-2. Confirm Watch reachability and phone sensor disconnection change their checklist
-   rows without reopening the page. With phone collection selected, let the last
-   BLE reading become older than three minutes; the freshness check must clear.
-3. Check the activity order and Show more/less after several transfers. Reopen the
-   app and confirm the history is retained without a new synthetic transfer event.
-4. Where an interrupted/unreachable transfer can be reproduced, confirm Recovery
-   appears and return/NFC reset still works. Unresolved-reading deletion must
-   remain explicitly confirmed. Do not delete wanted readings just for this check.
-
-The Watch antenna, double-tap restart, history transport and normal phone NFC/BLE
-behaviour are unchanged in this milestone. Optional runtime features remain the
-next milestone after this device gate.
-
-### Watch power-on alignment (2026-09-19)
-
-The Watch Bluetooth-state delegate now mirrors the phone's division of responsibility:
-start discovery only when no device address is known. The shared Bluetooth manager
-already reconnects known peripherals when powered on, so the Watch delegate no longer
-adds a second retrieval/connection request. Explicit collector activation is unchanged.
-Authentication, late-callback policy, retry timing, manager lifetime, phone/NFC code and
-transfer guards are unchanged. This removes a request overlap, not a proven cause of
-the reported connection instability.
-
-Six actual-coordinator test groups pass, including known/unknown power-on, Bluetooth-off,
-selection and retired-collector guards, manual reset, return/NFC races and antenna state.
-The Watch coordinator and its dependencies pass watchOS SDK typechecking; existing
-WatchKit deprecation warnings remain. Macro-bearing screens are excluded, as before;
-a full app build is not claimed. Checks are in workspace `validation/integrated-power-on`.
-
-Device check pending: transfer to Watch, cycle Watch Bluetooth off/on with xDrip visible,
-and confirm automatic reconnection. Also verify double-tap discovery and return to phone.
-Optional background runtime support remains a separate milestone.
-
-## Milestone 8: background location
-
-Restored the prototype's opt-in location helper with live request/reply controls,
-100 m / 1 km / 3 km accuracy choices and event-driven selection/foreground updates.
-It does not change the shared BLE protocol or the ordinary phone NFC path.
-
-- 60 host protocol/collector/selection/history tests passed, including new location
-  message validation and durable selection-change notification coverage.
-- 11 production-location-helper scenarios passed with framework doubles: default
-  off, non-Watch selection, foreground-only start, authorization, persistence,
-  transient failure, disable/reset/return, and accuracy changes without restart.
-- Real watchOS SDK type-check passed. Phone settings views are also SDK-checked
-  using temporary property-wrapper substitutes for the known sandbox-blocked
-  SwiftUI State macro; this does not validate rendering or a complete build.
-- [Physical runtime checks](DirectLibreRuntime.md#device-checkpoint) remain pending.
-
-Local validation artifacts: `validation/integrated-runtime` outside the checkout.
-
-### Minimal underwater foreground support
-
-Restored only `WKBackgroundModes = [underwater-depth]` on the Watch app.
-Property-list validation passed. No depth manager, automatic Water Lock, workout,
-Motion & Fitness prompt or restricted entitlement was added. Underwater foreground
-behaviour remains a physical-device check.
-
-### Manual background-delivery notification test
-
-Restored a separate Watch notification category/view and live scheduling request.
-The phone displays confirmed scheduling and the prototype's observed delivery
-benefit under Background connection. It never schedules automatically or changes
-real alarms, BLE recovery or selection.
-
-- Five production-helper scenarios passed with notification-service doubles:
-  one-shot scheduling/replacement, service failure, denied/quiet alerts, foreground
-  permission, and malformed/overlapping requests.
-- Six existing Watch coordinator/antenna/power-state test groups passed.
-- Final Watch non-UI dependency closure plus the new notification view passed the
-  real watchOS SDK type-check. Both phone settings views passed the iOS SDK check
-  with the temporary State-wrapper substitution described above.
-- Unsigned iPhone and Watch scheme builds were attempted. Both still fail in
-  existing extension/chart SwiftUI macros (`SwiftUIMacros.StateMacro` / preview
-  plugin malformed response; `sandbox_apply: Operation not permitted`). This
-  does not establish a complete build; the next checkpoint needs Xcode and devices.
-- Build outputs remain under `/tmp`; personal signing and scheme changes are
-  excluded from feature commits. No ordinary NFC or shared Bluetooth source changed
-  during the runtime restoration.
-
-Milestone 8 implementation is complete. Its physical-device acceptance remains
-pending; use the [runtime workflow](DirectLibreRuntime.md) to test all three options.
+## Next device regression checklist
+
+Install over the existing integrated build after returning collection to phone;
+retain logs if a failure occurs before resetting or reinstalling.
+
+1. With optional location off, ordinary phone NFC, fresh readings, cancellation,
+   short/long signal loss and automatic recovery retain their original behaviour.
+2. Switch both ways; verify actual readings and phone suspension. Restart during
+   collection, double-tap, cycle Watch Bluetooth and retry an interrupted transfer.
+   A failed/cancelled transfer must not silently enable both collectors.
+3. While Watch is selected, successfully scan on phone with Watch unreachable;
+   verify phone reclaim and Watch revocation once it receives the reset.
+4. Check live readings and configured downstream actions, then collect offline,
+   reconnect and verify latest delivery independent of backlog, durable history,
+   no duplicates and no replay of old readings as current alarms.
+5. Restart Watch without phone: units, limits and recent values persist. Confirm
+   arrow/antenna states and that old phone readings do not replace newer values.
+6. Enable location, grant permission and refresh runtime status. Background both
+   apps and compare real measurement timestamps. Try all accuracy options, disable,
+   return/reset and relaunch. Accuracy changes must not restart BLE; returning/reset
+   must stop location once received. Repeat with denied/restored permission.
+7. Schedule the test notification, return to Watch face and lock phone. Verify the
+   alert appears on Watch; compare subsequent timestamps without opening either app.
+8. With manual Water Lock, test foreground behaviour with location off/on and radio
+   recovery after water exposure. Record when reliable sensor range resumes.
+
+The integrated UI remains experimental. Extended diagnostic capture, measured
+connection latency and battery comparisons are separate remaining work, not implied
+by passing these host tests.
