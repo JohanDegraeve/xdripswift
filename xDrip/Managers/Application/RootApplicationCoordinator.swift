@@ -986,7 +986,7 @@ import AppIntents
     /// Existing AlertType records may contain a duration that the consolidated picker no longer
     /// offers. Each unsupported value is rounded down to the nearest supported duration so an
     /// upgrade never silently lengthens an alarm's configured snooze. Values below the new
-    /// 15-minute minimum are clamped to 15 minutes because no lower supported option exists.
+    /// 10-minute minimum are clamped to 10 minutes because no lower supported option exists.
     private func migrateStoredAlertSnoozePeriodsToReducedOptionsIfNeeded(coreDataManager: CoreDataManager) {
         let userDefaults = UserDefaults.standard
         guard !userDefaults.didMigrateAlertSnoozePeriodsToReducedOptions else { return }
