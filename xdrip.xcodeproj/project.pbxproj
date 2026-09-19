@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AB1900013014000200000001 /* LiveActivityWarmupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1900023014000200000001 /* LiveActivityWarmupTests.swift */; };
 		07ECB18D91AE096E637D1393 /* AlertsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */; };
 		0A51F9C534B04BD682E1EF4D /* xDrip Tests/TherapyMetricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E2401E5ED94424A2FEC5E8 /* xDrip Tests/TherapyMetricsTests.swift */; };
 		111352851C2F8F73108A3A62 /* CareLinkAccountState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F081BB1D5F106F950C4A8EA4 /* CareLinkAccountState.swift */; };
@@ -366,6 +365,7 @@
 		A40000010000000000000001 /* FollowerSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40000020000000000000001 /* FollowerSettingsTests.swift */; };
 		A50000010000000000000001 /* OnlineHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50000020000000000000001 /* OnlineHelp.swift */; };
 		A50000030000000000000001 /* OnlineHelpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50000040000000000000001 /* OnlineHelpTests.swift */; };
+		AB1900013014000200000001 /* LiveActivityWarmupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1900023014000200000001 /* LiveActivityWarmupTests.swift */; };
 		B1E511022026091100000001 /* BluetoothSignalStrengthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */; };
 		B1E511042026091100000001 /* BluetoothSignalStrengthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */; };
 		B3DBAE6F4DF8465BBF554DE4 /* xDrip/Managers/Therapy/TherapyMetricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F219EC5BAAF4D5E924415FA /* xDrip/Managers/Therapy/TherapyMetricsManager.swift */; };
@@ -912,7 +912,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		AB1900023014000200000001 /* LiveActivityWarmupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityWarmupTests.swift; sourceTree = "<group>"; };
 		05272484BD024BDAAA341C1C /* xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift; sourceTree = SOURCE_ROOT; };
 		102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertTypesSettingsView.swift; sourceTree = "<group>"; };
 		198D44C4260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Alerts.strings; sourceTree = "<group>"; };
@@ -1294,6 +1293,7 @@
 		A40000020000000000000001 /* FollowerSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerSettingsTests.swift; sourceTree = "<group>"; };
 		A50000020000000000000001 /* OnlineHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineHelp.swift; sourceTree = "<group>"; };
 		A50000040000000000000001 /* OnlineHelpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineHelpTests.swift; sourceTree = "<group>"; };
+		AB1900023014000200000001 /* LiveActivityWarmupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityWarmupTests.swift; sourceTree = "<group>"; };
 		ABA4DE8668C9A16DFF21A411 /* CareLinkTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkTests.swift; sourceTree = "<group>"; };
 		B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothSignalStrengthTests.swift; sourceTree = "<group>"; };
 		B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothSignalStrengthView.swift; sourceTree = "<group>"; };
