@@ -156,6 +156,33 @@ return and NFC reset. It does not silently evict data when full: further upload
 collection reports a storage error until space is freed, although the display can
 still receive frames. Saved formats remain unchanged by consolidation.
 
+### Implementation footprint
+
+Snapshot on **2026-09-19**, comparing upstream develop baseline
+`83009198dc5091398333f83aa832bbe3d99e3441` with feature commit
+`ee9239ef47c540d4600c6a235741e67f8ee022f9`, before adding this section.
+Net lines are additions minus deletions; files are grouped by their main
+responsibility. Counts include comments and whitespace, exclude uncommitted local
+settings, and do not measure complexity or executable size.
+
+| Area | Net added lines | Share |
+| --- | ---: | ---: |
+| Tests | 1,279 | 28.2% |
+| Synchronisation and phone processing | 986 | 21.8% |
+| Shared collector and platform separation | 413 | 9.1% |
+| Ownership and switching | 665 | 14.7% |
+| Optional runtime features | 420 | 9.3% |
+| Display and settings | 281 | 6.2% |
+| Documentation | 265 | 5.8% |
+| Xcode configuration | 222 | 4.9% |
+| **Total** | **4,531** | **100%** |
+
+Across 61 changed files, the snapshot contains 5,270 additions and 739 deletions.
+Excluding tests, documentation and Xcode configuration, the production-source
+increase is **2,765 lines**. Synchronisation and ownership switching contribute
+1,651 of those lines, approximately 60%. Update this snapshot at significant
+milestones, retaining the exact compared revisions.
+
 ## Status and remaining work
 
 Phone NFC/recovery, both transfer directions, restart/double-tap, readings/history,
