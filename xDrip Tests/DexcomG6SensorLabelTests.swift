@@ -70,6 +70,73 @@ final class DexcomG6SensorLabelTests: XCTestCase {
         }
     }
 
+    func testDecodesObservedDexcomG7ApplicatorLabels() throws {
+        let samples = [
+            ("01003862700039352196980078534311240901172602282405069", "969800785343", "5069"),
+            ("01003862700039352174508337707911240901172602282408782", "745083377079", "8782"),
+            ("01003862700039352145042249669611240901172602282407614", "450422496696", "7614")
+        ]
+
+        for (payload, serial, code) in samples {
+            let label = try DexcomG7SensorLabelParser.parse(payload)
+            XCTAssertEqual(label.productIdentifier, "00386270003935")
+            XCTAssertEqual(label.serialNumber, serial)
+            XCTAssertEqual(label.sensorCode, code)
+            XCTAssertEqual(label.manufactureDate, utcDate(year: 2024, month: 9, day: 1))
+            XCTAssertEqual(label.expirationDate, utcDate(year: 2026, month: 2, day: 28))
+            XCTAssertTrue(label.lotNumber.isEmpty)
+        }
+    }
+
+    func testRejectsMalformedDexcomG7ApplicatorLabel() {
+        XCTAssertThrowsError(
+            try DexcomG7SensorLabelParser.parse("0100386270003935219698007853431124090117260228240506")
+        )
+    }
+
+    func testDexcomG7ParserAcceptsAppleBarcodeTransportWrappers() throws {
+        let payload = "01003862700039352196980078534311240901172602282405069"
+        let symbologyWrapped = try DexcomG7SensorLabelParser.parse("]d2\(payload)")
+        let separatorWrapped = try DexcomG7SensorLabelParser.parse(
+            "]d2\(String(payload.prefix(30)))\u{001D}\(String(payload.dropFirst(30)))\u{0004}"
+        )
+
+        XCTAssertEqual(symbologyWrapped.sensorCode, "5069")
+        XCTAssertEqual(separatorWrapped, symbologyWrapped)
+    }
+
+    func testFormatsDexcomG7ApplicatorDatesWithoutShiftingToPreviousDay() throws {
+        // This observed Stelo label contains manufacture date 1 August 2025 and expiry date 31 January 2027.
+        // Both dates previously appeared one day early in a US time zone because midnight UTC was formatted locally.
+        let label = try DexcomG7SensorLabelParser.parse(
+            "01003862700043382169268597267111250801172701312406772"
+        )
+        let utc = try XCTUnwrap(TimeZone(secondsFromGMT: 0))
+        let pacific = try XCTUnwrap(TimeZone(identifier: "America/Los_Angeles"))
+
+        let expectedFormatter = DateFormatter()
+        expectedFormatter.timeZone = utc
+        expectedFormatter.setLocalizedDateFormatFromTemplate("dd/MM/yyyy")
+
+        for date in [try XCTUnwrap(label.manufactureDate), try XCTUnwrap(label.expirationDate)] {
+            // The production UI explicitly uses UTC for these date-only values while retaining the user's date order.
+            let displayedDate = date.toStringInUserLocale(
+                timeStyle: .none,
+                dateStyle: .short,
+                timeZone: utc
+            )
+            XCTAssertEqual(displayedDate, expectedFormatter.string(from: date))
+
+            // Confirm the regression is meaningful. Formatting the same midnight value in Pacific time changes its day.
+            let incorrectlyLocalizedDate = date.toStringInUserLocale(
+                timeStyle: .none,
+                dateStyle: .short,
+                timeZone: pacific
+            )
+            XCTAssertNotEqual(displayedDate, incorrectlyLocalizedDate)
+        }
+    }
+
     // MARK: - Persistence
 
     func testRoundTripsSensorStartMetadataThroughCoreData() throws {
@@ -121,6 +188,115 @@ final class DexcomG6SensorLabelTests: XCTestCase {
         XCTAssertNotNil(sensor.attributesByName["requestedSensorCode"])
         XCTAssertEqual((sensor.attributesByName["sensorSessionOriginRaw"]?.defaultValue as? NSNumber)?.int16Value, 0)
         XCTAssertEqual((sensor.attributesByName["sensorCalibrationModeRaw"]?.defaultValue as? NSNumber)?.int16Value, 0)
+    }
+
+    func testV27ToV28LightweightMappingCanBeInferred() throws {
+        let modelDirectory = try XCTUnwrap(
+            Bundle.main.url(forResource: ConstantsCoreData.modelName, withExtension: "momd")
+        )
+        let v27 = try XCTUnwrap(
+            NSManagedObjectModel(contentsOf: modelDirectory.appendingPathComponent("xdrip v27.mom"))
+        )
+        let v28 = try XCTUnwrap(
+            NSManagedObjectModel(contentsOf: modelDirectory.appendingPathComponent("xdrip v28.mom"))
+        )
+
+        XCTAssertNoThrow(try NSMappingModel.inferredMappingModel(forSourceModel: v27, destinationModel: v28))
+        let dexcomG7 = try XCTUnwrap(v28.entitiesByName["DexcomG7"])
+        XCTAssertNotNil(dexcomG7.attributesByName["sensorCode"])
+        XCTAssertNotNil(dexcomG7.attributesByName["sensorSerialNumber"])
+        XCTAssertNotNil(dexcomG7.attributesByName["sensorProductIdentifier"])
+        XCTAssertNotNil(dexcomG7.attributesByName["useOtherAppValue"])
+        XCTAssertNotNil(dexcomG7.attributesByName["bluetoothSlot"])
+    }
+
+    func testV28ToV29LightweightMappingCanBeInferred() throws {
+        let modelDirectory = try XCTUnwrap(
+            Bundle.main.url(forResource: ConstantsCoreData.modelName, withExtension: "momd")
+        )
+        let v28 = try XCTUnwrap(
+            NSManagedObjectModel(contentsOf: modelDirectory.appendingPathComponent("xdrip v28.mom"))
+        )
+        let v29 = try XCTUnwrap(
+            NSManagedObjectModel(contentsOf: modelDirectory.appendingPathComponent("xdrip v29.mom"))
+        )
+
+        XCTAssertNoThrow(try NSMappingModel.inferredMappingModel(forSourceModel: v28, destinationModel: v29))
+        let dexcomG7 = try XCTUnwrap(v29.entitiesByName["DexcomG7"])
+        XCTAssertNotNil(dexcomG7.attributesByName["sensorSessionLength"])
+    }
+
+    func testV29ToV30LightweightMappingCanBeInferred() throws {
+        let modelDirectory = try XCTUnwrap(
+            Bundle.main.url(forResource: ConstantsCoreData.modelName, withExtension: "momd")
+        )
+        let v29 = try XCTUnwrap(
+            NSManagedObjectModel(contentsOf: modelDirectory.appendingPathComponent("xdrip v29.mom"))
+        )
+        let v30 = try XCTUnwrap(
+            NSManagedObjectModel(contentsOf: modelDirectory.appendingPathComponent("xdrip v30.mom"))
+        )
+
+        XCTAssertNoThrow(try NSMappingModel.inferredMappingModel(forSourceModel: v29, destinationModel: v30))
+        let dexcomG7 = try XCTUnwrap(v30.entitiesByName["DexcomG7"])
+        let newAttributes = [
+            "firmwareVersion", "firmwareBuildVersion", "firmwareVersionCode",
+            "batteryStatus", "batteryResist", "batteryRuntime", "batteryTemperature",
+            "voltageA", "voltageB", "batteryLastReadDate"
+        ]
+        newAttributes.forEach { XCTAssertNotNil(dexcomG7.attributesByName[$0]) }
+    }
+
+    func testRoundTripsDexcomG7LabelAndConnectionSettingsThroughCoreData() throws {
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let context = coreDataManager.mainManagedObjectContext
+        let dexcomG7 = DexcomG7(
+            address: "test-g7",
+            name: "DXCM01",
+            alias: nil,
+            nsManagedObjectContext: context
+        )
+        let label = try DexcomG7SensorLabelParser.parse(
+            "01003862700039352196980078534311240901172602282405069"
+        )
+
+        dexcomG7.useOtherApp = false
+        dexcomG7.setBluetoothSlot(DexcomG7BluetoothSlot.smartWatch)
+        dexcomG7.sensorSessionLength = NSNumber(value: TimeInterval(days: 15.5))
+        dexcomG7.firmwareVersion = "1.2.3.4"
+        dexcomG7.firmwareBuildVersion = NSNumber(value: 123_456)
+        dexcomG7.firmwareVersionCode = NSNumber(value: 789)
+        dexcomG7.batteryStatus = 0
+        dexcomG7.voltageA = 288
+        dexcomG7.voltageB = 267
+        dexcomG7.batteryResist = 8_454
+        dexcomG7.batteryRuntime = 10
+        dexcomG7.batteryTemperature = 25
+        dexcomG7.batteryLastReadDate = Date(timeIntervalSince1970: 2_000_000_000)
+        dexcomG7.apply(sensorLabel: label)
+        coreDataManager.saveChanges()
+        let objectID = dexcomG7.objectID
+        context.reset()
+
+        let restored = try XCTUnwrap(context.existingObject(with: objectID) as? DexcomG7)
+        XCTAssertFalse(restored.useOtherApp)
+        XCTAssertEqual(restored.resolvedDexcomG7BluetoothSlot(), .smartWatch)
+        XCTAssertEqual(restored.sensorSessionLength?.doubleValue, TimeInterval(days: 15.5))
+        XCTAssertEqual(restored.firmwareVersion, "1.2.3.4")
+        XCTAssertEqual(restored.firmwareBuildVersion?.uint32Value, 123_456)
+        XCTAssertEqual(restored.firmwareVersionCode?.uint32Value, 789)
+        XCTAssertEqual(restored.voltageA, 288)
+        XCTAssertEqual(restored.voltageB, 267)
+        XCTAssertEqual(restored.batteryResist, 8_454)
+        XCTAssertEqual(restored.batteryRuntime, 10)
+        XCTAssertEqual(restored.batteryTemperature, 25)
+        XCTAssertEqual(restored.batteryLastReadDate, Date(timeIntervalSince1970: 2_000_000_000))
+        XCTAssertEqual(restored.sensorCode, "5069")
+        XCTAssertEqual(restored.sensorSerialNumber, "969800785343")
+        XCTAssertEqual(restored.sensorProductIdentifier, "00386270003935")
+        XCTAssertEqual(restored.sensorManufactureDate, utcDate(year: 2024, month: 9, day: 1))
+        XCTAssertEqual(restored.sensorExpirationDate, utcDate(year: 2026, month: 2, day: 28))
+        XCTAssertNil(restored.sensorLotNumber)
     }
 
     func testMigratesExistingSensorFromV26ToV27() throws {
@@ -329,5 +505,11 @@ final class DexcomG6SensorLabelTests: XCTestCase {
         XCTAssertFalse(sensor.confirmSessionStartedByApp())
         XCTAssertEqual(sensor.sensorSessionOrigin, .existingSessionAdopted)
         XCTAssertNil(sensor.activeSensorCode)
+    }
+
+    private func utcDate(year: Int, month: Int, day: Int) -> Date {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        return calendar.date(from: DateComponents(year: year, month: month, day: day))!
     }
 }

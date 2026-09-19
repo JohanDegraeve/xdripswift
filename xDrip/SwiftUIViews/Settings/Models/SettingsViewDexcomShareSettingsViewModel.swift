@@ -76,10 +76,10 @@ class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol 
             }
             
         case .dexcomShareAccountName:
-            return .askText(title: Texts_SettingsView.labelDexcomShareAccountName, message: Texts_SettingsView.giveDexcomShareAccountName, keyboardType: .alphabet, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: ConstantsSettingsPlaceholders.usernamePlaceholder, actionTitle: nil, cancelTitle: nil, actionHandler: {(accountName:String) in UserDefaults.standard.dexcomShareAccountName = accountName.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
+            return .askText(title: Texts_SettingsView.labelDexcomShareAccountName, message: Texts_SettingsView.giveDexcomShareAccountName, keyboardType: .credential, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: ConstantsSettingsPlaceholders.usernamePlaceholder, actionTitle: nil, cancelTitle: nil, actionHandler: {(accountName:String) in UserDefaults.standard.dexcomShareAccountName = accountName.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
         case .dexcomSharePassword:
-            return .askText(title: Texts_Common.password, message: Texts_SettingsView.giveDexcomSharePassword, keyboardType: .alphabet, text: UserDefaults.standard.dexcomSharePassword, placeHolder: ConstantsSettingsPlaceholders.passwordPlaceholder, actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
+            return .askText(title: Texts_Common.password, message: Texts_SettingsView.giveDexcomSharePassword, keyboardType: .credential, text: UserDefaults.standard.dexcomSharePassword, placeHolder: ConstantsSettingsPlaceholders.passwordPlaceholder, actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
         case .dexcomShareUploadSerialNumber:
             return .askText(title: Texts_SettingsView.labeldexcomShareUploadSerialNumber, message: Texts_SettingsView.givedexcomShareUploadSerialNumber, keyboardType: .alphabet, text: UserDefaults.standard.dexcomShareUploadSerialNumber, placeHolder: "AB12345678", actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in
@@ -142,7 +142,7 @@ class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol 
         case .dexcomShareAccountName:
             return Texts_SettingsView.labelDexcomShareAccountName
         case .useSchedule:
-            return Texts_SettingsView.useSchedule
+            return Texts_SettingsView.enableSchedule
         case .schedule:
             return Texts_SettingsView.schedule
         }

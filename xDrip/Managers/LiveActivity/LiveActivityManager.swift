@@ -154,6 +154,8 @@ extension LiveActivityManager {
         let endRevision = commandRevision
         shouldRun = false
         pendingUpdate = nil
+        // clear the warm-up state so heartbeats don't keep updating an ended activity
+        persistentContentState.sensorWarmupEndDate = nil
         await endActivities()
 
         // A newer update may arrive while ActivityKit is ending the previous activity. Requeue the
@@ -236,10 +238,19 @@ extension LiveActivityManager {
             return
         }
         
-        // If forceRestart is requested, always end and start a new activity, then return
+        // A replacement can only be created while the application is active. Recheck here, at the
+        // point of execution, because a foreground request may have waited behind another update
+        // while the application returned to the background. Preserve and update the existing
+        // activity in that case instead of ending it and leaving ActivityKit unable to replace it.
         if forceRestart {
             let activityAge = Date().timeIntervalSince(eventStartDate)
             if activityAge >= minimumForceRestartAge {
+                guard UIApplication.shared.applicationState == .active else {
+                    trace("in ensureActivity, deferring forced restart because application is not active", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                    await updateActivity(to: contentState)
+                    return
+                }
+
                 await endActivities()
                 guard shouldRun else { return }
                 await startActivity(contentState: contentState)

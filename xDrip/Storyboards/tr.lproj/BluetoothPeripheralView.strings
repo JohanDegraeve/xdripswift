@@ -11,6 +11,10 @@
 "sensorType" = "Sensör tipi";
 "serialNumber" = "Seri numarası";
 "battery" = "Pil";
+"versionCode" = "Sürüm Kodu";
+"voltageA" = "Voltaj A";
+"voltageB" = "Voltaj B";
+"waitingForData" = "Veriler bekleniyor...";
 "needsTransmitterId" = "Verici Kimliği Eksik";
 "scan" = "Tara";
 "medtrumNanoPumpScanNoticeTitle" = "Medtrum Nano Pompa Bağlantısı";
@@ -39,7 +43,6 @@
 "confirmDisconnectMessage" = "Verici bağlantısını gerçekten kesmek istediğinizi onaylamak için 'Bağlantıyı Kes'i tıklayın.";
 "transmittterStartDate" = "Vericiyi Başlatın";
 "sensorStartDate" = "Sensörü Başlat";
-"useOtherDexcomApp" = "Birlikte çalışma modu";
 "useOtherDexcomAppCoexistenceFooter" = "Birlikte çalışma modu, Dexcom veya CamAPS gibi başka bir uygulamayla çalışmamızı sağlar. Bu uygulama arka planda çalışmaya devam etmelidir.";
 "useOtherDexcomAppPrimaryFooter" = "Birincil mod ana uygulama olarak bağlanır ve bağlantıyı kontrol eder.";
 "runningInCoexistenceMode" = "Birlikte çalışma modunda çalışıyor";
@@ -71,13 +74,13 @@
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
 
 /// sensor warm-up text
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "Isınma sonu";
 
 /// Scan again button
 "nfcScanFailedScanAgainButton" = "Scan Again";
 
 /// Tell the user the scan was successful and to just wait now for connection
-"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 
 /// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
 "readSuccessLast24Hours" = "Son 24 Saat";
@@ -111,15 +114,71 @@
 
 /* Dexcom G6 Bluetooth authentication slot */
 "dexcomG6BluetoothSlot" = "Bluetooth Kanalı";
-"dexcomG6MobileAppSlot" = "Mobil Uygulama (Varsayılan)";
+"dexcomG6MobileAppSlot" = "Yuva 2: Mobil uygulama (Varsayılan)";
 "dexcomG6MobileAppSlotShort" = "Mobil Uygulama";
-"dexcomG6MedicalDeviceSlot" = "Alıcı veya Pompa (Deneysel)";
+"dexcomG6MedicalDeviceSlot" = "Yuva 1: Alıcı veya pompa";
 "dexcomG6MedicalDeviceSlotShort" = "Pompa";
 "dexcomG6MobileAppSlotFooter" = "Mobil Uygulama kanalı, telefon bağlantıları için varsayılandır.";
 "dexcomG6MedicalDeviceSlotFooter" = "Alıcı veya Pompa kanalı normalde Dexcom alıcısı veya uyumlu bir pompa için ayrılmıştır. Bu uygulamanın bu kanalı kullanması, Mobil Uygulama kanalını bir telefon veya başka bir cihaz için kullanılabilir durumda bırakır.";
 "dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Birlikte Çalışma Modunda kullanılamaz";
 "dexcomG6MedicalDeviceSlotWarning" = "Alıcı veya Pompa kanalı normalde bir Dexcom alıcısı veya uyumlu bir pompa için ayrılmıştır. Bu kanalın seçilmesi, söz konusu cihazın bağlanmasını engelleyebilir.\n\nAlıcı veya Pompa kanalı kullanımı yalnızca deneysel olarak değerlendirilmelidir. Seçim bir sonraki kimlik doğrulamada geçerli olur.";
-"dexcomG6AnubisSlot" = "Kanal 3 (Anubis Deneysel)";
+"dexcomG6AnubisSlot" = "Yuva 3: Anubis Extra";
+"dexcomG7MedicalDeviceSlot" = "Yuva 1: Alıcı veya pompa";
+"dexcomG7MedicalDeviceSlotShort" = "Pompa";
+"dexcomG7MobileAppSlot" = "Yuva 2: Mobil uygulama (Varsayılan)";
+"dexcomG7SmartWatchSlot" = "Yuva 3: Akıllı saat";
+"dexcomG7PairingCodeMessage" = "Geçerli sensör aplikatöründeki dört haneli kodu girin. Birincil Mod bu kod olmadan kimlik doğrulaması yapamaz.";
+"dexcomG7BluetoothSlot" = "Bluetooth Kanalı";
+"dexcomG7MobileAppSlotShort" = "Mobil uygulama";
+"dexcomG7SmartWatchSlotShort" = "Akıllı saat";
+"dexcomG7MobileAppSlotFooter" = "Mobil Uygulama kanalı (yuva 2) varsayılandır ve şu anda doğrulanmış doğrudan G7 bağlantısıdır.";
+"dexcomG7MedicalDeviceSlotFooter" = "Alıcı veya Pompa kanalı, kimlik doğrulama yuvası 1'i kullanır.";
+"dexcomG7SmartWatchSlotFooter" = "Akıllı Saat kanalı, fabrika kimlik doğrulama yuvası 3'ü kullanır.";
 "dexcomG6AnubisSlotShort" = "Kanal 3";
 "dexcomG6AnubisSlotFooter" = "Kanal 3 yalnızca Anubis vericilerinde kullanılabilir. Deneyseldir ve Mobil Uygulama ile Alıcı veya Pompa kanallarını diğer cihazlar için kullanılabilir bırakır.";
 "dexcomG6AnubisSlotWarning" = "Kanal 3, yalnızca Anubis vericilerinde kullanılabilen deneysel bir kanaldır.\n\nKanal 3'ü yalnızca test için kullanın. Seçim bir sonraki kimlik doğrulamada geçerli olur.";
+"dexcomConnectionMode" = "Bağlantı Modu";
+"dexcomPrimaryMode" = "Birincil";
+"dexcomCoexistenceMode" = "Birlikte Çalışma";
+"dexcomPrimaryModePickerOption" = "Birincil Mod";
+"dexcomCoexistenceModePickerOption" = "Birlikte Çalışma Modu";
+"dexcomG6ModeSelectionFooter" = "G6 bağlantı modunu daha sonra verici ayarlarından değiştirebilirsiniz.";
+"dexcomConnectionModeSelectionExplanation" = "Birincil Mod bu uygulamayı doğrudan bağlar ve Dexcom cihazına bağlanan diğer tüm uygulamaların kapatılmasını gerektirir.\n\nBirlikte Çalışma Modu, Dexcom bağlantısını sürdürmek ve ölçümleri almak için başka bir uygulamaya ihtiyaç duyar.";
+"dexcomBluetoothChannelSelectionExplanation" = "Bu uygulamanın kullanacağı Bluetooth kanalını seçin. Bu kanalı başka bir bağlantı için boş bırakmanız gerekmiyorsa Mobil Uygulama seçeneğini seçin.";
+"dexcomG6CoexistenceModeSelectionMessage" = "Birlikte Çalışma Modu seçildi. Dexcom G6 veya CamAPS gibi başka bir uygulama G6 vericisine bağlanmalı ve kimlik doğrulaması yapmalıdır.\n\nDiğer uygulamayı arka planda çalışır durumda tutun, aksi takdirde %@ ölçüm alamaz.";
+"dexcomG6PrimaryModeSelectionMessage" = "Birincil Mod seçildi. %@, G6 vericisine bağlanan ve kimlik doğrulaması yapan tek uygulama olmalıdır.\n\nVericiye bağlanan diğer uygulamaları kapatın veya Bluetooth izinlerini devre dışı bırakın. Aksi takdirde %@ ya da diğer uygulama ölçüm alamayabilir.";
+"dexcomPrimaryModeAddFlowMessage" = "Ana uygulama olarak doğrudan bağlanın. Diğer tüm uygulamaların bu Dexcom ile bağlantısını kesin.";
+"dexcomCoexistenceModeAddFlowMessage" = "Bağlantıyı başka bir uygulamayla paylaşın. Dexcom veya CamAPS uygulamasını arka planda düzgün çalışır durumda tutun.";
+"dexcomG7NoSensorLabelFound" = "Fotoğrafta Dexcom G7 sensör etiketi bulunamadı.";
+"dexcomG7InvalidSensorLabelFound" = "Bir Data Matrix bulundu, ancak geçerli bir Dexcom G7 sensör etiketi değildi.";
+
+
+/* Battery history */
+"batteryHistory" = "Pil geçmişi";
+"batteryHistoryTransmitterID" = "Verici kimliği";
+"batteryHistoryNoData" = "Pil geçmişi yok";
+"batteryHistoryBeginsAfterReading" = "Geçmiş, bir sonraki gerçek pil okumasından sonra başlar.";
+"batteryHistoryRange" = "Aralık";
+"batteryHistoryRangeAccessibility" = "Pil geçmişi aralığı";
+"batteryHistoryRangeExplanation" = "Sabit aralıklar şu andan seçilen gün sayısı kadar geriye uzanır. Boşluklar okuma olmayan dönemleri gösterir.";
+
+"connectionDiagramOtherApp" = "Diğer uygulama";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Sinyal Gücü";
+
+"signalStrengthChartExplanation" = "Son iki dakikanın canlı sinyali. Bağlıyken yaklaşık her saniyede bir yeni ölçüm alınır.";
+
+"signalStrengthWeak" = "Zayıf";
+"signalStrengthStrong" = "Güçlü";
+"signalStrengthLastMeasurement" = "Son ölçüm";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Abonelikler";
+"heartbeat.mode" = "Abonelik modu";
+"heartbeat.mode.automatic" = "Tek";
+"heartbeat.mode.all" = "Tümü";
+"heartbeat.footer.automatic" = "Abonelikleri en aza indirerek heartbeat güncellemeleri için desteklenen bir Bluetooth kanalını otomatik seçer. Abonelik başarısız olursa başka bir kanal denenir.";
+"heartbeat.footer.all" = "Desteklenen tüm Bluetooth kanallarına abone olur; herhangi birinden gelen güncellemeler heartbeat sağlayabilir.";
+"heartbeat.simpleFooter" = "Değişiklikler sonraki bağlantıda uygulanır.";
+
+"signalStrengthDisconnected" = "Bağlantı kesildi";

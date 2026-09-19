@@ -10,10 +10,12 @@ import SwiftUI
 
 /// Native detail screen for an existing or newly configured Bluetooth peripheral.
 struct BluetoothPeripheralDetailView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @ObservedObject var state: BluetoothPeripheralDetailState
 
     var body: some View {
         List {
+            // The connection banner identifies this section for every peripheral type.
             Section {
                 BluetoothPeripheralStatusBannerView(state: state)
                     .listRowInsets(ConstantsUI.bluetoothPeripheralStatusBannerRowInsets)
@@ -29,14 +31,12 @@ struct BluetoothPeripheralDetailView: View {
                 .disabled(!state.connectButtonIsEnabled)
                 .listRowInsets(ConstantsUI.bluetoothPeripheralStatusButtonRowInsets)
                 .listRowBackground(state.connectionStatus.rowBackgroundColor)
-            } header: {
-                Text(Texts_BluetoothPeripheralView.status)
-                    .foregroundStyle(ConstantsUI.tableViewHeaderTextColor)
             } footer: {
                 if let statusFooterText = state.statusFooterText {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         if let statusFooterSystemImage = state.statusFooterSystemImage {
                             Image(systemName: statusFooterSystemImage)
+                                .foregroundStyle(state.statusFooterSymbolColor)
                         }
 
                         Text(statusFooterText)
@@ -59,6 +59,7 @@ struct BluetoothPeripheralDetailView: View {
                             ForEach(section.footerLines) { footerLine in
                                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                                     Image(systemName: footerLine.systemImage)
+                                        .foregroundStyle(footerLine.symbolColor)
                                     Text(footerLine.text)
                                 }
                                 .foregroundStyle(footerLine.isActive ? ConstantsUI.listSectionFooterTextColor : Color(.colorTertiary))
@@ -92,7 +93,14 @@ struct BluetoothPeripheralDetailView: View {
             }
         }
         .alert(item: $state.pendingAlert, content: makeAlert)
-        .onAppear(perform: state.start)
+        .onAppear {
+            state.start()
+            state.setSignalStrengthVisible(true)
+        }
+        .onDisappear { state.setSignalStrengthVisible(false) }
+        .onChange(of: scenePhase) { phase in
+            state.updateSignalStrengthPolling(active: phase == .active)
+        }
         .frame(maxWidth: UIDevice.current.userInterfaceIdiom == .pad ? 780 : .infinity)
         .frame(maxWidth: .infinity)
     }
@@ -141,7 +149,8 @@ struct BluetoothPeripheralDetailView: View {
     }
 }
 
-private extension BluetoothPeripheralDisplayStatus {
+// Shared by the parent banner and signal screen so connection symbols and colours stay consistent.
+extension BluetoothPeripheralDisplayStatus {
     var tintColor: Color {
         switch self {
         case .notScanning:
@@ -260,6 +269,7 @@ struct BluetoothPeripheralTextEntryView: View {
 
     @State private var text: String
     @State private var validationMessage: String?
+    @State private var hasSubmitted = false
 
     init(textEntry: BluetoothPeripheralTextEntry, close: @escaping () -> Void) {
         self.textEntry = textEntry
@@ -306,7 +316,7 @@ struct BluetoothPeripheralTextEntryView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button(textEntry.actionTitle, action: submit)
                     .tint(ConstantsAppColors.toolbarAction)
-                    .disabled(!actionIsEnabled)
+                    .disabled(!actionIsEnabled || hasSubmitted)
             }
         }
         .colorScheme(.dark)
@@ -317,37 +327,59 @@ struct BluetoothPeripheralTextEntryView: View {
     }
 
     private func submit() {
-        guard actionIsEnabled else { return }
+        guard actionIsEnabled, !hasSubmitted else { return }
 
         if let validationMessage = textEntry.inputValidator?(text) {
             self.validationMessage = validationMessage
             return
         }
 
+        // Ignore another tap while the next screen is opening.
+        hasSubmitted = true
         textEntry.actionHandler(text)
-        close()
+        if textEntry.dismissAfterSubmit {
+            close()
+        }
     }
 }
 
 /// Native selection destination requested by a peripheral detail row.
 struct BluetoothPeripheralSelectionListView: View {
+    @State private var selectedRow: Int
+
     let selectionList: BluetoothPeripheralSelectionList
     let close: () -> Void
+    private let initialSelectedRow: Int
+
+    init(selectionList: BluetoothPeripheralSelectionList, close: @escaping () -> Void) {
+        self.selectionList = selectionList
+        self.close = close
+        let initialSelectedRow = selectionList.selectedRow ?? 0
+        self.initialSelectedRow = initialSelectedRow
+        _selectedRow = State(initialValue: initialSelectedRow)
+    }
 
     var body: some View {
         List {
+            if let explanation = selectionList.explanation {
+                Section {
+                    Text(explanation)
+                        .foregroundStyle(Color(.secondaryLabel))
+                }
+            }
+
             Section {
                 ForEach(Array(selectionList.data.enumerated()), id: \.offset) { index, title in
                     Button {
                         select(index: index)
                     } label: {
                         HStack {
-                            Text(title)
+                            optionTitle(title)
                                 .foregroundStyle(Color(.colorPrimary))
 
                             Spacer()
 
-                            if index == selectionList.selectedRow {
+                            if index == selectedRow {
                                 Image(systemName: "checkmark")
                                     .foregroundStyle(ConstantsUI.plusButtonColor)
                             }
@@ -368,12 +400,43 @@ struct BluetoothPeripheralSelectionListView: View {
                 Button(Texts_Common.Cancel, action: close)
                     .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
             }
+            ToolbarItem(placement: .confirmationAction) {
+                Button(Texts_Common.Ok, action: confirmSelection)
+                    .tint(ConstantsAppColors.toolbarAction)
+                    .disabled(selectedRow == initialSelectedRow)
+            }
         }
         .colorScheme(.dark)
     }
 
     private func select(index: Int) {
-        selectionList.actionHandler(index)
+        selectedRow = index
+    }
+
+    @ViewBuilder
+    private func optionTitle(_ title: String) -> some View {
+        if selectionList.emphasizesParenthesizedSuffix,
+           let suffixRange = parenthesizedSuffixRange(in: title) {
+            Text(String(title[..<suffixRange.lowerBound]))
+                + Text(String(title[suffixRange])).bold()
+        } else {
+            Text(title)
+        }
+    }
+
+    private func parenthesizedSuffixRange(in title: String) -> Range<String.Index>? {
+        if title.hasSuffix(")"), let range = title.range(of: " (", options: .backwards) {
+            return title.index(after: range.lowerBound)..<title.endIndex
+        }
+        if title.hasSuffix("）"), let range = title.range(of: "（", options: .backwards) {
+            return range.lowerBound..<title.endIndex
+        }
+        return nil
+    }
+
+    private func confirmSelection() {
+        guard selectedRow != initialSelectedRow else { return }
+        selectionList.actionHandler(selectedRow)
         close()
     }
 }

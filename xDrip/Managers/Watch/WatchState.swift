@@ -43,6 +43,7 @@ struct WatchStatus: WatchPayload {
     var keepAliveIsDisabled: Bool = false
 
     var aidStatus: AIDStatus?
+    var therapyMetrics: TherapyMetricsSnapshot? = nil
 }
 
 /// current BG chart data used to manage watch views

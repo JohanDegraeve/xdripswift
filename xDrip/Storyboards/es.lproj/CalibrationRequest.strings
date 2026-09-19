@@ -4,3 +4,4 @@
 "calibration_notification_body" = "Haz click en la notificación para calibrar";
 "singlePointCalibration" = "Estándar";
 "multiPointCalibration" = "Multi-punto";
+"previousCalibrationPrefillMessage" = "Se ha rellenado el valor de tu calibración anterior de las %@. Compáralo con la lectura actual de tu glucómetro antes de confirmar.";

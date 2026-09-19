@@ -555,7 +555,7 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
             }, cancelHandler: nil, inputValidator: nil)
 
         case .nightscoutAPIKey:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightscoutAPIKey, message:  Texts_SettingsView.giveNightscoutAPIKey, keyboardType: .default, text: UserDefaults.standard.nightscoutAPIKey, placeHolder: "MyAPISecret123", actionTitle: nil, cancelTitle: nil, actionHandler: {(apiKey: String) in
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightscoutAPIKey, message:  Texts_SettingsView.giveNightscoutAPIKey, keyboardType: .credential, text: UserDefaults.standard.nightscoutAPIKey, placeHolder: "MyAPISecret123", actionTitle: nil, cancelTitle: nil, actionHandler: {(apiKey: String) in
                 UserDefaults.standard.nightscoutAPIKey = apiKey.trimmingCharacters(in: .whitespaces).toNilIfLength0()
                 self.resetLastConnectionTimestamp()
             }, cancelHandler: nil, inputValidator: nil)
@@ -571,7 +571,7 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
             }, cancelHandler: nil, inputValidator: nil)
         
         case .token:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightscoutToken, message: Texts_SettingsView.giveNightscoutToken, keyboardType: .default, text: UserDefaults.standard.nightscoutToken, placeHolder: "readable-3f033c4515e623c2", actionTitle: nil, cancelTitle: nil, actionHandler: {(token: String) in
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightscoutToken, message: Texts_SettingsView.giveNightscoutToken, keyboardType: .credential, text: UserDefaults.standard.nightscoutToken, placeHolder: "readable-3f033c4515e623c2", actionTitle: nil, cancelTitle: nil, actionHandler: {(token: String) in
                 UserDefaults.standard.nightscoutToken = token.trimmingCharacters(in: .whitespaces).toNilIfLength0()
                 self.resetLastConnectionTimestamp()
             }, cancelHandler: nil, inputValidator: nil)
@@ -670,7 +670,7 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         case .token:
             return Texts_SettingsView.nightscoutToken
         case .useSchedule:
-            return Texts_SettingsView.useSchedule
+            return Texts_SettingsView.enableSchedule
         case .schedule:
             return Texts_SettingsView.schedule
         case .uploadSensorStartTime:

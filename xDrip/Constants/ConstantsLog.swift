@@ -128,6 +128,10 @@ enum ConstantsLog {
     
     /// SettingsViewSpeakSettingsViewModel
     static let categorySettingsViewSpeakSettingsViewModel = "SpeakSettingsViewModel        "
+
+    /// advanced settings, including follower protocol version overrides
+    static let categorySettingsViewDevelopmentSettingsViewModel =
+                                                            "DevelopmentSettingsViewModel  "
     
     /// LibreOOPClient
     static let categoryLibreOOPClient =                     "LibreOOPClient                "

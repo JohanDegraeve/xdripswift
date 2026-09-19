@@ -16,15 +16,19 @@ struct GlucoseReportMetricGridView: View {
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 4)
 
     var body: some View {
+        // Reuse the same allocated buckets as the report TIR bar. Formatting the three exact
+        // percentages independently here previously allowed this summary row to add up to 101%.
+        let rangeBuckets = analytics.rangeDistribution.timeInRangeBuckets(usesMgDl: analytics.usesMgDl)
+
         LazyVGrid(columns: columns, spacing: 8) {
             metric(title: language.text(.averageGlucose), value: GlucoseReportFormatting.glucose(analytics.averageMgDl, usesMgDl: analytics.usesMgDl), target: "")
             metric(title: "GMI", value: "\(analytics.gmiPercentage.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes)%", target: language.text(.consensusEstimate))
             metric(title: language.text(.cv), value: GlucoseReportFormatting.percentage(analytics.coefficientOfVariation), target: language.text(.targetLessThanOrEqual, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.coefficientOfVariationTargetPercentage)))
             metric(title: language.text(.dataCapture), value: GlucoseReportFormatting.percentage(analytics.dataCapturePercentage), target: language.text(.targetGreaterThanOrEqual, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.minimumDataCapturePercentage)))
             metric(title: language.text(.readings), value: "\(analytics.sampleCount)", target: "\(analytics.readingsPerDay.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes)/day")
-            metric(title: language.text(.timeBelowRange), value: GlucoseReportFormatting.percentage(analytics.rangeDistribution.veryLow + analytics.rangeDistribution.low), target: language.text(.targetLessThan, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.dailyLowTargetPercentage)), indicatorColor: GlucoseReportColors.low)
-            metric(title: language.text(.timeInRange), value: GlucoseReportFormatting.percentage(analytics.rangeDistribution.target), target: language.text(.targetGreaterThanOrEqual, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.dailyTimeInRangeTargetPercentage)), indicatorColor: GlucoseReportColors.target)
-            metric(title: language.text(.timeAboveRange), value: GlucoseReportFormatting.percentage(analytics.rangeDistribution.high + analytics.rangeDistribution.veryHigh), target: language.text(.targetLessThan, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.dailyHighTargetPercentage)), indicatorColor: GlucoseReportColors.high)
+            metric(title: language.text(.timeBelowRange), value: GlucoseReportFormatting.percentage(rangeBuckets[0].wholePercentage), target: language.text(.targetLessThan, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.dailyLowTargetPercentage)), indicatorColor: GlucoseReportColors.low)
+            metric(title: language.text(.timeInRange), value: GlucoseReportFormatting.percentage(rangeBuckets[1].wholePercentage), target: language.text(.targetGreaterThanOrEqual, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.dailyTimeInRangeTargetPercentage)), indicatorColor: GlucoseReportColors.target)
+            metric(title: language.text(.timeAboveRange), value: GlucoseReportFormatting.percentage(rangeBuckets[2].wholePercentage), target: language.text(.targetLessThan, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.dailyHighTargetPercentage)), indicatorColor: GlucoseReportColors.high)
         }
     }
 

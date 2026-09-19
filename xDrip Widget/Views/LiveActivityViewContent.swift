@@ -24,6 +24,17 @@ struct LiveActivityViewContentState: View {
     let state: XDripWidgetAttributes.ContentState
 
     var body: some View {
+        if state.liveActivityType != .disabled, state.isSensorWarmingUp, let endDate = state.sensorWarmupEndDate {
+            LiveActivitySensorWarmupView(endDate: endDate)
+                .padding(.vertical, 16)
+                .activityBackgroundTint(.black)
+        } else {
+            normalContent
+        }
+    }
+
+    @ViewBuilder
+    private var normalContent: some View {
         switch state.liveActivityType {
         case .minimal:
             // Minimal presentation with no chart.
@@ -111,24 +122,37 @@ struct LiveActivityViewContentState: View {
             // Detailed presentation with full chart and metadata.
             ZStack {
                 VStack(spacing: 0) {
-                    HStack(alignment: .center) {
+                    HStack(alignment: .center, spacing: 10) {
                         Text("\(state.bgValueStringInUserChosenUnit()) \(state.trendArrow())")
                             .font(.largeTitle).fontWeight(.bold)
                             .foregroundStyle(state.bgTextColor())
                             .lineLimit(1)
                             .minimumScaleFactor(0.5)
 
-                        Spacer()
-
-                        HStack(alignment: .center, spacing: 10) {
-                            deltaAndUnitText(font: .title)
+                        if let deviceStatusIconImage = state.deviceStatusIconImage(), let deviceStatusColor = state.deviceStatusColor() {
+                            deltaText(font: .title)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.5)
 
-                            if let deviceStatusIconImage = state.deviceStatusIconImage(), let deviceStatusColor = state.deviceStatusColor() {
-                                deviceStatusIconImage
-                                    .font(.title3).bold()
-                                    .foregroundStyle(deviceStatusColor)
+                            Spacer(minLength: 6)
+
+                            if state.showsTherapyMetrics {
+                                aidMetrics()
+                            }
+
+                            deviceStatusIconImage
+                                .font(.title3).bold()
+                                .foregroundStyle(deviceStatusColor)
+                        } else {
+                            Spacer()
+
+                            if state.showsTherapyMetrics {
+                                deltaText(font: .title)
+                                aidMetrics()
+                            } else {
+                                deltaAndUnitText(font: .title)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.5)
                             }
                         }
                     }
@@ -201,6 +225,49 @@ struct LiveActivityViewContentState: View {
             .foregroundColor(Color("colorTertiary"))
     }
 
+    private func aidMetrics() -> some View {
+        // Match the delta size, with room to adapt on narrower screens.
+        ViewThatFits(in: .horizontal) {
+            aidMetricsRow(font: .title)
+            aidMetricsRow(font: .system(size: 26))
+            aidMetricsRow(font: .system(size: 24))
+        }
+    }
+
+    private func aidMetricsRow(font: Font) -> some View {
+        TimelineView(.periodic(from: .now, by: 60)) { context in
+            let metrics = state.resolvedTherapyMetrics
+            HStack(alignment: .center, spacing: 12) {
+                if metrics.iob.isVisible(at: context.date) {
+                    let iobValue = metrics.iob.value(at: context.date)?.formatted(.number.precision(.fractionLength(1))) ?? "-"
+                    aidMetric(value: iobValue, unit: "U", font: font)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(metrics.iob.accessibilityName(isIOB: true))
+                        .accessibilityValue("\(iobValue) U")
+                }
+                if metrics.cob.isVisible(at: context.date) {
+                    aidMetric(value: metrics.cob.number(isIOB: false, at: context.date), unit: "g", font: font)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(metrics.cob.accessibilityName(isIOB: false))
+                        .accessibilityValue(metrics.cob.formatted(isIOB: false, at: context.date))
+                }
+            }
+            .fixedSize(horizontal: true, vertical: false)
+            .lineLimit(1)
+        }
+    }
+
+    private func aidMetric(value: String, unit: String, font: Font) -> some View {
+        HStack(alignment: .center, spacing: 2) {
+            Text(value)
+                .fontWeight(.regular)
+
+            Text(unit)
+        }
+        .font(font)
+        .foregroundColor(Color("colorSecondary"))
+    }
+
     private func openAppWarning(_ text: String) -> some View {
         Text(text)
             .font(.footnote).bold()
@@ -209,5 +276,99 @@ struct LiveActivityViewContentState: View {
             .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10))
             .background(.cyan).opacity(0.9)
             .cornerRadius(10)
+    }
+}
+
+/// shared warm-up view for the Lock Screen, Dynamic Island, CarPlay and Smart Stack
+struct LiveActivitySensorWarmupView: View {
+    let endDate: Date
+    var compactWidth: CGFloat? = nil
+
+    var body: some View {
+        if let compactWidth {
+            compactContent(width: compactWidth)
+        } else {
+            phoneContent
+        }
+    }
+
+    private var phoneContent: some View {
+        HStack(spacing: 40) {
+            Image("AppIconPreview")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 48, height: 48)
+                .clipShape(RoundedRectangle(cornerRadius: 11))
+                .accessibilityLabel(ConstantsHomeView.applicationName)
+
+            HStack(spacing: 8) {
+                Image(systemName: "hourglass")
+                    .font(.title2)
+                    .foregroundStyle(.orange)
+                    .fixedSize()
+                    .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(Texts_Common.sensorWarmingUp)
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                    Text(String(format: Texts_Common.sensorWarmupUntilFormat, endDate.formatted(date: .omitted, time: .shortened)))
+                        .font(.subheadline)
+                        .foregroundStyle(Color("colorSecondary"))
+                }
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        // keep the horizontal padding here to avoid adding it again in the containing view
+        .padding(.leading, 24)
+        .padding(.trailing, 8)
+        .accessibilityElement(children: .combine)
+    }
+
+    private func compactContent(width: CGFloat) -> some View {
+        let roomy = width >= 280
+        let iconSize: CGFloat = roomy ? 40 : 32
+
+        return HStack(spacing: roomy ? 20 : 12) {
+            Image("AppIconPreview")
+                .resizable()
+                .scaledToFit()
+                .frame(width: iconSize, height: iconSize)
+                .clipShape(RoundedRectangle(cornerRadius: roomy ? 9 : 7))
+                .accessibilityLabel(ConstantsHomeView.applicationName)
+
+            HStack(spacing: roomy ? 8 : 6) {
+                Image(systemName: "hourglass")
+                    .font(.system(size: roomy ? 18 : 16))
+                    .foregroundStyle(.orange)
+                    .fixedSize()
+                    .accessibilityHidden(true)
+
+                // fit both lines together so "Until" doesn't become larger than the title
+                ViewThatFits(in: .horizontal) {
+                    compactText(titleSize: roomy ? 16 : 14, timeSize: roomy ? 14 : 12)
+                    compactText(titleSize: 12, timeSize: 10)
+                    compactText(titleSize: 10, timeSize: 9)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, roomy ? 12 : 10)
+        .accessibilityElement(children: .combine)
+    }
+
+    private func compactText(titleSize: CGFloat, timeSize: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(Texts_Common.sensorWarmingUp)
+                .font(.system(size: titleSize, weight: .semibold))
+                .foregroundStyle(.white)
+            Text(String(format: Texts_Common.sensorWarmupUntilFormat, endDate.formatted(date: .omitted, time: .shortened)))
+                .font(.system(size: timeSize))
+                .foregroundStyle(Color("colorSecondary"))
+        }
+        .lineLimit(1)
+        .fixedSize(horizontal: true, vertical: false)
     }
 }

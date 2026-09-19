@@ -19,6 +19,102 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// variable : it can get a new value during app run, will be used by rootviewcontroller's that want to receive info
     public weak var bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
     
+    // Core Bluetooth owns writes on centralQueue. UI readers take only a short value-copy lock.
+    private let signalStrengthLock = NSLock()
+    private var latestSignalStrength: BluetoothSignalStrength?
+    private var signalStrengthRequestStartedAt: Date?
+    private var signalStrengthConnected = false
+    // Queue-owned and in memory only. Keep the budgets across reconnects to avoid trace bursts.
+    // UI sampling also satisfies the activity-driven request cadence.
+    private var signalStrengthTraceCadence = BluetoothSignalStrengthTraceCadence()
+
+    /// In-memory reception sample, retained through normal intermittent disconnections.
+    var signalStrength: BluetoothSignalStrength? {
+        signalStrengthLock.lock()
+        defer { signalStrengthLock.unlock() }
+        return latestSignalStrength
+    }
+
+    /// Copied connection state for the signal screen without reading Core Bluetooth on main.
+    var isSignalStrengthConnected: Bool {
+        signalStrengthLock.lock()
+        defer { signalStrengthLock.unlock() }
+        return signalStrengthConnected
+    }
+
+    private func updateSignalStrengthConnection() {
+        let connected = centralManager?.state == .poweredOn && peripheral?.state == .connected
+        signalStrengthLock.lock()
+        signalStrengthConnected = connected
+        signalStrengthLock.unlock()
+    }
+
+    func readSignalStrength() {
+        runOnCentralQueue { [weak self] in
+            guard let self else { return }
+            self.updateSignalStrengthConnection()
+            guard let peripheral = self.peripheral,
+                  peripheral.state == .connected, self.centralManager?.state == .poweredOn else { return }
+            // Allow a retry if Core Bluetooth never completes an earlier request.
+            if let startedAt = self.signalStrengthRequestStartedAt,
+               Date().timeIntervalSince(startedAt) < 10 { return }
+            self.signalStrengthRequestStartedAt = Date()
+            // Consume the request budget only when readRSSI is actually issued.
+            self.signalStrengthTraceCadence.didRequest(at: ProcessInfo.processInfo.systemUptime)
+            peripheral.readRSSI()
+        }
+    }
+
+    /// Called only from normal Bluetooth value callbacks on centralQueue. No timer or delayed retry.
+    /// The identity check excludes obsolete peripherals without interrupting their caller's protocol handling.
+    final func requestSignalStrengthForTraceIfNeeded(from peripheral: CBPeripheral) {
+        guard peripheral === self.peripheral,
+              peripheral.state == .connected, centralManager?.state == .poweredOn,
+              signalStrengthTraceCadence.requestIsDue(at: ProcessInfo.processInfo.systemUptime) else { return }
+        readSignalStrength()
+    }
+
+    @discardableResult
+    private func recordSignalStrength(_ rssi: Int) -> BluetoothSignalStrength? {
+        guard let sample = BluetoothSignalStrength(rssi: rssi, previous: signalStrength) else { return nil }
+        signalStrengthLock.lock()
+        latestSignalStrength = sample
+        signalStrengthLock.unlock()
+        dispatchToMain { [weak self] in
+            guard let self else { return }
+            self.bluetoothTransmitterDelegate?.didUpdateSignalStrength(bluetoothTransmitter: self)
+            NotificationCenter.default.post(name: .bluetoothSignalStrengthDidChange, object: self)
+        }
+        return sample
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
+        guard peripheral === self.peripheral else { return }
+        signalStrengthRequestStartedAt = nil
+        guard peripheral.state == .connected, centralManager?.state == .poweredOn else { return }
+        let sample = error == nil ? recordSignalStrength(RSSI.intValue) : nil
+        // Publish every valid measurement before throttling diagnostic output.
+        // Only completed reads are traced, never discovery values or cached UI samples.
+        // Success and failure share one result budget so repeated errors stay quiet too.
+        guard signalStrengthTraceCadence.shouldLogResult(at: ProcessInfo.processInfo.systemUptime) else { return }
+        if let sample {
+            // Use the same hysteresis-adjusted reception band as the UI, not the connection status.
+            let status: String
+            switch sample.band {
+            case .strong: status = "green"
+            case .moderate: status = "yellow"
+            case .weak: status = "red"
+            }
+            trace("BLE signal strength: device=%{public}@, rssi=%{public}@dBm, status=%{public}@", log: log,
+                  category: ConstantsLog.categoryBlueToothTransmitter, type: .info,
+                  deviceName ?? "unknown", sample.rssi.description, status)
+        } else {
+            trace("BLE signal strength: device=%{public}@, unavailable=%{public}@", log: log,
+                  category: ConstantsLog.categoryBlueToothTransmitter, type: .debug,
+                  deviceName ?? "unknown", error?.localizedDescription ?? "invalid RSSI")
+        }
+    }
+
     // MARK: - private properties
     /// whether we should auto‑reconnect after the *next* disconnect callback (explicitly controlled)
     private var shouldReconnectOnNextDisconnect = true
@@ -51,7 +147,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     private let centralQueueSpecificKey = DispatchSpecificKey<Void>()
     
     /// assert helper to ensure code is running on centralQueue (debug-only)
-    private func assertOnCentral(function: String = #function) {
+    final func assertOnCentral(function: String = #function) {
         // Using dispatchPrecondition is safe and low-overhead. This is for development safety only.
         dispatchPrecondition(condition: .onQueue(centralQueue))
     }
@@ -65,13 +161,32 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
     }
 
-    /// helper to synchronously execute work on centralQueue (re-entrant safe)
+    /// Synchronously enters the Core Bluetooth queue for the established APIs that must return an
+    /// immediate scan result. Keep this private so a subclass cannot expose Bluetooth-owned state
+    /// to the main thread and recreate a queue inversion.
     private func runOnCentralQueueSync<T>(_ block: () -> T) -> T {
         if DispatchQueue.getSpecific(key: centralQueueSpecificKey) != nil {
             return block()
         } else {
             return centralQueue.sync(execute: block)
         }
+    }
+
+    /// Executes subclass protocol state on the same serial queue as Core Bluetooth callbacks.
+    final func runOnCentralQueue(_ block: @escaping () -> Void) {
+        if DispatchQueue.getSpecific(key: centralQueueSpecificKey) != nil {
+            block()
+        } else {
+            centralQueue.async(execute: DispatchWorkItem(block: block))
+        }
+    }
+
+    /// Keeps delayed protocol work on the Core Bluetooth queue instead of crossing through main.
+    final func runOnCentralQueue(after delay: TimeInterval, _ block: @escaping () -> Void) {
+        centralQueue.asyncAfter(
+            deadline: .now() + delay,
+            execute: DispatchWorkItem(block: block)
+        )
     }
     
     /// centralManager
@@ -113,35 +228,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     private var lastConnectLogName: String? = nil
     
     private var hasLoggedPersistThisRun = false
-    /// If set by a subclass, we will treat the *next* disconnect as a temporary rejection for this specific device name.
-    /// This is intended for transient pre-auth cases (e.g. G7/ONE+ "Encryption is insufficient").
-    private var pendingTemporaryRejectionDeviceName: String? = nil
-    
-    /// Names of devices we should avoid reconnecting to for a short period after a recent disconnect
-    private var temporarilyRejectedDeviceNames: [String: Date] = [:]
-    private let temporaryRejectionCooldownSeconds: TimeInterval = 180
-
     /// set the connection options
     private var connectOptions: [String: Any] {
         [CBConnectPeripheralOptionNotifyOnConnectionKey: true, CBConnectPeripheralOptionNotifyOnDisconnectionKey: true]
-    }
-    
-    /// Returns true if the given device name is currently under temporary rejection cooldown
-    private func isTemporarilyRejected(_ discoveredDeviceName: String) -> Bool {
-        if let lastRejection = temporarilyRejectedDeviceNames[discoveredDeviceName] {
-            return Date().timeIntervalSince(lastRejection) < temporaryRejectionCooldownSeconds
-        }
-        return false
-    }
-    
-    /// Records a device name as temporarily rejected from immediate reconnection attempts
-    private func markDeviceNameAsTemporarilyRejected(_ discoveredDeviceName: String) {
-        temporarilyRejectedDeviceNames[discoveredDeviceName] = Date()
-    }
-
-    /// Returns true if the device name looks like a Dexcom G7/ONE+ (DX**)
-    private func isDexcomG7StyleName(_ name: String) -> Bool {
-        return name.uppercased().hasPrefix("DX")
     }
     
     // MARK: - Initialization
@@ -191,31 +280,21 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: - De-initialization
     
     deinit {
-        // Clear CoreBluetooth delegates synchronously on main as last resort
-        let clear = {
-            self.centralManager?.delegate = nil
-            self.peripheral?.delegate = nil
-        }
-        if Thread.isMainThread {
-            clear()
-        } else {
-            DispatchQueue.main.sync(execute: clear)
-        }
+        // Core Bluetooth delegates are weak. Clear them directly as a final safeguard. Dispatching
+        // synchronously from deinit could deadlock if main and Bluetooth are already waiting on one another.
+        centralManager?.delegate = nil
+        peripheral?.delegate = nil
     }
     
     // MARK: - public functions
     
-    /// Hook for subclasses to clear CoreBluetooth delegates/timers before ARC release.
-    /// Default clears CoreBluetooth delegates on the main thread synchronously to avoid races with CB callbacks.
+    /// Hook for subclasses to clear Core Bluetooth delegates and connection-owned state before ARC
+    /// release. Cleanup is queued with the callbacks it protects. Callers must never wait for the
+    /// Bluetooth queue from main because a callback may itself be completing main-thread work.
     @objc func prepareForRelease() {
-        let clear = {
+        runOnCentralQueue {
             self.centralManager?.delegate = nil
             self.peripheral?.delegate = nil
-        }
-        if Thread.isMainThread {
-            clear()
-        } else {
-            DispatchQueue.main.sync(execute: clear)
         }
     }
     
@@ -240,6 +319,17 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// Subclasses can opt in when a restored/already-connected session must quickly make
     /// service-discovery progress or be abandoned. Generic transmitters keep legacy behavior.
     func shouldTimeoutStalledConnectionSetup() -> Bool {
+        false
+    }
+
+    /// Subclasses can request duplicate advertisements when connection decisions depend on live
+    /// system state. Normal transmitters retain CoreBluetooth's default de-duplicated scanning.
+    func scanOptions() -> [String: Any]? {
+        nil
+    }
+
+    /// Override for transmitters whose notification window cannot tolerate another centralQueue turn.
+    func shouldSetNotifyValueInline() -> Bool {
         false
     }
 
@@ -355,7 +445,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 case .poweredOn:
                     
                     trace("in startScanning, state is poweredOn", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, troubleshooting: .detailed(.bluetooth(.scanning)))
-                    centralManager.scanForPeripherals(withServices: services, options: nil)
+                    centralManager.scanForPeripherals(withServices: services, options: scanOptions())
                     returnValue = .success
                     
                 case .poweredOff:
@@ -439,10 +529,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         if let peripheral = peripheral {
             trace("in setNotifyValue, for peripheral with name %{public}@, setting notify for characteristic %{public}@, to %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, deviceName ?? "'unknown'", characteristic.uuid.uuidString, enabled.description)
 
-            // CoreBluetooth delegate callbacks already arrive on centralQueue. In Dexcom
-            // passive/co-existence mode the control notification window can be very short,
-            // so do not queue-hop from an auth callback before subscribing to Write_Control.
-            if DispatchQueue.getSpecific(key: centralQueueSpecificKey) != nil {
+            // Keep the pre-version 7 queued sequencing unless a transmitter has a short-lived
+            // notification window and is already executing inside its CoreBluetooth callback.
+            if shouldSetNotifyValueInline(), DispatchQueue.getSpecific(key: centralQueueSpecificKey) != nil {
                 peripheral.setNotifyValue(enabled, for: characteristic)
             } else {
                 centralQueue.async {
@@ -459,22 +548,17 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         self.expectedName = name
     }
 
-    /// Requests that the next disconnect be treated as a temporary rejection for the given device name.
-    /// Use this from subclasses only in specific transient pre-auth flows.
-    func scheduleTemporaryRejectionOnNextDisconnect(forDeviceName name: String) {
-        centralQueue.async { [weak self] in
-            self?.pendingTemporaryRejectionDeviceName = name
-        }
-    }
-
     /// Find a peripheral already connected to the iOS Bluetooth stack (possibly by another app),
     /// matching at least one of the given service UUIDs, and connect to it without scanning.
     ///
     /// Used to piggy-back on a third-party app's authenticated BLE session (e.g. Medtrum EasyPatch).
     /// iOS multiplexes a single ACL link between apps, so notifications fan out to us once subscribed.
     ///
+    /// - parameters:
+    ///     - serviceUUIDs: the services that must be exposed by the connected peripheral
+    ///     - allowFallback: when false, only the stored address or expected device name may be used
     /// - returns: true if a matching peripheral was found and connection was initiated.
-    func retrieveConnectedPeripheral(withServiceUUIDs serviceUUIDs: [CBUUID]) -> Bool {
+    func retrieveConnectedPeripheral(withServiceUUIDs serviceUUIDs: [CBUUID], allowFallback: Bool = true) -> Bool {
         return runOnCentralQueueSync {
             guard let central = centralManager else { return false }
             let peripherals = central.retrieveConnectedPeripherals(withServices: serviceUUIDs)
@@ -482,11 +566,20 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 trace("in retrieveConnectedPeripheral, no system-connected peripherals match given services", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
                 return false
             }
-            // Prefer one matching expectedName if set; otherwise take the first.
-            let candidate: CBPeripheral = peripherals.first(where: { p in
+            // Prefer the previously selected peripheral, then the expected name. New-device flows
+            // can disable the final fallback when several nearby devices expose the same service.
+            // This is important for Dexcom because the final characters in the entered transmitter
+            // ID identify the one Bluetooth name that is safe to adopt.
+            let knownCandidate: CBPeripheral? = peripherals.first(where: { $0.identifier.uuidString == deviceAddress })
+                ?? peripherals.first(where: { p in
                 guard let expected = expectedName, let n = p.name else { return false }
                 return n.range(of: expected, options: .caseInsensitive) != nil
-            }) ?? peripherals[0]
+                })
+
+            guard let candidate = knownCandidate ?? (allowFallback ? peripherals[0] : nil) else {
+                trace("in retrieveConnectedPeripheral, system-connected peripherals were found but none matched the stored address or expected name", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                return false
+            }
             trace("in retrieveConnectedPeripheral, connecting to system-connected peripheral name=%{public}@ id=%{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, candidate.name ?? "<unnamed>", candidate.identifier.uuidString)
             stopScanAndconnect(to: candidate)
             return true
@@ -629,12 +722,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         // check if stored address not nil, in which case we already connected before and we expect a full match with the already known device name
         if let deviceAddress = deviceAddress {
             if peripheral.identifier.uuidString == deviceAddress {
-                // Skip recently rejected devices for a short cooldown period to avoid latching on the same stale DX transmitter repeatedly
-                if let discoveredName = peripheral.name, isDexcomG7StyleName(discoveredName), isTemporarilyRejected(discoveredName) {
-                    trace("in didDiscover, discovery skip: %{public}@ is within temporary rejection cooldown, keep scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, discoveredName)
-                    return
-                }
                 trace("in didDiscover, stored address matches peripheral address, will try to connect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                recordSignalStrength(RSSI.intValue)
                 stopScanAndconnect(to: peripheral)
             } else {
                 trace("in didDiscover, stored address does not match peripheral address, ignoring this device", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
@@ -646,12 +735,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 // so it's a new device, we need to see if it matches the specifically expected device name
                 if (peripheral.name?.range(of: expectedName, options: .caseInsensitive)) != nil {
                     // peripheral.name is not nil and contains expectedName
-                    // Skip recently rejected devices for a short cooldown period to avoid latching on the same stale DX transmitter repeatedly
-                    if let discoveredName = peripheral.name, isDexcomG7StyleName(discoveredName), isTemporarilyRejected(discoveredName) {
-                        trace("in didDiscover, discovery skip: %{public}@ is within temporary rejection cooldown, keep scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, discoveredName)
-                        return
-                    }
                     trace("in didDiscover, new peripheral has expected device name, will try to connect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                    recordSignalStrength(RSSI.intValue)
                     stopScanAndconnect(to: peripheral)
                 } else {
                     // peripheral.name is nil or does not contain expectedName
@@ -659,19 +744,18 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 }
             } else {
                 // we don't expect any specific device name, so let's connect
-                // Skip recently rejected devices for a short cooldown period to avoid latching on the same stale DX transmitter repeatedly
-                if let discoveredName = peripheral.name, isDexcomG7StyleName(discoveredName), isTemporarilyRejected(discoveredName) {
-                    trace("in didDiscover, discovery skip: %{public}@ is within temporary rejection cooldown, keep scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, discoveredName)
-                    return
-                }
                 trace("in didDiscover, new peripheral, will try to connect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                recordSignalStrength(RSSI.intValue)
                 stopScanAndconnect(to: peripheral)
             }
         }
     }
     
-    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+    /// Shared connection bookkeeping for subclasses with custom discovery flows.
+    func handleDidConnectCommon(_ peripheral: CBPeripheral) {
         
+        signalStrengthRequestStartedAt = nil
+        readSignalStrength()
         cancelConnectionTimer()
         scheduleConnectionSetupTimeout()
         // A previous timed-out connect attempt can temporarily disable reconnect.
@@ -686,7 +770,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         let cgmTransmitter = self as? CGMTransmitter
         if cgmTransmitter != nil || now.timeIntervalSince(lastConnectLogAt) > 2.0 || lastConnectLogName != name {
             // The developer trace keeps the peripheral name. The consumer candidate is typed as a
-            // CGM connection only when this transmitter really is a CGM; this prevents an unrelated
+            // CGM connection only when this transmitter really is a CGM. This prevents an unrelated
             // display or heartbeat connection from falsely completing a pending Add CGM action. The
             // store still discards routine CGM radio cycles unless this completes a user request or
             // proves recovery from a retained connection problem. CGM callbacks deliberately bypass
@@ -743,8 +827,11 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             }
         }
         
+    }
+
+    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        handleDidConnectCommon(peripheral)
         peripheral.discoverServices(servicesCBUUIDs)
-        
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
@@ -761,6 +848,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        updateSignalStrengthConnection()
         
         timeStampLastStatusUpdate = Date()
         trace("in centralManagerDidUpdateState, for peripheral with name %{public}@, new state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", "\(central.state.toString())")
@@ -784,6 +872,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        updateSignalStrengthConnection()
+        signalStrengthRequestStartedAt = nil
         
         timeStampLastStatusUpdate = Date()
         cancelConnectionTimer()
@@ -802,31 +892,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             } else {
                 // Unexpected error
                 // Unlike the normal short CGM disconnect above, an unexpected Core Bluetooth error
-                // is a real loss of connectivity. Expose the state only; the error and device name
+                // is a real loss of connectivity. Expose the state only. The error and device name
                 // remain confined to the developer trace.
                 trace("in didDisconnectPeripheral, didDisconnect peripheral %{public}@ with error: %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error, troubleshooting: .standard(.bluetooth(.connectionFailed)), deviceName ?? "'unknown'", err.localizedDescription)
             }
         } else {
             // Clean disconnect (rare, but handle)
             trace("in didDisconnectPeripheral, didDisconnect peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, troubleshooting: .detailed(.bluetooth(.disconnected)), deviceName ?? "'unknown'")
-        }
-
-        // One-shot, subclass-requested temporary rejection (e.g., pre-auth transient on G7/ONE+)
-        if let requestedRejectionName = pendingTemporaryRejectionDeviceName {
-            markDeviceNameAsTemporarilyRejected(requestedRejectionName)
-            pendingTemporaryRejectionDeviceName = nil
-        }
-
-        // If this device name is under temporary rejection, do NOT auto-reconnect, resume scanning so we can discover other DX devices instead
-        if let currentName = deviceName, isTemporarilyRejected(currentName) {
-            trace("in didDisconnectPeripheral, skip auto-reconnect for %{public}@ (temporary rejection active), resuming scan", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, currentName)
-            // Clear the peripheral reference so we do not request an OS-level reconnect to the same handle
-            self.peripheral = nil
-            self.deviceAddress = nil
-            // Always re-enable default policy for future disconnects
-            shouldReconnectOnNextDisconnect = true
-            _ = startScanning()
-            return
         }
 
         // Keep noisy reconnect intent at debug
@@ -911,6 +983,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        if error == nil, characteristic.value != nil {
+            requestSignalStrengthForTraceIfNeeded(from: peripheral)
+        }
         
         // trace the received value
         if let value = characteristic.value {
@@ -948,6 +1023,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             
             switch restoredPeripheral.state {
             case .connected:
+                readSignalStrength()
                 // On restore while connected, always rediscover services so subclasses can resubscribe ALL required characteristics (not just the cached receive one).
                 trace("didUpdateValueFor, connected, rediscovering services for full resubscribe", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
                 restoredPeripheral.discoverServices(self.servicesCBUUIDs)
@@ -1104,5 +1180,118 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         ///     * For an xDrip bridge, we don't expect a specific devicename, in which case the value stays nil
         case notYetConnected (expectedName:String?)
         
+    }
+}
+
+/// Display bands are approximate reception levels, not a measure of successful glucose reads.
+struct BluetoothSignalStrength {
+    enum Band { case strong, moderate, weak }
+
+    // Shared display cutoffs for the dot, gauge and history bands.
+    static let strongFrom = -95
+    static let moderateFrom = -110
+    static let displayRange = -120 ... -50
+
+    let rssi: Int
+    let measuredAt: Date
+    let band: Band
+
+    init?(rssi: Int, measuredAt: Date = Date(), previous: BluetoothSignalStrength? = nil) {
+        // 127 means unavailable. Positive values are not useful BLE reception measurements.
+        guard (-127...0).contains(rssi) else { return nil }
+        self.rssi = rssi
+        self.measuredAt = measuredAt
+        var band: Band = rssi >= Self.strongFrom ? .strong : (rssi >= Self.moderateFrom ? .moderate : .weak)
+        // Keep a two-dBm margin around a recent band's boundary to avoid flickering colours.
+        if let previous, (0..<15).contains(measuredAt.timeIntervalSince(previous.measuredAt)) {
+            switch previous.band {
+            case .strong where rssi >= Self.strongFrom - 2: band = .strong
+            case .moderate where ((Self.moderateFrom - 2) ... (Self.strongFrom + 1)).contains(rssi): band = .moderate
+            case .weak where rssi < Self.moderateFrom + 2: band = .weak
+            default: break
+            }
+        }
+        self.band = band
+    }
+
+    func isCurrent(now: Date = Date()) -> Bool {
+        (0..<330).contains(now.timeIntervalSince(measuredAt))
+    }
+}
+
+extension Notification.Name {
+    static let bluetoothSignalStrengthDidChange = Notification.Name("bluetoothSignalStrengthDidChange")
+}
+
+/// Only observations received during this visit belong in the two-minute live chart.
+struct BluetoothSignalStrengthHistory {
+    struct Point: Identifiable {
+        let sample: BluetoothSignalStrength
+        var id: Date { sample.measuredAt }
+    }
+
+    let startedAt: Date
+    private(set) var points = [Point]()
+    private var lastMeasurementAt: Date?
+
+    init(startedAt: Date = Date()) {
+        self.startedAt = startedAt
+    }
+
+    mutating func update(sample: BluetoothSignalStrength?, now: Date) {
+        points.removeAll { $0.sample.measuredAt < now.addingTimeInterval(-120) }
+        guard let sample, sample.measuredAt >= startedAt, sample.measuredAt <= now,
+              lastMeasurementAt.map({ sample.measuredAt > $0 }) ?? true else { return }
+        guard sample.measuredAt >= now.addingTimeInterval(-120) else { return }
+        points.append(Point(sample: sample))
+        lastMeasurementAt = sample.measuredAt
+    }
+}
+
+/// Expands to retain the weakest and strongest displayed signals for one visit.
+struct BluetoothSignalStrengthGauge {
+    // Minimum clearance in dBm from each observed extreme, independent of the display thresholds.
+    private static let padding = 2
+    private(set) var lowerBound = -120
+    private(set) var upperBound = -80
+    private(set) var minimumRSSI: Int?
+    private(set) var maximumRSSI: Int?
+
+    mutating func observe(_ sample: BluetoothSignalStrength?) {
+        guard let sample else { return }
+        // Retain actual observations for the translucent markers and unshaded working range.
+        // Both extremes start at the first sample and reset when the view is reopened.
+        minimumRSSI = min(minimumRSSI ?? sample.rssi, sample.rssi)
+        maximumRSSI = max(maximumRSSI ?? sample.rssi, sample.rssi)
+        // Preserve padding even when a new extreme falls inside the existing bounds. Never shrink during a visit.
+        lowerBound = min(lowerBound, sample.rssi - Self.padding)
+        upperBound = max(upperBound, sample.rssi + Self.padding)
+    }
+
+    func position(for rssi: Int) -> Double {
+        min(1, max(0, Double(rssi - lowerBound) / Double(upperBound - lowerBound)))
+    }
+}
+
+/// Independent request and result budgets prevent UI polling or notification bursts from flooding traces.
+/// Monotonic time avoids clock changes affecting the cadence. The owning transmitter keeps this on centralQueue.
+/// A missing callback consumes only the request budget. The next eligible activity can try again after five minutes.
+struct BluetoothSignalStrengthTraceCadence {
+    private static let interval: TimeInterval = 5 * 60
+    private var lastRequest: TimeInterval?
+    private var lastResult: TimeInterval?
+
+    func requestIsDue(at uptime: TimeInterval) -> Bool {
+        lastRequest.map { uptime - $0 >= Self.interval } ?? true
+    }
+
+    mutating func didRequest(at uptime: TimeInterval) {
+        lastRequest = uptime
+    }
+
+    mutating func shouldLogResult(at uptime: TimeInterval) -> Bool {
+        guard lastResult.map({ uptime - $0 >= Self.interval }) ?? true else { return false }
+        lastResult = uptime
+        return true
     }
 }

@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Ρυθμίσεις";
-"settingsviews_glucoseDisplaySectionTitle" = "Προβολή";
+"settingsviews_glucoseDisplaySectionTitle" = "Γενικά";
 "settingsviews_glucoseRangesSectionTitle" = "Εύρη γλυκόζης";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Συναγερμοί και ειδοποιήσεις";
 "settingsviews_sharingAndServicesSectionTitle" = "Κοινή χρήση και υπηρεσίες";
@@ -72,7 +72,8 @@
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Επιλογές μεταφόρτωσης";
 "settingsviews_nightscoutEnabled" = "Ενεργοποίηση του Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
-"settingsviews_useSchedule" = "Μεταφόρτωση με χρονοδιάγραμμα;";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "Ενεργοποίηση χρονοδιαγράμματος";
 "schedule" = "Χρονοδιάγραμμα";
 "settingsviews_giveNightscoutUrl" = "Εισαγάγετε το Nightscout URL σας";
 "settingsviews_nightscoutAPIKey" = "API_SECRET";
@@ -458,3 +459,53 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Γράφημα";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Βασικό";
 "settingsviews_liveActivitySectionTitle" = "Ζωντανή δραστηριότητα";
+"settingsviews_dexcomG7Message" = "Αφήστε κενό το όνομα Bluetooth. Στην επόμενη οθόνη, πατήστε Σάρωση για αυτόματη αναζήτηση του αισθητήρα.\n\nΕάν ο αισθητήρας έχει εμφανιστεί προηγουμένως στις Ρυθμίσεις > Bluetooth, μπορείτε να εισαγάγετε το όνομα Bluetooth χειροκίνητα.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Διάρκεια Υδατανθράκων";
+"therapy.local" = "Υπολογίζεται τοπικά";
+
+"settingsviews_showOriginalBGReadings" = "Εμφάνιση Αρχικών Τιμών";
+
+"therapy.insulinType" = "Τύπος Ινσουλίνης";
+
+"therapy.showIOBCOB" = "Εμφάνιση IOB/COB";
+
+"therapy.treatmentSettings" = "Θεραπείες";
+
+"therapy.settingsHelp" = "Χρησιμοποιούνται για την εκτίμηση της υπολειπόμενης ινσουλίνης και των υδατανθράκων από τις καταγεγραμμένες θεραπείες.";
+
+"therapy.settingsLocal" = "Αυτές οι ρυθμίσεις εκτιμούν IOB και COB από καταγεγραμμένες θεραπείες μόνο όταν οι τιμές δεν παρέχονται από σύστημα AID.";
+"therapy.settingsExternal" = "Αυτές οι επιλογές είναι απενεργοποιημένες επειδή το σύστημα AID που βασίζεται στο %@ παρέχει IOB και COB.";
+"therapy.settingsMixed" = "Το %@ παρέχει IOB, επομένως ο τύπος ινσουλίνης είναι αυτόματος. Η διάρκεια υδατανθράκων εκτιμά το COB τοπικά από καταγεγραμμένα γεύματα.";
+"therapy.insulinModel" = "Επιλέχθηκε το μοντέλο ινσουλίνης %@. Διάρκεια δράσης ινσουλίνης (DIA): %@. Χρόνος έως τη μέγιστη δράση ινσουλίνης: %@.";
+"therapy.carbFast" = "Ταχύτερη απορρόφηση υδατανθράκων. Περιλαμβάνει καθυστέρηση 10 λεπτών πριν από την έναρξη.";
+"therapy.carbNormal" = "Κανονική απορρόφηση υδατανθράκων. Περιλαμβάνει καθυστέρηση 10 λεπτών πριν από την έναρξη.";
+"therapy.carbLong" = "Μεγαλύτερη διάρκεια απορρόφησης υδατανθράκων. Μπορεί να είναι χρήσιμη όταν φάρμακα GLP-1 επιβραδύνουν την πέψη. Περιλαμβάνει καθυστέρηση 10 λεπτών πριν από την έναρξη.";
+"therapy.automatic" = "Αυτόματο";
+
+"therapy.liveActivityMetricsFooter" = "Εμφάνιση των διαθέσιμων IOB και COB στη μεγάλη διάταξη οθόνης κλειδώματος και στη διάταξη γραφήματος CarPlay/Έξυπνης στοίβας.";
+
+"therapy.liveActivityMetricsUnavailable" = "Το IOB/COB απαιτεί καταγεγραμμένες θεραπείες ινσουλίνης ή υδατανθράκων ή δεδομένα από συνδεδεμένο σύστημα AID.";
+
+"homeScreen.renderBasalDownwards" = "Εμφάνιση βασικής προς τα κάτω";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "Ενεργό";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "Ανενεργό";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "Πρόγραμμα";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "Ενεργοποίηση στις";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "Απενεργοποίηση στις";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "Όταν η εκφώνηση γλυκόζης είναι ενεργοποιημένη, οι μετρήσεις εκφωνούνται μόνο μέσα σε αυτές τις ώρες. Το πρόγραμμα επαναλαμβάνεται καθημερινά με βάση την τοπική ώρα του τηλεφώνου και μπορεί να περνά τα μεσάνυχτα. Οι συντομεύσεις αλλάζουν μόνο τον κύριο διακόπτη εκφώνησης γλυκόζης.";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "Επιλέξτε διαφορετικές ώρες ενεργοποίησης και απενεργοποίησης.";

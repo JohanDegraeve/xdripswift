@@ -17,39 +17,33 @@ struct MainViewAIDStatusView: View {
     var body: some View {
         let textSize: CGFloat = isSmallScreen ? 14 : 16
         
+        let metrics = watchState.resolvedTherapyMetrics
         HStack(alignment: .center, spacing: 0) {
-            Text(watchState.aidStatusIOBString())
-                .font(.system(size: textSize))
-                .fontWeight(.semibold)
-                .foregroundStyle(.colorPrimary)
-            
-            Spacer()
-            
-            // CareLink sends meal entries but no active-carb/COB calculation. The shared semantic
-            // capability keeps the unavailable placeholder out of both Watch and iOS compact rows.
-            if watchState.aidStatus?.supportsCOB == true {
-                Text(watchState.aidStatusCOBString())
-                    .font(.system(size: textSize))
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.colorPrimary)
-
+            if metrics.iob.isVisible() {
+                Text(watchState.aidStatusIOBString())
+                    .accessibilityLabel(metrics.iob.accessibilityName(isIOB: true))
+                    .accessibilityValue(watchState.aidStatusIOBString())
                 Spacer()
             }
-            
-            HStack(alignment: .center, spacing: 5) {
-                Text(watchState.aidStatusActivityAgeString())
-                    .font(.system(size: textSize))
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.colorPrimary)
-
-                watchState.aidStatusIconImage()
-                    .font(.system(size: textSize))
-                    .fontWeight(.bold)
-                    .foregroundStyle(watchState.aidStatusColor() ?? .colorSecondary)
+            if metrics.cob.isVisible() {
+                Text(watchState.aidStatusCOBString())
+                    .accessibilityLabel(metrics.cob.accessibilityName(isIOB: false))
+                    .accessibilityValue(watchState.aidStatusCOBString())
+                Spacer()
+            }
+            // Local estimates do not imply a pump or an AID operating status.
+            if watchState.aidStatus != nil {
+                HStack(alignment: .center, spacing: 5) {
+                    Text(watchState.aidStatusActivityAgeString())
+                    watchState.aidStatusIconImage()
+                        .fontWeight(.bold)
+                        .foregroundStyle(watchState.aidStatusColor() ?? .colorSecondary)
+                }
             }
         }
-        //        .padding(.leading, isSmallScreen ? 6 : 8)
-        //        .padding(.trailing, isSmallScreen ? 6 : 8)
+        .font(.system(size: textSize))
+        .fontWeight(.semibold)
+        .foregroundStyle(.colorPrimary)
         .padding(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
         .background(.white.opacity(0.2)).clipShape(RoundedRectangle(cornerRadius: 5))
         

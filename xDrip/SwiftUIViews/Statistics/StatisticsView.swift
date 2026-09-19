@@ -16,9 +16,11 @@ struct StatisticsView: View {
     @State private var isShowingReportGenerator = false
     @State private var selectedPage: StatisticsPage = .cgmData
     private let statisticsManager: StatisticsManager
+    private let refreshRevision: Int
 
-    init(statisticsManager: StatisticsManager) {
+    init(statisticsManager: StatisticsManager, refreshRevision: Int = 0) {
         self.statisticsManager = statisticsManager
+        self.refreshRevision = refreshRevision
         _viewModel = StateObject(wrappedValue: StatisticsViewModel(statisticsManager: statisticsManager))
     }
 
@@ -50,7 +52,9 @@ struct StatisticsView: View {
             GenerateReportView(statisticsManager: statisticsManager)
                 .ipadLargeSheet(width: 980, height: 840)
         }
-        .task {
+        .task(id: refreshRevision) {
+            // The manager invalidates cached calculations after Core Data changes. Re-run the view
+            // request as well so a Statistics tab that remains open cannot retain the old result.
             viewModel.load()
         }
     }
@@ -374,7 +378,9 @@ private struct StatisticsRangeCard: View {
     var body: some View {
         StatisticsCard {
             GeometryReader { geometry in
-                HStack(spacing: 1) {
+                // Exact normalized widths already fill the complete bar. Adding inter-segment
+                // spacing would make the rendered distribution wider than 100%.
+                HStack(spacing: 0) {
                     ForEach(buckets) { bucket in
                         Rectangle()
                             .fill(bucket.color)
@@ -403,7 +409,7 @@ private struct StatisticsRangeCard: View {
                                     .lineLimit(1)
                             }
                         }
-                        Text(GlucoseReportFormatting.percentage(bucket.percentage))
+                        Text(GlucoseReportFormatting.percentage(bucket.wholePercentage))
                             .font(.callout.weight(.bold))
                             .foregroundStyle(Color(.colorPrimary))
                             .monospacedDigit()
@@ -415,8 +421,7 @@ private struct StatisticsRangeCard: View {
     }
 
     private func segmentWidth(for bucket: GlucoseReportRangeBucket, totalWidth: CGFloat) -> CGFloat {
-        guard bucket.percentage > 0 else { return 0 }
-        return max(2, totalWidth * CGFloat(bucket.percentage / 100))
+        totalWidth * CGFloat(max(0, min(100, bucket.percentage)) / 100)
     }
 
     private func shouldShowRangeDetail(for bucket: GlucoseReportRangeBucket) -> Bool {
@@ -684,7 +689,7 @@ private struct StatisticsDailyPatternCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            StatisticsSection(title: Texts_Common.statisticsDailyPattern, detail: String(format: Texts_Common.statisticsAverageFormat, GlucoseReportFormatting.percentage(averageInRangePercentage))) {
+            StatisticsSection(title: Texts_Common.statisticsDailyPattern, detail: String(format: Texts_Common.statisticsAverageFormat, GlucoseReportFormatting.percentage(overallInRangePercentage))) {
                 StatisticsCard {
                     Chart {
                     ForEach(analytics.dailySummaries) { summary in
@@ -734,17 +739,26 @@ private struct StatisticsDailyPatternCard: View {
                 }
             }
 
-            Text(Texts_Common.statisticsDailyPatternFooter)
+            Text(dailyPatternFooter)
                 .font(.caption2)
                 .foregroundStyle(Color(.colorSecondary))
                 .padding(.horizontal, 12)
         }
     }
 
-    private var averageInRangePercentage: Double {
-        let validSummaries = analytics.dailySummaries.filter { $0.sampleCount > 0 }
-        guard !validSummaries.isEmpty else { return 0 }
-        return validSummaries.map(\.targetPercentage).reduce(0, +) / Double(validSummaries.count)
+    /// Format the fixed clinical range in the same units as the rest of this report.
+    private var dailyPatternFooter: String {
+        let low = GlucoseReportClinicalConstants.timeInRangeLowMgDl.mgDlToMmolAndToString(mgDl: analytics.usesMgDl)
+        let high = GlucoseReportClinicalConstants.timeInRangeHighMgDl.mgDlToMmolAndToString(mgDl: analytics.usesMgDl)
+        let unit = analytics.usesMgDl ? Texts_Common.mgdl : Texts_Common.mmol
+        return Texts_Common.statisticsDailyPatternFooter(range: "\(low)-\(high) \(unit)")
+    }
+
+    private var overallInRangePercentage: Double {
+        // Weight the summary with every sample in the selected report period, exactly like the TIR
+        // card above. Averaging daily percentages equally produces a different answer whenever one
+        // day has less CGM coverage than another.
+        analytics.rangeDistribution.target
     }
 
     private var xAxisDates: [Date] {

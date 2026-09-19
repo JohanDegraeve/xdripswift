@@ -11,6 +11,10 @@
 "sensorType" = "Sensor Type";
 "serialNumber" = "Serial Number";
 "battery" = "Battery";
+"versionCode" = "Versionskode";
+"voltageA" = "Spænding A";
+"voltageB" = "Spænding B";
+"waitingForData" = "Venter på data...";
 "needsTransmitterId" = "Missing Transmitter ID";
 "scan" = "Scan";
 "medtrumNanoPumpScanNoticeTitle" = "Forbindelse til Medtrum Nano-pumpe";
@@ -39,7 +43,6 @@
 "confirmDisconnectMessage" = "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.";
 "transmittterStartDate" = "Transmitter Started";
 "sensorStartDate" = "Sensor Started";
-"useOtherDexcomApp" = "Sameksistenstilstand";
 "useOtherDexcomAppCoexistenceFooter" = "Sameksistenstilstand lader os arbejde sammen med en anden app, f.eks. Dexcom eller CamAPS. Den app skal fortsat køre i baggrunden.";
 "useOtherDexcomAppPrimaryFooter" = "Primær tilstand forbinder som hovedappen og styrer forbindelsen.";
 "runningInCoexistenceMode" = "Kører i sameksistenstilstand";
@@ -71,13 +74,13 @@
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
 
 /// sensor warm-up text
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "Opvarmning til";
 
 /// Scan again button
 "nfcScanFailedScanAgainButton" = "Scan Again";
 
 /// Tell the user the scan was successful and to just wait now for connection
-"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 
 /// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
 "readSuccessLast24Hours" = "Seneste 24 timer";
@@ -111,15 +114,71 @@
 
 /* Dexcom G6 Bluetooth authentication slot */
 "dexcomG6BluetoothSlot" = "Bluetooth-kanal";
-"dexcomG6MobileAppSlot" = "Mobilapp (Standard)";
+"dexcomG6MobileAppSlot" = "Plads 2: Mobilapp (Standard)";
 "dexcomG6MobileAppSlotShort" = "Mobilapp";
-"dexcomG6MedicalDeviceSlot" = "Modtager eller pumpe (Eksperimentel)";
+"dexcomG6MedicalDeviceSlot" = "Plads 1: Modtager eller pumpe";
 "dexcomG6MedicalDeviceSlotShort" = "Pumpe";
 "dexcomG6MobileAppSlotFooter" = "Mobilapp-kanalen er standarden til telefonforbindelser.";
 "dexcomG6MedicalDeviceSlotFooter" = "Modtager- eller pumpekanalen er normalt reserveret til Dexcom-modtageren eller en kompatibel pumpe. Når denne app bruger den, forbliver mobilapp-kanalen tilgængelig for en telefon eller en anden enhed.";
 "dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Ikke tilgængelig i sameksistenstilstand";
 "dexcomG6MedicalDeviceSlotWarning" = "Modtager- eller pumpekanalen er normalt reserveret til en Dexcom-modtager eller en kompatibel pumpe. Hvis du vælger den, kan det forhindre denne enhed i at oprette forbindelse.\n\nBrug af modtager- eller pumpekanalen bør kun betragtes som eksperimentel. Valget træder i kraft ved næste godkendelse.";
-"dexcomG6AnubisSlot" = "Kanal 3 (Anubis, eksperimentel)";
+"dexcomG6AnubisSlot" = "Plads 3: Anubis Extra";
+"dexcomG7MedicalDeviceSlot" = "Plads 1: Modtager eller pumpe";
+"dexcomG7MedicalDeviceSlotShort" = "Pumpe";
+"dexcomG7MobileAppSlot" = "Plads 2: Mobilapp (Standard)";
+"dexcomG7SmartWatchSlot" = "Plads 3: Smartwatch";
+"dexcomG7PairingCodeMessage" = "Indtast den firecifrede kode fra den aktuelle sensorapplikator. Primær tilstand kan ikke godkende uden denne kode.";
+"dexcomG7BluetoothSlot" = "Bluetooth-kanal";
+"dexcomG7MobileAppSlotShort" = "Mobilapp";
+"dexcomG7SmartWatchSlotShort" = "Smartwatch";
+"dexcomG7MobileAppSlotFooter" = "Mobilapp-kanalen (plads 2) er standarden og den aktuelt validerede direkte G7-forbindelse.";
+"dexcomG7MedicalDeviceSlotFooter" = "Modtager- eller pumpekanalen bruger godkendelsesplads 1.";
+"dexcomG7SmartWatchSlotFooter" = "Smartwatch-kanalen bruger fabriksgodkendelsesplads 3.";
 "dexcomG6AnubisSlotShort" = "Kanal 3";
 "dexcomG6AnubisSlotFooter" = "Kanal 3 er kun tilgængelig på Anubis-sendere. Den er eksperimentel og lader kanalerne Mobilapp og Modtager eller pumpe være tilgængelige for andre enheder.";
 "dexcomG6AnubisSlotWarning" = "Kanal 3 er en eksperimentel kanal, som kun er tilgængelig på Anubis-sendere.\n\nBrug kun Kanal 3 til test. Valget træder i kraft ved næste godkendelse.";
+"dexcomConnectionMode" = "Forbindelsestilstand";
+"dexcomPrimaryMode" = "Primær";
+"dexcomCoexistenceMode" = "Sameksistens";
+"dexcomPrimaryModePickerOption" = "Primær tilstand";
+"dexcomCoexistenceModePickerOption" = "Sameksistenstilstand";
+"dexcomG6ModeSelectionFooter" = "Du kan ændre G6-forbindelsestilstanden senere i senderens indstillinger.";
+"dexcomConnectionModeSelectionExplanation" = "Primær tilstand forbinder denne app direkte og kræver, at alle andre apps, der opretter forbindelse til Dexcom-enheden, lukkes.\n\nSameksistenstilstand er afhængig af en anden app til at opretholde Dexcom-forbindelsen og modtage målinger.";
+"dexcomBluetoothChannelSelectionExplanation" = "Vælg den Bluetooth-kanal, som denne app skal bruge. Vælg Mobilapp, medmindre kanalen skal være ledig til en anden forbindelse.";
+"dexcomG6CoexistenceModeSelectionMessage" = "Sameksistenstilstand er valgt. En anden app, f.eks. Dexcom G6 eller CamAPS, skal oprette forbindelse til og godkende G6-senderen.\n\nLad den anden app køre i baggrunden, ellers modtager %@ ingen målinger.";
+"dexcomG6PrimaryModeSelectionMessage" = "Primær tilstand er valgt. %@ skal være den eneste app, der opretter forbindelse til og godkender G6-senderen.\n\nLuk alle andre apps, der forbinder til senderen, eller deaktiver deres Bluetooth-tilladelse. Ellers modtager %@ eller den anden app muligvis ingen målinger.";
+"dexcomPrimaryModeAddFlowMessage" = "Opret direkte forbindelse som den primære app. Afbryd forbindelsen mellem alle andre apps og denne Dexcom.";
+"dexcomCoexistenceModeAddFlowMessage" = "Del forbindelsen med en anden app. Sørg for, at Dexcom- eller CamAPS-appen fungerer korrekt i baggrunden.";
+"dexcomG7NoSensorLabelFound" = "Der blev ikke fundet en Dexcom G7-sensoretiket på billedet.";
+"dexcomG7InvalidSensorLabelFound" = "Der blev fundet en Data Matrix, men den var ikke en gyldig Dexcom G7-sensoretiket.";
+
+
+/* Battery history */
+"batteryHistory" = "Batterihistorik";
+"batteryHistoryTransmitterID" = "Sender-ID";
+"batteryHistoryNoData" = "Ingen batterihistorik";
+"batteryHistoryBeginsAfterReading" = "Historikken begynder efter den næste faktiske batteriaflæsning.";
+"batteryHistoryRange" = "Periode";
+"batteryHistoryRangeAccessibility" = "Periode for batterihistorik";
+"batteryHistoryRangeExplanation" = "Faste perioder går fra nu og tilbage til det valgte antal dage. Huller viser perioder uden en aflæsning.";
+
+"connectionDiagramOtherApp" = "Anden app";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Signalstyrke";
+
+"signalStrengthChartExplanation" = "Livesignal fra de seneste to minutter. Nye målinger modtages cirka hvert sekund, mens enheden er tilsluttet.";
+
+"signalStrengthWeak" = "Svag";
+"signalStrengthStrong" = "Stærk";
+"signalStrengthLastMeasurement" = "Seneste måling";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Abonnementer";
+"heartbeat.mode" = "Abonnementstilstand";
+"heartbeat.mode.automatic" = "Enkelt";
+"heartbeat.mode.all" = "Alle";
+"heartbeat.footer.automatic" = "Vælger automatisk én understøttet Bluetooth-kanal til heartbeat-opdateringer og holder antallet af abonnementer nede. Hvis abonnementet mislykkes, prøves en anden kanal.";
+"heartbeat.footer.all" = "Abonnerer på alle understøttede Bluetooth-kanaler, så opdateringer fra enhver kanal kan give et heartbeat.";
+"heartbeat.simpleFooter" = "Ændringer gælder ved næste forbindelse.";
+
+"signalStrengthDisconnected" = "Afbrudt";

@@ -16,6 +16,7 @@
 "common_days" = "days";
 "common_landscape_comparingWithLast" = "Sammenligner med de seneste:";
 "common_landscape_comparisonDays" = "%d dage";
+"common_landscape_comparisonNone" = "Ingen";
 "common_today" = "Today";
 "common_week" = "week";
 "common_hourshort" = "h";
@@ -57,3 +58,17 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Anslået aktivt insulin";
+"therapy.estimatedCOB" = "Anslåede aktive kulhydrater";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Ikke-gemte ændringer";
+"common_save" = "Gem";
+"common_discardChanges" = "Kassér ændringer";
+"common_back" = "Tilbage";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Sensor varmer op";
+"common_sensorWarmupUntilFormat" = "Indtil %@";

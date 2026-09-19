@@ -44,7 +44,7 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
-"settingsviews_glucoseDisplaySectionTitle" = "Prikaz";
+"settingsviews_glucoseDisplaySectionTitle" = "Splošno";
 "settingsviews_glucoseRangesSectionTitle" = "Razponi glukoze";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarmi in obvestila";
 "settingsviews_sharingAndServicesSectionTitle" = "Deljenje in storitve";
@@ -128,8 +128,8 @@
 /// M5 stack bluetooth  settings, pop up that asks user to enter the password
 "m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth Password";
 
-/// nightscout settings, where user can select to use schedule or not
-"settingsviews_useSchedule" = "Use Upload Schedule";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "Omogoči urnik";
 
 /// transmitter settings, just the words that explain that the settings is about transmitter type
 "settingsviews_transmittertype" = "Transmitter Type";
@@ -739,3 +739,53 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Graf";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Osnovno";
 "settingsviews_liveActivitySectionTitle" = "Dejavnost v živo";
+"settingsviews_dexcomG7Message" = "Pustite ime Bluetooth prazno. Na naslednjem zaslonu tapnite Skeniraj za samodejno iskanje senzorja.\n\nČe je bil senzor že prikazan v Nastavitve > Bluetooth, lahko njegovo ime Bluetooth vnesete ročno.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Trajanje Ogljikovih Hidratov";
+"therapy.local" = "Izračunano lokalno";
+
+"settingsviews_showOriginalBGReadings" = "Prikaži Izvirne Vrednosti";
+
+"therapy.insulinType" = "Vrsta Inzulina";
+
+"therapy.showIOBCOB" = "Prikaži IOB/COB";
+
+"therapy.treatmentSettings" = "Zdravljenja";
+
+"therapy.settingsHelp" = "Uporabljajo se za oceno preostalega inzulina in ogljikovih hidratov iz zabeleženih zdravljenj.";
+
+"therapy.settingsLocal" = "Te nastavitve ocenijo IOB in COB iz zabeleženih zdravljenj samo, ko teh vrednosti ne zagotavlja sistem AID.";
+"therapy.settingsExternal" = "Te možnosti so onemogočene, ker vaš sistem AID na osnovi %@ zagotavlja IOB in COB.";
+"therapy.settingsMixed" = "%@ zagotavlja IOB, zato je vrsta inzulina samodejna. Trajanje ogljikovih hidratov se uporablja za lokalno oceno COB iz zabeleženih obrokov.";
+"therapy.insulinModel" = "Izbran je inzulinski model %@. Trajanje delovanja inzulina (DIA): %@. Čas do največjega učinka inzulina: %@.";
+"therapy.carbFast" = "Hitrejša absorpcija ogljikovih hidratov. Vključuje 10-minutni zamik pred začetkom.";
+"therapy.carbNormal" = "Običajna absorpcija ogljikovih hidratov. Vključuje 10-minutni zamik pred začetkom.";
+"therapy.carbLong" = "Daljša absorpcija ogljikovih hidratov. Lahko je koristna, ko zdravila GLP-1 upočasnijo prebavo. Vključuje 10-minutni zamik pred začetkom.";
+"therapy.automatic" = "Samodejno";
+
+"therapy.liveActivityMetricsFooter" = "Prikaži razpoložljiva IOB in COB v veliki postavitvi zaklenjenega zaslona ter postavitvi z grafom CarPlay/Pametni sklad.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB zahteva zabeležene odmerke inzulina ali ogljikovih hidratov ali podatke povezanega sistema AID.";
+
+"homeScreen.renderBasalDownwards" = "Prikaži bazal navzdol";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "Aktivno";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "Neaktivno";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "Urnik";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "Omogoči ob";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "Onemogoči ob";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "Ko je glasovno branje glukoze vklopljeno, se odčitki berejo samo v tem časovnem obdobju. Urnik se ponavlja vsak dan po lokalnem času telefona in lahko sega čez polnoč. Bližnjice spreminjajo samo glavno stikalo za glasovno branje glukoze.";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "Izberite različna časa za omogočanje in onemogočanje.";

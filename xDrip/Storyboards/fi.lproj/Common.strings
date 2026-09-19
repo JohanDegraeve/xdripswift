@@ -59,6 +59,7 @@
 "common_days" = "päivää";
 "common_landscape_comparingWithLast" = "Vertailu viimeisiin:";
 "common_landscape_comparisonDays" = "%d päivää";
+"common_landscape_comparisonNone" = "Ei mitään";
 
 /// the word average
 "common_statistics_average" = "Keskiarvo";
@@ -87,3 +88,17 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Arvioitu aktiivinen insuliini";
+"therapy.estimatedCOB" = "Arvioidut aktiiviset hiilihydraatit";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Tallentamattomat muutokset";
+"common_save" = "Tallenna";
+"common_discardChanges" = "Hylkää muutokset";
+"common_back" = "Takaisin";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Sensori lämpenee";
+"common_sensorWarmupUntilFormat" = "Päättyy klo %@";

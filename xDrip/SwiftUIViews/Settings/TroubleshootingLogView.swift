@@ -85,21 +85,44 @@ struct TroubleshootingLogView: View {
         _viewModel = StateObject(wrappedValue: TroubleshootingLogViewModel(
             store: store,
             appInfoProvider: {
-                // Read the current G5/G6 channel for each report snapshot. The effective accessor
-                // applies the default in memory without materializing it merely by opening this view.
-                let dexcomG5 = coreDataManager.flatMap { coreDataManager in
-                    BLEPeripheralAccessor(coreDataManager: coreDataManager)
+                // Read the complete active Dexcom context for each report snapshot. Both channel
+                // accessors apply their default in memory without materializing it merely by
+                // opening this view. G6 has no disposable sensor code, while G7-family sensors add
+                // the scanned code that was used for Primary authentication.
+                let dexcomContext = coreDataManager.flatMap { coreDataManager in
+                    let activePeripheral = BLEPeripheralAccessor(coreDataManager: coreDataManager)
                         .getBLEPeripherals()
-                        .first(where: { $0.shouldconnect && $0.dexcomG5 != nil })?
-                        .dexcomG5
+                        .first(where: { $0.shouldconnect && ($0.dexcomG5 != nil || $0.dexcomG7 != nil) })
+
+                    if let dexcomG5 = activePeripheral?.dexcomG5 {
+                        return TroubleshootingDexcomContext(
+                            useOtherApp: dexcomG5.useOtherApp,
+                            bluetoothChannel: TroubleshootingDexcomBluetoothChannel(
+                                dexcomG5.effectiveDexcomG6BluetoothSlot()
+                            ),
+                            sensorCode: nil,
+                            voltageA: Int(dexcomG5.voltageA),
+                            voltageB: Int(dexcomG5.voltageB),
+                            batteryFamily: .g5
+                        )
+                    }
+                    if let dexcomG7 = activePeripheral?.dexcomG7 {
+                        return TroubleshootingDexcomContext(
+                            useOtherApp: dexcomG7.useOtherApp,
+                            bluetoothChannel: TroubleshootingDexcomBluetoothChannel(
+                                dexcomG7.effectiveDexcomG7BluetoothSlot()
+                            ),
+                            sensorCode: dexcomG7.sensorCode,
+                            voltageA: Int(dexcomG7.voltageA),
+                            voltageB: Int(dexcomG7.voltageB),
+                            batteryFamily: .g7
+                        )
+                    }
+                    return nil
                 }
                 return .current(
                     currentSourceCanUseFiveMinuteReadings: bgPostProcessingManager?.currentSourceCanUseFiveMinuteReadings(),
-                    dexcomBluetoothChannel: dexcomG5.map {
-                        TroubleshootingDexcomBluetoothChannel(
-                            $0.effectiveDexcomG6BluetoothSlot()
-                        )
-                    }
+                    dexcomContext: dexcomContext
                 )
             }
         ))
@@ -157,7 +180,7 @@ struct TroubleshootingLogView: View {
 
     /// Lives outside the `ScrollView` so the user can always refine or clear the query, including
     /// when the submitted text matches no entries. Editing does not repeatedly rebuild a covered
-    /// list; the keyboard Search action applies the completed query and then reveals the results.
+    /// list. The keyboard Search action applies the completed query and then reveals the results.
     private var filterField: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
@@ -339,7 +362,9 @@ struct TroubleshootingLogView: View {
         case .sensorNoise: return "waveform.path.ecg"
         case .sensorHealthAlert: return "exclamationmark.triangle.fill"
         case .transmitterReadSuccess: return "antenna.radiowaves.left.and.right"
-        case .calibrationAccepted: return "scope"
+        case let .dexcomBattery(_, status, _, _):
+            return dexcomBatterySystemName(status: status)
+        case .calibrationAccepted, .transmitterCalibration: return "scope"
         case let .alert(_, activity):
             return activity == .notificationsDenied || activity == .suppressedBySnooze || activity == .notificationDismissed || activity == .disabled ? "bell.slash.fill" : "bell.fill"
         case let .integration(.watch, activity):
@@ -347,7 +372,11 @@ struct TroubleshootingLogView: View {
             case .failed, .permissionDenied:
                 return "exclamationmark.applewatch"
             case .succeeded, .recovered:
-                return "checkmark.applewatch"
+                // The checked Watch symbol requires iOS 17. The event text still describes success on iOS 16.
+                if #available(iOS 17.0, *) {
+                    return "checkmark.applewatch"
+                }
+                return "applewatch"
             case .started, .noData, .restarted, .ended:
                 return "applewatch"
             }
@@ -375,7 +404,9 @@ struct TroubleshootingLogView: View {
             case .aidFollowerChanged: return "waveform.path.ecg"
             case .patientAliasChanged: return "person.text.rectangle.fill"
             case .credentialChanged: return "key.fill"
+            case .followerVersionChanged: return "number.circle.fill"
             case .postProcessingSettings: return "waveform.path.ecg.rectangle"
+            case .heartbeatSubscriptionsChanged: return "antenna.radiowaves.left.and.right"
             }
         case let .dataManagement(activity):
             switch activity {
@@ -395,6 +426,25 @@ struct TroubleshootingLogView: View {
             case .deleted: return "trash.fill"
             }
         case .app: return "text.document"
+        }
+    }
+
+    /// Uses the same modern battery symbols as the device details view while retaining its existing
+    /// fallback names for iOS 16. This keeps older supported phones readable instead of requesting
+    /// an SF Symbol that did not exist on their system version.
+    private func dexcomBatterySystemName(status: DexcomBatteryStatus) -> String {
+        if #available(iOS 17.0, *) {
+            switch status {
+            case .unknown, .red: return "battery.0percent"
+            case .yellow: return "battery.25percent"
+            case .green: return "battery.100percent"
+            }
+        }
+
+        switch status {
+        case .unknown, .red: return "minus.plus.batteryblock.slash"
+        case .yellow: return "minus.plus.batteryblock"
+        case .green: return "minus.plus.batteryblock.fill"
         }
     }
 
@@ -421,6 +471,19 @@ struct TroubleshootingLogView: View {
             case .bad: return ConstantsAppColors.urgent
             case nil: return ConstantsAppColors.navigationTint
             }
+        case let .transmitterCalibration(activity):
+            switch activity {
+            case .processing, .completedHigh: return ConstantsAppColors.normal
+            case .completedLow: return ConstantsAppColors.caution
+            case .rejected, .notPermitted: return ConstantsAppColors.urgent
+            }
+        case let .dexcomBattery(_, status, _, _):
+            switch status {
+            case .unknown: return ConstantsAppColors.navigationTint
+            case .green: return ConstantsAppColors.normal
+            case .yellow: return ConstantsAppColors.caution
+            case .red: return ConstantsAppColors.urgent
+            }
         default:
             return ConstantsAppColors.navigationTint
         }
@@ -437,7 +500,7 @@ struct TroubleshootingLogView: View {
     }
 }
 
-/// Lightweight presentation grouping only; it is never persisted as a second history format.
+/// Lightweight presentation grouping only. It is never persisted as a second history format.
 private struct TroubleshootingLogDayGroup: Identifiable {
     let day: Date
     var entries: [TroubleshootingLogEntry]

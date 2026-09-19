@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Inställningar";
-"settingsviews_glucoseDisplaySectionTitle" = "Visning";
+"settingsviews_glucoseDisplaySectionTitle" = "Allmänt";
 "settingsviews_glucoseRangesSectionTitle" = "Glukosintervall";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Larm och notiser";
 "settingsviews_sharingAndServicesSectionTitle" = "Delning och tjänster";
@@ -70,7 +70,8 @@
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Uppladdningsalternativ";
 "settingsviews_nightscoutEnabled" = "Slå på Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
-"settingsviews_useSchedule" = "Använd schemalagd uppladdning";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "Aktivera schema";
 "schedule" = "Schema";
 "settingsviews_giveNightscoutUrl" = "Ange din Nightscout URL";
 "settingsviews_nightscoutAPIKey" = "API_SECRET";
@@ -512,3 +513,53 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Diagram";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Grundläggande";
 "settingsviews_liveActivitySectionTitle" = "Liveaktivitet";
+"settingsviews_dexcomG7Message" = "Lämna Bluetooth-namnet tomt. På nästa skärm trycker du på Skanna för att automatiskt söka efter sensorn.\n\nOm sensorn tidigare har visats under Inställningar > Bluetooth kan du ange dess Bluetooth-namn manuellt.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Kolhydratduration";
+"therapy.local" = "Beräknat lokalt";
+
+"settingsviews_showOriginalBGReadings" = "Visa Ursprungliga Värden";
+
+"therapy.insulinType" = "Insulintyp";
+
+"therapy.showIOBCOB" = "Visa IOB/COB";
+
+"therapy.treatmentSettings" = "Behandlingar";
+
+"therapy.settingsHelp" = "Används för att uppskatta kvarvarande insulin och kolhydrater från registrerade behandlingar.";
+
+"therapy.settingsLocal" = "Dessa inställningar uppskattar IOB och COB från registrerade behandlingar endast när värdena inte tillhandahålls av ett AID-system.";
+"therapy.settingsExternal" = "Dessa alternativ är inaktiverade eftersom ditt %@-baserade AID-system tillhandahåller IOB och COB.";
+"therapy.settingsMixed" = "%@ tillhandahåller IOB, så insulintypen är automatisk. Kolhydratdurationen uppskattar COB lokalt från registrerade måltider.";
+"therapy.insulinModel" = "Insulinmodell %@ vald. Insulinets verkningstid (DIA): %@. Tid till maximal insulinverkan: %@.";
+"therapy.carbFast" = "Snabbare kolhydratupptag. Inkluderar 10 minuters fördröjning innan upptaget börjar.";
+"therapy.carbNormal" = "Normalt kolhydratupptag. Inkluderar 10 minuters fördröjning innan upptaget börjar.";
+"therapy.carbLong" = "Längre kolhydratupptag. Kan vara användbart när GLP-1-läkemedel bromsar matsmältningen. Inkluderar 10 minuters fördröjning innan upptaget börjar.";
+"therapy.automatic" = "Automatiskt";
+
+"therapy.liveActivityMetricsFooter" = "Visa tillgängligt IOB och COB i den stora låsskärmslayouten och i diagramlayouten för CarPlay/Smart trave.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB kräver registrerade insulin- eller kolhydratbehandlingar, eller data från ett anslutet AID-system.";
+
+"homeScreen.renderBasalDownwards" = "Visa basal nedåt";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "Aktiv";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "Inaktiv";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "Schema";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "Aktivera kl.";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "Inaktivera kl.";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "När uppläsning av glukos är på läses värden endast upp under dessa tider. Schemat upprepas dagligen enligt telefonens lokala tid och kan sträcka sig över midnatt. Genvägar ändrar endast reglaget för uppläsning av glukos.";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "Välj olika tider för aktivering och inaktivering.";

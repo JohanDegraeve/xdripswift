@@ -9,7 +9,7 @@ protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
     ///     - dexcomG6BluetoothSlot: the role to use when scanning for a G6 transmitter
     ///     - callBackForScanningResult : to be called with result of startScanning
     ///     - bluetoothTransmitterDelegate : optional
-    func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, dexcomG6BluetoothSlot: DexcomG6BluetoothSlot, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?, callBackForScanningResult: ((BluetoothTransmitter.startScanningResult) -> Void)?, callback: @escaping (BluetoothPeripheral) -> Void)
+    func startScanningForNewDevice(type: BluetoothPeripheralType, transmitterId: String?, dexcomG6BluetoothSlot: DexcomG6BluetoothSlot, dexcomConfiguration: DexcomAddConfiguration?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?, callBackForScanningResult: ((BluetoothTransmitter.startScanningResult) -> Void)?, callback: @escaping (BluetoothPeripheral) -> Void)
     
     /// stops scanning for new device
     func stopScanningForNewDevice()

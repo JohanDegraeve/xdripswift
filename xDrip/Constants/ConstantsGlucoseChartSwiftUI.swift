@@ -13,6 +13,58 @@ enum ConstantsGlucoseChartSwiftUI {
     // ------------------------------------------
     // ----- SwiftUI Glucose Chart --------------
     // ------------------------------------------
+    // Display-only therapy styling and relative scale. This ratio is not used for calculations.
+    static let therapyPlotMaximumIOB: Double = 15
+    static let therapyPlotMaximumCOB: Double = 70
+    static let therapyPlotReferenceHeightInMgDl: Double = 100
+    static let minimumChartValueWithBasal: Double = -10
+    static let minimumChartValueWithBasal24Hours: Double = 0
+
+    /// Shared bottom space for basal data and visible therapy plots.
+    static func minimumChartValueWithBottomSpace(hours: Double) -> Double {
+        hours >= 24 ? minimumChartValueWithBasal24Hours : minimumChartValueWithBasal
+    }
+
+    static let therapyPlotFillOpacity: Double = 0.17
+    static let therapyPlotLineOpacity: Double = 0.7
+    // Make therapy less prominent when it shares the bottom area with visible basal.
+    static let therapyPlotBottomBasalOpacityMultiplier: Double = 0.7
+    // Scale both curves and their fills around zero, preserving the shared carbs-to-insulin ratio.
+    static let therapyPlotHeightMultiplier: Double = 0.7
+    static let therapyPlotCarbsPerInsulinUnit: Double = 7
+
+    static func xAxisDates(from startDate: Date, to endDate: Date, everyHours: Int) -> [Date] {
+        // Keep labels anchored to real clock hours so a small scroll cannot switch between odd and
+        // even hour labels.
+        let hourInterval = max(everyHours, 1)
+        let calendar = Calendar.current
+        let startOfVisibleHourComponents = calendar.dateComponents([.year, .month, .day, .hour], from: startDate)
+
+        guard var date = calendar.date(from: startOfVisibleHourComponents) else { return [] }
+
+        if date < startDate, let nextHourDate = calendar.date(byAdding: .hour, value: 1, to: date) {
+            date = nextHourDate
+        }
+
+        var dates = [Date]()
+
+        while date <= endDate {
+            let hour = calendar.component(.hour, from: date)
+
+            if hourInterval == 1 || hour % hourInterval == 0 {
+                dates.append(date)
+            }
+
+            guard let nextDate = calendar.date(byAdding: .hour, value: 1, to: date), nextDate > date else {
+                break
+            }
+
+            date = nextDate
+        }
+
+        return dates
+    }
+
     // shared chart defaults
     static let yAxisLineSize: Double = 0.8
     static let yAxisAbsoluteMinimumChartValueInMgDl: Double = 38
@@ -48,7 +100,6 @@ enum ConstantsGlucoseChartSwiftUI {
     // Swift Charts `symbolSize` is area-based, so small changes here make a visible but controlled
     // difference to point diameter without changing every chart type's base size.
     static let glucosePointSymbolSizeMultiplier: Double = 1.2
-    static let carbTreatmentSymbolSizeMultiplier: Double = 2.0
 
     // AGP background styling
     // keep these values in the shared glucose chart constants so the same renderer can be used
@@ -78,7 +129,7 @@ enum ConstantsGlucoseChartSwiftUI {
     static let yAxisUpperContextGridLinesInMgDl = [150.0, 200.0, 250.0, 300.0, 350.0, 400.0]
     static let yAxisMainChartObjectiveLabelFontSize: CGFloat = 15
     static let yAxisMainChartSecondaryLabelFontSize: CGFloat = 14
-    // the main y-axis keeps a fixed trailing lane for each unit; mmol/L needs room for
+    // the main y-axis keeps a fixed trailing lane for each unit. Values in mmol/L need room for
     // four-character labels such as "10.0", while mg/dL normally uses three digits
     static let yAxisMainChartLabelWidthInMgDl: CGFloat = 30
     static let yAxisMainChartLabelWidthInMmol: CGFloat = 38

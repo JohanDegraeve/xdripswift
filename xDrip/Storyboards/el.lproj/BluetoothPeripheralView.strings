@@ -11,6 +11,10 @@
 "sensorType" = "Τύπος αισθητήρα";
 "serialNumber" = "Συριακός αριθμός";
 "battery" = "Μπαταρία";
+"versionCode" = "Κωδικός έκδοσης";
+"voltageA" = "Τάση A";
+"voltageB" = "Τάση B";
+"waitingForData" = "Αναμονή για δεδομένα...";
 "needsTransmitterId" = "Λείπει το αναγνωριστικό πομπού";
 "scan" = "Σάρωση";
 "medtrumNanoPumpScanNoticeTitle" = "Σύνδεση αντλίας Medtrum Nano";
@@ -39,7 +43,6 @@
 "confirmDisconnectMessage" = "Κάντε κλικ στο «Αποσύνδεση» για να επιβεβαιώσετε την αποσύνδεση από τον πομπό.";
 "transmittterStartDate" = "Έναρξη πομπού";
 "sensorStartDate" = "Έναρξη αισθητήρα";
-"useOtherDexcomApp" = "Λειτουργία συνύπαρξης";
 "useOtherDexcomAppCoexistenceFooter" = "Η λειτουργία συνύπαρξης μας επιτρέπει να λειτουργούμε με άλλη εφαρμογή, όπως Dexcom ή CamAPS. Η εφαρμογή αυτή πρέπει να συνεχίσει να εκτελείται στο παρασκήνιο.";
 "useOtherDexcomAppPrimaryFooter" = "Η κύρια λειτουργία συνδέεται ως κύρια εφαρμογή και ελέγχει τη σύνδεση.";
 "runningInCoexistenceMode" = "Εκτελείται σε λειτουργία συνύπαρξης";
@@ -71,13 +74,13 @@
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
 
 /// sensor warm-up text
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "Προθέρμ. έως";
 
 /// Scan again button
 "nfcScanFailedScanAgainButton" = "Scan Again";
 
 /// Tell the user the scan was successful and to just wait now for connection
-"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 
 /// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
 "readSuccessLast24Hours" = "Τελευταίες 24 ώρες";
@@ -111,15 +114,71 @@
 
 /* Dexcom G6 Bluetooth authentication slot */
 "dexcomG6BluetoothSlot" = "Κανάλι Bluetooth";
-"dexcomG6MobileAppSlot" = "Εφαρμογή για κινητά (Προεπιλογή)";
+"dexcomG6MobileAppSlot" = "Θέση 2: Εφαρμογή για κινητά (Προεπιλογή)";
 "dexcomG6MobileAppSlotShort" = "Εφαρμογή για κινητά";
-"dexcomG6MedicalDeviceSlot" = "Δέκτης ή αντλία (Πειραματικό)";
+"dexcomG6MedicalDeviceSlot" = "Θέση 1: Δέκτης ή αντλία";
 "dexcomG6MedicalDeviceSlotShort" = "Αντλία";
 "dexcomG6MobileAppSlotFooter" = "Το κανάλι Εφαρμογή για κινητά είναι το προεπιλεγμένο για συνδέσεις τηλεφώνου.";
 "dexcomG6MedicalDeviceSlotFooter" = "Το κανάλι Δέκτης ή αντλία προορίζεται συνήθως για τον δέκτη Dexcom ή μια συμβατή αντλία. Η χρήση του από αυτή την εφαρμογή αφήνει το κανάλι Εφαρμογή για κινητά διαθέσιμο για τηλέφωνο ή άλλη συσκευή.";
 "dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Δεν είναι διαθέσιμο στη λειτουργία συνύπαρξης";
 "dexcomG6MedicalDeviceSlotWarning" = "Το κανάλι Δέκτης ή αντλία προορίζεται συνήθως για έναν δέκτη Dexcom ή μια συμβατή αντλία. Η επιλογή του μπορεί να εμποδίσει τη σύνδεση αυτής της συσκευής.\n\nΗ χρήση του καναλιού Δέκτης ή αντλία πρέπει να θεωρείται αποκλειστικά πειραματική. Η επιλογή εφαρμόζεται στον επόμενο έλεγχο ταυτότητας.";
-"dexcomG6AnubisSlot" = "Κανάλι 3 (Anubis, πειραματικό)";
+"dexcomG6AnubisSlot" = "Θέση 3: Anubis Extra";
+"dexcomG7MedicalDeviceSlot" = "Θέση 1: Δέκτης ή αντλία";
+"dexcomG7MedicalDeviceSlotShort" = "Αντλία";
+"dexcomG7MobileAppSlot" = "Θέση 2: Εφαρμογή για κινητά (Προεπιλογή)";
+"dexcomG7SmartWatchSlot" = "Θέση 3: Έξυπνο ρολόι";
+"dexcomG7PairingCodeMessage" = "Εισαγάγετε τον τετραψήφιο κωδικό από τον εφαρμογέα του τρέχοντος αισθητήρα. Η Κύρια λειτουργία δεν μπορεί να πιστοποιηθεί χωρίς αυτόν τον κωδικό.";
+"dexcomG7BluetoothSlot" = "Κανάλι Bluetooth";
+"dexcomG7MobileAppSlotShort" = "Εφαρμογή για κινητά";
+"dexcomG7SmartWatchSlotShort" = "Έξυπνο ρολόι";
+"dexcomG7MobileAppSlotFooter" = "Το κανάλι Εφαρμογής για κινητά (θέση 2) είναι το προεπιλεγμένο και η επί του παρόντος επικυρωμένη άμεση σύνδεση G7.";
+"dexcomG7MedicalDeviceSlotFooter" = "Το κανάλι Δέκτη ή αντλίας χρησιμοποιεί τη θέση πιστοποίησης 1.";
+"dexcomG7SmartWatchSlotFooter" = "Το κανάλι Έξυπνου ρολογιού χρησιμοποιεί την εργοστασιακή θέση πιστοποίησης 3.";
 "dexcomG6AnubisSlotShort" = "Κανάλι 3";
 "dexcomG6AnubisSlotFooter" = "Το Κανάλι 3 είναι διαθέσιμο μόνο σε πομπούς Anubis. Είναι πειραματικό και αφήνει τα κανάλια Εφαρμογή για κινητά και Δέκτης ή αντλία διαθέσιμα για άλλες συσκευές.";
 "dexcomG6AnubisSlotWarning" = "Το Κανάλι 3 είναι ένα πειραματικό κανάλι διαθέσιμο μόνο σε πομπούς Anubis.\n\nΧρησιμοποιήστε το Κανάλι 3 μόνο για δοκιμές. Η επιλογή εφαρμόζεται στον επόμενο έλεγχο ταυτότητας.";
+"dexcomConnectionMode" = "Λειτουργία σύνδεσης";
+"dexcomPrimaryMode" = "Κύρια";
+"dexcomCoexistenceMode" = "Συνύπαρξη";
+"dexcomPrimaryModePickerOption" = "Κύρια λειτουργία";
+"dexcomCoexistenceModePickerOption" = "Λειτουργία συνύπαρξης";
+"dexcomG6ModeSelectionFooter" = "Μπορείτε να αλλάξετε τη λειτουργία σύνδεσης του G6 αργότερα στις ρυθμίσεις του πομπού.";
+"dexcomConnectionModeSelectionExplanation" = "Η Κύρια λειτουργία συνδέει αυτή την εφαρμογή απευθείας και απαιτεί να κλείσουν όλες οι άλλες εφαρμογές που συνδέονται με τη συσκευή Dexcom.\n\nΗ λειτουργία συνύπαρξης βασίζεται σε άλλη εφαρμογή για τη διατήρηση της σύνδεσης Dexcom και τη λήψη μετρήσεων.";
+"dexcomBluetoothChannelSelectionExplanation" = "Επιλέξτε το κανάλι Bluetooth που θα χρησιμοποιεί αυτή η εφαρμογή. Επιλέξτε Εφαρμογή κινητού, εκτός αν θέλετε να αφήσετε αυτό το κανάλι διαθέσιμο για άλλη σύνδεση.";
+"dexcomG6CoexistenceModeSelectionMessage" = "Επιλέχθηκε η λειτουργία συνύπαρξης. Μια άλλη εφαρμογή, όπως η Dexcom G6 ή η CamAPS, πρέπει να συνδεθεί και να πραγματοποιήσει έλεγχο ταυτότητας με τον πομπό G6.\n\nΗ άλλη εφαρμογή πρέπει να παραμένει ενεργή στο παρασκήνιο, διαφορετικά το %@ δεν θα λαμβάνει μετρήσεις.";
+"dexcomG6PrimaryModeSelectionMessage" = "Επιλέχθηκε η Κύρια λειτουργία. Το %@ πρέπει να είναι η μόνη εφαρμογή που συνδέεται και πραγματοποιεί έλεγχο ταυτότητας με τον πομπό G6.\n\nΚλείστε κάθε άλλη εφαρμογή που συνδέεται με τον πομπό ή απενεργοποιήστε την άδεια Bluetooth. Διαφορετικά, το %@ ή η άλλη εφαρμογή ενδέχεται να μη λαμβάνει μετρήσεις.";
+"dexcomPrimaryModeAddFlowMessage" = "Συνδεθείτε απευθείας ως η κύρια εφαρμογή. Αποσυνδέστε κάθε άλλη εφαρμογή από αυτό το Dexcom.";
+"dexcomCoexistenceModeAddFlowMessage" = "Μοιραστείτε τη σύνδεση με άλλη εφαρμογή. Διατηρήστε την εφαρμογή Dexcom ή CamAPS σε σωστή λειτουργία στο παρασκήνιο.";
+"dexcomG7NoSensorLabelFound" = "Δεν βρέθηκε ετικέτα αισθητήρα Dexcom G7 στη φωτογραφία.";
+"dexcomG7InvalidSensorLabelFound" = "Βρέθηκε Data Matrix, αλλά δεν ήταν έγκυρη ετικέτα αισθητήρα Dexcom G7.";
+
+
+/* Battery history */
+"batteryHistory" = "Ιστορικό μπαταρίας";
+"batteryHistoryTransmitterID" = "ID πομπού";
+"batteryHistoryNoData" = "Δεν υπάρχει ιστορικό μπαταρίας";
+"batteryHistoryBeginsAfterReading" = "Το ιστορικό αρχίζει μετά την επόμενη πραγματική ένδειξη μπαταρίας.";
+"batteryHistoryRange" = "Εύρος";
+"batteryHistoryRangeAccessibility" = "Εύρος ιστορικού μπαταρίας";
+"batteryHistoryRangeExplanation" = "Τα σταθερά εύρη εκτείνονται από τώρα έως τον επιλεγμένο αριθμό ημερών στο παρελθόν. Τα κενά δείχνουν περιόδους χωρίς ένδειξη.";
+
+"connectionDiagramOtherApp" = "Άλλη εφαρμογή";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Ισχύς σήματος";
+
+"signalStrengthChartExplanation" = "Ζωντανό σήμα των τελευταίων δύο λεπτών. Νέες μετρήσεις λαμβάνονται περίπου κάθε δευτερόλεπτο όσο υπάρχει σύνδεση.";
+
+"signalStrengthWeak" = "Ασθενές";
+"signalStrengthStrong" = "Ισχυρό";
+"signalStrengthLastMeasurement" = "Τελευταία μέτρηση";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Συνδρομές";
+"heartbeat.mode" = "Λειτουργία συνδρομής";
+"heartbeat.mode.automatic" = "Μία";
+"heartbeat.mode.all" = "Όλες";
+"heartbeat.footer.automatic" = "Επιλέγει αυτόματα ένα υποστηριζόμενο κανάλι Bluetooth για ενημερώσεις heartbeat, περιορίζοντας τις συνδρομές στο ελάχιστο. Αν η συνδρομή αποτύχει, δοκιμάζεται άλλο κανάλι.";
+"heartbeat.footer.all" = "Εγγράφεται σε όλα τα υποστηριζόμενα κανάλια Bluetooth, ώστε ενημερώσεις από οποιοδήποτε να παρέχουν heartbeat.";
+"heartbeat.simpleFooter" = "Οι αλλαγές ισχύουν στην επόμενη σύνδεση.";
+
+"signalStrengthDisconnected" = "Αποσυνδέθηκε";

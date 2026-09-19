@@ -67,6 +67,13 @@ public struct TreatmentNSResponse {
             
             let enteredBy: String? = dictionary["enteredBy"] as? String
             
+            // Recognise our envelope before expanding numeric Nightscout fields. One basal Note
+            // must become exactly one injection, with no duplicate Note or active-insulin record.
+            if nightscoutEventType?.caseInsensitiveCompare(ConstantsNightscout.noteEventType) == .orderedSame,
+               let payload = BasalInjectionPayload.decode(from: dictionary["notes"] as? String) {
+                return [TreatmentNSResponse(id: id + TreatmentType.BasalInjection.idExtension(), createdAt: date, eventType: .BasalInjection, nightscoutEventType: ConstantsNightscout.noteEventType, value: Double(payload.units), valueSecondary: nil, enteredBy: enteredBy, notes: payload.insulinDescription.toNilIfLength0())]
+            }
+
             if let carbs = dictionary["carbs"] as? Double {
                 
                 treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Carbs, nightscoutEventType: nightscoutEventType, value: carbs, valueSecondary: nil, enteredBy: enteredBy, notes: nil))

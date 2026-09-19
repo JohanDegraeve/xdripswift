@@ -3,6 +3,9 @@ import Foundation
 // all common texts 
 class Texts_Common {
     static private let filename = "Common"
+
+    static let sensorWarmingUp = NSLocalizedString("common_sensorWarmingUp", tableName: filename, bundle: .main, value: "Sensor warming up", comment: "Live Activity sensor warm-up title")
+    static let sensorWarmupUntilFormat = NSLocalizedString("common_sensorWarmupUntilFormat", tableName: filename, bundle: .main, value: "Until %@", comment: "Warm-up completion time; %@ is a localized time")
     
     static let Ok = {
         return NSLocalizedString("common_Ok", tableName: filename, bundle: Bundle.main, value: "OK", comment: "literally 'OK'")
@@ -12,6 +15,12 @@ class Texts_Common {
     static let Cancel = {
         return NSLocalizedString("common_cancel", tableName: filename, bundle: Bundle.main, value: "Cancel", comment: "literally 'Cancel'")
     }()
+
+    // Actions used when leaving an editor with changes that have not been saved.
+    static let unsavedChanges = NSLocalizedString("common_unsavedChanges", tableName: filename, bundle: .main, value: "Unsaved Changes", comment: "title when leaving an editor with unsaved changes")
+    static let save = NSLocalizedString("common_save", tableName: filename, bundle: .main, value: "Save", comment: "save editor changes")
+    static let discardChanges = NSLocalizedString("common_discardChanges", tableName: filename, bundle: .main, value: "Discard Changes", comment: "leave the editor without saving changes")
+    static let back = NSLocalizedString("common_back", tableName: filename, bundle: .main, value: "Back", comment: "accessibility label for the navigation back button")
 
     static let dismiss = {
         return NSLocalizedString(
@@ -102,6 +111,10 @@ class Texts_Common {
     static func landscapeComparisonDays(_ days: Int) -> String {
         return String(format: NSLocalizedString("common_landscape_comparisonDays", tableName: filename, bundle: Bundle.main, value: "%d days", comment: "number of days in the landscape AGP comparison picker"), days)
     }
+
+    static let landscapeComparisonNone = {
+        return NSLocalizedString("common_landscape_comparisonNone", tableName: filename, bundle: Bundle.main, value: "None", comment: "option that disables the AGP baseline in the landscape comparison picker")
+    }()
     
     static let today = {
         return NSLocalizedString("common_today", tableName: filename, bundle: Bundle.main, value: "Today", comment: "the word today")
@@ -328,9 +341,11 @@ class Texts_Common {
         return NSLocalizedString("common_statistics_averageFormat", tableName: filename, bundle: Bundle.main, value: "Average %@", comment: "statistics average value format")
     }()
 
-    static let statisticsDailyPatternFooter = {
-        return NSLocalizedString("common_statistics_dailyPatternFooter", tableName: filename, bundle: Bundle.main, value: "Bars show daily percentage in 70-180 mg/dL range. The dashed line marks the 70% clinical target.", comment: "statistics daily pattern chart footer")
-    }()
+    /// The caller supplies the clinical range in the report's selected units.
+    static func statisticsDailyPatternFooter(range: String) -> String {
+        let format = NSLocalizedString("common_statistics_dailyPatternFooter", tableName: filename, bundle: Bundle.main, value: "Bars show daily percentage in %@ range. The dashed line marks the 70%% clinical target.", comment: "statistics daily pattern chart footer; %@ is the glucose range with units")
+        return String(format: format, range)
+    }
 
     static let statisticsAverageTDD = {
         return NSLocalizedString("common_statistics_averageTDD", tableName: filename, bundle: Bundle.main, value: "Average TDD", comment: "statistics AID average total daily dose title")

@@ -23,5 +23,5 @@ class Texts_WatchApp {
     static let noSensorData: String = {
         return NSLocalizedString("noSensorData", tableName: filename, bundle: Bundle.main, value: "No sensor data", comment: "watch app - text for no sensor data")
     }()
-}
 
+}

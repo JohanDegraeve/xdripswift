@@ -18,6 +18,7 @@ struct SensorManagementView: View {
 
     let activeSensorProvider: () -> Sensor?
     let transmitterProvider: () -> CGMTransmitter?
+    let dexcomG7Provider: () -> DexcomG7?
     let calibrationsAccessor: CalibrationsAccessor
     let bgReadingsAccessor: BgReadingsAccessor
     let sensorNoiseManager: SensorNoiseManager
@@ -33,6 +34,7 @@ struct SensorManagementView: View {
     @State private var showingCalibrationSheet = false
     @State private var showingSensorDetails = false
     @State private var showingNoSensorCodeConfirmation = false
+    @State private var showingCalibrationStatusDetails = false
     @State private var sensorNoiseSensitivity = UserDefaults.standard.sensorNoiseSensitivity
     @State private var persistentNoise: Double?
     @State private var persistentNoiseSensorID: String?
@@ -46,7 +48,7 @@ struct SensorManagementView: View {
     var body: some View {
         let state = currentState()
 
-        if initiallyShowsCalibration, state.canCalibrate, state.currentBgDisplay != nil {
+        if initiallyShowsCalibration, state.canEnterCalibration {
             CalibrationView(
                 canCalibrate: state.canCalibrate,
                 shouldWarnOnLargeCalibrationStep: state.shouldWarnOnLargeCalibrationStep,
@@ -84,12 +86,16 @@ struct SensorManagementView: View {
                         Button(action: {
                             showingCalibrationSheet = true
                         }) {
-                            Text(Texts_HomeView.calibrationButton)
+                            Text(
+                                state.transmitterCalibrationStatus?.isInProgress == true
+                                    ? Texts_HomeView.sensorManagementCalibrationInProgress
+                                    : Texts_HomeView.calibrationButton
+                            )
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(Color(.systemBlue))
-                        .disabled(!state.canCalibrate || state.currentBgDisplay == nil)
+                        .disabled(!state.canEnterCalibration)
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
@@ -102,12 +108,20 @@ struct SensorManagementView: View {
                                 .id(refreshView)
 
                             if state.sensorInformationRows.isEmpty {
-                                row(title: Texts_HomeView.sensorManagementCGMType, data: state.bannerTitle)
+                                row(
+                                    title: Texts_HomeView.sensorManagementCGMType,
+                                    data: state.bannerTitle,
+                                    dexcomConnectionMode: state.dexcomConnectionMode
+                                )
                             } else {
                                 NavigationLink {
                                     SensorInformationView(rows: state.sensorInformationRows)
                                 } label: {
-                                    row(title: Texts_HomeView.sensorManagementCGMType, data: state.bannerTitle)
+                                    row(
+                                        title: Texts_HomeView.sensorManagementCGMType,
+                                        data: state.bannerTitle,
+                                        dexcomConnectionMode: state.dexcomConnectionMode
+                                    )
                                 }
                             }
 
@@ -165,6 +179,29 @@ struct SensorManagementView: View {
                                 row(title: Texts_HomeView.sensorManagementLastCalibration, data: state.calibrationSummary)
                             }
                             .disabled(!state.hasCalibrationHistory)
+
+                            if let transmitterCalibrationStatus = state.transmitterCalibrationStatus {
+                                Button {
+                                    showingCalibrationStatusDetails = true
+                                } label: {
+                                    HStack {
+                                        Text(Texts_HomeView.statusActionTitle)
+                                            .foregroundStyle(ConstantsAppColors.rowTitleText)
+                                        Spacer()
+                                        HStack(spacing: 8) {
+                                            Circle()
+                                                .fill(transmitterCalibrationStatus.indicatorColor.color)
+                                                .frame(width: 10, height: 10)
+                                            Text(transmitterCalibrationStatus.shortDescription)
+                                                .multilineTextAlignment(.trailing)
+                                                .foregroundStyle(ConstantsAppColors.rowDetailText)
+                                        }
+                                        Image(systemName: "chevron.right")
+                                            .font(.footnote.weight(.semibold))
+                                            .foregroundStyle(Color(.tertiaryLabel))
+                                    }
+                                }
+                            }
                         }
                     } else {
                         Section {
@@ -217,6 +254,13 @@ struct SensorManagementView: View {
         } message: {
             Text(state.sensorDetailsMessage)
         }
+        .alert(Texts_HomeView.statusActionTitle, isPresented: $showingCalibrationStatusDetails) {
+            Button(Texts_Common.Ok, role: .cancel) {}
+        } message: {
+            if let transmitterCalibrationStatus = state.transmitterCalibrationStatus {
+                Text(calibrationStatusText(transmitterCalibrationStatus))
+            }
+        }
         .alert(Texts_Common.warning, isPresented: $showingStopConfirmation) {
             Button(Texts_Common.Cancel, role: .cancel) {}
             Button(Texts_Common.yes, role: .destructive) {
@@ -231,7 +275,7 @@ struct SensorManagementView: View {
                 pendingStartSensorCode = nil
                 pendingStartSensorLabel = nil
             }
-            Button(Texts_HomeView.startSensorAnyway) {
+            Button(Texts_HomeView.sensorCodeContinue) {
                 startSensorWithPendingCode()
             }
         } message: {
@@ -250,12 +294,14 @@ struct SensorManagementView: View {
             )
         }
         .sheet(isPresented: $showingStartCodeSheet) {
-            SensorStartCodeView(
-                onCancel: {
-                    showingStartCodeSheet = false
-                },
-                onSubmit: submitStartSensorCode
-            )
+            NavigationStack {
+                SensorStartCodeView(
+                    onCancel: {
+                        showingStartCodeSheet = false
+                    },
+                    onSubmit: submitStartSensorCode
+                )
+            }
         }
         .sheet(isPresented: $showingCalibrationSheet) {
             CalibrationView(
@@ -414,14 +460,49 @@ struct SensorManagementView: View {
         }
     }
 
-    private func row(title: String, data: String, dataColor: Color = ConstantsAppColors.rowDetailText) -> some View {
+    private func row(
+        title: String,
+        data: String,
+        dataColor: Color = ConstantsAppColors.rowDetailText,
+        dexcomConnectionMode: DexcomConnectionMode? = nil
+    ) -> some View {
         HStack {
             Text(title)
                 .foregroundStyle(ConstantsAppColors.rowTitleText)
             Spacer()
-            Text(data)
-                .foregroundStyle(dataColor)
-                .multilineTextAlignment(.trailing)
+            HStack(spacing: 4) {
+                if let mode = dexcomConnectionMode {
+                    Image(systemName: mode.systemImage)
+                        .foregroundStyle(mode.color)
+                        .accessibilityLabel(dexcomModeAccessibilityLabel(mode))
+                }
+
+                Text(data)
+                    .multilineTextAlignment(.trailing)
+            }
+            .foregroundStyle(dataColor)
+        }
+    }
+
+    private func dexcomModeAccessibilityLabel(_ mode: DexcomConnectionMode) -> String {
+        mode == .coexistence
+            ? Texts_BluetoothPeripheralView.runningInCoexistenceMode
+            : Texts_BluetoothPeripheralView.runningInPrimaryMode
+    }
+
+    /// Converts the transmitter's existing sensor-status severity into the SwiftUI color used by
+    /// Sensor Management. Keeping the original severity means a pre-glucose failure remains
+    /// visible while the expected stopped state can still use the separate neutral presentation.
+    private func dexcomSensorStatusColor(_ indicatorColor: DexcomSensorStatusIndicatorColor) -> Color {
+        switch indicatorColor {
+        case .green:
+            return .green
+        case .yellow:
+            return Color(.systemYellow)
+        case .orange:
+            return Color(.systemOrange)
+        case .red:
+            return .red
         }
     }
 
@@ -461,16 +542,38 @@ struct SensorManagementView: View {
     private func currentState() -> SensorManagementState {
         let transmitter = transmitterProvider()
         let activeSensor = activeSensorProvider()
+        let transmitterType = transmitter?.cgmTransmitterType()
+        let dexcomG7 = transmitterType == .dexcomG7 ? dexcomG7Provider() : nil
         let sensorDescription: String
         if activeSensor != nil {
             sensorDescription = UserDefaults.standard.activeSensorDescription ?? Texts_HomeView.sensor
+        } else if let dexcomG7 {
+            // A G7-family sensor manages its own session. Before the first usable glucose creates
+            // the internal xDrip4iOS sensor, the Bluetooth device still contains enough
+            // information to identify whether it is G7, ONE+, or Stelo. Showing that real product
+            // name avoids implying that no CGM has been configured during automatic warm-up.
+            sensorDescription = DexcomProductNameResolver.title(
+                transmitterType: .dexcomG7,
+                transmitterID: dexcomG7.blePeripheral.transmitterId,
+                bluetoothName: dexcomG7.blePeripheral.name
+            ) ?? CGMTransmitterType.dexcomG7.rawValue
         } else {
             sensorDescription = Texts_HomeView.sensorManagementNoSensor
         }
         let startDate = activeSensor?.startDate
         let maxSensorAgeInDays = UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? transmitter?.maxSensorAgeInDays() ?? 0
 
-        let sensorType = transmitter?.cgmTransmitterType().sensorType()
+        let sensorType = transmitterType?.sensorType()
+        let dexcomConnectionMode: DexcomConnectionMode?
+        if activeSensor == nil {
+            dexcomConnectionMode = nil
+        } else if let transmitter = transmitter as? CGMG5Transmitter {
+            dexcomConnectionMode = DexcomConnectionMode(useOtherApp: transmitter.useOtherApp)
+        } else if let transmitter = transmitter as? CGMG7Transmitter {
+            dexcomConnectionMode = DexcomConnectionMode(useOtherApp: transmitter.useOtherApp)
+        } else {
+            dexcomConnectionMode = nil
+        }
         let isAnubis = transmitter?.isAnubisG6() ?? false
         let warmupMinutes: Double?
 
@@ -478,7 +581,7 @@ struct SensorManagementView: View {
         case .Libre:
             warmupMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
         case .Dexcom:
-            if transmitter?.cgmTransmitterType() == .dexcomG7 {
+            if transmitterType == .dexcomG7 {
                 warmupMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG7
             } else {
                 warmupMinutes = isAnubis ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6
@@ -503,8 +606,27 @@ struct SensorManagementView: View {
 
         let statusTitle: String
         let statusColor: Color
+        let dexcomG7AlgorithmState = dexcomG7?.sensorStatus.flatMap { status in
+            DexcomAlgorithmState.allCases.first { $0.description == status }
+        }
 
-        if activeSensor == nil {
+        if activeSensor == nil, dexcomG7 != nil {
+            // A newly inserted G7 can briefly report `SessionStopped` before it begins its own
+            // session. Once the transmitter reports `SensorWarmup`, use that real state even
+            // though no glucose has arrived yet. Other algorithm states remain visible so a
+            // genuine expiry or sensor failure is never hidden behind the neutral waiting text.
+            switch dexcomG7AlgorithmState {
+            case .some(.SensorWarmup):
+                statusTitle = Texts_HomeView.sensorManagementStatusWarmingUp
+                statusColor = Color(.systemYellow)
+            case .none, .some(.None), .some(.SessionStopped):
+                statusTitle = Texts_HomeView.sensorManagementWaitingForSensorStart
+                statusColor = Color(.systemGray)
+            case let .some(algorithmState):
+                statusTitle = algorithmState.description
+                statusColor = dexcomSensorStatusColor(algorithmState.indicatorColor)
+            }
+        } else if activeSensor == nil {
             statusTitle = Texts_HomeView.sensorManagementStatusNotStarted
             statusColor = Color(.systemGray)
         } else if warmupReadyTimeString != nil {
@@ -568,7 +690,8 @@ struct SensorManagementView: View {
 
         let sensorInformationRows = sensorInformationRows(
             activeSensor: activeSensor,
-            isDexcomG6: transmitter?.needsSensorStartCode() == true
+            isDexcomG6: transmitter?.needsSensorStartCode() == true,
+            dexcomG7SensorLabel: dexcomG7?.storedSensorLabel
         )
 
         let sensorDetailsMessage = sensorDetailsMessage(
@@ -612,6 +735,7 @@ struct SensorManagementView: View {
         } ?? []
 
         let firstCalibration = activeSensor.flatMap { calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: $0) }
+        let transmitterCalibrationStatus = transmitter?.transmitterCalibrationStatus()
         let calibrationNote: String?
         let canCalibrate: Bool
         let showCalibrationUnavailableRow: Bool
@@ -628,6 +752,12 @@ struct SensorManagementView: View {
             canCalibrate = false
             showCalibrationUnavailableRow = false
             calibrationNote = Texts_HomeView.startSensorBeforeCalibration
+        } else if transmitterCalibrationStatus?.preventsCalibrationSubmission == true {
+            canCalibrate = false
+            showCalibrationUnavailableRow = false
+            calibrationNote = transmitterCalibrationStatus == .notPermitted
+                ? Texts_HomeView.sensorManagementCalibrationNotPermittedNote
+                : nil
         } else if transmitter?.isWebOOPEnabled() == true && transmitter?.overruleIsWebOOPEnabled() == false {
             canCalibrate = false
             showCalibrationUnavailableRow = true
@@ -684,6 +814,7 @@ struct SensorManagementView: View {
             sensorID: activeSensor?.id,
             sensorStartDate: activeSensor?.startDate,
             bannerTitle: sensorDescription,
+            dexcomConnectionMode: dexcomConnectionMode,
             statusTitle: statusTitle,
             statusColor: statusColor,
             usesNormalStatusTextColor: usesNormalStatusTextColor,
@@ -707,9 +838,11 @@ struct SensorManagementView: View {
             shouldWarnOnLargeCalibrationStep: transmitter?.shouldWarnOnLargeCalibrationStep() ?? false,
             sensorActionNote: sensorActionNote,
             canCalibrate: canCalibrate,
+            isNativeG6: transmitter is CGMG5Transmitter && transmitter?.needsSensorStartCode() == true,
             showCalibrationUnavailableRow: showCalibrationUnavailableRow,
             calibrationNote: calibrationNote,
             calibrationSummary: calibrationSummary,
+            transmitterCalibrationStatus: hasCalibrationHistory ? transmitterCalibrationStatus : nil,
             hasCalibrationHistory: hasCalibrationHistory,
             shortTermNoise: activeSensor?.shortTermNoise?.doubleValue,
             longTermNoise: activeSensor?.longTermNoise?.doubleValue,
@@ -724,10 +857,54 @@ struct SensorManagementView: View {
         )
     }
 
+    private func calibrationStatusText(_ status: CGMTransmitterCalibrationStatus) -> String {
+        switch status {
+        case .queued:
+            return Texts_HomeView.sensorManagementCalibrationQueued
+        case .sentAwaitingResponse:
+            return Texts_HomeView.sensorManagementCalibrationSent
+        case .processing:
+            return Texts_HomeView.sensorManagementCalibrationProcessing
+        case .completedHigh:
+            return Texts_HomeView.sensorManagementCalibrationCompletedHigh
+        case .completedLow:
+            return Texts_HomeView.sensorManagementCalibrationCompletedLow
+        case let .rejected(reason):
+            return String(
+                format: Texts_HomeView.sensorManagementCalibrationRejectedFormat,
+                calibrationRejectionText(reason)
+            )
+        case .notPermitted:
+            return Texts_HomeView.sensorManagementCalibrationNotPermitted
+        }
+    }
+
+    private func calibrationRejectionText(_ reason: DexcomG7CalibrationRejectionReason) -> String {
+        switch reason {
+        case .outsideRange, .extremeOutlier:
+            return Texts_HomeView.sensorManagementCalibrationRejectedRange
+        case .timestampInFuture, .earlierThanSessionStart, .notInOrder, .stale:
+            return Texts_HomeView.sensorManagementCalibrationRejectedTime
+        case .duplicate, .alreadyEntered:
+            return Texts_HomeView.sensorManagementCalibrationRejectedDuplicate
+        case .disabled, .notPermitted:
+            return Texts_HomeView.sensorManagementCalibrationNotPermitted
+        case .calibrationBoundsFailed:
+            return Texts_HomeView.sensorManagementCalibrationRejectedBounds
+        case .unspecified, .unknown:
+            return Texts_HomeView.sensorManagementCalibrationRejectedUnknown
+        }
+    }
+
     private func sensorInformationRows(
         activeSensor: Sensor?,
-        isDexcomG6: Bool
+        isDexcomG6: Bool,
+        dexcomG7SensorLabel: DexcomG6SensorLabel?
     ) -> [SensorManagementInformationRow] {
+        if let dexcomG7SensorLabel {
+            return sensorInformationRows(label: dexcomG7SensorLabel)
+        }
+
         guard isDexcomG6, let activeSensor else { return [] }
 
         let origin = activeSensor.sensorSessionOrigin
@@ -765,6 +942,46 @@ struct SensorManagementView: View {
         return rows
     }
 
+    private func sensorInformationRows(label: DexcomG6SensorLabel) -> [SensorManagementInformationRow] {
+        var rows = [
+            SensorManagementInformationRow(title: Texts_HomeView.sensorCode, value: label.sensorCode)
+        ]
+
+        if !label.lotNumber.isEmpty {
+            rows.append(.init(title: Texts_HomeView.sensorLotNumber, value: label.lotNumber))
+        }
+        if !label.serialNumber.isEmpty {
+            rows.append(.init(title: Texts_HomeView.sensorSerialNumber, value: label.serialNumber))
+        }
+        if let manufactureDate = label.manufactureDate {
+            // Keep the source calendar day when showing stored applicator metadata. These dates were decoded at
+            // midnight UTC and must not move to the previous day when the phone is in a US time zone.
+            rows.append(.init(
+                title: Texts_HomeView.sensorManufactureDate,
+                value: manufactureDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short, timeZone: TimeZone(secondsFromGMT: 0))
+            ))
+        }
+        if let expirationDate = label.expirationDate {
+            rows.append(.init(
+                title: Texts_HomeView.sensorExpirationDate,
+                value: expirationDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short, timeZone: TimeZone(secondsFromGMT: 0))
+            ))
+        }
+
+        return rows
+    }
+
+}
+
+private extension DexcomSensorStatusIndicatorColor {
+    var color: Color {
+        switch self {
+        case .green: return Color(.systemGreen)
+        case .yellow: return Color(.systemYellow)
+        case .orange: return Color(.systemOrange)
+        case .red: return Color(.systemRed)
+        }
+    }
 }
 
 // MARK: - sensitivity picker
@@ -831,6 +1048,7 @@ private struct SensorManagementState {
     let sensorID: String?
     let sensorStartDate: Date?
     let bannerTitle: String
+    let dexcomConnectionMode: DexcomConnectionMode?
     let statusTitle: String
     let statusColor: Color
     let usesNormalStatusTextColor: Bool
@@ -854,9 +1072,17 @@ private struct SensorManagementState {
     let shouldWarnOnLargeCalibrationStep: Bool
     let sensorActionNote: String?
     let canCalibrate: Bool
+    let isNativeG6: Bool
+
+    var canEnterCalibration: Bool {
+        DexcomG6InitialCalibrationPolicy.canEnterCalibration(
+            canCalibrate: canCalibrate, hasReading: currentBgDisplay != nil, isNativeG6: isNativeG6
+        )
+    }
     let showCalibrationUnavailableRow: Bool
     let calibrationNote: String?
     let calibrationSummary: String
+    let transmitterCalibrationStatus: CGMTransmitterCalibrationStatus?
     let hasCalibrationHistory: Bool
     let shortTermNoise: Double?
     let longTermNoise: Double?

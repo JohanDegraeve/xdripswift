@@ -31,6 +31,7 @@ extension BluetoothPeripheralManager: CGMMiaoMiaoTransmitterDelegate {
         
         // store serial number in miaoMiao object
         miaoMiao.batteryLevel = batteryLevel
+        batteryHistoryManager.record(peripheralObjectID: miaoMiao.blePeripheral.objectID, observation: .percentage(value: batteryLevel, producer: .miaoMiao))
         
         // no coredatamanager savechanges needed because batterylevel is not stored in coredata
         

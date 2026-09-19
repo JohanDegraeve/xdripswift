@@ -2,3 +2,4 @@
 "calibration_title" = "Calibration";
 "calibration_notification_title" = "Calibration";
 "calibration_notification_body" = "Click the Notification to Calibrate";
+"previousCalibrationPrefillMessage" = "Din tidligere kalibrering fra %@ er udfyldt på forhånd. Sammenlign den med din aktuelle blodsukkermåling, før du bekræfter.";

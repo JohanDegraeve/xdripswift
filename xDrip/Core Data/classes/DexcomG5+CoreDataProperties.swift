@@ -20,6 +20,9 @@ extension DexcomG5 {
     
     @NSManaged public var batteryTemperature: Int32
 
+    /// When this transmitter last returned a genuine battery packet.
+    @NSManaged public var batteryLastReadDate: Date?
+
     /// The raw Dexcom authentication role. Nil resolves to the family default for migrated stores.
     @NSManaged public var bluetoothSlot: NSNumber?
     

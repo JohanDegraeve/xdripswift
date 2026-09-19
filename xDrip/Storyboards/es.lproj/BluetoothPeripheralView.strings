@@ -10,6 +10,10 @@
 "SensorSerialNumber" = "Número de Serie";
 "serialNumber" = "Número de Serie";
 "battery" = "Batería";
+"versionCode" = "Código de versión";
+"voltageA" = "Voltaje A";
+"voltageB" = "Voltaje B";
+"waitingForData" = "Esperando datos...";
 "needsTransmitterId" = "Falta la ID del Transmisor";
 "scan" = "Escanear";
 "medtrumNanoPumpScanNoticeTitle" = "Conexión con la bomba Medtrum Nano";
@@ -37,8 +41,7 @@
 "sensorType" = "Tipo de Sensor";
 "confirmDisconnectTitle" = "Confirmar Desconexión";
 "confirmDisconnectMessage" = "Haz click en 'Desconectar' para confirmar que deseas desconectar el transmisor.";
-"warmingUpUntil" = "Calentando hasta";
-"useOtherDexcomApp" = "Modo de coexistencia";
+"warmingUpUntil" = "Calent. hasta";
 "useOtherDexcomAppCoexistenceFooter" = "El modo de coexistencia nos permite funcionar con otra app, como Dexcom o CamAPS. Esa app debe seguir ejecutándose en segundo plano.";
 "useOtherDexcomAppPrimaryFooter" = "El modo principal se conecta como app principal y controla la conexión.";
 "runningInCoexistenceMode" = "Funcionando en modo de coexistencia";
@@ -75,7 +78,7 @@
 "nfcScanFailedScanAgainButton" = "Scan Again";
 
 /// Tell the user the scan was successful and to just wait now for connection
-"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 
 
 "nativeAlgorithm" = "Algoritmo nativo";
@@ -118,15 +121,71 @@
 
 /* Dexcom G6 Bluetooth authentication slot */
 "dexcomG6BluetoothSlot" = "Canal Bluetooth";
-"dexcomG6MobileAppSlot" = "App móvil (Predeterminada)";
+"dexcomG6MobileAppSlot" = "Ranura 2: App móvil (Predeterminada)";
 "dexcomG6MobileAppSlotShort" = "App móvil";
-"dexcomG6MedicalDeviceSlot" = "Receptor o bomba (Experimental)";
+"dexcomG6MedicalDeviceSlot" = "Ranura 1: Receptor o bomba";
 "dexcomG6MedicalDeviceSlotShort" = "Bomba";
 "dexcomG6MobileAppSlotFooter" = "El canal App móvil es el predeterminado para conexiones de teléfonos.";
 "dexcomG6MedicalDeviceSlotFooter" = "El canal Receptor o bomba suele estar reservado para el receptor Dexcom o una bomba compatible. Usarlo para esta app deja el canal App móvil disponible para un teléfono u otro dispositivo.";
 "dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "No disponible en el modo de coexistencia";
 "dexcomG6MedicalDeviceSlotWarning" = "El canal Receptor o bomba suele estar reservado para un receptor Dexcom o una bomba compatible. Seleccionarlo puede impedir que ese dispositivo se conecte.\n\nEl uso del canal Receptor o bomba debe considerarse únicamente experimental. La selección se aplicará en la siguiente autenticación.";
-"dexcomG6AnubisSlot" = "Canal 3 (Anubis experimental)";
+"dexcomG6AnubisSlot" = "Ranura 3: Anubis Extra";
+"dexcomG7MedicalDeviceSlot" = "Ranura 1: Receptor o bomba";
+"dexcomG7MedicalDeviceSlotShort" = "Bomba";
+"dexcomG7MobileAppSlot" = "Ranura 2: App móvil (Predeterminada)";
+"dexcomG7SmartWatchSlot" = "Ranura 3: Reloj inteligente";
+"dexcomG7PairingCodeMessage" = "Introduce el código de cuatro dígitos del aplicador del sensor actual. El modo principal no puede autenticarse sin este código.";
+"dexcomG7BluetoothSlot" = "Canal Bluetooth";
+"dexcomG7MobileAppSlotShort" = "App móvil";
+"dexcomG7SmartWatchSlotShort" = "Reloj inteligente";
+"dexcomG7MobileAppSlotFooter" = "El canal de la app móvil (ranura 2) es el predeterminado y la conexión directa G7 validada actualmente.";
+"dexcomG7MedicalDeviceSlotFooter" = "El canal Receptor o bomba utiliza la ranura de autenticación 1.";
+"dexcomG7SmartWatchSlotFooter" = "El canal Reloj inteligente utiliza la ranura de autenticación de fábrica 3.";
 "dexcomG6AnubisSlotShort" = "Canal 3";
 "dexcomG6AnubisSlotFooter" = "El Canal 3 solo está disponible en transmisores Anubis. Es experimental y deja los canales App móvil y Receptor o bomba disponibles para otros dispositivos.";
 "dexcomG6AnubisSlotWarning" = "El Canal 3 es un canal experimental disponible únicamente en transmisores Anubis.\n\nUsa el Canal 3 solo para pruebas. La selección se aplicará en la siguiente autenticación.";
+"dexcomConnectionMode" = "Modo de conexión";
+"dexcomPrimaryMode" = "Principal";
+"dexcomCoexistenceMode" = "Coexistencia";
+"dexcomPrimaryModePickerOption" = "Modo principal";
+"dexcomCoexistenceModePickerOption" = "Modo de coexistencia";
+"dexcomG6ModeSelectionFooter" = "Puedes cambiar el modo de conexión del G6 más tarde en los ajustes del transmisor.";
+"dexcomConnectionModeSelectionExplanation" = "El modo principal conecta esta app directamente y requiere cerrar cualquier otra app que se conecte al dispositivo Dexcom.\n\nEl modo de coexistencia depende de otra app para mantener la conexión con Dexcom y recibir lecturas.";
+"dexcomBluetoothChannelSelectionExplanation" = "Elige el canal Bluetooth que utilizará esta app. Selecciona App móvil salvo que necesites dejar ese canal disponible para otra conexión.";
+"dexcomG6CoexistenceModeSelectionMessage" = "Se ha seleccionado el modo de coexistencia. Otra app, como Dexcom G6 o CamAPS, debe conectarse y autenticarse con el transmisor G6.\n\nMantén la otra app ejecutándose en segundo plano o %@ no recibirá lecturas.";
+"dexcomG6PrimaryModeSelectionMessage" = "Se ha seleccionado el modo principal. %@ debe ser la única app que se conecte y autentique con el transmisor G6.\n\nCierra cualquier otra app que se conecte al transmisor o desactiva su permiso de Bluetooth. De lo contrario, %@ o la otra app podrían no recibir lecturas.";
+"dexcomPrimaryModeAddFlowMessage" = "Conecta directamente como app principal. Desconecta cualquier otra app de este Dexcom.";
+"dexcomCoexistenceModeAddFlowMessage" = "Comparte la conexión con otra app. Mantén la app de Dexcom o CamAPS funcionando correctamente en segundo plano.";
+"dexcomG7NoSensorLabelFound" = "No se encontró ninguna etiqueta de sensor Dexcom G7 en la foto.";
+"dexcomG7InvalidSensorLabelFound" = "Se encontró un Data Matrix, pero no era una etiqueta válida de sensor Dexcom G7.";
+
+
+/* Battery history */
+"batteryHistory" = "Historial de la batería";
+"batteryHistoryTransmitterID" = "ID del transmisor";
+"batteryHistoryNoData" = "No hay historial de la batería";
+"batteryHistoryBeginsAfterReading" = "El historial comienza después de la próxima lectura real de la batería.";
+"batteryHistoryRange" = "Intervalo";
+"batteryHistoryRangeAccessibility" = "Intervalo del historial de la batería";
+"batteryHistoryRangeExplanation" = "Los intervalos fijos van desde ahora hasta el número de días seleccionado. Los espacios muestran periodos sin lecturas.";
+
+"connectionDiagramOtherApp" = "Otra app";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Intensidad de señal";
+
+"signalStrengthChartExplanation" = "Señal en directo de los últimos dos minutos. Se reciben nuevas mediciones aproximadamente cada segundo mientras está conectado.";
+
+"signalStrengthWeak" = "Débil";
+"signalStrengthStrong" = "Fuerte";
+"signalStrengthLastMeasurement" = "Última medición";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Suscripciones";
+"heartbeat.mode" = "Modo de suscripción";
+"heartbeat.mode.automatic" = "Única";
+"heartbeat.mode.all" = "Todas";
+"heartbeat.footer.automatic" = "Selecciona automáticamente un canal Bluetooth compatible para recibir latidos, manteniendo las suscripciones al mínimo. Si la suscripción falla, se prueba otro canal.";
+"heartbeat.footer.all" = "Se suscribe a todos los canales Bluetooth compatibles, permitiendo que las actualizaciones de cualquiera de ellos proporcionen un latido.";
+"heartbeat.simpleFooter" = "Los cambios se aplican en la próxima conexión.";
+
+"signalStrengthDisconnected" = "Desconectado";

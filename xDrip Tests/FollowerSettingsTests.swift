@@ -186,6 +186,31 @@ final class FollowerSettingsTests: XCTestCase {
     }
 
     @MainActor
+    func testCareLinkVersionFollowsLibreLinkUpAndSharesItsFormatRules() throws {
+        try withTemporaryStandardDefaults { standard in
+            standard.showDeveloperSettings = true
+            standard.careLinkVersion = ConstantsCareLink.carePartnerAppVersionDefault
+
+            let model = SettingsViewDevelopmentSettingsViewModel(rowGroup: .advanced)
+            let rows = model.settingsRows(sectionID: 0)
+            let libreIndex = try XCTUnwrap(rows.firstIndex { $0.id == "developer.libreLinkUpVersion" })
+            let careLinkIndex = try XCTUnwrap(rows.firstIndex { $0.id == "developer.careLinkVersion" })
+
+            XCTAssertEqual(careLinkIndex, libreIndex + 1)
+            XCTAssertEqual(rows[careLinkIndex].title, Texts_SettingsView.careLinkVersion)
+            XCTAssertEqual(rows[careLinkIndex].detail, ConstantsCareLink.carePartnerAppVersionDefault)
+            XCTAssertTrue(model.checkFollowerVersionFormat(for: "3.8.0"))
+            XCTAssertTrue(model.checkFollowerVersionFormat(for: "12.345.6789"))
+            XCTAssertFalse(model.checkFollowerVersionFormat(for: "3.8"))
+            XCTAssertFalse(model.checkFollowerVersionFormat(for: "3.8.x"))
+            XCTAssertFalse(model.checkFollowerVersionFormat(for: "3.8.0.1"))
+            XCTAssertFalse(model.checkFollowerVersionFormat(for: "3..0"))
+            XCTAssertFalse(model.checkFollowerVersionFormat(for: " 3.8.0"))
+            XCTAssertFalse(model.checkFollowerVersionFormat(for: "٣.٨.٠"))
+        }
+    }
+
+    @MainActor
     func testBlockedShareClearsPublishedAndDelayedData() throws {
         try withTemporaryStandardDefaults { standard in
             standard.loopShareType = .trio

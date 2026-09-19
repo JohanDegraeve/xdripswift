@@ -35,6 +35,16 @@ enum ConstantsFollower {
     static let followerStatusAtlassianApiPath = "/api/v2/summary.json"
     /// status endpoint for Nightscout
     static let followerStatusNightscoutApiPath = "/api/v1/status.json"    
+
+    /// Follower app versions must contain exactly three non-empty ASCII-numeric components.
+    /// Keeping this rule outside the settings screen also protects URL and request builders that
+    /// consume a stored override directly.
+    static func isValidAppVersion(_ version: String) -> Bool {
+        let components = version.split(separator: ".", omittingEmptySubsequences: false)
+        return components.count == 3 && components.allSatisfy { component in
+            !component.isEmpty && component.unicodeScalars.allSatisfy { (48 ... 57).contains($0.value) }
+        }
+    }
 }
 
 /// CareLink-specific follower configuration.
@@ -46,10 +56,10 @@ enum ConstantsFollower {
 /// with CareLink server throttling, so CareLink now uses its source-specific reference strategy.
 /// Reference: NightscoutFoundation/xDrip, `cgm/carelinkfollow/CareLinkFollowService.java`.
 enum ConstantsCareLink {
-    static let carePartnerDiscoveryURL = URL(string: "https://clcloud.minimed.eu/connect/carepartner/v13/discover/android/3.6")!
+    static let carePartnerAppVersionDefault = "3.8.0"
+    static let carePartnerDiscoveryURLBase = URL(string: "https://clcloud.minimed.eu/connect/carepartner/v13/discover/android")!
     static let carePartnerRegionUS = "US"
     static let carePartnerRegionOutsideUS = "EU"
-    static let carePartnerAppVersion = "3.6.0"
     static let oauthResponseType = "code"
     static let oauthCodeChallengeMethod = "S256"
     static let oauthRefreshMargin: TimeInterval = 10 * 60
@@ -64,9 +74,16 @@ enum ConstantsCareLink {
     static let pollingGracePeriod: TimeInterval = 30
     static let missedDataPollingInterval: TimeInterval = 60
     static let minimumPollingInterval: TimeInterval = 20
-    /// A local deadline check only; CareLink is contacted only when `nextPollAt` is due.
+    /// A local deadline check only. CareLink is contacted only when `nextPollAt` is due.
     static let schedulerCheckInterval = minimumPollingInterval
     static let staleReadingAge: TimeInterval = 20 * 60
     static let initialRetryBackoff: TimeInterval = 15
     static let maximumRetryBackoff: TimeInterval = 5 * 60
+
+    /// CarePartner discovery uses major.minor while data requests use the full major.minor.patch.
+    static func carePartnerDiscoveryURL(appVersion: String) -> URL? {
+        guard ConstantsFollower.isValidAppVersion(appVersion) else { return nil }
+        let components = appVersion.split(separator: ".")
+        return carePartnerDiscoveryURLBase.appendingPathComponent(components.prefix(2).joined(separator: "."))
+    }
 }

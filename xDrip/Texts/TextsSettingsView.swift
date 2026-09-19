@@ -21,7 +21,7 @@ class Texts_SettingsView {
     }()
 
     static let glucoseDisplaySectionTitle: String = {
-        return NSLocalizedString("settingsviews_glucoseDisplaySectionTitle", tableName: filename, bundle: Bundle.main, value: "Display", comment: "settings group title for display options")
+        return NSLocalizedString("settingsviews_glucoseDisplaySectionTitle", tableName: filename, bundle: Bundle.main, value: "General", comment: "settings group title for general options")
     }()
 
     static let glucoseRangesSectionTitle: String = {
@@ -554,7 +554,7 @@ class Texts_SettingsView {
     }()
     
     static let dexcomG7Message:String = {
-        return NSLocalizedString("settingsviews_dexcomG7Message", tableName: filename, bundle: Bundle.main, value: "Press OK to automatically try to find your sensor.\n\nIf you have trouble connecting then you can manually enter the bluetooth name shown in the iPhone Settings -> Bluetooth devices list.", comment: "transmitter settings, instructions for adding a G7 type transmitter")
+        return NSLocalizedString("settingsviews_dexcomG7Message", tableName: filename, bundle: Bundle.main, value: "Leave the Bluetooth name empty. On the next screen, tap Scan to search for the sensor automatically.\n\nIf the sensor has previously appeared in Settings > Bluetooth, you can enter its Bluetooth name manually.", comment: "transmitter settings, instructions for adding a G7 type transmitter")
     }()
     
     static let labelTransmitterIdTextForButton:String = {
@@ -725,8 +725,8 @@ class Texts_SettingsView {
         return NSLocalizedString("nightscoutFollowTypeOpenAPSExpanded", tableName: filename, bundle: Bundle.main, value: "OpenAPS/Trio/iAPS/AAPS", comment: "nightscout settings, openaps based follower type explanation")
     }()
     
-    static let useSchedule = {
-        return NSLocalizedString("settingsviews_useSchedule", tableName: filename, bundle: Bundle.main, value: "Use Upload Schedule", comment: "nightscout settings, where user can select to use schedule or not")
+    static let enableSchedule = {
+        return NSLocalizedString("settingsviews_enableSchedule", tableName: filename, bundle: Bundle.main, value: "Enable Schedule", comment: "Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate.")
     }()
     
     static let schedule = {
@@ -782,6 +782,16 @@ class Texts_SettingsView {
     }()
 
     // MARK: - Section Speak
+
+    static let speakScheduleActive = NSLocalizedString("speak.schedule.active", tableName: filename, bundle: .main, value: "Active", comment: "Speech is enabled and allowed at the current time; not a promise that audio is currently playing.")
+    static let speakScheduleInactive = NSLocalizedString("speak.schedule.inactive", tableName: filename, bundle: .main, value: "Inactive", comment: "Speech is enabled but paused outside its daily schedule.")
+
+    static let speakScheduleSection = NSLocalizedString("speak.schedule.section", tableName: filename, bundle: .main, value: "Schedule", comment: "Daily speech schedule section title.")
+
+    static let speakScheduleStart = NSLocalizedString("speak.schedule.start", tableName: filename, bundle: .main, value: "Enable at", comment: "Start of the daily speech window.")
+    static let speakScheduleEnd = NSLocalizedString("speak.schedule.end", tableName: filename, bundle: .main, value: "Disable at", comment: "End of the daily speech window; may be on the following morning.")
+    static let speakScheduleExplanation = NSLocalizedString("speak.schedule.explanation", tableName: filename, bundle: .main, value: "When Speak Glucose is on, readings are spoken only within these hours. The schedule repeats daily in your phone’s local time and can cross midnight. Shortcuts change only the Speak Glucose switch.", comment: "Explain the separate master switch and daily speech schedule.")
+    static let speakScheduleDifferentTimes = NSLocalizedString("speak.schedule.differentTimes", tableName: filename, bundle: .main, value: "Choose different enable and disable times.", comment: "Validation message when both speech schedule times are equal.")
     
     static let sectionTitleSpeak: String = {
         return NSLocalizedString("settingsviews_speakBgReadings", tableName: filename, bundle: Bundle.main, value: "Speak Glucose", comment: "speak settings, where user can enable or disable speak readings")
@@ -1215,6 +1225,22 @@ class Texts_SettingsView {
     static let libreLinkUpVersionMessage = {
         return String(format: NSLocalizedString("libreLinkUpVersionMessage", tableName: filename, bundle: Bundle.main, value: "Setting this value incorrectly could result in your LibreLinkUp account being locked.\n\nDo not touch this setting unless instructed by an xDrip4iOS developer.\n\nThe default version is: %@", comment: "developer settings, ask the user for the libre link up version"), ConstantsLibreLinkUp.libreLinkUpVersionDefault)
     }()
+
+    static let careLinkVersion: String = {
+        return NSLocalizedString("careLinkVersion", tableName: filename, bundle: Bundle.main, value: "CareLink version", comment: "developer settings, CareLink version number")
+    }()
+
+    static func careLinkVersionMessage(defaultVersion: String) -> String {
+        return String(format: NSLocalizedString("careLinkVersionMessage", tableName: filename, bundle: Bundle.main, value: "Setting this value incorrectly could prevent CareLink from downloading data.\n\nDo not touch this setting unless instructed by an xDrip4iOS developer.\n\nThe default version is: %@", comment: "developer settings, ask the user for the CareLink version"), defaultVersion)
+    }
+
+    static let followerVersionFormatMessage = NSLocalizedString(
+        "followerVersionFormatMessage",
+        tableName: filename,
+        bundle: Bundle.main,
+        value: "Enter a version in 0.0.0 format.",
+        comment: "developer settings, follower version validation message"
+    )
     
     static let CAGEMaxHours: String = {
         return NSLocalizedString("CAGEMaxHours", tableName: filename, bundle: Bundle.main, value: "CAGE Max Hours", comment: "developer settings, maximum hours for canula until it expires")

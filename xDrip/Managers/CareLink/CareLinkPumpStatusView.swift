@@ -20,9 +20,15 @@ struct CareLinkPumpStatusView: View {
                 header
                 List {
                     therapySection
-                    pumpSection
+                    // CareLink also uses its medical-device fields for sensor-only accounts. Do not
+                    // turn those fields into a Pump or Reported Limits section without pump evidence.
+                    if pump.isReported {
+                        pumpSection
+                    }
                     communicationSection
-                    limitsSection
+                    if hasReportedLimits {
+                        limitsSection
+                    }
                 }
                 .listStyle(.insetGrouped)
             }
@@ -56,17 +62,22 @@ struct CareLinkPumpStatusView: View {
                 .font(.title2)
                 .foregroundStyle(ConstantsAppColors.primaryText)
         } statusIcon: {
-            Image(systemName: statusImage)
+            AIDStatusSymbolImage(symbol: statusSymbol)
         }
     }
 
     private var therapySection: some View {
         Section(Texts_SettingsView.careLinkTherapy) {
-            row(Texts_SettingsView.careLinkDelivery, readable(pump.algorithmState))
-            row(Texts_SettingsView.careLinkReadiness, readable(pump.algorithmReadiness))
-            row(Texts_SettingsView.careLinkLowGlucoseSuspend, readable(pump.lowGlucoseSuspendState))
+            // IOB remains useful without a pump. Every other therapy row describes pump delivery.
+            if pump.isReported {
+                row(Texts_SettingsView.careLinkDelivery, readable(pump.algorithmState))
+                row(Texts_SettingsView.careLinkReadiness, readable(pump.algorithmReadiness))
+                row(Texts_SettingsView.careLinkLowGlucoseSuspend, readable(pump.lowGlucoseSuspendState))
+            }
             row(Texts_SettingsView.careLinkActiveInsulin, units(pump.activeInsulin))
-            row(Texts_SettingsView.careLinkBasalRate, rate(pump.currentBasalRate))
+            if pump.isReported {
+                row(Texts_SettingsView.careLinkBasalRate, rate(pump.currentBasalRate))
+            }
             if let remainingMinutes = snapshot.metadata.sensorRemainingMinutes {
                 row(
                     Texts_SettingsView.careLinkSensorRemaining,
@@ -74,7 +85,9 @@ struct CareLinkPumpStatusView: View {
                     indicator: ConstantsHomeView.careLinkSensorIndicator(remainingMinutes: remainingMinutes)
                 )
             }
-            row(Texts_SettingsView.careLinkLastPumpUpdate, formatted(pump.observedAt ?? pump.lastDataUpdateAt))
+            if pump.isReported {
+                row(Texts_SettingsView.careLinkLastPumpUpdate, formatted(pump.observedAt ?? pump.lastDataUpdateAt))
+            }
         }
     }
 
@@ -93,8 +106,12 @@ struct CareLinkPumpStatusView: View {
 
     private var communicationSection: some View {
         Section(Texts_SettingsView.careLinkCommunication) {
-            row(Texts_SettingsView.careLinkPumpConnected, yesNo(pump.isCommunicating))
-            row(Texts_SettingsView.careLinkPumpInRange, yesNo(pump.isInRange))
+            // The conduit range flag refers to the sensor when no pump is present, so keep only the
+            // CareLink service check and route in that case.
+            if pump.isReported {
+                row(Texts_SettingsView.careLinkPumpConnected, yesNo(pump.isCommunicating))
+                row(Texts_SettingsView.careLinkPumpInRange, yesNo(pump.isInRange))
+            }
             row(Texts_SettingsView.careLinkLastCareLinkCheck, formatted(snapshot.lastCheckAt))
             row(Texts_SettingsView.careLinkDataRoute, snapshot.metadata.route?.rawValue.capitalized)
         }
@@ -118,6 +135,11 @@ struct CareLinkPumpStatusView: View {
     }
 
     private var statusTitle: String {
+        // The shared IOB presentation supplies OK/No Data from freshness without inventing a pump
+        // connection status for an account that has not reported one.
+        if !pump.isReported {
+            return snapshot.aidStatus?.presentation().title ?? snapshot.status.title
+        }
         if pump.isSuspended == true { return Texts_SettingsView.careLinkSuspended }
         if pump.isCommunicating == false || pump.isInRange == false { return Texts_SettingsView.careLinkDisconnected }
         if snapshot.status == .connecting {
@@ -126,13 +148,23 @@ struct CareLinkPumpStatusView: View {
         return snapshot.status.title
     }
 
-    private var statusImage: String {
-        if pump.isSuspended == true { return "pause.circle.fill" }
-        if pump.isCommunicating == false || pump.isInRange == false { return "exclamationmark.triangle.fill" }
-        return pump.reportsActiveSmartGuard ? "shield.lefthalf.filled" : "checkmark.circle.fill"
+    /// Keep the pump detail banner's existing state selection, but use the common symbol definitions.
+    /// The shared renderer applies the circle weight and preserves the shield and triangle styling.
+    private var statusSymbol: AIDStatusSymbol {
+        // Keep the same freshness symbol used by Home, Watch, widgets and Live Activity.
+        if !pump.isReported {
+            return snapshot.aidStatus?.presentation().symbol ?? .pump
+        }
+        if pump.isSuspended == true { return .suspended }
+        if pump.isCommunicating == false || pump.isInRange == false { return .disconnected }
+        return pump.reportsActiveSmartGuard ? .smartGuard : .pump
     }
 
     private var statusColor: Color {
+        // Color is the only state change for non-pump IOB: green, yellow and red reflect its age.
+        if !pump.isReported {
+            return snapshot.aidStatus?.presentation().color ?? snapshot.status.indicatorColor
+        }
         if pump.isSuspended == true { return ConstantsAppColors.warning }
         if pump.isCommunicating == false || pump.isInRange == false { return ConstantsAppColors.urgent }
         if snapshot.status == .connecting {
@@ -142,7 +174,12 @@ struct CareLinkPumpStatusView: View {
     }
 
     private var hasPumpData: Bool {
-        pump.observedAt != nil || pump.lastDataUpdateAt != nil
+        pump.isReported && (pump.observedAt != nil || pump.lastDataUpdateAt != nil)
+    }
+
+    /// Do not show an empty limits section merely because some other pump telemetry is present.
+    private var hasReportedLimits: Bool {
+        pump.isReported && (pump.maximumAutoBasalRate != nil || pump.maximumBolusAmount != nil)
     }
 
     private func row(_ title: String, _ value: String?, indicator: StatusSymbolPresentation? = nil) -> some View {

@@ -15,6 +15,25 @@ struct DexcomG6SensorLabel: Equatable, Hashable {
     let sensorCode: String
     let lotNumber: String
     let serialNumber: String
+    let productIdentifier: String?
+    let manufactureDate: Date?
+    let expirationDate: Date?
+
+    init(
+        sensorCode: String,
+        lotNumber: String,
+        serialNumber: String,
+        productIdentifier: String? = nil,
+        manufactureDate: Date? = nil,
+        expirationDate: Date? = nil
+    ) {
+        self.sensorCode = sensorCode
+        self.lotNumber = lotNumber
+        self.serialNumber = serialNumber
+        self.productIdentifier = productIdentifier
+        self.manufactureDate = manufactureDate
+        self.expirationDate = expirationDate
+    }
 }
 
 enum DexcomG6SensorLabelParserError: Error, Equatable {
@@ -23,6 +42,83 @@ enum DexcomG6SensorLabelParserError: Error, Equatable {
     case invalidLotNumber
     case invalidSerialNumber
     case invalidSensorCode
+}
+
+/// Decodes the GS1 Data Matrix printed on a Dexcom G7 applicator.
+/// The observed production labels use fixed-width AIs without group separators:
+/// 01 (GTIN), 21 (serial), 11 (manufacture date), 17 (expiry), and 240 (sensor code).
+enum DexcomG7SensorLabelParser {
+    static func parse(_ payload: String) throws -> DexcomG6SensorLabel {
+        let digits = normalizedPayload(payload)
+        guard digits.count == 53, digits.allSatisfy(\.isNumber) else {
+            throw DexcomG6SensorLabelParserError.missingRequiredField
+        }
+        guard digits.count == 53,
+              digits.hasPrefix("01"),
+              String(digits.dropFirst(16)).hasPrefix("21"),
+              String(digits.dropFirst(30)).hasPrefix("11"),
+              String(digits.dropFirst(38)).hasPrefix("17"),
+              String(digits.dropFirst(46)).hasPrefix("240") else {
+            throw DexcomG6SensorLabelParserError.missingRequiredField
+        }
+
+        let gtin = substring(digits, 2 ..< 16)
+        let serialNumber = substring(digits, 18 ..< 30)
+        let manufactureDate = try date(substring(digits, 32 ..< 38))
+        let expirationDate = try date(substring(digits, 40 ..< 46))
+        let sensorCode = substring(digits, 49 ..< 53)
+
+        guard sensorCode.count == 4, sensorCode.allSatisfy(\.isNumber) else {
+            throw DexcomG6SensorLabelParserError.invalidSensorCode
+        }
+
+        return DexcomG6SensorLabel(
+            sensorCode: sensorCode,
+            lotNumber: "",
+            serialNumber: serialNumber,
+            productIdentifier: gtin,
+            manufactureDate: manufactureDate,
+            expirationDate: expirationDate
+        )
+    }
+
+    /// Apple barcode APIs can expose the ISO symbology identifier and FNC1 separators while
+    /// other decoders return only the encoded digits. Normalize those transport wrappers before
+    /// validating the exact G7 application-identifier layout.
+    private static func normalizedPayload(_ payload: String) -> String {
+        var value = payload.trimmingCharacters(in: .whitespacesAndNewlines)
+        if value.hasPrefix("]d1") || value.hasPrefix("]d2") {
+            value.removeFirst(3)
+        }
+        value.removeAll { $0 == "\u{001D}" || $0 == "\u{001E}" || $0 == "\u{0004}" }
+        return value
+    }
+
+    private static func substring(_ value: String, _ range: Range<Int>) -> String {
+        let start = value.index(value.startIndex, offsetBy: range.lowerBound)
+        let end = value.index(value.startIndex, offsetBy: range.upperBound)
+        return String(value[start ..< end])
+    }
+
+    private static func date(_ value: String) throws -> Date {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyMMdd"
+        formatter.isLenient = false
+        guard let date = formatter.date(from: value) else {
+            throw DexcomG6SensorLabelParserError.missingRequiredField
+        }
+        return date
+    }
+}
+
+struct DexcomSensorLabelScannerConfiguration {
+    let parse: (String) throws -> DexcomG6SensorLabel
+
+    static let g6 = DexcomSensorLabelScannerConfiguration(parse: DexcomG6SensorLabelParser.parse)
+    static let g7 = DexcomSensorLabelScannerConfiguration(parse: DexcomG7SensorLabelParser.parse)
 }
 
 enum DexcomG6SensorLabelParser {
