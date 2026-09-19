@@ -14,6 +14,16 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         static let lastKnownDeviceName    = "bt.lastKnownDeviceName"
     }
     
+    /// Presentation-only progress; it does not change connection or retry policy.
+    enum ConnectionActivity { case scanning, connecting }
+
+    private func reportConnectionActivity(_ activity: ConnectionActivity) {
+        dispatchToMain { [weak self] in
+            guard let self = self else { return }
+            self.bluetoothTransmitterDelegate?.didChangeConnectionActivity(activity, bluetoothTransmitter: self)
+        }
+    }
+
     // MARK: - public properties
     
     /// variable : it can get a new value during app run, will be used by rootviewcontroller's that want to receive info
@@ -315,6 +325,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func reconnectAfterDisconnect(_ central: CBCentralManager) {
         guard isConnectionAllowed else { return }
         if let ownPeripheral = self.peripheral {
+            reportConnectionActivity(.connecting)
             central.connect(ownPeripheral, options: connectOptions)
         }
     }
@@ -442,6 +453,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                     #endif
                     trace("in startScanning, state is poweredOn", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
                     centralManager.scanForPeripherals(withServices: services, options: nil)
+                    reportConnectionActivity(.scanning)
                     returnValue = .success
                     
                 case .poweredOff:
@@ -611,6 +623,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             
             scheduleConnectTimeout(forgetDeviceOnTimeout: forgetDeviceOnTimeout)
             
+            reportConnectionActivity(.connecting)
             centralManager?.connect(peripheral, options: connectOptions)
             
         } else {
@@ -704,6 +717,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                         if shouldTimeoutStalledConnectionSetup() {
                             scheduleConnectTimeout(forgetDeviceOnTimeout: false)
                         }
+                        if peripheral.state != .connected { reportConnectionActivity(.connecting) }
                         central.connect(peripheral, options: connectOptions)
                         return true
                     } else {
@@ -880,6 +894,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             trace("in didFailToConnect, failed to connect for peripheral with name %{public}@, will try again", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error, deviceName ?? "'unknown'")
         }
         
+        reportConnectionActivity(.connecting)
         centralManager?.connect(peripheral, options: connectOptions)
         
     }
@@ -1105,9 +1120,10 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 restoredPeripheral.discoverServices(self.servicesCBUUIDs)
             case .connecting:
                 // Nothing to do. CoreBluetooth will finish the connection
-                break
+                reportConnectionActivity(.connecting)
             default:
                 // Reconnect restored peripheral to resume subscriptions after OS restore
+                reportConnectionActivity(.connecting)
                 central.connect(restoredPeripheral, options: connectOptions)
             }
         }

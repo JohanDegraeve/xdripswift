@@ -612,3 +612,18 @@ The actual Watch display-mapping method also passes arrow/complication-routing
 checks with presentation doubles. Phone and Watch SDK typechecking passes. Full Xcode and
 physical-display verification remain subject to the milestone's existing build
 and device gate.
+
+### Antenna animation restoration
+
+The prototype's orange pulse is restored for scanning and manual restart. Actual
+scan/connect progress comes through an optional Bluetooth delegate callback;
+known-peripheral reconnects show solid orange, and connection remains solid green
+without waiting for glucose. Disconnected inactive/unavailable states are grey.
+The pulse respects scene activity, Always On dimming and Reduce Motion.
+
+The actual Watch coordinator/animation-predicate harness passes the scan/connect,
+restart, late callback, return/NFC race and Bluetooth-off cases. Phone and Watch
+SDK typechecks pass. Removing the added presentation notifications reproduces the
+prior radio source exactly: no connection, cancellation, timeout or retry policy
+was changed. There is no new polling timer. Check the visible pulse on-device;
+full builds retain the previously documented compiler-plugin limitation here.

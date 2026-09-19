@@ -6,6 +6,9 @@ protocol BluetoothTransmitterDelegate: AnyObject {
  
     // MARK: - Generic functions that can be used for any type of BluetoothTransmitter
     
+    /// Optional scan/connect progress for connection indicators.
+    func didChangeConnectionActivity(_ activity: BluetoothTransmitter.ConnectionActivity, bluetoothTransmitter: BluetoothTransmitter)
+
     /// did connect to
     /// - parameters:
     ///     - bluetoothTransmitter : the bluetoothTransmitter to which the connection is made
@@ -42,6 +45,8 @@ protocol BluetoothTransmitterDelegate: AnyObject {
 }
 
 extension BluetoothTransmitterDelegate {
+    func didChangeConnectionActivity(_: BluetoothTransmitter.ConnectionActivity, bluetoothTransmitter _: BluetoothTransmitter) {}
+
     /// Keep battery reporting optional so transmitters without EmaLink/OrangeLink-style battery
     /// support do not need special handling and retain their existing behaviour.
     func didUpdateBatteryLevel(_: Int, bluetoothTransmitter _: BluetoothTransmitter) {}

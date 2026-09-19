@@ -13,6 +13,7 @@ final class Libre2WatchConnection: NSObject, ObservableObject, BluetoothTransmit
     @Published private(set) var status = "iPhone selected"
     @Published private(set) var connected = false
     @Published private(set) var direct = false
+    @Published private(set) var activity: BluetoothTransmitter.ConnectionActivity?
 
     func restore() {
         // Apply the latest authoritative reset before restarting a saved Watch selection.
@@ -53,6 +54,7 @@ final class Libre2WatchConnection: NSObject, ObservableObject, BluetoothTransmit
                 try store.select(.preparingWatch, sessionID: id)
                 try prepared.save(to: store.sessionURL)
                 direct = true
+                activity = nil
                 status = "Prepared"
                 Libre2ConnectionMessage.reply(.success(.init(kind: .ready, id: id)), to: reply)
             case .activate:
@@ -69,6 +71,7 @@ final class Libre2WatchConnection: NSObject, ObservableObject, BluetoothTransmit
                     throw Libre2ConnectionError("Stale return request rejected.")
                 }
                 if selection.phase != .phone { try store.select(.returningToPhone, sessionID: id) }
+                activity = nil
                 status = "Returning"
                 if transmitter == nil && (selection.phase == .watch || selection.phase == .returningToPhone) {
                     // Recreate a disabled collector solely to release a handle after an interrupted return.
@@ -106,6 +109,7 @@ final class Libre2WatchConnection: NSObject, ObservableObject, BluetoothTransmit
         guard let previous = transmitter else { startCollector(reuseKnownPeripheral: false); return }
         restarting = true
         connected = false
+        activity = .scanning
         status = "Restarting connection"
         previous.suspendConnection(waitForDisconnect: false) { [weak self, weak previous] in
             guard let self = self else { return }
@@ -122,7 +126,7 @@ final class Libre2WatchConnection: NSObject, ObservableObject, BluetoothTransmit
 
     private func startCollector(reuseKnownPeripheral: Bool = true) {
         do { try startCollectorIfNeeded(reuseKnownPeripheral: reuseKnownPeripheral) }
-        catch { status = error.localizedDescription }
+        catch { activity = nil; status = error.localizedDescription }
     }
 
     private func startCollectorIfNeeded(reuseKnownPeripheral: Bool = true) throws {
@@ -142,38 +146,51 @@ final class Libre2WatchConnection: NSObject, ObservableObject, BluetoothTransmit
             }
             self.readingsReceived?(readings, age)
         }
+        activity = .connecting
         status = "Connecting"
         transmitter?.connect()
     }
 
     private func stopCollector(completion: @escaping () -> Void) {
-        guard let transmitter = transmitter else { connected = false; completion(); return }
+        guard let transmitter = transmitter else { connected = false; activity = nil; completion(); return }
         transmitter.suspendConnection { [weak self, weak transmitter] in
             guard let self = self else { return }
             if self.transmitter === transmitter {
                 transmitter?.prepareForRelease()
                 self.transmitter = nil
                 self.connected = false
+                self.activity = nil
             }
             completion()
         }
+    }
+
+    func didChangeConnectionActivity(_ activity: BluetoothTransmitter.ConnectionActivity, bluetoothTransmitter: BluetoothTransmitter) {
+        guard transmitter === bluetoothTransmitter, store.snapshot?.allowsWatch == true, !restarting else { return }
+        self.activity = activity
+        status = activity == .scanning ? "Scanning" : "Connecting"
     }
 
     func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
         guard transmitter === bluetoothTransmitter, store.snapshot?.allowsWatch == true, !restarting else { return }
         bluetoothTransmitter.rememberDevice()
         connected = true
+        activity = nil
         status = "Direct connected"
     }
     func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
         guard transmitter === bluetoothTransmitter else { return }
         connected = false
-        status = store.snapshot?.phase == .returningToPhone ? "Returning" : "Connecting"
+        // A cancellation callback can arrive after scanning has already resumed.
+        // Let the collector report an actual new attempt; Bluetooth may be powered off.
+        if store.snapshot?.allowsWatch != true { activity = nil }
+        status = store.snapshot?.phase == .returningToPhone ? "Returning" :
+            (activity == .scanning ? "Scanning" : (activity == .connecting ? "Connecting" : "Disconnected"))
     }
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
         guard transmitter === bluetoothTransmitter else { return }
         if state == .poweredOn && store.snapshot?.allowsWatch == true { bluetoothTransmitter.connect() }
-        if state != .poweredOn { connected = false; status = "Bluetooth unavailable" }
+        if state != .poweredOn { connected = false; activity = nil; status = "Bluetooth unavailable" }
     }
     func error(message: String) { status = message }
     func transmitterNeedsPairing(bluetoothTransmitter: BluetoothTransmitter) {}

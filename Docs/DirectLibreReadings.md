@@ -76,6 +76,13 @@ existing complication cache before receiving new data. Direct collection ignores
 relayed glucose and stale phone sensor status; returning to relay does not replace
 a newer displayed measurement with an older one.
 
+The Direct Libre antenna pulses orange during scanning and manual restart, is
+solid orange during a connection attempt, and turns solid green on Bluetooth
+connection (without waiting for glucose). When disconnected and inactive or
+Bluetooth is unavailable it is grey. Pulsing stops when the app is inactive,
+the display is dimmed or Reduce Motion is enabled. Reading age remains separate;
+an old value does not change a connected antenna to orange.
+
 ## Milestone 6 device check
 
 Return collection to the phone before upgrading both apps. After installation,
