@@ -157,10 +157,10 @@ capture, not additional background execution permission or a recovery fix.
 | --- | --- |
 | Shared BLE lifecycle / F001-F002 protocol | `BluetoothTransmitter`, `Libre2BluetoothTransmitter` |
 | Existing crypto and parsing | `PreLibre2`, `Libre2BLEUtilities`; explicit parser state on Watch |
-| Phone provisioning / adapter | `CGMLibre2Transmitter+NFC`, `CGMLibre2Transmitter`, `Libre2PhoneSensor` |
+| Phone provisioning / adapter | `CGMLibre2Transmitter` (including NFC), `Libre2PhoneSensor` |
 | Watch adapter / persisted credentials | `Libre2WatchTransmitter`, `Libre2WatchSensor`, `Libre2WatchSession` |
 | Selection and handoff | `Libre2ConnectionStore`, `Libre2ConnectionMessage`, phone/Watch `Connection` coordinators |
-| Reading messages / outbox / sensor mapping | `Libre2History`, `Libre2HistoryQueue`, `Libre2HistoryRegistry`, `Libre2JournalFile` |
+| Reading messages / outbox / sensor mapping | `Libre2History`, `Libre2HistoryQueue`, `Libre2JournalFile`; registry in `Libre2PhoneHistorySync` |
 | Delivery / phone import | phone/Watch `HistorySync`, `Libre2PhoneReadingProcessing` |
 | Display / controls | `WatchStateModel`, `GlucoseTrend`, `Libre2ConnectionIndicator`, `DirectLibreSettingsView` |
 | Watch capture / phone export | `Libre2DiagnosticCapture` / `Libre2DiagnosticRecorder`, `Libre2WatchDiagnostics`, `Libre2CaptureController`, `DirectLibreDiagnosticsView` |
@@ -229,23 +229,12 @@ return and NFC reset. It does not silently evict data when full: further upload
 collection reports a storage error until space is freed, although the display can
 still receive frames. Saved formats remain unchanged by consolidation.
 
-### Implementation footprint
+### Maintainer review
 
-Snapshot after the **2026-09-20 file consolidation**, relative to upstream `03709376`.
-Net lines are additions minus deletions, including comments and whitespace; personal
-signing settings are excluded. These counts measure review size, not executable size.
-
-| Area | Net added lines |
-| --- | ---: |
-| Production code and configuration | 3,364 |
-| Tests | 1,550 |
-| Documentation | 352 |
-| Xcode project entries | 226 |
-| **Total** | **5,492** |
-
-Across **61 files**, the diff contains **6,009 additions and 517 deletions**.
-Phone-only helpers stay in upstream's original files under iOS compilation guards;
-this reduces moved-code churn without adding phone dependencies to Watch.
+The [maintainer review guide](DirectLibreMaintainerReview.md) maps each changed file
+to its responsibility, recommends a review order and separates implementation,
+tests, documentation and configuration line counts against upstream `develop`.
+Its counts and source links are pinned to the stated implementation snapshot.
 
 ## Status and remaining work
 
