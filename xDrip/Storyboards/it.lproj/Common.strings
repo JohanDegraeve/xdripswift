@@ -134,7 +134,7 @@
 
 /// literal translation needed
 "common_days" = "days";
-"common_landscape_comparingWithLast" = "Confronto con gli ultimi:";
+"common_landscape_showAGPChartData" = "Mostra i dati del grafico AGP:";
 "common_landscape_comparisonDays" = "%d giorni";
 "common_landscape_comparisonNone" = "Nessuno";
 

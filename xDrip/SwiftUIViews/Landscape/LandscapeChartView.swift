@@ -591,7 +591,7 @@ struct LandscapeChartView: View {
 
     private var comparisonPeriodMenu: some View {
         HStack(spacing: presentation == .expandedIPad ? 8 : 6) {
-            Text(Texts_Common.landscapeComparingWithLast)
+            Text(Texts_Common.landscapeShowAGPChartData)
                 .foregroundStyle(comparisonPeriodColor)
                 .font(comparisonPeriodFont)
 

@@ -120,7 +120,7 @@
 
 /// literal translation needed
 "common_days" = "days";
-"common_landscape_comparingWithLast" = "Порівняння з останніми:";
+"common_landscape_showAGPChartData" = "Показати дані графіка AGP:";
 "common_landscape_comparisonDays" = "%d днів";
 "common_landscape_comparisonNone" = "Немає";
 

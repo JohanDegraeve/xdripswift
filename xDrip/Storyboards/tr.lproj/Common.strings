@@ -14,7 +14,7 @@
 "common_minute" = "dak";
 "common_day" = "gün";
 "common_days" = "gün";
-"common_landscape_comparingWithLast" = "Son dönemle karşılaştır:";
+"common_landscape_showAGPChartData" = "AGP grafik verilerini göster:";
 "common_landscape_comparisonDays" = "%d gün";
 "common_landscape_comparisonNone" = "Yok";
 "common_today" = "Bugün";

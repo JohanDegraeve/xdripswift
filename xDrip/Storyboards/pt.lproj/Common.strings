@@ -14,7 +14,7 @@
 "common_minute" = "min";
 "common_day" = "dia";
 "common_days" = "dias";
-"common_landscape_comparingWithLast" = "Comparação com os últimos:";
+"common_landscape_showAGPChartData" = "Mostrar dados do gráfico AGP:";
 "common_landscape_comparisonDays" = "%d dias";
 "common_landscape_comparisonNone" = "Nenhuma";
 "common_today" = "Hoje";

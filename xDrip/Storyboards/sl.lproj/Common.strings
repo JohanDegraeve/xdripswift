@@ -134,7 +134,7 @@
 
 /// literal translation needed
 "common_days" = "days";
-"common_landscape_comparingWithLast" = "Primerjava z zadnjimi:";
+"common_landscape_showAGPChartData" = "Prikaži podatke grafa AGP:";
 "common_landscape_comparisonDays" = "%d dni";
 "common_landscape_comparisonNone" = "Brez";
 

@@ -14,7 +14,7 @@
 "common_minute" = "دقيقة";
 "common_day" = "يوم";
 "common_days" = "أيام";
-"common_landscape_comparingWithLast" = "المقارنة مع آخر:";
+"common_landscape_showAGPChartData" = "عرض بيانات مخطط AGP:";
 "common_landscape_comparisonDays" = "%d أيام";
 "common_landscape_comparisonNone" = "لا شيء";
 "common_today" = "اليوم";

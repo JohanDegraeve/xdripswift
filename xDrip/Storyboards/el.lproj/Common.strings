@@ -14,7 +14,7 @@
 "common_minute" = "λεπτό";
 "common_day" = "ημέρα";
 "common_days" = "ημέρες";
-"common_landscape_comparingWithLast" = "Σύγκριση με τις τελευταίες:";
+"common_landscape_showAGPChartData" = "Εμφάνιση δεδομένων γραφήματος AGP:";
 "common_landscape_comparisonDays" = "%d ημέρες";
 "common_landscape_comparisonNone" = "Καμία";
 "common_today" = "Σήμερα";

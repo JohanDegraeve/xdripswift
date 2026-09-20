@@ -104,8 +104,8 @@ class Texts_Common {
         return NSLocalizedString("common_days", tableName: filename, bundle: Bundle.main, value: "days", comment: "literal translation needed")
     }()
 
-    static let landscapeComparingWithLast = {
-        return NSLocalizedString("common_landscape_comparingWithLast", tableName: filename, bundle: Bundle.main, value: "Comparing with the last:", comment: "label before a selectable number of days used for the landscape AGP comparison")
+    static let landscapeShowAGPChartData = {
+        return NSLocalizedString("common_landscape_showAGPChartData", tableName: filename, bundle: Bundle.main, value: "Show AGP chart data:", comment: "Label before the history period picker, which controls only AGP chart data")
     }()
 
     static func landscapeComparisonDays(_ days: Int) -> String {

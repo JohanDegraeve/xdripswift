@@ -14,7 +14,7 @@
 "common_minute" = "мин";
 "common_day" = "день";
 "common_days" = "дней";
-"common_landscape_comparingWithLast" = "Сравнение с последними:";
+"common_landscape_showAGPChartData" = "Показать данные графика AGP:";
 "common_landscape_comparisonDays" = "%d дней";
 "common_landscape_comparisonNone" = "Нет";
 "common_today" = "Сегодня";

@@ -14,7 +14,7 @@
 "common_minute" = "min";
 "common_day" = "dag";
 "common_days" = "dagen";
-"common_landscape_comparingWithLast" = "Vergelijken met de laatste:";
+"common_landscape_showAGPChartData" = "AGP-grafiekgegevens tonen:";
 "common_landscape_comparisonDays" = "%d dagen";
 "common_landscape_comparisonNone" = "Geen";
 "common_today" = "Vandaag";

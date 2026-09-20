@@ -106,7 +106,7 @@
 "invalidAccountOrPassword" = "Konto oder Passwort ungültig";
 
 "common_days" = "Tage";
-"common_landscape_comparingWithLast" = "Vergleich mit den letzten";
+"common_landscape_showAGPChartData" = "AGP-Diagrammdaten anzeigen:";
 "common_landscape_comparisonDays" = "%d Tagen";
 "common_landscape_comparisonNone" = "Keiner";
 "common_today" = "Heute";
