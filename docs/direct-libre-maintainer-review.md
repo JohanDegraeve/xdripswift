@@ -45,7 +45,7 @@ Counts include comments and blank lines. Each file is assigned once by its prima
 
 ## Complete changed-file map
 
-Links are pinned to the measured commit. “Existing” means a modified upstream file; “New” means a file added by this branch. Negative net counts generally reflect extraction into shared code.
+Links and table paths refer to the measured commit; the guides now live under lowercase `docs/direct-libre*.md`. “Existing” means a modified upstream file; “New” means a file added by this branch. Negative net counts generally reflect extraction into shared code.
 
 ### Shared BLE, protocol and platform adaptation
 
@@ -161,7 +161,7 @@ There is no separate CGMLibre2Transmitter+NFC file in this snapshot: NFC methods
 
 ## Validation status and review limits
 
-See the [validation record and device regression checklist](DirectLibreValidation.md) for automated coverage, build-environment limitations and outstanding acceptance checks. Platform doubles and targeted type-checks do not establish real Bluetooth recovery or WatchConnectivity scheduling behaviour.
+See the [validation record and device regression checklist](direct-libre-validation.md) for automated coverage, build-environment limitations and outstanding acceptance checks. Platform doubles and targeted type-checks do not establish real Bluetooth recovery or WatchConnectivity scheduling behaviour.
 
 ## Reproducing the totals
 

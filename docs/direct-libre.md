@@ -231,7 +231,7 @@ still receive frames. Saved formats remain unchanged by consolidation.
 
 ### Maintainer review
 
-The [maintainer review guide](DirectLibreMaintainerReview.md) maps each changed file
+The [maintainer review guide](direct-libre-maintainer-review.md) maps each changed file
 to its responsibility, recommends a review order and separates implementation,
 tests, documentation and configuration line counts against upstream `develop`.
 Its counts and source links are pinned to the stated implementation snapshot.
@@ -243,4 +243,4 @@ downstream services and display persistence have passed earlier device checkpoin
 Optional runtime features and this cleanup still require device validation. Controlled
 interrupted-transfer testing, prolonged signal-loss timing, a representative water
 session, battery profiling and physical-device capture acceptance remain open. See the
-[validation record and regression checklist](DirectLibreValidation.md).
+[validation record and regression checklist](direct-libre-validation.md).

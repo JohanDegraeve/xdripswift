@@ -1,7 +1,7 @@
 # Direct Libre validation
 
-Implementation and setup: [Direct Libre guide](DirectLibre.md).
-Review order and file counts: [maintainer review guide](DirectLibreMaintainerReview.md).
+Implementation and setup: [Direct Libre guide](direct-libre.md).
+Review order and file counts: [maintainer review guide](direct-libre-maintainer-review.md).
 Upstream: `develop` at `03709376` (7.1.0, build 4232).
 This file records current evidence and remaining device acceptance. Earlier milestone
 reports and test totals remain in Git history.
