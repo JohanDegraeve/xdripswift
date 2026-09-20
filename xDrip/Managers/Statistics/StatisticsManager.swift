@@ -297,7 +297,9 @@ public final class StatisticsManager: @unchecked Sendable {
 
     /// Returns the AGP baseline and optional selected-day OS-AID traces in one queued operation.
     func landscapeAnalytics(referenceDate: Date, daysBack: Int, includesAID: Bool) async -> LandscapeAnalytics {
-        await withCheckedContinuation { continuation in
+        // Keep historical metrics owned by the configured provider, including CareLink.
+        let therapySource = UserDefaults.standard.dataFlowPolicy.aidAnalyticsSource
+        return await withCheckedContinuation { continuation in
             operationQueue.addOperation { [weak self] in
                 guard let self else {
                     continuation.resume(returning: LandscapeAnalytics(
@@ -350,7 +352,7 @@ public final class StatisticsManager: @unchecked Sendable {
                 let averageMgDl = selectedDaySamples.isEmpty ? nil
                     : selectedDaySamples.reduce(0) { $0 + $1.valueMgDl } / Double(selectedDaySamples.count)
 
-                guard includesAID else {
+                guard includesAID, let therapySource else {
                     continuation.resume(returning: LandscapeAnalytics(
                         baseline: baseline,
                         rangeSummary: rangeSummary,
@@ -363,7 +365,8 @@ public final class StatisticsManager: @unchecked Sendable {
                 let statusAccessor = NightscoutDeviceStatusAccessor(coreDataManager: self.coreDataManager)
                 let profileAccessor = NightscoutProfileAccessor(coreDataManager: self.coreDataManager)
                 let statuses = statusAccessor.fetch(fromDate: selectedDayStart, toDate: selectedDayEnd)
-                    .filter { $0.createdAt >= selectedDayStart && $0.createdAt <= selectedDayEnd }
+                    .filter { $0.createdAt >= selectedDayStart && $0.createdAt <= selectedDayEnd
+                        && therapySource.ownsDeviceStatus(with: $0.device) }
                     .sorted { $0.createdAt < $1.createdAt }
                 // Include the earliest known profile as a fallback when Nightscout has no
                 // historical profile snapshot preceding the selected day.

@@ -193,3 +193,5 @@
 "dexcomG7SelectSensorCodeMessage" = "Ange den fyrsiffriga parkopplingskoden manuellt, skanna den aktuella applikatorn eller välj ett foto. Kontrollera den valda koden och tryck på Fortsätt.";
 "noSensorCodeSelectedTitle" = "Fortsätta utan sensorkod?";
 "noSensorCodeSelectedMessage" = "Om en sensorsession redan är aktiv på sändaren använder appen den sessionen med dess befintliga kalibreringskrav.\n\nEn ny session utan kod kräver kalibreringar efter uppvärmningen och därefter regelbundet. Kraven försvinner inte om appens kalibreringspåminnelse stängs av.";
+"showHideGlucoseChartTitle" = "Diagram";
+"showHideAdditionalItemsTitle" = "Larm och tal";

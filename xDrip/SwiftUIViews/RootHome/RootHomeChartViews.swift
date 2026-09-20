@@ -28,13 +28,14 @@ struct RootHomeMainChartView: View {
     @AppStorage(UserDefaults.Key.renderBasalDownwards.rawValue) private var renderBasalDownwards = true
     @State private var therapySeries = TherapyChartSeries()
     @State private var therapyRevision = 0
-    private var hasIOB: Bool { allowsTherapyCharts && showIOBCOB && !therapySeries.iob.isEmpty }
-    private var hasCOB: Bool { allowsTherapyCharts && showIOBCOB && !therapySeries.cob.isEmpty }
+    // Hide curves immediately and cancel pending chart work when Treatments is off.
+    private var hasIOB: Bool { showsTreatments && allowsTherapyCharts && showIOBCOB && !therapySeries.iob.isEmpty }
+    private var hasCOB: Bool { showsTreatments && allowsTherapyCharts && showIOBCOB && !therapySeries.cob.isEmpty }
     // Reuse the glucose cache's buffered coverage, rounded outward so tiny pans do
     // not dispatch another fetch and rebuild for each visible-range change.
     private var therapyStart: Date { Date(timeIntervalSince1970: floor(chartState.dataStartDate.timeIntervalSince1970 / 3600) * 3600) }
     private var therapyEnd: Date { Date(timeIntervalSince1970: ceil(chartState.dataEndDate.timeIntervalSince1970 / 3600) * 3600) }
-    private var seriesKey: String { scenePhase != .active ? "inactive" : "\(therapyStart)-\(therapyEnd)-\(showIOBCOB)-\(allowsTherapyCharts)-\(therapyRevision)-\(floor(Date().timeIntervalSince1970 / 60))" }
+    private var seriesKey: String { scenePhase != .active ? "inactive" : "\(therapyStart)-\(therapyEnd)-\(showIOBCOB)-\(showsTreatments)-\(allowsTherapyCharts)-\(therapyRevision)-\(floor(Date().timeIntervalSince1970 / 60))" }
 
     private enum Layout {
         static let rangeOverlayTopInset: CGFloat = 8
@@ -129,7 +130,10 @@ struct RootHomeMainChartView: View {
         }
         .task(id: seriesKey) {
             guard scenePhase == .active else { return }
-            guard allowsTherapyCharts && showIOBCOB else { therapySeries = TherapyChartSeries(); return }
+            guard showsTreatments && allowsTherapyCharts && showIOBCOB else {
+                therapySeries = TherapyChartSeries()
+                return
+            }
             let result = await TherapyMetricsManager.shared.chart(from: therapyStart, to: therapyEnd)
             guard !Task.isCancelled else { return }
             therapySeries = result

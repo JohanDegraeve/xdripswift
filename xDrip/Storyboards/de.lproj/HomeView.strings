@@ -282,3 +282,5 @@
 "dexcomG7SelectSensorCodeMessage" = "Gib den vierstelligen Kopplungscode manuell ein, scanne den aktuellen Applikator oder wähle ein Foto aus. Prüfe den ausgewählten Code und tippe auf Weiter.";
 "noSensorCodeSelectedTitle" = "Ohne Sensorcode fortfahren?";
 "noSensorCodeSelectedMessage" = "Wenn auf dem Transmitter bereits eine Sensorsitzung läuft, verwendet die App diese Sitzung mit ihren bestehenden Kalibrierungsanforderungen.\n\nEine neue Sitzung ohne Code erfordert Kalibrierungen nach der Aufwärmphase und danach in regelmäßigen Abständen. Das Ausschalten der Kalibrierungserinnerung der App hebt diese Anforderungen nicht auf.";
+"showHideGlucoseChartTitle" = "Diagramm";
+"showHideAdditionalItemsTitle" = "Alarme und Sprachausgabe";

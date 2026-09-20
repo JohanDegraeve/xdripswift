@@ -634,7 +634,8 @@ struct GlucoseChartView: View {
         let basalMinimumChartValue = showsTreatments && !basalValues.isEmpty && !downwardBasal
             ? chartState?.minimumChartValueInMgDl ?? ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl
             : ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl
-        let visibleTherapy = usesMainChartYAxisContext ? therapySeries.clipped(from: visibleStartDate, to: visibleEndDate) : TherapyChartSeries()
+        // Gate curves at rendering too, so cached series cannot bypass treatment visibility.
+        let visibleTherapy = showsTreatments && usesMainChartYAxisContext ? therapySeries.clipped(from: visibleStartDate, to: visibleEndDate) : TherapyChartSeries()
         let hasTherapy = !visibleTherapy.iob.isEmpty || !visibleTherapy.cob.isEmpty
         let therapyBaseline = ConstantsGlucoseChartSwiftUI.minimumChartValueWithBottomSpace(hours: hoursToShow)
         let therapyScale = TherapyChartScale(series: visibleTherapy, baseline: therapyBaseline)

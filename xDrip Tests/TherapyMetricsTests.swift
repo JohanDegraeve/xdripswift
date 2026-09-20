@@ -11,6 +11,40 @@ import SwiftUI
 @testable import xdrip
 
 final class TherapyMetricsTests: XCTestCase {
+    func testTreatmentMasterPreservesSummaryAndCurvePreferences() throws {
+        let defaults = UserDefaults.standard
+        let previous = (defaults.showTreatmentsOnChart, defaults.showTherapySummary, defaults.showIOBCOB)
+        defer {
+            defaults.showTreatmentsOnChart = previous.0
+            defaults.showTherapySummary = previous.1
+            defaults.showIOBCOB = previous.2
+        }
+        defaults.showTherapySummary = true
+        defaults.showIOBCOB = true
+        let layout = SettingsViewHomeScreenSettingsViewModel(rowGroup: .layout)
+        let treatments = SettingsViewHomeScreenSettingsViewModel(rowGroup: .treatments)
+        for enabled in [false, true] {
+            defaults.showTreatmentsOnChart = enabled
+            let summary = try XCTUnwrap(layout.settingsRows(sectionID: 0).first { $0.id == "homeScreen.showTherapySummary" })
+            XCTAssertTrue(summary.isVisible)
+            XCTAssertEqual(summary.isEnabled, enabled)
+            let children = treatments.settingsRows(sectionID: 1).filter { $0.id != "homeScreen.showTreatments" }
+            XCTAssertEqual(children.count, 2)
+            XCTAssertTrue(children.allSatisfy { $0.isVisible == enabled })
+            XCTAssertTrue(defaults.showTherapySummary)
+            XCTAssertTrue(defaults.showIOBCOB)
+        }
+    }
+
+    func testPumpCageRequiresSiteChangeButNotFreshDeviceStatus() {
+        let model = RootHomeStateModel()
+        XCTAssertNil(model.pumpState(deviceStatus: nil, latestSiteChangeDate: nil).cage)
+        let pump = model.pumpState(deviceStatus: nil, latestSiteChangeDate: now.addingTimeInterval(-3600),
+                                   referenceDate: now, usesRelativeCageTime: false)
+        XCTAssertNotNil(pump.cage)
+        XCTAssertNotEqual(pump.cage?.value, "-")
+    }
+
     func testLiveActivityMetricsPreferenceIsIndependentOfChartPreference() {
         let suite = "LiveActivityMetricsTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suite)!

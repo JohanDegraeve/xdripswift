@@ -29,7 +29,9 @@ struct RootHomePumpView: View {
             RootHomeHorizontalMetricView(metric: state.basal, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
             RootHomeHorizontalMetricView(metric: state.reservoir, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
             RootHomeHorizontalMetricView(metric: state.battery, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
-            RootHomeHorizontalMetricView(metric: state.cage, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
+            if let cage = state.cage {
+                RootHomeHorizontalMetricView(metric: cage, valueOpacity: state.isHistorical.rootHomeHistoricalValueOpacity)
+            }
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)

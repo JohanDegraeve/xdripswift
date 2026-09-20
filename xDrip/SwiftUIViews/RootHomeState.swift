@@ -50,7 +50,8 @@ struct RootHomePumpState {
     var basal = RootHomeMetricState(title: "Basal", value: "-")
     var reservoir = RootHomeMetricState(title: Texts_HomeView.pumpReservoir, value: "-")
     var battery = RootHomeMetricState(title: Texts_HomeView.pumpBattery, value: "-")
-    var cage = RootHomeMetricState(title: "CAGE", value: "-")
+    // A missing site-change date means there is no CAGE row to display.
+    var cage: RootHomeMetricState? = nil
     var isHistorical = false
 }
 
@@ -591,11 +592,13 @@ final class RootHomeStateModel: ObservableObject {
             basal: RootHomeMetricState(title: "Basal", value: basal.map { "\($0) U/hr" } ?? "? U/hr", valueColor: defaultTextColor),
             reservoir: RootHomeMetricState(title: Texts_HomeView.pumpReservoir, value: reservoirText, valueColor: hasRecentData ? deviceStatus?.pumpReservoirColor() ?? defaultTextColor : defaultTextColor),
             battery: RootHomeMetricState(title: Texts_HomeView.pumpBattery, value: batteryText, valueColor: hasRecentData ? deviceStatus?.pumpBatteryPercentColor() ?? defaultTextColor : defaultTextColor),
-            cage: RootHomeMetricState(
-                title: "CAGE",
-                value: cageText(latestSiteChangeDate, referenceDate: referenceDate, usesRelativeCageTime: usesRelativeCageTime),
-                valueColor: cageColor(latestSiteChangeDate, referenceDate: referenceDate, defaultColor: defaultTextColor)
-            )
+            cage: latestSiteChangeDate.map { siteChangeDate in
+                RootHomeMetricState(
+                    title: "CAGE",
+                    value: cageText(siteChangeDate, referenceDate: referenceDate, usesRelativeCageTime: usesRelativeCageTime),
+                    valueColor: cageColor(siteChangeDate, referenceDate: referenceDate, defaultColor: defaultTextColor)
+                )
+            }
         )
     }
 

@@ -233,3 +233,5 @@
 "dexcomG7SelectSensorCodeMessage" = "手动输入四位配对代码、扫描当前的传感器助针器或选择照片。确认所选代码后，轻点“继续”。";
 "noSensorCodeSelectedTitle" = "不使用传感器代码继续？";
 "noSensorCodeSelectedMessage" = "如果发射器上已有正在运行的传感器会话，应用将使用该会话并保留其现有校准要求。\n\n不使用代码启动新会话时，需要在预热后进行校准，并在之后定期校准。关闭应用的校准提醒并不会取消这些要求。";
+"showHideGlucoseChartTitle" = "图表";
+"showHideAdditionalItemsTitle" = "提醒和语音";

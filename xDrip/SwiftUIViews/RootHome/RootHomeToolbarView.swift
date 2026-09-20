@@ -38,7 +38,7 @@ struct RootHomeToolbarView: View {
             toolbarButton(systemImage: "drop", label: "BgReadings", action: actions.showBgReadings)
             sensorToolbarButton()
             postProcessingToolbarButton()
-            toolbarButton(systemImage: "rectangle.3.group", label: "Show/Hide", action: actions.showHideItems)
+            toolbarButton(systemImage: "slider.horizontal.3", label: Texts_HomeView.showHideItemsTitle, action: actions.showHideItems)
             screenLockToolbarButton()
         }
         .padding(.horizontal, Layout.horizontalPadding)
