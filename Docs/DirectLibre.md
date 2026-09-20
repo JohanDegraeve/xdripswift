@@ -231,30 +231,21 @@ still receive frames. Saved formats remain unchanged by consolidation.
 
 ### Implementation footprint
 
-Snapshot on **2026-09-19**, comparing upstream develop baseline
-`83009198dc5091398333f83aa832bbe3d99e3441` with feature commit
-`ee9239ef47c540d4600c6a235741e67f8ee022f9`, before adding this section.
-Net lines are additions minus deletions; files are grouped by their main
-responsibility. Counts include comments and whitespace, exclude uncommitted local
-settings, and do not measure complexity or executable size.
+Snapshot after the **2026-09-20 file consolidation**, relative to upstream `03709376`.
+Net lines are additions minus deletions, including comments and whitespace; personal
+signing settings are excluded. These counts measure review size, not executable size.
 
-| Area | Net added lines | Share |
-| --- | ---: | ---: |
-| Tests | 1,279 | 28.2% |
-| Synchronisation and phone processing | 986 | 21.8% |
-| Shared collector and platform separation | 413 | 9.1% |
-| Ownership and switching | 665 | 14.7% |
-| Optional runtime features | 420 | 9.3% |
-| Display and settings | 281 | 6.2% |
-| Documentation | 265 | 5.8% |
-| Xcode configuration | 222 | 4.9% |
-| **Total** | **4,531** | **100%** |
+| Area | Net added lines |
+| --- | ---: |
+| Production code and configuration | 3,364 |
+| Tests | 1,550 |
+| Documentation | 352 |
+| Xcode project entries | 226 |
+| **Total** | **5,492** |
 
-Across 61 changed files, the snapshot contains 5,270 additions and 739 deletions.
-Excluding tests, documentation and Xcode configuration, the production-source
-increase is **2,765 lines**. Synchronisation and ownership switching contribute
-1,651 of those lines, approximately 60%. Update this snapshot at significant
-milestones, retaining the exact compared revisions.
+Across **61 files**, the diff contains **6,009 additions and 517 deletions**.
+Phone-only helpers stay in upstream's original files under iOS compilation guards;
+this reduces moved-code churn without adding phone dependencies to Watch.
 
 ## Status and remaining work
 

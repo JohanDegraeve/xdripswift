@@ -200,7 +200,6 @@ final class Libre2WatchConnection: NSObject, ObservableObject, BluetoothTransmit
     func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
         record("Connected UI callback currentCollector=\(transmitter === bluetoothTransmitter) restarting=\(restarting)")
         guard transmitter === bluetoothTransmitter, store.snapshot?.allowsWatch == true, !restarting else { return }
-        bluetoothTransmitter.rememberDevice()
         connected = true
         activity = nil
         status = "Direct connected"

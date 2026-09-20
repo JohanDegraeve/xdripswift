@@ -384,13 +384,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
     }
 
-    /// Watch collection has no phone Core Data peripheral record to restore from.
-    func rememberDevice() {
-        guard let address = deviceAddress, let name = deviceName else { return }
-        UserDefaults.standard.set(address, forKey: DefaultsKey.lastKnownDeviceAddress)
-        UserDefaults.standard.set(name, forKey: DefaultsKey.lastKnownDeviceName)
-    }
-
     /// Reuse the identity already saved by this class; identifiers are local to each device.
     static func rememberedDevice(named name: String) -> DeviceAddressAndName? {
         guard let savedName = UserDefaults.standard.string(forKey: DefaultsKey.lastKnownDeviceName),
