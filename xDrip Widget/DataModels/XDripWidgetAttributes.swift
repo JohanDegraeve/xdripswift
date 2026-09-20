@@ -59,6 +59,17 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var sensorNoiseStateRawValue: Int?
         // optional so existing activities without warm-up information still decode
         var sensorWarmupEndDate: Date?
+        var sensorWarmupConfirmationUntil: Date?
+
+        var isWaitingForSensorReading: Bool {
+            guard let endDate = sensorWarmupEndDate, let validUntil = sensorWarmupConfirmationUntil else { return false }
+            let now = Date()
+            return endDate <= now && now < validUntil
+        }
+
+        var showsSensorWarmupStatus: Bool {
+            isSensorWarmingUp || isWaitingForSensorReading
+        }
 
         var isSensorWarmingUp: Bool {
             sensorWarmupEndDate.map { $0 > Date() } ?? false

@@ -72,3 +72,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Sensör ısınıyor";
 "common_sensorWarmupUntilFormat" = "Bitiş: %@";
+"common_sensorWarmupComplete" = "Isınma tamamlandı";
+"common_sensorWaitingForReading" = "İlk ölçüm bekleniyor…";

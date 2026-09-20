@@ -33,7 +33,7 @@ struct LiveActivitySettingsPreview: View {
     }
 
     private var liveActivityPreviewHeight: CGFloat {
-        if previewState.isSensorWarmingUp { return 84 }
+        if previewState.showsSensorWarmupStatus { return 84 }
         switch liveActivityType {
         case .minimal:
             return 84

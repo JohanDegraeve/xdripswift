@@ -73,3 +73,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Sensorn värmer upp";
 "common_sensorWarmupUntilFormat" = "Till %@";
+"common_sensorWarmupComplete" = "Uppvärmning klar";
+"common_sensorWaitingForReading" = "Väntar på första mätvärdet…";

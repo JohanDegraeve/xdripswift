@@ -72,3 +72,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "جارٍ إحماء المستشعر";
 "common_sensorWarmupUntilFormat" = "حتى %@";
+"common_sensorWarmupComplete" = "اكتمل الإحماء";
+"common_sensorWaitingForReading" = "بانتظار القراءة الأولى…";

@@ -765,6 +765,11 @@ final class RootHomeStateModel: ObservableObject {
             currentAge = ""
             let readyDate = sensorStartDate.addingTimeInterval(warmUpMinutes * 60)
             maximumAge = "\(Texts_BluetoothPeripheralView.warmingUpUntil) \(readyDate.toStringInUserLocale(timeStyle: .short, dateStyle: .none))"
+        } else if UserDefaults.standard.isMaster,
+                  let transmitter = cgmTransmitter as? CGMG5Transmitter,
+                  transmitter.sensorWarmupConfirmationUntil(for: sensorStartDate) != nil {
+            currentAge = ""
+            maximumAge = Texts_Common.sensorWaitingForReading
         } else {
             currentAge = countsDown
                 ? Texts_HomeView.sensorLifetimeRemaining(max(timeLeftInMinutes, 0).minutesToDaysAndHours())

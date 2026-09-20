@@ -18,7 +18,7 @@ struct XDripWidgetLiveActivity: Widget {
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    if !context.state.isSensorWarmingUp {
+                    if !context.state.showsSensorWarmupStatus {
                         Text("\(context.state.bgValueStringInUserChosenUnit())\(context.state.trendArrow())")
                             .font(.largeTitle).bold()
                             .foregroundStyle(context.state.bgTextColor())
@@ -28,7 +28,7 @@ struct XDripWidgetLiveActivity: Widget {
                     }
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    if !context.state.isSensorWarmingUp {
+                    if !context.state.showsSensorWarmupStatus {
                         HStack(alignment: .firstTextBaseline, spacing: 4) {
                             if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
                                 HStack(alignment: .center, spacing: 10) {
@@ -59,25 +59,29 @@ struct XDripWidgetLiveActivity: Widget {
                     }
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    if context.state.isSensorWarmingUp, let endDate = context.state.sensorWarmupEndDate {
-                        LiveActivitySensorWarmupView(endDate: endDate)
+                    if context.state.showsSensorWarmupStatus, let endDate = context.state.sensorWarmupEndDate {
+                        LiveActivitySensorWarmupView(endDate: endDate, waitingForReading: context.state.isWaitingForSensorReading)
                             .padding(.vertical, 12)
                     } else {
                         GlucoseChartView(glucoseChartType: .dynamicIsland, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
                     }
                 }
             } compactLeading: {
-                if context.state.isSensorWarmingUp {
+                if context.state.showsSensorWarmupStatus {
                     Image(systemName: "hourglass")
                         .foregroundStyle(.orange)
-                        .accessibilityLabel(Texts_Common.sensorWarmingUp)
+                        .accessibilityLabel(context.state.isWaitingForSensorReading ? Texts_Common.sensorWaitingForReading : Texts_Common.sensorWarmingUp)
                 } else {
                     Text("\(context.state.bgValueStringInUserChosenUnit())\(context.state.trendArrow())")
                         .foregroundStyle(context.state.bgTextColor())
                         .minimumScaleFactor(0.2)
                 }
             } compactTrailing: {
-                if context.state.isSensorWarmingUp, let endDate = context.state.sensorWarmupEndDate {
+                if context.state.isWaitingForSensorReading {
+                    Image(systemName: "ellipsis")
+                        .foregroundStyle(.white)
+                        .accessibilityLabel(Texts_Common.sensorWaitingForReading)
+                } else if context.state.showsSensorWarmupStatus, let endDate = context.state.sensorWarmupEndDate {
                     Text(endDate.formatted(date: .omitted, time: .shortened))
                         .foregroundStyle(.white)
                         .font(.caption)
@@ -95,10 +99,10 @@ struct XDripWidgetLiveActivity: Widget {
                         .minimumScaleFactor(0.2)
                 }
             } minimal: {
-                if context.state.isSensorWarmingUp {
+                if context.state.showsSensorWarmupStatus {
                     Image(systemName: "hourglass")
                         .foregroundStyle(.orange)
-                        .accessibilityLabel(Texts_Common.sensorWarmingUp)
+                        .accessibilityLabel(context.state.isWaitingForSensorReading ? Texts_Common.sensorWaitingForReading : Texts_Common.sensorWarmingUp)
                 } else {
                     Text("\(context.state.bgValueStringInUserChosenUnit())")
                         .foregroundStyle(context.state.bgTextColor())
@@ -106,7 +110,7 @@ struct XDripWidgetLiveActivity: Widget {
                 }
             }
             .widgetURL(URL(string: "xdripswift://open"))
-            .keylineTint(context.state.isSensorWarmingUp ? .orange : context.state.bgTextColor())
+            .keylineTint(context.state.showsSensorWarmupStatus ? .orange : context.state.bgTextColor())
         }
         .addSupplementalActivityFamilies()
     }

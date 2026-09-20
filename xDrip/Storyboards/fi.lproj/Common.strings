@@ -102,3 +102,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Sensori lämpenee";
 "common_sensorWarmupUntilFormat" = "Päättyy klo %@";
+"common_sensorWarmupComplete" = "Lämpeneminen valmis";
+"common_sensorWaitingForReading" = "Odotetaan ensimmäistä lukemaa…";

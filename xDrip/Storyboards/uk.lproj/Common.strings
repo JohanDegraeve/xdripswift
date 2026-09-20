@@ -171,3 +171,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Сенсор прогрівається";
 "common_sensorWarmupUntilFormat" = "До %@";
+"common_sensorWarmupComplete" = "Прогрів завершено";
+"common_sensorWaitingForReading" = "Очікування першого показника…";

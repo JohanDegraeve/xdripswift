@@ -183,3 +183,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Senzor se ogreva";
 "common_sensorWarmupUntilFormat" = "Do %@";
+"common_sensorWarmupComplete" = "Ogrevanje končano";
+"common_sensorWaitingForReading" = "Čakanje na prvi odčitek…";

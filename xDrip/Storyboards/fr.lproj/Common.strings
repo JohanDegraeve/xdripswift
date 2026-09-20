@@ -143,3 +143,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Capteur en chauffe";
 "common_sensorWarmupUntilFormat" = "Jusqu’à %@";
+"common_sensorWarmupComplete" = "Préchauffage terminé";
+"common_sensorWaitingForReading" = "En attente de la première mesure…";

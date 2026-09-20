@@ -72,3 +72,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Ο αισθητήρας προθερμαίνεται";
 "common_sensorWarmupUntilFormat" = "Έως %@";
+"common_sensorWarmupComplete" = "Η προθέρμανση ολοκληρώθηκε";
+"common_sensorWaitingForReading" = "Αναμονή πρώτης μέτρησης…";

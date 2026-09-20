@@ -138,3 +138,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Sensor warming up";
 "common_sensorWarmupUntilFormat" = "Until %@";
+"common_sensorWarmupComplete" = "Warm-up complete";
+"common_sensorWaitingForReading" = "Waiting for first reading…";

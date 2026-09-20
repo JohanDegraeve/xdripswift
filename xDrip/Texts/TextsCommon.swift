@@ -4,6 +4,8 @@ import Foundation
 class Texts_Common {
     static private let filename = "Common"
 
+    static let sensorWarmupComplete = NSLocalizedString("common_sensorWarmupComplete", tableName: filename, bundle: .main, value: "Warm-up complete", comment: "Estimated warm-up time has elapsed")
+    static let sensorWaitingForReading = NSLocalizedString("common_sensorWaitingForReading", tableName: filename, bundle: .main, value: "Waiting for first reading…", comment: "Waiting for the next sensor report after estimated warm-up")
     static let sensorWarmingUp = NSLocalizedString("common_sensorWarmingUp", tableName: filename, bundle: .main, value: "Sensor warming up", comment: "Live Activity sensor warm-up title")
     static let sensorWarmupUntilFormat = NSLocalizedString("common_sensorWarmupUntilFormat", tableName: filename, bundle: .main, value: "Until %@", comment: "Warm-up completion time; %@ is a localized time")
     
