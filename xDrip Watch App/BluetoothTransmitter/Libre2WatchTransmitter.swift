@@ -8,6 +8,15 @@ final class Libre2WatchTransmitter: Libre2BluetoothTransmitter {
         return super.isConnectionAllowed && selection?.allowsWatch == true && selection?.sessionID == sessionID
     }
 
+    private let diagnosticID = String(UUID().uuidString.prefix(8))
+
+    #if os(watchOS)
+    override func recordDiagnostic(_ message: @autoclosure () -> String) {
+        Libre2WatchDiagnostics.shared.record("collector=\(diagnosticID) \(message())")
+    }
+
+    #endif
+
     let sessionID: UUID
     private let readingsReceived: ([GlucoseData], UInt16) -> Void
 
@@ -21,6 +30,7 @@ final class Libre2WatchTransmitter: Libre2BluetoothTransmitter {
     }
 
     override func received(glucoseData: [GlucoseData], sensorTimeInMinutes: UInt16) {
+        recordDiagnostic("Watch adapter received readings=\(glucoseData.count) sensorMinute=\(sensorTimeInMinutes)")
         readingsReceived(glucoseData, sensorTimeInMinutes)
     }
 }

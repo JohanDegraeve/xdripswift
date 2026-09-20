@@ -20,6 +20,9 @@ final class Libre2WatchLocationSession: NSObject, CLLocationManagerDelegate {
     private var isUpdating = false
     private var requestedAuthorization = false
     private var receivedLocation = false
+    private var lastLocationCallback: Date?
+    private var locationCallbacks = 0
+    private var lastDiagnosticLocation: Date?
     private var status = "Background location is off."
 
     init(defaults: UserDefaults = .standard) {
@@ -89,6 +92,7 @@ final class Libre2WatchLocationSession: NSObject, CLLocationManagerDelegate {
             isUpdating = true
             receivedLocation = false
             publish("Background location started; waiting for a location update.")
+            Libre2WatchDiagnostics.shared.record("Location start issued accuracy=\(manager.desiredAccuracy)")
             manager.startUpdatingLocation()
         case .notDetermined:
             publish("Allow location access in xDrip on the Watch.")
@@ -104,29 +108,48 @@ final class Libre2WatchLocationSession: NSObject, CLLocationManagerDelegate {
     }
 
     private func stop(status: String) {
+        if isUpdating { Libre2WatchDiagnostics.shared.record("Location stop issued reason=\(status)") }
         if isUpdating { locationManager?.stopUpdatingLocation() }
         isUpdating = false
         receivedLocation = false
         publish(status)
     }
 
+    func recordDiagnosticSnapshot() {
+        Libre2WatchDiagnostics.shared.record("Location snapshot enabled=\(enabled) updating=\(isUpdating) accuracy=\(accuracy.rawValue) authorization=\(locationManager?.authorizationStatus.rawValue ?? -1) receivedFix=\(receivedLocation) lastCallbackAge=\(lastLocationCallback.map { Date().timeIntervalSince($0) } ?? -1) status=\(status)")
+    }
+
     private func publish(_ value: String) {
         guard status != value else { return }
         status = value
+        Libre2WatchDiagnostics.shared.record("Location status: \(value)")
         log.info("\(value, privacy: .public)")
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        Libre2WatchDiagnostics.shared.record("Location authorization=\(manager.authorizationStatus.rawValue)")
         refresh()
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if Libre2WatchDiagnostics.shared.isRecording {
+            let now = Date()
+            let gap = lastLocationCallback.map { now.timeIntervalSince($0) } ?? -1
+            lastLocationCallback = now
+            locationCallbacks += 1
+            if lastDiagnosticLocation == nil || now.timeIntervalSince(lastDiagnosticLocation!) >= 60 {
+                Libre2WatchDiagnostics.shared.record("Location callbacks=\(locationCallbacks) previousGap=\(gap) fixAge=\(locations.last.map { now.timeIntervalSince($0.timestamp) } ?? -1); coordinates omitted")
+                lastDiagnosticLocation = now
+                locationCallbacks = 0
+            }
+        }
         guard isUpdating, !receivedLocation, !locations.isEmpty else { return }
         receivedLocation = true
         publish("Location updates received. Background glucose collection remains experimental.")
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        Libre2WatchDiagnostics.shared.record("Location error: \(BluetoothTransmitter.diagnosticError(error))")
         guard isUpdating else { return }
         if (error as? CLError)?.code == .denied {
             stop(status: "Location access is unavailable. Check Location Services and xDrip permission on the Watch.")

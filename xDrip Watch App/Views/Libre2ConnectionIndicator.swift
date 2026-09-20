@@ -26,6 +26,7 @@ struct Libre2ConnectionIndicator: View {
             .padding(.top, connection.direct ? 0 : 4)
             .foregroundStyle(connection.direct ? connectionColor : relayColor)
             .symbolEffect(.pulse.wholeSymbol, options: .repeating, isActive: shouldBlink)
+            .onChange(of: isLuminanceReduced) { _, dimmed in Libre2WatchDiagnostics.shared.record("Display dimmed=\(dimmed)") }
             .accessibilityLabel(connection.direct ? connection.status : "Phone update")
     }
 }

@@ -92,6 +92,38 @@ retain logs if a failure occurs before resetting or reinstalling.
 8. With manual Water Lock, test foreground behaviour with location off/on and radio
    recovery after water exposure. Record when reliable sensor range resumes.
 
-The integrated UI remains experimental. Extended diagnostic capture, measured
+The integrated UI remains experimental. Physical-device diagnostic capture acceptance, measured
 connection latency and battery comparisons are separate remaining work, not implied
 by passing these host tests.
+
+## Watch diagnostic capture (September 20)
+
+The pool test showed automatic foreground recovery after short submersion, some
+longer losses requiring double-tap, and some requiring Watch Bluetooth cycling plus
+double-tap. Resets sometimes showed a grey antenna. These observations motivate the
+capture; they do not identify a system limit or demonstrate a fix.
+
+`Libre2DiagnosticCaptureTests` is included in the existing `xdrip` test target.
+Its 15 storage/recorder tests passed in a standalone host run: 90-minute retention,
+relaunch/chunked export, stale/idempotent commands, capacity/expiry, corruption and
+write failures, concurrent admission, disabled logging and event-origin timestamps.
+The existing 60 core tests and six coordinator/antenna regression groups also passed;
+the latter exercise the actual coordinator with simulated dependencies, including
+reset/release ordering, late callbacks, grey on Bluetooth-off and power-on scanning.
+
+Before a pool visit, install matching builds and perform a dry capture: start while
+already connected, double-tap, cycle Watch Bluetooth, briefly separate the phone,
+relaunch the Watch app, then stop/download/share. Check that the report retains its
+beginning, distinguishes app runs and ends explicitly; compare normal collection
+with capture off/on. Full device persistence, radio recovery and UI acceptance
+remain physical-device checks. Logs and SDK/build check details are in workspace
+`validation/integrated-capture/`.
+
+Combined current host verification passed all **75 core/capture tests**, six
+coordinator/antenna groups and 11 location groups with diagnostics enabled in the
+location test double. Current Watch dependency closure and changed phone sources
+passed real SDK type-checks. The new phone capture view passed a limited SDK check
+with a temporary State-property substitute and a reachability model double; this
+checks view types, not macro expansion or rendering. Both full scheme builds remain
+blocked by the existing SwiftUI compiler-plugin sandbox failure described above.
+Personal build configurations, plist and scheme edits were preserved.

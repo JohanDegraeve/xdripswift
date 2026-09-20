@@ -51,6 +51,32 @@ The phone now saves the code actually provisioned by successful NFC scans.
   unresolved Watch records, not pending uploads or phone data.
 - **Recent activity** displays five events initially and up to 80 with Show more.
 
+### Recovery paths
+
+Confirm recovery by a newly timestamped glucose reading. A green antenna confirms
+BLE connection, not successful streaming. Brief grey during Bluetooth initialization
+can occur; persistent grey means no active attempt is currently reported.
+
+| Situation | Recovery |
+| --- | --- |
+| Watch loses connection | Bring the Watch within sensor range and open xDrip. Allow the existing attempt to recover; if it remains disconnected, double-tap the large reading to restart the collector. |
+| Double-tap does not restore collection | Turn Bluetooth off and back on **on the Watch**, reopen xDrip, then double-tap if needed. If still unsuccessful, close and relaunch the Watch app. Saved selection, credentials and attempted counter are retained. |
+| Switching to Watch stalls | Keep both apps open and check the transfer status on the phone. If the iPhone appears to retain the sensor connection, cycling **iPhone Bluetooth** may help release it. Reopen both apps, check the saved transfer state and retry the switch/return control as appropriate. |
+| Returning to iPhone stalls | Keep both apps open and retry **Return to iPhone**. If necessary, cycle Bluetooth on the device apparently retaining the sensor connection, reopen both apps and retry. |
+| Transfer was interrupted | Reopen both apps and use the phone's switch/return control to resolve the saved selection. **Cancel transfer** does not itself enable phone collection. |
+| Normal return cannot complete | Perform a successful ordinary sensor NFC scan on the iPhone to reset selection. A failed or cancelled scan does not reclaim collection. An unreachable Watch stops its old collection only after it receives the revocation. |
+
+Bluetooth cycling is a fallback, not a routine handoff requirement: clean device
+checks passed in both directions without it. Cycling iPhone Bluetooth also disrupts
+phone–Watch communication, so restore communication before retrying the transfer.
+Other apps must release their own sensor connections; xDrip cannot disconnect them.
+A collector reset forces a new attempt, not a successful connection.
+
+If [diagnostic capture](#watch-connection-diagnostics) is running, leave it enabled
+through recovery and note the time of each action. Resetting the collector or cycling
+Bluetooth does not deliberately clear the capture. Once recovered, stop/download
+and share the report before starting a replacement capture.
+
 ## Optional runtime support
 
 All controls are in **Background connection** on the same experimental page.
@@ -88,6 +114,43 @@ Location uses extra battery. Neither background collection nor a fixed phone-del
 latency is guaranteed. See Apple's [background location guidance](https://developer.apple.com/documentation/corelocation/handling-location-updates-in-the-background)
 and [underwater foreground behaviour](https://developer.apple.com/documentation/coremotion/accessing-submersion-data).
 
+## Watch connection diagnostics
+
+Open **Advanced Settings → Direct Libre → Connection diagnostics** with both apps
+open. Refresh status, then **Start capture** and wait for confirmation. The Watch
+records locally without the phone; closing this page does not stop the capture.
+After the test, reopen both apps, **Stop and download**, then **Share report**.
+A stopped capture can be downloaded again. Starting another requires confirming
+replacement; a failed download leaves the last complete phone report intact.
+
+Recording is bounded to two hours, 5,000 events or 2 MB, whichever is reached first.
+The duration limit is checked on the next event/status request; no timer wakes the
+Watch. A bounded file queue keeps disk work off Bluetooth and UI callbacks. Capacity,
+queue overload and storage errors are explicitly reported. Relaunch resumes an
+unexpired capture; abrupt termination can lose events still queued in memory.
+
+The report records collector/request IDs, event-origin UTC/uptime, Bluetooth state,
+scan/connect/cancel requests and callbacks, existing timeout execution, reset
+acceptance/rejection, service/subscription setup, unlock reservation/write results,
+packet lengths/parser outcomes and reading delivery timing. Lifecycle/dimming and
+location status/callback timing provide execution context. Location callback samples
+are coalesced to at most one per minute without requesting extra updates. There is
+no automatic water-entry detection, RSSI polling, new reconnect timer or log upload.
+Credentials, raw sensor packets, glucose values and coordinates are omitted.
+
+For a recovery test, note the time reliable range returns. First wait without
+interacting, then open xDrip without double-tapping, then double-tap if needed.
+Record Bluetooth cycling separately; the capture records the resulting system state
+callbacks but cannot identify who caused them. Brief grey during manager startup is
+different from persistent grey: the trace distinguishes reset, initialization,
+powered-on, scan and UI state transitions.
+
+Explicit background-notification-budget errors are labelled. Silence, a pending
+request or recovery after interaction does not prove Apple throttling, suspension
+or radio loss. Callback association can be ambiguous when connection requests overlap;
+write acknowledgement alone does not establish streaming. This is a diagnostic
+capture, not additional background execution permission or a recovery fix.
+
 ## Architecture and code map
 
 | Responsibility | Main source files |
@@ -100,6 +163,7 @@ and [underwater foreground behaviour](https://developer.apple.com/documentation/
 | Reading messages / outbox / sensor mapping | `Libre2History`, `Libre2HistoryQueue`, `Libre2HistoryRegistry`, `Libre2JournalFile` |
 | Delivery / phone import | phone/Watch `HistorySync`, `Libre2PhoneReadingProcessing` |
 | Display / controls | `WatchStateModel`, `GlucoseTrend`, `Libre2ConnectionIndicator`, `DirectLibreSettingsView` |
+| Watch capture / phone export | `Libre2DiagnosticCapture` / `Libre2DiagnosticRecorder`, `Libre2WatchDiagnostics`, `Libre2CaptureController`, `DirectLibreDiagnosticsView` |
 | Optional runtime | `Libre2RuntimeMessages`, `DirectLibreRuntimeSettingsView`, Watch location/notification helpers |
 
 Shared protocol files remain under `xDrip/BluetoothTransmitter/CGM/Libre`; shared and
@@ -189,5 +253,5 @@ Phone NFC/recovery, both transfer directions, restart/double-tap, readings/histo
 downstream services and display persistence have passed earlier device checkpoints.
 Optional runtime features and this cleanup still require device validation. Controlled
 interrupted-transfer testing, prolonged signal-loss timing, a representative water
-session, battery profiling and extended diagnostic capture remain open. See the
+session, battery profiling and physical-device capture acceptance remain open. See the
 [validation record and regression checklist](DirectLibreValidation.md).

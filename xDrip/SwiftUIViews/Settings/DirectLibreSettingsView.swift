@@ -3,6 +3,7 @@ import SwiftUI
 /// Experimental collection and synchronisation controls remain under Advanced Settings.
 struct DirectLibreSettingsView: View {
     @ObservedObject private var connection = Libre2PhoneConnection.shared
+    @Environment(\.settingsNavigationActions) private var navigationActions
     @Environment(\.scenePhase) private var scenePhase
     @State private var isVisible = false
     @State private var showAllActivity = false
@@ -15,6 +16,11 @@ struct DirectLibreSettingsView: View {
             DirectLibreRuntimeSettingsView()
             if needsRecovery { recoverySection }
             if connection.hasExperiment { readingsSection }
+            Section {
+                Button("Connection diagnostics") {
+                    navigationActions?.push("Connection diagnostics") { _ in AnyView(DirectLibreDiagnosticsView()) }
+                }
+            }
             activitySection
         }
         .onAppear {

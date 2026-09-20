@@ -74,6 +74,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// the Watch Connectivity session
     var session: WCSession
 
+    private let directLibreDiagnostics = Libre2WatchDiagnostics.shared
     private let directLibreLocation = Libre2WatchLocationSession()
     private lazy var directLibreNotification = Libre2WatchNotificationTest()
 
@@ -920,6 +921,7 @@ extension WatchStateModel: WCSessionDelegate {
 
     func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
         DispatchQueue.main.async {
+            if self.directLibreDiagnostics.receive(message, snapshot: { self.directLibreLocation.recordDiagnosticSnapshot() }, reply: replyHandler) { return }
             if self.directLibreLocation.receive(message, reply: replyHandler) { return }
             if self.directLibreNotification.receive(message, reply: replyHandler) { return }
             if Libre2WatchHistorySync.shared.receiveCleanup(message, reply: replyHandler) { return }
