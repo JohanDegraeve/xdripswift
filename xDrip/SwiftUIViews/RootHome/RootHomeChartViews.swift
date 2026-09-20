@@ -11,6 +11,7 @@ import Charts
 
 /// Main interactive chart with loading state and the reading shown at the panned end date.
 struct RootHomeMainChartView: View {
+    @AppStorage(UserDefaults.Key.targetMarkValue.rawValue) private var targetValueInMgDl = 0.0
     @Binding var selectedRange: RootHomeChartRange
     let showsTreatments: Bool
     var allowsTherapyCharts = true
@@ -57,6 +58,7 @@ struct RootHomeMainChartView: View {
                     lowLimitInMgDl: UserDefaults.standard.lowMarkValue,
                     highLimitInMgDl: UserDefaults.standard.highMarkValue,
                     urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue,
+                    targetValueInMgDl: targetValueInMgDl,
                     liveActivityType: nil,
                     hoursToShowScalingHours: selectedRange.rawValue,
                     glucoseCircleDiameterScalingHours: selectedRange.glucoseCircleDiameterScalingHours,
@@ -186,6 +188,7 @@ struct RootHomeMainChartView: View {
 
 /// Historical overview chart and the active main-chart window.
 struct RootHomeMiniChartView: View {
+    @AppStorage(UserDefaults.Key.targetMarkValue.rawValue) private var targetValueInMgDl = 0.0
     let miniChartHoursToShow: Double
     let chartState: GlucoseChartState
     let scrollCoordinator: GlucoseChartScrollCoordinator
@@ -217,6 +220,7 @@ struct RootHomeMiniChartView: View {
                     lowLimitInMgDl: UserDefaults.standard.lowMarkValue,
                     highLimitInMgDl: UserDefaults.standard.highMarkValue,
                     urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue,
+                    targetValueInMgDl: targetValueInMgDl,
                     liveActivityType: nil,
                     hoursToShowScalingHours: miniChartHoursToShow,
                     glucoseCircleDiameterScalingHours: miniChartHoursToShow,

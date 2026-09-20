@@ -130,6 +130,7 @@ struct GlucoseChartView: View {
     let lowLimitInMgDl: Double
     let highLimitInMgDl: Double
     let urgentHighLimitInMgDl: Double
+    let targetValueInMgDl: Double
     let liveActivityType: LiveActivityType
     let hoursToShow: Double
     let glucoseCircleDiameter: Double
@@ -171,6 +172,7 @@ struct GlucoseChartView: View {
     ///   - lowLimitInMgDl: Low threshold in mg/dL.
     ///   - highLimitInMgDl: High threshold in mg/dL.
     ///   - urgentHighLimitInMgDl: Urgent high threshold in mg/dL.
+    ///   - targetValueInMgDl: Optional background target band; zero disables it.
     ///   - liveActivityType: Live activity size variant. Defaults to `.normal` when nil.
     ///   - hoursToShowScalingHours: Overrides the chart type's default visible duration.
     ///   - glucoseCircleDiameterScalingHours: Optional baseline used to scale glucose/treatment symbol sizes for wider or narrower ranges.
@@ -179,7 +181,7 @@ struct GlucoseChartView: View {
     ///   - overrideChartWidth: Optional explicit chart width.
     ///   - highContrast: Optional high-contrast override for StandBy charts.
     ///   - chartState: Full SwiftUI chart state containing the visible range and all renderable chart series.
-    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, additionalBgReadingDataSets: [GlucoseChartDataSet]? = nil, backgroundBands: [GlucoseChartBackgroundBand]? = nil, agpBackgroundPoints: [GlucoseChartAGPPoint]? = nil, agpBackgroundOpacityMultiplier: Double? = nil, explicitVisibleEndDate: Date? = nil, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, showsTreatments: Bool = true, overrideChartHeight: Double?, overrideChartWidth: Double?, highContrast: Bool?, chartState: GlucoseChartState? = nil) {
+    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, additionalBgReadingDataSets: [GlucoseChartDataSet]? = nil, backgroundBands: [GlucoseChartBackgroundBand]? = nil, agpBackgroundPoints: [GlucoseChartAGPPoint]? = nil, agpBackgroundOpacityMultiplier: Double? = nil, explicitVisibleEndDate: Date? = nil, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, targetValueInMgDl: Double = 0, liveActivityType: LiveActivityType?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, showsTreatments: Bool = true, overrideChartHeight: Double?, overrideChartWidth: Double?, highContrast: Bool?, chartState: GlucoseChartState? = nil) {
 
         self.chartType = glucoseChartType
         self.isMgDl = isMgDl
@@ -187,6 +189,7 @@ struct GlucoseChartView: View {
         self.lowLimitInMgDl = lowLimitInMgDl
         self.highLimitInMgDl = highLimitInMgDl
         self.urgentHighLimitInMgDl = urgentHighLimitInMgDl
+        self.targetValueInMgDl = targetValueInMgDl
         self.liveActivityType = liveActivityType ?? .normal
         self.showHighContrast = highContrast ?? false
         self.overrideChartHeightWasPassed = overrideChartHeight != nil
@@ -684,6 +687,13 @@ struct GlucoseChartView: View {
         // Swift Charts renders marks in declaration order: guides first, basal and treatments below
         // glucose, then calibration and overlay marks above the plot.
         Chart {
+            // Keep the target behind every other mark, including background annotations.
+            if targetValueInMgDl > 0, domain.contains(targetValueInMgDl) {
+                RuleMark(y: .value("", targetValueInMgDl))
+                    .lineStyle(StrokeStyle(lineWidth: 6))
+                    .foregroundStyle(Color.green.opacity(0.25))
+            }
+
             ForEach(backgroundBands) { backgroundBand in
                 RectangleMark(
                     xStart: .value("Sensor noise start", backgroundBand.startDate),
