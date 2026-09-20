@@ -7,7 +7,7 @@ protocol Libre2SensorDataSource: AnyObject {
     var sensorUID: Data? { get }
     var patchInfo: Data? { get }
     func reserveUnlock() throws -> Libre2StreamingUnlock
-    func parseBLEFrame(_ frame: Data, sensorUID: Data) throws -> (bleGlucose: [GlucoseData], sensorTimeInMinutes: UInt16)?
+    func parseBLEFrame(_ decryptedFrame: Data, date: Date) -> (bleGlucose: [GlucoseData], sensorTimeInMinutes: UInt16)?
 }
 
 struct Libre2StreamingUnlock {
@@ -27,14 +27,10 @@ class Libre2BluetoothTransmitter: BluetoothTransmitter {
     /// write characteristic
     let CBUUID_WriteCharacteristic_Libre2: String = "F001"
 
-    /// how many bytes should we receive from Libre 2
-    private let expectedBufferSize = 46
-
     let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMLibre2)
     private let sensor: Libre2SensorDataSource
-    private var rxBuffer = Data()
-    private var startDate = Date()
-    private static let maxWaitForpacketInSeconds = 3.0
+    private var frameAssembler = Libre2FrameAssembler()
+    private let frameAssemblyClock = ContinuousClock()
 
     init(addressAndName: DeviceAddressAndName, sensor: Libre2SensorDataSource, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, restorationIdentifier: String? = nil) {
         self.sensor = sensor
@@ -71,15 +67,19 @@ class Libre2BluetoothTransmitter: BluetoothTransmitter {
         }
     }
 
-    override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
-        recordDiagnostic("Libre callback allowed=\(isConnectionAllowed) characteristic=\(characteristic.uuid) error=\(Self.diagnosticError(error))")
+    override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        recordDiagnostic("Libre callback allowed=\(isConnectionAllowed) service=\(service.uuid) error=\(Self.diagnosticError(error))")
         guard isConnectionAllowed else { return }
-        super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
+        super.peripheral(peripheral, didDiscoverCharacteristicsFor: service, error: error)
+
+        guard error == nil,
+              service.characteristics?.contains(where: { $0.uuid == CBUUID(string: CBUUID_WriteCharacteristic_Libre2) }) == true,
+              service.characteristics?.contains(where: { $0.uuid == CBUUID(string: CBUUID_ReceiveCharacteristic_Libre2) }) == true else { return }
 
         // Sensor credentials must already be available before notifications are processed.
         guard let libreSensorUID = sensor.sensorUID else {
             recordDiagnostic("Libre callback stopped: sensor UID missing")
-            trace("in peripheral didUpdateNotificationStateFor but libreSensorUID is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+            trace("in peripheral didDiscoverCharacteristicsFor but libreSensorUID is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
 
             return
         }
@@ -87,7 +87,7 @@ class Libre2BluetoothTransmitter: BluetoothTransmitter {
         // NFC patch information is needed to generate the streaming unlock.
         guard let librePatchInfo = sensor.patchInfo else {
             recordDiagnostic("Libre setup stopped: patch information missing")
-            trace("in peripheral didUpdateNotificationStateFor but librePatchInfo is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+            trace("in peripheral didDiscoverCharacteristicsFor but librePatchInfo is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
 
             return
         }
@@ -95,86 +95,80 @@ class Libre2BluetoothTransmitter: BluetoothTransmitter {
         // the unlock algorithm reads 6 bytes directly, so invalid restored sensor metadata must be rejected before creating the payload
         guard libreSensorUID.count >= 6, librePatchInfo.count >= 6 else {
             recordDiagnostic("Libre setup stopped: invalid credential lengths")
-            trace("in peripheral didUpdateNotificationStateFor but the stored sensor metadata is incomplete, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
+            trace("in peripheral didDiscoverCharacteristicsFor but the stored sensor metadata is incomplete, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
 
             return
         }
 
-        if error == nil && characteristic.isNotifying {
-            do {
-                // The Watch data source saves the reservation before this method can write F001.
-                // The phone data source retains its existing counter and suppression behaviour.
-                recordDiagnostic("Unlock reservation requested")
-                let unlock = try sensor.reserveUnlock()
-                recordDiagnostic("Unlock reserved count=\(unlock.count) shouldWrite=\(unlock.shouldWrite); Watch persistence completed")
-                let payload = Data(Libre2BLEUtilities.streamingUnlockPayload(sensorUID: libreSensorUID, info: librePatchInfo, enableTime: unlock.code, unlockCount: unlock.count))
-                trace("in peripheral didUpdateNotificationStateFor, unlock counter = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, unlock.count.description)
-                if unlock.shouldWrite {
-                    let accepted = writeDataToPeripheral(data: payload, type: .withResponse)
-                    recordDiagnostic("Unlock write enqueue accepted=\(accepted); acknowledgement pending")
-                }
-            } catch {
-                recordDiagnostic("Unlock reservation failed: \(Self.diagnosticError(error))")
-                trace("Unable to reserve Libre unlock counter: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error, error.localizedDescription)
-                DispatchQueue.main.async { [weak self] in
-                    self?.bluetoothTransmitterDelegate?.error(message: error.localizedDescription)
-                }
+        // Match phone upstream: queue F001 immediately after the subscription request.
+        // Waiting for its notification-state callback can let the sensor disconnect.
+        do {
+            // The Watch data source saves the reservation before this method can write F001.
+            // The phone data source retains its existing counter and suppression behaviour.
+            recordDiagnostic("Unlock reservation requested")
+            let unlock = try sensor.reserveUnlock()
+            recordDiagnostic("Unlock reserved count=\(unlock.count) shouldWrite=\(unlock.shouldWrite); Watch persistence completed")
+            let payload = Data(Libre2BLEUtilities.streamingUnlockPayload(sensorUID: libreSensorUID, info: librePatchInfo, enableTime: unlock.code, unlockCount: unlock.count))
+            trace("in peripheral didDiscoverCharacteristicsFor, unlock counter = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, unlock.count.description)
+            if unlock.shouldWrite {
+                let accepted = writeDataToPeripheral(data: payload, type: .withResponse)
+                recordDiagnostic("Unlock write enqueue accepted=\(accepted); acknowledgement pending")
+            }
+        } catch {
+            recordDiagnostic("Unlock reservation failed: \(Self.diagnosticError(error))")
+            trace("Unable to reserve Libre unlock counter: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error, error.localizedDescription)
+            DispatchQueue.main.async { [weak self] in
+                self?.bluetoothTransmitterDelegate?.error(message: error.localizedDescription)
             }
         }
     }
 
     override func prepareForRelease() {
         super.prepareForRelease()
-        if Thread.isMainThread {
-            resetRxBuffer()
-        } else {
-            DispatchQueue.main.sync { self.resetRxBuffer() }
+        runOnCentralQueue {
+            self.recordDiagnostic("Frame buffer reset on release")
+            self.frameAssembler.reset()
         }
     }
 
-    private func resetRxBuffer() {
-        recordDiagnostic("Frame buffer reset bytes=\(rxBuffer.count)")
-        rxBuffer = Data()
-        startDate = Date()
-    }
-
-    /// process value received from transmitter
+    /// Assembles on the Bluetooth queue, then parses and delivers on main, as on the phone.
     public func processValue(value: Data, sensorUID: Data) {
-        recordDiagnostic("Frame fragment bytes=\(value.count) buffered=\(rxBuffer.count) bufferAge=\(Date().timeIntervalSince(startDate))")
-        // check if buffer needs to be reset
-        if Date() > startDate.addingTimeInterval(Libre2BluetoothTransmitter.maxWaitForpacketInSeconds) {
-            trace("in peripheral didUpdateValueFor, more than %{public}@ seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug, Libre2BluetoothTransmitter.maxWaitForpacketInSeconds.description)
-
-            resetRxBuffer()
+        let frameArrivalDate = Date()
+        let result = frameAssembler.append(value, arrival: frameAssemblyClock.now)
+        recordDiagnostic("Frame fragment bytes=\(value.count)")
+        if let timeout = result.timedOutPartialFrame {
+            recordDiagnostic("Partial frame timed out bytes=\(timeout.discardedByteCount) age=\(timeout.assemblyDuration)")
+            trace("Libre 2 partial frame timed out: discardedBytes=%{public}@, assemblyElapsedSeconds=%{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error, timeout.discardedByteCount.description, timeout.assemblyDuration.description)
         }
-
-        // add new value to rxBuffer
-        rxBuffer.append(value)
-
-        // check if enough bytes are received, and if yes start processing
-        if rxBuffer.count > expectedBufferSize { recordDiagnostic("Frame buffer exceeds expected size bytes=\(rxBuffer.count)") }
-        if rxBuffer.count == expectedBufferSize {
+        switch result.frameResult {
+        case .incomplete:
+            return
+        case let .oversized(count):
+            recordDiagnostic("Oversized frame discarded bytes=\(count)")
+            trace("Libre 2 frame contains %{public}@ bytes instead of 46, discarding it", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error, count.description)
+        case let .complete(frame, duration):
             do {
-                guard let parsedBLEData = try sensor.parseBLEFrame(rxBuffer, sensorUID: sensorUID) else {
-                    recordDiagnostic("Frame parser returned no result")
-                    return
-                }
-                recordDiagnostic("Frame parsed readings=\(parsedBLEData.bleGlucose.count) sensorMinute=\(parsedBLEData.sensorTimeInMinutes); delivery queued")
-
-                // Deliver readings and sensor age to the platform adapter on main.
+                let decrypted = Data(try Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: frame))
+                recordDiagnostic("Frame decrypted assemblySeconds=\(duration); delivery queued")
+                // Capture arrival before scheduling: queue delays must not make readings newer.
+                // Parser history and application delivery are committed on the same queue.
                 DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    self.recordDiagnostic("Parsed readings delivery executing on main")
-                    self.received(glucoseData: parsedBLEData.bleGlucose, sensorTimeInMinutes: parsedBLEData.sensorTimeInMinutes)
+                    guard let self else { return }
+                    guard self.isConnectionAllowed else {
+                        self.recordDiagnostic("Frame delivery skipped: collection released")
+                        return
+                    }
+                    guard let parsed = self.sensor.parseBLEFrame(decrypted, date: frameArrivalDate) else {
+                        self.recordDiagnostic("Frame parser returned no result")
+                        return
+                    }
+                    self.recordDiagnostic("Frame parsed readings=\(parsed.bleGlucose.count) sensorMinute=\(parsed.sensorTimeInMinutes); delivery executing on main")
+                    self.received(glucoseData: parsed.bleGlucose, sensorTimeInMinutes: parsed.sensorTimeInMinutes)
                 }
-
             } catch {
                 recordDiagnostic("Frame parse/decrypt failed: \(Self.diagnosticError(error))")
-                trace("in peripheral didUpdateValueFor, error while parsing/decrypting data =  %{public}@ ", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, error.localizedDescription)
-
-                resetRxBuffer()
+                trace("Error parsing/decrypting Libre 2 frame: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error, error.localizedDescription)
             }
         }
     }
-
 }

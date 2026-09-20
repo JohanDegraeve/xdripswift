@@ -14,6 +14,7 @@ private func validLandscapeDimension(_ value: CGFloat) -> CGFloat {
 
 /// Supported history periods for the landscape comparison baseline.
 enum LandscapeComparisonPeriod: Int, CaseIterable, Identifiable {
+    case none = 0
     case threeDays = 3
     case sevenDays = 7
     case thirtyDays = 30
@@ -23,19 +24,28 @@ enum LandscapeComparisonPeriod: Int, CaseIterable, Identifiable {
     var id: Int { rawValue }
 
     var title: String {
-        Texts_Common.landscapeComparisonDays(rawValue)
+        switch self {
+        case .none:
+            return Texts_Common.landscapeComparisonNone
+        default:
+            return Texts_Common.landscapeComparisonDays(rawValue)
+        }
     }
 }
 
 // MARK: - State Model
 
 /// Owns the selected day trace and recent AGP baseline for the landscape comparison view.
+/// Keep snapshot requests and published UI state on the same actor as chart lifecycle changes.
+@MainActor
 final class LandscapeChartStateModel: ObservableObject {
 
     @Published var selectedDate = Date().toMidnight()
     @Published var displayedDate = Date().toMidnight()
     @Published var chartState = GlucoseChartState.empty(startDate: Date().toMidnight(), endDate: Date().toMidnight().addingTimeInterval(.hours(24) - 1))
     @Published var baseline = StatisticsManager.LandscapeBaseline.empty
+    @Published var rangeSummary = GlucoseClinicalRangeSummary.empty
+    @Published var averageMgDl: Double?
     @Published var loopalyzerSnapshot: StatisticsManager.LandscapeLoopalyzerSnapshot?
     @Published private(set) var comparisonPeriod: LandscapeComparisonPeriod
     let showsAIDCharts: Bool
@@ -186,6 +196,8 @@ final class LandscapeChartStateModel: ObservableObject {
             completion(LandscapeDaySnapshot(
                 chartState: loadedChartState,
                 baseline: loadedAnalytics.baseline,
+                rangeSummary: loadedAnalytics.rangeSummary,
+                averageMgDl: loadedAnalytics.averageMgDl,
                 loopalyzerSnapshot: loadedAnalytics.loopalyzer
             ))
         }
@@ -223,6 +235,8 @@ final class LandscapeChartStateModel: ObservableObject {
         displayedDate = cacheKey.date
         chartState = snapshot.chartState
         baseline = snapshot.baseline
+        rangeSummary = snapshot.rangeSummary
+        averageMgDl = snapshot.averageMgDl
         loopalyzerSnapshot = snapshot.loopalyzerSnapshot
         prefetchAdjacentDates(around: cacheKey.date, comparisonPeriod: comparisonPeriod)
     }
@@ -268,6 +282,8 @@ private struct LandscapeSnapshotCacheKey: Hashable {
 private struct LandscapeDaySnapshot {
     let chartState: GlucoseChartState
     let baseline: StatisticsManager.LandscapeBaseline
+    let rangeSummary: GlucoseClinicalRangeSummary
+    let averageMgDl: Double?
     let loopalyzerSnapshot: StatisticsManager.LandscapeLoopalyzerSnapshot?
 }
 
@@ -293,6 +309,9 @@ struct LandscapeChartView: View {
 
     @ObservedObject var stateModel: LandscapeChartStateModel
     let presentation: Presentation
+
+    // The badge and AGP share one selection so their clinical boundaries always agree.
+    @State private var rangeMode = LandscapeTIRBadge.RangeMode.timeInRange
 
     private enum Layout {
         static let screenPadding: CGFloat = 6
@@ -356,7 +375,10 @@ struct LandscapeChartView: View {
                     landscapeAGPColumn
                         .frame(width: availableWidth * Layout.agpColumnFraction)
 
-                    LandscapeLoopalyzerCharts(snapshot: stateModel.loopalyzerSnapshot)
+                    LandscapeLoopalyzerCharts(
+                        snapshot: stateModel.loopalyzerSnapshot,
+                        showsNowRule: Calendar.current.isDateInToday(stateModel.displayedDate)
+                    )
                         .frame(width: availableWidth * (1 - Layout.agpColumnFraction))
                 }
             }
@@ -385,32 +407,41 @@ struct LandscapeChartView: View {
             canMoveForward: stateModel.canMoveForward,
             moveBackOneDay: stateModel.moveBackOneDay,
             moveForwardOneDay: stateModel.moveForwardOneDay,
-            selectToday: stateModel.selectToday
+            selectToday: stateModel.selectToday,
+            usesTightRange: rangeMode == .timeInTightRange
         )
     }
 
     private var toolbar: some View {
         HStack(spacing: 12) {
             Text(stateModel.selectedDateText)
-                .font(.system(size: 22, weight: .heavy))
+                .font(.system(size: 18, weight: .heavy))
                 .foregroundStyle(ConstantsAppColors.primaryText)
                 .lineLimit(1)
-                .minimumScaleFactor(0.75)
+                .minimumScaleFactor(0.7)
+                .layoutPriority(1)
                 .onTapGesture(count: 2) {
                     stateModel.selectToday()
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
+            averageGlucoseLabel
+                .font(.system(size: 15))
+                .foregroundStyle(ConstantsAppColors.primaryText)
+                .fixedSize(horizontal: true, vertical: false)
+                .accessibilityLabel(Texts_Common.statisticsAverageGlucose)
+                .accessibilityValue(averageGlucoseText)
+
             LandscapeTIRBadge(
-                chartState: stateModel.chartState,
-                referenceDate: stateModel.displayedDate,
-                isExpandedIPad: presentation == .expandedIPad
+                rangeSummary: stateModel.rangeSummary,
+                isExpandedIPad: presentation == .expandedIPad,
+                rangeMode: $rangeMode
             )
         }
         .padding(.horizontal, 14)
         .frame(height: presentation == .expandedIPad ? Layout.expandedToolbarHeight : Layout.toolbarHeight)
         .background(ConstantsAppColors.homePanelBackground)
-        .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius + 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
     }
 
     private var expandedSummary: some View {
@@ -472,8 +503,18 @@ struct LandscapeChartView: View {
         return dailyValuesMgDl.reduce(0, +) / Double(dailyValuesMgDl.count)
     }
 
+    private var averageGlucoseLabel: Text {
+        guard let averageMgDl = stateModel.averageMgDl else { return Text("-").bold() }
+
+        let usesMgDl = stateModel.baseline.usesMgDl
+        let value = averageMgDl.mgDlToMmolAndToString(mgDl: usesMgDl)
+        let unit = usesMgDl ? Texts_Common.mgdl : Texts_Common.mmol
+
+        return Text("\(Text(value).bold()) \(Text(unit).foregroundColor(Color(.colorSecondary)))")
+    }
+
     private var averageGlucoseText: String {
-        guard let averageMgDl else { return "-" }
+        guard let averageMgDl = stateModel.averageMgDl else { return "-" }
 
         let usesMgDl = stateModel.baseline.usesMgDl
         let unit = usesMgDl ? Texts_Common.mgdl : Texts_Common.mmol
@@ -510,7 +551,7 @@ struct LandscapeChartView: View {
     }
 
     private var comparisonPeriodMenu: some View {
-        HStack(spacing: presentation == .expandedIPad ? 6 : 0) {
+        HStack(spacing: presentation == .expandedIPad ? 8 : 6) {
             Text(Texts_Common.landscapeComparingWithLast)
                 .foregroundStyle(comparisonPeriodColor)
                 .font(comparisonPeriodFont)
@@ -522,8 +563,10 @@ struct LandscapeChartView: View {
                     } label: {
                         if stateModel.comparisonPeriod == period {
                             Label(period.title, systemImage: "checkmark")
+                                .font(.system(size: 15))
                         } else {
                             Text(period.title)
+                                .font(.system(size: 15))
                         }
                     }
                 }
@@ -538,6 +581,7 @@ struct LandscapeChartView: View {
             }
             .buttonStyle(.plain)
 
+            .dynamicTypeSize(.xSmall ... .large)
         }
         .lineLimit(1)
         .minimumScaleFactor(0.8)
@@ -552,7 +596,7 @@ struct LandscapeChartView: View {
     private var comparisonPeriodFont: Font {
         presentation == .expandedIPad
             ? .system(size: 18, weight: .semibold)
-            : .body
+            : .system(size: 15)
     }
 
 }
@@ -596,6 +640,7 @@ struct IPadHomeAGPView: View {
 
 private struct LandscapeLoopalyzerCharts: View {
     let snapshot: StatisticsManager.LandscapeLoopalyzerSnapshot?
+    let showsNowRule: Bool
 
     private enum Layout {
         static let chartSpacing: CGFloat = 14
@@ -613,7 +658,8 @@ private struct LandscapeLoopalyzerCharts: View {
                         44,
                         (validLandscapeDimension(geometry.size.height) - Layout.chartChromeHeight) / 3
                     ),
-                    chartSpacing: Layout.chartSpacing
+                    chartSpacing: Layout.chartSpacing,
+                    showsNowRule: showsNowRule
                 )
             }
         }
@@ -636,6 +682,7 @@ private struct LandscapeAGPComparisonChart: View {
     let moveBackOneDay: () -> Void
     let moveForwardOneDay: () -> Void
     let selectToday: () -> Void
+    var usesTightRange = false
 
     @State private var hasTriggeredSwipe = false
     @State private var contentWidth: CGFloat = 0
@@ -647,7 +694,8 @@ private struct LandscapeAGPComparisonChart: View {
             presentation: .landscapeComparison,
             glucosePoints: agpGlucosePoints,
             showsNowRule: Calendar.current.isDateInToday(displayedDate),
-            emptyMessage: Texts_Common.statisticsWaitingForGlucoseData
+            emptyMessage: Texts_Common.statisticsWaitingForGlucoseData,
+            usesTightRange: usesTightRange
         )
         .padding(.horizontal, 6)
         .padding(.top, 2)
@@ -813,7 +861,7 @@ private struct LandscapeGlucosePoint: Identifiable {
 
 private struct LandscapeTIRBadge: View {
 
-    private enum RangeMode: CaseIterable {
+    enum RangeMode: CaseIterable {
         case timeInRange
         case timeInTightRange
 
@@ -826,73 +874,56 @@ private struct LandscapeTIRBadge: View {
             }
         }
 
-        var lowLimitMgDl: Double {
-            switch self {
-            case .timeInRange:
-                return GlucoseReportClinicalConstants.timeInRangeLowMgDl
-            case .timeInTightRange:
-                return GlucoseReportClinicalConstants.timeInTightRangeLowMgDl
-            }
-        }
-
-        var highLimitMgDl: Double {
-            switch self {
-            case .timeInRange:
-                return GlucoseReportClinicalConstants.timeInRangeHighMgDl
-            case .timeInTightRange:
-                return GlucoseReportClinicalConstants.timeInTightRangeHighMgDl
-            }
-        }
-
     }
 
-    let chartState: GlucoseChartState
-    let referenceDate: Date
+    /// Both distributions come from StatisticsManager's validated selected-calendar-day samples.
+    let rangeSummary: GlucoseClinicalRangeSummary
     var isExpandedIPad = false
 
-    @State private var rangeMode = RangeMode.timeInRange
+    @Binding var rangeMode: RangeMode
 
     var body: some View {
-        HStack(spacing: isExpandedIPad ? 22 : 12) {
+        HStack(spacing: isExpandedIPad ? 22 : 8) {
+            tirBar
+
             HStack(spacing: isExpandedIPad ? 12 : 0) {
-                percentageText(lowPercentage, ConstantsAppColors.statisticsLow)
+                percentageText(wholePercentages[0], ConstantsAppColors.statisticsLow)
                 separator
-                percentageText(inRangePercentage, ConstantsAppColors.statisticsInRange, weight: .bold)
+                percentageText(wholePercentages[1], ConstantsAppColors.statisticsInRange, weight: .bold)
                 separator
-                percentageText(highPercentage, ConstantsAppColors.statisticsHigh)
+                percentageText(wholePercentages[2], ConstantsAppColors.statisticsHigh)
             }
             .fixedSize(horizontal: true, vertical: false)
 
-            HStack(spacing: isExpandedIPad ? 12 : 0) {
-                tirBar
-
-                Menu {
-                    ForEach(RangeMode.allCases, id: \.self) { mode in
-                        Button {
-                            rangeMode = mode
-                        } label: {
-                            if rangeMode == mode {
-                                Label(mode.title, systemImage: "checkmark")
-                            } else {
-                                Text(mode.title)
-                            }
+            Menu {
+                ForEach(RangeMode.allCases, id: \.self) { mode in
+                    Button {
+                        rangeMode = mode
+                    } label: {
+                        if rangeMode == mode {
+                            Label(mode.title, systemImage: "checkmark")
+                                .font(.system(size: 15))
+                        } else {
+                            Text(mode.title)
+                                .font(.system(size: 15))
                         }
                     }
-                } label: {
-                    HStack(spacing: 2) {
-                        Text(rangeMode.title)
-                        Image(systemName: "chevron.up.chevron.down")
-                            .font(.caption.weight(.semibold))
-                    }
-                    .foregroundStyle(ConstantsAppColors.primaryText)
                 }
-                .buttonStyle(.plain)
+            } label: {
+                HStack(spacing: 2) {
+                    Text(rangeMode.title)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption.weight(.semibold))
+                }
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(ConstantsAppColors.primaryText)
             }
-            .fixedSize(horizontal: true, vertical: false)
+            .buttonStyle(.plain)
+            .dynamicTypeSize(.xSmall ... .large)
         }
         .frame(height: isExpandedIPad ? 48 : 40)
         .accessibilityLabel(rangeMode.title)
-        .accessibilityValue("\(Texts_Common.lowStatistics) \(percentage(lowPercentage)), \(Texts_Common.inRangeStatistics) \(percentage(inRangePercentage)), \(Texts_Common.highStatistics) \(percentage(highPercentage))")
+        .accessibilityValue("\(Texts_Common.lowStatistics) \(percentage(wholePercentages[0])), \(Texts_Common.inRangeStatistics) \(percentage(wholePercentages[1])), \(Texts_Common.highStatistics) \(percentage(wholePercentages[2]))")
     }
 
     private var tirBar: some View {
@@ -913,63 +944,60 @@ private struct LandscapeTIRBadge: View {
             .background(Color.white.opacity(0.14))
             .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
         }
-        .frame(width: isExpandedIPad ? 220 : 160, height: isExpandedIPad ? 22 : 18)
+        .frame(
+            minWidth: isExpandedIPad ? 130 : 35,
+            idealWidth: isExpandedIPad ? 180 : 130,
+            maxWidth: isExpandedIPad ? 180 : 130,
+            minHeight: isExpandedIPad ? 22 : 18,
+            maxHeight: isExpandedIPad ? 22 : 18
+        )
     }
 
-    private var analysisPoints: [LandscapeGlucosePoint] {
-        let points = zip(chartState.bgReadingDates, chartState.bgReadingValues)
-            .map { date, value in
-                let components = Calendar.current.dateComponents([.hour, .minute], from: date)
-                let minute = (components.hour ?? 0) * 60 + (components.minute ?? 0)
-                return LandscapeGlucosePoint(date: date, minuteOfDay: minute, valueMgDl: value, isLatest: false)
-            }
-            .sorted { $0.date < $1.date }
-
-        guard Calendar.current.isDateInToday(referenceDate) else { return points }
-
-        let now = Date()
-
-        return points.filter { $0.date <= now }
+    /// One shared calculation supplies the exact bar geometry, visible whole-number labels and
+    /// accessibility value. StatisticsManager has already limited it to the selected day.
+    private var rangeDistribution: GlucoseRangeDistribution {
+        switch rangeMode {
+        case .timeInRange:
+            return rangeSummary.timeInRange
+        case .timeInTightRange:
+            return rangeSummary.timeInTightRange
+        }
     }
 
     private var lowPercentage: Double {
-        percentage { $0 < rangeMode.lowLimitMgDl }
+        rangeDistribution.belowPercentage
     }
 
     private var inRangePercentage: Double {
-        percentage { $0 >= rangeMode.lowLimitMgDl && $0 <= rangeMode.highLimitMgDl }
+        rangeDistribution.inRangePercentage
     }
 
     private var highPercentage: Double {
-        percentage { $0 > rangeMode.highLimitMgDl }
+        rangeDistribution.abovePercentage
+    }
+
+    private var wholePercentages: [Int] {
+        rangeDistribution.wholePercentages
     }
 
     private var separator: some View {
         Text("·")
-            .font(.system(size: 18, weight: .regular))
+            .font(.system(size: 15, weight: .regular))
             .foregroundStyle(ConstantsAppColors.tertiaryText)
-            .padding(.horizontal, 6)
-    }
-
-    private func percentage(_ matches: (Double) -> Bool) -> Double {
-        guard !analysisPoints.isEmpty else { return 0 }
-
-        let count = analysisPoints.filter { matches($0.valueMgDl) }.count
-
-        return Double(count) / Double(analysisPoints.count) * 100
+            .padding(.horizontal, 4)
     }
 
     private func segmentWidth(for percentage: Double, totalWidth: CGFloat) -> CGFloat {
         validLandscapeDimension(totalWidth) * CGFloat(max(0, min(100, percentage)) / 100)
     }
 
-    private func percentage(_ value: Double) -> String {
-        "\(Int(value.round(toDecimalPlaces: 0)))%"
+    private func percentage(_ value: Int) -> String {
+        "\(value)%"
     }
 
-    private func percentageText(_ value: Double, _ color: Color, weight: Font.Weight = .regular) -> some View {
+    private func percentageText(_ value: Int, _ color: Color, weight: Font.Weight = .regular) -> some View {
         Text(percentage(value))
-            .font(.system(size: 18, weight: weight))
+            .font(.system(size: 15, weight: weight))
             .foregroundStyle(color)
             .monospacedDigit()
             .lineLimit(1)

@@ -219,7 +219,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     }
 
     deinit {
-        // Delegate cleanup is handled in the base class; just clear packet buffer
+        // Delegate cleanup is handled in the base class. Just clear packet buffer
         blePasswordM5StackPacket = nil
     }
 

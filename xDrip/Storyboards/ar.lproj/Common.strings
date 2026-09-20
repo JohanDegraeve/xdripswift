@@ -16,6 +16,7 @@
 "common_days" = "أيام";
 "common_landscape_comparingWithLast" = "المقارنة مع آخر:";
 "common_landscape_comparisonDays" = "%d أيام";
+"common_landscape_comparisonNone" = "لا شيء";
 "common_today" = "اليوم";
 "common_week" = "أسبوع";
 "common_todayshort" = "اليوم";
@@ -57,3 +58,17 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "الإنسولين النشط المقدّر";
+"therapy.estimatedCOB" = "الكربوهيدرات النشطة المقدّرة";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "تغييرات غير محفوظة";
+"common_save" = "حفظ";
+"common_discardChanges" = "تجاهل التغييرات";
+"common_back" = "رجوع";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "جارٍ إحماء المستشعر";
+"common_sensorWarmupUntilFormat" = "حتى %@";

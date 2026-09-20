@@ -9,6 +9,7 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
         guard let index = bluetoothTransmitters.firstIndex(of: m5StackBluetoothTransmitter), let m5Stack = bluetoothPeripherals[index] as? M5Stack else {return}
         
         m5Stack.batteryLevel = level
+        batteryHistoryManager.record(peripheralObjectID: m5Stack.blePeripheral.objectID, observation: .percentage(value: level, producer: .m5Stack))
         
     }
     

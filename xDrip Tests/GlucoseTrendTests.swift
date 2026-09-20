@@ -16,7 +16,7 @@ final class GlucoseTrendTests: XCTestCase {
     }
 
     func testArrowUsesElapsedTimeBetweenLatestReadings() {
-        for seconds in [60.0, 120, 300] {
+        for seconds in [240.0, 300, 600] {
             let (slope, hidden) = GlucoseTrend.slope(currentValue: 120 + seconds / 60 * 3,
                 currentDate: now, previousValue: 120, previousDate: now.addingTimeInterval(-seconds))
             XCTAssertFalse(hidden)
@@ -27,12 +27,12 @@ final class GlucoseTrendTests: XCTestCase {
 
     func testFlatReadingsShowHorizontalArrow() {
         let (slope, hidden) = GlucoseTrend.slope(currentValue: 120, currentDate: now,
-            previousValue: 120, previousDate: now.addingTimeInterval(-60))
+            previousValue: 120, previousDate: now.addingTimeInterval(-240))
         XCTAssertEqual(GlucoseTrend.ordinal(slope: slope, hideSlope: hidden), 4)
     }
 
-    func testEqualTimestampsAndGapsBeyondTwentyOneMinutesHideArrow() {
-        let intervals: [TimeInterval] = [0, 21 * 60 + 0.001, 22 * 60]
+    func testNewerOrCloseTimestampsAndLongGapsHideArrow() {
+        let intervals: [TimeInterval] = [-60, 0, 60, 120, 239.999, 21 * 60 + 0.001, 22 * 60]
         for seconds in intervals {
             let (slope, hidden) = GlucoseTrend.slope(currentValue: 130, currentDate: now,
                 previousValue: 120, previousDate: now.addingTimeInterval(-seconds))

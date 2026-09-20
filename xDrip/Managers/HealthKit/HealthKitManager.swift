@@ -1,6 +1,8 @@
 import Foundation
+import CoreData
 import HealthKit
 import os
+import UIKit
 
 public class HealthKitManager: NSObject {
     // MARK: - public properties
@@ -28,12 +30,16 @@ public class HealthKitManager: NSObject {
     /// reference to HKHealthStore, should be used only if we're sure HealthKit is supported on the device
     private lazy var healthStore = HKHealthStore()
     
-    /// set of timestamps currently being written to HealthKit to prevent overlap across runs
+    /// Main-thread-only timestamps currently being written to HealthKit to prevent overlap across runs.
     private var timeStampsOfBgReadingsCurrentlyBeingSaved = Set<Date>()
-    
-    /// serial queue to ensure atomic updates of the latest HealthKit store timestamp
-    /// the idea is to use this and force all updates to be done
-    private let healthKitTimestampUpdateQueue = DispatchQueue(label: "HealthKitManager.timestampUpdate")
+
+    /// Main-thread-only replacement IDs and their latest requested values. Persist them so
+    /// a locked phone or a restart cannot strand corrections outside the smoothing window.
+    private var pendingHealthKitReplacements = UserDefaults.standard.dictionary(forKey: "pendingHealthKitReplacements") as? [String: Double] ?? [:] {
+        didSet {
+            UserDefaults.standard.set(pendingHealthKitReplacements, forKey: "pendingHealthKitReplacements")
+        }
+    }
     
     /// metadata key used to identify individual BG readings in HealthKit
     private let bgReadingIdMetadataKey = "BgReadingId"
@@ -55,6 +61,9 @@ public class HealthKitManager: NSObject {
 
         // call initializeHealthKit, set healthKitInitialized according to result of initialization
         healthKitInitialized = initializeHealthKit()
+
+        NotificationCenter.default.addObserver(self, selector: #selector(storeBgReadings), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(storeBgReadings), name: UIApplication.didBecomeActiveNotification, object: nil)
         
         // do first store
         storeBgReadings()
@@ -104,7 +113,7 @@ public class HealthKitManager: NSObject {
     }
     
     /// stores latest readings in healthkit, only if HK supported, authorized, enabled in settings
-    public func storeBgReadings() {
+    @objc public func storeBgReadings() {
         // ensure this function runs on main thread because it accesses objects from the main managedObjectContext
         if !Thread.isMainThread {
             DispatchQueue.main.async { [weak self] in
@@ -122,7 +131,7 @@ public class HealthKitManager: NSObject {
         
         // snapshot of the latest saved timestamp (strict boundary) and in-flight timestamps (to avoid re-saving while previous saves are not completed)
         let strictLatestHealthKitStoredTimeStamp = UserDefaults.standard.timeStampLatestHealthKitStoreBgReading ?? Date.distantPast
-        let timeStampsCurrentlyInFlight: Set<Date> = healthKitTimestampUpdateQueue.sync { timeStampsOfBgReadingsCurrentlyBeingSaved }
+        let timeStampsCurrentlyInFlight: Set<Date> = timeStampsOfBgReadingsCurrentlyBeingSaved
         
         // user setting to allow more frequent HealthKit writes (e.g. Libre 2 Direct 60-second cadence)
         let storeFrequentReadingsInHealthKit = UserDefaults.standard.storeFrequentReadingsInHealthKit
@@ -142,6 +151,21 @@ public class HealthKitManager: NSObject {
         if bgReadingsToStoreAfterApplyingStrictBoundaryAndInFlightExclusion.count > 0 {
             for (_, bgReading) in bgReadingsToStoreAfterApplyingStrictBoundaryAndInFlightExclusion.enumerated().reversed() { // reversed order because the first element is the youngest
                 saveBgReadingInHealthKit(bgReading: bgReading, bloodGlucoseType: bloodGlucoseType, bloodGlucoseUnit: bloodGlucoseUnit, shouldUpdateLatestTimeStamp: true)
+            }
+        }
+
+        if !pendingHealthKitReplacements.isEmpty, UIApplication.shared.isProtectedDataAvailable {
+            // Reload current values, not stale smoothed snapshots saved before a restart.
+            // Deleted/suppressed readings must not be resurrected by a delayed retry.
+            let request = BgReading.fetchRequest()
+            request.predicate = NSPredicate(format: "id IN %@ AND calculatedValue > 0 AND isSuppressedByFiveMinuteCadence == NO", Array(pendingHealthKitReplacements.keys))
+            do {
+                let readings = try coreDataManager.mainManagedObjectContext.fetch(request)
+                let readingIDs = Set(readings.map { $0.id })
+                pendingHealthKitReplacements = pendingHealthKitReplacements.filter { readingIDs.contains($0.key) }
+                replaceBgReadingsInHealthKit(bgReadings: readings)
+            } catch {
+                trace("failed fetch pending healthkit BG readings, error = %{public}@", log: log, category: ConstantsLog.categoryHealthKitManager, type: .error, error.localizedDescription)
             }
         }
     }
@@ -169,10 +193,62 @@ public class HealthKitManager: NSObject {
         guard let bloodGlucoseType = bloodGlucoseType else { return }
         
         let bloodGlucoseUnit = HKUnit(from: "mg/dL")
+
+        var pendingReplacements = pendingHealthKitReplacements
+        for bgReading in bgReadings {
+            pendingReplacements[bgReading.id] = bgReading.finalValue
+        }
+        pendingHealthKitReplacements = pendingReplacements
+
+        // HealthKit can accept writes while locked but cannot read the old samples.
+        // Keep replacements pending until we can safely migrate any legacy samples.
+        guard UIApplication.shared.isProtectedDataAvailable else { return }
         
         for bgReading in bgReadings {
+            // Reserve the whole query/delete/save operation, not just its final save.
+            guard timeStampsOfBgReadingsCurrentlyBeingSaved.insert(bgReading.timeStamp).inserted else { continue }
             deleteExistingBgReadingsFromHealthKit(bgReading: bgReading, bloodGlucoseType: bloodGlucoseType, bloodGlucoseUnit: bloodGlucoseUnit)
         }
+    }
+
+    /// Removes readings hidden by an explicit five-minute cadence rebuild without
+    /// touching the samples that remain visible and will be updated separately.
+    public func deleteBgReadingsFromHealthKit(bgReadingIDs: [String]) {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { [weak self] in
+                self?.deleteBgReadingsFromHealthKit(bgReadingIDs: bgReadingIDs)
+            }
+            return
+        }
+
+        guard UserDefaults.standard.storeReadingsInHealthkit,
+              healthKitInitialized,
+              let bloodGlucoseType = bloodGlucoseType,
+              bgReadingIDs.count > 0
+        else { return }
+
+        let suppressedIDs = Set(bgReadingIDs)
+        pendingHealthKitReplacements = pendingHealthKitReplacements.filter { !suppressedIDs.contains($0.key) }
+
+        let metadataPredicate = HKQuery.predicateForObjects(withMetadataKey: bgReadingIdMetadataKey, allowedValues: bgReadingIDs)
+        let sampleQuery = HKSampleQuery(sampleType: bloodGlucoseType, predicate: metadataPredicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { [weak self] _, samples, error in
+            guard let self = self else { return }
+
+            if let error = error {
+                trace("failed query suppressed healthkit BG readings, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, error.localizedDescription)
+                return
+            }
+
+            guard let samples = samples, samples.count > 0 else { return }
+
+            self.healthStore.delete(samples) { success, deleteError in
+                if !success, let deleteError = deleteError {
+                    trace("failed delete suppressed healthkit BG readings, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, deleteError.localizedDescription)
+                }
+            }
+        }
+
+        healthStore.execute(sampleQuery)
     }
     
     // MARK: - observe function
@@ -201,29 +277,41 @@ public class HealthKitManager: NSObject {
     }
     
     deinit {
+        NotificationCenter.default.removeObserver(self)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.storeReadingsInHealthkitAuthorized.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.storeReadingsInHealthkit.rawValue)
     }
     
     private func deleteExistingBgReadingsFromHealthKit(bgReading: BgReadingSnapshot, bloodGlucoseType: HKQuantityType, bloodGlucoseUnit: HKUnit) {
         let metadataPredicate = HKQuery.predicateForObjects(withMetadataKey: bgReadingIdMetadataKey, allowedValues: [bgReading.id])
-        let sampleQuery = HKSampleQuery(sampleType: bloodGlucoseType, predicate: metadataPredicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { [weak self] _, samples, error in
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [metadataPredicate, HKQuery.predicateForObjects(from: HKSource.default())])
+        let sampleQuery = HKSampleQuery(sampleType: bloodGlucoseType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { [weak self] _, samples, error in
             guard let self = self else { return }
             
-            if let error = error {
-                trace("failed query existing healthkit BG reading, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, error.localizedDescription)
+            guard error == nil, let samples = samples else {
+                trace("failed query existing healthkit BG reading, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, error?.localizedDescription ?? "missing query results")
+                // An inaccessible store is not an empty store. Saving here creates duplicates.
+                DispatchQueue.main.async {
+                    self.timeStampsOfBgReadingsCurrentlyBeingSaved.remove(bgReading.timeStamp)
+                }
+                return
+            }
+            
+            // New samples are replaced atomically by HealthKit's sync metadata. Only
+            // pre-fix samples need explicit deletion; retain modern samples if saving fails.
+            let legacySamples = samples.filter { $0.metadata?[HKMetadataKeySyncIdentifier] == nil }
+            guard !legacySamples.isEmpty else {
                 self.saveBgReadingInHealthKit(bgReading: bgReading, bloodGlucoseType: bloodGlucoseType, bloodGlucoseUnit: bloodGlucoseUnit, shouldUpdateLatestTimeStamp: false)
                 return
             }
             
-            guard let samples = samples, samples.count > 0 else {
-                self.saveBgReadingInHealthKit(bgReading: bgReading, bloodGlucoseType: bloodGlucoseType, bloodGlucoseUnit: bloodGlucoseUnit, shouldUpdateLatestTimeStamp: false)
-                return
-            }
-            
-            self.healthStore.delete(samples) { success, deleteError in
-                if !success, let deleteError = deleteError {
-                    trace("failed delete existing healthkit BG reading, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, deleteError.localizedDescription)
+            self.healthStore.delete(legacySamples) { success, deleteError in
+                guard success else {
+                    trace("failed delete existing healthkit BG reading, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, deleteError?.localizedDescription ?? "unknown error")
+                    DispatchQueue.main.async {
+                        self.timeStampsOfBgReadingsCurrentlyBeingSaved.remove(bgReading.timeStamp)
+                    }
+                    return
                 }
                 
                 self.saveBgReadingInHealthKit(bgReading: bgReading, bloodGlucoseType: bloodGlucoseType, bloodGlucoseUnit: bloodGlucoseUnit, shouldUpdateLatestTimeStamp: false)
@@ -234,34 +322,57 @@ public class HealthKitManager: NSObject {
     }
     
     private func saveBgReadingInHealthKit(bgReading: BgReadingSnapshot, bloodGlucoseType: HKQuantityType, bloodGlucoseUnit: HKUnit, shouldUpdateLatestTimeStamp: Bool) {
-        let quantity = HKQuantity(unit: bloodGlucoseUnit, doubleValue: bgReading.finalValue)
-        let metadata = [bgReadingIdMetadataKey: bgReading.id]
+        // Replacement queries also call this from HealthKit's callback queue.
+        // Keep bookkeeping on main. Synchronously waiting for a queue that writes
+        // UserDefaults can deadlock against a main-queue defaults observer.
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { [weak self] in
+                self?.saveBgReadingInHealthKit(bgReading: bgReading, bloodGlucoseType: bloodGlucoseType, bloodGlucoseUnit: bloodGlucoseUnit, shouldUpdateLatestTimeStamp: shouldUpdateLatestTimeStamp)
+            }
+            return
+        }
+
+        // Use the newest requested value if smoothing ran again during the query.
+        // A removed pending entry means the reading was deleted or suppressed meanwhile.
+        guard let valueToStore = shouldUpdateLatestTimeStamp ? bgReading.finalValue : pendingHealthKitReplacements[bgReading.id] else {
+            timeStampsOfBgReadingsCurrentlyBeingSaved.remove(bgReading.timeStamp)
+            return
+        }
+
+        let quantity = HKQuantity(unit: bloodGlucoseUnit, doubleValue: valueToStore)
+        // BgReadingId alone is only custom metadata, not a uniqueness constraint.
+        // A persisted, increasing version makes retries/revisions replace the same sample,
+        // including after relaunch or a backwards clock change.
+        let syncVersion = max(UserDefaults.standard.integer(forKey: "healthKitSyncVersion") + 1, Int(Date().timeIntervalSince1970 * 1_000_000))
+        UserDefaults.standard.set(syncVersion, forKey: "healthKitSyncVersion")
+        let metadata: [String: Any] = [bgReadingIdMetadataKey: bgReading.id, HKMetadataKeySyncIdentifier: bgReading.id, HKMetadataKeySyncVersion: syncVersion]
         let sample = HKQuantitySample(type: bloodGlucoseType, quantity: quantity, start: bgReading.timeStamp, end: bgReading.timeStamp, metadata: metadata)
         let timeStampLastReadingToUpload = bgReading.timeStamp
         
-        healthKitTimestampUpdateQueue.sync {
-            _ = timeStampsOfBgReadingsCurrentlyBeingSaved.insert(timeStampLastReadingToUpload)
-        }
+        timeStampsOfBgReadingsCurrentlyBeingSaved.insert(timeStampLastReadingToUpload)
         
         healthStore.save(sample, withCompletion: { [weak self]
             (success: Bool, error: Error?) in
-                guard let self = self else { return }
-                if success {
-                    trace("stored reading in HealthKit", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .debug, troubleshooting: .detailed(.integration(name: .healthKit, activity: .succeeded(itemCount: 1))))
-                    self.healthKitTimestampUpdateQueue.async {
-                        self.timeStampsOfBgReadingsCurrentlyBeingSaved.remove(timeStampLastReadingToUpload)
-                        
+                // Remove the in-flight marker and advance the timestamp together on main.
+                // Always clear the marker, including failures without an Error payload.
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.timeStampsOfBgReadingsCurrentlyBeingSaved.remove(timeStampLastReadingToUpload)
+                    if success {
+                        // A newer smoothing pass may have arrived during this operation.
+                        // Clear only the value we actually saved; leave newer corrections queued.
+                        if !shouldUpdateLatestTimeStamp, self.pendingHealthKitReplacements[bgReading.id] == valueToStore {
+                            self.pendingHealthKitReplacements.removeValue(forKey: bgReading.id)
+                        }
                         if shouldUpdateLatestTimeStamp {
                             let existingTimeStampLatestHealthKitStoreBgReading = UserDefaults.standard.timeStampLatestHealthKitStoreBgReading ?? Date.distantPast
                             let newTimeStampLatestHealthKitStoreBgReading = max(existingTimeStampLatestHealthKitStoreBgReading, timeStampLastReadingToUpload)
                             UserDefaults.standard.timeStampLatestHealthKitStoreBgReading = newTimeStampLatestHealthKitStoreBgReading
                         }
+                        trace("stored reading in HealthKit", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .debug, troubleshooting: .detailed(.integration(name: .healthKit, activity: .succeeded(itemCount: 1))))
+                    } else if let error = error {
+                        trace("failed store reading in healthkit, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, troubleshooting: .detailed(.integration(name: .healthKit, activity: .failed)), error.localizedDescription)
                     }
-                } else if let error = error {
-                    self.healthKitTimestampUpdateQueue.async {
-                        self.timeStampsOfBgReadingsCurrentlyBeingSaved.remove(timeStampLastReadingToUpload)
-                    }
-                    trace("failed store reading in healthkit, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, troubleshooting: .detailed(.integration(name: .healthKit, activity: .failed)), error.localizedDescription)
                 }
         })
     }

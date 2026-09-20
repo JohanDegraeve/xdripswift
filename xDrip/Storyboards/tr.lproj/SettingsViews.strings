@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Ayarlar";
-"settingsviews_glucoseDisplaySectionTitle" = "Görünüm";
+"settingsviews_glucoseDisplaySectionTitle" = "Genel";
 "settingsviews_glucoseRangesSectionTitle" = "Glikoz Aralıkları";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Uyarılar ve Bildirimler";
 "settingsviews_sharingAndServicesSectionTitle" = "Paylaşım ve Servisler";
@@ -66,7 +66,8 @@
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Yükleme Seçenekleri";
 "settingsviews_nightscoutEnabled" = "Nightscout etkinleştirilsin mi";
 "settingsviews_nightscoutUrl" = "URL";
-"settingsviews_useSchedule" = "Yükleme Takvimi Kullanılsın mı";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "Zamanlamayı etkinleştir";
 "schedule" = "Yükleme Takvimi";
 "settingsviews_giveNightscoutUrl" = "Nightscout URL'nizi girin";
 "settingsviews_nightscoutAPIKey" = "API_SECRET";
@@ -486,3 +487,53 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Grafik";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Temel";
 "settingsviews_liveActivitySectionTitle" = "Canlı Etkinlik";
+"settingsviews_dexcomG7Message" = "Bluetooth adını boş bırakın. Sonraki ekranda sensörü otomatik olarak aramak için Tara’ya dokunun.\n\nSensör daha önce Ayarlar > Bluetooth bölümünde göründüyse Bluetooth adını elle girebilirsiniz.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Karbonhidrat Süresi";
+"therapy.local" = "Yerel olarak hesaplanır";
+
+"settingsviews_showOriginalBGReadings" = "Orijinal Değerleri Göster";
+
+"therapy.insulinType" = "İnsülin Türü";
+
+"therapy.showIOBCOB" = "IOB/COB göster";
+
+"therapy.treatmentSettings" = "Tedaviler";
+
+"therapy.settingsHelp" = "Kaydedilen tedavilerden kalan insülin ve karbonhidrat miktarını tahmin etmek için kullanılır.";
+
+"therapy.settingsLocal" = "Bu ayarlar, yalnızca değerler bir AID sistemi tarafından sağlanmadığında kayıtlı tedavilerden IOB ve COB tahmini yapar.";
+"therapy.settingsExternal" = "IOB ve COB, %@ tabanlı AID sisteminiz tarafından sağlandığı için bu seçenekler devre dışıdır.";
+"therapy.settingsMixed" = "%@ IOB sağladığından insülin türü otomatiktir. Karbonhidrat süresi kayıtlı öğünlerden yerel COB tahmini için kullanılır.";
+"therapy.insulinModel" = "%@ insülin modeli seçildi. İnsülin Etki Süresi (DIA): %@. İnsülin Tepe Etkisine Kadar Geçen Süre: %@.";
+"therapy.carbFast" = "Daha hızlı karbonhidrat emilimi. Emilim başlamadan önce 10 dakikalık gecikme içerir.";
+"therapy.carbNormal" = "Normal karbonhidrat emilimi. Emilim başlamadan önce 10 dakikalık gecikme içerir.";
+"therapy.carbLong" = "Daha uzun karbonhidrat emilimi. GLP-1 ilaçları sindirimi yavaşlattığında yararlı olabilir. Emilim başlamadan önce 10 dakikalık gecikme içerir.";
+"therapy.automatic" = "Otomatik";
+
+"therapy.liveActivityMetricsFooter" = "Kullanılabilir IOB ve COB değerlerini büyük kilit ekranı düzeninde ve CarPlay/Akıllı Gruplama grafik düzeninde göster.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB için kaydedilmiş insülin veya karbonhidrat tedavileri ya da bağlı bir AID sisteminden gelen veriler gerekir.";
+
+"homeScreen.renderBasalDownwards" = "Bazalı Aşağı Doğru Göster";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "Etkin";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "Etkin değil";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "Zamanlama";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "Etkinleştirme saati";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "Devre dışı bırakma saati";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "Glikozu sesli okuma açıkken ölçümler yalnızca bu saatler arasında okunur. Zamanlama telefonun yerel saatine göre her gün tekrarlanır ve gece yarısını aşabilir. Kestirmeler yalnızca glikozu sesli okuma anahtarını değiştirir.";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "Etkinleştirme ve devre dışı bırakma için farklı saatler seçin.";

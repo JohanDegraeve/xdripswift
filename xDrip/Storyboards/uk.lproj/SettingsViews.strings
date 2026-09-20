@@ -137,8 +137,8 @@
 /// M5 stack bluetooth  settings, pop up that asks user to enter the password
 "m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth Password";
 
-/// nightscout settings, where user can select to use schedule or not
-"settingsviews_useSchedule" = "Use Upload Schedule";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "Увімкнути розклад";
 
 /// speak settings, where user can select the language
 "settingsviews_speakBgReadingslanguage" = "Language";
@@ -241,7 +241,7 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
-"settingsviews_glucoseDisplaySectionTitle" = "Відображення";
+"settingsviews_glucoseDisplaySectionTitle" = "Загальні";
 "settingsviews_glucoseRangesSectionTitle" = "Діапазони глюкози";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Оповіщення та сповіщення";
 "settingsviews_sharingAndServicesSectionTitle" = "Обмін і сервіси";
@@ -694,3 +694,53 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Графік";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Базовий";
 "settingsviews_liveActivitySectionTitle" = "Дія наживо";
+"settingsviews_dexcomG7Message" = "Залиште ім’я Bluetooth порожнім. На наступному екрані натисніть Сканувати для автоматичного пошуку сенсора.\n\nЯкщо сенсор уже відображався в Параметри > Bluetooth, його ім’я Bluetooth можна ввести вручну.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Час Засвоєння Вуглеводів";
+"therapy.local" = "Розраховується локально";
+
+"settingsviews_showOriginalBGReadings" = "Показувати Початкові Значення";
+
+"therapy.insulinType" = "Тип Інсуліну";
+
+"therapy.showIOBCOB" = "Показувати IOB/COB";
+
+"therapy.treatmentSettings" = "Терапія";
+
+"therapy.settingsHelp" = "Використовуються для оцінки залишкового інсуліну та вуглеводів за записаними введеннями й прийомами їжі.";
+
+"therapy.settingsLocal" = "Ці налаштування оцінюють IOB і COB за записаними введеннями й прийомами їжі, лише коли система AID не надає цих значень.";
+"therapy.settingsExternal" = "Ці параметри вимкнено, оскільки ваша система AID на основі %@ надає IOB і COB.";
+"therapy.settingsMixed" = "%@ надає IOB, тому тип інсуліну визначається автоматично. Час засвоєння вуглеводів використовується для локальної оцінки COB за записаними прийомами їжі.";
+"therapy.insulinModel" = "Вибрано модель інсуліну %@. Тривалість дії інсуліну (DIA): %@. Час до піку дії інсуліну: %@.";
+"therapy.carbFast" = "Швидше засвоєння вуглеводів. Включає затримку 10 хвилин перед початком.";
+"therapy.carbNormal" = "Звичайне засвоєння вуглеводів. Включає затримку 10 хвилин перед початком.";
+"therapy.carbLong" = "Триваліше засвоєння вуглеводів. Може бути корисним, якщо препарати GLP-1 уповільнюють травлення. Включає затримку 10 хвилин перед початком.";
+"therapy.automatic" = "Автоматично";
+
+"therapy.liveActivityMetricsFooter" = "Показувати доступні IOB і COB у великому макеті екрана блокування та в макеті з графіком CarPlay/Смарт-стосу.";
+
+"therapy.liveActivityMetricsUnavailable" = "Для IOB/COB потрібні записи введеного інсуліну чи вуглеводів або дані підключеної системи AID.";
+
+"homeScreen.renderBasalDownwards" = "Відображати базальний інсулін униз";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "Активно";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "Неактивно";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "Розклад";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "Вмикати о";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "Вимикати о";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "Коли озвучування глюкози ввімкнено, показники озвучуються лише в зазначені години. Розклад повторюється щодня за місцевим часом телефона й може переходити через північ. Швидкі команди змінюють лише головний перемикач озвучування глюкози.";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "Виберіть різний час увімкнення та вимкнення.";

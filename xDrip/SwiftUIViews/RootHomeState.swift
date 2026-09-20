@@ -59,8 +59,12 @@ struct RootHomeLoopState {
     var iob = RootHomeMetricState(title: "IOB", value: "- U")
     var cob = RootHomeMetricState(title: "COB", value: "- g")
     var showsCOB = true
+    var showsIOB = true
+    var showsAIDStatus = true
+    var therapyMetrics: TherapyMetricsSnapshot? = nil
     var statusTitle = "-"
-    var statusSystemImage: String?
+    // Carry the shared symbol into the Home strip, landscape and night-lock views without string lookups.
+    var statusSymbol: AIDStatusSymbol?
     var statusColor = ConstantsAppColors.secondaryText
     var statusTimeAgo = ""
     var showsStatusTimeAgo = false
@@ -71,17 +75,83 @@ struct RootHomeLoopState {
     var isHistorical = false
 }
 
+// we removed the original easter egg during the SwiftUI migration, but users asked for it back.
+// let's bring back the sunglasses and Christmas present, with a few more seasonal surprises.
+/// a little surprise when all available readings are in range
+enum RootHomeStatisticsEasterEgg: String, CaseIterable {
+    case sunglasses = "😎"
+    case newYear = "🥳"
+    case halloween = "🎃"
+    case christmas = "🎁"
+}
+
+/// checks when we can show the easter egg and which emoji to use
+enum RootHomeStatisticsEasterEggPolicy {
+    static func easterEgg(low: Double, inRange: Double, high: Double, days: Int,
+                           now: Date, calendar: Calendar,
+                           enabled: Bool = ConstantsStatistics.showInRangeEasterEgg,
+                           minimumHour: Double = ConstantsStatistics.minimumHoursInDayBeforeShowingEasterEgg) -> RootHomeStatisticsEasterEgg? {
+        // use the exact values, as a rounded 100% can still include a few readings outside the range
+        guard enabled, low == 0, high == 0, inRange.isFinite, inRange > 0 else { return nil }
+
+        // Today waits until 16:00 local time, even on days when the clocks change. Longer periods don't need to wait.
+        let components = calendar.dateComponents([.hour, .minute, .second], from: now)
+        let hour = Double(components.hour ?? 0) + Double(components.minute ?? 0) / 60 + Double(components.second ?? 0) / 3600
+        guard days > 0 || hour >= minimumHour else { return nil }
+        return seasonalEasterEgg(now: now, calendar: calendar)
+    }
+
+    /// use today's date for the seasonal surprise, regardless of the selected statistics period
+    static func seasonalEasterEgg(now: Date, calendar: Calendar) -> RootHomeStatisticsEasterEgg {
+        var gregorian = Calendar(identifier: .gregorian)
+        gregorian.timeZone = calendar.timeZone
+        let date = gregorian.dateComponents([.month, .day], from: now)
+        if date.month == 1 && date.day == 1 { return .newYear }
+        if date.month == 10 && date.day == 31 { return .halloween }
+        if date.month == 12, let day = date.day, (23...31).contains(day) { return .christmas }
+        return .sunglasses
+    }
+}
+
+/// keeps track of the settings and local day used when we requested the statistics
+struct RootHomeStatisticsContext: Equatable {
+    let days: Int
+    let range: Int
+    let lowLimit: Double
+    let highLimit: Double
+    let isMgDl: Bool
+    let day: Date?
+    let timeZone: String
+
+    init(days: Int, range: Int, lowLimit: Double, highLimit: Double, isMgDl: Bool,
+         now: Date, calendar: Calendar) {
+        self.days = days
+        self.range = range
+        self.lowLimit = lowLimit
+        self.highLimit = highLimit
+        self.isMgDl = isMgDl
+        // only Today needs a new calculation when we cross midnight
+        day = days == 0 ? calendar.startOfDay(for: now) : nil
+        timeZone = calendar.timeZone.identifier
+    }
+}
+
 /// Calculated statistics and their loading state for the selected period.
 struct RootHomeStatisticsState {
     var low = RootHomeMetricState(title: Texts_Common.lowStatistics, value: "-")
     var inRange = RootHomeMetricState(title: UserDefaults.standard.timeInRangeType.title, value: "-")
     var high = RootHomeMetricState(title: Texts_Common.highStatistics, value: "-")
+    /// Exact values retained for pie geometry. Display text uses the jointly allocated integers.
+    var lowPercentage = 0.0
+    var inRangePercentage = 0.0
+    var highPercentage = 0.0
     var average = RootHomeMetricState(title: Texts_Common.averageStatistics, value: "-")
     var a1c = RootHomeMetricState(title: Texts_Common.a1cStatistics, value: "-")
     var cv = RootHomeMetricState(title: Texts_Common.cvStatistics, value: "-")
     var lowLimitText = ""
     var highLimitText = ""
     var showsActivityIndicator = false
+    var easterEgg: RootHomeStatisticsEasterEgg?
 }
 
 /// Picker values and labels for the selected statistics calculation period.
@@ -121,6 +191,7 @@ struct RootHomeSensorNoiseState {
 /// Current data-source description and connection indicators.
 struct RootHomeDataSourceState {
     var title = ""
+    var dexcomConnectionMode: DexcomConnectionMode?
     var detail = ""
     var detailColor = ConstantsAppColors.secondaryText
     var detailSystemImage: String?
@@ -240,9 +311,13 @@ final class RootHomeStateModel: ObservableObject {
         var newState = state
         newState.glucose = glucoseState(from: latestReadings)
         newState.pump = pumpState(deviceStatus: deviceStatus, latestSiteChangeDate: latestSiteChangeDate)
-        newState.loop = dataFlowPolicy.importsTherapyFromCareLink
-            ? careLinkLoopState(snapshot: careLinkSnapshot)
-            : loopState(deviceStatus: deviceStatus)
+        if dataFlowPolicy.importsTherapyFromCareLink {
+            newState.loop = careLinkLoopState(snapshot: careLinkSnapshot)
+        } else if dataFlowPolicy.importsStatusFromNightscout {
+            newState.loop = loopState(deviceStatus: deviceStatus)
+        } else {
+            newState.loop = RootHomeLoopState()
+        }
         newState.sensor = sensorState(activeSensor: activeSensor, cgmTransmitter: cgmTransmitter)
         newState.sensorNoise = sensorNoiseState(activeSensor: activeSensor)
         newState.dataSource = dataSourceState(
@@ -251,11 +326,17 @@ final class RootHomeStateModel: ObservableObject {
             cgmTransmitter: cgmTransmitter,
             connectionStatus: cgmConnectionStatus
         )
-        newState.visibility = visibilityState(sensorState: newState.sensor, usesScreenLockNightLayout: usesScreenLockNightLayout)
+        newState.visibility = visibilityState(
+            sensorState: newState.sensor,
+            careLinkSnapshot: careLinkSnapshot,
+            usesScreenLockNightLayout: usesScreenLockNightLayout
+        )
         newState.controls = controlsState(alertManager: alertManager, bgPostProcessingManager: bgPostProcessingManager)
         newState.isScreenLocked = isScreenLocked
         newState.usesScreenLockNightLayout = usesScreenLockNightLayout
 
+        applyTherapyMetrics(to: &newState.loop)
+        newState.visibility.showsLoop = !usesScreenLockNightLayout && (newState.loop.showsIOB || newState.loop.showsCOB || newState.visibility.showsLoop)
         publish(newState)
     }
 
@@ -284,18 +365,42 @@ final class RootHomeStateModel: ObservableObject {
                 deviceStatus: deviceStatus,
                 latestSiteChangeDate: latestSiteChangeDate
             )
-            state.loop = dataFlowPolicy.importsTherapyFromCareLink
-                ? self.careLinkLoopState(snapshot: careLinkSnapshot)
-                : self.loopState(deviceStatus: deviceStatus)
+            if dataFlowPolicy.importsTherapyFromCareLink {
+                state.loop = self.careLinkLoopState(snapshot: careLinkSnapshot)
+                // A CareLink poll can change from unknown to pump, IOB-only or glucose-only without
+                // rebuilding the rest of Home, so update both dependent visibility flags here too.
+                state.visibility.showsPump = careLinkSnapshot.pump.isReported && !state.usesScreenLockNightLayout
+                state.visibility.showsLoop = careLinkSnapshot.aidStatus != nil && !state.usesScreenLockNightLayout
+            } else if dataFlowPolicy.importsStatusFromNightscout {
+                state.loop = self.loopState(deviceStatus: deviceStatus)
+            } else {
+                state.loop = RootHomeLoopState()
+            }
+            self.applyTherapyMetrics(to: &state.loop)
+            state.visibility.showsLoop = !state.usesScreenLockNightLayout && (state.loop.showsIOB || state.loop.showsCOB || state.loop.showsAIDStatus)
         }
+    }
+
+    func applyTherapyMetrics(to loop: inout RootHomeLoopState, at date: Date = .now, external: AIDStatus? = nil, historical: Bool = false) {
+        let metrics = TherapyMetricsManager.shared.snapshot(at: date, external: external, historical: historical)
+        loop.therapyMetrics = metrics
+        loop.showsIOB = metrics.iob.isVisible(at: date)
+        loop.showsCOB = metrics.cob.isVisible(at: date)
+        loop.showsAIDStatus = UserDefaults.standard.dataFlowPolicy.showsTherapyStatus
+        loop.iob.value = metrics.iob.formatted(isIOB: true, at: date)
+        loop.cob.value = metrics.cob.formatted(isIOB: false, at: date)
     }
 
     func setStatisticsLoading() {
         updateState { state in
+            state.statistics.easterEgg = nil
             state.statistics.showsActivityIndicator = state.statistics.average.value != "-"
             state.statistics.low.value = "-"
             state.statistics.inRange.value = "-"
             state.statistics.high.value = "-"
+            state.statistics.lowPercentage = 0
+            state.statistics.inRangePercentage = 0
+            state.statistics.highPercentage = 0
             state.statistics.average.value = "-"
             state.statistics.a1c.value = "-"
             state.statistics.cv.value = "-"
@@ -310,6 +415,12 @@ final class RootHomeStateModel: ObservableObject {
             ? statistics.averageStatisticValue.bgValueToString(mgDl: isMgDl) + " " + glucoseUnit
             : "-"
         let a1cValue: String
+        let rangeDistribution = GlucoseRangeDistribution(
+            below: statistics.lowStatisticValue,
+            inRange: statistics.inRangeStatisticValue,
+            above: statistics.highStatisticValue
+        )
+        let wholePercentages = rangeDistribution.wholePercentages
 
         if statistics.a1CStatisticValue.value <= 0 {
             a1cValue = "-"
@@ -321,15 +432,29 @@ final class RootHomeStateModel: ObservableObject {
 
         updateState { state in
             state.statistics = RootHomeStatisticsState(
-                low: RootHomeMetricState(title: Texts_Common.lowStatistics, value: "\(Int(statistics.lowStatisticValue.round(toDecimalPlaces: 0)))%", valueColor: ConstantsAppColors.statisticsLow),
-                inRange: RootHomeMetricState(title: UserDefaults.standard.timeInRangeType.title, value: "\(Int(statistics.inRangeStatisticValue.round(toDecimalPlaces: 0)))%", valueColor: ConstantsAppColors.statisticsInRange),
-                high: RootHomeMetricState(title: Texts_Common.highStatistics, value: "\(Int(statistics.highStatisticValue.round(toDecimalPlaces: 0)))%", valueColor: ConstantsAppColors.statisticsHigh),
+                low: RootHomeMetricState(title: Texts_Common.lowStatistics, value: "\(wholePercentages[0])%", valueColor: ConstantsAppColors.statisticsLow),
+                inRange: RootHomeMetricState(title: UserDefaults.standard.timeInRangeType.title, value: "\(wholePercentages[1])%", valueColor: ConstantsAppColors.statisticsInRange),
+                high: RootHomeMetricState(title: Texts_Common.highStatistics, value: "\(wholePercentages[2])%", valueColor: ConstantsAppColors.statisticsHigh),
+                lowPercentage: rangeDistribution.belowPercentage,
+                inRangePercentage: rangeDistribution.inRangePercentage,
+                highPercentage: rangeDistribution.abovePercentage,
                 average: RootHomeMetricState(title: Texts_Common.averageStatistics, value: averageValue),
                 a1c: RootHomeMetricState(title: Texts_Common.a1cStatistics, value: a1cValue),
                 cv: RootHomeMetricState(title: Texts_Common.cvStatistics, value: statistics.cVStatisticValue.value > 0 ? "\(Int(statistics.cVStatisticValue.round(toDecimalPlaces: 0)))%" : "-"),
                 lowLimitText: "(<\(self.formattedLimit(statistics.lowLimitForTIR, isMgDl: isMgDl)))",
                 highLimitText: "(>\(self.formattedLimit(statistics.highLimitForTIR, isMgDl: isMgDl)))",
                 showsActivityIndicator: false
+            )
+        }
+    }
+
+    /// recheck the easter egg when the time changes, without recalculating the statistics
+    func updateStatisticsEasterEgg(days: Int, now: Date, calendar: Calendar) {
+        updateState { state in
+            let statistics = state.statistics
+            state.statistics.easterEgg = statistics.showsActivityIndicator ? nil : RootHomeStatisticsEasterEggPolicy.easterEgg(
+                low: statistics.lowPercentage, inRange: statistics.inRangePercentage,
+                high: statistics.highPercentage, days: days, now: now, calendar: calendar
             )
         }
     }
@@ -499,7 +624,8 @@ final class RootHomeStateModel: ObservableObject {
 
     /// Presents CareLink pump activity without pretending it is a Nightscout OS-AID loop record.
     func careLinkLoopState(snapshot: CareLinkStatusSnapshot, referenceDate: Date = .now) -> RootHomeLoopState {
-        rootHomeLoopState(aidStatus: snapshot.aidStatus, referenceDate: referenceDate)
+        guard let aidStatus = snapshot.aidStatus else { return RootHomeLoopState() }
+        return rootHomeLoopState(aidStatus: aidStatus, referenceDate: referenceDate)
     }
 
     /// Applies source capabilities after a status has been selected for the historical strip.
@@ -558,7 +684,7 @@ final class RootHomeStateModel: ObservableObject {
             // metric for Nightscout loops, whose device status contains algorithm-calculated COB.
             showsCOB: aidStatus.supportsCOB,
             statusTitle: presentation.title,
-            statusSystemImage: presentation.systemImage,
+            statusSymbol: presentation.symbol,
             statusColor: presentation.color,
             statusTimeAgo: statusTimeAgo,
             showsStatusTimeAgo: !statusTimeAgo.isEmpty,
@@ -644,7 +770,7 @@ final class RootHomeStateModel: ObservableObject {
         }
 
         return RootHomeSensorState(
-            title: description + (cgmTransmitter?.isAnubisG6() == true ? " (Anubis)" : ""),
+            title: cgmTransmitter?.isAnubisG6() == true ? DexcomProductNameResolver.anubisTitle : description,
             currentAge: currentAge,
             maxAge: maximumAge,
             currentAgeColor: sensorAgeColor(timeLeftInMinutes: timeLeftInMinutes),
@@ -667,6 +793,17 @@ final class RootHomeStateModel: ObservableObject {
         var detailSystemImage: String?
         var detailSystemImageColor = ConstantsAppColors.secondaryText
         var detailSystemImageAccessibilityLabel = ""
+        let dexcomConnectionMode: DexcomConnectionMode?
+
+        if activeSensor == nil {
+            dexcomConnectionMode = nil
+        } else if let transmitter = cgmTransmitter as? CGMG5Transmitter {
+            dexcomConnectionMode = DexcomConnectionMode(useOtherApp: transmitter.useOtherApp)
+        } else if let transmitter = cgmTransmitter as? CGMG7Transmitter {
+            dexcomConnectionMode = DexcomConnectionMode(useOtherApp: transmitter.useOtherApp)
+        } else {
+            dexcomConnectionMode = nil
+        }
 
         if isMaster, sensorState.title.isEmpty {
             if cgmTransmitter?.cgmTransmitterType().sensorType() == .Libre, activeSensor?.startDate != nil {
@@ -766,6 +903,7 @@ final class RootHomeStateModel: ObservableObject {
 
         return RootHomeDataSourceState(
             title: title,
+            dexcomConnectionMode: isMaster ? dexcomConnectionMode : nil,
             detail: detail,
             detailColor: detailColor,
             detailSystemImage: detailSystemImage,
@@ -868,12 +1006,24 @@ final class RootHomeStateModel: ObservableObject {
 
     // MARK: - Visibility and Controls
 
-    private func visibilityState(sensorState: RootHomeSensorState, usesScreenLockNightLayout: Bool) -> RootHomeVisibilityState {
+    private func visibilityState(
+        sensorState: RootHomeSensorState,
+        careLinkSnapshot: CareLinkStatusSnapshot,
+        usesScreenLockNightLayout: Bool
+    ) -> RootHomeVisibilityState {
         let dataFlowPolicy = UserDefaults.standard.dataFlowPolicy
+        // CareLink capabilities come from each response: pump, IOB-only and glucose-only accounts
+        // share one follower selection but must not reserve the same Home rows.
+        let showsPump = dataFlowPolicy.importsTherapyFromCareLink
+            ? careLinkSnapshot.pump.isReported
+            : dataFlowPolicy.showsPumpData
+        let showsTherapyStatus = dataFlowPolicy.importsTherapyFromCareLink
+            ? careLinkSnapshot.aidStatus != nil
+            : dataFlowPolicy.showsTherapyStatus
 
         return RootHomeVisibilityState(
-            showsPump: dataFlowPolicy.showsPumpData && !usesScreenLockNightLayout,
-            showsLoop: dataFlowPolicy.showsTherapyStatus && !usesScreenLockNightLayout,
+            showsPump: showsPump && !usesScreenLockNightLayout,
+            showsLoop: showsTherapyStatus && !usesScreenLockNightLayout,
             showsMiniChart: UserDefaults.standard.showMiniChart && !usesScreenLockNightLayout,
             showsStatistics: UserDefaults.standard.showStatistics && !usesScreenLockNightLayout,
             showsSensor: !sensorState.maxAge.isEmpty && !usesScreenLockNightLayout,

@@ -50,7 +50,7 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Einstellungen";
-"settingsviews_glucoseDisplaySectionTitle" = "Anzeige";
+"settingsviews_glucoseDisplaySectionTitle" = "Allgemein";
 "settingsviews_glucoseRangesSectionTitle" = "Glukosebereiche";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alarme und Mitteilungen";
 "settingsviews_sharingAndServicesSectionTitle" = "Teilen und Dienste";
@@ -249,8 +249,8 @@
 /// speak settings, where user can select the language
 "settingsviews_speakBgReadingslanguage" = "Sprache";
 
-/// nightscout settings, where user can select to use schedule or not
-"settingsviews_useSchedule" = "Upload Planer nutzen";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "Zeitplan aktivieren";
 
 /// about settings, section title
 "settingsviews_sectiontitleAbout" = "Über %@";
@@ -714,3 +714,53 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Diagramm";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Einfach";
 "settingsviews_liveActivitySectionTitle" = "Live-Aktivität";
+"settingsviews_dexcomG7Message" = "Lasse den Bluetooth-Namen leer. Tippe im nächsten Bildschirm auf Scannen, um automatisch nach dem Sensor zu suchen.\n\nWenn der Sensor bereits unter Einstellungen > Bluetooth angezeigt wurde, kannst du seinen Bluetooth-Namen manuell eingeben.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Kohlenhydratdauer";
+"therapy.local" = "Lokal berechnet";
+
+"settingsviews_showOriginalBGReadings" = "Originalwerte Anzeigen";
+
+"therapy.insulinType" = "Insulintyp";
+
+"therapy.showIOBCOB" = "IOB/COB anzeigen";
+
+"therapy.treatmentSettings" = "Behandlungen";
+
+"therapy.settingsHelp" = "Dienen zur Schätzung des verbleibenden Insulins und der Kohlenhydrate aus aufgezeichneten Behandlungen.";
+
+"therapy.settingsLocal" = "Diese Einstellungen schätzen IOB und COB aus erfassten Behandlungen nur, wenn kein AID-System diese Werte liefert.";
+"therapy.settingsExternal" = "Diese Optionen sind deaktiviert, da Ihr auf %@ basierendes AID-System IOB und COB liefert.";
+"therapy.settingsMixed" = "%@ liefert IOB, daher ist der Insulintyp automatisch. Die Kohlenhydratdauer dient zur lokalen COB-Schätzung aus erfassten Mahlzeiten.";
+"therapy.insulinModel" = "Insulinmodell %@ ausgewählt. Insulinwirkdauer (DIA): %@. Zeit bis zum Insulinwirkmaximum: %@.";
+"therapy.carbFast" = "Schnellere Kohlenhydrataufnahme. Enthält eine Verzögerung von 10 Minuten vor Beginn.";
+"therapy.carbNormal" = "Normale Kohlenhydrataufnahme. Enthält eine Verzögerung von 10 Minuten vor Beginn.";
+"therapy.carbLong" = "Längere Kohlenhydrataufnahme. Kann hilfreich sein, wenn GLP-1-Medikamente die Verdauung verlangsamen. Enthält eine Verzögerung von 10 Minuten vor Beginn.";
+"therapy.automatic" = "Automatisch";
+
+"therapy.liveActivityMetricsFooter" = "Verfügbare IOB- und COB-Werte im großen Sperrbildschirm-Layout und im Diagramm-Layout von CarPlay/Smart-Stapel anzeigen.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB erfordert erfasste Insulin- oder Kohlenhydratbehandlungen oder Daten eines verbundenen AID-Systems.";
+
+"homeScreen.renderBasalDownwards" = "Basalrate nach unten darstellen";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "Aktiv";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "Inaktiv";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "Zeitplan";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "Aktivieren um";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "Deaktivieren um";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "Wenn die Glukose-Sprachausgabe eingeschaltet ist, werden Messwerte nur innerhalb dieser Zeiten vorgelesen. Der Zeitplan wiederholt sich täglich nach der Ortszeit des Telefons und kann über Mitternacht hinausgehen. Kurzbefehle ändern nur den Hauptschalter der Glukose-Sprachausgabe.";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "Wähle unterschiedliche Zeiten zum Aktivieren und Deaktivieren.";

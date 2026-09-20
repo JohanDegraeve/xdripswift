@@ -4,7 +4,114 @@
 //
 
 import XCTest
+import CoreBluetooth
 @testable import xdrip
+
+/// Generic heartbeat policy tests need no sensor and never alter the app's real preferences.
+final class GenericHeartbeatSubscriptionTests: XCTestCase {
+    private func channel(_ uuid: String, _ properties: CBCharacteristicProperties = .notify, service: String = "1234") -> GenericHeartbeatChannel {
+        GenericHeartbeatChannel(service: service, characteristic: uuid, properties: properties)
+    }
+
+    func testCapabilityFilteringAndDeterministicRanking() {
+        // Standard measurements win over arbitrary notify channels, then indication-only channels.
+        let candidates = [channel("3333", .indicate), channel("1111"), channel("2AA7"), channel("2222", .read), channel("2A19", [.read, .notify], service: "180F")]
+        let expected = ["1234/2AA7", "1234/1111", "1234/3333"]
+        XCTAssertEqual(GenericHeartbeatChannel.ordered(candidates).map(\.id), expected)
+        XCTAssertEqual(GenericHeartbeatChannel.ordered(candidates.reversed()).map(\.id), expected)
+    }
+
+    func testDuplicateUUIDPairsAreExcluded() {
+        // A UUID pair must identify one physical characteristic, even in All mode.
+        XCTAssertTrue(GenericHeartbeatChannel.ordered([channel("2222"), channel("2222")]).isEmpty)
+    }
+
+    func testAutomaticFallbackRequiresExplicitFailureAndStopsAfterSuccess() {
+        // Silence leaves the first request pending; only its explicit failure opens the next candidate.
+        var state = GenericHeartbeatSubscriptions()
+        XCTAssertEqual(state.next(["a", "b"], mode: .automatic), ["a"])
+        XCTAssertTrue(state.next(["a", "b"], mode: .automatic).isEmpty)
+        XCTAssertEqual(state.outcome, "pending")
+        XCTAssertTrue(state.complete("a", success: false))
+        XCTAssertEqual(state.next(["a", "b"], mode: .automatic), ["b"])
+        // A duplicate failure must not abandon the channel currently awaiting confirmation.
+        XCTAssertFalse(state.complete("a", success: false))
+        XCTAssertTrue(state.complete("b", success: true))
+        XCTAssertTrue(state.next(["a", "b", "c"], mode: .automatic).isEmpty)
+        XCTAssertEqual(state.outcome, "subscribed")
+    }
+
+    func testExhaustionAndSessionResetAreBounded() {
+        // Exhausted candidates stay exhausted for this connection, without a retry loop.
+        var state = GenericHeartbeatSubscriptions()
+        XCTAssertEqual(state.next(["a"], mode: .automatic), ["a"])
+        state.complete("a", success: false)
+        XCTAssertTrue(state.next(["a"], mode: .automatic).isEmpty)
+        XCTAssertEqual(state.outcome, "failed")
+        // A new connection discards the old pending confirmations before discovery resumes.
+        state = GenericHeartbeatSubscriptions()
+        XCTAssertFalse(state.complete("a", success: true))
+        XCTAssertEqual(state.next(["a"], mode: .automatic), ["a"])
+    }
+
+    func testCompatibilityModeRequestsEachSupportedChannelOnlyOnce() {
+        // All may request multiple channels, but repeated discovery must not request them again.
+        var state = GenericHeartbeatSubscriptions()
+        XCTAssertEqual(state.next(["a", "b"], mode: .all), ["a", "b"])
+        state.complete("a", success: true)
+        XCTAssertTrue(state.next(["a", "b"], mode: .all).isEmpty)
+        state.complete("b", success: false)
+        XCTAssertEqual(state.subscribed, ["a"])
+    }
+
+    func testPerDevicePersistenceDefaultsAndRemoval() throws {
+        // Isolate storage and clean up even when an assertion fails.
+        let suite = "GenericHeartbeatTests." + UUID().uuidString
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        XCTAssertEqual(GenericHeartbeatSettings.load("one", defaults: defaults), GenericHeartbeatSettings())
+        var settings = GenericHeartbeatSettings()
+        // Decode the old experimental format without reviving manual or battery controls.
+        defaults.set(Data(#"{"mode":"selected","characteristic":"1234/2AA7","readBattery":false}"#.utf8), forKey: "genericHeartbeat.ONE")
+        settings.mode = .automatic
+        XCTAssertEqual(GenericHeartbeatSettings.load("ONE", defaults: defaults), settings)
+        XCTAssertEqual(GenericHeartbeatSettings.load("one", defaults: defaults), settings)
+        // Saving the simplified format must round-trip the existing Single choice.
+        settings.save("one", defaults: defaults)
+        XCTAssertEqual(GenericHeartbeatSettings.load("ONE", defaults: defaults), settings)
+        XCTAssertEqual(GenericHeartbeatSettings.load("two", defaults: defaults), GenericHeartbeatSettings())
+        GenericHeartbeatSettings.remove("one", defaults: defaults)
+        XCTAssertEqual(GenericHeartbeatSettings.load("one", defaults: defaults), GenericHeartbeatSettings())
+        defaults.set(Data("invalid".utf8), forKey: "genericHeartbeat.ONE")
+        XCTAssertEqual(GenericHeartbeatSettings.load("one", defaults: defaults), GenericHeartbeatSettings())
+    }
+
+    func testSimplifiedPickerContainsOnlyCompatibleAndAutomaticModes() {
+        // The persisted automatic value represents Single; no hidden third mode remains.
+        XCTAssertEqual(GenericHeartbeatSettings.Mode.allCases, [.all, .automatic])
+    }
+
+    func testSupportLabelsMatchTheTwoSubscriptionChoices() {
+        // Keep support files readable without renaming the persisted automatic preference.
+        XCTAssertEqual(GenericHeartbeatSettings.Mode.automatic.rawValue, "automatic")
+        XCTAssertEqual(GenericHeartbeatSettings.Mode.automatic.logDescription, "Single")
+        XCTAssertEqual(GenericHeartbeatSettings.Mode.all.logDescription, "All")
+    }
+
+    func testUnexpectedStateChangesDoNotCompletePendingRequests() {
+        var state = GenericHeartbeatSubscriptions()
+        XCTAssertEqual(state.next(["a", "b"], mode: .automatic), ["a"])
+        // An unsolicited channel may become active, but must not consume the pending request.
+        state.observe("b", isNotifying: true)
+        XCTAssertEqual(state.pending, ["a"])
+        XCTAssertEqual(state.subscribed, ["b"])
+        XCTAssertFalse(state.complete("b", success: false))
+        state.observe("b", isNotifying: false)
+        XCTAssertTrue(state.subscribed.isEmpty)
+        XCTAssertEqual(state.pending, ["a"])
+        XCTAssertTrue(state.next(["a", "b"], mode: .automatic).isEmpty)
+    }
+}
 
 final class BluetoothPeripheralDisplayStatusTests: XCTestCase {
     func testConnectedTakesPrecedenceOverEveryOtherInput() {

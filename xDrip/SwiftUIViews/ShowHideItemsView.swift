@@ -21,7 +21,9 @@ struct ShowHideItemsView: View {
     @State private var showOriginalBGReadings = UserDefaults.standard.showOriginalBGReadings
     @State private var showTreatmentsOnChart = UserDefaults.standard.showTreatmentsOnChart
     @State private var showSensorNoise = UserDefaults.standard.showSensorNoise
-    @State private var speakReadings = UserDefaults.standard.speakReadings
+    @AppStorage("showIOBCOB") private var showIOBCOB = UserDefaults.standard.showIOBCOB
+    // Observe the stored preference so Home Screen quick actions also update an open sheet.
+    @AppStorage(UserDefaults.Key.speakReadings.rawValue) private var speakReadings = false
     @AppStorage(UserDefaults.Key.preferLargeSnoozeScreen.rawValue) private var preferLargeSnoozeScreen = true
     @AppStorage(UserDefaults.KeysCharts.chartWidthInHours.rawValue) private var chartWidthInHours = ConstantsGlucoseChart.defaultChartWidthInHours
     
@@ -37,6 +39,8 @@ struct ShowHideItemsView: View {
             VStack {
                 List {
                     Section(header: Text(Texts_HomeView.showHideGlucoseChartTitle)) {
+                        Toggle(TherapyTexts.text("showIOBCOB"), isOn: $showIOBCOB)
+
                         Toggle(Texts_SettingsView.showOriginalBGReadings, isOn: $showOriginalBGReadings)
                             .onChange(of: showOriginalBGReadings) { newValue in
                                 UserDefaults.standard.showOriginalBGReadings = newValue
@@ -77,9 +81,6 @@ struct ShowHideItemsView: View {
                     
                     Section(header: Text(Texts_HomeView.showHideAdditionalItemsTitle)) {
                         Toggle(Texts_SettingsView.labelSpeakBgReadings, isOn: $speakReadings)
-                            .onChange(of: speakReadings) { newValue in
-                                UserDefaults.standard.speakReadings = newValue
-                            }
 
                         // Uses the same stored preference as the full Alarms settings screen.
                         Toggle(Texts_SettingsView.preferLargeSnoozeScreen, isOn: $preferLargeSnoozeScreen)

@@ -127,4 +127,24 @@ final class Libre2ProtocolTests: XCTestCase {
             XCTAssertEqual(reopened.previousTemperatureAdjustmentValues, state.previousTemperatureAdjustmentValues)
         }
     }
+    func testPhoneAdapterPreservesArrivalDateAndCommitsHistory() throws {
+        let suite = "Libre2ProtocolTests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        defaults.libre1DerivedAlgorithmParameters = calibration
+        let sensor = Libre2PhoneSensor(serialNumber: "test", webOOPEnabled: true, defaults: defaults)
+        let result = try XCTUnwrap(sensor.parseBLEFrame(frame(age: 100), date: date))
+        XCTAssertEqual(result.bleGlucose.first?.timeStamp, date)
+        XCTAssertEqual(defaults.previousRawGlucoseValues?.first, 1100)
+        // A second delivery sees the committed overlap state and detects a repeated frame.
+        XCTAssertTrue(try XCTUnwrap(sensor.parseBLEFrame(frame(age: 100), date: date)).bleGlucose.isEmpty)
+    }
+
+    func testIncompleteHistoryCannotHideValidFrameAsExpired() {
+        var state = Libre2BLEUtilities.ParserState()
+        _ = parse(frame(age: 100), state: &state)
+        state.previousRawTemperatureValues = nil
+        XCTAssertFalse(parse(frame(age: 100), state: &state).isEmpty)
+    }
+
 }

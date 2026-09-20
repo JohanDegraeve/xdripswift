@@ -13,3 +13,4 @@
 
 "singlePointCalibration" = "Standard";
 "multiPointCalibration" = "Multi-Punkt";
+"previousCalibrationPrefillMessage" = "Deine vorherige Kalibrierung von %@ ist vorausgefüllt. Vergleiche sie vor dem Bestätigen mit deinem aktuellen Blutzuckermesswert.";

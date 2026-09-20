@@ -32,6 +32,21 @@ struct NotLoopingDeviceStatus: Sendable {
     }
 }
 
+/// Defines the short settling period during which an initially low Dexcom battery value is not a
+/// reliable indication of the battery's usable state.
+struct DexcomBatteryAlertPolicy {
+    /// A missing start date is treated as still inside the settling period. In particular, a G6
+    /// battery response can arrive before its transmitter-time response during the first message
+    /// flow. Allowing the alarm at that point would recreate the false warning this policy prevents.
+    static func shouldSuppress(hardwareStartDate: Date?, now: Date = Date()) -> Bool {
+        guard let hardwareStartDate else { return true }
+        let suppressionInterval = TimeInterval(
+            ConstantsAlerts.dexcomBatteryAlertSuppressionPeriodInHours * 60 * 60
+        )
+        return now < hardwareStartDate.addingTimeInterval(suppressionInterval)
+    }
+}
+
 /// low, high, very low, very high, ...
 public enum AlertKind: Int, CaseIterable {
     // when adding alertkinds, add new cases at the end (ie 9, ...)
@@ -53,69 +68,75 @@ public enum AlertKind: Int, CaseIterable {
     /// The event arrives from the active BLE peripheral and fires once through AlertManager.
     /// Recoverable sensor-health episodes never use this AlertKind.
     case sensorTransmitterFailure = 11
+    /// G5, G6 and ONE retain the established long-life transmitter Voltage B alarm.
+    case dexcomG5BatteryLow = 12
+    /// G7, ONE+ and Stelo use the disposable-sensor Voltage B alarm.
+    case dexcomG7BatteryLow = 13
 
-    /// this is used for presentation in UI table view. It allows to order the alert kinds in the view, different than they case ordering, and so allows to add new cases
-    init?(forSection section: Int) {
-        switch section {
-        case 0:
-            self = .verylow
-        case 1:
-            self = .low
-        case 2:
-            self = .fastdrop
-        case 3:
-            self = .high
-        case 4:
-            self = .veryhigh
-        case 5:
-            self = .fastrise
-        case 6:
-            self = .missedreading
-        case 7:
-            self = .notlooping
-        case 8:
-            self = .calibration
-        case 9:
-            self = .batterylow
-        case 10:
-            self = .phonebatterylow
-        case 11:
-            self = .sensorTransmitterFailure
-        default:
-            fatalError("in AlertKind initializer init(forRowAt row: Int), there's no case for the rownumber")
+    /// Returns the single battery configuration that belongs to a configured CGM type.
+    ///
+    /// The three persisted battery alert kinds remain independent so their schedules, sounds and
+    /// thresholds survive when the user changes CGM family. Presentation code must use this
+    /// resolver instead of showing all three configurations at once.
+    static func batteryAlertKind(for transmitterType: CGMTransmitterType?) -> AlertKind? {
+        switch transmitterType {
+        case .dexcom:
+            return .dexcomG5BatteryLow
+        case .dexcomG7:
+            return .dexcomG7BatteryLow
+        case .miaomiao, .Bubble, .Libre2:
+            return .batterylow
+        case .medtrumTouchCareNano, nil:
+            // Medtrum does not currently provide a battery value through TransmitterBatteryInfo.
+            // With no configured CGM there is likewise no meaningful battery alarm to edit.
+            return nil
         }
     }
-    
-    /// gives the raw value of the alertkind for a specific section in a uitableview, is the opposite of the initializer
-    static func alertKindRawValue(forSection section: Int) -> Int {
-        switch section {
-        case 0: // very low
-            return 0
-        case 1: // low
-            return 1
-        case 2: // fast drop
-            return 7
-        case 3: // high
-            return 2
-        case 4: // very high
-            return 3
-        case 5: // fast rise
-            return 8
-        case 6: // missed reading
-            return 4
-        case 7: // not looping
-            return 10
-        case 8: // calibration
-            return 5
-        case 9: // battery low
-            return 6
-        case 10: // phone battery low
-            return 9
-        case 11: // sensor/transmitter failure
-            return 11
-        default:
-            fatalError("in alertKindRawValue, unknown case")
+
+    /// Returns the exact persisted alert kind which owns an incoming battery payload.
+    ///
+    /// Runtime alert evaluation deliberately uses the payload rather than the selected CGM type.
+    /// This prevents a stale selection or an in-progress device change from applying a G5 threshold
+    /// to G7 data, or a voltage threshold to a percentage value.
+    static func batteryAlertKind(for transmitterBatteryInfo: TransmitterBatteryInfo?) -> AlertKind? {
+        switch transmitterBatteryInfo {
+        case .percentage:
+            return .batterylow
+        case .dexcom(let family, _, _, _, _, _):
+            switch family {
+            case .g5:
+                return .dexcomG5BatteryLow
+            case .g7:
+                return .dexcomG7BatteryLow
+            }
+        case nil:
+            return nil
         }
+    }
+
+    /// Defines the alarm order shown in Settings and Snooze for the configured CGM.
+    /// Only the applicable battery configuration is inserted, immediately beside the other device
+    /// alarms, while the inactive family configurations remain safely persisted but hidden.
+    static func visibleAlertKinds(for transmitterType: CGMTransmitterType?) -> [AlertKind] {
+        var kinds: [AlertKind] = [
+            .verylow,
+            .low,
+            .fastdrop,
+            .high,
+            .veryhigh,
+            .fastrise,
+            .missedreading,
+            .notlooping,
+            .calibration,
+            .sensorTransmitterFailure
+        ]
+
+        if let batteryAlertKind = batteryAlertKind(for: transmitterType) {
+            kinds.append(batteryAlertKind)
+        }
+
+        kinds.append(.phonebatterylow)
+        return kinds
     }
     
     /// if true, then this type of alert will (if raised) create an immediate notification which will have the current reading as text - simply means there's no need to create an additional notification with the current reading
@@ -201,6 +222,10 @@ public enum AlertKind: Int, CaseIterable {
             } else {
                 return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelMiaoMiao
             }
+        case .dexcomG5BatteryLow:
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG5
+        case .dexcomG7BatteryLow:
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG7
         case .fastdrop:
             return ConstantsDefaultAlertLevels.fastdrop
         case .fastrise:
@@ -253,6 +278,10 @@ public enum AlertKind: Int, CaseIterable {
             return "calibration"
         case .batterylow:
             return "batterylow"
+        case .dexcomG5BatteryLow:
+            return "dexcomG5BatteryLow"
+        case .dexcomG7BatteryLow:
+            return "dexcomG7BatteryLow"
         case .fastdrop:
             return "fastdrop"
         case .fastrise:
@@ -433,25 +462,20 @@ public enum AlertKind: Int, CaseIterable {
             }
             return (false, nil, nil, nil)
             
-        case .batterylow:
+        case .batterylow, .dexcomG5BatteryLow, .dexcomG7BatteryLow:
             // if alertEntry not enabled, return false
             if !currentAlertEntry.alertType.enabled { return (false, nil, nil, nil) }
                 
             // if transmitterBatteryInfo is nil, return false
             guard let transmitterBatteryInfo = transmitterBatteryInfo else { return (false, nil, nil, nil) }
                 
-            // get level
-            var batteryLevelToCheck: Int?
-                
-            switch transmitterBatteryInfo {
-            case .percentage(let percentage):
-                batteryLevelToCheck = percentage
-            case .DexcomG5(_, let voltageB, _, _, _):
-                batteryLevelToCheck = voltageB
-            }
+            // Each persisted alert kind owns exactly one unit and battery family. Reject a battery
+            // from every other family so the percentage, G5 and G7 alarms cannot all fire for the
+            // same packet.
+            let batteryLevelToCheck = matchingBatteryLevel(from: transmitterBatteryInfo)
 
             if let batteryLevelToCheck = batteryLevelToCheck, currentAlertEntry.value > batteryLevelToCheck {
-                return (true, "", Texts_Alerts.batteryLowAlertTitle, nil)
+                return (true, "", alertTitle(), nil)
             }
                 
             return (false, nil, nil, nil)
@@ -513,6 +537,27 @@ public enum AlertKind: Int, CaseIterable {
             return (false, nil, nil, nil)
         }
     }
+
+    /// Returns a level only when this alert kind owns the supplied battery representation.
+    /// Keeping this routing independent from Core Data makes it directly testable and prevents a
+    /// later alert refactor from reintroducing duplicate G5/G7/percentage notifications.
+    func matchingBatteryLevel(from transmitterBatteryInfo: TransmitterBatteryInfo) -> Int? {
+        switch transmitterBatteryInfo {
+        case .percentage(let percentage):
+            return self == .batterylow ? percentage : nil
+
+        case .dexcom(let family, _, let voltageB, _, _, _):
+            switch (self, family) {
+            case (.dexcomG5BatteryLow, .g5), (.dexcomG7BatteryLow, .g7):
+                // Dexcom uses zero while a real Voltage B value is unavailable. The battery UI
+                // already presents this as unknown, so the alert must not interpret it as an
+                // exceptionally low battery. Negative protocol values are likewise invalid.
+                return voltageB > 0 ? voltageB : nil
+            default:
+                return nil
+            }
+        }
+    }
     
     /// returns notification identifier for local notifications, for specific alertKind.
     func notificationIdentifier() -> String {
@@ -531,6 +576,10 @@ public enum AlertKind: Int, CaseIterable {
             return ConstantsNotifications.NotificationIdentifiersForCalibration.subsequentCalibrationRequest
         case .batterylow:
             return ConstantsNotifications.NotificationIdentifiersForAlerts.batteryLow
+        case .dexcomG5BatteryLow:
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.dexcomG5BatteryLow
+        case .dexcomG7BatteryLow:
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.dexcomG7BatteryLow
         case .fastdrop:
             return ConstantsNotifications.NotificationIdentifiersForAlerts.fastDropAlert
         case .fastrise:
@@ -559,7 +608,9 @@ public enum AlertKind: Int, CaseIterable {
             return Texts_Alerts.missedReadingAlertTitle
         case .calibration:
             return Texts_Alerts.calibrationNeededAlertTitle
-        case .batterylow:
+        case .batterylow, .dexcomG5BatteryLow, .dexcomG7BatteryLow:
+            // Settings exposes one active-family battery alarm. Keep its visible name short and
+            // stable while logging and notification identifiers retain the internal family.
             return Texts_Alerts.batteryLowAlertTitle
         case .fastdrop:
             return Texts_Alerts.fastDropTitle
@@ -571,6 +622,28 @@ public enum AlertKind: Int, CaseIterable {
             return Texts_Alerts.notLoopingAlertTitle
         case .sensorTransmitterFailure:
             return Texts_Alerts.sensorTransmitterFailureAlertTitle
+        }
+    }
+
+    /// Returns the alert title used while configuring or snoozing an alert.
+    ///
+    /// Only one transmitter battery alarm is visible at a time, but the family suffix makes it
+    /// immediately clear which independently persisted threshold is being edited. Percentage-based
+    /// transmitters keep the normal title because they do not share the Dexcom voltage settings.
+    func configurationTitle() -> String {
+        alertTitle() + configurationFamilySuffix()
+    }
+
+    /// Identifies the independently persisted Dexcom threshold wherever a short settings label is
+    /// otherwise ambiguous. Other alerts do not need a family suffix.
+    func configurationFamilySuffix() -> String {
+        switch self {
+        case .dexcomG5BatteryLow:
+            return " (G6)"
+        case .dexcomG7BatteryLow:
+            return " (G7)"
+        default:
+            return ""
         }
     }
 
@@ -611,10 +684,53 @@ public enum AlertKind: Int, CaseIterable {
             } else {
                 return "" // even though 20 is used as default alert level (assuming 20%) give as default value empty string
             }
+        case .dexcomG5BatteryLow, .dexcomG7BatteryLow:
+            // Dexcom packets store Voltage B in 10 mV units, but Settings presents real mV.
+            return "mV"
         case .phonebatterylow:
             return "%"
         case .sensorTransmitterFailure:
             return ""
+        }
+    }
+
+    /// Converts a persisted alert value into the unit shown to the user.
+    /// Dexcom values remain stored in their native 10 mV unit so alert comparisons can use the
+    /// packet value directly without conversion or rounding at the safety-critical firing point.
+    func displayedAlertValue(fromStoredValue value: Int) -> Int {
+        switch self {
+        case .dexcomG5BatteryLow, .dexcomG7BatteryLow:
+            return DexcomBatteryStatus.millivolts(fromRawVoltage: value)
+        default:
+            return value
+        }
+    }
+
+    /// True for each persisted transmitter/sensor battery configuration, but not the phone battery.
+    var isTransmitterBatteryAlert: Bool {
+        switch self {
+        case .batterylow, .dexcomG5BatteryLow, .dexcomG7BatteryLow:
+            return true
+        default:
+            return false
+        }
+    }
+
+    /// Converts a value entered in Settings back to the persisted comparison unit.
+    /// Dexcom thresholds must be a whole 10 mV step because that is the packet resolution.
+    func storedAlertValue(fromDisplayedValue value: Double) -> Int? {
+        guard value.isFinite else { return nil }
+
+        switch self {
+        case .dexcomG5BatteryLow, .dexcomG7BatteryLow:
+            guard value.rounded() == value else { return nil }
+            let integerValue = Int(value)
+            guard integerValue > 0, integerValue % 10 == 0 else { return nil }
+            return integerValue / 10
+        default:
+            // Preserve the existing behaviour for glucose and percentage inputs: conversion to the
+            // Int16 persistence unit truncates any fractional remainder after validation.
+            return Int(value)
         }
     }
     
@@ -648,7 +764,8 @@ private func createAlertTitleForBgReadingAlerts(alertKind: AlertKind) -> String 
         return Texts_Alerts.fastDropTitle
     case .fastrise:
         return Texts_Alerts.fastRiseTitle
-    case .missedreading, .calibration, .batterylow, .phonebatterylow, .notlooping, .sensorTransmitterFailure:
+    case .missedreading, .calibration, .batterylow, .dexcomG5BatteryLow, .dexcomG7BatteryLow,
+         .phonebatterylow, .notlooping, .sensorTransmitterFailure:
         return ""
     }
 }

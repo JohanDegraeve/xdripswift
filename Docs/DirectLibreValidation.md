@@ -1,9 +1,45 @@
 # Direct Libre validation
 
 Current implementation and setup: [Direct Libre guide](DirectLibre.md).
-Baseline: upstream `develop` at `83009198dc5091398333f83aa832bbe3d99e3441`.
+Current upstream: `develop` at `0370937605a59f520f2d4eb6bec79fcc3cc3af88`.
+Earlier device checkpoints below precede this upstream merge and need reconfirmation.
 Historical milestone notes and superseded experiments remain in Git history; this
 file records current evidence and pending acceptance only.
+
+## September 20 upstream merge
+
+The merge adopts upstream's queued subscription/immediate unlock sequencing, frame
+assembler, Bluetooth queue cleanup, signal-strength diagnostics and minimum trend
+interval. Phone and Watch retain the same shared protocol; Watch counter persistence
+and transfer/release guards remain in place. Ordinary NFC method bodies are unchanged
+from the previous feature commit (upstream only edited a comment in the NFC utility).
+
+Validation passed:
+
+- 101 portable core, frame-assembly, trend, signal-strength and capture tests.
+- 176 synthetic frame comparisons against the exact upstream parser, checking
+  calibrated/raw values, timestamps, sensor age and persisted overlap history.
+- Seven shared-collector callback cases with platform doubles: subscription/unlock
+  ordering, persistence failure, suppression, discovery failure, ownership guards,
+  captured arrival timestamps and release before delivery.
+- 27 Watch / 8 phone delivery scenarios and 96 phone downstream combinations against
+  current upstream, including accepted-reading activity logging after processing.
+- Five phone-control, six Watch coordinator/antenna, 11 location and five notification
+  groups.
+- Watch dependency-closure and targeted iOS SDK type-checks, including shared BLE,
+  parser adapters, trends, reading processing and hosted history test sources.
+
+One capture stress test exceeded its ten-second timeout during concurrent full
+builds. The unchanged test passed on rerun without competing compilers, and the
+final 101-test run passed. Both full builds still stop at the SwiftUI preview-plugin
+sandbox failure described below; no full build or hosted Core Data execution is
+claimed. Logs and local harnesses: workspace `validation/integrated-upstream-merge`.
+
+Device acceptance for this merge: ordinary phone NFC/fresh readings and signal-loss
+recovery; phone → Watch → phone with confirmed release; Watch signal-loss/double-tap
+recovery; trend arrows and live/history imports with configured downstream services.
+Recheck optional location/background collection and diagnostic export with matching
+phone and Watch builds.
 
 ## Established checkpoints
 

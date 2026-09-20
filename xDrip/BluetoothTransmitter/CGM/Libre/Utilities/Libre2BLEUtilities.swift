@@ -105,7 +105,7 @@ class Libre2BLEUtilities {
         
         return result
     }
-    
+
     /// - returns:
     ///     - array of GlucoseData. Returns empty array if the latest value is 0.0 for any reason
     ///     - restricts to reading 8 values from data, the 8th value differens only 1 minute from its previous value. (while the others differ 2 minutes). This allows us to sync with previously stored values
@@ -160,6 +160,12 @@ class Libre2BLEUtilities {
             
         }
         
+        // A partially restored history must not participate in overlap or expiry detection.
+        if state.previousRawGlucoseValues?.count != state.previousRawTemperatureValues?.count ||
+            state.previousRawTemperatureValues?.count != state.previousTemperatureAdjustmentValues?.count {
+            state = ParserState()
+        }
+
         // append previous rawvalues
         appendPreviousValues(to: &rawGlucoseValues, rawTemperatureValues: &rawTemperatureValues, temperatureAdjustmentValues: &temperatureAdjustmentValues, state: state)
         
@@ -233,7 +239,7 @@ class Libre2BLEUtilities {
         
         // unwrap stored previous values, if nil then it means it was never used before, nothing to append
         guard let previousRawGlucoseValues = state.previousRawGlucoseValues, let previousRawTemperatureValues = state.previousRawTemperatureValues, let previousTemperatureAdjustmentValues = state.previousTemperatureAdjustmentValues else {return}
-        
+
         // size of each array of stored values should be the same, check that to avoid crashes
         guard previousRawGlucoseValues.count == previousRawTemperatureValues.count, previousRawTemperatureValues.count == previousTemperatureAdjustmentValues.count else {return}
         

@@ -4,3 +4,4 @@
 "calibration_notification_body" = "Cliquez la notification pour calibrer";
 "singlePointCalibration" = "Standard";
 "multiPointCalibration" = "Multi-points";
+"previousCalibrationPrefillMessage" = "Votre précédente calibration de %@ est préremplie. Comparez-la à la mesure actuelle de votre lecteur avant de confirmer.";

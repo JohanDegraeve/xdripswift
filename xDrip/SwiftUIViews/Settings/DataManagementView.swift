@@ -248,8 +248,12 @@ struct DataManagementView: View {
                     .tint(.green)
                 SecureField(Texts_Common.password, text: $viewModel.backupPassphrase)
                     .textContentType(.newPassword)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
                 SecureField(Texts_SettingsView.backupConfirmPassword, text: $viewModel.backupPassphraseConfirmation)
                     .textContentType(.newPassword)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
             }
         } header: {
             Text(Texts_SettingsView.backupPasswordProtection)
@@ -333,6 +337,8 @@ struct DataManagementView: View {
             LabeledContent(Texts_Common.password) {
                 SecureField(Texts_SettingsView.backupPasswordRequired, text: $viewModel.restorePassphrase)
                     .textContentType(.password)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
                     .multilineTextAlignment(.trailing)
                     .frame(maxWidth: 180)
             }

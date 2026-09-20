@@ -67,8 +67,8 @@ struct RootHomeGlucoseReadingView: View {
     @ViewBuilder
     private var nightLockStatusIndicator: some View {
         if isScreenLocked, let nightLockStatus {
-            if let statusSystemImage = nightLockStatus.statusSystemImage {
-                Image(systemName: statusSystemImage)
+            if let statusSymbol = nightLockStatus.statusSymbol {
+                AIDStatusSymbolImage(symbol: statusSymbol)
                     .font(.system(size: Layout.nightLockStatusSymbolSize, weight: .black))
                     .symbolRenderingMode(.monochrome)
                     .foregroundStyle(nightLockStatus.statusColor)

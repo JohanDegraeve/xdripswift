@@ -42,16 +42,19 @@ enum GlucoseReportFormatting {
         "\(value.round(toDecimalPlaces: decimals).stringWithoutTrailingZeroes)%"
     }
 
+    /// Formats a percentage that has already been allocated as part of a complete distribution.
+    /// Callers displaying several mutually exclusive buckets must use this overload rather than
+    /// independently rounding their exact `Double` values.
+    static func percentage(_ value: Int) -> String {
+        "\(value)%"
+    }
+
     static func number(_ value: Double, decimalPlaces: Int, locale: Locale = .current) -> String {
         value.formatted(
             .number
                 .locale(locale)
                 .precision(.fractionLength(decimalPlaces))
         )
-    }
-
-    static func hoursPerDay(from percentage: Double) -> String {
-        hoursPerDay(from: percentage, language: .english)
     }
 
     static func date(_ date: Date, language: GlucoseReportLanguage) -> String {
@@ -81,8 +84,10 @@ enum GlucoseReportFormatting {
         (duration / 60).minutesToDaysAndHours()
     }
 
-    static func hoursPerDay(from percentage: Double, language: GlucoseReportLanguage) -> String {
-        let totalMinutes = Int((percentage / 100 * 24 * 60).rounded())
+    /// Formats one bucket from a jointly allocated 1,440-minute day.
+    /// Accepting minutes rather than a percentage prevents each report bucket from rounding its
+    /// duration independently and guarantees that the three displayed durations total 24 hours.
+    static func hoursPerDay(minutes totalMinutes: Int, language: GlucoseReportLanguage) -> String {
         let hours = totalMinutes / 60
         let minutes = totalMinutes % 60
         let daySuffix = language == .spanish ? "día" : "day"

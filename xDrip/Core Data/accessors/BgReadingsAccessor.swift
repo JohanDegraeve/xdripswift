@@ -235,7 +235,7 @@ class BgReadingsAccessor: ObservableObject {
     /// Only readings with meaningful values are included (calculatedValue != 0.0 OR rawData != 0.0).
     /// - Parameters:
     ///   - forSensor: If not nil, restrict results to this sensor.
-    ///   - endingAt: The window end time; the window start is "endingAt - 24h".
+    ///   - endingAt: The window end time. The window start is "endingAt - 24h".
     /// - Returns: An array of timestamps sorted ascending. May be empty.
     func getReadingTimestampsForLast24h(forSensor sensor: Sensor?, endingAt endDate: Date) -> [Date] {
         let twentyFourHoursBefore = endDate.addingTimeInterval(-24 * 3600)

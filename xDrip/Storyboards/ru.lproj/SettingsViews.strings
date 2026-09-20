@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Настройки";
-"settingsviews_glucoseDisplaySectionTitle" = "Отображение";
+"settingsviews_glucoseDisplaySectionTitle" = "Общие";
 "settingsviews_glucoseRangesSectionTitle" = "Диапазоны глюкозы";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Оповещения и уведомления";
 "settingsviews_sharingAndServicesSectionTitle" = "Обмен и сервисы";
@@ -72,7 +72,8 @@
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Параметры загрузки";
 "settingsviews_nightscoutEnabled" = "Интеграция Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
-"settingsviews_useSchedule" = "Использовать расписание загрузки";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "Включить расписание";
 "schedule" = "Расписание";
 "settingsviews_giveNightscoutUrl" = "Введите ваш Nightscout URL";
 "settingsviews_nightscoutAPIKey" = "API_SECRET";
@@ -458,3 +459,53 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "График";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Базовый";
 "settingsviews_liveActivitySectionTitle" = "Активность в реальном времени";
+"settingsviews_dexcomG7Message" = "Оставьте имя Bluetooth пустым. На следующем экране нажмите Сканировать для автоматического поиска сенсора.\n\nЕсли сенсор уже отображался в Настройки > Bluetooth, его имя Bluetooth можно ввести вручную.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Время Усвоения Углеводов";
+"therapy.local" = "Рассчитывается локально";
+
+"settingsviews_showOriginalBGReadings" = "Показывать Исходные Значения";
+
+"therapy.insulinType" = "Тип Инсулина";
+
+"therapy.showIOBCOB" = "Показывать IOB/COB";
+
+"therapy.treatmentSettings" = "Терапия";
+
+"therapy.settingsHelp" = "Используются для оценки оставшегося инсулина и углеводов по записанным введениям и приёмам пищи.";
+
+"therapy.settingsLocal" = "Эти настройки оценивают IOB и COB по записанным введениям и приёмам пищи, только если система AID не предоставляет эти значения.";
+"therapy.settingsExternal" = "Эти параметры отключены, поскольку ваша система AID на базе %@ предоставляет IOB и COB.";
+"therapy.settingsMixed" = "%@ предоставляет IOB, поэтому тип инсулина определяется автоматически. Время усвоения углеводов используется для локальной оценки COB по записанным приёмам пищи.";
+"therapy.insulinModel" = "Выбрана модель инсулина %@. Продолжительность действия инсулина (DIA): %@. Время до пика действия инсулина: %@.";
+"therapy.carbFast" = "Более быстрое усвоение углеводов. Включает задержку 10 минут перед началом.";
+"therapy.carbNormal" = "Обычное усвоение углеводов. Включает задержку 10 минут перед началом.";
+"therapy.carbLong" = "Более длительное усвоение углеводов. Может быть полезно, если препараты GLP-1 замедляют пищеварение. Включает задержку 10 минут перед началом.";
+"therapy.automatic" = "Автоматически";
+
+"therapy.liveActivityMetricsFooter" = "Показывать доступные IOB и COB в большом макете экрана блокировки и в макете с графиком CarPlay/Смарт-стопки.";
+
+"therapy.liveActivityMetricsUnavailable" = "Для IOB/COB нужны записи введённого инсулина или углеводов либо данные подключённой системы AID.";
+
+"homeScreen.renderBasalDownwards" = "Отображать базальный инсулин вниз";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "Активно";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "Неактивно";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "Расписание";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "Включать в";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "Выключать в";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "Когда озвучивание глюкозы включено, показания произносятся только в указанные часы. Расписание повторяется ежедневно по местному времени телефона и может переходить через полночь. Команды изменяют только главный переключатель озвучивания глюкозы.";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "Выберите разное время включения и выключения.";

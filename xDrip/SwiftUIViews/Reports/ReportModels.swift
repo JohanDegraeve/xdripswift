@@ -308,11 +308,15 @@ struct GlucoseReportRangeDistribution {
     let veryHigh: Double
 
     func timeInRangeBuckets(usesMgDl: Bool) -> [GlucoseReportRangeBucket] {
-        [
-            GlucoseReportRangeBucket(key: .low, detail: rangeLabel(upperMgDl: GlucoseReportClinicalConstants.timeInRangeLowMgDl, usesMgDl: usesMgDl), percentage: veryLow + low, color: GlucoseReportColors.low),
-            GlucoseReportRangeBucket(key: .inRange, detail: rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInRangeLowMgDl, upperMgDl: GlucoseReportClinicalConstants.timeInRangeHighMgDl, usesMgDl: usesMgDl), percentage: target, color: GlucoseReportColors.target),
-            GlucoseReportRangeBucket(key: .high, detail: rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInRangeHighMgDl, usesMgDl: usesMgDl), percentage: high + veryHigh, color: GlucoseReportColors.high)
-        ]
+        makeBuckets(
+            distribution: GlucoseRangeDistribution(below: veryLow + low, inRange: target, above: high + veryHigh),
+            keys: [.low, .inRange, .high],
+            details: [
+                rangeLabel(upperMgDl: GlucoseReportClinicalConstants.timeInRangeLowMgDl, usesMgDl: usesMgDl),
+                rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInRangeLowMgDl, upperMgDl: GlucoseReportClinicalConstants.timeInRangeHighMgDl, usesMgDl: usesMgDl),
+                rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInRangeHighMgDl, usesMgDl: usesMgDl)
+            ]
+        )
     }
 
     static let timeInRangeSourceURL = "https://doi.org/10.2337/dci19-0028"
@@ -329,11 +333,40 @@ struct GlucoseReportRangeDistribution {
     }
 
     func tightRangeBuckets(usesMgDl: Bool) -> [GlucoseReportRangeBucket] {
-        [
-            GlucoseReportRangeBucket(key: .low, detail: rangeLabel(upperMgDl: GlucoseReportClinicalConstants.timeInTightRangeLowMgDl, usesMgDl: usesMgDl), percentage: low, color: GlucoseReportColors.low),
-            GlucoseReportRangeBucket(key: .tightRange, detail: rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInTightRangeLowMgDl, upperMgDl: GlucoseReportClinicalConstants.timeInTightRangeHighMgDl, usesMgDl: usesMgDl), percentage: target, color: GlucoseReportColors.target),
-            GlucoseReportRangeBucket(key: .high, detail: rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInTightRangeHighMgDl, usesMgDl: usesMgDl), percentage: high, color: GlucoseReportColors.high)
-        ]
+        makeBuckets(
+            distribution: GlucoseRangeDistribution(below: low, inRange: target, above: high),
+            keys: [.low, .tightRange, .high],
+            details: [
+                rangeLabel(upperMgDl: GlucoseReportClinicalConstants.timeInTightRangeLowMgDl, usesMgDl: usesMgDl),
+                rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInTightRangeLowMgDl, upperMgDl: GlucoseReportClinicalConstants.timeInTightRangeHighMgDl, usesMgDl: usesMgDl),
+                rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInTightRangeHighMgDl, usesMgDl: usesMgDl)
+            ]
+        )
+    }
+
+    /// Builds all three display buckets together so percentages and daily minutes are apportioned as
+    /// one distribution. Calculating either value independently is what previously allowed labels to
+    /// total 99/101% and report durations to total 23h59/24h01.
+    private func makeBuckets(
+        distribution: GlucoseRangeDistribution,
+        keys: [GlucoseReportText],
+        details: [String]
+    ) -> [GlucoseReportRangeBucket] {
+        let exactPercentages = distribution.percentages
+        let wholePercentages = distribution.wholePercentages
+        let minutesPerDay = distribution.allocatedUnits(total: 24 * 60)
+        let colors = [GlucoseReportColors.low, GlucoseReportColors.target, GlucoseReportColors.high]
+
+        return exactPercentages.indices.map { index in
+            GlucoseReportRangeBucket(
+                key: keys[index],
+                detail: details[index],
+                percentage: exactPercentages[index],
+                wholePercentage: wholePercentages[index],
+                minutesPerDay: minutesPerDay[index],
+                color: colors[index]
+            )
+        }
     }
 
     private func rangeLabel(lowerMgDl: Double? = nil, upperMgDl: Double? = nil, usesMgDl: Bool) -> String {
@@ -358,7 +391,12 @@ struct GlucoseReportRangeBucket: Identifiable {
     let id = UUID()
     let key: GlucoseReportText
     let detail: String
+    /// Exact normalized value used for bar geometry and clinical calculations.
     let percentage: Double
+    /// Shared largest-remainder result used by every whole-number percentage label.
+    let wholePercentage: Int
+    /// Shared 1,440-minute allocation used by clinical report duration labels.
+    let minutesPerDay: Int
     let color: Color
 
     func title(language: GlucoseReportLanguage) -> String {

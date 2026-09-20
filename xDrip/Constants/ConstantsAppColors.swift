@@ -56,6 +56,11 @@ enum ConstantsAppColors {
     static let sensorUrgent = caution
     static let sensorExpired = urgent
 
+    // MARK: - Dexcom connection modes
+
+    static let dexcomPrimaryMode = Color(red: 0.20, green: 0.82, blue: 0.96)
+    static let dexcomCoexistenceMode = Color(red: 0.72, green: 0.40, blue: 1.0)
+
     // MARK: - Statistics
 
     /// SwiftUI-native statistics colours used by pie charts and TIR value labels.
@@ -76,4 +81,13 @@ enum ConstantsAppColors {
     static let agpObjectiveGridLine = Color(white: 0.7).opacity(0.5)
     static let agpPlotBorder = Color(.separator).opacity(0.45)
 
+}
+
+extension DexcomConnectionMode {
+    var color: Color {
+        switch self {
+        case .primary: return ConstantsAppColors.dexcomPrimaryMode
+        case .coexistence: return ConstantsAppColors.dexcomCoexistenceMode
+        }
+    }
 }

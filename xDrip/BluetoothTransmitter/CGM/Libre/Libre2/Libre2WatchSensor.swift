@@ -1,15 +1,18 @@
 import Foundation
 
-/// Used only by the active Watch collector, on its serial Bluetooth queue.
+/// The active collector reserves counters on its Bluetooth queue and parses history on main.
 /// Session replacement belongs to the phone-controlled switching coordinator.
 final class Libre2WatchSensor: Libre2SensorDataSource {
     private(set) var session: Libre2WatchSession
     private let sessionURL: URL
+    // Parsing on main must not read the session whose counter is updated on the BLE queue.
+    private let algorithmParameters: Libre1DerivedAlgorithmParameters
     private var parserState = Libre2BLEUtilities.ParserState()
 
     init(sessionURL: URL) throws {
         session = try Libre2WatchSession.load(from: sessionURL)
         self.sessionURL = sessionURL
+        algorithmParameters = session.algorithmParameters
     }
 
     var sensorUID: Data? { session.sensorUID }
@@ -35,7 +38,7 @@ final class Libre2WatchSensor: Libre2SensorDataSource {
         return Libre2StreamingUnlock(code: saved.unlockCode, count: saved.unlockCount)
     }
 
-    func parseBLEFrame(_ frame: Data, sensorUID: Data) throws -> (bleGlucose: [GlucoseData], sensorTimeInMinutes: UInt16)? {
-        return try Libre2BLEUtilities.parseBLEData(Data(Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: frame)), libre1DerivedAlgorithmParameters: session.algorithmParameters, state: &parserState)
+    func parseBLEFrame(_ decryptedFrame: Data, date: Date) -> (bleGlucose: [GlucoseData], sensorTimeInMinutes: UInt16)? {
+        return Libre2BLEUtilities.parseBLEData(decryptedFrame, libre1DerivedAlgorithmParameters: algorithmParameters, state: &parserState, date: date)
     }
 }

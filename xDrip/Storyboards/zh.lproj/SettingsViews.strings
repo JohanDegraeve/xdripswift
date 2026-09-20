@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "设置";
-"settingsviews_glucoseDisplaySectionTitle" = "显示";
+"settingsviews_glucoseDisplaySectionTitle" = "通用";
 "settingsviews_glucoseRangesSectionTitle" = "葡萄糖范围";
 "settingsviews_alertsAndNotificationsSectionTitle" = "警报和通知";
 "settingsviews_sharingAndServicesSectionTitle" = "共享和服务";
@@ -120,8 +120,8 @@
 
 /// used in settings, section Info, title of the build setting
 
-/// nightscout settings, where user can select to use schedule or not
-"settingsviews_useSchedule" = "Use Upload Schedule";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "启用时间表";
 
 /// home screen settings, target value
 "settingsviews_targetValue" = "Target Value";
@@ -664,3 +664,53 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "图表";
 "settingsviews_carPlayLiveActivityTypeBasic" = "基础";
 "settingsviews_liveActivitySectionTitle" = "实时活动";
+"settingsviews_dexcomG7Message" = "将蓝牙名称留空。在下一个屏幕中，轻点“扫描”以自动搜索传感器。\n\n如果传感器之前曾出现在“设置”>“蓝牙”中，您可以手动输入其蓝牙名称。";
+
+// Local therapy estimates
+"therapy.carbDuration" = "碳水吸收时长";
+"therapy.local" = "本地计算";
+
+"settingsviews_showOriginalBGReadings" = "显示原始值";
+
+"therapy.insulinType" = "胰岛素类型";
+
+"therapy.showIOBCOB" = "显示 IOB/COB";
+
+"therapy.treatmentSettings" = "治疗";
+
+"therapy.settingsHelp" = "用于根据已记录的治疗估算剩余胰岛素和碳水化合物。";
+
+"therapy.settingsLocal" = "仅在 AID 系统未提供数值时，这些设置才用于根据已记录的治疗估算 IOB 和 COB。";
+"therapy.settingsExternal" = "这些选项已停用，因为基于 %@ 的 AID 系统会提供 IOB 和 COB。";
+"therapy.settingsMixed" = "%@ 提供 IOB，因此胰岛素类型为自动。碳水吸收时长用于根据已记录的餐食在本地估算 COB。";
+"therapy.insulinModel" = "已选择 %@ 胰岛素模型。胰岛素作用时长（DIA）：%@。胰岛素达峰时间：%@。";
+"therapy.carbFast" = "较快的碳水吸收。吸收开始前有 10 分钟延迟。";
+"therapy.carbNormal" = "正常的碳水吸收。吸收开始前有 10 分钟延迟。";
+"therapy.carbLong" = "较长的碳水吸收。当 GLP-1 药物减慢消化时可能有用。吸收开始前有 10 分钟延迟。";
+"therapy.automatic" = "自动";
+
+"therapy.liveActivityMetricsFooter" = "在锁定屏幕的大布局和 CarPlay/智能叠放的图表布局中显示可用的 IOB 和 COB。";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB 需要已记录的胰岛素或碳水化合物治疗，或来自已连接 AID 系统的数据。";
+
+"homeScreen.renderBasalDownwards" = "向下绘制基础胰岛素";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "活跃";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "非活跃";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "定时计划";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "开启时间";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "关闭时间";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "开启血糖播报后，仅在此时间段内播报读数。定时计划按照手机的当地时间每天重复，可以跨越午夜。快捷指令仅更改血糖播报的总开关。";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "请选择不同的开启和关闭时间。";

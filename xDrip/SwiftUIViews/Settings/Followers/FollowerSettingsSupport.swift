@@ -37,8 +37,13 @@ final class FollowerSettingsSectionProvider: SettingsNativeSectionProvider {
             defaultsObserver = NotificationCenter.default.addObserver(
                 forName: UserDefaults.didChangeNotification,
                 object: UserDefaults.standard,
-                queue: .main
-            ) { [weak self] _ in self?.sectionReloadClosure?() }
+                queue: nil
+            ) { [weak self] _ in
+                // Defaults may be written on a queue that main is waiting for.
+                DispatchQueue.main.async { [weak self] in
+                    self?.sectionReloadClosure?()
+                }
+            }
         }
         if let refreshEvery {
             refreshTimer = Timer.scheduledTimer(withTimeInterval: refreshEvery, repeats: true) { [weak self] _ in
@@ -177,7 +182,7 @@ enum FollowerSettingsRows {
                 SettingsTextEntryContent(
                     title: title,
                     message: message,
-                    keyboardType: .default,
+                    keyboardType: .credential,
                     text: currentValue(),
                     placeholder: placeholder,
                     fieldTitle: nil,
@@ -219,7 +224,7 @@ enum FollowerSettingsRows {
                         guard alias != UserDefaults.standard.followerPatientName else { return }
                         UserDefaults.standard.followerPatientName = alias
                         // The alias itself is private and may identify a patient. Record only whether
-                        // it was set or removed; never pass the entered text to trace or troubleshooting.
+                        // it was set or removed. Never pass the entered text to trace or troubleshooting.
                         trace(
                             "patient alias was %{public}@",
                             log: log,

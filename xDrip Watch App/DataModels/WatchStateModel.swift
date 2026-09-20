@@ -130,6 +130,8 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var requestingDataIconColor: Color = ConstantsAppleWatch.requestingDataIconColorInactive
     @Published var lastComplicationUpdateTimeStamp: Date = .distantPast
 
+    @Published var therapyMetrics: TherapyMetricsSnapshot?
+    var resolvedTherapyMetrics: TherapyMetricsSnapshot { therapyMetrics ?? .external(aidStatus) }
     @Published var aidStatus: AIDStatus?
 
     // we use the following to record when the user has manually requested a state update on each view so that we can trigger the animation on just this view
@@ -453,19 +455,19 @@ final class WatchStateModel: NSObject, ObservableObject {
         aidStatus?.presentation().color
     }
 
-    func aidStatusIconImage() -> Image? {
-        guard let systemImage = aidStatus?.presentation().systemImage else { return nil }
-        return Image(systemName: systemImage)
+    /// Use the common AID renderer so this surface inherits the same symbol weight as the app.
+    /// Keep a missing symbol absent so checking states do not imply an active loop.
+    func aidStatusIconImage() -> AIDStatusSymbolImage? {
+        guard let symbol = aidStatus?.presentation().symbol else { return nil }
+        return AIDStatusSymbolImage(symbol: symbol)
     }
 
     func aidStatusIOBString() -> String {
-        guard let aidStatus, aidStatus.presentation().hasFreshData, let iob = aidStatus.iob else { return "-U" }
-        return "\(iob.round(toDecimalPlaces: 2).stringWithoutTrailingZeroes)U"
+        resolvedTherapyMetrics.iob.formatted(isIOB: true)
     }
 
     func aidStatusCOBString() -> String {
-        guard let aidStatus, aidStatus.presentation().hasFreshData, let cob = aidStatus.cob else { return "-g" }
-        return "\(cob.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes)g"
+        resolvedTherapyMetrics.cob.formatted(isIOB: false)
     }
 
     func aidStatusActivityAgeString() -> String {
@@ -666,7 +668,8 @@ final class WatchStateModel: NSObject, ObservableObject {
         let previousDate = dates.first { latestDate - $0 >= 5 * 60 && latestDate - $0 <= 6 * 60 }
         let delta = previousDate.flatMap { values[$0] }.map { latestValue - $0 } ?? 0
         var trend = 0
-        if let previousDate = dates.dropFirst().first, let previousValue = values[previousDate] {
+        if let previousDate = dates.first(where: { latestDate - $0 >= Double(ConstantsBGGraphBuilder.minSlopeInMinutes * 60) }),
+           let previousValue = values[previousDate] {
             let (slope, hidden) = GlucoseTrend.slope(currentValue: latestValue, currentDate: Date(timeIntervalSince1970: latestDate),
                                                    previousValue: previousValue, previousDate: Date(timeIntervalSince1970: previousDate))
             trend = GlucoseTrend.ordinal(slope: slope, hideSlope: hidden)
@@ -779,6 +782,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         secondsUntilHeartBeatDisconnectWarning = dictionary["secondsUntilHeartBeatDisconnectWarning"] as? Int ?? 0
         keepAliveIsDisabled = dictionary["keepAliveIsDisabled"] as? Bool ?? false
 
+        therapyMetrics = (dictionary["therapyMetrics"] as? [String: Any]).flatMap { try? JSONSerialization.data(withJSONObject: $0) }.flatMap { try? JSONDecoder().decode(TherapyMetricsSnapshot.self, from: $0) }
         if let aidStatusDictionary = dictionary["aidStatus"] as? [String: Any],
            let data = try? JSONSerialization.data(withJSONObject: aidStatusDictionary),
            let decodedStatus = try? JSONDecoder().decode(AIDStatus.self, from: data) {
@@ -869,7 +873,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     private func updateComplicationData() {
         guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else { return }
 
-        // Do not leave stale glucose behind the warning when disabled; complications may remain
+        // Do not leave stale glucose behind the warning when disabled. Complications may remain
         // visible long after watchOS stops receiving updates from the phone.
         let complicationBgReadingValues = keepAliveIsDisabled ? [] : bgReadingValues
         let complicationBgReadingDates = keepAliveIsDisabled ? [] : bgReadingDates

@@ -31,7 +31,7 @@ class MedtrumEasyViewFollowManager: NSObject {
     /// Delegate to pass back glucose data
     private(set) weak var followerDelegate: FollowerDelegate?
 
-    /// The root-owned shared keep-alive engine; this follower reports operational state only and
+    /// The root-owned shared keep-alive engine. This follower reports operational state only and
     /// does not own silent-audio playback, replay timing, or application lifecycle callbacks.
     private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
 
@@ -234,8 +234,8 @@ class MedtrumEasyViewFollowManager: NSObject {
                                         let aliasChanged = UserDefaults.standard.followerPatientName != singlePatient.displayName
                                         UserDefaults.standard.followerPatientName = singlePatient.displayName
                                         if aliasChanged {
-                                            // The developer trace retains the account detail above;
-                                            // the shareable log records only that the alias changed.
+                                            // The developer trace retains the account detail above.
+                                            // The shareable log records only that the alias changed.
                                             trace(
                                                 "automatic patient selection changed the patient alias",
                                                 log: self.log,

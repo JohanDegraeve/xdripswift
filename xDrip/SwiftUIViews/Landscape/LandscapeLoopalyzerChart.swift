@@ -16,6 +16,7 @@ struct LandscapeLoopalyzerChart: View {
     let carbTreatmentMarkers: [GlucoseReportLoopalyzerTreatmentMarker]
     let plotHeight: CGFloat
     let chartSpacing: CGFloat
+    let showsNowRule: Bool
 
     private enum Series: CaseIterable {
         case tempBasalDelta
@@ -27,7 +28,8 @@ struct LandscapeLoopalyzerChart: View {
         static let xAxisHeight: CGFloat = 18
         static let yAxisLabelWidth: CGFloat = 24
         static let axisLabelFontSize = ConstantsStatistics.chartAxisLabelFontSize + 1
-        static let treatmentBarWidthMinutes = 5.0
+        static let treatmentBarWidthMinutes = 10.0
+        static let treatmentBarOpacity = 1.0
     }
 
     var body: some View {
@@ -83,6 +85,7 @@ struct LandscapeLoopalyzerChart: View {
                     dataMarks(for: series)
                     referenceMarks(yDomain: yDomain, includesZero: includesZero)
                     treatmentMarks(for: series, yDomain: yDomain)
+                    nowRule
                 }
                 .chartLegend(.hidden)
                 .chartXScale(
@@ -190,6 +193,19 @@ struct LandscapeLoopalyzerChart: View {
         }
     }
 
+    @ChartContentBuilder private var nowRule: some ChartContent {
+        if showsNowRule {
+            RuleMark(x: .value("Now", currentMinuteOfDay))
+                .lineStyle(StrokeStyle(lineWidth: 1.0, dash: [4, 4]))
+                .foregroundStyle(ConstantsAppColors.primaryText)
+        }
+    }
+
+    private var currentMinuteOfDay: Int {
+        let components = Calendar.current.dateComponents([.hour, .minute], from: Date())
+        return (components.hour ?? 0) * 60 + (components.minute ?? 0)
+    }
+
     @ChartContentBuilder private func treatmentMarks(
         for series: Series,
         yDomain: ClosedRange<Double>
@@ -258,7 +274,7 @@ struct LandscapeLoopalyzerChart: View {
             yStart: .value("Zero", 0),
             yEnd: .value("Treatment", min(marker.amount, yDomain.upperBound))
         )
-        .foregroundStyle(Color(.lightGray).opacity(0.6))
+        .foregroundStyle(Color(.colorPrimary).opacity(Layout.treatmentBarOpacity))
     }
 
     private var basalDeltaDomain: ClosedRange<Double> {

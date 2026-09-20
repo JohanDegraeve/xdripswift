@@ -92,7 +92,7 @@ struct GlucoseChartAGPPoint: Identifiable, Hashable {
 /// define the wider cached data range already loaded by `GlucoseChartStateManager`.
 ///
 /// This is intentionally a plain value type. The state manager owns loading, cache mutation and
-/// Core Data access; the chart view owns rendering and remains independent of database work.
+/// Core Data access. The chart view owns rendering and remains independent of database work.
 ///
 /// `overlayWindowStartDate`/`overlayWindowEndDate` optionally define a highlighted time window
 /// inside an overview chart. They are ignored unless both dates are supplied.
@@ -135,19 +135,15 @@ struct GlucoseChartState {
 
 /// Bucketed treatment and basal points in the form expected by `GlucoseChartView`.
 ///
-/// Separate buckets let the renderer apply the correct marker size, label policy and layer ordering
-/// without recalculating treatment meaning during every body pass.
+/// Each dose type has one series. Marker size is interpolated from its value by the renderer,
+/// while cached labels retain the existing visibility policy.
 struct GlucoseChartTreatmentPoints {
 
-    var smallBolus: [GlucoseChartTreatmentPoint] = []
-    var mediumBolus: [GlucoseChartTreatmentPoint] = []
-    var largeBolus: [GlucoseChartTreatmentPoint] = []
-    var veryLargeBolus: [GlucoseChartTreatmentPoint] = []
+    var boluses: [GlucoseChartTreatmentPoint] = []
+    // Keep injections outside bolus sizing and pump basal series.
+    var basalInjections: [GlucoseChartTreatmentPoint] = []
 
-    var smallCarbs: [GlucoseChartTreatmentPoint] = []
-    var mediumCarbs: [GlucoseChartTreatmentPoint] = []
-    var largeCarbs: [GlucoseChartTreatmentPoint] = []
-    var veryLargeCarbs: [GlucoseChartTreatmentPoint] = []
+    var carbs: [GlucoseChartTreatmentPoint] = []
 
     var bgChecks: [GlucoseChartTreatmentPoint] = []
     var notes: [GlucoseChartTreatmentPoint] = []
@@ -195,7 +191,7 @@ struct GlucoseChartPoint: Identifiable, Hashable {
 /// Dated treatment marker with its display y-value and optional treatment label/notes.
 ///
 /// `yValue` is already resolved by the state manager. For bolus, carbs and notes this means near the
-/// glucose line; the view only draws the supplied position.
+/// glucose line. The view only draws the supplied position.
 struct GlucoseChartTreatmentPoint: Identifiable, Hashable {
 
     let id: String
@@ -228,34 +224,57 @@ enum GlucoseChartTreatmentStyle {
 
     // MARK: - Bolus
 
+    // Share SF Symbol names between chart points, rows and treatment entry. Filters remove
+    // the fill suffix when excluded, rather than using a different treatment symbol.
+    static let bolusSymbol = "arrowtriangle.down.fill"
+    static let carbsSymbol = "arrowtriangle.up.fill"
+    // Use the single triangle on every iOS version. Pink and fixed chart sizing distinguish basal injections.
+    static let basalInjectionSymbol = "arrowtriangle.down.fill"
+    static let treatmentIconSize = 17.0
+    /// Small chart-only halo to separate treatment symbols from similarly coloured data.
+    static let symbolHaloRadius = 1.0
     static let bolusColor = Color.blue
+    // Use a light pink to keep basal injections distinct from the red BG check.
+    static let basalInjectionColor = Color(red: 1, green: 0.72, blue: 0.88)
+    /// Fixed basal injection marker scale, independent of the injected dose.
+    static let basalInjectionScale = 1.6
+    /// Small-bolus row and filter scale. Chart dose sizing is independent of this preference.
     static let smallBolusScale = 0.6
-    static let mediumBolusScale = 0.9
-    static let largeBolusScale = 1.2
-    static let veryLargeBolusScale = 1.5
-    static let bolusTriangleSize3h = 18.0
-    static let bolusTriangleSize6h = 15.5
-    static let bolusTriangleSize12h = 13.5
-    static let bolusTriangleSize24h = 11.0
-    static let bolusTriangleHeightScale = 0.9
+
+    /// Dose bounds and physical SF Symbol sizes in points. Values outside the bounds clamp
+    /// to the endpoint size. The actual dose and its label are never clamped.
+    static let bolusSymbolSizing = GlucoseChartTreatmentSizeRange(minimumValue: 0.5, maximumValue: 10, minimumSize: 9, maximumSize: 30)
+    static let carbsSymbolSizing = GlucoseChartTreatmentSizeRange(minimumValue: 5, maximumValue: 70, minimumSize: 9, maximumSize: 30)
+    static let treatmentSymbolSize3h = 18.0
+    static let treatmentSymbolSize6h = 15.5
+    static let treatmentSymbolSize12h = 13.5
+    static let treatmentSymbolSize24h = 11.0
 
     // MARK: - Carbs
 
     static let carbsColor = Color.orange
-    static let smallCarbsScale = 1.25
-    static let mediumCarbsScale = 2.25
-    static let largeCarbsScale = 3.65
-    static let veryLargeCarbsScale = 5.5
 
     // MARK: - BG Checks and Notes
 
-    static let bgCheckOuterColor = Color.gray
+    static let bgCheckSymbol = "drop.fill"
     static let bgCheckInnerColor = Color.red
-    static let bgCheckOuterScale = 1.9
-    static let bgCheckInnerScale = 1.4
 
     static let noteColor = Color(white: 0.9)
-    static let noteScale = 1.9
+    static let noteSymbol = "note.text"
+    /// Keep note labels short enough to read vertically above their markers.
+    static let noteLabelCharacterLimit = 16
+    static let noteLabelFontSize = 13.0
+    /// Extra space above the glucose point before the vertical note text begins.
+    static let noteLabelExtraSpacing = 3.0
+
+    /// Collapse line breaks for the chart and truncate by Character so emoji remain intact.
+    static func noteLabel(_ notes: String?) -> String? {
+        guard let notes else { return nil }
+        let text = notes.split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
+        guard !text.isEmpty, noteLabelCharacterLimit > 0 else { return nil }
+        guard text.count > noteLabelCharacterLimit else { return text }
+        return String(text.prefix(noteLabelCharacterLimit - 1)) + "…"
+    }
 
     // MARK: - Basal
 
@@ -273,4 +292,20 @@ enum GlucoseChartTreatmentStyle {
     static let treatmentLabelBackgroundColor = Color.black.opacity(0.4)
     static let treatmentLabelFontColor = Color.white.opacity(0.85)
 
+}
+
+/// Linear interpolation of symbol side length in points, rather than area or dose buckets.
+/// This is a small, allocation-free calculation shared by bolus and carbohydrate chart markers.
+struct GlucoseChartTreatmentSizeRange {
+    let minimumValue: Double
+    let maximumValue: Double
+    let minimumSize: Double
+    let maximumSize: Double
+
+    func size(for value: Double) -> Double {
+        guard !value.isNaN, value > minimumValue else { return minimumSize }
+        guard value < maximumValue else { return maximumSize }
+        let fraction = (value - minimumValue) / (maximumValue - minimumValue)
+        return minimumSize + fraction * (maximumSize - minimumSize)
+    }
 }

@@ -11,6 +11,10 @@
 "sensorType" = "Sensorin tyyppi";
 "serialNumber" = "Sarjanumero";
 "battery" = "Akku";
+"versionCode" = "Versiokoodi";
+"voltageA" = "Jännite A";
+"voltageB" = "Jännite B";
+"waitingForData" = "Odotetaan tietoja...";
 "needsTransmitterId" = "Lähettimen tunnus puuttuu";
 "scan" = "Skannaa";
 "medtrumNanoPumpScanNoticeTitle" = "Yhteys Medtrum Nano -pumppuun";
@@ -37,7 +41,6 @@
 "cannotActiveCGMInFollowerMode" = "Et voi aktivoida CGM:ää seuraaja-tilassa";
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Rinnakkaiskäyttötila";
 "useOtherDexcomAppCoexistenceFooter" = "Rinnakkaiskäyttötila sallii meidän toimia toisen sovelluksen, kuten Dexcomin tai CamAPSin, kanssa. Sovelluksen on pysyttävä käynnissä taustalla.";
 "useOtherDexcomAppPrimaryFooter" = "Ensisijainen tila yhdistää pääsovelluksena ja hallitsee yhteyttä.";
 "runningInCoexistenceMode" = "Käytössä rinnakkaiskäyttötilassa";
@@ -80,13 +83,13 @@
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
 
 /// sensor warm-up text
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "Lämmitys päättyy";
 
 /// Scan again button
 "nfcScanFailedScanAgainButton" = "Scan Again";
 
 /// Tell the user the scan was successful and to just wait now for connection
-"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 
 /// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
 "readSuccessLast24Hours" = "Viimeiset 24 tuntia";
@@ -120,15 +123,71 @@
 
 /* Dexcom G6 Bluetooth authentication slot */
 "dexcomG6BluetoothSlot" = "Bluetooth-kanava";
-"dexcomG6MobileAppSlot" = "Mobiilisovellus (Oletus)";
+"dexcomG6MobileAppSlot" = "Paikka 2: Mobiilisovellus (Oletus)";
 "dexcomG6MobileAppSlotShort" = "Mobiilisovellus";
-"dexcomG6MedicalDeviceSlot" = "Vastaanotin tai pumppu (Kokeellinen)";
+"dexcomG6MedicalDeviceSlot" = "Paikka 1: Vastaanotin tai pumppu";
 "dexcomG6MedicalDeviceSlotShort" = "Pumppu";
 "dexcomG6MobileAppSlotFooter" = "Mobiilisovelluskanava on puhelinyhteyksien oletuskanava.";
 "dexcomG6MedicalDeviceSlotFooter" = "Vastaanotin- tai pumppukanava on tavallisesti varattu Dexcom-vastaanottimelle tai yhteensopivalle pumpulle. Kun tämä appi käyttää sitä, mobiilisovelluskanava jää puhelimen tai muun laitteen käyttöön.";
 "dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Ei käytettävissä rinnakkaistilassa";
 "dexcomG6MedicalDeviceSlotWarning" = "Vastaanotin- tai pumppukanava on tavallisesti varattu Dexcom-vastaanottimelle tai yhteensopivalle pumpulle. Sen valitseminen voi estää kyseistä laitetta muodostamasta yhteyttä.\n\nVastaanotin- tai pumppukanavan käyttöä tulee pitää vain kokeellisena. Valinta tulee voimaan seuraavan todennuksen yhteydessä.";
-"dexcomG6AnubisSlot" = "Kanava 3 (Anubis, kokeellinen)";
+"dexcomG6AnubisSlot" = "Paikka 3: Anubis Extra";
+"dexcomG7MedicalDeviceSlot" = "Paikka 1: Vastaanotin tai pumppu";
+"dexcomG7MedicalDeviceSlotShort" = "Pumppu";
+"dexcomG7MobileAppSlot" = "Paikka 2: Mobiilisovellus (Oletus)";
+"dexcomG7SmartWatchSlot" = "Paikka 3: Älykello";
+"dexcomG7PairingCodeMessage" = "Syötä nykyisen sensorin asettimen nelinumeroinen koodi. Ensisijainen tila ei voi todentaa yhteyttä ilman tätä koodia.";
+"dexcomG7BluetoothSlot" = "Bluetooth-kanava";
+"dexcomG7MobileAppSlotShort" = "Mobiilisovellus";
+"dexcomG7SmartWatchSlotShort" = "Älykello";
+"dexcomG7MobileAppSlotFooter" = "Mobiilisovelluskanava (paikka 2) on oletus ja tällä hetkellä validoitu suora G7-yhteys.";
+"dexcomG7MedicalDeviceSlotFooter" = "Vastaanotin- tai pumppukanava käyttää todennuspaikkaa 1.";
+"dexcomG7SmartWatchSlotFooter" = "Älykellokanava käyttää tehtaan todennuspaikkaa 3.";
 "dexcomG6AnubisSlotShort" = "Kanava 3";
 "dexcomG6AnubisSlotFooter" = "Kanava 3 on käytettävissä vain Anubis-lähettimissä. Se on kokeellinen ja jättää Mobiilisovellus- sekä Vastaanotin tai pumppu -kanavat muiden laitteiden käyttöön.";
 "dexcomG6AnubisSlotWarning" = "Kanava 3 on kokeellinen kanava, joka on käytettävissä vain Anubis-lähettimissä.\n\nKäytä Kanavaa 3 vain testaamiseen. Valinta tulee voimaan seuraavan todennuksen yhteydessä.";
+"dexcomConnectionMode" = "Yhteystila";
+"dexcomPrimaryMode" = "Ensisijainen";
+"dexcomCoexistenceMode" = "Rinnakkaistila";
+"dexcomPrimaryModePickerOption" = "Ensisijainen tila";
+"dexcomCoexistenceModePickerOption" = "Rinnakkaistila";
+"dexcomG6ModeSelectionFooter" = "Voit vaihtaa G6:n yhteystilaa myöhemmin lähettimen asetuksissa.";
+"dexcomConnectionModeSelectionExplanation" = "Ensisijainen tila yhdistää tämän sovelluksen suoraan ja edellyttää, että kaikki muut Dexcom-laitteeseen yhdistyvät sovellukset suljetaan.\n\nRinnakkaistila käyttää toista sovellusta Dexcom-yhteyden ylläpitämiseen ja lukemien vastaanottamiseen.";
+"dexcomBluetoothChannelSelectionExplanation" = "Valitse tämän sovelluksen käyttämä Bluetooth-kanava. Valitse Mobiilisovellus, ellei kanavaa tarvitse jättää vapaaksi toiselle yhteydelle.";
+"dexcomG6CoexistenceModeSelectionMessage" = "Rinnakkaistila on valittu. Toisen sovelluksen, kuten Dexcom G6:n tai CamAPSin, on yhdistettävä G6-lähettimeen ja todennettava se.\n\nPidä toinen sovellus käynnissä taustalla, tai %@ ei vastaanota lukemia.";
+"dexcomG6PrimaryModeSelectionMessage" = "Ensisijainen tila on valittu. Sovelluksen %@ on oltava ainoa G6-lähettimeen yhdistävä ja sen todentava sovellus.\n\nSulje kaikki muut lähettimeen yhdistävät sovellukset tai poista niiden Bluetooth-oikeus käytöstä. Muuten %@ tai toinen sovellus ei ehkä vastaanota lukemia.";
+"dexcomPrimaryModeAddFlowMessage" = "Yhdistä suoraan ensisijaisena sovelluksena. Katkaise kaikkien muiden sovellusten yhteys tähän Dexcomiin.";
+"dexcomCoexistenceModeAddFlowMessage" = "Jaa yhteys toisen sovelluksen kanssa. Pidä Dexcom- tai CamAPS-sovellus toiminnassa taustalla.";
+"dexcomG7NoSensorLabelFound" = "Kuvasta ei löytynyt Dexcom G7 -sensorin etikettiä.";
+"dexcomG7InvalidSensorLabelFound" = "Data Matrix löytyi, mutta se ei ollut kelvollinen Dexcom G7 -sensorin etiketti.";
+
+
+/* Battery history */
+"batteryHistory" = "Akkuhistoria";
+"batteryHistoryTransmitterID" = "Lähettimen tunnus";
+"batteryHistoryNoData" = "Ei akkuhistoriaa";
+"batteryHistoryBeginsAfterReading" = "Historia alkaa seuraavan todellisen akkulukeman jälkeen.";
+"batteryHistoryRange" = "Aikaväli";
+"batteryHistoryRangeAccessibility" = "Akkuhistorian aikaväli";
+"batteryHistoryRangeExplanation" = "Kiinteät aikavälit ulottuvat nykyhetkestä valitun päivämäärän verran taaksepäin. Aukot osoittavat ajanjaksot, joilta lukema puuttuu.";
+
+"connectionDiagramOtherApp" = "Muu sovellus";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Signaalin voimakkuus";
+
+"signalStrengthChartExplanation" = "Viimeisten kahden minuutin reaaliaikainen signaali. Uusia mittauksia saadaan noin sekunnin välein yhteyden ollessa aktiivinen.";
+
+"signalStrengthWeak" = "Heikko";
+"signalStrengthStrong" = "Voimakas";
+"signalStrengthLastMeasurement" = "Viimeisin mittaus";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Tilaukset";
+"heartbeat.mode" = "Tilaustila";
+"heartbeat.mode.automatic" = "Yksi";
+"heartbeat.mode.all" = "Kaikki";
+"heartbeat.footer.automatic" = "Valitsee automaattisesti yhden tuetun Bluetooth-kanavan heartbeat-päivityksiä varten ja pitää tilausten määrän pienenä. Jos tilaus epäonnistuu, kokeillaan toista kanavaa.";
+"heartbeat.footer.all" = "Tilaa kaikki tuetut Bluetooth-kanavat, jolloin minkä tahansa kanavan päivitys voi tuottaa heartbeat-signaalin.";
+"heartbeat.simpleFooter" = "Muutokset tulevat voimaan seuraavassa yhteydessä.";
+
+"signalStrengthDisconnected" = "Yhteys katkaistu";

@@ -3,7 +3,7 @@
 The iPhone selects which xDrip app collects Libre 2 readings. The Watch uses the
 phone's existing BLE protocol, crypto and parser, displays direct readings, and
 synchronises them back to the phone. This branch integrates the earlier prototype
-into upstream `develop` at `83009198dc5091398333f83aa832bbe3d99e3441`.
+into upstream `develop`, updated through `03709376` (version 7.1.0, build 4232).
 Other sensor types are outside this feature's scope.
 
 ## Setup
@@ -189,13 +189,22 @@ are never reused. Session IDs, credentials and retired IDs reject stale transfer
 These are current transaction safeguards, not support for obsolete protocol versions.
 The four phases remain `phone`, `preparingWatch`, `watch`, `returningToPhone`.
 
+The shared collector follows upstream's immediate unlock after requesting the F002
+subscription, without waiting for its notification-state callback. The Watch still
+persists the next counter before writing F001. Both targets use upstream's frame
+assembler: complete buffers clear immediately and incomplete frames expire after
+three seconds using a monotonic clock. Parsing/history and application delivery run
+on main with the captured frame arrival time, so scheduling delays do not make a
+reading appear newer.
+
 ### Readings and downstream actions
 
 Each frame updates the existing Watch graph/complication path. Only the newest actual
 measurement enters the durable outbox; interpolated graph points are not uploaded.
 Units, limits and recent direct values restore from the existing complication cache;
 stale relayed glucose cannot replace newer direct data. Trend arrows use shared
-phone calculations.
+phone calculations, using the nearest older reading at least four minutes before
+the current reading. Gaps over 21 minutes hide the arrow.
 
 Latest delivery uses live messaging when reachable plus replaceable application
 context, independently of immutable history batches of up to 120 readings. Latest

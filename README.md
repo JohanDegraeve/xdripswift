@@ -7,7 +7,7 @@ xDrip4iOS (`xdripswift`) is a community-developed, open-source iOS app for displ
 xDrip4iOS is not related to the xDrip+ project for Android.
 
 > [!IMPORTANT]
-> xDrip4iOS is experimental software. It is not a regulated medical device and is not approved for making treatment decisions. Never rely on it as the only source of glucose information; use it at your own risk and confirm readings with approved equipment when necessary.
+> xDrip4iOS is experimental software. It is not a regulated medical device and is not approved for making treatment decisions. Never rely on it as the only source of glucose information. Use it at your own risk and confirm readings with approved equipment when necessary.
 
 ## Current capabilities
 

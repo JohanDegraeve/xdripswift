@@ -11,6 +11,10 @@
 "sensorType" = "Sensortyp";
 "serialNumber" = "Serienumer";
 "battery" = "Batteri";
+"versionCode" = "Versionskod";
+"voltageA" = "Spänning A";
+"voltageB" = "Spänning B";
+"waitingForData" = "Väntar på data...";
 "needsTransmitterId" = "Saknar sändar-ID";
 "scan" = "Scanna";
 "medtrumNanoPumpScanNoticeTitle" = "Anslutning till Medtrum Nano-pump";
@@ -43,7 +47,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Samexistensläge";
 "useOtherDexcomAppCoexistenceFooter" = "Samexistensläge låter oss fungera med en annan app, till exempel Dexcom eller CamAPS. Den appen måste fortsätta köras i bakgrunden.";
 "useOtherDexcomAppPrimaryFooter" = "Primärt läge ansluter som huvudapp och styr anslutningen.";
 "runningInCoexistenceMode" = "Körs i samexistensläge";
@@ -79,7 +82,7 @@
 "nfcScanNeeded" = "NFC scan needed";
 
 /// sensor warm-up text
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "Uppvärmning till";
 
 "nativeAlgorithm" = "Inbyggd Algoritm";
 "xDripAlgorithm" = "xDrip Algoritm";
@@ -121,15 +124,71 @@
 
 /* Dexcom G6 Bluetooth authentication slot */
 "dexcomG6BluetoothSlot" = "Bluetooth-kanal";
-"dexcomG6MobileAppSlot" = "Mobilapp (Standard)";
+"dexcomG6MobileAppSlot" = "Plats 2: Mobilapp (Standard)";
 "dexcomG6MobileAppSlotShort" = "Mobilapp";
-"dexcomG6MedicalDeviceSlot" = "Mottagare eller pump (Experimentell)";
+"dexcomG6MedicalDeviceSlot" = "Plats 1: Mottagare eller pump";
 "dexcomG6MedicalDeviceSlotShort" = "Pump";
 "dexcomG6MobileAppSlotFooter" = "Mobilapp-kanalen är standard för telefonanslutningar.";
 "dexcomG6MedicalDeviceSlotFooter" = "Mottagar- eller pumpkanalen är normalt reserverad för Dexcom-mottagaren eller en kompatibel pump. När den används av den här appen förblir mobilapp-kanalen tillgänglig för en telefon eller annan enhet.";
 "dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Inte tillgängligt i samexistensläge";
 "dexcomG6MedicalDeviceSlotWarning" = "Mottagar- eller pumpkanalen är normalt reserverad för en Dexcom-mottagare eller en kompatibel pump. Om du väljer den kan enheten hindras från att ansluta.\n\nAnvändning av mottagar- eller pumpkanalen bör endast betraktas som experimentell. Valet träder i kraft vid nästa autentisering.";
-"dexcomG6AnubisSlot" = "Kanal 3 (Anubis, experimentell)";
+"dexcomG6AnubisSlot" = "Plats 3: Anubis Extra";
+"dexcomG7MedicalDeviceSlot" = "Plats 1: Mottagare eller pump";
+"dexcomG7MedicalDeviceSlotShort" = "Pump";
+"dexcomG7MobileAppSlot" = "Plats 2: Mobilapp (Standard)";
+"dexcomG7SmartWatchSlot" = "Plats 3: Smartklocka";
+"dexcomG7PairingCodeMessage" = "Ange den fyrsiffriga koden från den aktuella sensorapplikatorn. Primärt läge kan inte autentisera utan denna kod.";
+"dexcomG7BluetoothSlot" = "Bluetooth-kanal";
+"dexcomG7MobileAppSlotShort" = "Mobilapp";
+"dexcomG7SmartWatchSlotShort" = "Smartklocka";
+"dexcomG7MobileAppSlotFooter" = "Mobilappskanalen (plats 2) är standard och den för närvarande validerade direkta G7-anslutningen.";
+"dexcomG7MedicalDeviceSlotFooter" = "Mottagar- eller pumpkanalen använder autentiseringsplats 1.";
+"dexcomG7SmartWatchSlotFooter" = "Smartklockskanalen använder fabrikens autentiseringsplats 3.";
 "dexcomG6AnubisSlotShort" = "Kanal 3";
 "dexcomG6AnubisSlotFooter" = "Kanal 3 är endast tillgänglig på Anubis-sändare. Den är experimentell och lämnar kanalerna Mobilapp och Mottagare eller pump tillgängliga för andra enheter.";
 "dexcomG6AnubisSlotWarning" = "Kanal 3 är en experimentell kanal som endast är tillgänglig på Anubis-sändare.\n\nAnvänd Kanal 3 endast för tester. Valet träder i kraft vid nästa autentisering.";
+"dexcomConnectionMode" = "Anslutningsläge";
+"dexcomPrimaryMode" = "Primärt";
+"dexcomCoexistenceMode" = "Samexistens";
+"dexcomPrimaryModePickerOption" = "Primärt läge";
+"dexcomCoexistenceModePickerOption" = "Samexistensläge";
+"dexcomG6ModeSelectionFooter" = "Du kan ändra G6-anslutningsläget senare i sändarens inställningar.";
+"dexcomConnectionModeSelectionExplanation" = "Primärt läge ansluter denna app direkt och kräver att alla andra appar som ansluter till Dexcom-enheten stängs.\n\nSamexistensläge är beroende av en annan app för att upprätthålla Dexcom-anslutningen och ta emot värden.";
+"dexcomBluetoothChannelSelectionExplanation" = "Välj den Bluetooth-kanal som denna app ska använda. Välj Mobilapp om du inte behöver lämna kanalen tillgänglig för en annan anslutning.";
+"dexcomG6CoexistenceModeSelectionMessage" = "Samexistensläge har valts. En annan app, till exempel Dexcom G6 eller CamAPS, måste ansluta till och autentisera G6-sändaren.\n\nLåt den andra appen fortsätta köras i bakgrunden, annars tar %@ inte emot några värden.";
+"dexcomG6PrimaryModeSelectionMessage" = "Primärt läge har valts. %@ måste vara den enda appen som ansluter till och autentiserar G6-sändaren.\n\nStäng alla andra appar som ansluter till sändaren eller inaktivera deras Bluetooth-behörighet. Annars kanske %@ eller den andra appen inte tar emot några värden.";
+"dexcomPrimaryModeAddFlowMessage" = "Anslut direkt som huvudapp. Koppla från alla andra appar från den här Dexcom.";
+"dexcomCoexistenceModeAddFlowMessage" = "Dela anslutningen med en annan app. Se till att Dexcom- eller CamAPS-appen fungerar korrekt i bakgrunden.";
+"dexcomG7NoSensorLabelFound" = "Ingen Dexcom G7-sensoretikett hittades på bilden.";
+"dexcomG7InvalidSensorLabelFound" = "En Data Matrix hittades, men den var inte en giltig Dexcom G7-sensoretikett.";
+
+
+/* Battery history */
+"batteryHistory" = "Batterihistorik";
+"batteryHistoryTransmitterID" = "Sändar-ID";
+"batteryHistoryNoData" = "Ingen batterihistorik";
+"batteryHistoryBeginsAfterReading" = "Historiken börjar efter nästa faktiska batteriavläsning.";
+"batteryHistoryRange" = "Intervall";
+"batteryHistoryRangeAccessibility" = "Intervall för batterihistorik";
+"batteryHistoryRangeExplanation" = "Fasta intervall går från nu och tillbaka det valda antalet dagar. Luckor visar perioder utan avläsning.";
+
+"connectionDiagramOtherApp" = "Annan app";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Signalstyrka";
+
+"signalStrengthChartExplanation" = "Livesignal för de senaste två minuterna. Nya mätningar tas emot ungefär varje sekund när enheten är ansluten.";
+
+"signalStrengthWeak" = "Svag";
+"signalStrengthStrong" = "Stark";
+"signalStrengthLastMeasurement" = "Senaste mätning";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Prenumerationer";
+"heartbeat.mode" = "Prenumerationsläge";
+"heartbeat.mode.automatic" = "Enkel";
+"heartbeat.mode.all" = "Alla";
+"heartbeat.footer.automatic" = "Väljer automatiskt en Bluetooth-kanal som stöds för heartbeat-uppdateringar och håller antalet prenumerationer nere. Om prenumerationen misslyckas provas en annan kanal.";
+"heartbeat.footer.all" = "Prenumererar på alla Bluetooth-kanaler som stöds, så att uppdateringar från vilken som helst kan ge ett heartbeat.";
+"heartbeat.simpleFooter" = "Ändringar gäller vid nästa anslutning.";
+
+"signalStrengthDisconnected" = "Frånkopplad";

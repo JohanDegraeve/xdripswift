@@ -44,6 +44,12 @@ enum Texts_TreatmentsView {
         return NSLocalizedString("treatments_basalRate", tableName: filename, bundle: Bundle.main, value: "Temp Basal", comment: "Temp Basal")
     }()
 
+    static let basalInjection = NSLocalizedString("treatments_basalInjection", tableName: filename, bundle: .main, value: "Basal (Injection)", comment: "Long-acting insulin injection, not a pump basal rate")
+    static let basalInjectionCopiedFooter = NSLocalizedString("treatments_basalInjectionCopiedFooter", tableName: filename, bundle: .main, value: "The basal amount and type have been copied from the previous entry", comment: "Footer for a new basal injection prefilled from the previous entry")
+    static let insulinDescription = NSLocalizedString("treatments_insulinDescription", tableName: filename, bundle: .main, value: "Insulin Type", comment: "Name of the long-acting insulin")
+    static let insulinDescriptionPlaceholder = NSLocalizedString("treatments_insulinDescriptionPlaceholder", tableName: filename, bundle: .main, value: "e.g. Tresiba", comment: "Example long-acting insulin name")
+    static let invalidBasalInjectionValueMessage = NSLocalizedString("treatments_invalidBasalInjectionValueMessage", tableName: filename, bundle: .main, value: "Please enter a whole number of units greater than zero.", comment: "Basal injections require positive integer units")
+
     static let automaticBasal: String = {
         return NSLocalizedString("treatments_automaticBasal", tableName: filename, bundle: Bundle.main, value: "Automatic Basal", comment: "One automatic basal insulin delivery")
     }()
@@ -90,6 +96,10 @@ enum Texts_TreatmentsView {
 
     static let noTreatmentsToShow:String = {
         return NSLocalizedString("treatments_noTreatmentsToShow", tableName: filename, bundle: Bundle.main, value: "No treatments to show for this date.", comment: "Shown when no treatments match the current date and filters.")
+    }()
+
+    static let treatmentType: String = {
+        return NSLocalizedString("treatments_treatmentType", tableName: filename, bundle: Bundle.main, value: "Treatment Type", comment: "Section heading when choosing a new treatment type.")
     }()
 
     static let type:String = {

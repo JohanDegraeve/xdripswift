@@ -11,6 +11,10 @@
 
 /// 
 "battery" = "Battery";
+"versionCode" = "Koda različice";
+"voltageA" = "Napetost A";
+"voltageB" = "Napetost B";
+"waitingForData" = "Čakanje na podatke...";
 
 /// cell text, shows when last reset was done, if known. Only for Dexcom
 "lastReset" = "Last Reset";
@@ -103,7 +107,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Način soobstoja";
 "useOtherDexcomAppCoexistenceFooter" = "Način soobstoja nam omogoča delovanje z drugo aplikacijo, na primer Dexcom ali CamAPS. Ta aplikacija mora še naprej delovati v ozadju.";
 "useOtherDexcomAppPrimaryFooter" = "Primarni način se poveže kot glavna aplikacija in nadzoruje povezavo.";
 "runningInCoexistenceMode" = "Deluje v načinu soobstoja";
@@ -147,13 +150,13 @@
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
 
 /// sensor warm-up text
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "Ogrevanje do";
 
 /// Scan again button
 "nfcScanFailedScanAgainButton" = "Scan Again";
 
 /// Tell the user the scan was successful and to just wait now for connection
-"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 
 /// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
 "readSuccessLast24Hours" = "Zadnjih 24 ur";
@@ -187,15 +190,71 @@
 
 /* Dexcom G6 Bluetooth authentication slot */
 "dexcomG6BluetoothSlot" = "Kanal Bluetooth";
-"dexcomG6MobileAppSlot" = "Mobilna aplikacija (Privzeto)";
+"dexcomG6MobileAppSlot" = "Reža 2: Mobilna aplikacija (Privzeto)";
 "dexcomG6MobileAppSlotShort" = "Mobilna aplikacija";
-"dexcomG6MedicalDeviceSlot" = "Sprejemnik ali črpalka (Poskusno)";
+"dexcomG6MedicalDeviceSlot" = "Reža 1: Sprejemnik ali črpalka";
 "dexcomG6MedicalDeviceSlotShort" = "Črpalka";
 "dexcomG6MobileAppSlotFooter" = "Kanal Mobilna aplikacija je privzet za telefonske povezave.";
 "dexcomG6MedicalDeviceSlotFooter" = "Kanal Sprejemnik ali črpalka je običajno rezerviran za sprejemnik Dexcom ali združljivo črpalko. Če ga uporablja ta aplikacija, ostane kanal Mobilna aplikacija na voljo za telefon ali drugo napravo.";
 "dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Ni na voljo v načinu soobstoja";
 "dexcomG6MedicalDeviceSlotWarning" = "Kanal Sprejemnik ali črpalka je običajno rezerviran za sprejemnik Dexcom ali združljivo črpalko. Če ga izberete, se ta naprava morda ne bo mogla povezati.\n\nUporaba kanala Sprejemnik ali črpalka naj se šteje samo za poskusno. Izbira začne veljati ob naslednjem preverjanju pristnosti.";
-"dexcomG6AnubisSlot" = "Kanal 3 (Anubis, poskusno)";
+"dexcomG6AnubisSlot" = "Reža 3: Anubis Extra";
+"dexcomG7MedicalDeviceSlot" = "Reža 1: Sprejemnik ali črpalka";
+"dexcomG7MedicalDeviceSlotShort" = "Črpalka";
+"dexcomG7MobileAppSlot" = "Reža 2: Mobilna aplikacija (Privzeto)";
+"dexcomG7SmartWatchSlot" = "Reža 3: Pametna ura";
+"dexcomG7PairingCodeMessage" = "Vnesite štirimestno kodo z aplikatorja trenutnega senzorja. Primarni način se brez te kode ne more overiti.";
+"dexcomG7BluetoothSlot" = "Kanal Bluetooth";
+"dexcomG7MobileAppSlotShort" = "Mobilna aplikacija";
+"dexcomG7SmartWatchSlotShort" = "Pametna ura";
+"dexcomG7MobileAppSlotFooter" = "Kanal Mobilna aplikacija (reža 2) je privzeti in trenutno potrjeni neposredni način povezave G7.";
+"dexcomG7MedicalDeviceSlotFooter" = "Kanal Sprejemnik ali črpalka uporablja overitveno režo 1.";
+"dexcomG7SmartWatchSlotFooter" = "Kanal Pametna ura uporablja tovarniško overitveno režo 3.";
 "dexcomG6AnubisSlotShort" = "Kanal 3";
 "dexcomG6AnubisSlotFooter" = "Kanal 3 je na voljo samo pri oddajnikih Anubis. Je poskusni in pušča kanala Mobilna aplikacija ter Sprejemnik ali črpalka na voljo drugim napravam.";
 "dexcomG6AnubisSlotWarning" = "Kanal 3 je poskusni kanal, ki je na voljo samo pri oddajnikih Anubis.\n\nKanal 3 uporabljajte samo za preizkušanje. Izbira začne veljati ob naslednjem preverjanju pristnosti.";
+"dexcomConnectionMode" = "Način povezave";
+"dexcomPrimaryMode" = "Primarni";
+"dexcomCoexistenceMode" = "Soobstoj";
+"dexcomPrimaryModePickerOption" = "Primarni način";
+"dexcomCoexistenceModePickerOption" = "Način soobstoja";
+"dexcomG6ModeSelectionFooter" = "Način povezave G6 lahko pozneje spremenite v nastavitvah oddajnika.";
+"dexcomConnectionModeSelectionExplanation" = "Primarni način poveže to aplikacijo neposredno in zahteva, da zaprete vse druge aplikacije, ki se povezujejo z napravo Dexcom.\n\nNačin soobstoja uporablja drugo aplikacijo za vzdrževanje povezave Dexcom in prejemanje odčitkov.";
+"dexcomBluetoothChannelSelectionExplanation" = "Izberite kanal Bluetooth, ki ga bo uporabljala ta aplikacija. Izberite Mobilna aplikacija, razen če mora ta kanal ostati na voljo za drugo povezavo.";
+"dexcomG6CoexistenceModeSelectionMessage" = "Izbran je način soobstoja. Druga aplikacija, na primer Dexcom G6 ali CamAPS, se mora povezati z oddajnikom G6 in ga preveriti.\n\nDruga aplikacija mora ostati zagnana v ozadju, sicer %@ ne bo prejemal odčitkov.";
+"dexcomG6PrimaryModeSelectionMessage" = "Izbran je primarni način. %@ mora biti edina aplikacija, ki se poveže z oddajnikom G6 in ga preveri.\n\nZaprite vse druge aplikacije, ki se povezujejo z oddajnikom, ali jim onemogočite dovoljenje Bluetooth. Sicer %@ ali druga aplikacija morda ne bo prejemala odčitkov.";
+"dexcomPrimaryModeAddFlowMessage" = "Povežite se neposredno kot glavna aplikacija. Prekinite povezavo vseh drugih aplikacij s tem Dexcomom.";
+"dexcomCoexistenceModeAddFlowMessage" = "Delite povezavo z drugo aplikacijo. Aplikacija Dexcom ali CamAPS mora pravilno delovati v ozadju.";
+"dexcomG7NoSensorLabelFound" = "Na fotografiji ni bila najdena oznaka senzorja Dexcom G7.";
+"dexcomG7InvalidSensorLabelFound" = "Najdena je bila koda Data Matrix, vendar ni bila veljavna oznaka senzorja Dexcom G7.";
+
+
+/* Battery history */
+"batteryHistory" = "Zgodovina baterije";
+"batteryHistoryTransmitterID" = "ID oddajnika";
+"batteryHistoryNoData" = "Ni zgodovine baterije";
+"batteryHistoryBeginsAfterReading" = "Zgodovina se začne po naslednjem dejanskem odčitku baterije.";
+"batteryHistoryRange" = "Obdobje";
+"batteryHistoryRangeAccessibility" = "Obdobje zgodovine baterije";
+"batteryHistoryRangeExplanation" = "Fiksna obdobja segajo od zdaj nazaj za izbrano število dni. Vrzeli prikazujejo obdobja brez odčitka.";
+
+"connectionDiagramOtherApp" = "Druga aplikacija";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Moč signala";
+
+"signalStrengthChartExplanation" = "Signal v živo v zadnjih dveh minutah. Med povezavo prispejo nove meritve približno vsako sekundo.";
+
+"signalStrengthWeak" = "Šibek";
+"signalStrengthStrong" = "Močan";
+"signalStrengthLastMeasurement" = "Zadnja meritev";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Naročnine";
+"heartbeat.mode" = "Način naročnine";
+"heartbeat.mode.automatic" = "Ena";
+"heartbeat.mode.all" = "Vse";
+"heartbeat.footer.automatic" = "Samodejno izbere en podprt kanal Bluetooth za posodobitve heartbeat in zmanjša število naročnin. Če naročnina ne uspe, poskusi drug kanal.";
+"heartbeat.footer.all" = "Naroči se na vse podprte kanale Bluetooth, tako da lahko posodobitve katerega koli od njih zagotovijo heartbeat.";
+"heartbeat.simpleFooter" = "Spremembe veljajo ob naslednji povezavi.";
+
+"signalStrengthDisconnected" = "Povezava prekinjena";

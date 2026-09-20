@@ -71,5 +71,8 @@ extension BLEPeripheral {
 
     /// timestamp when connection changed to connected or not connected
     @NSManaged public var lastConnectionStatusChangeTimeStamp: Date?
+
+    /// Genuine battery readings retained for this exact saved peripheral.
+    @NSManaged public var batteryHistorySamples: Set<BatteryHistorySample>?
     
 }

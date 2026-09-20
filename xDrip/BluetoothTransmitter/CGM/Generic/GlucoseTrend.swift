@@ -5,7 +5,8 @@ enum GlucoseTrend {
     static func slope(currentValue: Double, currentDate: Date, previousValue: Double, previousDate: Date) -> (Double, Bool) {
         let currentMilliseconds = currentDate.timeIntervalSince1970 * 1000
         let previousMilliseconds = previousDate.timeIntervalSince1970 * 1000
-        if currentDate == previousDate || currentMilliseconds - previousMilliseconds > Double(ConstantsBGGraphBuilder.maxSlopeInMinutes * 60 * 1000) {
+        let minutes = currentDate.timeIntervalSince(previousDate) / 60
+        if minutes < Double(ConstantsBGGraphBuilder.minSlopeInMinutes) || minutes > Double(ConstantsBGGraphBuilder.maxSlopeInMinutes) {
             return (0, true)
         }
         return ((previousValue - currentValue) / (previousMilliseconds - currentMilliseconds), false)

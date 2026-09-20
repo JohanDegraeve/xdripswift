@@ -16,6 +16,7 @@
 "common_days" = "dias";
 "common_landscape_comparingWithLast" = "Comparação com os últimos:";
 "common_landscape_comparisonDays" = "%d dias";
+"common_landscape_comparisonNone" = "Nenhuma";
 "common_today" = "Hoje";
 "common_week" = "semana";
 "common_hourshort" = "h";
@@ -79,7 +80,7 @@
 "common_statistics_cvTrend" = "Tendência CV";
 "common_statistics_dailyPattern" = "Padrão Diário";
 "common_statistics_averageFormat" = "Média %@";
-"common_statistics_dailyPatternFooter" = "As barras mostram a percentagem diária no intervalo 70-180 mg/dL. A linha tracejada marca o alvo clínico de 70%.";
+"common_statistics_dailyPatternFooter" = "As barras mostram a percentagem diária no intervalo %@. A linha tracejada marca o alvo clínico de 70%%.";
 "common_statistics_dailySummary" = "Resumo Diário";
 "common_statistics_bestDay" = "Melhor Dia";
 "common_statistics_mostLow" = "Mais Baixo";
@@ -118,3 +119,17 @@
 "common_statistics_averageCarbs" = "Hidratos médios";
 "common_statistics_tempBasalDelta" = "Delta basal temporária";
 "common_statistics_waitingForGlucoseData" = "A aguardar dados de glicose...";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Insulina ativa estimada";
+"therapy.estimatedCOB" = "Hidratos de carbono ativos estimados";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Alterações não guardadas";
+"common_save" = "Guardar";
+"common_discardChanges" = "Descartar alterações";
+"common_back" = "Voltar";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Sensor a aquecer";
+"common_sensorWarmupUntilFormat" = "Até às %@";

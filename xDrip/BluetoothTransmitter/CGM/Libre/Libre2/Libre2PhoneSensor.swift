@@ -23,15 +23,14 @@ final class Libre2PhoneSensor: Libre2SensorDataSource {
         return Libre2StreamingUnlock(code: defaults.libreActiveSensorUnlockCode, count: defaults.libreActiveSensorUnlockCount, shouldWrite: !defaults.suppressUnLockPayLoad)
     }
 
-    func parseBLEFrame(_ frame: Data, sensorUID: Data) throws -> (bleGlucose: [GlucoseData], sensorTimeInMinutes: UInt16)? {
+    func parseBLEFrame(_ decryptedFrame: Data, date: Date) -> (bleGlucose: [GlucoseData], sensorTimeInMinutes: UInt16)? {
         let parameters = defaults.libre1DerivedAlgorithmParameters
-        trace("in peripheral didUpdateValueFor libreSensorUID = %{public}@, libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug, sensorUID.hexEncodedString(), parameters?.description ?? "unknown")
         if webOOPEnabled {
             guard let parameters = parameters, parameters.serialNumber == serialNumber else {
                 trace("web oop enabled but libre1DerivedAlgorithmParameters is nil or libre1DerivedAlgorithmParameters.serialNumber != sensorSerialNumber, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
                 return nil
             }
         }
-        return try Libre2BLEUtilities.parseBLEData(Data(Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: frame)), libre1DerivedAlgorithmParameters: webOOPEnabled ? parameters : nil, defaults: defaults)
+        return Libre2BLEUtilities.parseBLEData(decryptedFrame, libre1DerivedAlgorithmParameters: webOOPEnabled ? parameters : nil, defaults: defaults, date: date)
     }
 }

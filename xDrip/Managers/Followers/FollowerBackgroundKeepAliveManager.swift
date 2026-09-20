@@ -30,14 +30,14 @@ import os
 ///    source has not been logged out. Sources requiring authentication, such as CareLink, must also
 ///    confirm a usable authenticated session.
 /// 3. Immediately after those checks pass, call `start(for:)` with this follower's
-///    `FollowerBackgroundKeepAliveSource`. This reports operational state only; keep the follower's
+///    `FollowerBackgroundKeepAliveSource`. This reports operational state only. Keep the follower's
 ///    initial download, recurring polling, retries, and heartbeat response in their existing code.
 /// 4. Shared Calendar alone calls `start(for:backgroundRefresh:)`, passing its existing throttled
 ///    `downloadFromKeepAliveTick()` path. Every network-backed follower must use `start(for:)` so an
 ///    audio health check can never initiate a network request.
 /// 5. Call `stop(for:)` on every path that makes the source non-operational: source deselection,
 ///    master-mode selection, missing configuration, explicit logout, authentication loss, and
-///    `deinit`. It is safe for several teardown paths to call `stop`; a stale source cannot stop a
+///    `deinit`. It is safe for several teardown paths to call `stop`. A stale source cannot stop a
 ///    newer source that has already registered.
 /// 6. Do not observe the keep-alive setting, create audio or keep-alive timers, register audio
 ///    lifecycle callbacks, or call `refreshForSelectedMode()` from a follower manager. This class
@@ -50,10 +50,10 @@ import os
 ///
 /// This class deliberately preserves the established Normal and Aggressive engine:
 ///
-/// - one retained one-shot player for `1-millisecond-of-silence.caf`;
-/// - ordinary one-shot playback, replayed only after `isPlaying` becomes `false`;
-/// - one suspended `RepeatingTimer`, using the existing 5-second or 2-second interval;
-/// - one shared background callback to resume/check playback;
+/// - one retained one-shot player for `1-millisecond-of-silence.caf`
+/// - ordinary one-shot playback, replayed only after `isPlaying` becomes `false`
+/// - one suspended `RepeatingTimer`, using the existing 5-second or 2-second interval
+/// - one shared background callback to resume/check playback
 /// - one shared foreground callback to suspend the timer without altering the player.
 ///
 /// Continuous mode is intentionally isolated on a second retained player created from the same
@@ -135,7 +135,7 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     ///
     /// - Parameters:
     ///   - applicationManager: Supplies the foreground and background lifecycle callbacks. The
-    ///     production default uses the shared `ApplicationManager`; tests inject a passive fake.
+    ///     production default uses the shared `ApplicationManager`. Tests inject a passive fake.
     ///   - selectedKeepAliveType: Reads the user's current keep-alive selection. It is evaluated at
     ///     configuration time and again at every lifecycle event and timer tick so queued work
     ///     cannot use an obsolete normal, aggressive, continuous, disabled, or heartbeat value.
@@ -144,7 +144,7 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     ///   - timerFactory: Creates the single suspended keep-alive timer at the selected interval.
     ///     Injection allows tests to drive ticks deterministically without waiting in real time.
     ///   - notificationCenter: Supplies audio-interruption notifications. The production default
-    ///     uses `NotificationCenter.default`; tests inject an isolated notification center.
+    ///     uses `NotificationCenter.default`. Tests inject an isolated notification center.
     init(
         applicationManager: FollowerBackgroundApplicationManaging = ApplicationManager.shared,
         selectedKeepAliveType: @escaping () -> FollowerBackgroundKeepAliveType = {
@@ -233,7 +233,7 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     /// - Parameters:
     ///   - source: The follower that is currently configured, selected, and operational.
     ///   - backgroundRefresh: Optional work invoked after the audio check on background entry and
-    ///     after each keep-alive tick. Only Shared Calendar supplies this closure; network-backed
+    ///     after each keep-alive tick. Only Shared Calendar supplies this closure. Network-backed
     ///     followers must pass `nil` so audio ticks remain independent of follower polling.
     func start(for source: FollowerBackgroundKeepAliveSource, backgroundRefresh: (() -> Void)?) {
         stateLock.lock()
@@ -384,7 +384,7 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     /// Handles one shared replay-timer tick after revalidating current source and setting state.
     ///
     /// Revalidation makes an already-queued callback harmless after source deselection or a change
-    /// to disabled or heartbeat. The optional Shared Calendar refresh follows the audio check; this
+    /// to disabled or heartbeat. The optional Shared Calendar refresh follows the audio check. This
     /// method never invokes a network follower's polling API.
     ///
     /// - Parameters:
@@ -408,7 +408,7 @@ final class FollowerBackgroundKeepAliveManager: NSObject, FollowerBackgroundKeep
     /// Returns the shared timer interval for an audio-enabled keep-alive mode.
     ///
     /// Normal and Aggressive retain their proven intervals. Continuous uses the normal five-second
-    /// cadence only as a health check and Shared Calendar refresh opportunity; the audio itself is
+    /// cadence only as a health check and Shared Calendar refresh opportunity. The audio itself is
     /// already looping independently. Disabled and Heartbeat have no audio timer.
     private func keepAliveInterval(for keepAliveType: FollowerBackgroundKeepAliveType) -> Int? {
         switch keepAliveType {
@@ -597,14 +597,14 @@ protocol FollowerBackgroundKeepAliveManaging: AnyObject {
     /// - Parameters:
     ///   - source: The follower whose own configuration and operational checks have passed.
     ///   - backgroundRefresh: Optional work invoked after background audio checks. This is reserved
-    ///     for Shared Calendar's existing throttled read; all network followers pass `nil`.
+    ///     for Shared Calendar's existing throttled read. All network followers pass `nil`.
     func start(for source: FollowerBackgroundKeepAliveSource, backgroundRefresh: (() -> Void)?)
 
     /// Removes a follower from the application-wide shared keep-alive engine if it still owns it.
     ///
     /// The source check prevents delayed teardown from a previously selected follower from stopping
     /// a newer source. A matching stop removes only shared audio scheduling and the optional Calendar
-    /// action; follower polling, authentication, retries, and session teardown remain the caller's
+    /// action. Follower polling, authentication, retries, and session teardown remain the caller's
     /// responsibility.
     ///
     /// - Parameter source: The follower that is no longer selected, configured, or operational.
@@ -637,7 +637,7 @@ protocol FollowerBackgroundAudioPlaying: AnyObject {
 
     /// Controls whether the player's audio repeats after reaching the end of the CAF.
     ///
-    /// The dedicated Continuous player receives `-1`; the proven one-shot player retains the
+    /// The dedicated Continuous player receives `-1`. The proven one-shot player retains the
     /// `AVAudioPlayer` default of `0` and is never modified by Continuous mode.
     var numberOfLoops: Int { get set }
 

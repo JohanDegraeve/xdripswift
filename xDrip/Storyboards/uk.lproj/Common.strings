@@ -122,6 +122,7 @@
 "common_days" = "days";
 "common_landscape_comparingWithLast" = "Порівняння з останніми:";
 "common_landscape_comparisonDays" = "%d днів";
+"common_landscape_comparisonNone" = "Немає";
 
 /// the word today
 "common_todayshort" = "Today";
@@ -156,3 +157,17 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Оцінений активний інсулін";
+"therapy.estimatedCOB" = "Оцінені активні вуглеводи";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Незбережені зміни";
+"common_save" = "Зберегти";
+"common_discardChanges" = "Відхилити зміни";
+"common_back" = "Назад";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Сенсор прогрівається";
+"common_sensorWarmupUntilFormat" = "До %@";
