@@ -45,7 +45,11 @@
 "common_statistics_inRange" = "In Range";
 "common_statistics_high" = "High";
 "common_statistics_average" = "Average";
-"common_statistics_a1c" = "HbA1c";
+"common_statistics_gmiTrend" = "GMI-tendens";
+"common_statistics_threeDay" = "Hver 3. dag";
+"common_statistics_weekly" = "Ugentligt";
+"common_statistics_daily" = "Dagligt";
+"common_statistics_gmi" = "GMI";
 "common_statistics_cv" = "CV";
 "common_dontshowagain" = "Don't Show Again";
 

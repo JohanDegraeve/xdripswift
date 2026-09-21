@@ -529,8 +529,8 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_timeInRangeTypeUserDefinedRange", tableName: filename, bundle: Bundle.main, value: "User Range", comment: "statistics settings, prefer user-defined range")
     }()
     
-    static let labelUseIFFCA1C: String = {
-        return NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "HbA1c in mmols/mol", comment: "statistics settings, use IFCC method for HbA1c")
+    static let labelUseIFCCGMI: String = {
+        return NSLocalizedString("settingsviews_useIFCCGMI", tableName: filename, bundle: Bundle.main, value: "GMI in mmols/mol", comment: "statistics settings, display GMI in IFCC units")
     }()
     
     

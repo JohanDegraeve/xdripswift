@@ -31,7 +31,7 @@
 "settingsviews_showStatistics" = "الإحصائيات";
 "settingsviews_daysToUseStatisticsTitle" = "عدد الأيام للاحصائيات";
 "settingsviews_daysToUseStatisticsMessage" = "الحد الأقصى للأيام التي يجب أن نحاول استخدامها لحساب الإحصائيات?\n\n(أدخل 0 لحساب احصائيات اليوم منذ منتصف الليل)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "جهاز الإرسال";
 "settingsviews_transmittertype" = "نوع جهاز الإرسال";
 "settingsviews_transmitterid" = "رقم هوية جهاز الإرسال";

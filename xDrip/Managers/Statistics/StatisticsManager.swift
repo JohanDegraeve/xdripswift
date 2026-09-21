@@ -451,7 +451,7 @@ public final class StatisticsManager: @unchecked Sendable {
                 highStatisticValue: 0,
                 inRangeStatisticValue: 0,
                 averageStatisticValue: 0,
-                a1CStatisticValue: 0,
+                gmiPercentage: 0,
                 cVStatisticValue: 0,
                 lowLimitForTIR: lowLimitForTIR,
                 highLimitForTIR: highLimitForTIR,
@@ -460,7 +460,7 @@ public final class StatisticsManager: @unchecked Sendable {
         }
 
         // TIR must use the same stored, cadence-approved samples as Statistics and reports. The
-        // additional 4.5-minute filter below is retained only for the legacy Home average/A1C/CV
+        // additional 4.5-minute filter below is retained only for the legacy Home average/CV
         // calculation. Applying it to TIR made otherwise identical app surfaces count different
         // readings.
         let rangeDistribution = GlucoseRangeDistribution(
@@ -475,7 +475,7 @@ public final class StatisticsManager: @unchecked Sendable {
                 highStatisticValue: 0,
                 inRangeStatisticValue: 0,
                 averageStatisticValue: 0,
-                a1CStatisticValue: 0,
+                gmiPercentage: 0,
                 cVStatisticValue: 0,
                 lowLimitForTIR: lowLimitForTIR,
                 highLimitForTIR: highLimitForTIR,
@@ -484,7 +484,9 @@ public final class StatisticsManager: @unchecked Sendable {
         }
 
         let averageStatisticValue = filteredValues.reduce(0, +) / Double(filteredValues.count)
-        let a1CStatisticValue = Self.a1cValue(forAverage: averageStatisticValue, isMgDl: isMgDl)
+        // GMI shares the report sample population; only legacy average/CV retain the extra filter.
+        let averageMgDl = samples.reduce(0) { $0 + $1.valueMgDl } / Double(samples.count)
+        let gmiPercentage = GlucoseReportClinicalMath.gmiPercentage(forAverageMgDl: averageMgDl)
         let cVStatisticValue = Self.coefficientOfVariation(values: filteredValues, average: averageStatisticValue)
         let firstDate = samples.first?.date ?? Date()
         var numberOfDaysUsed = calendar.dateComponents([.day], from: firstDate - 5 * 60, to: Date()).day ?? 0
@@ -497,7 +499,7 @@ public final class StatisticsManager: @unchecked Sendable {
             highStatisticValue: rangeDistribution.abovePercentage,
             inRangeStatisticValue: rangeDistribution.inRangePercentage,
             averageStatisticValue: averageStatisticValue,
-            a1CStatisticValue: a1CStatisticValue,
+            gmiPercentage: gmiPercentage,
             cVStatisticValue: cVStatisticValue,
             lowLimitForTIR: lowLimitForTIR,
             highLimitForTIR: highLimitForTIR,
@@ -522,9 +524,10 @@ public final class StatisticsManager: @unchecked Sendable {
             let values = filteredRootStatisticValues(samples: daySamples, isMgDl: isMgDl)
             statisticsByDay[day] = makeStatisticsForDay(
                 values: values,
+                gmiPercentage: daySamples.isEmpty ? 0 : GlucoseReportClinicalMath.gmiPercentage(
+                    forAverageMgDl: daySamples.reduce(0) { $0 + $1.valueMgDl } / Double(daySamples.count)),
                 lowLimitForTIR: lowLimitForTIR,
-                highLimitForTIR: highLimitForTIR,
-                isMgDl: isMgDl
+                highLimitForTIR: highLimitForTIR
             )
 
             guard let nextDay = calendar.date(byAdding: .day, value: 1, to: day) else { break }
@@ -534,14 +537,14 @@ public final class StatisticsManager: @unchecked Sendable {
         return statisticsByDay
     }
 
-    private func makeStatisticsForDay(values: [Double], lowLimitForTIR: Double, highLimitForTIR: Double, isMgDl: Bool) -> Statistics {
+    private func makeStatisticsForDay(values: [Double], gmiPercentage: Double, lowLimitForTIR: Double, highLimitForTIR: Double) -> Statistics {
         guard !values.isEmpty else {
             return Statistics(
                 lowStatisticValue: 0,
                 highStatisticValue: 0,
                 inRangeStatisticValue: 0,
                 averageStatisticValue: 0,
-                a1CStatisticValue: 0,
+                gmiPercentage: 0,
                 cVStatisticValue: 0,
                 lowLimitForTIR: lowLimitForTIR,
                 highLimitForTIR: highLimitForTIR,
@@ -561,7 +564,7 @@ public final class StatisticsManager: @unchecked Sendable {
             highStatisticValue: rangeDistribution.abovePercentage,
             inRangeStatisticValue: rangeDistribution.inRangePercentage,
             averageStatisticValue: averageStatisticValue,
-            a1CStatisticValue: Self.a1cValue(forAverage: averageStatisticValue, isMgDl: isMgDl),
+            gmiPercentage: gmiPercentage,
             cVStatisticValue: Self.coefficientOfVariation(values: values, average: averageStatisticValue),
             lowLimitForTIR: lowLimitForTIR,
             highLimitForTIR: highLimitForTIR,
@@ -1576,17 +1579,6 @@ public final class StatisticsManager: @unchecked Sendable {
         return eventCount
     }
 
-    private static func a1cValue(forAverage average: Double, isMgDl: Bool) -> Double {
-        let averageMgDl = isMgDl ? average : average / ConstantsBloodGlucose.mgDlToMmoll
-
-        // NGSP/DCCT and IFCC conversion equations: http://www.ngsp.org/ifccngsp.asp
-        if UserDefaults.standard.useIFCCA1C {
-            return (((46.7 + averageMgDl) / 28.7) - 2.152) / 0.09148
-        } else {
-            return (46.7 + averageMgDl) / 28.7
-        }
-    }
-
     private static func coefficientOfVariation(values: [Double], average: Double) -> Double {
         guard average > 0 else { return 0 }
         return standardDeviation(values: values, average: average) / average * 100
@@ -1670,7 +1662,8 @@ public final class StatisticsManager: @unchecked Sendable {
         var highStatisticValue: Double
         var inRangeStatisticValue: Double
         var averageStatisticValue: Double
-        var a1CStatisticValue: Double
+        // Keep GMI in percentage units; convert only when displaying the result.
+        var gmiPercentage: Double
         var cVStatisticValue: Double
         var lowLimitForTIR: Double
         var highLimitForTIR: Double

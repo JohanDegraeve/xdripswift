@@ -38,7 +38,7 @@
 "settingsviews_showStatistics" = "Statistik";
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
 "settingsviews_daysToUseStatisticsMessage" = "Maximum days we should try to use to calculate the statistics?\n\n(Enter 0 to calculate today since midnight)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_transmittertype" = "Transmitter Type";
 "settingsviews_transmitterid" = "Transmitter ID";

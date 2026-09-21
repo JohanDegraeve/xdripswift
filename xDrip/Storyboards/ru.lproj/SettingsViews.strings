@@ -41,7 +41,7 @@
 "settingsviews_showStatistics" = "Статистика";
 "settingsviews_daysToUseStatisticsTitle" = "Дней для расчета";
 "settingsviews_daysToUseStatisticsMessage" = "Максимальное количество дней, которые мы должны попытаться использовать для расчета статистики?\n\n(Введите 0, чтобы рассчитать сегодня с полуночи)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Транисмиттер";
 "settingsviews_transmittertype" = "Тип трансмиттера";
 "settingsviews_transmitterid" = "Идентификатор трансмиттера";

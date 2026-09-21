@@ -94,7 +94,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard";
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_transmittertype" = "Transmitter Type";
 "settingsviews_transmitterid" = "Transmitter ID";

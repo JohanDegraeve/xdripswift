@@ -101,7 +101,7 @@
 "settingsviews_urgentHighValue" = "Urgent High Value";
 
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 
 /// dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload
 "settingsviews_dexcomShareUploadSerialNumber" = "Receiver Serial Number";

@@ -37,7 +37,7 @@
 "settingsviews_showStatistics" = "Statistieken";
 "settingsviews_daysToUseStatisticsTitle" = "Hoeveel dagen berekenen";
 "settingsviews_daysToUseStatisticsMessage" = "Maximum aantal dagen te gebruiken om de statistieken te berekenen?\n\n(0 betekent vanaf vandaag 00:00)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_givetransmitterid" = "Voer Transmitter ID In";
 "settingsviews_nonfixedtransmitter" = "Meerpuntskalibratie";

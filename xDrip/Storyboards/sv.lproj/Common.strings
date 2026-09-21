@@ -45,7 +45,11 @@
 "common_statistics_inRange" = "Normalvärde";
 "common_statistics_high" = "Högt";
 "common_statistics_average" = "Medel";
-"common_statistics_a1c" = "HbA1c";
+"common_statistics_gmiTrend" = "GMI-trend";
+"common_statistics_threeDay" = "Var tredje dag";
+"common_statistics_weekly" = "Veckovis";
+"common_statistics_daily" = "Dagligen";
+"common_statistics_gmi" = "GMI";
 "common_statistics_cv" = "CV";
 
 "common_dontshowagain" = "Visa inte igen";

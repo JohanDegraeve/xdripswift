@@ -319,7 +319,7 @@
 "settingsviews_sectiontitlestatistics" = "Statistics";
 
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 
 /// statistics settings, show statistics on home screen
 "settingsviews_showStatistics" = "Statistiche";

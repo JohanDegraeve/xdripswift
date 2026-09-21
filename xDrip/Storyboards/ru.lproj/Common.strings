@@ -45,7 +45,11 @@
 "common_statistics_inRange" = "В диапазоне";
 "common_statistics_high" = "Выс";
 "common_statistics_average" = "Средний";
-"common_statistics_a1c" = "HbA1c";
+"common_statistics_gmiTrend" = "Тренд GMI";
+"common_statistics_threeDay" = "За 3 дня";
+"common_statistics_weekly" = "Еженедельно";
+"common_statistics_daily" = "Ежедневно";
+"common_statistics_gmi" = "GMI";
 "common_statistics_cv" = "CV";
 "common_dontshowagain" = "Не показывать снова";
 

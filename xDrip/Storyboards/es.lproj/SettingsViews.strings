@@ -75,7 +75,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Estándar";
 "settingsviews_timeInRangeTypeTightRange" = "Rango Estrecho";
 "settingsviews_timeInRangeTypeUserDefinedRange" = "Rango Usuario";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmisor";
 "settingsviews_transmittertype" = "Tipo de Transmisor";
 "settingsviews_transmitterid" = "ID del Transmisor";

@@ -31,7 +31,7 @@
 "settingsviews_showStatistics" = "Statistiques";
 "settingsviews_daysToUseStatisticsTitle" = "Nombre de jours";
 "settingsviews_daysToUseStatisticsMessage" = "Nombre maximum de jours utilisés pour le calcul des statistiques?\n\n(Saisir 0 pour aujourd'hui depuis minuit)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmetteur";
 "settingsviews_transmittertype" = "Type de Transmetteur";
 "settingsviews_transmitterid" = "Transmetteur ID";

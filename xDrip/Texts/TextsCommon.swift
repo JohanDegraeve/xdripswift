@@ -243,10 +243,6 @@ class Texts_Common {
         return NSLocalizedString("common_statistics_average", tableName: filename, bundle: Bundle.main, value: "Average", comment: "the word average")
     }()
     
-    static let a1cStatistics = {
-        return NSLocalizedString("common_statistics_a1c", tableName: filename, bundle: Bundle.main, value: "HbA1c", comment: "phrase HbA1c")
-    }()
-    
     static let cvStatistics = {
         return NSLocalizedString("common_statistics_cv", tableName: filename, bundle: Bundle.main, value: "CV", comment: "coefficient of variation")
     }()
@@ -327,8 +323,16 @@ class Texts_Common {
         return NSLocalizedString("common_statistics_insufficientData", tableName: filename, bundle: Bundle.main, value: "Insufficient data", comment: "statistics chart empty message")
     }()
 
-    static let statisticsEstimatedA1cTrend = {
-        return NSLocalizedString("common_statistics_estimatedA1cTrend", tableName: filename, bundle: Bundle.main, value: "Estimated HbA1c trend", comment: "statistics estimated HbA1c trend chart title")
+    static let statisticsGMITrend = {
+        return NSLocalizedString("common_statistics_gmiTrend", tableName: filename, bundle: Bundle.main, value: "GMI trend", comment: "statistics GMI trend chart title")
+    }()
+
+    static let statisticsThreeDay = {
+        return NSLocalizedString("common_statistics_threeDay", tableName: filename, bundle: Bundle.main, value: "3-day", comment: "three-day GMI trend interval")
+    }()
+
+    static let statisticsWeekly = {
+        return NSLocalizedString("common_statistics_weekly", tableName: filename, bundle: Bundle.main, value: "Weekly", comment: "weekly GMI trend interval")
     }()
 
     static let statisticsCVTrend = {

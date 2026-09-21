@@ -202,7 +202,7 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
                 return Texts_SettingsView.labelTimeInRangeType
                     
             case .useIFCCA1C:
-                return Texts_SettingsView.labelUseIFFCA1C
+                return Texts_SettingsView.labelUseIFCCGMI
                 
         }
     }

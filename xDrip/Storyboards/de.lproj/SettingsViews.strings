@@ -304,7 +304,7 @@
 "settingsviews_showStatistics" = "Statistik";
 "settingsviews_daysToUseStatisticsTitle" = "Tage zum berechnen";
 "settingsviews_daysToUseStatisticsMessage" = "Maximale Tage anhand dessen versucht wird den Verlauf zu berechnen?\n\n(Bei 0 wird heute ab Mitternacht berechnet)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 
 "settingsviews_showClockWhenScreenIsLocked" = "Uhr";
 

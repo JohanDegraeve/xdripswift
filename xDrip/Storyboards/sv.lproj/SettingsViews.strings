@@ -36,7 +36,7 @@
 "settingsviews_showStatistics" = "Statistik";
 "settingsviews_daysToUseStatisticsTitle" = "Dagar att beräkna";
 "settingsviews_daysToUseStatisticsMessage" = "Maximalt antal dagar för beräkning av statistik?\n\n(ange 0 för beräkning sedan midnatt)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Sändare";
 "settingsviews_transmittertype" = "Typ av sändare";
 "settingsviews_transmitterid" = "Sändar-ID";

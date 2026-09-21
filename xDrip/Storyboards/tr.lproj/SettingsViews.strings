@@ -35,7 +35,7 @@
 "settingsviews_showStatistics" = "İstatistikler";
 "settingsviews_daysToUseStatisticsTitle" = "Hesaplanacak Günler";
 "settingsviews_daysToUseStatisticsMessage" = "İstatistikleri hesaplamak için kullanmaya çalışmamız gereken maksimum gün sayısı?\n\n(Gece yarısından itibaren bugünü hesaplamak için 0 girin)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Verici";
 "settingsviews_transmittertype" = "Verici Tipi";
 "settingsviews_transmitterid" = "Verici Kimliği";
