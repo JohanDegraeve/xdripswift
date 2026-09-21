@@ -1265,6 +1265,7 @@
 		4F3100153007000100000001 /* BatteryHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryHistoryTests.swift; sourceTree = "<group>"; };
 		4F3100313007000100000001 /* xdrip v31.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v31.xcdatamodel"; sourceTree = "<group>"; };
 		4F3200023008000100000001 /* BgReadingTrendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingTrendTests.swift; sourceTree = "<group>"; };
+		4F3200313008000100000001 /* xdrip v32.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v32.xcdatamodel"; sourceTree = "<group>"; };
 		50E2401E5ED94424A2FEC5E8 /* xDrip Tests/TherapyMetricsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "xDrip Tests/TherapyMetricsTests.swift"; sourceTree = SOURCE_ROOT; };
 		5A0100013015000100000001 /* GlucoseRangeDistribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseRangeDistribution.swift; sourceTree = "<group>"; };
 		5A0100033015000100000001 /* GlucoseRangeDistributionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseRangeDistributionTests.swift; sourceTree = "<group>"; };
@@ -2089,14 +2090,14 @@
 				F081BB1D5F106F950C4A8EA4 /* CareLinkAccountState.swift */,
 				F40AD096DBCD9BD7C4BA770E /* CareLinkClient.swift */,
 				7C0FD9F50417D2E4B3ABA2D6 /* CareLinkFollowManager.swift */,
+				A2000000000000000000000F /* CareLinkGlucoseParser.swift */,
 				B7A32F780DBE240AE91ECDBB /* CareLinkModels.swift */,
 				A2000000000000000000000C /* CareLinkPresentation.swift */,
-				A2000000000000000000000F /* CareLinkGlucoseParser.swift */,
-				A2000000000000000000000E /* CareLinkTherapyParser.swift */,
-				A2000000000000000000000D /* CareLinkWebLogin.swift */,
-				CA1E00020000000000000001 /* CareLinkTherapyImporter.swift */,
 				CA1E00040000000000000001 /* CareLinkPumpStatusView.swift */,
+				CA1E00020000000000000001 /* CareLinkTherapyImporter.swift */,
+				A2000000000000000000000E /* CareLinkTherapyParser.swift */,
 				2BBDAD3BFBEF70B1B2A1AFAD /* CareLinkTokenStore.swift */,
+				A2000000000000000000000D /* CareLinkWebLogin.swift */,
 			);
 			path = CareLink;
 			sourceTree = "<group>";
@@ -2622,15 +2623,14 @@
 		4F2600213002000200000001 /* xDrip Tests */ = {
 			isa = PBXGroup;
 			children = (
+				BA0709260000000000000002 /* BasalInjectionTests.swift */,
 				4F3100153007000100000001 /* BatteryHistoryTests.swift */,
 				4F3200023008000100000001 /* BgReadingTrendTests.swift */,
 				4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */,
 				B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */,
 				4D7C00013015000100000001 /* CalibrationReadinessTests.swift */,
 				ABA4DE8668C9A16DFF21A411 /* CareLinkTests.swift */,
-				50E2401E5ED94424A2FEC5E8 /* xDrip Tests/TherapyMetricsTests.swift */,
 				4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */,
-				AB1900023014000200000001 /* LiveActivityWarmupTests.swift */,
 				4D7E00013017000200000001 /* DexcomG6BluetoothSlotTests.swift */,
 				4B0C00242F3B000100000001 /* DexcomG6SensorLabelTests.swift */,
 				4D7F00013018000100000001 /* DexcomG7CalibrationTests.swift */,
@@ -2639,13 +2639,14 @@
 				4F2800123004000100000001 /* GlucoseChartYAxisRetentionTests.swift */,
 				5A0100033015000100000001 /* GlucoseRangeDistributionTests.swift */,
 				4D800003301F000100000001 /* Libre2FrameAssemblerTests.swift */,
+				AB1900023014000200000001 /* LiveActivityWarmupTests.swift */,
 				BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */,
-				BA0709260000000000000002 /* BasalInjectionTests.swift */,
 				A50000040000000000000001 /* OnlineHelpTests.swift */,
 				4F2800113004000100000001 /* RootHomeInteractionTests.swift */,
 				4F2600123002000200000001 /* SensorHealthIssueManagerTests.swift */,
 				4F2600113002000200000001 /* SensorNoisePersistenceTests.swift */,
 				4D7A00053014000100000001 /* TroubleshootingLogTests.swift */,
+				50E2401E5ED94424A2FEC5E8 /* xDrip Tests/TherapyMetricsTests.swift */,
 			);
 			path = "xDrip Tests";
 			sourceTree = "<group>";
@@ -6109,6 +6110,7 @@
 		F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				4F3200313008000100000001 /* xdrip v32.xcdatamodel */,
 				4F3100313007000100000001 /* xdrip v31.xcdatamodel */,
 				4F3000313006000100000001 /* xdrip v30.xcdatamodel */,
 				4F2900313005000100000001 /* xdrip v29.xcdatamodel */,
@@ -6130,7 +6132,7 @@
 				F85FF3CB252F9C9A004E6FF1 /* xdrip v13.xcdatamodel */,
 				F85FF3C3252D0C32004E6FF1 /* xdrip v12.xcdatamodel */,
 			);
-			currentVersion = 4F3100313007000100000001 /* xdrip v31.xcdatamodel */;
+			currentVersion = 4F3200313008000100000001 /* xdrip v32.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

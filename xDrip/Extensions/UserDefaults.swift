@@ -105,6 +105,7 @@ extension UserDefaults {
         case careLinkSelectedPatientID = "careLinkSelectedPatientID"
         /// Store-wide historical repair completed and saved successfully.
         case careLinkTimestampRepairCompleted = "careLinkTimestampRepairCompleted"
+        case careLinkHistoryRestoreGeneration = "careLinkHistoryRestoreGeneration"
         /// Corroborated patient namespaces used to deduplicate future imports.
         case careLinkPatientAliases = "careLinkPatientAliases"
         /// CarePartner mobile app version used for discovery and data requests.

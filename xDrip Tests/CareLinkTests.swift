@@ -76,6 +76,47 @@ final class CareLinkTests: XCTestCase {
         XCTAssertNil(try JSONDecoder().decode(BackupTreatment.self, from: legacyData).careLinkSourceIdentifier)
     }
 
+    @MainActor
+    func testBackupRestoresCareLinkIdentityOnlyWithTreatmentHistory() async throws {
+        let snapshot = CareLinkDefaultsSnapshot(keys: [.careLinkPatientAliases, .careLinkTimestampRepairCompleted,
+            .careLinkHistoryRestoreGeneration, .nightscoutFollowerGapFillCoverage])
+        defer { snapshot.restore() }
+        let defaults = UserDefaults.standard
+        let source = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let treatment = TreatmentEntry(date: now, value: 1, valueSecondary: 0, treatmentType: .Insulin,
+            nightscoutEventType: "Correction Bolus", enteredBy: "CareLink", nsManagedObjectContext: source.mainManagedObjectContext)
+        treatment.careLinkSourceIdentifier = "patient|INSULIN|event"
+        defaults.set(["new-patient": "patient"], forKey: UserDefaults.Key.careLinkPatientAliases.rawValue)
+        XCTAssertTrue(source.saveChangesSynchronously())
+        let exporter = BackupService(coreDataManager: source)
+        let archive = try await exporter.createBackup(options: BackupOptions(
+            includesSettings: false, includesAccounts: false, includesBgReadings: false, includesTreatments: true
+        ))
+        defer { try? FileManager.default.removeItem(at: archive.url) }
+        let inspection = try exporter.inspectBackup(at: archive.url)
+        XCTAssertNil(inspection.payload.settings)
+        XCTAssertEqual(inspection.payload.careLinkPatientAliases, ["new-patient": "patient"])
+
+        defaults.set(["existing": "root"], forKey: UserDefaults.Key.careLinkPatientAliases.rawValue)
+        defaults.set(true, forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue)
+        defaults.set(Data([1]), forKey: UserDefaults.Key.nightscoutFollowerGapFillCoverage.rawValue)
+        let destination = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let importer = BackupService(coreDataManager: destination)
+        _ = try await importer.restore(inspection: inspection, mode: .ignore,
+                                       restoresSettings: false, restoredAccountCategories: [])
+        XCTAssertTrue(defaults.bool(forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue))
+        XCTAssertEqual(defaults.dictionary(forKey: UserDefaults.Key.careLinkPatientAliases.rawValue) as? [String: String], ["existing": "root"])
+        _ = try await importer.restore(inspection: inspection, mode: .keepCurrent,
+                                       restoresSettings: false, restoredAccountCategories: [])
+        XCTAssertFalse(defaults.bool(forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue))
+        XCTAssertNotNil(defaults.string(forKey: UserDefaults.Key.careLinkHistoryRestoreGeneration.rawValue))
+        XCTAssertNil(defaults.data(forKey: UserDefaults.Key.nightscoutFollowerGapFillCoverage.rawValue))
+        XCTAssertEqual(defaults.dictionary(forKey: UserDefaults.Key.careLinkPatientAliases.rawValue) as? [String: String],
+                       ["existing": "root", "new-patient": "patient"])
+        XCTAssertEqual(try destination.mainManagedObjectContext.fetch(TreatmentEntry.fetchRequest()).first?.careLinkSourceIdentifier,
+                       treatment.careLinkSourceIdentifier)
+    }
+
     func testConnectionIndicatorPaletteDoesNotUseReadingFreshness() {
         XCTAssertEqual(CareLinkConnectionStatus.loginRequired.indicatorColor, Color.gray)
         XCTAssertEqual(CareLinkConnectionStatus.connecting.indicatorColor, ConstantsAppColors.warning)
@@ -1033,7 +1074,7 @@ final class CareLinkTests: XCTestCase {
     @MainActor
     func testTimestampRepairDefersInBackgroundAndCachesSuccessfulCompletion() async throws {
         let defaultsSnapshot = CareLinkDefaultsSnapshot(keys: [.isMaster, .followerDataSourceType,
-            .careLinkTimestampRepairCompleted, .nightscoutTreatmentsUpdateCounter, .nightscoutSyncRequired])
+            .careLinkTimestampRepairCompleted, .careLinkHistoryRestoreGeneration, .nightscoutTreatmentsUpdateCounter, .nightscoutSyncRequired])
         defer { defaultsSnapshot.restore() }
         let defaults = UserDefaults.standard
         let marker = UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue
@@ -1080,6 +1121,13 @@ final class CareLinkTests: XCTestCase {
         added = await restarted.importTreatments([repairRecord(now.addingTimeInterval(2100))])
         XCTAssertEqual(added, 1)
         XCTAssertNil(defaults.object(forKey: marker))
+
+        // A history restore must invalidate both live instances before their next import.
+        defaults.set(UUID().uuidString, forKey: UserDefaults.Key.careLinkHistoryRestoreGeneration.rawValue)
+        added = await importer.importTreatments([repairRecord(now.addingTimeInterval(2400))])
+        XCTAssertEqual(added, 0)
+        added = await restarted.importTreatments([repairRecord(now.addingTimeInterval(2700))])
+        XCTAssertEqual(added, 0)
     }
 
     @MainActor
