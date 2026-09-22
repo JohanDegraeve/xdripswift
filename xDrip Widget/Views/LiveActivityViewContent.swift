@@ -24,8 +24,8 @@ struct LiveActivityViewContentState: View {
     let state: XDripWidgetAttributes.ContentState
 
     var body: some View {
-        if state.liveActivityType != .disabled, state.isSensorWarmingUp, let endDate = state.sensorWarmupEndDate {
-            LiveActivitySensorWarmupView(endDate: endDate)
+        if state.liveActivityType != .disabled, state.showsSensorWarmupStatus, let endDate = state.sensorWarmupEndDate {
+            LiveActivitySensorWarmupView(endDate: endDate, waitingForReading: state.isWaitingForSensorReading)
                 .padding(.vertical, 16)
                 .activityBackgroundTint(.black)
         } else {
@@ -282,6 +282,7 @@ struct LiveActivityViewContentState: View {
 /// shared warm-up view for the Lock Screen, Dynamic Island, CarPlay and Smart Stack
 struct LiveActivitySensorWarmupView: View {
     let endDate: Date
+    var waitingForReading = false
     var compactWidth: CGFloat? = nil
 
     var body: some View {
@@ -309,10 +310,10 @@ struct LiveActivitySensorWarmupView: View {
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(Texts_Common.sensorWarmingUp)
+                    Text(waitingForReading ? Texts_Common.sensorWarmupComplete : Texts_Common.sensorWarmingUp)
                         .font(.headline)
                         .foregroundStyle(.white)
-                    Text(String(format: Texts_Common.sensorWarmupUntilFormat, endDate.formatted(date: .omitted, time: .shortened)))
+                    Text(waitingForReading ? Texts_Common.sensorWaitingForReading : String(format: Texts_Common.sensorWarmupUntilFormat, endDate.formatted(date: .omitted, time: .shortened)))
                         .font(.subheadline)
                         .foregroundStyle(Color("colorSecondary"))
                 }
@@ -350,7 +351,7 @@ struct LiveActivitySensorWarmupView: View {
                 ViewThatFits(in: .horizontal) {
                     compactText(titleSize: roomy ? 16 : 14, timeSize: roomy ? 14 : 12)
                     compactText(titleSize: 12, timeSize: 10)
-                    compactText(titleSize: 10, timeSize: 9)
+                    compactText(titleSize: 10, timeSize: 9, scalesToFit: true)
                 }
             }
         }
@@ -359,16 +360,17 @@ struct LiveActivitySensorWarmupView: View {
         .accessibilityElement(children: .combine)
     }
 
-    private func compactText(titleSize: CGFloat, timeSize: CGFloat) -> some View {
+    private func compactText(titleSize: CGFloat, timeSize: CGFloat, scalesToFit: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text(Texts_Common.sensorWarmingUp)
+            Text(waitingForReading ? Texts_Common.sensorWarmupComplete : Texts_Common.sensorWarmingUp)
                 .font(.system(size: titleSize, weight: .semibold))
                 .foregroundStyle(.white)
-            Text(String(format: Texts_Common.sensorWarmupUntilFormat, endDate.formatted(date: .omitted, time: .shortened)))
+            Text(waitingForReading ? Texts_Common.sensorWaitingForReading : String(format: Texts_Common.sensorWarmupUntilFormat, endDate.formatted(date: .omitted, time: .shortened)))
                 .font(.system(size: timeSize))
                 .foregroundStyle(Color("colorSecondary"))
         }
         .lineLimit(1)
-        .fixedSize(horizontal: true, vertical: false)
+        .minimumScaleFactor(scalesToFit ? 0.5 : 1)
+        .fixedSize(horizontal: !scalesToFit, vertical: false)
     }
 }

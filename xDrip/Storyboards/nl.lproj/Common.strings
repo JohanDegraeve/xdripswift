@@ -14,7 +14,7 @@
 "common_minute" = "min";
 "common_day" = "dag";
 "common_days" = "dagen";
-"common_landscape_comparingWithLast" = "Vergelijken met de laatste:";
+"common_landscape_showAGPChartData" = "AGP-grafiekgegevens tonen:";
 "common_landscape_comparisonDays" = "%d dagen";
 "common_landscape_comparisonNone" = "Geen";
 "common_today" = "Vandaag";
@@ -46,7 +46,6 @@
 "common_statistics_inRange" = "In Bereik";
 "common_statistics_high" = "Hoog";
 "common_statistics_average" = "Gemiddelde";
-"common_statistics_a1c" = "HbA1c";
 "common_statistics_cv" = "CV";
 "common_dontshowagain" = "Toon niet opnieuw";
 
@@ -77,7 +76,9 @@
 "common_statistics_ambulatoryGlucoseProfile" = "Ambulant Glucoseprofiel";
 "common_statistics_insufficientAGPData" = "Onvoldoende gegevens voor AGP-percentielgrafiek";
 "common_statistics_insufficientData" = "Onvoldoende gegevens";
-"common_statistics_estimatedA1cTrend" = "Trend geschatte HbA1c";
+"common_statistics_gmiTrend" = "GMI-trend";
+"common_statistics_threeDay" = "Elke 3 dagen";
+"common_statistics_weekly" = "Wekelijks";
 "common_statistics_cvTrend" = "CV-trend";
 "common_statistics_dailyPattern" = "Dagpatroon";
 "common_statistics_averageFormat" = "Gemiddeld %@";
@@ -134,3 +135,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Sensor warmt op";
 "common_sensorWarmupUntilFormat" = "Tot %@";
+"common_sensorWarmupComplete" = "Opwarmen voltooid";
+"common_sensorWaitingForReading" = "Wachten op eerste meting…";

@@ -258,3 +258,6 @@
 "heartbeat.simpleFooter" = "Zmiany obowiązują od następnego połączenia.";
 
 "signalStrengthDisconnected" = "Rozłączono";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "Wygasa";

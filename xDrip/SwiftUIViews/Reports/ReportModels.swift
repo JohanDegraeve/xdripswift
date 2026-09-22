@@ -145,6 +145,8 @@ struct GlucoseReportConfiguration {
     var aidPeriod: GlucoseReportAIDPeriod
     var paperSize: GlucoseReportPaperSize
     var language: GlucoseReportLanguage
+    // Keep every report page in the units selected when generation started.
+    var usesIFCC: Bool = false
 
     func text(_ key: GlucoseReportText) -> String {
         language.text(key)
@@ -493,6 +495,27 @@ enum GlucoseReportClinicalMath {
     static func gmiPercentage(forAverageMgDl averageMgDl: Double) -> Double {
         3.31 + 0.02392 * averageMgDl
     }
+
+    /// Convert the unrounded GMI percentage using the NGSP/IFCC master equation.
+    /// Source: https://ngsp.org/ifccngsp.asp
+    static func gmiValue(_ percentage: Double, usesIFCC: Bool) -> Double {
+        usesIFCC ? (percentage - 2.152) / 0.09148 : percentage
+    }
+
+    // Keep the existing percentage bounds; even IFCC bounds give three whole-number axis ticks.
+    static func gmiDomain(percentages: [Double], usesIFCC: Bool) -> ClosedRange<Double> {
+        let lower: Double
+        let upper: Double
+        if let minimum = percentages.min(), let maximum = percentages.max() {
+            lower = max(4, floor((minimum - 0.2) * 2) / 2)
+            upper = max(lower + 1, min(14, ceil((maximum + 0.2) * 2) / 2))
+        } else {
+            lower = 5
+            upper = 10
+        }
+        guard usesIFCC else { return lower ... upper }
+        return (floor(gmiValue(lower, usesIFCC: true) / 2) * 2) ... (ceil(gmiValue(upper, usesIFCC: true) / 2) * 2)
+    }
 }
 
 enum GlucoseReportAGPDisplayPoints {
@@ -583,8 +606,8 @@ enum GlucoseReportText {
     case bestTIR
     case lowestAverage
     case highestAverage
-    case estimatedA1cAndVariabilityTrend
-    case estimatedA1cGMI
+    case trendAnalysis
+    case gmi
     case lowerIsGenerallyBetter
     case cv
     case daily
@@ -657,8 +680,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Best TIR"
         case .lowestAverage: return "Lowest Avg"
         case .highestAverage: return "Highest Avg"
-        case .estimatedA1cAndVariabilityTrend: return "Trend Analysis"
-        case .estimatedA1cGMI: return "Estimated A1c / GMI"
+        case .trendAnalysis: return "Trend Analysis"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Lower is generally better"
         case .cv: return "CV"
         case .daily: return "Daily"
@@ -733,8 +756,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Mejor TIR"
         case .lowestAverage: return "Media Mínima"
         case .highestAverage: return "Media Máxima"
-        case .estimatedA1cAndVariabilityTrend: return "Análisis de Tendencias"
-        case .estimatedA1cGMI: return "A1c Estimada / GMI"
+        case .trendAnalysis: return "Análisis de Tendencias"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Más bajo suele ser mejor"
         case .cv: return "CV"
         case .daily: return "Diario"
@@ -809,8 +832,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Meilleur TIR"
         case .lowestAverage: return "Moy. la plus basse"
         case .highestAverage: return "Moy. la plus haute"
-        case .estimatedA1cAndVariabilityTrend: return "Analyse des Tendances"
-        case .estimatedA1cGMI: return "A1c Estimée / GMI"
+        case .trendAnalysis: return "Analyse des Tendances"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Plus bas est généralement meilleur"
         case .cv: return "CV"
         case .daily: return "Quotidien"
@@ -885,8 +908,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Beste TIR"
         case .lowestAverage: return "Laagste Gem."
         case .highestAverage: return "Hoogste Gem."
-        case .estimatedA1cAndVariabilityTrend: return "Trendanalyse"
-        case .estimatedA1cGMI: return "Geschatte A1c / GMI"
+        case .trendAnalysis: return "Trendanalyse"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Lager is meestal beter"
         case .cv: return "CV"
         case .daily: return "Dagelijks"
@@ -961,8 +984,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Beste TIR"
         case .lowestAverage: return "Niedrigster Ø"
         case .highestAverage: return "Höchster Ø"
-        case .estimatedA1cAndVariabilityTrend: return "Trendanalyse"
-        case .estimatedA1cGMI: return "Geschätzte A1c / GMI"
+        case .trendAnalysis: return "Trendanalyse"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Niedriger ist im Allgemeinen besser"
         case .cv: return "CV"
         case .daily: return "Täglich"
@@ -1037,8 +1060,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Miglior TIR"
         case .lowestAverage: return "Media Minima"
         case .highestAverage: return "Media Massima"
-        case .estimatedA1cAndVariabilityTrend: return "Analisi delle Tendenze"
-        case .estimatedA1cGMI: return "A1c Stimata / GMI"
+        case .trendAnalysis: return "Analisi delle Tendenze"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Più basso è generalmente meglio"
         case .cv: return "CV"
         case .daily: return "Giornaliero"
@@ -1113,8 +1136,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Melhor TIR"
         case .lowestAverage: return "Média Mínima"
         case .highestAverage: return "Média Máxima"
-        case .estimatedA1cAndVariabilityTrend: return "Análise de Tendências"
-        case .estimatedA1cGMI: return "A1c Estimada / GMI"
+        case .trendAnalysis: return "Análise de Tendências"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Mais baixo é geralmente melhor"
         case .cv: return "CV"
         case .daily: return "Diário"

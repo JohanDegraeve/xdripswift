@@ -299,3 +299,5 @@
 "dexcomG7SelectSensorCodeMessage" = "Inserisci manualmente il codice di abbinamento a quattro cifre, scansiona l’applicatore attuale o scegli una foto. Controlla il codice selezionato, poi tocca Continua.";
 "noSensorCodeSelectedTitle" = "Continuare senza codice del sensore?";
 "noSensorCodeSelectedMessage" = "Se sul trasmettitore è già attiva una sessione del sensore, l’app userà quella sessione con i suoi requisiti di calibrazione esistenti.\n\nAvviare una nuova sessione senza codice richiede calibrazioni dopo il riscaldamento e periodicamente in seguito. Disattivare il promemoria di calibrazione dell’app non elimina questi requisiti.";
+"showHideGlucoseChartTitle" = "Grafico";
+"showHideAdditionalItemsTitle" = "Avvisi e lettura vocale";

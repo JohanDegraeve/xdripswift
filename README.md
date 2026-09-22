@@ -16,7 +16,7 @@ xDrip4iOS is not related to the xDrip+ project for Android.
 Master mode currently includes:
 
 - Dexcom G6, Anubis and ONE
-- Dexcom G7, ONE+ and Stelo
+- Dexcom G7, ONE+ and Stelo over native Bluetooth, in Primary or Coexistence mode
 - Libre 2 and Libre 2 Plus EU sensors over direct Bluetooth
 - Compatible Libre sensors through MiaoMiao or Nano/Bubble/Bubble Mini transmitters
 
@@ -34,15 +34,16 @@ Sensor support depends on the exact model, region, transmitter firmware and whet
 ### App features
 
 - Adaptive iPhone and iPad Home layouts, including Clock Mode and configurable glucose chart ranges
-- Optional sensor-noise bands, reading history, treatments, statistics and time-in-range views
-- Custom glucose, missed-reading, device and battery alerts, with spoken readings and trends
+- Optional sensor-noise bands, reading history, treatments, local IOB and COB estimates, statistics and time-in-range views
+- Custom glucose, missed-reading, device and battery alerts, with scheduled spoken readings and trends
 - Nightscout upload and synchronization, Dexcom Share upload and Apple Health integration
 - Apple Watch app and complications
-- Home Screen and Lock Screen widgets, StandBy support, Live Activities and Dynamic Island layouts
-- Siri and Shortcuts access to the latest reading
+- Home Screen and Lock Screen widgets, StandBy support, Live Activities and Dynamic Island layouts, including sensor warm-up status
+- Siri and Shortcuts access to the latest reading and Speak Glucose controls
 - Optional calendar events and contact-image displays
 - AID status displays and open-source data sharing with Loop/iAPS and Trio
 - Contextual links to the online documentation and a filterable Activity Log for troubleshooting
+- Bluetooth connection diagnostics, signal-strength history and per-device battery history
 - Bluetooth output to M5Stack and M5StickC companion displays
 
 ## Requirements

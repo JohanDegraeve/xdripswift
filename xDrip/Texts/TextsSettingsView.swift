@@ -331,8 +331,15 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_sectiontitlehomescreen", tableName: filename, bundle: Bundle.main, value: "Home Screen", comment: "home screen settings, section title")
     }()
 
+    static let homeScreenLayoutSectionTitle = NSLocalizedString("homeScreen.layout", tableName: filename, bundle: Bundle.main, value: "Home Layout", comment: "Home screen layout setting")
+    static let sensorLifetimeElapsed = NSLocalizedString("homeScreen.elapsed", tableName: filename, bundle: Bundle.main, value: "Elapsed", comment: "Home screen layout setting")
+    static let sensorLifetimeRemaining = NSLocalizedString("homeScreen.remaining", tableName: filename, bundle: Bundle.main, value: "Remaining", comment: "Home screen layout setting")
+    static let basalPosition = NSLocalizedString("homeScreen.basalPosition", tableName: filename, bundle: Bundle.main, value: "Basal Position", comment: "Home screen layout setting")
+    static let basalPositionTop = NSLocalizedString("homeScreen.basalTop", tableName: filename, bundle: Bundle.main, value: "Top", comment: "Home screen layout setting")
+    static let basalPositionBottom = NSLocalizedString("homeScreen.basalBottom", tableName: filename, bundle: Bundle.main, value: "Bottom", comment: "Home screen layout setting")
+
     static let homeScreenChartDisplaySectionTitle: String = {
-        return NSLocalizedString("settingsviews_homeScreenChartDisplaySectionTitle", tableName: filename, bundle: Bundle.main, value: "Chart Display", comment: "home screen settings, section title for main chart display options")
+        return NSLocalizedString("settingsviews_homeScreenChartDisplaySectionTitle", tableName: filename, bundle: Bundle.main, value: "Glucose Chart", comment: "home screen settings, section title for main chart display options")
     }()
 
     static let homeScreenMainChartSectionFooter: String = {
@@ -340,7 +347,7 @@ class Texts_SettingsView {
     }()
 
     static let mainChartHours: String = {
-        return NSLocalizedString("settingsviews_mainChartHours", tableName: filename, bundle: Bundle.main, value: "Main Chart Hours", comment: "home screen settings, visible number of hours on the main glucose chart")
+        return NSLocalizedString("settingsviews_mainChartHours", tableName: filename, bundle: Bundle.main, value: "Time Range", comment: "home screen settings, visible number of hours on the main glucose chart")
     }()
 
     static let homeScreenSensorLifetimeSectionTitle: String = {
@@ -360,11 +367,11 @@ class Texts_SettingsView {
     }()
     
     static let showClockWhenScreenIsLocked: String = {
-        return NSLocalizedString("settingsviews_showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Lock Screen Clock", comment: "home screen settings, should the clock also be displayed when the screen is locked")
+        return NSLocalizedString("settingsviews_showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Clock", comment: "home screen settings, should the clock also be displayed when the screen is locked")
     }()
     
     static let screenLockDimmingTypeWhenScreenIsLocked: String = {
-        return NSLocalizedString("settingsviews_screenLockDimmingTypeWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Lock Screen Dimming", comment: "home screen settings, should the screen be dimmed when the screen is locked")
+        return NSLocalizedString("settingsviews_screenLockDimmingTypeWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Dimming", comment: "home screen settings, should the screen be dimmed when the screen is locked")
     }()
     
     static let screenLockDimmingTypeDisabled: String = {
@@ -388,7 +395,7 @@ class Texts_SettingsView {
     }()
     
     static let showMiniChart: String = {
-        return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show Mini-Chart", comment: "home screen settings, should the mini-chart be shown")
+        return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Mini-Chart", comment: "home screen settings, should the mini-chart be shown")
     }()
     
     static let showOriginalBGReadings: String = {
@@ -396,7 +403,7 @@ class Texts_SettingsView {
     }()
 
     static let showSensorNoise: String = {
-        return NSLocalizedString("settingsviews_showSensorNoise", tableName: filename, bundle: Bundle.main, value: "Show Sensor Noise", comment: "home screen settings, should visible sensor noise UI be shown")
+        return NSLocalizedString("settingsviews_showSensorNoise", tableName: filename, bundle: Bundle.main, value: "Sensor Noise", comment: "home screen settings, should visible sensor noise UI be shown")
     }()
 
     static let sensorHealthNotifications: String = {
@@ -471,7 +478,7 @@ class Texts_SettingsView {
     }()
 
     static let settingsviews_showTreatments: String = {
-        return NSLocalizedString("settingsviews_showTreatments", tableName: filename, bundle: Bundle.main, value: "Show Treatments", comment: "treatments settings, show the treatments on main chart")
+        return NSLocalizedString("settingsviews_showTreatments", tableName: filename, bundle: Bundle.main, value: "Therapy", comment: "Master visibility switch for therapy panels, treatment markers and therapy plots")
     }()
     
     static let settingsviews_smallBolusTreatmentThreshold = {
@@ -489,7 +496,7 @@ class Texts_SettingsView {
     }()
 
     static let labelShowStatistics: String = {
-        return NSLocalizedString("settingsviews_showStatistics", tableName: filename, bundle: Bundle.main, value: "Show Statistics", comment: "statistics settings, show statistics on home screen")
+        return NSLocalizedString("settingsviews_showStatistics", tableName: filename, bundle: Bundle.main, value: "Statistics", comment: "statistics settings, show statistics on home screen")
     }()
 
     static let labelDaysToUseStatisticsTitle: String = {
@@ -522,8 +529,8 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_timeInRangeTypeUserDefinedRange", tableName: filename, bundle: Bundle.main, value: "User Range", comment: "statistics settings, prefer user-defined range")
     }()
     
-    static let labelUseIFFCA1C: String = {
-        return NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "HbA1c in mmols/mol", comment: "statistics settings, use IFCC method for HbA1c")
+    static let labelUseIFCCGMI: String = {
+        return NSLocalizedString("settingsviews_useIFCCGMI", tableName: filename, bundle: Bundle.main, value: "GMI in mmols/mol", comment: "statistics settings, display GMI in IFCC units")
     }()
     
     
@@ -1027,7 +1034,7 @@ class Texts_SettingsView {
     }()
     
     static let displayTrendInContactImage: String = {
-        return NSLocalizedString("settingsviews_displayTrendInContactImage", tableName: filename, bundle: Bundle.main, value: "Show Trend", comment: "Contact Image Settings - text in row where user needs to say if trend should be displayed or not")
+        return NSLocalizedString("settingsviews_displayTrendInContactImage", tableName: filename, bundle: Bundle.main, value: "Trend", comment: "Contact Image Settings - text in row where user needs to say if trend should be displayed or not")
     }()
     
     static let useHighContrastContactImage: String = {

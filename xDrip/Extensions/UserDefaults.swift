@@ -105,6 +105,7 @@ extension UserDefaults {
         case careLinkSelectedPatientID = "careLinkSelectedPatientID"
         /// Store-wide historical repair completed and saved successfully.
         case careLinkTimestampRepairCompleted = "careLinkTimestampRepairCompleted"
+        case careLinkHistoryRestoreGeneration = "careLinkHistoryRestoreGeneration"
         /// Corroborated patient namespaces used to deduplicate future imports.
         case careLinkPatientAliases = "careLinkPatientAliases"
         /// CarePartner mobile app version used for discovery and data requests.
@@ -228,7 +229,7 @@ extension UserDefaults {
         case showStatistics = "showStatistics"
         /// show the objective lines in color or grey?
         case daysToUseStatistics = "daysToUseStatistics"
-        /// use IFCC way to show A1C?
+        /// Display GMI in IFCC units; retain the original persisted key.
         case useIFCCA1C = "useIFCCA1C"
         /// which type of TIR calculation is selected?
         case timeInRangeType = "timeInRangeType"
@@ -1766,9 +1767,9 @@ extension UserDefaults {
         }
     }
 
-    /// should the statistics view be shown on the home screen?
+    /// Display GMI in mmol/mol instead of a percentage.
     @objc dynamic var useIFCCA1C: Bool {
-        // default value for bool in userdefaults is false, by default we want the HbA1c to be calculated in "not IFCC" way (false)
+        // Default false displays GMI as a percentage. Keep this key for existing preferences.
         get {
             return bool(forKey: Key.useIFCCA1C.rawValue)
         }

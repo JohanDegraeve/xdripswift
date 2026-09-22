@@ -986,7 +986,7 @@ import AppIntents
     /// Existing AlertType records may contain a duration that the consolidated picker no longer
     /// offers. Each unsupported value is rounded down to the nearest supported duration so an
     /// upgrade never silently lengthens an alarm's configured snooze. Values below the new
-    /// 15-minute minimum are clamped to 15 minutes because no lower supported option exists.
+    /// 10-minute minimum are clamped to 10 minutes because no lower supported option exists.
     private func migrateStoredAlertSnoozePeriodsToReducedOptionsIfNeeded(coreDataManager: CoreDataManager) {
         let userDefaults = UserDefaults.standard
         guard !userDefaults.didMigrateAlertSnoozePeriodsToReducedOptions else { return }
@@ -2564,7 +2564,8 @@ import AppIntents
 
         guard let startDate, startDate <= now else { return nil }
         let endDate = startDate.addingTimeInterval(duration * 60)
-        return endDate > now ? endDate : nil
+        let confirmationUntil = (transmitter as? CGMG5Transmitter)?.sensorWarmupConfirmationUntil(for: startDate, now: now)
+        return endDate > now || confirmationUntil != nil ? endDate : nil
     }
 
     /// check if the conditions are correct to start a live activity, update it, or end it
@@ -2679,6 +2680,11 @@ import AppIntents
                     
                     contentState.showIOBCOB = UserDefaults.standard.liveActivityShowIOBCOB
                     contentState.sensorWarmupEndDate = sensorWarmupEndDate
+                    if UserDefaults.standard.isMaster,
+                       let transmitter = bluetoothPeripheralManager?.getCGMTransmitter() as? CGMG5Transmitter,
+                       let startDate = activeSensor?.startDate {
+                        contentState.sensorWarmupConfirmationUntil = transmitter.sensorWarmupConfirmationUntil(for: startDate)
+                    }
                     LiveActivityManager.shared.update(contentState: contentState, forceRestart: forceRestart)
                 } else {
                     Task { await LiveActivityManager.shared.endAllActivities() }
@@ -3021,6 +3027,12 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
             sensorStartDate: activeSensor?.startDate
         )
         loopManager?.shareMetadata(clearReadings: sensorHealthIssueManager.visibleIssue?.severity == .terminal)
+        // G6 status packets can finish warm-up or report a problem without delivering glucose.
+        if bluetoothPeripheralManager?.getCGMTransmitter() is CGMG5Transmitter,
+           liveActivitySensorWarmupEndDate() != nil || LiveActivityManager.shared.contentStateForPreview?.sensorWarmupEndDate != nil {
+            publishRootHomeState()
+            updateLiveActivityAndWidgets(forceRestart: false)
+        }
     }
 }
 

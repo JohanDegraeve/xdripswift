@@ -82,6 +82,13 @@ struct TherapyMetricsSnapshot: Codable, Hashable, Sendable {
 }
 
 extension UserDefaults {
+    /// Controls the Home pump panel and status strip within the Treatments master gate.
+    /// Default to the existing visible behaviour when no preference has been saved.
+    var showTherapySummary: Bool {
+        get { object(forKey: "showTherapySummary") == nil || bool(forKey: "showTherapySummary") }
+        set { set(newValue, forKey: "showTherapySummary") }
+    }
+
     /// Therapy curves are shown by default. An explicit user choice is preserved.
     var showIOBCOB: Bool {
         get {

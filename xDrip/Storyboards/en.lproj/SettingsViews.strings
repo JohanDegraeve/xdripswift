@@ -56,19 +56,19 @@
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Keep-alive.";
 "settingsviews_allowScreenRotation" = "Chart Rotation";
-"settingsviews_homeScreenChartDisplaySectionTitle" = "Chart Display";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Glucose Chart";
 "settingsviews_homeScreenMainChartSectionFooter" = "These options control how glucose data is displayed on the main chart.";
-"settingsviews_mainChartHours" = "Main Chart Hours";
+"settingsviews_mainChartHours" = "Time Range";
 "settingsviews_homeScreenScreenLockSectionTitle" = "Screen Lock";
 "settingsviews_homeScreenScreenLockSectionFooter" = "These options control how the Home screen behaves when the app is left open or locked.";
-"settingsviews_showClockWhenScreenIsLocked" = "Lock Screen Clock";
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Lock Screen Dimming";
+"settingsviews_showClockWhenScreenIsLocked" = "Clock";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dimming";
 "settingsviews_screenLockDimmingTypeDisabled" = "Disabled";
 "settingsviews_screenLockDimmingTypeDimmed" = "Dimmed";
 "settingsviews_screenLockDimmingTypeDark" = "Dark";
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
-"settingsviews_showOriginalBGReadings" = "Show Original Values";
-"settingsviews_showSensorNoise" = "Show Sensor Noise";
+"settingsviews_showOriginalBGReadings" = "Original Values";
+"settingsviews_showSensorNoise" = "Sensor Noise";
 "settingsviews_sensorHealthNotifications" = "Sensor Health Warnings";
 "settingsviews_sensorHealthNotificationsFooter" = "Controls optional system notifications for prolonged sensor noise, a flat signal and temporary sensor issues. Sensor/Transmitter Failure is configured with the other alarms. The dismissible Home banner remains available.";
 "settingsviews_urgentHighValue" = "Urgent High Value";
@@ -84,17 +84,17 @@
 "settingsviews_showcoloredobjectives" = "Colored Lines";
 "settingsviews_showtarget" = "Target Line";
 "settingsviews_sectiontitletreatments" = "Treatments";
-"settingsviews_showTreatments" = "Show Treatments";
+"settingsviews_showTreatments" = "Therapy";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Statistics";
-"settingsviews_showStatistics" = "Show Statistics";
+"settingsviews_showStatistics" = "Statistics";
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
 "settingsviews_daysToUseStatisticsMessage" = "Maximum days we should try to use to calculate the statistics?\n\n(Enter 0 to calculate today since midnight)";
 "settingsviews_labelTimeInRangeType" = "Time In Range";
 "settingsviews_timeInRangeTypeStandardRange" = "Standard";
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_transmittertype" = "Transmitter Type";
 "settingsviews_transmitterid" = "Transmitter ID";
@@ -169,7 +169,7 @@
 "settingsviews_infoContactsAccessRestricted" = "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.";
 "settingsviews_contactImageSectionTitle" = "Contact Image";
 "settingsviews_enableContactImage" = "Contact Image";
-"settingsviews_displayTrendInContactImage" = "Show Trend";
+"settingsviews_displayTrendInContactImage" = "Trend";
 "settingsviews_contactImageCreatedByString" = "Contact automatically created by";
 "sectionTitleTrace" = "Issue Reporting";
 "sendTraceFile" = "Send Issue Report";
@@ -464,7 +464,7 @@
 
 "therapy.insulinType" = "Insulin Type";
 
-"therapy.showIOBCOB" = "Show IOB/COB";
+"therapy.showIOBCOB" = "IOB/COB";
 
 "therapy.treatmentSettings" = "Treatments";
 
@@ -504,3 +504,12 @@
 
 /* Validation message when both speech schedule times are equal. */
 "speak.schedule.differentTimes" = "Choose different enable and disable times.";
+"therapy.summary" = "Therapy Summary";
+"therapy.curves" = "IOB/COB Curves";
+"settingsviews_showMiniChart" = "Mini-Chart";
+"homeScreen.layout" = "Home Layout";
+"homeScreen.elapsed" = "Elapsed";
+"homeScreen.remaining" = "Remaining";
+"homeScreen.basalPosition" = "Basal Position";
+"homeScreen.basalTop" = "Top";
+"homeScreen.basalBottom" = "Bottom";

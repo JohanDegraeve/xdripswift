@@ -192,3 +192,6 @@
 "heartbeat.simpleFooter" = "Ändringar gäller vid nästa anslutning.";
 
 "signalStrengthDisconnected" = "Frånkopplad";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "Upphör";

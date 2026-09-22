@@ -93,6 +93,18 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// track the algorithm state so we can use it in different parts of the class
     private var lastAlgorithmStatus: DexcomAlgorithmState?
     
+    // main-thread snapshot for presentation; never reuse a warm-up report for another session
+    private var warmupReport: (startDate: Date?, receivedAt: Date)?
+
+    func sensorWarmupConfirmationUntil(for startDate: Date, now: Date = Date()) -> Date? {
+        guard let report = warmupReport, let reportedStartDate = report.startDate,
+              !Self.shouldReportDetectedSensor(activeSensorStartDate: startDate, receivedSensorStartDate: reportedStartDate),
+              report.receivedAt <= now else { return nil }
+        // Two reading cycles without a fresh report must not leave Home waiting indefinitely.
+        let validUntil = report.receivedAt.addingTimeInterval(10 * 60)
+        return validUntil > now ? validUntil : nil
+    }
+
     /// transmitterId
     private let transmitterId:String
 
@@ -1514,9 +1526,15 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // track the last algorithm status for disconnect filtering
         lastAlgorithmStatus = algorithmStatus
         
+        let reportedStartDate = receivedSensorStartDate
+        let statusReceivedAt = Date()
+
         // send algorithm status to delegate
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            self.warmupReport = algorithmStatus == .SensorWarmup
+                ? (startDate: reportedStartDate, receivedAt: statusReceivedAt)
+                : nil
             self.cGMG5TransmitterDelegate?.received(sensorStatus: algorithmStatus.description, cGMG5Transmitter: self)
             self.cgmTransmitterDelegate?.sensorHealthEventOccurred(algorithmStatus.sensorHealthEvent)
         }
@@ -1554,6 +1572,16 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// Reconciles the internal Sensor only after Dexcom has supplied both the session date and a status which confirms that session is running.
     private func reconcileInternalSensorSessionIfConfirmed() {
         guard let receivedSensorStartDate, let lastAlgorithmStatus else { return }
+
+        // Coexistence can deliver warm-up before the session date; keep the original report time.
+        if lastAlgorithmStatus == .SensorWarmup {
+            DispatchQueue.main.async { [weak self] in
+                guard let self, self.warmupReport != nil,
+                      self.warmupReport?.startDate != receivedSensorStartDate else { return }
+                self.warmupReport?.startDate = receivedSensorStartDate
+                self.cgmTransmitterDelegate?.sensorHealthEventOccurred(lastAlgorithmStatus.sensorHealthEvent)
+            }
+        }
 
         // Glucose, warm-up and initial-calibration states confirm a real running session.
         // A no-code session needs an internal Sensor before it can accept its first calibration.

@@ -182,3 +182,6 @@
 "heartbeat.simpleFooter" = "Değişiklikler sonraki bağlantıda uygulanır.";
 
 "signalStrengthDisconnected" = "Bağlantı kesildi";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "Sona erme";

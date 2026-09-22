@@ -17,8 +17,18 @@ struct LandscapeLoopalyzerChart: View {
     let plotHeight: CGFloat
     let chartSpacing: CGFloat
     let showsNowRule: Bool
+    // Nil keeps the AID series. An empty local series stays empty rather than falling back to AID.
+    var localIOB: [TherapyChartPoint]? = nil
+    var localCOB: [TherapyChartPoint]? = nil
+    var showsBasal = true
 
-    private enum Series: CaseIterable {
+    private var visibleSeries: [Series] {
+        (showsBasal ? [.tempBasalDelta] : [])
+            + (localIOB?.isEmpty == true ? [] : [.iob])
+            + (localCOB?.isEmpty == true ? [] : [.cob])
+    }
+
+    private enum Series {
         case tempBasalDelta
         case iob
         case cob
@@ -34,8 +44,8 @@ struct LandscapeLoopalyzerChart: View {
 
     var body: some View {
         VStack(spacing: chartSpacing) {
-            ForEach(Array(Series.allCases.enumerated()), id: \.offset) { index, series in
-                chart(for: series, showsXAxisLabels: index == Series.allCases.indices.last)
+            ForEach(Array(visibleSeries.enumerated()), id: \.offset) { index, series in
+                chart(for: series, showsXAxisLabels: index == visibleSeries.indices.last)
             }
         }
     }
@@ -142,7 +152,7 @@ struct LandscapeLoopalyzerChart: View {
                     )
                 }
             case .iob:
-                if let value = point.iob {
+                if localIOB == nil, let value = point.iob {
                     RectangleMark(
                         xStart: .value("Start", point.bucketBarStartMinute),
                         xEnd: .value("End", point.bucketBarEndMinute),
@@ -156,7 +166,7 @@ struct LandscapeLoopalyzerChart: View {
                     )
                 }
             case .cob:
-                if let value = point.cob {
+                if localCOB == nil, let value = point.cob {
                     RectangleMark(
                         xStart: .value("Start", point.bucketBarStartMinute),
                         xEnd: .value("End", point.bucketBarEndMinute),
@@ -169,6 +179,32 @@ struct LandscapeLoopalyzerChart: View {
                 }
             }
         }
+        if series == .iob, let localIOB {
+            localMarks(localIOB, color: GlucoseChartTreatmentStyle.bolusColor)
+        }
+        if series == .cob, let localCOB {
+            localMarks(localCOB, color: GlucoseChartTreatmentStyle.carbsColor)
+        }
+    }
+
+    @ChartContentBuilder private func localMarks(_ points: [TherapyChartPoint], color: Color) -> some ChartContent {
+        ForEach(points) { point in
+            LineMark(
+                x: .value("Time", minuteOfDay(point.date)),
+                y: .value("Amount", point.amount),
+                series: .value("Segment", point.segment)
+            )
+            .interpolationMethod(.linear)
+            .foregroundStyle(color.opacity(ConstantsGlucoseChartSwiftUI.therapyPlotLineOpacity))
+            .lineStyle(StrokeStyle(lineWidth: 1.4))
+        }
+    }
+
+    // Preserve fractional minutes so treatment jumps keep their original vertical edge.
+    private func minuteOfDay(_ date: Date) -> Double {
+        let parts = Calendar.current.dateComponents([.hour, .minute, .second, .nanosecond], from: date)
+        return Double(parts.hour ?? 0) * 60 + Double(parts.minute ?? 0)
+            + Double(parts.second ?? 0) / 60 + Double(parts.nanosecond ?? 0) / 60_000_000_000
     }
 
     /// Draws the time and value guides above the full-width bar marks.
@@ -284,11 +320,11 @@ struct LandscapeLoopalyzerChart: View {
     }
 
     private var iobUpperBound: Double {
-        upperBound(values: points.compactMap(\.iob) + insulinTreatmentMarkers.map(\.amount), minimum: 5)
+        upperBound(values: (localIOB?.map(\.amount) ?? points.compactMap(\.iob)) + insulinTreatmentMarkers.map(\.amount), minimum: 5)
     }
 
     private var cobUpperBound: Double {
-        upperBound(values: points.compactMap(\.cob) + carbTreatmentMarkers.map(\.amount), minimum: 30)
+        upperBound(values: (localCOB?.map(\.amount) ?? points.compactMap(\.cob)) + carbTreatmentMarkers.map(\.amount), minimum: 30)
     }
 
     private func upperBound(values: [Double], minimum: Double) -> Double {

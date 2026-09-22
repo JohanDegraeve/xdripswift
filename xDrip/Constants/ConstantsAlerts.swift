@@ -40,16 +40,20 @@ enum ConstantsAlerts {
     static let notificationBannerBackgroundColor = Color(red: 0.15, green: 0.15, blue: 0.15, opacity: 1)
     
     /// The single supported set of durations for every snooze picker, in minutes.
-    static let snoozeValueMinutes = [15, 30, 60, 120, 240, 360, 720, 1440, 2880, 10080]
+    static let snoozeValueMinutes = [10, 15, 30, 45, 60, 120, 240, 360, 480, 600, 720, 1440, 2880, 10080]
 
     /// Localized labels corresponding one-to-one with `snoozeValueMinutes`.
     static let snoozeValueStrings = [
+        "10 " + Texts_Common.minutes,
         "15 " + Texts_Common.minutes,
         "30 " + Texts_Common.minutes,
+        "45 " + Texts_Common.minutes,
         "1 " + Texts_Common.hour,
         "2 " + Texts_Common.hours,
         "4 " + Texts_Common.hours,
         "6 " + Texts_Common.hours,
+        "8 " + Texts_Common.hours,
+        "10 " + Texts_Common.hours,
         "12 " + Texts_Common.hours,
         "1 " + Texts_Common.day,
         "2 " + Texts_Common.days,

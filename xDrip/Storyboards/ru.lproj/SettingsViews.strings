@@ -23,9 +23,9 @@
 "settingsviews_labelShowReadingInAppBadge" = "Бейдж приложения";
 "settingsviews_multipleAppBadgeValueWith10" = "Бейдж приложения x10";
 "settingsviews_allowScreenRotation" = "Поворот графика";
-"settingsviews_showMiniChart" = "Показать мини-диаграмму";
-"settingsviews_showSensorNoise" = "Показывать шум сенсора";
-"settingsviews_showClockWhenScreenIsLocked" = "Часы на экране блокировки";
+"settingsviews_showMiniChart" = "Мини-график";
+"settingsviews_showSensorNoise" = "Шум сенсора";
+"settingsviews_showClockWhenScreenIsLocked" = "Часы";
 "settingsviews_urgentHighValue" = "Очень высокий уровень";
 "settingsviews_highValue" = "Высокий уровень";
 "settingsviews_targetValue" = "Целевое значение";
@@ -34,14 +34,14 @@
 "settingsviews_showcoloredobjectives" = "Цветные линии";
 "settingsviews_showtarget" = "Целевая линия";
 "settingsviews_sectiontitletreatments" = "Терапия";
-"settingsviews_showTreatments" = "Показать лечение на графике";
+"settingsviews_showTreatments" = "Терапия";
 "settingsviews_smallBolusTreatmentThreshold" = "Пороговое значение микроболюса";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Ниже скольких единиц мы должны считать болюс микроболюсом?\n\n(Рекомендуемое значение: 1,0U)";
 "settingsviews_sectiontitlestatistics" = "Статистика";
-"settingsviews_showStatistics" = "Показывать статистику";
+"settingsviews_showStatistics" = "Статистика";
 "settingsviews_daysToUseStatisticsTitle" = "Дней для расчета";
 "settingsviews_daysToUseStatisticsMessage" = "Максимальное количество дней, которые мы должны попытаться использовать для расчета статистики?\n\n(Введите 0, чтобы рассчитать сегодня с полуночи)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Транисмиттер";
 "settingsviews_transmittertype" = "Тип трансмиттера";
 "settingsviews_transmitterid" = "Идентификатор трансмиттера";
@@ -126,7 +126,7 @@
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Домашний экран";
-"settingsviews_mainChartHours" = "Часы на основном графике";
+"settingsviews_mainChartHours" = "Временной диапазон";
 "settingsviews_sectionTitleHousekeeper" = "Управление данными";
 "settingsviews_housekeeperRetentionPeriod" = "Срок хранения";
 "settingsviews_housekeeperRetentionPeriodMessage" = "Сколько дней должны храниться данные? (минимум 90, максимум 365)\n\n(рекомендуется: 90 дней)";
@@ -245,7 +245,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Поддержание активности is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Затемнение экрана блокировки";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Затемнение";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -465,11 +465,11 @@
 "therapy.carbDuration" = "Время Усвоения Углеводов";
 "therapy.local" = "Рассчитывается локально";
 
-"settingsviews_showOriginalBGReadings" = "Показывать Исходные Значения";
+"settingsviews_showOriginalBGReadings" = "Исходные значения";
 
 "therapy.insulinType" = "Тип Инсулина";
 
-"therapy.showIOBCOB" = "Показывать IOB/COB";
+"therapy.showIOBCOB" = "IOB/COB";
 
 "therapy.treatmentSettings" = "Терапия";
 
@@ -509,3 +509,13 @@
 
 /* Validation message when both speech schedule times are equal. */
 "speak.schedule.differentTimes" = "Выберите разное время включения и выключения.";
+"therapy.summary" = "Сводка терапии";
+"therapy.curves" = "Кривые IOB/COB";
+"settingsviews_displayTrendInContactImage" = "Тенденция";
+"homeScreen.layout" = "Макет главного экрана";
+"homeScreen.elapsed" = "Прошло";
+"homeScreen.remaining" = "Осталось";
+"homeScreen.basalPosition" = "Положение базала";
+"homeScreen.basalTop" = "Сверху";
+"homeScreen.basalBottom" = "Снизу";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "График глюкозы";

@@ -155,6 +155,9 @@ struct BackupPayload: Codable, Sendable {
     let treatments: [BackupTreatment]
     let deviceStatuses: [BackupNightscoutDeviceStatus]?
     let profiles: [BackupNightscoutProfile]?
+    // Older backups have no battery history or CareLink identity map.
+    var batteryHistory: [BackupBatteryHistorySample]? = nil
+    var careLinkPatientAliases: [String: String]? = nil
 }
 
 // MARK: - Settings and Alerts
@@ -239,6 +242,24 @@ struct BackupTreatment: Codable, Sendable {
     let uploaded: Bool
     let value: Double
     let valueSecondary: Double
+}
+
+// The address preserves history without restoring a Bluetooth connection.
+struct BackupBatteryHistorySample: Codable, Sendable {
+    let id: String
+    let peripheralAddress: String
+    let observedAt: Date
+    let measurementKindRaw: Int16
+    let producerKindRaw: Int16
+    let percentage: Int?
+    let batteryStatusRaw: Int?
+    let dexcomFamilyRaw: Int?
+    let resistanceRaw: Int?
+    let runtimeRaw: Int?
+    let temperatureRaw: Int?
+    let voltageARaw: Int?
+    let voltageBRaw: Int?
+    let utcHourBucketStart: Date?
 }
 
 struct BackupNightscoutDeviceStatus: Codable, Sendable {

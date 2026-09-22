@@ -29,5 +29,7 @@ extension BatteryHistorySample {
     @NSManaged public var utcHourBucketStart: Date?
     @NSManaged public var voltageARaw: NSNumber?
     @NSManaged public var voltageBRaw: NSNumber?
-    @NSManaged public var blePeripheral: BLEPeripheral
+    // Restored history can exist before the same device is saved again.
+    @NSManaged public var blePeripheral: BLEPeripheral?
+    @NSManaged public var peripheralAddress: String?
 }

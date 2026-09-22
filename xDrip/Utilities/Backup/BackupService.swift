@@ -16,6 +16,18 @@ final class BackupService: @unchecked Sendable {
     private static let accountKeys = BackupAccountCategory.allKeys
     // Runtime, sensor-specific and current post-processing values must not move between app instances.
     private static let excludedSettingKeys: Set<String> = [
+        UserDefaults.Key.nightscoutFollowerGapFillLastAuditEndDate.rawValue,
+        UserDefaults.Key.nightscoutFollowerGapFillSite.rawValue,
+        UserDefaults.Key.nightscoutFollowerGapFillCoverage.rawValue,
+        UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue,
+        UserDefaults.Key.careLinkHistoryRestoreGeneration.rawValue,
+        UserDefaults.Key.careLinkPatientAliases.rawValue,
+        "pendingHealthKitReplacements",
+        "healthKitSyncVersion",
+        "is15DayDexcomG7",
+        // Keep removed credentials out of settings backups from upgraded installations.
+        "m5StackWiFiName1", "m5StackWiFiName2", "m5StackWiFiName3",
+        "m5StackWiFiPassword1", "m5StackWiFiPassword2", "m5StackWiFiPassword3",
         UserDefaults.Key.timeStampOfLastFollowerConnection.rawValue,
         UserDefaults.Key.medtrumEasyViewCachedConnections.rawValue,
         UserDefaults.Key.medtrumEasyViewConnectionsFetchFailed.rawValue,
@@ -168,7 +180,7 @@ final class BackupService: @unchecked Sendable {
             options.includesBgReadings.description,
             options.includesTreatments.description
         )
-        let settings = options.includesSettings ? try storedValues(excluding: Self.accountKeys.union(Self.excludedSettingKeys)) : nil
+        let settings = options.includesSettings ? try storedSettings() : nil
         guard !options.includesAccounts || options.passphrase?.isEmpty == false else {
             throw BackupError.missingPassphrase
         }
@@ -183,7 +195,9 @@ final class BackupService: @unchecked Sendable {
             let treatments = options.includesTreatments ? try self.exportTreatments(context: context) : []
             let deviceStatuses = includesLoopData ? try self.exportDeviceStatuses(context: context) : []
             let profiles = includesLoopData ? try self.exportProfiles(context: context) : []
-            return (alertTypes, bgReadings, treatments, deviceStatuses, profiles)
+            // Battery history travels with glucose history, without restoring device connections.
+            let batteryHistory = options.includesBgReadings ? try self.exportBatteryHistory(context: context) : []
+            return (alertTypes, bgReadings, treatments, deviceStatuses, profiles, batteryHistory)
         }
 
         let info = Bundle.main.infoDictionary
@@ -214,7 +228,10 @@ final class BackupService: @unchecked Sendable {
             bgReadings: snapshot.1,
             treatments: snapshot.2,
             deviceStatuses: snapshot.3,
-            profiles: snapshot.4
+            profiles: snapshot.4,
+            batteryHistory: snapshot.5,
+            careLinkPatientAliases: options.includesTreatments
+                ? UserDefaults.standard.dictionary(forKey: UserDefaults.Key.careLinkPatientAliases.rawValue) as? [String: String] : nil
         )
         let json = try encoder.encode(payload)
         let compressed = try (json as NSData).compressed(using: .lzfse) as Data
@@ -366,17 +383,43 @@ final class BackupService: @unchecked Sendable {
                 treatmentCounts = try self.restoreTreatments(payload.treatments, context: context)
                 deviceStatusCounts = try self.restoreDeviceStatuses(payload.deviceStatuses ?? [], context: context)
                 profileCounts = try self.restoreProfiles(payload.profiles ?? [], context: context)
+                try self.restoreBatteryHistory(payload.batteryHistory ?? [], mode: mode, context: context)
             }
-            if restoresSettings {
+            if restoresSettings && payload.settings != nil {
                 try self.replaceAlertTypes(payload.alertTypes, context: context)
             }
             try context.save()
             return (bgCounts, treatmentCounts, deviceStatusCounts, profileCounts)
         }
-        coreDataManager.saveChanges()
+        // Do not report success or update restore state before the database is saved.
+        guard coreDataManager.saveChangesSynchronously() else {
+            throw NSError(domain: NSCocoaErrorDomain, code: NSPersistentStoreSaveError)
+        }
 
         let restoredValueCounts = try await MainActor.run {
-            let settingsCount = restoresSettings ? try restoreStoredValues(payload.settings ?? [:]) : 0
+            let settings = (payload.settings ?? [:]).filter { Self.isPortableSetting($0.key) }
+            let settingsCount = restoresSettings ? try restoreStoredValues(settings) : 0
+            if mode != .ignore {
+                let defaults = UserDefaults.standard
+                if !payload.bgReadings.isEmpty || !payload.treatments.isEmpty
+                    || payload.deviceStatuses?.isEmpty == false || payload.profiles?.isEmpty == false {
+                    // The restored history may not match the destination's previous gap-fill coverage.
+                    for key in [UserDefaults.Key.nightscoutFollowerGapFillLastAuditEndDate,
+                                .nightscoutFollowerGapFillSite, .nightscoutFollowerGapFillCoverage] {
+                        defaults.removeObject(forKey: key.rawValue)
+                    }
+                }
+                if payload.treatments.contains(where: { $0.careLinkSourceIdentifier != nil }) {
+                    defaults.removeObject(forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue)
+                    // Older backups kept aliases in settings. Merge them only with CareLink history.
+                    let legacyAliases = try payload.settings?[UserDefaults.Key.careLinkPatientAliases.rawValue]?.decoded() as? [String: String]
+                    let incoming = payload.careLinkPatientAliases ?? legacyAliases ?? [:]
+                    var aliases = defaults.dictionary(forKey: UserDefaults.Key.careLinkPatientAliases.rawValue) as? [String: String] ?? [:]
+                    aliases.merge(incoming) { current, _ in current }
+                    defaults.set(aliases, forKey: UserDefaults.Key.careLinkPatientAliases.rawValue)
+                    defaults.set(UUID().uuidString, forKey: UserDefaults.Key.careLinkHistoryRestoreGeneration.rawValue)
+                }
+            }
             let accountsCount = try restoreStoredValues(accountValues)
             return (settingsCount, accountsCount)
         }
@@ -427,6 +470,25 @@ final class BackupService: @unchecked Sendable {
     }
 
     // MARK: - Core Data Export
+
+    private func exportBatteryHistory(context: NSManagedObjectContext) throws -> [BackupBatteryHistorySample] {
+        let request = BatteryHistorySample.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "observedAt", ascending: true)]
+        return try context.fetch(request).map {
+            guard let address = $0.blePeripheral?.address ?? $0.peripheralAddress, !address.isEmpty else {
+                throw BackupError.invalidFile
+            }
+            return BackupBatteryHistorySample(
+                id: $0.id, peripheralAddress: address, observedAt: $0.observedAt,
+                measurementKindRaw: $0.measurementKindRaw, producerKindRaw: $0.producerKindRaw,
+                percentage: $0.percentage?.intValue, batteryStatusRaw: $0.batteryStatusRaw?.intValue,
+                dexcomFamilyRaw: $0.dexcomFamilyRaw?.intValue, resistanceRaw: $0.resistanceRaw?.intValue,
+                runtimeRaw: $0.runtimeRaw?.intValue, temperatureRaw: $0.temperatureRaw?.intValue,
+                voltageARaw: $0.voltageARaw?.intValue, voltageBRaw: $0.voltageBRaw?.intValue,
+                utcHourBucketStart: $0.utcHourBucketStart
+            )
+        }
+    }
 
     private func exportBgReadings(context: NSManagedObjectContext) throws -> [BackupBgReading] {
         let request: NSFetchRequest<BgReading> = BgReading.fetchRequest()
@@ -589,6 +651,55 @@ final class BackupService: @unchecked Sendable {
     }
 
     // MARK: - Core Data Restore
+
+    func restoreBatteryHistory(_ records: [BackupBatteryHistorySample], mode: BackupMergeMode,
+                               context: NSManagedObjectContext) throws {
+        guard mode != .ignore, !records.isEmpty else { return }
+        let peripherals = try context.fetch(BLEPeripheral.fetchRequest())
+        // Match by address only. A restore must never create or activate a Bluetooth device.
+        for (address, samples) in Dictionary(grouping: records, by: { $0.peripheralAddress.uppercased() }) {
+            let peripheral = peripherals.first { $0.address.uppercased() == address }
+            let request = BatteryHistorySample.fetchRequest()
+            request.predicate = NSPredicate(format: "blePeripheral.address ==[c] %@ OR peripheralAddress ==[c] %@", address, address)
+            var existing = try context.fetch(request)
+            if mode == .replaceRange, let first = samples.map(\.observedAt).min(), let last = samples.map(\.observedAt).max() {
+                for sample in existing where sample.observedAt >= first && sample.observedAt <= last {
+                    context.delete(sample)
+                }
+                existing.removeAll { $0.isDeleted }
+            }
+            var ids = Set(existing.map(\.id))
+            var timestamps = Set(existing.map(\.observedAt))
+            var percentageHours = Set(existing.filter {
+                $0.measurementKindRaw == BatteryMeasurementKind.percentage.rawValue
+            }.map { BatteryHistoryManager.utcHourStart(for: $0.observedAt) })
+            for record in samples {
+                let hour = record.measurementKindRaw == BatteryMeasurementKind.percentage.rawValue
+                    ? BatteryHistoryManager.utcHourStart(for: record.observedAt) : nil
+                guard !ids.contains(record.id), !timestamps.contains(record.observedAt),
+                      hour.map({ !percentageHours.contains($0) }) ?? true else { continue }
+                let sample = BatteryHistorySample(context: context)
+                sample.id = record.id
+                sample.peripheralAddress = address
+                sample.blePeripheral = peripheral
+                sample.observedAt = record.observedAt
+                sample.measurementKindRaw = record.measurementKindRaw
+                sample.producerKindRaw = record.producerKindRaw
+                sample.percentage = record.percentage.nsNumber
+                sample.batteryStatusRaw = record.batteryStatusRaw.nsNumber
+                sample.dexcomFamilyRaw = record.dexcomFamilyRaw.nsNumber
+                sample.resistanceRaw = record.resistanceRaw.nsNumber
+                sample.runtimeRaw = record.runtimeRaw.nsNumber
+                sample.temperatureRaw = record.temperatureRaw.nsNumber
+                sample.voltageARaw = record.voltageARaw.nsNumber
+                sample.voltageBRaw = record.voltageBRaw.nsNumber
+                sample.utcHourBucketStart = hour
+                ids.insert(record.id)
+                timestamps.insert(record.observedAt)
+                if let hour { percentageHours.insert(hour) }
+            }
+        }
+    }
 
     private func restoreBgReadings(
         _ readings: [BackupBgReading],
@@ -896,6 +1007,13 @@ final class BackupService: @unchecked Sendable {
             throw BackupError.invalidFile
         }
 
+        guard (payload.batteryHistory ?? []).allSatisfy({
+            !$0.id.isEmpty && !$0.peripheralAddress.isEmpty
+                && ($0.percentage.map { (0 ... 100).contains($0) } ?? true)
+                && [$0.batteryStatusRaw, $0.dexcomFamilyRaw].compactMap { $0 }.allSatisfy { Int16(exactly: $0) != nil }
+                && [$0.resistanceRaw, $0.runtimeRaw, $0.temperatureRaw, $0.voltageARaw, $0.voltageBRaw]
+                    .compactMap { $0 }.allSatisfy { Int32(exactly: $0) != nil }
+        }) else { throw BackupError.invalidFile }
         try payload.bgReadings.forEach(validateFinalValue)
         try payload.settings?.values.forEach { _ = try $0.decoded() }
         try payload.accounts?.values.forEach { _ = try $0.decoded() }
@@ -938,8 +1056,14 @@ final class BackupService: @unchecked Sendable {
 
     // MARK: - User Defaults
 
-    private func storedValues(excluding excludedKeys: Set<String>) throws -> [String: BackupPropertyListValue] {
-        let values = persistentDefaults().filter { !excludedKeys.contains($0.key) }
+    static func isPortableSetting(_ key: String) -> Bool {
+        !accountKeys.contains(key) && !excludedSettingKeys.contains(key)
+            && !key.hasPrefix(UserDefaults.Key.dexcomG7PairingCode.rawValue + "-")
+            && !key.hasPrefix(UserDefaults.Key.dexcomG7BluetoothSlot.rawValue + "-")
+    }
+
+    private func storedSettings() throws -> [String: BackupPropertyListValue] {
+        let values = persistentDefaults().filter { Self.isPortableSetting($0.key) }
         return try values.mapValues(BackupPropertyListValue.init)
     }
 

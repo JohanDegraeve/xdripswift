@@ -82,7 +82,8 @@ final class GenerateReportViewModel: ObservableObject {
                 period: selectedPeriod,
                 aidPeriod: aidReportIsAvailable ? .three : .notIncluded,
                 paperSize: paperSize,
-                language: language
+                language: language,
+                usesIFCC: UserDefaults.standard.useIFCCA1C
             )
 
             UserDefaults.standard.reportPatientName = configuration.patientName

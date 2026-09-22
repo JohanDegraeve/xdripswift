@@ -254,3 +254,6 @@
 "heartbeat.simpleFooter" = "Зміни діятимуть із наступного підключення.";
 
 "signalStrengthDisconnected" = "Відключено";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "Закінчується";

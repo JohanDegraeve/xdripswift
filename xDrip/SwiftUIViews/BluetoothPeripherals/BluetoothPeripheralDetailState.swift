@@ -2110,7 +2110,16 @@ private extension BluetoothPeripheralDetailState {
     }
 
     func makeDexcomG5CommonRows(dexcomG5: DexcomG5) -> [BluetoothPeripheralDetailRow] {
-        [
+        // G6 (including Anubis) keeps its transmitter start date in the expiry popup.
+        // Other products sharing this Core Data type retain their existing rows.
+        let isG6 = dexcomG5.isAnubis || dexcomG5.blePeripheral.transmitterId?.hasPrefix("8") == true
+        let transmitterExpiryDate = dexcomG5TransmitterExpiryDate(dexcomG5: dexcomG5)
+        let expiryIndicator: SettingsIndicator? = isG6 ? transmitterExpiryDate.map { expiryDate in
+            let remaining = expiryDate.timeIntervalSinceNow
+            return SettingsIndicator(color: remaining <= 0 ? .red : remaining <= TimeInterval(days: 10) ? .yellow : .green)
+        } : nil
+
+        var rows = [
             row(
                 id: "dexcom-g5-sensor-start-date",
                 title: Texts_BluetoothPeripheralView.sensorStartDate,
@@ -2135,9 +2144,10 @@ private extension BluetoothPeripheralDetailState {
             row(
                 id: "dexcom-g5-transmitter-expiry-date",
                 title: Texts_BluetoothPeripheralView.transmittterExpiryDate,
-                detail: dexcomG5TransmitterExpiryDate(dexcomG5: dexcomG5)?.toStringInUserLocale(timeStyle: .none, dateStyle: .short) ?? "-",
-                showsDisclosure: dexcomG5TransmitterExpiryDate(dexcomG5: dexcomG5) != nil,
-                isEnabled: dexcomG5TransmitterExpiryDate(dexcomG5: dexcomG5) != nil,
+                detail: transmitterExpiryDate?.toStringInUserLocale(timeStyle: .none, dateStyle: .short) ?? "-",
+                detailIndicator: expiryIndicator,
+                showsDisclosure: transmitterExpiryDate != nil,
+                isEnabled: transmitterExpiryDate != nil,
                 action: { [weak self] in
                     self?.showDexcomG5TransmitterExpiryDateInfo(dexcomG5: dexcomG5)
                 }
@@ -2162,6 +2172,15 @@ private extension BluetoothPeripheralDetailState {
                 }
             )
         ]
+        if isG6 {
+            // Group transmitter dates first, followed by sensor details and firmware.
+            rows.swapAt(3, 4)
+            rows.insert(rows.remove(at: 0), at: 2)
+            if transmitterExpiryDate != nil {
+                rows.removeAll { $0.id == "dexcom-g5-transmitter-start-date" }
+            }
+        }
+        return rows
     }
 
     func makeDexcomG5ConnectionModeRows(dexcomG5: DexcomG5) -> [BluetoothPeripheralDetailRow] {
@@ -2302,9 +2321,16 @@ private extension BluetoothPeripheralDetailState {
     func showDexcomG5SensorStartDateInfo(dexcomG5: DexcomG5) {
         guard let startDate = dexcomG5.sensorStartDate, shouldShowDexcomG5SensorStartDate(dexcomG5: dexcomG5) else { return }
 
-        var startDateString = startDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
-        startDateString += "\n\n" + startDate.daysAndHoursAgo() + " " + Texts_HomeView.ago
-        showInfo(title: Texts_BluetoothPeripheralView.sensorStartDate, message: "\n" + startDateString)
+        let startDateString = startDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
+        let elapsed = startDate.daysAndHoursAgo() + " " + Texts_HomeView.ago
+        if dexcomG5.isAnubis || dexcomG5.blePeripheral.transmitterId?.hasPrefix("8") == true {
+            showInfo(
+                title: Texts_BluetoothPeripheralView.sensorStartDate,
+                message: Texts_HomeView.sensorManagementStarted + ": " + startDateString + "\n" + elapsed
+            )
+        } else {
+            showInfo(title: Texts_BluetoothPeripheralView.sensorStartDate, message: "\n" + startDateString + "\n\n" + elapsed)
+        }
     }
 
     func showDexcomG5TransmitterStartDateInfo(dexcomG5: DexcomG5) {
@@ -2319,10 +2345,24 @@ private extension BluetoothPeripheralDetailState {
         guard let transmitterExpiryDate = dexcomG5TransmitterExpiryDate(dexcomG5: dexcomG5) else { return }
 
         let expiryDays = dexcomG5.isAnubis ? ConstantsMaster.transmitterExpiryDaysDexcomG6Anubis : ConstantsMaster.transmitterExpiryDaysDexcomG5G6
-        var expiryDateString = transmitterExpiryDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
-        expiryDateString += "\n\n" + transmitterExpiryDate.daysAndHoursRemaining(showOnlyDays: true) + " / " + expiryDays.stringWithoutTrailingZeroes + Texts_Common.dayshort + " " + Texts_HomeView.remaining
-        expiryDateString += dexcomG5.isAnubis ? "\n\n Anubis" : ""
-        showInfo(title: Texts_BluetoothPeripheralView.transmittterExpiryDate, message: "\n" + expiryDateString)
+        let expiryDateString = transmitterExpiryDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
+        let remaining = transmitterExpiryDate.daysAndHoursRemaining(showOnlyDays: true)
+        let lifetime = expiryDays.stringWithoutTrailingZeroes + Texts_Common.dayshort
+
+        if dexcomG5.isAnubis || dexcomG5.blePeripheral.transmitterId?.hasPrefix("8") == true,
+           let startDate = dexcomG5.transmitterStartDate {
+            let message = [
+                Texts_HomeView.sensorManagementStarted + ": " + startDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short),
+                Texts_BluetoothPeripheralView.transmitterExpiresLabel + ": " + expiryDateString,
+                remaining + "/" + lifetime + " " + Texts_HomeView.remaining
+            ].joined(separator: "\n")
+            showInfo(title: Texts_BluetoothPeripheralView.transmittterExpiryDate, message: message)
+        } else {
+            showInfo(
+                title: Texts_BluetoothPeripheralView.transmittterExpiryDate,
+                message: "\n" + expiryDateString + "\n\n" + remaining + " / " + lifetime + " " + Texts_HomeView.remaining
+            )
+        }
     }
 
     func setDexcomG5UseOtherApp(_ useOtherApp: Bool, dexcomG5: DexcomG5) {

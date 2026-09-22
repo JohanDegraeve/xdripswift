@@ -12,6 +12,7 @@ import SwiftUI
 struct GlucoseReportMetricGridView: View {
     let analytics: GlucoseReportAnalytics
     let language: GlucoseReportLanguage
+    let usesIFCC: Bool
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 4)
 
@@ -22,7 +23,7 @@ struct GlucoseReportMetricGridView: View {
 
         LazyVGrid(columns: columns, spacing: 8) {
             metric(title: language.text(.averageGlucose), value: GlucoseReportFormatting.glucose(analytics.averageMgDl, usesMgDl: analytics.usesMgDl), target: "")
-            metric(title: "GMI", value: "\(analytics.gmiPercentage.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes)%", target: language.text(.consensusEstimate))
+            metric(title: "GMI", value: GlucoseReportFormatting.gmi(analytics.gmiPercentage, usesIFCC: usesIFCC, locale: language.locale), target: language.text(.consensusEstimate))
             metric(title: language.text(.cv), value: GlucoseReportFormatting.percentage(analytics.coefficientOfVariation), target: language.text(.targetLessThanOrEqual, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.coefficientOfVariationTargetPercentage)))
             metric(title: language.text(.dataCapture), value: GlucoseReportFormatting.percentage(analytics.dataCapturePercentage), target: language.text(.targetGreaterThanOrEqual, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.minimumDataCapturePercentage)))
             metric(title: language.text(.readings), value: "\(analytics.sampleCount)", target: "\(analytics.readingsPerDay.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes)/day")

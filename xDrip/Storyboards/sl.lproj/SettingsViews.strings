@@ -299,7 +299,7 @@
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
-"settingsviews_mainChartHours" = "Ure glavnega grafikona";
+"settingsviews_mainChartHours" = "Časovni razpon";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -319,10 +319,10 @@
 "settingsviews_sectiontitlestatistics" = "Statistics";
 
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 
 /// statistics settings, show statistics on home screen
-"settingsviews_showStatistics" = "Show Statistics";
+"settingsviews_showStatistics" = "Statistika";
 
 /// statistics settings, how many days to use for calculations
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
@@ -332,7 +332,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the clock also be displayed when the screen is locked?
-"settingsviews_showClockWhenScreenIsLocked" = "Ura na zaklenjenem zaslonu";
+"settingsviews_showClockWhenScreenIsLocked" = "Ura";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -377,7 +377,7 @@
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatments" = "Show Treatments";
+"settingsviews_showTreatments" = "Terapija";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -480,8 +480,8 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show Mini-Chart";
-"settingsviews_showSensorNoise" = "Show Sensor Noise";
+"settingsviews_showMiniChart" = "Mini graf";
+"settingsviews_showSensorNoise" = "Šum senzorja";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Vzdevek";
@@ -525,7 +525,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Ohranjanje aktivnosti is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Zatemnitev zaklenjenega zaslona";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Zatemnitev";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -745,11 +745,11 @@
 "therapy.carbDuration" = "Trajanje Ogljikovih Hidratov";
 "therapy.local" = "Izračunano lokalno";
 
-"settingsviews_showOriginalBGReadings" = "Prikaži Izvirne Vrednosti";
+"settingsviews_showOriginalBGReadings" = "Izvirne vrednosti";
 
 "therapy.insulinType" = "Vrsta Inzulina";
 
-"therapy.showIOBCOB" = "Prikaži IOB/COB";
+"therapy.showIOBCOB" = "IOB/COB";
 
 "therapy.treatmentSettings" = "Zdravljenja";
 
@@ -789,3 +789,13 @@
 
 /* Validation message when both speech schedule times are equal. */
 "speak.schedule.differentTimes" = "Izberite različna časa za omogočanje in onemogočanje.";
+"therapy.summary" = "Povzetek zdravljenja";
+"therapy.curves" = "Krivulje IOB/COB";
+"settingsviews_displayTrendInContactImage" = "Trend";
+"homeScreen.layout" = "Postavitev začetnega zaslona";
+"homeScreen.elapsed" = "Pretečeno";
+"homeScreen.remaining" = "Preostalo";
+"homeScreen.basalPosition" = "Položaj bazala";
+"homeScreen.basalTop" = "Zgoraj";
+"homeScreen.basalBottom" = "Spodaj";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Graf glukoze";
