@@ -189,3 +189,6 @@
 "heartbeat.simpleFooter" = "Wijzigingen gelden bij de volgende verbinding.";
 
 "signalStrengthDisconnected" = "Verbinding verbroken";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "Verloopt";

@@ -14,7 +14,7 @@
 "common_minute" = "min";
 "common_day" = "day";
 "common_days" = "days";
-"common_landscape_comparingWithLast" = "Sammenligner med de seneste:";
+"common_landscape_showAGPChartData" = "Vis data i AGP-grafen:";
 "common_landscape_comparisonDays" = "%d dage";
 "common_landscape_comparisonNone" = "Ingen";
 "common_today" = "Today";
@@ -45,7 +45,11 @@
 "common_statistics_inRange" = "In Range";
 "common_statistics_high" = "High";
 "common_statistics_average" = "Average";
-"common_statistics_a1c" = "HbA1c";
+"common_statistics_gmiTrend" = "GMI-tendens";
+"common_statistics_threeDay" = "Hver 3. dag";
+"common_statistics_weekly" = "Ugentligt";
+"common_statistics_daily" = "Dagligt";
+"common_statistics_gmi" = "GMI";
 "common_statistics_cv" = "CV";
 "common_dontshowagain" = "Don't Show Again";
 
@@ -72,3 +76,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Sensor varmer op";
 "common_sensorWarmupUntilFormat" = "Indtil %@";
+"common_sensorWarmupComplete" = "Opvarmning fuldført";
+"common_sensorWaitingForReading" = "Venter på første måling…";

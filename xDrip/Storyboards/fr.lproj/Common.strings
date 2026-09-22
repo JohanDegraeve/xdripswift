@@ -14,7 +14,7 @@
 "common_minute" = "min";
 "common_day" = "jour";
 "common_days" = "jours";
-"common_landscape_comparingWithLast" = "Comparaison avec les derniers :";
+"common_landscape_showAGPChartData" = "Afficher les données du graphique AGP :";
 "common_landscape_comparisonDays" = "%d jours";
 "common_landscape_comparisonNone" = "Aucune";
 "common_today" = "Aujourd'hui";
@@ -54,7 +54,6 @@
 "common_statistics_inRange" = "En gamme";
 "common_statistics_high" = "Haute";
 "common_statistics_average" = "Moyenne";
-"common_statistics_a1c" = "HbA1c";
 "common_statistics_cv" = "CV";
 
 "common_dontshowagain" = "Ne plus visualiser";
@@ -86,7 +85,9 @@
 "common_statistics_ambulatoryGlucoseProfile" = "Profil Ambulatoire du Glucose";
 "common_statistics_insufficientAGPData" = "Données insuffisantes pour le graphique percentile AGP";
 "common_statistics_insufficientData" = "Données insuffisantes";
-"common_statistics_estimatedA1cTrend" = "Tendance HbA1c estimée";
+"common_statistics_gmiTrend" = "Tendance GMI";
+"common_statistics_threeDay" = "Tous les 3 jours";
+"common_statistics_weekly" = "Hebdomadaire";
 "common_statistics_cvTrend" = "Tendance CV";
 "common_statistics_dailyPattern" = "Profil Quotidien";
 "common_statistics_averageFormat" = "Moyenne %@";
@@ -143,3 +144,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Capteur en chauffe";
 "common_sensorWarmupUntilFormat" = "Jusqu’à %@";
+"common_sensorWarmupComplete" = "Préchauffage terminé";
+"common_sensorWaitingForReading" = "En attente de la première mesure…";

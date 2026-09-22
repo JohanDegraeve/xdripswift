@@ -22,16 +22,16 @@
 "settingsviews_showReadingInNotification" = "Notifications de glycémie";
 "settingsviews_labelShowReadingInAppBadge" = "Pastille d’app";
 "settingsviews_multipleAppBadgeValueWith10" = "Pastille d’app x10";
-"settingsviews_showClockWhenScreenIsLocked" = "Horloge écran verrouillé";
+"settingsviews_showClockWhenScreenIsLocked" = "Horloge";
 "settingsviews_sectiontitletreatments" = "Traitements";
-"settingsviews_showTreatments" = "Visualiser les traitements";
+"settingsviews_showTreatments" = "Thérapie";
 "settingsviews_smallBolusTreatmentThreshold" = "Seuil des micro-bolus";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "En dessous de combien d'unités un bolus est considéré micro-bolus?\n\n(Valeur conseillée: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Statistiques";
-"settingsviews_showStatistics" = "Visualiser les statistiques";
+"settingsviews_showStatistics" = "Statistiques";
 "settingsviews_daysToUseStatisticsTitle" = "Nombre de jours";
 "settingsviews_daysToUseStatisticsMessage" = "Nombre maximum de jours utilisés pour le calcul des statistiques?\n\n(Saisir 0 pour aujourd'hui depuis minuit)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmetteur";
 "settingsviews_transmittertype" = "Type de Transmetteur";
 "settingsviews_transmitterid" = "Transmetteur ID";
@@ -155,7 +155,7 @@
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Ecran d'accueil";
-"settingsviews_mainChartHours" = "Heures du graphique principal";
+"settingsviews_mainChartHours" = "Plage horaire";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -296,8 +296,8 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show Mini-Chart";
-"settingsviews_showSensorNoise" = "Show Sensor Noise";
+"settingsviews_showMiniChart" = "Mini-graphique";
+"settingsviews_showSensorNoise" = "Bruit du capteur";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Alias";
@@ -341,7 +341,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Maintien actif is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Assombrissement écran verrouillé";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Atténuation";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -561,11 +561,11 @@
 "therapy.carbDuration" = "Durée des Glucides";
 "therapy.local" = "Calculé localement";
 
-"settingsviews_showOriginalBGReadings" = "Afficher les Valeurs Originales";
+"settingsviews_showOriginalBGReadings" = "Valeurs originales";
 
 "therapy.insulinType" = "Type d’Insuline";
 
-"therapy.showIOBCOB" = "Afficher l’IOB/COB";
+"therapy.showIOBCOB" = "IOB/COB";
 
 "therapy.treatmentSettings" = "Traitements";
 
@@ -605,3 +605,13 @@
 
 /* Validation message when both speech schedule times are equal. */
 "speak.schedule.differentTimes" = "Choisissez des heures d’activation et de désactivation différentes.";
+"therapy.summary" = "Résumé du traitement";
+"therapy.curves" = "Courbes IOB/COB";
+"settingsviews_displayTrendInContactImage" = "Tendance";
+"homeScreen.layout" = "Disposition de l’accueil";
+"homeScreen.elapsed" = "Écoulée";
+"homeScreen.remaining" = "Restante";
+"homeScreen.basalPosition" = "Position du basal";
+"homeScreen.basalTop" = "En haut";
+"homeScreen.basalBottom" = "En bas";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Graphique de glycémie";

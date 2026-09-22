@@ -38,6 +38,14 @@ enum GlucoseReportFormatting {
         mgDlValue.mgDlToMmolAndToString(mgDl: usesMgDl)
     }
 
+    // Convert before rounding. Home keeps its shorter unit label to fit the statistics row.
+    static func gmi(_ percentage: Double, usesIFCC: Bool, compactUnit: Bool = false, locale: Locale = .current) -> String {
+        guard percentage > 0 else { return "-" }
+        let value = GlucoseReportClinicalMath.gmiValue(percentage, usesIFCC: usesIFCC)
+        let suffix = usesIFCC ? (compactUnit ? " mmol" : " mmol/mol") : "%"
+        return number(value, decimalPlaces: usesIFCC ? 0 : 1, locale: locale) + suffix
+    }
+
     static func percentage(_ value: Double, decimals: Int = 0) -> String {
         "\(value.round(toDecimalPlaces: decimals).stringWithoutTrailingZeroes)%"
     }

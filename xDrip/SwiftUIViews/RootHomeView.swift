@@ -77,6 +77,7 @@ struct RootHomeView: View {
     @State private var chartYAxisResetRevision = 0
     @State private var showsExpandedIPadChart = false
     @AppStorage(UserDefaults.KeysCharts.chartWidthInHours.rawValue) private var chartWidthInHours = ConstantsGlucoseChart.defaultChartWidthInHours
+    @AppStorage("showTherapySummary") private var showTherapySummary = UserDefaults.standard.showTherapySummary
     @AppStorage(UserDefaults.Key.miniChartHoursToShow.rawValue) private var miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
     @AppStorage(UserDefaults.Key.showTreatmentsOnChart.rawValue) private var hideTreatmentsOnChart = false
     @AppStorage(UserDefaults.Key.showOriginalBGReadings.rawValue) private var hideOriginalBGReadings = false
@@ -595,7 +596,7 @@ struct RootHomeView: View {
         for cardWidth: CGFloat,
         horizontalPadding: CGFloat
     ) -> CGFloat {
-        guard state.visibility.showsPump else { return 0 }
+        guard showsPumpPanel else { return 0 }
 
         let availableSpacing = cardWidth
             - (horizontalPadding * 2)
@@ -679,7 +680,7 @@ struct RootHomeView: View {
         height: CGFloat = Layout.glucoseStatusRowHeight
     ) -> some View {
         HStack(spacing: spacing) {
-            if state.visibility.showsPump {
+            if showsPumpPanel {
                 RootHomePumpView(state: pumpDisplayState)
                     .frame(maxHeight: .infinity)
             }
@@ -697,7 +698,7 @@ struct RootHomeView: View {
     private var mainChart: some View {
         configuredMainChart(
             chartState: visibleChartState,
-            showsTreatments: true
+            showsTreatments: showTreatments
         )
     }
 
@@ -935,8 +936,12 @@ struct RootHomeView: View {
         )
     }
 
+    private var showsPumpPanel: Bool {
+        showTreatments && showTherapySummary && state.visibility.showsPump
+    }
+
     private func showsTherapyRow(_ loop: RootHomeLoopState) -> Bool {
-        !state.usesScreenLockNightLayout && (loop.showsIOB || loop.showsCOB || loop.showsAIDStatus)
+        showTreatments && showTherapySummary && !state.usesScreenLockNightLayout && (loop.showsIOB || loop.showsCOB || loop.showsAIDStatus)
     }
 
     private var loopDisplayState: RootHomeLoopState {

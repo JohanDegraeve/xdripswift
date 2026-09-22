@@ -54,10 +54,10 @@
 "showHideItemsTitle" = "Quick Show/Hide";
 "showHideHomeScreenTitle" = "Home Screen";
 "showHideHomeScreenFooter" = "Show or hide main home screen elements, useful when using smaller iPhone screen sizes";
-"showHideGlucoseChartTitle" = "Glucose Chart";
+"showHideGlucoseChartTitle" = "Chart";
 "showHideStandByModeTitle" = "StandBy Mode";
 "showHideStandByModeFooter" = "Changes how the StandBy mode will be displayed if activated in the iPhone settings";
-"showHideAdditionalItemsTitle" = "Additional Items";
+"showHideAdditionalItemsTitle" = "Alerts and Speech";
 "postProcessingTitle" = "Glucose Adjustments";
 "postProcessingPreviewHours" = "Preview Hours";
 "postProcessingAdjustment" = "Adjustment";

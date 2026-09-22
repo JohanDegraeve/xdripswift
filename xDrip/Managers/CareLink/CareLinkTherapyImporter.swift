@@ -29,6 +29,7 @@ final class CareLinkTherapyImporter: CareLinkTherapyImporting {
     private let coreDataManager: CoreDataManager
     private var timestampRepairCompleted: Bool
     private var patientAliases: [String: String]
+    private var historyRestoreGeneration: String?
     private let isAppActive: @MainActor () -> Bool
     private let deviceStatusAccessor: NightscoutDeviceStatusAccessor
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCareLinkFollowManager)
@@ -42,6 +43,7 @@ final class CareLinkTherapyImporter: CareLinkTherapyImporting {
             forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue)
         self.patientAliases = UserDefaults.standard.dictionary(
             forKey: UserDefaults.Key.careLinkPatientAliases.rawValue) as? [String: String] ?? [:]
+        self.historyRestoreGeneration = UserDefaults.standard.string(forKey: UserDefaults.Key.careLinkHistoryRestoreGeneration.rawValue)
         self.deviceStatusAccessor = NightscoutDeviceStatusAccessor(coreDataManager: coreDataManager)
     }
 
@@ -86,6 +88,13 @@ final class CareLinkTherapyImporter: CareLinkTherapyImporting {
     /// dedicated source field was added to the Core Data model.
     func importTreatments(_ records: [CareLinkTherapyRecord]) async -> Int {
         guard !records.isEmpty else { return 0 }
+        // Refresh cached identity and repair state only when history has been restored.
+        let generation = UserDefaults.standard.string(forKey: UserDefaults.Key.careLinkHistoryRestoreGeneration.rawValue)
+        if generation != historyRestoreGeneration {
+            timestampRepairCompleted = UserDefaults.standard.bool(forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue)
+            patientAliases = UserDefaults.standard.dictionary(forKey: UserDefaults.Key.careLinkPatientAliases.rawValue) as? [String: String] ?? [:]
+            historyRestoreGeneration = generation
+        }
         guard await repairTimestampDuplicatesIfNeeded(records) else { return 0 }
         await migrateLegacyAutomaticBasals()
         let context = coreDataManager.privateChildManagedObjectContext()

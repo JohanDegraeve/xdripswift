@@ -47,9 +47,13 @@
 "common_statistics_high" = "Korkea";
 
 /// phrase HbA1c
-"common_statistics_a1c" = "HbA1c";
 
 /// coefficient of variation
+"common_statistics_gmiTrend" = "GMI-trendi";
+"common_statistics_threeDay" = "3 päivän välein";
+"common_statistics_weekly" = "Viikoittain";
+"common_statistics_daily" = "Päivittäin";
+"common_statistics_gmi" = "GMI";
 "common_statistics_cv" = "CV";
 
 /// the word low
@@ -57,7 +61,7 @@
 
 /// literal translation needed
 "common_days" = "päivää";
-"common_landscape_comparingWithLast" = "Vertailu viimeisiin:";
+"common_landscape_showAGPChartData" = "Näytä AGP-kaavion tiedot:";
 "common_landscape_comparisonDays" = "%d päivää";
 "common_landscape_comparisonNone" = "Ei mitään";
 
@@ -102,3 +106,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Sensori lämpenee";
 "common_sensorWarmupUntilFormat" = "Päättyy klo %@";
+"common_sensorWarmupComplete" = "Lämpeneminen valmis";
+"common_sensorWaitingForReading" = "Odotetaan ensimmäistä lukemaa…";

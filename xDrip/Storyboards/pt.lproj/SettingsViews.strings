@@ -31,14 +31,14 @@
 "settingsviews_showcoloredobjectives" = "Linhas coloridas";
 "settingsviews_showtarget" = "Linha alvo";
 "settingsviews_sectiontitletreatments" = "Tratamentos";
-"settingsviews_showTreatments" = "Show Treatments";
+"settingsviews_showTreatments" = "Terapia";
 "settingsviews_smallBolusTreatmentThreshold" = "Limiar Micro-bolus";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Abaixo de quantas unidades devemos considerar um bolus como micro-bolus?\n\n(Valor recomendado: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Estatísticas";
-"settingsviews_showStatistics" = "Mostrar Estatísticas";
+"settingsviews_showStatistics" = "Estatísticas";
 "settingsviews_daysToUseStatisticsTitle" = "Dias para Calcular";
 "settingsviews_daysToUseStatisticsMessage" = "Máximo de dias que devemos tentar usar para calcular as estatísticas?\n\n(Introduza 0 para calcular desde a meia-noite de hoje)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmissor";
 "settingsviews_transmittertype" = "Tipo de Transmissor";
 "settingsviews_transmitterid" = "ID de Transmissor";
@@ -121,8 +121,8 @@
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Vida útil do sensor";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Controla se a vida útil do sensor é apresentada como tempo decorrido ou como contagem decrescente no iPhone e Apple Watch.";
 "settingsviews_sectiontitlehomescreen" = "Ecrã Inicial";
-"settingsviews_mainChartHours" = "Horas do gráfico principal";
-"settingsviews_showClockWhenScreenIsLocked" = "Relógio no ecrã bloqueado";
+"settingsviews_mainChartHours" = "Intervalo de tempo";
+"settingsviews_showClockWhenScreenIsLocked" = "Relógio";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -240,8 +240,8 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show Mini-Chart";
-"settingsviews_showSensorNoise" = "Show Sensor Noise";
+"settingsviews_showMiniChart" = "Minigráfico";
+"settingsviews_showSensorNoise" = "Ruído do sensor";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Alias";
@@ -285,7 +285,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Manter ativo is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Escurecimento do ecrã bloqueado";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Escurecimento";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -505,11 +505,11 @@
 "therapy.carbDuration" = "Duração dos Hidratos de Carbono";
 "therapy.local" = "Calculado localmente";
 
-"settingsviews_showOriginalBGReadings" = "Mostrar Valores Originais";
+"settingsviews_showOriginalBGReadings" = "Valores originais";
 
 "therapy.insulinType" = "Tipo de Insulina";
 
-"therapy.showIOBCOB" = "Mostrar IOB/COB";
+"therapy.showIOBCOB" = "IOB/COB";
 
 "therapy.treatmentSettings" = "Tratamentos";
 
@@ -549,3 +549,13 @@
 
 /* Validation message when both speech schedule times are equal. */
 "speak.schedule.differentTimes" = "Escolha horas de ativação e desativação diferentes.";
+"therapy.summary" = "Resumo do tratamento";
+"therapy.curves" = "Curvas IOB/COB";
+"settingsviews_displayTrendInContactImage" = "Tendência";
+"homeScreen.layout" = "Disposição do ecrã inicial";
+"homeScreen.elapsed" = "Decorrido";
+"homeScreen.remaining" = "Restante";
+"homeScreen.basalPosition" = "Posição da basal";
+"homeScreen.basalTop" = "Em cima";
+"homeScreen.basalBottom" = "Em baixo";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Gráfico de glicose";

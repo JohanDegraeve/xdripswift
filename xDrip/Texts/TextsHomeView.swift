@@ -904,7 +904,7 @@ enum Texts_HomeView {
     }()
 
     static let showHideGlucoseChartTitle: String = {
-        return NSLocalizedString("showHideGlucoseChartTitle", tableName: filename, bundle: Bundle.main, value: "Glucose Chart", comment: "quick show hide section title for chart items")
+        return NSLocalizedString("showHideGlucoseChartTitle", tableName: filename, bundle: Bundle.main, value: "Chart", comment: "quick show hide section title for chart items")
     }()
 
     static let showHideStandByModeTitle: String = {
@@ -916,7 +916,7 @@ enum Texts_HomeView {
     }()
 
     static let showHideAdditionalItemsTitle: String = {
-        return NSLocalizedString("showHideAdditionalItemsTitle", tableName: filename, bundle: Bundle.main, value: "Additional Items", comment: "quick show hide section title for additional items")
+        return NSLocalizedString("showHideAdditionalItemsTitle", tableName: filename, bundle: Bundle.main, value: "Alerts and Speech", comment: "quick controls for alerts and spoken readings")
     }()
     
     static let postProcessingTitle: String = {

@@ -598,10 +598,10 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                             onlineHelpTopic: .glucoseDisplay,
                             providers: {
                                 [
+                                    SettingsViewHomeScreenSettingsViewModel(rowGroup: .layout),
                                     SettingsViewHomeScreenSettingsViewModel(rowGroup: .mainChart),
-                                    SettingsViewHomeScreenSettingsViewModel(rowGroup: .miniChart),
-                                    SettingsViewHomeScreenSettingsViewModel(rowGroup: .sensorLifetime),
-                                    SettingsViewHomeScreenSettingsViewModel(rowGroup: .screenLock)
+                                    SettingsViewHomeScreenSettingsViewModel(rowGroup: .treatments),
+                                    SettingsViewHomeScreenSettingsViewModel(rowGroup: .screenLockLink)
                                 ]
                             }
                         )

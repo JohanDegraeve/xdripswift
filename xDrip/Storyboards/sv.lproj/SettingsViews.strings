@@ -20,7 +20,7 @@
 "settingsviews_showReadingInNotification" = "Glukosnotiser";
 "settingsviews_labelShowReadingInAppBadge" = "Appbricka";
 "settingsviews_multipleAppBadgeValueWith10" = "Appbricka x10";
-"settingsviews_showClockWhenScreenIsLocked" = "Klocka på låsskärm";
+"settingsviews_showClockWhenScreenIsLocked" = "Klocka";
 "settingsviews_urgentHighValue" = "Akut högt värde";
 "settingsviews_highValue" = "Högt värde";
 "settingsviews_targetValue" = "Målvärde";
@@ -29,14 +29,14 @@
 "settingsviews_showcoloredobjectives" = "Färgade linjer";
 "settingsviews_showtarget" = "Mållinje";
 "settingsviews_sectiontitletreatments" = "Behandlingar";
-"settingsviews_showTreatments" = "Visa behandlingar i diagram";
+"settingsviews_showTreatments" = "Behandling";
 "settingsviews_smallBolusTreatmentThreshold" = "Tröskelvärde för mikrobolus";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Under vilket värde ska det visas som en mikrobolus?\n\n(Rekommenderat värde: 1,0 IE)";
 "settingsviews_sectiontitlestatistics" = "Statistik";
-"settingsviews_showStatistics" = "Visa statistik";
+"settingsviews_showStatistics" = "Statistik";
 "settingsviews_daysToUseStatisticsTitle" = "Dagar att beräkna";
 "settingsviews_daysToUseStatisticsMessage" = "Maximalt antal dagar för beräkning av statistik?\n\n(ange 0 för beräkning sedan midnatt)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Sändare";
 "settingsviews_transmittertype" = "Typ av sändare";
 "settingsviews_transmitterid" = "Sändar-ID";
@@ -124,7 +124,7 @@
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Hemskärm";
-"settingsviews_mainChartHours" = "Timmar i huvuddiagrammet";
+"settingsviews_mainChartHours" = "Tidsintervall";
  
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -254,8 +254,8 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show Mini-Chart";
-"settingsviews_showSensorNoise" = "Show Sensor Noise";
+"settingsviews_showMiniChart" = "Minidiagram";
+"settingsviews_showSensorNoise" = "Sensorbrus";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Alias";
@@ -299,7 +299,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Håll aktiv is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dämpning på låsskärm";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Nedtoning";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -519,11 +519,11 @@
 "therapy.carbDuration" = "Kolhydratduration";
 "therapy.local" = "Beräknat lokalt";
 
-"settingsviews_showOriginalBGReadings" = "Visa Ursprungliga Värden";
+"settingsviews_showOriginalBGReadings" = "Ursprungliga värden";
 
 "therapy.insulinType" = "Insulintyp";
 
-"therapy.showIOBCOB" = "Visa IOB/COB";
+"therapy.showIOBCOB" = "IOB/COB";
 
 "therapy.treatmentSettings" = "Behandlingar";
 
@@ -563,3 +563,13 @@
 
 /* Validation message when both speech schedule times are equal. */
 "speak.schedule.differentTimes" = "Välj olika tider för aktivering och inaktivering.";
+"therapy.summary" = "Behandlingsöversikt";
+"therapy.curves" = "IOB/COB-kurvor";
+"settingsviews_displayTrendInContactImage" = "Trend";
+"homeScreen.layout" = "Hemskärmens layout";
+"homeScreen.elapsed" = "Förfluten";
+"homeScreen.remaining" = "Återstående";
+"homeScreen.basalPosition" = "Basalplacering";
+"homeScreen.basalTop" = "Överst";
+"homeScreen.basalBottom" = "Nederst";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Glukosdiagram";

@@ -299,7 +299,7 @@
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
-"settingsviews_mainChartHours" = "Ore del grafico principale";
+"settingsviews_mainChartHours" = "Intervallo di tempo";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -319,10 +319,10 @@
 "settingsviews_sectiontitlestatistics" = "Statistics";
 
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 
 /// statistics settings, show statistics on home screen
-"settingsviews_showStatistics" = "Show Statistics";
+"settingsviews_showStatistics" = "Statistiche";
 
 /// statistics settings, how many days to use for calculations
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
@@ -332,7 +332,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the clock also be displayed when the screen is locked?
-"settingsviews_showClockWhenScreenIsLocked" = "Orologio schermata bloccata";
+"settingsviews_showClockWhenScreenIsLocked" = "Orologio";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -378,7 +378,7 @@
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatments" = "Show Treatments";
+"settingsviews_showTreatments" = "Terapia";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -481,8 +481,8 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show Mini-Chart";
-"settingsviews_showSensorNoise" = "Show Sensor Noise";
+"settingsviews_showMiniChart" = "Mini grafico";
+"settingsviews_showSensorNoise" = "Rumore del sensore";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Alias";
@@ -526,7 +526,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Mantieni attivo is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Oscuramento schermata bloccata";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Oscuramento";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -746,11 +746,11 @@
 "therapy.carbDuration" = "Durata dei Carboidrati";
 "therapy.local" = "Calcolato localmente";
 
-"settingsviews_showOriginalBGReadings" = "Mostra Valori Originali";
+"settingsviews_showOriginalBGReadings" = "Valori originali";
 
 "therapy.insulinType" = "Tipo di Insulina";
 
-"therapy.showIOBCOB" = "Mostra IOB/COB";
+"therapy.showIOBCOB" = "IOB/COB";
 
 "therapy.treatmentSettings" = "Trattamenti";
 
@@ -790,3 +790,13 @@
 
 /* Validation message when both speech schedule times are equal. */
 "speak.schedule.differentTimes" = "Scegli orari di attivazione e disattivazione diversi.";
+"therapy.summary" = "Riepilogo della terapia";
+"therapy.curves" = "Curve IOB/COB";
+"settingsviews_displayTrendInContactImage" = "Tendenza";
+"homeScreen.layout" = "Layout della schermata iniziale";
+"homeScreen.elapsed" = "Trascorsa";
+"homeScreen.remaining" = "Rimanente";
+"homeScreen.basalPosition" = "Posizione della basale";
+"homeScreen.basalTop" = "In alto";
+"homeScreen.basalBottom" = "In basso";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Grafico del glucosio";

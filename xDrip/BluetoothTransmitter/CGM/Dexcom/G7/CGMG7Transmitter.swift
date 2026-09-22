@@ -51,9 +51,10 @@ import os
  Coexistence mode
 
  In coexistence mode the Dexcom app owns authentication. xDrip4iOS must not send J-PAKE packets,
- restore a primary shared key, or claim any Bluetooth channel. startCoexistenceObservation()
- first asks Core Bluetooth for the G7 peripheral that is already connected by the other app.
- Scanning is used only to notice later wake cycles and repeat that system-connected lookup.
+ restore a primary shared key, or claim any Bluetooth channel. Initial discovery uses
+ startCoexistenceObservation() to find the peripheral already connected by the other app.
+ Once the peripheral is known, keep a Core Bluetooth connection request pending between wakes.
+ Repeated scan discoveries are not guaranteed in the background and cannot drive reconnection.
  subscribeForCoexistenceAuthentication() subscribes only to Receive_Authentication. When
  handleCoexistenceAuthentication() observes the paired and authenticated status created by
  the other app, xDrip4iOS enables Write_Control and passively receives the shared data stream.
@@ -424,8 +425,8 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
         super.prepareForRelease()
     }
 
-    /// Primary mode owns its connection and uses the normal direct-connect path. Coexistence only
-    /// attaches after the Dexcom app has established the system Bluetooth connection.
+    /// Discover new coexistence sensors through the Dexcom app's connection. Known sensors use
+    /// the saved-peripheral path in either mode; connecting does not claim authentication ownership.
     override func connect() {
         runOnCentralQueue { [weak self] in
             self?.connectOnCentral()
@@ -434,17 +435,17 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
 
     private func connectOnCentral() {
         assertOnCentral()
-        if useOtherApp {
+        if useOtherApp, deviceAddress == nil {
             startCoexistenceObservation()
-        } else if primaryAuthenticationBlocked {
+        } else if !useOtherApp, primaryAuthenticationBlocked {
             trace("G7 primary connection remains stopped after authentication rejection", log: log, category: ConstantsLog.categoryCGMG7, type: .info)
         } else {
             super.connect()
         }
     }
 
-    /// Duplicate advertisements let coexistence re-check the live system-connected list after the
-    /// Dexcom app authenticates. No timer or delayed retry is needed.
+    /// During initial discovery, foreground duplicate advertisements can re-check whether the
+    /// Dexcom app has connected. Known-sensor reconnection must not depend on these callbacks.
     override func scanOptions() -> [String: Any]? {
         useOtherApp ? [CBCentralManagerScanOptionAllowDuplicatesKey: true] : nil
     }
@@ -594,7 +595,11 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
 
     override func reconnectAfterDisconnect(_ central: CBCentralManager) {
         if useOtherApp {
-            startCoexistenceObservation()
+            // The sensor normally sleeps between readings. An immediate system-connected lookup
+            // is then empty, and background scanning may never deliver another discovery. Keep
+            // the known peripheral's request pending, as on startup, while Dexcom owns authentication.
+            trace("G7 coexistence reconnect queued for known sensor; waiting for Dexcom authentication", log: log, category: ConstantsLog.categoryCGMG7, type: .info)
+            super.reconnectAfterDisconnect(central)
         } else if primaryAuthenticationBlocked {
             trace("G7 primary reconnect suppressed after authentication rejection", log: log, category: ConstantsLog.categoryCGMG7, type: .info)
         } else {
@@ -602,7 +607,11 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
         }
     }
 
-    override func centralManager(_: CBCentralManager, didConnect peripheral: CBPeripheral) {
+    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        // Saved-peripheral and restored connections can arrive while an old discovery scan is
+        // still active. Stop it so unrelated advertisements cannot replace this pending connection.
+        if useOtherApp { central.stopScan() }
+
         // A G7 wakes for a short connection window. Every callback and command below must belong to
         // this window, so clear cached clocks, paired coexistence frames, notification readiness,
         // and partial calibration transport before discovering the new characteristic instances.

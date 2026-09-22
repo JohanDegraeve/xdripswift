@@ -182,3 +182,6 @@
 "heartbeat.simpleFooter" = "تُطبَّق التغييرات عند الاتصال التالي.";
 
 "signalStrengthDisconnected" = "غير متصل";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "تنتهي الصلاحية";

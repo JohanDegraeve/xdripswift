@@ -124,9 +124,13 @@
 "common_statistics_high" = "High";
 
 /// phrase HbA1c
-"common_statistics_a1c" = "HbA1c";
 
 /// coefficient of variation
+"common_statistics_gmiTrend" = "Trend GMI";
+"common_statistics_threeDay" = "Co 3 dni";
+"common_statistics_weekly" = "Tygodniowo";
+"common_statistics_daily" = "Codziennie";
+"common_statistics_gmi" = "GMI";
 "common_statistics_cv" = "CV";
 
 /// the word low
@@ -134,7 +138,7 @@
 
 /// literal translation needed
 "common_days" = "days";
-"common_landscape_comparingWithLast" = "Porównanie z ostatnimi:";
+"common_landscape_showAGPChartData" = "Pokaż dane wykresu AGP:";
 "common_landscape_comparisonDays" = "%d dni";
 "common_landscape_comparisonNone" = "Brak";
 
@@ -183,3 +187,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Sensor się rozgrzewa";
 "common_sensorWarmupUntilFormat" = "Do %@";
+"common_sensorWarmupComplete" = "Rozgrzewanie zakończone";
+"common_sensorWaitingForReading" = "Oczekiwanie na pierwszy odczyt…";

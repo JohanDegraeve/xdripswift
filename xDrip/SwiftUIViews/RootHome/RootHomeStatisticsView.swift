@@ -47,7 +47,7 @@ struct RootHomeStatisticsView: View {
     var body: some View {
         HStack(spacing: 0) {
             RootHomeStatisticsColumn(top: state.low, bottom: state.average, limitText: state.lowLimitText)
-            RootHomeStatisticsColumn(top: state.inRange, bottom: state.a1c, limitText: "")
+            RootHomeStatisticsColumn(top: state.inRange, bottom: state.gmi, limitText: "")
             RootHomeStatisticsColumn(top: state.high, bottom: state.cv, limitText: state.highLimitText)
 
             VStack(spacing: pieSpacing) {

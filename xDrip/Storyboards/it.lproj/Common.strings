@@ -124,7 +124,6 @@
 "common_statistics_high" = "High";
 
 /// phrase HbA1c
-"common_statistics_a1c" = "HbA1c";
 
 /// coefficient of variation
 "common_statistics_cv" = "CV";
@@ -134,7 +133,7 @@
 
 /// literal translation needed
 "common_days" = "days";
-"common_landscape_comparingWithLast" = "Confronto con gli ultimi:";
+"common_landscape_showAGPChartData" = "Mostra i dati del grafico AGP:";
 "common_landscape_comparisonDays" = "%d giorni";
 "common_landscape_comparisonNone" = "Nessuno";
 
@@ -187,7 +186,9 @@
 "common_statistics_ambulatoryGlucoseProfile" = "Profilo Ambulatoriale del Glucosio";
 "common_statistics_insufficientAGPData" = "Dati insufficienti per il grafico percentile AGP";
 "common_statistics_insufficientData" = "Dati insufficienti";
-"common_statistics_estimatedA1cTrend" = "Tendenza HbA1c stimata";
+"common_statistics_gmiTrend" = "Tendenza GMI";
+"common_statistics_threeDay" = "Ogni 3 giorni";
+"common_statistics_weekly" = "Settimanale";
 "common_statistics_cvTrend" = "Tendenza CV";
 "common_statistics_dailyPattern" = "Andamento Giornaliero";
 "common_statistics_averageFormat" = "Media %@";
@@ -244,3 +245,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "Sensore in riscaldamento";
 "common_sensorWarmupUntilFormat" = "Fino alle %@";
+"common_sensorWarmupComplete" = "Riscaldamento completato";
+"common_sensorWaitingForReading" = "In attesa della prima lettura…";

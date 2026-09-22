@@ -4,6 +4,8 @@ import Foundation
 class Texts_Common {
     static private let filename = "Common"
 
+    static let sensorWarmupComplete = NSLocalizedString("common_sensorWarmupComplete", tableName: filename, bundle: .main, value: "Warm-up complete", comment: "Estimated warm-up time has elapsed")
+    static let sensorWaitingForReading = NSLocalizedString("common_sensorWaitingForReading", tableName: filename, bundle: .main, value: "Waiting for first reading…", comment: "Waiting for the next sensor report after estimated warm-up")
     static let sensorWarmingUp = NSLocalizedString("common_sensorWarmingUp", tableName: filename, bundle: .main, value: "Sensor warming up", comment: "Live Activity sensor warm-up title")
     static let sensorWarmupUntilFormat = NSLocalizedString("common_sensorWarmupUntilFormat", tableName: filename, bundle: .main, value: "Until %@", comment: "Warm-up completion time; %@ is a localized time")
     
@@ -104,8 +106,8 @@ class Texts_Common {
         return NSLocalizedString("common_days", tableName: filename, bundle: Bundle.main, value: "days", comment: "literal translation needed")
     }()
 
-    static let landscapeComparingWithLast = {
-        return NSLocalizedString("common_landscape_comparingWithLast", tableName: filename, bundle: Bundle.main, value: "Comparing with the last:", comment: "label before a selectable number of days used for the landscape AGP comparison")
+    static let landscapeShowAGPChartData = {
+        return NSLocalizedString("common_landscape_showAGPChartData", tableName: filename, bundle: Bundle.main, value: "Show AGP chart data:", comment: "Label before the history period picker, which controls only AGP chart data")
     }()
 
     static func landscapeComparisonDays(_ days: Int) -> String {
@@ -241,10 +243,6 @@ class Texts_Common {
         return NSLocalizedString("common_statistics_average", tableName: filename, bundle: Bundle.main, value: "Average", comment: "the word average")
     }()
     
-    static let a1cStatistics = {
-        return NSLocalizedString("common_statistics_a1c", tableName: filename, bundle: Bundle.main, value: "HbA1c", comment: "phrase HbA1c")
-    }()
-    
     static let cvStatistics = {
         return NSLocalizedString("common_statistics_cv", tableName: filename, bundle: Bundle.main, value: "CV", comment: "coefficient of variation")
     }()
@@ -325,8 +323,16 @@ class Texts_Common {
         return NSLocalizedString("common_statistics_insufficientData", tableName: filename, bundle: Bundle.main, value: "Insufficient data", comment: "statistics chart empty message")
     }()
 
-    static let statisticsEstimatedA1cTrend = {
-        return NSLocalizedString("common_statistics_estimatedA1cTrend", tableName: filename, bundle: Bundle.main, value: "Estimated HbA1c trend", comment: "statistics estimated HbA1c trend chart title")
+    static let statisticsGMITrend = {
+        return NSLocalizedString("common_statistics_gmiTrend", tableName: filename, bundle: Bundle.main, value: "GMI trend", comment: "statistics GMI trend chart title")
+    }()
+
+    static let statisticsThreeDay = {
+        return NSLocalizedString("common_statistics_threeDay", tableName: filename, bundle: Bundle.main, value: "3-day", comment: "three-day GMI trend interval")
+    }()
+
+    static let statisticsWeekly = {
+        return NSLocalizedString("common_statistics_weekly", tableName: filename, bundle: Bundle.main, value: "Weekly", comment: "weekly GMI trend interval")
     }()
 
     static let statisticsCVTrend = {

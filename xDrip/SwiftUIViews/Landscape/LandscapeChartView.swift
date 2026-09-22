@@ -70,7 +70,7 @@ final class LandscapeChartStateModel: ObservableObject {
         self.coreDataManager = coreDataManager
         self.nightscoutSyncManager = nightscoutSyncManager
         statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
-        showsAIDCharts = UserDefaults.standard.dataFlowPolicy.showsAIDData
+        showsAIDCharts = UserDefaults.standard.dataFlowPolicy.aidAnalyticsSource != nil
         comparisonPeriod = LandscapeComparisonPeriod(rawValue: UserDefaults.standard.landscapeComparisonDays) ?? .sevenDays
 
         refresh()
@@ -310,6 +310,24 @@ struct LandscapeChartView: View {
     @ObservedObject var stateModel: LandscapeChartStateModel
     let presentation: Presentation
 
+    @AppStorage(UserDefaults.Key.showTreatmentsOnChart.rawValue) private var hidesTreatments = false
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var localTherapy = TherapyChartSeries()
+    @State private var localTherapyDate: Date?
+    @State private var therapyRevision = 0
+
+    private var usesLocalIOB: Bool { UserDefaults.standard.dataFlowPolicy.externalIOBSource == nil }
+    private var usesLocalCOB: Bool { UserDefaults.standard.dataFlowPolicy.externalCOBSource == nil }
+    // Never combine a previous day's local curves with a newly committed AGP snapshot.
+    private var displayedLocalTherapy: TherapyChartSeries {
+        localTherapyDate == stateModel.displayedDate ? localTherapy : TherapyChartSeries()
+    }
+    private var therapyRequestKey: String {
+        // Extend today's curves on the existing glucose refresh without adding a timer.
+        let latestGlucose = stateModel.chartState.bgReadingDates.last?.timeIntervalSince1970 ?? 0
+        return "\(stateModel.displayedDate)-\(hidesTreatments)-\(usesLocalIOB)-\(usesLocalCOB)-\(therapyRevision)-\(latestGlucose)-\(scenePhase == .active)"
+    }
+
     // The badge and AGP share one selection so their clinical boundaries always agree.
     @State private var rangeMode = LandscapeTIRBadge.RangeMode.timeInRange
 
@@ -362,10 +380,28 @@ struct LandscapeChartView: View {
         .padding(.top, 2)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ConstantsAppColors.background)
+        .task(id: therapyRequestKey) {
+            guard !hidesTreatments, scenePhase == .active, usesLocalIOB || usesLocalCOB else {
+                localTherapy = TherapyChartSeries()
+                localTherapyDate = nil
+                return
+            }
+            let date = stateModel.displayedDate
+            guard let end = Calendar.current.date(byAdding: .day, value: 1, to: date) else { return }
+            // Reuse Home's source resolution, visibility rules and cancellable history cache.
+            // Keep local display estimates out of the statistics/report snapshot.
+            let result = await TherapyMetricsManager.shared.chart(from: date, to: end.addingTimeInterval(-0.001))
+            guard !Task.isCancelled, date == stateModel.displayedDate else { return }
+            localTherapy = TherapyChartSeries(iob: usesLocalIOB ? result.iob : [], cob: usesLocalCOB ? result.cob : [])
+            localTherapyDate = date
+        }
+        .onReceive(NotificationCenter.default.publisher(for: TherapyMetricsManager.changed)) { _ in
+            if scenePhase == .active { therapyRevision &+= 1 }
+        }
     }
 
     @ViewBuilder private var chartContent: some View {
-        if stateModel.showsAIDCharts {
+        if !hidesTreatments && (stateModel.showsAIDCharts || !displayedLocalTherapy.iob.isEmpty || !displayedLocalTherapy.cob.isEmpty) {
             GeometryReader { geometry in
                 let availableWidth = validLandscapeDimension(
                     geometry.size.width - Layout.chartColumnSpacing
@@ -377,6 +413,9 @@ struct LandscapeChartView: View {
 
                     LandscapeLoopalyzerCharts(
                         snapshot: stateModel.loopalyzerSnapshot,
+                        localIOB: usesLocalIOB ? displayedLocalTherapy.iob : nil,
+                        localCOB: usesLocalCOB ? displayedLocalTherapy.cob : nil,
+                        showsBasal: stateModel.showsAIDCharts,
                         showsNowRule: Calendar.current.isDateInToday(stateModel.displayedDate)
                     )
                         .frame(width: availableWidth * (1 - Layout.agpColumnFraction))
@@ -552,7 +591,7 @@ struct LandscapeChartView: View {
 
     private var comparisonPeriodMenu: some View {
         HStack(spacing: presentation == .expandedIPad ? 8 : 6) {
-            Text(Texts_Common.landscapeComparingWithLast)
+            Text(Texts_Common.landscapeShowAGPChartData)
                 .foregroundStyle(comparisonPeriodColor)
                 .font(comparisonPeriodFont)
 
@@ -640,6 +679,9 @@ struct IPadHomeAGPView: View {
 
 private struct LandscapeLoopalyzerCharts: View {
     let snapshot: StatisticsManager.LandscapeLoopalyzerSnapshot?
+    let localIOB: [TherapyChartPoint]?
+    let localCOB: [TherapyChartPoint]?
+    let showsBasal: Bool
     let showsNowRule: Bool
 
     private enum Layout {
@@ -649,17 +691,21 @@ private struct LandscapeLoopalyzerCharts: View {
 
     var body: some View {
         GeometryReader { geometry in
-            if let snapshot {
+            let count = (showsBasal ? 1 : 0) + (localIOB?.isEmpty == true ? 0 : 1) + (localCOB?.isEmpty == true ? 0 : 1)
+            if count > 0 {
                 LandscapeLoopalyzerChart(
-                    points: snapshot.points,
-                    insulinTreatmentMarkers: snapshot.insulinTreatmentMarkers,
-                    carbTreatmentMarkers: snapshot.carbTreatmentMarkers,
+                    points: snapshot?.points ?? [],
+                    insulinTreatmentMarkers: snapshot?.insulinTreatmentMarkers ?? [],
+                    carbTreatmentMarkers: snapshot?.carbTreatmentMarkers ?? [],
                     plotHeight: max(
                         44,
-                        (validLandscapeDimension(geometry.size.height) - Layout.chartChromeHeight) / 3
+                        (validLandscapeDimension(geometry.size.height) - Layout.chartChromeHeight * CGFloat(count) / 3) / CGFloat(count)
                     ),
                     chartSpacing: Layout.chartSpacing,
-                    showsNowRule: showsNowRule
+                    showsNowRule: showsNowRule,
+                    localIOB: localIOB,
+                    localCOB: localCOB,
+                    showsBasal: showsBasal
                 )
             }
         }

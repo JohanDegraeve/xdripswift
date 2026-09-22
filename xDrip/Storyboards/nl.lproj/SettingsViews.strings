@@ -24,7 +24,7 @@
 "settingsviews_showReadingInNotification" = "Glucosemeldingen";
 "settingsviews_labelShowReadingInAppBadge" = "Appbadge";
 "settingsviews_multipleAppBadgeValueWith10" = "Appbadge x10";
-"settingsviews_showClockWhenScreenIsLocked" = "Klok op vergrendelscherm";
+"settingsviews_showClockWhenScreenIsLocked" = "Klok";
 "settingsviews_urgentHighValue" = "Urgent Hoge Waarde";
 "settingsviews_highValue" = "Hoge Waarde";
 "settingsviews_targetValue" = "Doel Waarde";
@@ -34,10 +34,10 @@
 "settingsviews_showcoloredobjectives" = "Gekleurde lijnen";
 "settingsviews_showtarget" = "Doellijn";
 "settingsviews_sectiontitlestatistics" = "Statistieken";
-"settingsviews_showStatistics" = "Toon Statistieken";
+"settingsviews_showStatistics" = "Statistieken";
 "settingsviews_daysToUseStatisticsTitle" = "Hoeveel dagen berekenen";
 "settingsviews_daysToUseStatisticsMessage" = "Maximum aantal dagen te gebruiken om de statistieken te berekenen?\n\n(0 betekent vanaf vandaag 00:00)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_givetransmitterid" = "Voer Transmitter ID In";
 "settingsviews_nonfixedtransmitter" = "Meerpuntskalibratie";
@@ -140,7 +140,7 @@
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
-"settingsviews_mainChartHours" = "Uren in hoofdgrafiek";
+"settingsviews_mainChartHours" = "Tijdsbereik";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -179,7 +179,7 @@
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatments" = "Show Treatments";
+"settingsviews_showTreatments" = "Therapie";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -282,8 +282,8 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show Mini-Chart";
-"settingsviews_showSensorNoise" = "Show Sensor Noise";
+"settingsviews_showMiniChart" = "Minigrafiek";
+"settingsviews_showSensorNoise" = "Sensorruis";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Alias";
@@ -325,7 +325,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Actief houden is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dimmen vergrendelscherm";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dimmen";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -545,11 +545,11 @@
 "therapy.carbDuration" = "Koolhydraatduur";
 "therapy.local" = "Lokaal berekend";
 
-"settingsviews_showOriginalBGReadings" = "Oorspronkelijke Waarden Tonen";
+"settingsviews_showOriginalBGReadings" = "Oorspronkelijke waarden";
 
 "therapy.insulinType" = "Insulinetype";
 
-"therapy.showIOBCOB" = "IOB/COB tonen";
+"therapy.showIOBCOB" = "IOB/COB";
 
 "therapy.treatmentSettings" = "Behandelingen";
 
@@ -589,3 +589,13 @@
 
 /* Validation message when both speech schedule times are equal. */
 "speak.schedule.differentTimes" = "Kies verschillende tijden voor in- en uitschakelen.";
+"therapy.summary" = "Therapieoverzicht";
+"therapy.curves" = "IOB/COB-curven";
+"settingsviews_displayTrendInContactImage" = "Trend";
+"homeScreen.layout" = "Indeling beginscherm";
+"homeScreen.elapsed" = "Verstreken";
+"homeScreen.remaining" = "Resterend";
+"homeScreen.basalPosition" = "Basaalpositie";
+"homeScreen.basalTop" = "Boven";
+"homeScreen.basalBottom" = "Onder";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Glucosegrafiek";

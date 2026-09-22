@@ -100,9 +100,10 @@ final class BatteryHistoryManager {
             } else {
                 sample = BatteryHistorySample(context: context)
                 sample.id = UniqueId.createEventId()
-                sample.blePeripheral = peripheral
             }
 
+            sample.blePeripheral = peripheral
+            sample.peripheralAddress = peripheral.address
             sample.observedAt = observedAt
             switch observation {
             case .percentage(let value, let producer):
@@ -148,7 +149,7 @@ final class BatteryHistoryManager {
                   !peripheral.isDeleted else { return }
             let request: NSFetchRequest<BatteryHistorySample> = BatteryHistorySample.fetchRequest()
             request.fetchLimit = 1
-            request.predicate = NSPredicate(format: "blePeripheral == %@", peripheral)
+            request.predicate = NSPredicate(format: "blePeripheral == %@ OR (blePeripheral == nil AND peripheralAddress ==[c] %@)", peripheral, peripheral.address)
             result = ((try? context.count(for: request)) ?? 0) > 0
         }
         return result
@@ -166,7 +167,7 @@ final class BatteryHistoryManager {
                 return
             }
             let request: NSFetchRequest<BatteryHistorySample> = BatteryHistorySample.fetchRequest()
-            request.predicate = NSPredicate(format: "blePeripheral == %@", peripheral)
+            request.predicate = NSPredicate(format: "blePeripheral == %@ OR (blePeripheral == nil AND peripheralAddress ==[c] %@)", peripheral, peripheral.address)
             request.sortDescriptors = [NSSortDescriptor(key: #keyPath(BatteryHistorySample.observedAt), ascending: true)]
             do {
                 let samples = try context.fetch(request)
@@ -267,7 +268,7 @@ final class BatteryHistoryManager {
     private func latestReading(peripheral: BLEPeripheral, context: NSManagedObjectContext) -> BatteryHistoryCurrentReading? {
         let request: NSFetchRequest<BatteryHistorySample> = BatteryHistorySample.fetchRequest()
         request.fetchLimit = 1
-        request.predicate = NSPredicate(format: "blePeripheral == %@", peripheral)
+        request.predicate = NSPredicate(format: "blePeripheral == %@ OR (blePeripheral == nil AND peripheralAddress ==[c] %@)", peripheral, peripheral.address)
         request.sortDescriptors = [NSSortDescriptor(key: #keyPath(BatteryHistorySample.observedAt), ascending: false)]
         guard let sample = try? request.execute().first,
               let kind = BatteryMeasurementKind(rawValue: sample.measurementKindRaw) else { return nil }
@@ -283,14 +284,14 @@ final class BatteryHistoryManager {
     private func percentageSample(peripheral: BLEPeripheral, observedAt: Date, context: NSManagedObjectContext) -> BatteryHistorySample? {
         let request: NSFetchRequest<BatteryHistorySample> = BatteryHistorySample.fetchRequest()
         request.fetchLimit = 1
-        request.predicate = NSPredicate(format: "blePeripheral == %@ AND measurementKindRaw == %d AND utcHourBucketStart == %@", peripheral, BatteryMeasurementKind.percentage.rawValue, Self.utcHourStart(for: observedAt) as NSDate)
+        request.predicate = NSPredicate(format: "(blePeripheral == %@ OR (blePeripheral == nil AND peripheralAddress ==[c] %@)) AND measurementKindRaw == %d AND utcHourBucketStart == %@", peripheral, peripheral.address, BatteryMeasurementKind.percentage.rawValue, Self.utcHourStart(for: observedAt) as NSDate)
         return try? request.execute().first
     }
 
     private func exactSample(peripheral: BLEPeripheral, observedAt: Date, context: NSManagedObjectContext) -> BatteryHistorySample? {
         let request: NSFetchRequest<BatteryHistorySample> = BatteryHistorySample.fetchRequest()
         request.fetchLimit = 1
-        request.predicate = NSPredicate(format: "blePeripheral == %@ AND observedAt == %@", peripheral, observedAt as NSDate)
+        request.predicate = NSPredicate(format: "(blePeripheral == %@ OR (blePeripheral == nil AND peripheralAddress ==[c] %@)) AND observedAt == %@", peripheral, peripheral.address, observedAt as NSDate)
         return try? request.execute().first
     }
 

@@ -49,8 +49,8 @@
 "settingsviews_showReadingInNotification" = "Notificaciones de glucosa";
 "settingsviews_labelShowReadingInAppBadge" = "Globo de la app";
 "settingsviews_multipleAppBadgeValueWith10" = "Globo de app x10";
-"settingsviews_showClockWhenScreenIsLocked" = "Reloj en pantalla bloqueada";
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Atenuación en pantalla bloqueada";
+"settingsviews_showClockWhenScreenIsLocked" = "Reloj";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Atenuación";
 "settingsviews_screenLockDimmingTypeDisabled" = "Deshabilitado";
 "settingsviews_screenLockDimmingTypeDimmed" = "Atenuado";
 "settingsviews_screenLockDimmingTypeDark" = "Oscuro";
@@ -64,18 +64,18 @@
 "settingsviews_showcoloredobjectives" = "Líneas de colores";
 "settingsviews_showtarget" = "Línea objetivo";
 "settingsviews_sectiontitletreatments" = "Tratamientos";
-"settingsviews_showTreatments" = "Mostrar Tratamientos";
+"settingsviews_showTreatments" = "Terapia";
 "settingsviews_smallBolusTreatmentThreshold" = "Límite Micro-bolo";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Por debajo de cuántas unidades debemos considerar un bolo como micro-bolo?\n\n(Valor recomendado: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Estadísticas";
-"settingsviews_showStatistics" = "Mostrar Estadísticas";
+"settingsviews_showStatistics" = "Estadísticas";
 "settingsviews_daysToUseStatisticsTitle" = "Días a Calcular";
 "settingsviews_daysToUseStatisticsMessage" = "Máximos días a intentar usar para calcular las estadísticas?\n\n(Entrar 0 para calcular el día de hoy desde las 00:00hrs)";
 "settingsviews_labelTimeInRangeType" = "Tipo de Tiempo en Rango";
 "settingsviews_timeInRangeTypeStandardRange" = "Estándar";
 "settingsviews_timeInRangeTypeTightRange" = "Rango Estrecho";
 "settingsviews_timeInRangeTypeUserDefinedRange" = "Rango Usuario";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmisor";
 "settingsviews_transmittertype" = "Tipo de Transmisor";
 "settingsviews_transmitterid" = "ID del Transmisor";
@@ -125,13 +125,13 @@
 "settingsviews_IntervalTitle" = "Intervalo entre notificaciones";
 "settingsviews_IntervalMessage" = "Intervalo mínimo entre dos notificaciones";
 "settingsviews_allowScreenRotation" = "Rotación del gráfico";
-"settingsviews_homeScreenChartDisplaySectionTitle" = "Visualización del gráfico";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Gráfico de Glucosa";
 "settingsviews_homeScreenMainChartSectionFooter" = "Estas opciones controlan cómo se muestran los datos de glucosa en el gráfico principal.";
-"settingsviews_mainChartHours" = "Horas del gráfico principal";
+"settingsviews_mainChartHours" = "Intervalo de Tiempo";
 "settingsviews_homeScreenScreenLockSectionTitle" = "Bloqueo de pantalla";
 "settingsviews_homeScreenScreenLockSectionFooter" = "Estas opciones controlan cómo se comporta la pantalla de Inicio cuando la app queda abierta o bloqueada.";
-"settingsviews_showMiniChart" = "Mostrar la mini-gráfica";
-"settingsviews_showSensorNoise" = "Mostrar ruido del sensor";
+"settingsviews_showMiniChart" = "Minigráfico";
+"settingsviews_showSensorNoise" = "Ruido del Sensor";
 "settingsviews_Version" = "Versión";
 "settingsviews_license" = "Licencia";
 "m5stack_settingsviews_settingstitle" = "Configuración M5 Stack";
@@ -177,7 +177,7 @@
 "settingsviews_infoContactsAccessRestricted" = "No has podido dar permiso a %@ para accesar a tus contactos. Esto es probablemente debido a restriciones como el control parental o similar.";
 "settingsviews_contactImageSectionTitle" = "Imagen de Contacto";
 "settingsviews_enableContactImage" = "Imagen de contacto";
-"settingsviews_displayTrendInContactImage" = "Mostrar Tendencia";
+"settingsviews_displayTrendInContactImage" = "Tendencia";
 "settingsviews_contactImageCreatedByString" = "Contacto creado automáticamente por";
 
 
@@ -464,11 +464,11 @@
 "therapy.carbDuration" = "Duración de Carbohidratos";
 "therapy.local" = "Calculado localmente";
 
-"settingsviews_showOriginalBGReadings" = "Mostrar Valores Originales";
+"settingsviews_showOriginalBGReadings" = "Valores Originales";
 
 "therapy.insulinType" = "Tipo de Insulina";
 
-"therapy.showIOBCOB" = "Mostrar IOB/COB";
+"therapy.showIOBCOB" = "IOB/COB";
 
 "therapy.treatmentSettings" = "Tratamientos";
 
@@ -508,3 +508,11 @@
 
 /* Validation message when both speech schedule times are equal. */
 "speak.schedule.differentTimes" = "Elige horas de activación y desactivación diferentes.";
+"therapy.summary" = "Resumen del Tratamiento";
+"therapy.curves" = "Curvas de IOB/COB";
+"homeScreen.layout" = "Diseño de Inicio";
+"homeScreen.elapsed" = "Transcurrido";
+"homeScreen.remaining" = "Restante";
+"homeScreen.basalPosition" = "Posición de la Basal";
+"homeScreen.basalTop" = "Arriba";
+"homeScreen.basalBottom" = "Abajo";

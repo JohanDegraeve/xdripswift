@@ -180,3 +180,5 @@
 "dexcomG7SelectSensorCodeMessage" = "Indtast den firecifrede parringskode manuelt, scan den aktuelle applikator, eller vælg et foto. Kontrollér den valgte kode, og tryk på Fortsæt.";
 "noSensorCodeSelectedTitle" = "Fortsæt uden sensorkode?";
 "noSensorCodeSelectedMessage" = "Hvis en sensorsession allerede kører på senderen, bruger appen den session med dens eksisterende kalibreringskrav.\n\nEn ny session uden kode kræver kalibreringer efter opvarmning og derefter med jævne mellemrum. Disse krav forsvinder ikke, når appens kalibreringspåmindelse slås fra.";
+"showHideGlucoseChartTitle" = "Graf";
+"showHideAdditionalItemsTitle" = "Alarmer og tale";

@@ -163,7 +163,7 @@ final class RootHomeStatisticsEasterEggTests: XCTestCase {
     func testLoadingClearsEasterEggAndTimeRefreshDoesNotRestoreIt() {
         let model = RootHomeStateModel()
         model.updateStatistics(StatisticsManager.Statistics(lowStatisticValue: 0, highStatisticValue: 0,
-            inRangeStatisticValue: 100, averageStatisticValue: 100, a1CStatisticValue: 5,
+            inRangeStatisticValue: 100, averageStatisticValue: 100, gmiPercentage: 5,
             cVStatisticValue: 0, lowLimitForTIR: 70, highLimitForTIR: 180, numberOfDaysUsed: 1))
         model.updateStatisticsEasterEgg(days: 0, now: date(9, 10), calendar: calendar)
         XCTAssertEqual(model.state.statistics.easterEgg, .sunglasses)
@@ -176,7 +176,7 @@ final class RootHomeStatisticsEasterEggTests: XCTestCase {
     func testTimeRefreshHandlesForegroundReturnAndSeasonChange() {
         let model = RootHomeStateModel()
         model.updateStatistics(StatisticsManager.Statistics(lowStatisticValue: 0, highStatisticValue: 0,
-            inRangeStatisticValue: 100, averageStatisticValue: 100, a1CStatisticValue: 5,
+            inRangeStatisticValue: 100, averageStatisticValue: 100, gmiPercentage: 5,
             cVStatisticValue: 0, lowLimitForTIR: 70, highLimitForTIR: 180, numberOfDaysUsed: 1))
         model.updateStatisticsEasterEgg(days: 0, now: date(9, 10, hour: 15), calendar: calendar)
         XCTAssertNil(model.state.statistics.easterEgg)

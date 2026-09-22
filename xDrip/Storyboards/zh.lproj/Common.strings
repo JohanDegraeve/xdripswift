@@ -90,9 +90,13 @@
 "common_statistics_high" = "High";
 
 /// phrase HbA1c
-"common_statistics_a1c" = "HbA1c";
 
 /// coefficient of variation
+"common_statistics_gmiTrend" = "GMI 趋势";
+"common_statistics_threeDay" = "每3天";
+"common_statistics_weekly" = "每周";
+"common_statistics_daily" = "每天";
+"common_statistics_gmi" = "GMI";
 "common_statistics_cv" = "CV";
 
 /// the word low
@@ -100,7 +104,7 @@
 
 /// literal translation needed
 "common_days" = "days";
-"common_landscape_comparingWithLast" = "与最近时段比较：";
+"common_landscape_showAGPChartData" = "显示 AGP 图表数据：";
 "common_landscape_comparisonDays" = "%d 天";
 "common_landscape_comparisonNone" = "无";
 
@@ -149,3 +153,5 @@
 // Live Activity sensor warm-up
 "common_sensorWarmingUp" = "传感器预热中";
 "common_sensorWarmupUntilFormat" = "至 %@";
+"common_sensorWarmupComplete" = "预热完成";
+"common_sensorWaitingForReading" = "等待首次读数…";

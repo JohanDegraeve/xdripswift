@@ -218,3 +218,5 @@
 "dexcomG7SelectSensorCodeMessage" = "Voer de viercijferige koppelingscode handmatig in, scan de huidige applicator of kies een foto. Controleer de geselecteerde code en tik op Doorgaan.";
 "noSensorCodeSelectedTitle" = "Doorgaan zonder sensorcode?";
 "noSensorCodeSelectedMessage" = "Als er al een sensorsessie actief is op de zender, gebruikt de app die sessie met de bestaande kalibratievereisten.\n\nEen nieuwe sessie zonder code vereist kalibraties na het opwarmen en daarna periodiek. Het uitschakelen van de kalibratieherinnering van de app neemt deze vereisten niet weg.";
+"showHideGlucoseChartTitle" = "Grafiek";
+"showHideAdditionalItemsTitle" = "Alarmen en spraak";

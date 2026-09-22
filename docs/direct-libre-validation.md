@@ -2,9 +2,13 @@
 
 Implementation and setup: [Direct Libre guide](direct-libre.md).
 Review order and file counts: [maintainer review guide](direct-libre-maintainer-review.md).
-Upstream: `develop` at `03709376` (7.1.0, build 4232).
+Upstream: `develop` at `c268542e` (7.1.1, build 4233).
 This file records current evidence and remaining device acceptance. Earlier milestone
 reports and test totals remain in Git history.
+
+The September 22 merge preserves the shared Bluetooth/Libre implementation, Watch
+collector and handoff/history code unchanged. The sole merge conflict combined test
+entries in the Xcode project; upstream's battery-history model v32 is retained.
 
 ## Automated checks
 

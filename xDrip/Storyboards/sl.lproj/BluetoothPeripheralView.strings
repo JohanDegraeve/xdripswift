@@ -258,3 +258,6 @@
 "heartbeat.simpleFooter" = "Spremembe veljajo ob naslednji povezavi.";
 
 "signalStrengthDisconnected" = "Povezava prekinjena";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "Poteče";

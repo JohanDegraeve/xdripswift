@@ -276,3 +276,5 @@
 "dexcomG7SelectSensorCodeMessage" = "Wpisz ręcznie czterocyfrowy kod parowania, zeskanuj bieżący aplikator lub wybierz zdjęcie. Sprawdź wybrany kod, a następnie stuknij Kontynuuj.";
 "noSensorCodeSelectedTitle" = "Kontynuować bez kodu sensora?";
 "noSensorCodeSelectedMessage" = "Jeśli w nadajniku działa już sesja sensora, aplikacja użyje jej z dotychczasowymi wymaganiami dotyczącymi kalibracji.\n\nRozpoczęcie nowej sesji bez kodu wymaga kalibracji po rozgrzewaniu, a następnie okresowo. Wyłączenie przypomnienia o kalibracji w aplikacji nie znosi tych wymagań.";
+"showHideGlucoseChartTitle" = "Wykres";
+"showHideAdditionalItemsTitle" = "Alarmy i mowa";
