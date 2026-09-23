@@ -145,6 +145,8 @@
 "batteryHistoryRange" = "Range";
 "batteryHistoryRangeAccessibility" = "Battery history range";
 "batteryHistoryRangeExplanation" = "Fixed ranges run from now back to the selected number of days. Gaps show periods without a reading.";
+"batteryHistoryInactive" = "Transmitter Inactive";
+"batteryHistoryHistoricalRangeExplanation" = "Ranges end at the last recorded reading. Gaps show periods without a reading.";
 
 "connectionDiagramOtherApp" = "Other App";
 

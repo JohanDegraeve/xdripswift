@@ -171,6 +171,8 @@
 "batteryHistoryRange" = "Intervall";
 "batteryHistoryRangeAccessibility" = "Intervall för batterihistorik";
 "batteryHistoryRangeExplanation" = "Fasta intervall går från nu och tillbaka det valda antalet dagar. Luckor visar perioder utan avläsning.";
+"batteryHistoryInactive" = "Sändaren är inaktiv";
+"batteryHistoryHistoricalRangeExplanation" = "Intervallen slutar vid den senast registrerade avläsningen. Luckor visar perioder utan avläsning.";
 
 "connectionDiagramOtherApp" = "Annan app";
 

@@ -88,6 +88,8 @@ class Texts_BluetoothPeripheralView {
     static let batteryHistoryRange = NSLocalizedString("batteryHistoryRange", tableName: filename, bundle: .main, value: "Range", comment: "Label for the battery history time-range selector")
     static let batteryHistoryRangeAccessibility = NSLocalizedString("batteryHistoryRangeAccessibility", tableName: filename, bundle: .main, value: "Battery history range", comment: "Accessibility label for the battery history time-range selector")
     static let batteryHistoryRangeExplanation = NSLocalizedString("batteryHistoryRangeExplanation", tableName: filename, bundle: .main, value: "Fixed ranges run from now back to the selected number of days. Gaps show periods without a reading.", comment: "Explanation below the battery history chart")
+    static let batteryHistoryInactive = NSLocalizedString("batteryHistoryInactive", tableName: filename, bundle: .main, value: "Transmitter Inactive", comment: "Label identifying battery history for a disabled transmitter")
+    static let batteryHistoryHistoricalRangeExplanation = NSLocalizedString("batteryHistoryHistoricalRangeExplanation", tableName: filename, bundle: .main, value: "Ranges end at the last recorded reading. Gaps show periods without a reading.", comment: "Section footer below an inactive transmitter battery history chart")
 
     static let versionCode: String = {
         return NSLocalizedString("versionCode", tableName: filename, bundle: Bundle.main, value: "Version Code", comment: "Dexcom G7 family firmware compatibility version code")

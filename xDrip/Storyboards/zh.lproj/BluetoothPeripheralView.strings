@@ -237,6 +237,8 @@
 "batteryHistoryRange" = "范围";
 "batteryHistoryRangeAccessibility" = "电池历史记录范围";
 "batteryHistoryRangeExplanation" = "固定范围从现在回溯到所选天数。空白表示没有读数的时段。";
+"batteryHistoryInactive" = "发射器未启用";
+"batteryHistoryHistoricalRangeExplanation" = "时间范围截止于最后一次记录的读数。空白表示没有读数的时段。";
 
 "connectionDiagramOtherApp" = "其他应用";
 

@@ -237,6 +237,8 @@
 "batteryHistoryRange" = "Obdobje";
 "batteryHistoryRangeAccessibility" = "Obdobje zgodovine baterije";
 "batteryHistoryRangeExplanation" = "Fiksna obdobja segajo od zdaj nazaj za izbrano število dni. Vrzeli prikazujejo obdobja brez odčitka.";
+"batteryHistoryInactive" = "Oddajnik ni aktiven";
+"batteryHistoryHistoricalRangeExplanation" = "Obdobja se končajo pri zadnjem shranjenem odčitku. Vrzeli prikazujejo obdobja brez odčitka.";
 
 "connectionDiagramOtherApp" = "Druga aplikacija";
 

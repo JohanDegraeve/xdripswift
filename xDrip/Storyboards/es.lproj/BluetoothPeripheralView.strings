@@ -168,6 +168,8 @@
 "batteryHistoryRange" = "Intervalo";
 "batteryHistoryRangeAccessibility" = "Intervalo del historial de la batería";
 "batteryHistoryRangeExplanation" = "Los intervalos fijos van desde ahora hasta el número de días seleccionado. Los espacios muestran periodos sin lecturas.";
+"batteryHistoryInactive" = "Transmisor inactivo";
+"batteryHistoryHistoricalRangeExplanation" = "Los intervalos terminan en la última lectura registrada. Los espacios muestran periodos sin lecturas.";
 
 "connectionDiagramOtherApp" = "Otra app";
 

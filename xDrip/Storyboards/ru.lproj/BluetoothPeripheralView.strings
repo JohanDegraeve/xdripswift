@@ -164,6 +164,8 @@
 "batteryHistoryRange" = "Период";
 "batteryHistoryRangeAccessibility" = "Период истории батареи";
 "batteryHistoryRangeExplanation" = "Фиксированные периоды отсчитываются от текущего момента назад на выбранное количество дней. Пробелы обозначают периоды без показаний.";
+"batteryHistoryInactive" = "Передатчик неактивен";
+"batteryHistoryHistoricalRangeExplanation" = "Периоды заканчиваются последним сохранённым показанием. Пробелы обозначают периоды без показаний.";
 
 "connectionDiagramOtherApp" = "Другое приложение";
 

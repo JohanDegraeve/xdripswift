@@ -161,6 +161,8 @@
 "batteryHistoryRange" = "Periode";
 "batteryHistoryRangeAccessibility" = "Periode for batterihistorik";
 "batteryHistoryRangeExplanation" = "Faste perioder går fra nu og tilbage til det valgte antal dage. Huller viser perioder uden en aflæsning.";
+"batteryHistoryInactive" = "Sender inaktiv";
+"batteryHistoryHistoricalRangeExplanation" = "Perioderne slutter ved den senest registrerede aflæsning. Huller viser perioder uden en aflæsning.";
 
 "connectionDiagramOtherApp" = "Anden app";
 

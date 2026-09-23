@@ -171,6 +171,8 @@
 "batteryHistoryRange" = "Période";
 "batteryHistoryRangeAccessibility" = "Période de l’historique de la batterie";
 "batteryHistoryRangeExplanation" = "Les périodes fixes vont de maintenant au nombre de jours sélectionné dans le passé. Les interruptions indiquent des périodes sans mesure.";
+"batteryHistoryInactive" = "Transmetteur inactif";
+"batteryHistoryHistoricalRangeExplanation" = "Les périodes se terminent à la dernière mesure enregistrée. Les interruptions indiquent des périodes sans mesure.";
 
 "connectionDiagramOtherApp" = "Autre app";
 

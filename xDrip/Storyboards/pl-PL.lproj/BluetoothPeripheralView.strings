@@ -237,6 +237,8 @@
 "batteryHistoryRange" = "Zakres";
 "batteryHistoryRangeAccessibility" = "Zakres historii baterii";
 "batteryHistoryRangeExplanation" = "Stałe zakresy obejmują czas od teraz do wybranej liczby dni wstecz. Przerwy oznaczają okresy bez odczytu.";
+"batteryHistoryInactive" = "Nadajnik nieaktywny";
+"batteryHistoryHistoricalRangeExplanation" = "Zakresy kończą się na ostatnim zapisanym odczycie. Przerwy oznaczają okresy bez odczytów.";
 
 "connectionDiagramOtherApp" = "Inna aplikacja";
 

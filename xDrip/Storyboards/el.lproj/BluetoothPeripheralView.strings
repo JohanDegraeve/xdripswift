@@ -161,6 +161,8 @@
 "batteryHistoryRange" = "Εύρος";
 "batteryHistoryRangeAccessibility" = "Εύρος ιστορικού μπαταρίας";
 "batteryHistoryRangeExplanation" = "Τα σταθερά εύρη εκτείνονται από τώρα έως τον επιλεγμένο αριθμό ημερών στο παρελθόν. Τα κενά δείχνουν περιόδους χωρίς ένδειξη.";
+"batteryHistoryInactive" = "Ανενεργός πομπός";
+"batteryHistoryHistoricalRangeExplanation" = "Τα χρονικά διαστήματα τελειώνουν στην τελευταία καταγεγραμμένη ένδειξη. Τα κενά δείχνουν περιόδους χωρίς ένδειξη.";
 
 "connectionDiagramOtherApp" = "Άλλη εφαρμογή";
 

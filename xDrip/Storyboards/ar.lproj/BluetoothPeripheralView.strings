@@ -161,6 +161,8 @@
 "batteryHistoryRange" = "النطاق";
 "batteryHistoryRangeAccessibility" = "نطاق سجل البطارية";
 "batteryHistoryRangeExplanation" = "تمتد النطاقات الثابتة من الآن إلى عدد الأيام المحدد في الماضي. تشير الفجوات إلى فترات لم تتوفر فيها قراءة.";
+"batteryHistoryInactive" = "جهاز الإرسال غير نشط";
+"batteryHistoryHistoricalRangeExplanation" = "تنتهي النطاقات عند آخر قراءة مسجلة. تشير الفجوات إلى فترات لم تتوفر فيها قراءة.";
 
 "connectionDiagramOtherApp" = "تطبيق آخر";
 

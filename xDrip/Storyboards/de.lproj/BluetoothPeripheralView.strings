@@ -230,6 +230,8 @@
 "batteryHistoryRange" = "Zeitraum";
 "batteryHistoryRangeAccessibility" = "Zeitraum des Batterieverlaufs";
 "batteryHistoryRangeExplanation" = "Feste Zeiträume reichen von jetzt bis zur ausgewählten Anzahl von Tagen zurück. Lücken zeigen Zeiträume ohne Messwert.";
+"batteryHistoryInactive" = "Transmitter inaktiv";
+"batteryHistoryHistoricalRangeExplanation" = "Die Zeiträume enden beim letzten aufgezeichneten Messwert. Lücken zeigen Zeiträume ohne Messwert.";
 
 "connectionDiagramOtherApp" = "Andere App";
 

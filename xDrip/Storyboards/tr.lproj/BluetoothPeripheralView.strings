@@ -161,6 +161,8 @@
 "batteryHistoryRange" = "Aralık";
 "batteryHistoryRangeAccessibility" = "Pil geçmişi aralığı";
 "batteryHistoryRangeExplanation" = "Sabit aralıklar şu andan seçilen gün sayısı kadar geriye uzanır. Boşluklar okuma olmayan dönemleri gösterir.";
+"batteryHistoryInactive" = "Verici etkin değil";
+"batteryHistoryHistoricalRangeExplanation" = "Aralıklar son kaydedilen okumada sona erer. Boşluklar okuma olmayan dönemleri gösterir.";
 
 "connectionDiagramOtherApp" = "Diğer uygulama";
 

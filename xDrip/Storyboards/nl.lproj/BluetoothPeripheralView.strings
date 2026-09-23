@@ -168,6 +168,8 @@
 "batteryHistoryRange" = "Periode";
 "batteryHistoryRangeAccessibility" = "Periode van batterijgeschiedenis";
 "batteryHistoryRangeExplanation" = "Vaste periodes lopen vanaf nu terug tot het geselecteerde aantal dagen. Onderbrekingen tonen periodes zonder meting.";
+"batteryHistoryInactive" = "Zender inactief";
+"batteryHistoryHistoricalRangeExplanation" = "De periodes eindigen bij de laatst opgeslagen meting. Onderbrekingen tonen periodes zonder meting.";
 
 "connectionDiagramOtherApp" = "Andere app";
 
