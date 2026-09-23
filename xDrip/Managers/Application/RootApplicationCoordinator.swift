@@ -1093,6 +1093,8 @@ import AppIntents
         // also for cases where calibration is not needed, we go through this code
         if let activeSensor = activeSensor, let calibrator = calibrator, let bgReadingsAccessor = bgReadingsAccessor {
             trace("in processNewGlucoseData, calibrator = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, calibrator.description())
+
+            let previousVisibleReadingTimeStamp = latestVisibleReadingTimeStamp()
             
             // initialize help variables
             var lastCalibrationsForActiveSensorInLastXDays = calibrationsAccessor.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
@@ -1213,7 +1215,12 @@ import AppIntents
             
             // if a new reading is created, create either initial calibration request or bgreading notification - upload to nightscout and check alerts
             if newReadingCreated {
-                _ = bgPostProcessingManager?.processLatestReadings()
+                let shouldProcessDownstream = bgPostProcessingManager?.processLatestReadings(
+                    previousVisibleReadingTimeStamp: previousVisibleReadingTimeStamp
+                ).shouldProcessDownstream ?? BgReadingDownstreamPolicy.shouldProcess(
+                    previousVisibleReadingTimeStamp: previousVisibleReadingTimeStamp,
+                    currentVisibleReadingTimeStamp: latestVisibleReadingTimeStamp()
+                )
                 for accepted in acceptedReadings {
                     TroubleshootingLogStore.shared.record(.standard(.glucoseAccepted(
                         mgDl: accepted.reading.finalValue,
@@ -1222,6 +1229,11 @@ import AppIntents
                         originalMgDl: accepted.reading.calculatedValue
                     ), timestamp: accepted.acceptedAt))
                 }
+
+                // Suppressed source readings remain stored for post-processing context and diagnostics,
+                // but only a newer visible reading may enter the app's downstream processing pipeline.
+                guard shouldProcessDownstream else { return }
+
                 sensorNoiseManager?.update(activeSensor: activeSensor)
 
                 // Publish the final stored value before optional downstream consumers perform their work.
@@ -1916,6 +1928,10 @@ import AppIntents
               let state = dexcomG6InitialCalibrationPolicy.requiredState else { return }
 
         requestCalibration(userRequested: false, expectedDexcomInitialCalibrationState: state)
+    }
+
+    private func latestVisibleReadingTimeStamp() -> Date? {
+        bgReadingsAccessor?.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0).first?.timeStamp
     }
 
     /// creates bgreading notification, and set app badge to value of reading
@@ -3163,6 +3179,7 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
         if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor { //}, let followManager = (UserDefaults.standard.followerDataSourceType == .nightscout ? self.nightscoutFollowManager : self.libreLinkUpFollowManager) {
 
             let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+            let previousVisibleReadingTimeStamp = latestVisibleReadingTimeStamp()
             
             // assign value of timeStampLastBgReading
             var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
@@ -3276,16 +3293,28 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 coreDataManager.saveChanges()
                 statisticsManager?.invalidate()
                 
+                let shouldProcessDownstream: Bool
                 if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled, let firstCreatedBgReadingTimeStamp = firstCreatedBgReadingTimeStamp {
                     let processingStartDateOverride = previousTimeStampLastBgReading.timeIntervalSince1970 > 0 ? min(previousTimeStampLastBgReading.addingTimeInterval(-1.0), firstCreatedBgReadingTimeStamp) : firstCreatedBgReadingTimeStamp
                     if let bgPostProcessingManager = bgPostProcessingManager {
-                        _ = bgPostProcessingManager.processBgReadings(
+                        shouldProcessDownstream = bgPostProcessingManager.processBgReadings(
                             processingStartDateOverride: processingStartDateOverride,
-                            allowHistoricalDownstreamRewrite: bgPostProcessingManager.hasActiveDownstreamPostProcessing()
+                            allowHistoricalDownstreamRewrite: bgPostProcessingManager.hasActiveDownstreamPostProcessing(),
+                            downstreamGate: .newerVisibleReading(previousTimeStamp: previousVisibleReadingTimeStamp)
+                        ).shouldProcessDownstream
+                    } else {
+                        shouldProcessDownstream = BgReadingDownstreamPolicy.shouldProcess(
+                            previousVisibleReadingTimeStamp: previousVisibleReadingTimeStamp,
+                            currentVisibleReadingTimeStamp: latestVisibleReadingTimeStamp()
                         )
                     }
                 } else {
-                    _ = bgPostProcessingManager?.processLatestReadings()
+                    shouldProcessDownstream = bgPostProcessingManager?.processLatestReadings(
+                        previousVisibleReadingTimeStamp: previousVisibleReadingTimeStamp
+                    ).shouldProcessDownstream ?? BgReadingDownstreamPolicy.shouldProcess(
+                        previousVisibleReadingTimeStamp: previousVisibleReadingTimeStamp,
+                        currentVisibleReadingTimeStamp: latestVisibleReadingTimeStamp()
+                    )
                 }
 
                 for accepted in acceptedReadings {
@@ -3296,6 +3325,10 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                         originalMgDl: accepted.reading.calculatedValue
                     ), timestamp: accepted.acceptedAt))
                 }
+
+                // Suppressed source readings remain stored for post-processing context and diagnostics,
+                // but only a newer visible reading may enter the app's downstream processing pipeline.
+                guard shouldProcessDownstream else { return }
 
                 // Publish the final stored value before optional downstream consumers perform their work.
                 updateLiveActivityAndWidgets(forceRestart: false)
