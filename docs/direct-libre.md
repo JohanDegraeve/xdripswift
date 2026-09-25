@@ -50,10 +50,16 @@ The phone now saves the code actually provisioned by successful NFC scans.
 - A successful ordinary phone **NFC scan** authoritatively resets collection. Failed
   or cancelled scans do not transfer control. An unavailable Watch stops when it
   receives the reset; do not assume an offline Watch has already processed it.
-- **Unresolved Watch readings** inspects uploads whose original phone sensor cannot
+- **Troubleshooting → Unresolved Watch readings** inspects uploads whose original phone sensor cannot
   be found. Deletion requires confirming the current count/revision and affects only
   unresolved Watch records, not pending uploads or phone data.
-- **Recent activity** displays five events initially and up to 80 with Show more.
+- **Troubleshooting → Recent activity** opens a separate page showing events from
+  the last hour, newest first. Older entries are removed when the app loads, records
+  or refreshes activity; the visible activity page also updates when an entry expires,
+  without background polling.
+- **Troubleshooting → Help** separates switching from recovery, with recovery advice
+  for each symptom, plus background location and notification-test guidance. Current
+  transfer errors and recovery guidance remain beside the switching control.
 
 ### Recovery paths
 
@@ -63,12 +69,17 @@ can occur; persistent grey means no active attempt is currently reported.
 
 | Situation | Recovery |
 | --- | --- |
-| Watch loses connection | Bring the Watch within sensor range and open xDrip. Allow the existing attempt to recover; if it remains disconnected, double-tap the large reading to restart the collector. |
+| Watch loses connection | Bring the Watch within sensor range, open xDrip and interact with it by swiping between pages. Allow the existing attempt to recover; if it remains disconnected, double-tap the large reading to restart the collector. |
 | Double-tap does not restore collection | Turn Bluetooth off and back on **on the Watch**, reopen xDrip, then double-tap if needed. If still unsuccessful, close and relaunch the Watch app. Saved selection, credentials and attempted counter are retained. |
 | Switching to Watch stalls | Keep both apps open and check the transfer status on the phone. If the iPhone appears to retain the sensor connection, cycling **iPhone Bluetooth** may help release it. Reopen both apps, check the saved transfer state and retry the switch/return control as appropriate. |
 | Returning to iPhone stalls | Keep both apps open and retry **Return to iPhone**. If necessary, cycle Bluetooth on the device apparently retaining the sensor connection, reopen both apps and retry. |
 | Transfer was interrupted | Reopen both apps and use the phone's switch/return control to resolve the saved selection. **Cancel transfer** does not itself enable phone collection. |
 | Normal return cannot complete | Perform a successful ordinary sensor NFC scan on the iPhone to reset selection. A failed or cancelled scan does not reclaim collection. An unreachable Watch stops its old collection only after it receives the revocation. |
+| Watch has fresh readings but phone delivery lags | Open both apps and try **Test Watch notification** under **Background connection**, following the instructions below. This has helped background delivery in testing; it does not reset the sensor connection. |
+
+In device testing, opening the Watch app alone was not always sufficient; swiping
+between pages appeared to help recovery. This observation does not establish that
+watchOS background limits were reset.
 
 Bluetooth cycling is a fallback, not a routine handoff requirement: clean device
 checks passed in both directions without it. Cycling iPhone Bluetooth also disrupts
@@ -120,7 +131,7 @@ and [underwater foreground behaviour](https://developer.apple.com/documentation/
 
 ## Watch connection diagnostics
 
-Open **Advanced Settings → Direct Libre → Connection diagnostics** with both apps
+Open **Advanced Settings → Direct Libre → Troubleshooting → Connection diagnostics** with both apps
 open. Refresh status, then **Start capture** and wait for confirmation. The Watch
 records locally without the phone; closing this page does not stop the capture.
 After the test, reopen both apps, **Stop and download**, then **Share report**.

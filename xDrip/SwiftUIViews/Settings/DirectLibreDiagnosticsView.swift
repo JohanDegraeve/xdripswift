@@ -7,11 +7,14 @@ struct DirectLibreDiagnosticsView: View {
     @State private var confirmReplacement = false
 
     var body: some View {
-        Form {
+        List {
             Section {
-                Text(capture.description)
-                if let error = capture.error { Text(error).foregroundStyle(.red) }
-                if capture.isBusy { ProgressView() }
+                HStack {
+                    Text(capture.description).font(.footnote).foregroundStyle(ConstantsAppColors.rowDetailText)
+                    Spacer()
+                    if capture.isBusy { ProgressView() }
+                }
+                if let error = capture.error { Text(error).font(.footnote).foregroundStyle(.red) }
                 Button("Refresh status") { capture.refresh() }
                     .disabled(capture.isBusy || !connection.reachable)
                 if capture.status?.isRecording == true {
@@ -28,21 +31,33 @@ struct DirectLibreDiagnosticsView: View {
                             .disabled(capture.isBusy || !connection.reachable)
                     }
                 }
-            } header: { Text("Watch connection capture") } footer: {
+            } header: {
+                DirectLibreSectionHeader(title: "Watch connection capture", symbol: "antenna.radiowaves.left.and.right")
+            } footer: {
                 Text("Records up to 24 hours, 100,000 events or 10 MB on the Watch, whichever comes first, even without the phone. Open both apps to control or download it. Status is the last confirmed reply. Capture adds no reconnect attempts or background execution time.")
+                    .font(.footnote)
+                    .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                    .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
             }
             if let url = capture.reportURL {
-                Section("Saved report") {
+                Section {
                     ShareLink(item: url) { Label("Share report", systemImage: "square.and.arrow.up") }
-                    if let date = capture.savedAt { Text(date, format: .dateTime).font(.footnote) }
+                    if let date = capture.savedAt {
+                        Text(date, format: .dateTime).font(.footnote).foregroundStyle(ConstantsAppColors.rowDetailText)
+                    }
+                } header: {
+                    DirectLibreSectionHeader(title: "Saved report", symbol: "doc.text")
                 }
             }
-            Section("Pool test") {
-                Text("After returning to reliable sensor range, first wait without interacting, then open xDrip without double-tapping, and finally double-tap if needed. Note those times separately. Bluetooth cycling is recorded as radio state changes. Water entry is not detected automatically.")
+            Section {
                 Text("Includes Bluetooth requests, callbacks, reset decisions, setup and reading timing. No credentials, raw packets, glucose values or coordinates. Gaps and pending requests do not prove Apple throttling or radio loss.")
-            }.font(.footnote)
+                    .font(.footnote).foregroundStyle(ConstantsAppColors.rowDetailText)
+            } header: {
+                DirectLibreSectionHeader(title: "About the capture", symbol: "info.circle")
+            }
         }
-        .navigationTitle("Connection diagnostics")
+        .font(.subheadline)
+        .settingsListStyle(title: "Connection diagnostics", titleDisplayMode: .inline)
         .onAppear { if connection.reachable { capture.refresh() } }
         .alert("Replace Watch capture?", isPresented: $confirmReplacement) {
             Button("Start new capture", role: .destructive) { capture.start() }

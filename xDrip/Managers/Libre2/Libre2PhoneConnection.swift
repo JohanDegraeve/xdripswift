@@ -35,7 +35,7 @@ final class Libre2PhoneConnection: ObservableObject {
         let date: Date
         let message: String
     }
-    static let maximumActivityEntries = 80
+    static let activityRetentionInterval: TimeInterval = 60 * 60
     @Published private(set) var activity: [Activity] = []
     private let activityURL = Libre2JournalFile.url("phone-activity.json")
     var settingsVisible = false
@@ -67,10 +67,23 @@ final class Libre2PhoneConnection: ObservableObject {
     }
 
     func recordActivity(_ message: String) {
+        let now = Date()
+        removeExpiredActivity(at: now)
         let message = String(message.prefix(300))
         guard activity.last?.message != message else { return }
-        activity = Array((activity + [Activity(id: UUID(), date: Date(), message: message)]).suffix(Self.maximumActivityEntries))
+        activity.append(Activity(id: UUID(), date: now, message: message))
         // A diagnostic write failure must never affect collection or transfer safety.
+        try? Libre2JournalFile.save(activity, to: activityURL)
+    }
+
+    var activityExpiration: Date? {
+        activity.map(\.date).min()?.addingTimeInterval(Self.activityRetentionInterval)
+    }
+
+    private func removeExpiredActivity(at now: Date = Date()) {
+        let cutoff = now.addingTimeInterval(-Self.activityRetentionInterval)
+        guard activity.contains(where: { $0.date <= cutoff }) else { return }
+        activity.removeAll { $0.date <= cutoff }
         try? Libre2JournalFile.save(activity, to: activityURL)
     }
 
@@ -100,7 +113,7 @@ final class Libre2PhoneConnection: ObservableObject {
     }
 
     private init() {
-        activity = Array(((try? Libre2JournalFile.load([Activity].self, from: activityURL, fallback: [])) ?? []).suffix(Self.maximumActivityEntries))
+        activity = (try? Libre2JournalFile.load([Activity].self, from: activityURL, fallback: [])) ?? []
         phase = store.snapshot?.phase
         let initialStatus: String
         switch phase {
@@ -113,9 +126,11 @@ final class Libre2PhoneConnection: ObservableObject {
         // Restoring the selection is not a new activity event.
         _status = Published(initialValue: initialStatus)
         transferFailed = phase == nil || phase == .preparingWatch || phase == .returningToPhone
+        removeExpiredActivity()
     }
 
     func refresh() {
+        removeExpiredActivity()
         let selection = store.snapshot?.phase
         if phase != selection { phase = selection }
         let watchReachable = WCSession.default.activationState == .activated && WCSession.default.isReachable

@@ -10,45 +10,47 @@ struct DirectLibreRuntimeSettingsView: View {
     @State private var status = ""
     @State private var isBusy = false
     @State private var isVisible = false
-    @State private var showsHelp = false
 
     var body: some View {
         Section {
-            Toggle("Background location", isOn: Binding(
+            Toggle(isOn: Binding(
                 get: { enabled ?? false },
-                set: { request(.setEnabled($0)) }))
-                .disabled(enabled == nil || isBusy || !connection.reachable)
-            if enabled == true, let accuracy {
-                Picker("Requested location accuracy", selection: Binding(
-                    get: { self.accuracy ?? accuracy },
-                    set: { if $0 != self.accuracy { request(.setAccuracy($0)) } })) {
-                    Text("100 m").tag(Libre2LocationRequest.Accuracy.hundredMeters)
-                    Text("1 km").tag(Libre2LocationRequest.Accuracy.kilometer)
-                    Text("3 km").tag(Libre2LocationRequest.Accuracy.threeKilometers)
+                set: { request(.setEnabled($0)) })) {
+                    Text("Background location").foregroundStyle(ConstantsAppColors.rowTitleText)
                 }
-                .pickerStyle(.segmented)
-                .disabled(isBusy || !connection.reachable)
+            .disabled(enabled == nil || isBusy || !connection.reachable)
+            if enabled == true, let accuracy {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Requested location accuracy").foregroundStyle(ConstantsAppColors.rowTitleText)
+                    Picker("Requested location accuracy", selection: Binding(
+                        get: { self.accuracy ?? accuracy },
+                        set: { if $0 != self.accuracy { request(.setAccuracy($0)) } })) {
+                        Text("100 m").tag(Libre2LocationRequest.Accuracy.hundredMeters)
+                        Text("1 km").tag(Libre2LocationRequest.Accuracy.kilometer)
+                        Text("3 km").tag(Libre2LocationRequest.Accuracy.threeKilometers)
+                    }
+                    .pickerStyle(.segmented)
+                    .disabled(isBusy || !connection.reachable)
+                }
             }
-            if isBusy { ProgressView() }
-            Text(connection.reachable ? status : "Open xDrip on the Watch to read or change these settings.")
-                .font(.footnote).foregroundStyle(.secondary)
+            if isBusy || !status.isEmpty || !connection.reachable {
+                HStack {
+                    Text(connection.reachable ? (isBusy ? "Updating Watch settings…" : status) : "Open xDrip on the Watch to read or change these settings.")
+                        .font(.footnote).foregroundStyle(ConstantsAppColors.rowDetailText)
+                    Spacer()
+                    if isBusy { ProgressView() }
+                }
+            }
             Button("Refresh runtime status") { request(.inspect) }
                 .disabled(isBusy || !connection.reachable)
             DirectLibreNotificationTestButton()
         } header: {
-            HStack {
-                Text("Background connection")
-                Spacer()
-                Button { showsHelp = true } label: { Image(systemName: "info.circle") }
-                    .accessibilityLabel("About background connection")
-            }
+            DirectLibreSectionHeader(title: "Background connection", symbol: "location.fill")
         } footer: {
             Text("Optional location updates may help collection continue in the background. Uses extra battery; continuous collection is not guaranteed.")
-        }
-        .alert("Background connection", isPresented: $showsHelp) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text("Enable while xDrip is open on the Watch and allow location access. Updates run only while Watch collection is selected. Locations are never saved or shared.\n\n100 m matches the prototype. 1 km and 3 km request coarser accuracy and may reduce energy use, but savings and background reliability need device testing. These choices do not set a polling interval.\n\nThe status is the last reply from the Watch. Refresh after granting permission to confirm it has received a location update.")
+                .font(.footnote)
+                .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
         }
         .onAppear { isVisible = true; request(.inspect) }
         .onDisappear { isVisible = false }
@@ -96,7 +98,6 @@ private struct DirectLibreNotificationTestButton: View {
     @ObservedObject private var connection = Libre2PhoneConnection.shared
     @State private var isScheduling = false
     @State private var status = ""
-    @State private var showsHelp = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -105,18 +106,13 @@ private struct DirectLibreNotificationTestButton: View {
                     .disabled(isScheduling || !connection.reachable)
                 if isScheduling { ProgressView() }
                 Spacer()
-                Button { showsHelp = true } label: { Image(systemName: "info.circle") }
-                    .accessibilityLabel("About the notification test")
             }
             .buttonStyle(.borderless)
             Text("May restore immediate phone updates when the Watch is collecting but the phone lags. Schedules one Watch notification in 30 seconds.")
-                .font(.footnote).foregroundStyle(.secondary)
-            if !status.isEmpty { Text(status).font(.footnote) }
-        }
-        .alert("Test Watch notification", isPresented: $showsHelp) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text("In prototype testing, a notification appearing on the Watch restored immediate delivery of new readings while both apps stayed in the background. Updates continued after the notification closed, without tapping it. This is an experimental workaround, not a guaranteed connection.\n\nOpen both apps to schedule the test. After confirmation, return to the watch face and lock the phone. Let the notification appear on the Watch and check subsequent reading times without opening either app. Notification settings and Focus may affect presentation. Another press replaces the pending test.")
+                .font(.footnote).foregroundStyle(ConstantsAppColors.rowDetailText)
+            if !status.isEmpty {
+                Text(status).font(.footnote).foregroundStyle(ConstantsAppColors.rowDetailText)
+            }
         }
     }
 
