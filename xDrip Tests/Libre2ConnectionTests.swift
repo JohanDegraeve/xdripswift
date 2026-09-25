@@ -10,6 +10,52 @@ final class Libre2ConnectionTests: XCTestCase {
     }
     override func tearDownWithError() throws { try FileManager.default.removeItem(at: directory) }
 
+    func testPhoneTransferRequiresReadingAfterSuccessfulUnlockWrite() {
+        let uid = Data([1, 2, 3, 4, 5, 6]), now = Date()
+        var readiness = Libre2PhoneTransferReadiness(sensorUID: uid, unlockCode: 42)
+        readiness.receivedReading(at: now, unlockEnabled: true)
+        XCTAssertFalse(readiness.isReady(sensorUID: uid, unlockCode: 42, at: now))
+        readiness.didWriteUnlock(success: false)
+        readiness.receivedReading(at: now, unlockEnabled: true)
+        XCTAssertFalse(readiness.isReady(sensorUID: uid, unlockCode: 42, at: now))
+        readiness.didWriteUnlock(success: true)
+        XCTAssertFalse(readiness.isReady(sensorUID: uid, unlockCode: 42, at: now))
+        readiness.receivedReading(at: now, unlockEnabled: true)
+        XCTAssertTrue(readiness.isReady(sensorUID: uid, unlockCode: 42, at: now))
+    }
+
+    func testPhoneTransferCannotUseSuppressedUnlockOrAnEarlierReading() {
+        let uid = Data([1, 2, 3, 4, 5, 6]), now = Date()
+        var suppressed = Libre2PhoneTransferReadiness(sensorUID: uid)
+        suppressed.didWriteUnlock(success: true)
+        suppressed.receivedReading(at: now, unlockEnabled: true)
+        XCTAssertFalse(suppressed.isReady(sensorUID: uid, unlockCode: 42, at: now))
+
+        var readiness = Libre2PhoneTransferReadiness(sensorUID: uid, unlockCode: 42)
+        readiness.didWriteUnlock(success: true)
+        readiness.receivedReading(at: now, unlockEnabled: false)
+        XCTAssertFalse(readiness.isReady(sensorUID: uid, unlockCode: 42, at: now))
+        readiness.receivedReading(at: now, unlockEnabled: true)
+        XCTAssertTrue(readiness.isReady(sensorUID: uid, unlockCode: 42, at: now))
+        readiness.receivedReading(at: now, unlockEnabled: false)
+        XCTAssertFalse(readiness.isReady(sensorUID: uid, unlockCode: 42, at: now))
+    }
+
+    func testPhoneTransferRejectsExpiredReadingAndChangedCredentials() {
+        let uid = Data([1, 2, 3, 4, 5, 6]), now = Date()
+        var readiness = Libre2PhoneTransferReadiness(sensorUID: uid, unlockCode: 42)
+        readiness.didWriteUnlock(success: true)
+        readiness.receivedReading(at: now, unlockEnabled: true)
+        XCTAssertTrue(readiness.isReady(sensorUID: uid, unlockCode: 42, at: now.addingTimeInterval(179)))
+        XCTAssertFalse(readiness.isReady(sensorUID: uid, unlockCode: 42, at: now.addingTimeInterval(180)))
+        XCTAssertFalse(readiness.isReady(sensorUID: uid, unlockCode: 42, at: now.addingTimeInterval(-1)))
+        XCTAssertFalse(readiness.isReady(sensorUID: Data([7]), unlockCode: 42, at: now))
+        XCTAssertFalse(readiness.isReady(sensorUID: uid, unlockCode: 43, at: now))
+        readiness = Libre2PhoneTransferReadiness()
+        readiness.receivedReading(at: now, unlockEnabled: true)
+        XCTAssertFalse(readiness.isReady(sensorUID: uid, unlockCode: 42, at: now))
+    }
+
     func testRuntimeRequestsRoundTripAndRejectInvalidAccuracy() throws {
         let requests: [Libre2LocationRequest] = [.inspect, .setEnabled(true), .setEnabled(false),
             .setAccuracy(.hundredMeters), .setAccuracy(.kilometer), .setAccuracy(.threeKilometers)]

@@ -30,6 +30,10 @@ The phone now saves the code actually provisioned by successful NFC scans.
 
 ## Daily workflow and recovery
 
+- Switching requires a phone BLE reading less than three minutes old, received after
+  a successful unlock-write callback on the current connection with unlock enabled.
+  Enabling unlock alone does not qualify an earlier reading; if the connection was
+  established with unlock suppressed, reconnect the phone and wait for a new reading.
 - Press **Switch to Watch**. Keep both apps open until Watch is selected; the phone
   pauses its Libre collector and the Watch begins connecting.
 - The antenna replaces the reading-age dot on every Watch page: **blinking orange**

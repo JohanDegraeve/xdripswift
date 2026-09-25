@@ -58,7 +58,7 @@ final class Libre2PhoneConnection: ObservableObject {
     }
 
     var readingExpiration: Date? {
-        recentReading ? lastReading?.addingTimeInterval(180) : nil
+        recentReading ? lastReading?.addingTimeInterval(Libre2PhoneTransferReadiness.recentReadingInterval) : nil
     }
 
     func connectionChanged(from transmitter: BluetoothTransmitter) {
@@ -138,7 +138,7 @@ final class Libre2PhoneConnection: ObservableObject {
         if nativeAlgorithmEnabled != native { nativeAlgorithmEnabled = native }
         let unlock = !UserDefaults.standard.suppressUnLockPayLoad
         if unlockPayloadEnabled != unlock { unlockPayloadEnabled = unlock }
-        let recent = lastReading.map { Date().timeIntervalSince($0) < 180 } ?? false
+        let recent = transmitter?.hasRecentVerifiedReading() == true
         if recentReading != recent { recentReading = recent }
     }
 

@@ -80,7 +80,7 @@ struct DirectLibreSettingsView: View {
                     check("Libre Native Algorithm enabled", connection.nativeAlgorithmEnabled)
                     check("Unlock payload enabled", connection.unlockPayloadEnabled)
                     check("iPhone connected to sensor", connection.phoneConnected)
-                    check("Libre BLE reading within 3 minutes", connection.recentReading)
+                    check("Fresh reading after phone unlock", connection.recentReading)
                 }
             } else if connection.phase == .watch || connection.phase == .returningToPhone {
                 check("iPhone collection paused", true)

@@ -5,6 +5,8 @@ import os
 final class Libre2PhoneSensor: Libre2SensorDataSource {
     var serialNumber: String?
     var webOOPEnabled: Bool
+    /// Observed on main for Watch transfer readiness; never controls ordinary phone BLE.
+    var transferReadiness = Libre2PhoneTransferReadiness()
     private let defaults: UserDefaults
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMLibre2)
 
@@ -20,7 +22,12 @@ final class Libre2PhoneSensor: Libre2SensorDataSource {
     func reserveUnlock() throws -> Libre2StreamingUnlock {
         // Preserve phone behaviour, including advancing when unlock transmission is suppressed.
         defaults.libreActiveSensorUnlockCount += 1
-        return Libre2StreamingUnlock(code: defaults.libreActiveSensorUnlockCode, count: defaults.libreActiveSensorUnlockCount, shouldWrite: !defaults.suppressUnLockPayLoad)
+        let unlock = Libre2StreamingUnlock(code: defaults.libreActiveSensorUnlockCode, count: defaults.libreActiveSensorUnlockCount, shouldWrite: !defaults.suppressUnLockPayLoad)
+        let uid = sensorUID
+        DispatchQueue.main.async {
+            self.transferReadiness = Libre2PhoneTransferReadiness(sensorUID: uid, unlockCode: unlock.shouldWrite ? unlock.code : nil)
+        }
+        return unlock
     }
 
     func parseBLEFrame(_ decryptedFrame: Data, date: Date) -> (bleGlucose: [GlucoseData], sensorTimeInMinutes: UInt16)? {
@@ -32,6 +39,35 @@ final class Libre2PhoneSensor: Libre2SensorDataSource {
             }
         }
         return Libre2BLEUtilities.parseBLEData(decryptedFrame, libre1DerivedAlgorithmParameters: webOOPEnabled ? parameters : nil, defaults: defaults, date: date)
+    }
+}
+
+/// Evidence from one phone connection. A toggle or an old reading cannot establish readiness.
+struct Libre2PhoneTransferReadiness {
+    static let recentReadingInterval: TimeInterval = 180
+    private let sensorUID: Data?
+    private let unlockCode: UInt32?
+    private var unlockWritten = false
+    private var lastReading: Date?
+
+    init(sensorUID: Data? = nil, unlockCode: UInt32? = nil) {
+        self.sensorUID = sensorUID
+        self.unlockCode = unlockCode
+    }
+
+    mutating func didWriteUnlock(success: Bool) {
+        unlockWritten = success && sensorUID != nil && unlockCode != nil
+        lastReading = nil
+    }
+
+    mutating func receivedReading(at date: Date, unlockEnabled: Bool) {
+        lastReading = unlockWritten && unlockEnabled ? date : nil
+    }
+
+    func isReady(sensorUID: Data?, unlockCode: UInt32, at now: Date = Date()) -> Bool {
+        guard self.sensorUID == sensorUID, self.unlockCode == unlockCode, let lastReading else { return false }
+        let age = now.timeIntervalSince(lastReading)
+        return age >= 0 && age < Self.recentReadingInterval
     }
 }
 

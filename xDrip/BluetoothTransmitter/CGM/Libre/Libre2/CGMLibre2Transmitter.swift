@@ -139,6 +139,7 @@ class CGMLibre2Transmitter: Libre2BluetoothTransmitter, CGMTransmitter {
     }
 
     override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        resetTransferReadiness()
         super.centralManager(central, didConnect: peripheral)
         guard isConnectionAllowed else { return }
         
@@ -166,6 +167,27 @@ class CGMLibre2Transmitter: Libre2BluetoothTransmitter, CGMTransmitter {
                     self?.bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.donotusethelibrelinkapp)
                 }
             }
+        }
+    }
+
+    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        resetTransferReadiness()
+        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+    }
+
+    override func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        super.peripheral(peripheral, didWriteValueFor: characteristic, error: error)
+        guard characteristic.uuid == CBUUID(string: CBUUID_WriteCharacteristic_Libre2) else { return }
+        DispatchQueue.main.async {
+            self.phoneSensor.transferReadiness.didWriteUnlock(success: error == nil)
+            Libre2PhoneConnection.shared.connectionChanged(from: self)
+        }
+    }
+
+    private func resetTransferReadiness() {
+        DispatchQueue.main.async {
+            self.phoneSensor.transferReadiness = Libre2PhoneTransferReadiness()
+            Libre2PhoneConnection.shared.connectionChanged(from: self)
         }
     }
 
@@ -206,10 +228,21 @@ class CGMLibre2Transmitter: Libre2BluetoothTransmitter, CGMTransmitter {
     }
     
     override func received(glucoseData: [GlucoseData], sensorTimeInMinutes: UInt16) {
+        if let date = glucoseData.map({ $0.timeStamp }).max() {
+            phoneSensor.transferReadiness.receivedReading(at: date, unlockEnabled: !UserDefaults.standard.suppressUnLockPayLoad)
+        }
         Libre2PhoneConnection.shared.received(glucoseData, from: self)
         var copy = glucoseData
         cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: TimeInterval(minutes: Double(sensorTimeInMinutes)))
         cGMLibre2TransmitterDelegate?.received(sensorTimeInMinutes: Int(sensorTimeInMinutes), from: self)
+    }
+
+    func hasRecentVerifiedReading() -> Bool {
+        if UserDefaults.standard.suppressUnLockPayLoad {
+            phoneSensor.transferReadiness.receivedReading(at: Date(), unlockEnabled: false)
+        }
+        return phoneSensor.transferReadiness.isReady(sensorUID: UserDefaults.standard.libreSensorUID,
+                                                    unlockCode: UserDefaults.standard.libreActiveSensorUnlockCode)
     }
 
     func watchSession(id: UUID) throws -> Libre2WatchSession {
