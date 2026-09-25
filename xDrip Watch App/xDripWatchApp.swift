@@ -26,6 +26,7 @@ struct xDrip_Watch_AppApp: App {
         // assign the custom view controller to show all watch notifications with snoozeCategory (which will be most of them)
         #if canImport(WatchKit)
         WKNotificationScene(controller: NotificationController.self, category: "snoozeCategoryIdentifier")
+        WKNotificationScene(controller: Libre2NotificationTestController.self, category: Libre2NotificationTest.category)
         #endif
     }
 }

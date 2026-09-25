@@ -7,15 +7,11 @@
 //
 
 import Foundation
-import OSLog
 
 /// - for libre2 to decrypt 344 data like libre1 data
 /// - only for libre 2 data read via transmitter (bubble, MM - probably also if read via NFC)
 class PreLibre2 {
     
-    /// for logging
-    static private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryRootView)
-
     static private let key: [UInt16] = [0xA0C5, 0x6860, 0x0000, 0x14C6]
     
     public static func op(_ value: UInt16, _ l1: UInt16, _ l2: UInt16) -> UInt16 {

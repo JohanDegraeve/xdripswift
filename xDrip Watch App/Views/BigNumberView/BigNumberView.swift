@@ -57,7 +57,7 @@ struct BigNumberView: View {
                 }
                 .onTapGesture(count: 2) {
                     watchState.updateBigNumberViewDate = Date()
-                    watchState.requestWatchStateUpdate()
+                    watchState.retryReadingConnection()
                 }
             
             HStack(alignment: .center, spacing: 10) {
@@ -98,10 +98,7 @@ struct BigNumberView: View {
             }
             
             HStack(alignment: .center, spacing: 3) {
-                Image(systemName: ConstantsAppleWatch.requestingDataIconSFSymbolName)
-                    .font(.system(size: ConstantsAppleWatch.requestingDataIconFontSize, weight: .heavy))
-                    .foregroundStyle(watchState.requestingDataIconColor)
-                    .padding(.top, 4)
+                Libre2ConnectionIndicator(relayColor: watchState.requestingDataIconColor)
                     .padding(.trailing, 2)
                 
                 Text(watchState.lastUpdatedMinsAgoString())

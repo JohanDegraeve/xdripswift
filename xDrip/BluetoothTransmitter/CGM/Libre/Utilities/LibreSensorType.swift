@@ -84,6 +84,7 @@ public enum LibreSensorType: String {
         }
     }
     
+    #if os(iOS)
     /// decrypts for libre2 and libreUs,
     func decryptIfPossibleAndNeeded(rxBuffer:inout Data, headerLength: Int, log: OSLog?, patchInfo: String?, uid: [UInt8]) -> Bool {
         
@@ -140,6 +141,7 @@ public enum LibreSensorType: String {
         return true
 
     }
+    #endif
 
     /// - reads the sensor type from patchInfo and returns the matching Libre type
     /// - if patchInfo = nil, then returnvalue is Libre1

@@ -96,6 +96,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         }
 
         let advancedRows = [
+            SettingsRow(id: "developer.directLibre", title: "Direct Libre (Experimental)", accessory: .disclosure, action: .directLibre),
             nativeSettingsRow(id: "developer.showDeveloperSettings", index: Setting.showDeveloperSettings.rawValue, sectionID: sectionID),
             SettingsRow(
                 id: "developer.issueReport",

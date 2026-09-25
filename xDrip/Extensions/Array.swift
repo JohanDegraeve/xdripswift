@@ -118,6 +118,7 @@ extension Array where Element: GlucoseData {
   
 }
 
+#if os(iOS)
 extension Array where Element: BgReading {
     
     /// - Filter out readings that are too close to each other
@@ -262,6 +263,8 @@ extension Array where Element == BgReadingSnapshot {
         return returnValue
     }
 }
+
+#endif
 
 extension Array where Element: GlucoseData {
     

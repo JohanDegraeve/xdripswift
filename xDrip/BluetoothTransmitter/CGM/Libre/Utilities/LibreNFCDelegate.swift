@@ -19,7 +19,8 @@ protocol LibreNFCDelegate: AnyObject {
     
     func received(fram: Data)
     
-    func streamingEnabled(successful : Bool)
+    /// Reports the code sent by this scan so BLE authentication uses the same credentials.
+    func streamingEnabled(successful: Bool, unlockCode: UInt32)
     
     /// Used to pass back the high-level result of the NFC scan.
     func nfcScanResult(_ result: LibreNFCScanResult)

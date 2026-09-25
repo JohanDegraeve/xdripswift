@@ -74,6 +74,10 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// the Watch Connectivity session
     var session: WCSession
 
+    private let directLibreDiagnostics = Libre2WatchDiagnostics.shared
+    private let directLibreLocation = Libre2WatchLocationSession()
+    private lazy var directLibreNotification = Libre2WatchNotificationTest()
+
     // set timer to automatically refresh the view
     // https://www.hackingwithswift.com/quick-start/swiftui/how-to-use-a-timer-with-swiftui
     let timer = Timer.publish(every: 2, tolerance: 0.5, on: .main, in: .common).autoconnect()
@@ -139,6 +143,10 @@ final class WatchStateModel: NSObject, ObservableObject {
         self.session = session
         super.init()
 
+        restoreComplicationState()
+        Libre2WatchConnection.shared.readingsReceived = { [weak self] readings, age in
+            self?.receiveDirectLibre(readings, sensorAge: age)
+        }
         session.delegate = self
         session.activate()
     }
@@ -477,6 +485,15 @@ final class WatchStateModel: NSObject, ObservableObject {
 
     // MARK: - helper functions not related with the class structure
 
+    /// Explicit double tap retries the selected source; routine refreshes never restart BLE.
+    func retryReadingConnection() {
+        if Libre2WatchConnection.shared.direct {
+            Libre2WatchConnection.shared.restartConnection()
+        } else {
+            requestWatchStateUpdate()
+        }
+    }
+
     /// request a state update from the iOS companion app
     func requestWatchStateUpdate() {
         guard session.activationState == .activated else {
@@ -618,6 +635,55 @@ final class WatchStateModel: NSObject, ObservableObject {
         }
     }
 
+    /// The existing complication cache already persists readings, units and limits together.
+    /// Restore it before a status-only reply can publish an empty/default complication.
+    private func restoreComplicationState() {
+        guard let defaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName),
+              let data = defaults.data(forKey: "complicationSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)"),
+              let cached = try? JSONDecoder().decode(ComplicationSharedUserDefaultsModel.self, from: data) else { return }
+        isMgDl = cached.isMgDl
+        urgentLowLimitInMgDl = cached.urgentLowLimitInMgDl
+        lowLimitInMgDl = cached.lowLimitInMgDl
+        highLimitInMgDl = cached.highLimitInMgDl
+        urgentHighLimitInMgDl = cached.urgentHighLimitInMgDl
+        if Libre2ConnectionStore.shared.snapshot?.sessionID != nil,
+           cached.bgReadingValues.count == cached.bgReadingDatesAsDouble.count {
+            _ = processBgReadingsFromDictionary(dictionary: [
+                "bgReadingValues": cached.bgReadingValues, "bgReadingDatesAsDouble": cached.bgReadingDatesAsDouble,
+                "slopeOrdinal": cached.slopeOrdinal, "deltaValueInUserUnit": cached.deltaValueInUserUnit
+            ])
+        }
+    }
+
+    /// Reuse the existing chart/complication update path for the direct collector.
+    private func receiveDirectLibre(_ readings: [GlucoseData], sensorAge: UInt16) {
+        guard let oldestFrameDate = readings.map({ $0.timeStamp }).min() else { return }
+        let olderHistory = zip(bgReadingDates, bgReadingValues).filter { $0.0 < oldestFrameDate }
+        var values = Dictionary(olderHistory.map { ($0.0.timeIntervalSince1970, $0.1) }, uniquingKeysWith: { _, latest in latest })
+        for reading in readings where reading.glucoseLevelRaw > 0 {
+            values[reading.timeStamp.timeIntervalSince1970] = reading.glucoseLevelRaw
+        }
+        let dates = values.keys.filter { $0 > Date().addingTimeInterval(-12 * 3600).timeIntervalSince1970 }.sorted(by: >)
+        guard let latestDate = dates.first, let latestValue = values[latestDate] else { return }
+        let previousDate = dates.first { latestDate - $0 >= 5 * 60 && latestDate - $0 <= 6 * 60 }
+        let delta = previousDate.flatMap { values[$0] }.map { latestValue - $0 } ?? 0
+        var trend = 0
+        if let previousDate = dates.first(where: { latestDate - $0 >= Double(ConstantsBGGraphBuilder.minSlopeInMinutes * 60) }),
+           let previousValue = values[previousDate] {
+            let (slope, hidden) = GlucoseTrend.slope(currentValue: latestValue, currentDate: Date(timeIntervalSince1970: latestDate),
+                                                   previousValue: previousValue, previousDate: Date(timeIntervalSince1970: previousDate))
+            trend = GlucoseTrend.ordinal(slope: slope, hideSlope: hidden)
+        }
+        let processed = processBgReadingsFromDictionary(dictionary: [
+            "bgReadingDatesAsDouble": dates, "bgReadingValues": dates.compactMap { values[$0] },
+            "slopeOrdinal": trend, "deltaValueInUserUnit": delta.mgDlToMmol(mgDl: isMgDl), "generatedAt": Date().timeIntervalSince1970
+        ])
+        sensorAgeInMinutes = Double(sensorAge)
+        keepAliveIsDisabled = false
+        sensorNoiseStateRawValue = nil
+        if processed { updateComplicationData() }
+    }
+
     // MARK: - Private functions used to interact with the WCSession and prepare internal data
 
     private func processWatchPayloadFromDictionary(dictionary: [String: Any]) {
@@ -627,7 +693,8 @@ final class WatchStateModel: NSObject, ObservableObject {
             processedUpdate = processStatusFromDictionary(dictionary: statusDictionary)
         }
 
-        if let bgReadingsDictionary = dictionary["bgReadings"] as? [String: Any] {
+        if Libre2ConnectionStore.shared.snapshot?.allowsWatch != true,
+           let bgReadingsDictionary = dictionary["bgReadings"] as? [String: Any] {
             processedUpdate = processBgReadingsFromDictionary(dictionary: bgReadingsDictionary) || processedUpdate
         }
 
@@ -644,6 +711,10 @@ final class WatchStateModel: NSObject, ObservableObject {
 
     private func processBgReadingsFromDictionary(dictionary: [String: Any]) -> Bool {
         let bgReadingDatesFromDictionary: [Double] = dictionary["bgReadingDatesAsDouble"] as? [Double] ?? [0]
+        // After direct collection, a queued phone payload must not replace a newer Watch reading.
+        if Libre2ConnectionStore.shared.snapshot?.sessionID != nil,
+           let incoming = bgReadingDatesFromDictionary.first, let displayed = bgReadingDates.first,
+           incoming < displayed.timeIntervalSince1970 { return false }
 
         // let's make a quick check to see if the data about to be processed is from within the last hour
         // this is to avoid long delays when re-opening a Watch app for the first time in days and waiting
@@ -684,14 +755,20 @@ final class WatchStateModel: NSObject, ObservableObject {
             return false
         }
 
-        isMgDl = dictionary["isMgDl"] as? Bool ?? true
-        urgentLowLimitInMgDl = dictionary["urgentLowLimitInMgDl"] as? Double ?? 60
-        lowLimitInMgDl = dictionary["lowLimitInMgDl"] as? Double ?? 70
-        highLimitInMgDl = dictionary["highLimitInMgDl"] as? Double ?? 180
-        urgentHighLimitInMgDl = dictionary["urgentHighLimitInMgDl"] as? Double ?? 250
+        let previousUnits = isMgDl
+        isMgDl = dictionary["isMgDl"] as? Bool ?? isMgDl
+        if Libre2ConnectionStore.shared.snapshot?.allowsWatch == true, previousUnits != isMgDl {
+            deltaValueInUserUnit = isMgDl ? deltaValueInUserUnit.mmolToMgdl() : deltaValueInUserUnit.mgDlToMmol()
+        }
+        urgentLowLimitInMgDl = dictionary["urgentLowLimitInMgDl"] as? Double ?? urgentLowLimitInMgDl
+        lowLimitInMgDl = dictionary["lowLimitInMgDl"] as? Double ?? lowLimitInMgDl
+        highLimitInMgDl = dictionary["highLimitInMgDl"] as? Double ?? highLimitInMgDl
+        urgentHighLimitInMgDl = dictionary["urgentHighLimitInMgDl"] as? Double ?? urgentHighLimitInMgDl
         updatedDate = Date(timeIntervalSince1970: generatedAt)
         activeSensorDescription = dictionary["activeSensorDescription"] as? String ?? ""
-        sensorAgeInMinutes = dictionary["sensorAgeInMinutes"] as? Double ?? 0
+        if Libre2ConnectionStore.shared.snapshot?.allowsWatch != true {
+            sensorAgeInMinutes = dictionary["sensorAgeInMinutes"] as? Double ?? 0
+        }
         sensorMaxAgeInMinutes = dictionary["sensorMaxAgeInMinutes"] as? Double ?? 0
         preferSensorCountdown = dictionary["preferSensorCountdown"] as? Bool ?? false
         sensorNoiseStateRawValue = dictionary["sensorNoiseStateRawValue"] as? Int
@@ -714,6 +791,13 @@ final class WatchStateModel: NSObject, ObservableObject {
             aidStatus = nil
         }
 
+        if Libre2ConnectionStore.shared.snapshot?.allowsWatch == true {
+            if let sensor = try? Libre2WatchSession.load(from: Libre2ConnectionStore.shared.sessionURL) {
+                activeSensorDescription = "Libre 2 " + sensor.serialNumber
+            }
+            sensorNoiseStateRawValue = nil
+            keepAliveIsDisabled = false
+        }
         return true
     }
 
@@ -823,6 +907,8 @@ extension WatchStateModel: WCSessionDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self = self, activationState == .activated else { return }
 
+            Libre2WatchConnection.shared.restore()
+            Libre2WatchHistorySync.shared.resume()
             self.requestWatchStateUpdate()
             // if the AGP tab requested data while activation was pending, send it now
             self.sendPendingAGPRequestIfPossible()
@@ -831,15 +917,38 @@ extension WatchStateModel: WCSessionDelegate {
 
     func sessionReachabilityDidChange(_: WCSession) {
         DispatchQueue.main.async {
+            Libre2WatchHistorySync.shared.flush()
             // retry AGP requests that were made before the phone became reachable
             self.sendPendingAGPRequestIfPossible()
         }
+    }
+
+    func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+        DispatchQueue.main.async {
+            if self.directLibreDiagnostics.receive(message, snapshot: { self.directLibreLocation.recordDiagnosticSnapshot() }, reply: replyHandler) { return }
+            if self.directLibreLocation.receive(message, reply: replyHandler) { return }
+            if self.directLibreNotification.receive(message, reply: replyHandler) { return }
+            if Libre2WatchHistorySync.shared.receiveCleanup(message, reply: replyHandler) { return }
+            if Libre2WatchHistorySync.shared.receive(message) { replyHandler([:]); return }
+            if message[Libre2ConnectionMessage.key] != nil {
+                Libre2WatchConnection.shared.receive(message, reply: replyHandler)
+            } else {
+                self.processWatchPayloadFromDictionary(dictionary: message)
+                replyHandler([:])
+            }
+        }
+    }
+
+    func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+        guard applicationContext[Libre2ConnectionMessage.key] != nil else { return }
+        DispatchQueue.main.async { Libre2WatchConnection.shared.receive(applicationContext, reply: { _ in }) }
     }
 
     func session(_: WCSession, didReceiveMessageData _: Data) {}
 
     func session(_: WCSession, didReceiveMessage message: [String: Any]) {
         DispatchQueue.main.async {
+            guard !Libre2WatchHistorySync.shared.receive(message) else { return }
             self.processWatchPayloadFromDictionary(dictionary: message)
             self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorActive
 
@@ -853,6 +962,7 @@ extension WatchStateModel: WCSessionDelegate {
 
     func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
         DispatchQueue.main.async {
+            guard !Libre2WatchHistorySync.shared.receive(userInfo) else { return }
             self.processWatchPayloadFromDictionary(dictionary: userInfo)
         }
     }

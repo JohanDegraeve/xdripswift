@@ -363,14 +363,14 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
 
                     session.alertMessage = TextsLibreNFC.scanComplete
                     self.nfcScanSuccessful = true
-                    self.libreNFCDelegate?.streamingEnabled(successful: true)
+                    self.libreNFCDelegate?.streamingEnabled(successful: true, unlockCode: self.unlockCode)
                 } else {
-                    self.libreNFCDelegate?.streamingEnabled(successful: false)
+                    self.libreNFCDelegate?.streamingEnabled(successful: false, unlockCode: self.unlockCode)
                 }
             } catch {
                 let respLog = "NFC: '" + subCmd.description + " command error: " + error.localizedDescription
                 xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, respLog)
-                self.libreNFCDelegate?.streamingEnabled(successful: false)
+                self.libreNFCDelegate?.streamingEnabled(successful: false, unlockCode: self.unlockCode)
             }
 
             session.invalidate()

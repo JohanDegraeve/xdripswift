@@ -2,6 +2,19 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>WKBackgroundModes</key>
+	<array>
+		<string>underwater-depth</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+		<string>location</string>
+	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>When you enable experimental background collection, xDrip uses ongoing location updates to help keep Direct Libre collection running. Your location is not saved or shared. This uses additional battery.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Connect directly to your Libre sensor when collection is switched to Apple Watch.</string>
 	<key>AppGroupIdentifier</key>
 	<string>$(APP_GROUP_IDENTIFIER)</string>
 	<key>MainAppBundleIdentifier</key>

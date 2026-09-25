@@ -59,6 +59,8 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
 
     // MARK: - intializer
 
+    private lazy var directLibreHistory = Libre2PhoneHistorySync(coreDataManager: coreDataManager, session: session)
+
     init(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager, session: WCSession = .default) {
         // set coreDataManager and bgReadingsAccessor
         self.coreDataManager = coreDataManager
@@ -70,6 +72,10 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
         self.session = session
 
         super.init()
+        Libre2PhoneConnection.shared.registerHistorySession = { [weak self] session, completion in
+            guard let self = self else { completion(.failure(Libre2HistoryError.unavailable)); return }
+            self.directLibreHistory.register(session, completion: completion)
+        }
 
         if WCSession.isSupported() {
             session.delegate = self
@@ -417,6 +423,11 @@ extension WatchManager: WCSessionDelegate {
         // send the update that was deferred while the session was activating
         DispatchQueue.main.async { [weak self] in
             self?.processWatchUpdate(updateTypes: [.status, .bgReadings], forceComplicationUpdate: false)
+            if session.receivedApplicationContext[Libre2HistoryBatch.latestKey] as? Bool == true {
+                self?.directLibreHistory.receive(session.receivedApplicationContext)
+            }
+            Libre2PhoneConnection.shared.refresh()
+            Libre2PhoneConnection.shared.publishRevocations()
         }
     }
 
@@ -456,11 +467,28 @@ extension WatchManager: WCSessionDelegate {
         }
     }
 
-    func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {}
+    func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+        DispatchQueue.main.async {
+            if !self.directLibreHistory.receive(message, reply: replyHandler) { replyHandler([:]) }
+        }
+    }
+
+    func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        DispatchQueue.main.async { self.directLibreHistory.receive(userInfo) }
+    }
+
+    func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+        guard applicationContext[Libre2HistoryBatch.latestKey] as? Bool == true else { return }
+        DispatchQueue.main.async { self.directLibreHistory.receive(applicationContext) }
+    }
 
     func session(_: WCSession, didReceiveMessageData _: Data) {}
 
     func sessionReachabilityDidChange(_ session: WCSession) {
+        DispatchQueue.main.async {
+            Libre2PhoneConnection.shared.refresh()
+            if session.isReachable { Libre2PhoneConnection.shared.publishRevocations() }
+        }
         if session.isReachable {
             DispatchQueue.main.async {
                 self.processWatchUpdate(updateTypes: [.status, .bgReadings], forceComplicationUpdate: false)
