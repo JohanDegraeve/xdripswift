@@ -29,7 +29,7 @@ struct DirectLibreDiagnosticsView: View {
                     }
                 }
             } header: { Text("Watch connection capture") } footer: {
-                Text("Records up to two hours, 5,000 events or 2 MB on the Watch, even without the phone. Open both apps to control or download it. Status is the last confirmed reply. Capture adds no reconnect attempts or background execution time.")
+                Text("Records up to 24 hours, 100,000 events or 10 MB on the Watch, whichever comes first, even without the phone. Open both apps to control or download it. Status is the last confirmed reply. Capture adds no reconnect attempts or background execution time.")
             }
             if let url = capture.reportURL {
                 Section("Saved report") {

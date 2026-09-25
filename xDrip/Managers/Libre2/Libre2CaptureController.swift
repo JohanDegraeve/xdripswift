@@ -28,8 +28,8 @@ final class Libre2CaptureController: ObservableObject {
         guard let status else { return "No capture on the Watch." }
         if let failure = status.storageError { return failure }
         if status.isRecording {
-            return "Recording since \(status.startedAt.formatted(date: .omitted, time: .standard)); "
-                + "records until \(status.expiresAt.formatted(date: .omitted, time: .standard)) at most. \(status.events) events at last refresh."
+            return "Recording since \(status.startedAt.formatted(date: .abbreviated, time: .standard)); "
+                + "records until \(status.expiresAt.formatted(date: .abbreviated, time: .standard)) at most. \(status.events) events at last refresh."
         }
         return "\(status.reason ?? "Stopped"). \(status.events) events, \(status.bytes) bytes."
     }

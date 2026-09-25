@@ -127,7 +127,9 @@ After the test, reopen both apps, **Stop and download**, then **Share report**.
 A stopped capture can be downloaded again. Starting another requires confirming
 replacement; a failed download leaves the last complete phone report intact.
 
-Recording is bounded to two hours, 5,000 events or 2 MB, whichever is reached first.
+New captures are bounded to 24 hours, 100,000 events or 10 MB, whichever is reached first.
+An existing capture keeps its original expiry time. Larger reports take longer to
+download; Watch restoration and export read the archive in small chunks.
 The duration limit is checked on the next event/status request; no timer wakes the
 Watch. A bounded file queue keeps disk work off Bluetooth and UI callbacks. Capacity,
 queue overload and storage errors are explicitly reported. Relaunch resumes an

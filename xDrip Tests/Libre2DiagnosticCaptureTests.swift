@@ -73,28 +73,37 @@ final class Libre2DiagnosticCaptureTests: XCTestCase {
     func testExpirationOnNextEventDoesNotNeedATimerAndSurvivesRestart() throws {
         let id = UUID()
         try capture.start(id: id)
-        now = now.addingTimeInterval(Libre2DiagnosticCapture.duration + 60)
+        let startedAt = now
+        XCTAssertEqual(capture.status!.expiresAt, startedAt.addingTimeInterval(24 * 60 * 60))
+        now = startedAt.addingTimeInterval(24 * 60 * 60 - 1)
         capture = makeCapture()
+        capture.record("Still within the day")
+        XCTAssertTrue(capture.status!.isRecording)
+        now = startedAt.addingTimeInterval(24 * 60 * 60)
         capture.record("Too late")
         XCTAssertFalse(capture.status!.isRecording)
-        XCTAssertTrue(capture.status!.reason!.contains("Two-hour"))
-        XCTAssertFalse(try export(capture).contains("Too late"))
+        XCTAssertTrue(capture.status!.reason!.contains("duration limit"))
+        let report = try export(capture)
+        XCTAssertTrue(report.contains("Still within the day"))
+        XCTAssertFalse(report.contains("Too late"))
     }
 
     func testCapacityPreservesBeginningAndExplicitlyMarksTruncation() throws {
         try capture.start(id: UUID())
-        for index in 0..<6_000 { capture.record("Event \(index)") }
+        for index in 0...Libre2DiagnosticCapture.maximumEvents { capture.record("Event \(index)") }
         XCTAssertEqual(capture.status!.events, Libre2DiagnosticCapture.maximumEvents)
         XCTAssertLessThanOrEqual(capture.status!.bytes, Libre2DiagnosticCapture.maximumBytes)
         let report = try export(capture)
         XCTAssertTrue(report.contains("Event 0"))
         XCTAssertTrue(report.contains("capacity reached"))
-        XCTAssertFalse(report.contains("Event 5999"))
+        XCTAssertFalse(report.contains("Event \(Libre2DiagnosticCapture.maximumEvents)"))
     }
 
     func testByteLimitAlsoPreservesATerminalReason() throws {
         try capture.start(id: UUID())
-        for _ in 0..<3_000 { capture.record(String(repeating: "x", count: 1_200)) }
+        for _ in 0..<(Libre2DiagnosticCapture.maximumBytes / 1_200 + 1) {
+            capture.record(String(repeating: "x", count: 1_200))
+        }
         XCTAssertFalse(capture.status!.isRecording)
         XCTAssertLessThan(capture.status!.events, Libre2DiagnosticCapture.maximumEvents)
         XCTAssertLessThanOrEqual(capture.status!.bytes, Libre2DiagnosticCapture.maximumBytes)

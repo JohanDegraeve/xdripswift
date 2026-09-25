@@ -4,10 +4,10 @@ import Foundation
 /// Captures never schedule wakes, touch Bluetooth, or contain credentials, packets or locations.
 final class Libre2DiagnosticCapture {
     static let commandKey = "libre2CaptureCommand"
-    static let maximumEvents = 5_000
-    static let maximumBytes = 2_000_000
+    static let maximumEvents = 100_000
+    static let maximumBytes = 10_000_000
     static let chunkBytes = 40_000
-    static let duration: TimeInterval = 2 * 60 * 60
+    static let duration: TimeInterval = 24 * 60 * 60
 
     struct Status: Codable {
         let id: UUID
@@ -48,12 +48,21 @@ final class Libre2DiagnosticCapture {
                 guard let size = attributes[.size] as? NSNumber, size.intValue <= Self.maximumBytes else {
                     throw CaptureError.invalidArchive
                 }
-                let data = try Data(contentsOf: eventsURL)
-                guard data.count <= Self.maximumBytes else { throw CaptureError.invalidArchive }
-                state?.bytes = data.count
-                state?.events = data.filter { $0 == 10 }.count
+                // Recount incrementally so restoring a day-long capture uses bounded Watch memory.
+                let handle = try FileHandle(forReadingFrom: eventsURL)
+                defer { try? handle.close() }
+                var bytes = 0, events = 0
+                var lastByte: UInt8?
+                while let data = try handle.read(upToCount: Self.chunkBytes), !data.isEmpty {
+                    bytes += data.count
+                    guard bytes <= Self.maximumBytes else { throw CaptureError.invalidArchive }
+                    events += data.reduce(0) { $0 + ($1 == 10 ? 1 : 0) }
+                    lastByte = data.last
+                }
+                state?.bytes = bytes
+                state?.events = events
                 // A killed process can leave an incomplete final append. Preserve it and mark it.
-                if !data.isEmpty && data.last != 10 {
+                if bytes > 0 && lastByte != 10 {
                     state?.storageError = "Incomplete final event after interruption."
                 }
             }
@@ -89,7 +98,7 @@ final class Libre2DiagnosticCapture {
             }
         }
         startupError = nil
-        record("Capture started; limit=2h/5000 events/2MB; no radio polling")
+        record("Capture started; limit=\(Int(Self.duration / 3600))h/\(Self.maximumEvents) events/\(Self.maximumBytes / 1_000_000)MB; no radio polling")
         if let error = state?.storageError { throw CaptureError.storage(error) }
     }
 
@@ -107,7 +116,7 @@ final class Libre2DiagnosticCapture {
 
     private func expireIfNeeded() {
         guard let state, state.isRecording, clock() >= state.expiresAt else { return }
-        finish("Two-hour capture limit reached; later events were not recorded")
+        finish("Capture duration limit reached; later events were not recorded")
     }
 
     private func finish(_ reason: String) {
