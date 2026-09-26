@@ -3182,6 +3182,7 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
             
             var firstCreatedBgReadingTimeStamp: Date?
             var acceptedReadings: [(reading: BgReading, acceptedAt: Date)] = []
+            var gapFilledReadings: [BgReading] = []
 
             let duplicateReadingWindow = TimeInterval(minutes: 2.5)
             let oldestIncomingTimeStamp = followGlucoseDataArray.map { $0.timeStamp }.min()
@@ -3191,16 +3192,32 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
             if let oldestIncomingTimeStamp = oldestIncomingTimeStamp, let newestIncomingTimeStamp = newestIncomingTimeStamp {
                 existingBgReadingsInIncomingRange = bgReadingsAccessor.getBgReadings(from: oldestIncomingTimeStamp.addingTimeInterval(-duplicateReadingWindow), to: newestIncomingTimeStamp.addingTimeInterval(duplicateReadingWindow), on: coreDataManager.mainManagedObjectContext, includingSuppressed: true)
             }
+
+            // A gap-filled reading is stored with its raw value and never post processed, so it is
+            // only consistent with its neighbours when no post processing is enabled now and none
+            // was applied anywhere in the downloaded range, for example before a "from now" change.
+            let hasDownstreamPostProcessing = (bgPostProcessingManager?.hasActiveDownstreamPostProcessing() ?? false)
+                || UserDefaults.standard.enableAdjustment
+                || UserDefaults.standard.enableSmoothing
+                || existingBgReadingsInIncomingRange.contains { $0.adjustedValue != nil || $0.smoothedValue != nil || $0.isSuppressedByFiveMinuteCadence }
+            let fillsHistoricalGaps: Bool
+            switch UserDefaults.standard.followerDataSourceType.historicalGapFill {
+            case .never:
+                fillsHistoricalGaps = false
+            case .always:
+                fillsHistoricalGaps = true
+            case .withoutDownstreamPostProcessing:
+                fillsHistoricalGaps = !hasDownstreamPostProcessing
+            }
             
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
             for (_, followGlucoseData) in followGlucoseDataArray.enumerated().reversed() {
                 let checktimestamp = Date(timeInterval: 5.0 * 60.0 - 10.0, since: timeStampLastBgReading)
                 let existingReadingInSameSlot = existingBgReadingsInIncomingRange.contains { abs($0.timeStamp.timeIntervalSince(followGlucoseData.timeStamp)) <= duplicateReadingWindow }
 
-                // Calendar Follow payloads carry a small history window so the follower can recover
-                // missed calendar syncs. Keep the older-than-latest gap-fill rule scoped to Calendar
-                // Follow so the behaviour of the other follower sources remains unchanged.
-                let isHistoricalGapFill = UserDefaults.standard.followerDataSourceType == .calendar && followGlucoseData.timeStamp <= checktimestamp && !existingReadingInSameSlot
+                // Sources whose payload carries history may fill an older gap. A reading already
+                // stored within the duplicate window marks the slot as covered.
+                let isHistoricalGapFill = fillsHistoricalGaps && followGlucoseData.timeStamp <= checktimestamp && !existingReadingInSameSlot
 
                 if followGlucoseData.timeStamp > timeStampLastBgReading || isHistoricalGapFill {
                     var newReading: BgReading?
@@ -3256,6 +3273,15 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                         )
                         existingBgReadingsInIncomingRange.append(newReading)
                         existingBgReadingsInIncomingRange.sort { $0.timeStamp < $1.timeStamp }
+
+                        if followGlucoseData.timeStamp <= previousTimeStampLastBgReading {
+                            // The slope was taken from the newest stored readings, which are later
+                            // than this one, so it is not this reading's trend. Hide it; post
+                            // processing recomputes it where the reading is in its window.
+                            newReading.calculatedValueSlope = 0
+                            newReading.hideSlope = true
+                            gapFilledReadings.append(newReading)
+                        }
                     }
 
                     if firstCreatedBgReadingTimeStamp == nil {
@@ -3329,6 +3355,16 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 checkAlertsCreateNotificationAndSetAppBadge()
                 
                 healthKitManager?.storeBgReadings()
+                
+                // storeBgReadings only writes readings newer than the last one it stored, so
+                // gap-filled readings are written explicitly. Only without downstream post
+                // processing, where their stored values are final.
+                if !hasDownstreamPostProcessing {
+                    let visibleGapFilledReadings = gapFilledReadings.filter { !$0.isSuppressedByFiveMinuteCadence }
+                    if !visibleGapFilledReadings.isEmpty {
+                        healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: visibleGapFilledReadings)
+                    }
+                }
                 
                 if let bgReadingSpeaker = bgReadingSpeaker {
                     bgReadingSpeaker.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
