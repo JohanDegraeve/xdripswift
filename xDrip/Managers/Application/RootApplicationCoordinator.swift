@@ -3280,12 +3280,17 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 coreDataManager.saveChanges()
                 statisticsManager?.invalidate()
                 
-                if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled, let firstCreatedBgReadingTimeStamp = firstCreatedBgReadingTimeStamp {
+                let postProcessingRewritesDownstream = bgPostProcessingManager?.hasActiveDownstreamPostProcessing() ?? false
+
+                // A gap-filled reading can be older than the automatic processing window, so process
+                // explicitly from the oldest created reading. Otherwise it would keep its unadjusted
+                // value and a slope taken against a newer reading.
+                if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled || !gapFilledReadings.isEmpty, let firstCreatedBgReadingTimeStamp = firstCreatedBgReadingTimeStamp {
                     let processingStartDateOverride = previousTimeStampLastBgReading.timeIntervalSince1970 > 0 ? min(previousTimeStampLastBgReading.addingTimeInterval(-1.0), firstCreatedBgReadingTimeStamp) : firstCreatedBgReadingTimeStamp
                     if let bgPostProcessingManager = bgPostProcessingManager {
                         _ = bgPostProcessingManager.processBgReadings(
                             processingStartDateOverride: processingStartDateOverride,
-                            allowHistoricalDownstreamRewrite: bgPostProcessingManager.hasActiveDownstreamPostProcessing()
+                            allowHistoricalDownstreamRewrite: postProcessingRewritesDownstream
                         )
                     }
                 } else {
@@ -3334,12 +3339,14 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 
                 healthKitManager?.storeBgReadings()
                 
-                // storeBgReadings only writes readings newer than the last one it stored, so a
-                // gap-filled reading has to be written explicitly, after post processing has set
-                // its final value and cadence suppression.
-                let visibleGapFilledReadings = gapFilledReadings.filter { !$0.isSuppressedByFiveMinuteCadence }
-                if !visibleGapFilledReadings.isEmpty {
-                    healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: visibleGapFilledReadings)
+                // storeBgReadings only writes readings newer than the last one it stored. With post
+                // processing active, the explicit pass above already rewrote every visible reading
+                // from the oldest gap-filled one; otherwise gap-filled readings are written here.
+                if !postProcessingRewritesDownstream {
+                    let visibleGapFilledReadings = gapFilledReadings.filter { !$0.isSuppressedByFiveMinuteCadence }
+                    if !visibleGapFilledReadings.isEmpty {
+                        healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: visibleGapFilledReadings)
+                    }
                 }
                 
                 if let bgReadingSpeaker = bgReadingSpeaker {
