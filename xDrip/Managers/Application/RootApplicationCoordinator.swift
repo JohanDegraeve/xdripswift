@@ -3184,7 +3184,22 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
             var acceptedReadings: [(reading: BgReading, acceptedAt: Date)] = []
             var gapFilledReadings: [BgReading] = []
 
-            let hasDownstreamPostProcessing = bgPostProcessingManager?.hasActiveDownstreamPostProcessing() ?? false
+            let duplicateReadingWindow = TimeInterval(minutes: 2.5)
+            let oldestIncomingTimeStamp = followGlucoseDataArray.map { $0.timeStamp }.min()
+            let newestIncomingTimeStamp = followGlucoseDataArray.map { $0.timeStamp }.max()
+            var existingBgReadingsInIncomingRange = [BgReading]()
+
+            if let oldestIncomingTimeStamp = oldestIncomingTimeStamp, let newestIncomingTimeStamp = newestIncomingTimeStamp {
+                existingBgReadingsInIncomingRange = bgReadingsAccessor.getBgReadings(from: oldestIncomingTimeStamp.addingTimeInterval(-duplicateReadingWindow), to: newestIncomingTimeStamp.addingTimeInterval(duplicateReadingWindow), on: coreDataManager.mainManagedObjectContext, includingSuppressed: true)
+            }
+
+            // A gap-filled reading is stored with its raw value and never post processed, so it is
+            // only consistent with its neighbours when no post processing is enabled now and none
+            // was applied anywhere in the downloaded range, for example before a "from now" change.
+            let hasDownstreamPostProcessing = (bgPostProcessingManager?.hasActiveDownstreamPostProcessing() ?? false)
+                || UserDefaults.standard.enableAdjustment
+                || UserDefaults.standard.enableSmoothing
+                || existingBgReadingsInIncomingRange.contains { $0.adjustedValue != nil || $0.smoothedValue != nil || $0.isSuppressedByFiveMinuteCadence }
             let fillsHistoricalGaps: Bool
             switch UserDefaults.standard.followerDataSourceType.historicalGapFill {
             case .never:
@@ -3193,15 +3208,6 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 fillsHistoricalGaps = true
             case .withoutDownstreamPostProcessing:
                 fillsHistoricalGaps = !hasDownstreamPostProcessing
-            }
-
-            let duplicateReadingWindow = TimeInterval(minutes: 2.5)
-            let oldestIncomingTimeStamp = followGlucoseDataArray.map { $0.timeStamp }.min()
-            let newestIncomingTimeStamp = followGlucoseDataArray.map { $0.timeStamp }.max()
-            var existingBgReadingsInIncomingRange = [BgReading]()
-
-            if let oldestIncomingTimeStamp = oldestIncomingTimeStamp, let newestIncomingTimeStamp = newestIncomingTimeStamp {
-                existingBgReadingsInIncomingRange = bgReadingsAccessor.getBgReadings(from: oldestIncomingTimeStamp.addingTimeInterval(-duplicateReadingWindow), to: newestIncomingTimeStamp.addingTimeInterval(duplicateReadingWindow), on: coreDataManager.mainManagedObjectContext, includingSuppressed: true)
             }
             
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
@@ -3350,14 +3356,13 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 
                 healthKitManager?.storeBgReadings()
                 
-                // storeBgReadings and the live Nightscout upload only send readings newer than the
-                // last ones they sent, so gap-filled readings are sent explicitly. Only without
-                // downstream post processing, where their stored values are final.
+                // storeBgReadings only writes readings newer than the last one it stored, so
+                // gap-filled readings are written explicitly. Only without downstream post
+                // processing, where their stored values are final.
                 if !hasDownstreamPostProcessing {
                     let visibleGapFilledReadings = gapFilledReadings.filter { !$0.isSuppressedByFiveMinuteCadence }
                     if !visibleGapFilledReadings.isEmpty {
                         healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: visibleGapFilledReadings)
-                        nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: visibleGapFilledReadings)
                     }
                 }
                 
