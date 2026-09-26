@@ -1757,6 +1757,9 @@ import AppIntents
             return Texts_HomeView.sensorManagementCalibrationUnavailable
         }
 
+        var recalibratedBgReading: BgReading?
+        let finalValueBeforeCalibration = latestReadings.first?.finalValue
+
         if latestCalibrations.count == 0 {
             trace("calibration : initial calibration, creating two calibrations", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
 
@@ -1771,6 +1774,7 @@ import AppIntents
             trace("calibration : creating calibration", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
 
             if let calibration = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings.count > 0 ? latestReadings[0] : nil, sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext) {
+                recalibratedBgReading = latestReadings.first
                 cgmTransmitter.calibrate(calibration: calibration)
                 self.alertManager?.snooze(alertKind: .fastdrop, snoozePeriodInMinutes: 9, response: nil)
                 self.alertManager?.snooze(alertKind: .fastrise, snoozePeriodInMinutes: 9, response: nil)
@@ -1779,6 +1783,18 @@ import AppIntents
 
         coreDataManager.saveChanges()
         sensorNoiseManager?.update(activeSensor: activeSensor)
+
+        // A calibration can change the latest reading's final value outside post processing, which
+        // only rewrites Apple Health for readings whose final value or visibility changes during its
+        // own pass. So when the value moved and the reading is already in Apple Health, replace it here.
+        if let recalibratedBgReading = recalibratedBgReading,
+           let finalValueBeforeCalibration = finalValueBeforeCalibration,
+           abs(recalibratedBgReading.finalValue - finalValueBeforeCalibration) > 0.001,
+           !recalibratedBgReading.isSuppressedByFiveMinuteCadence,
+           let timeStampLatestHealthKitStoreBgReading = UserDefaults.standard.timeStampLatestHealthKitStoreBgReading,
+           recalibratedBgReading.timeStamp <= timeStampLatestHealthKitStoreBgReading {
+            healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: [recalibratedBgReading])
+        }
 
         if cgmTransmitter is CGMG5Transmitter {
             dexcomG6InitialCalibrationPolicy.calibrationSubmitted(
