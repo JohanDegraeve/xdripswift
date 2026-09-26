@@ -32,6 +32,12 @@ class BgPostProcessingManager {
         var affectsOlderDownstreamHistory: Bool {
             return finalValueChanged || suppressionChanged || trendChanged
         }
+
+        /// HealthKit stores a reading's value but not its trend, so a trend-only change does not
+        /// need rewriting there.
+        var affectsHealthKit: Bool {
+            return finalValueChanged || suppressionChanged
+        }
     }
 
     /// for logging
@@ -219,6 +225,7 @@ class BgPostProcessingManager {
         guard allowHistoricalDownstreamRewrite else { return false }
 
         let bgReadingsToReplaceDownstream: [BgReading]
+        var bgReadingsToReplaceInHealthKit: [BgReading]?
         if shouldRewriteFullDownstreamWindow {
             bgReadingsToReplaceDownstream = bgReadings.filter { !$0.isSuppressedByFiveMinuteCadence }
         } else if let latestVisibleBgReading = latestVisibleBgReading, let automaticRewriteStartDate = automaticRewriteStartDate {
@@ -240,6 +247,10 @@ class BgPostProcessingManager {
                     guard let change = downstreamChangesByObjectID[bgReading.objectID] else { return false }
                     return change.affectsOlderDownstreamHistory
                 }
+                bgReadingsToReplaceInHealthKit = bgReadingsToReplaceDownstream.filter { bgReading in
+                    guard let change = downstreamChangesByObjectID[bgReading.objectID] else { return false }
+                    return change.affectsHealthKit
+                }
             }
         } else {
             bgReadingsToReplaceDownstream = []
@@ -259,7 +270,7 @@ class BgPostProcessingManager {
                 blocksDirectLiveUpload: shouldRewriteFullDownstreamWindow
             )
             healthKitManager?.deleteBgReadingsFromHealthKit(bgReadingIDs: downstreamReadingsToDelete.map { $0.id })
-            healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: downstreamReadingsToReplace)
+            healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: bgReadingsToReplaceInHealthKit ?? downstreamReadingsToReplace)
             return true
         }
 
