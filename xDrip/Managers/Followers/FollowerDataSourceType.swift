@@ -112,7 +112,21 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return .allowed
         }
     }
-    
+
+    /// Whether an older reading from this source may fill a gap in stored history.
+    ///
+    /// Shared Calendar payloads carry a history window, and LibreLinkUp's graph carries 15-minute
+    /// history that reaches the server after the current reading has already moved on. Without gap
+    /// fill, readings missed while the app was suspended are never recovered for these sources.
+    var fillsHistoricalGaps: Bool {
+        switch self {
+        case .calendar, .libreLinkUp, .libreLinkUpRussia:
+            return true
+        case .nightscout, .dexcomShare, .medtrumEasyView, .careLink:
+            return false
+        }
+    }
+
     var description: String {
         switch self {
         case .nightscout:

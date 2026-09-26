@@ -3182,6 +3182,7 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
             
             var firstCreatedBgReadingTimeStamp: Date?
             var acceptedReadings: [(reading: BgReading, acceptedAt: Date)] = []
+            var gapFilledReadings: [BgReading] = []
 
             let duplicateReadingWindow = TimeInterval(minutes: 2.5)
             let oldestIncomingTimeStamp = followGlucoseDataArray.map { $0.timeStamp }.min()
@@ -3197,10 +3198,9 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 let checktimestamp = Date(timeInterval: 5.0 * 60.0 - 10.0, since: timeStampLastBgReading)
                 let existingReadingInSameSlot = existingBgReadingsInIncomingRange.contains { abs($0.timeStamp.timeIntervalSince(followGlucoseData.timeStamp)) <= duplicateReadingWindow }
 
-                // Calendar Follow payloads carry a small history window so the follower can recover
-                // missed calendar syncs. Keep the older-than-latest gap-fill rule scoped to Calendar
-                // Follow so the behaviour of the other follower sources remains unchanged.
-                let isHistoricalGapFill = UserDefaults.standard.followerDataSourceType == .calendar && followGlucoseData.timeStamp <= checktimestamp && !existingReadingInSameSlot
+                // Sources whose payload carries history may fill an older gap. A reading already
+                // stored within the duplicate window marks the slot as covered.
+                let isHistoricalGapFill = UserDefaults.standard.followerDataSourceType.fillsHistoricalGaps && followGlucoseData.timeStamp <= checktimestamp && !existingReadingInSameSlot
 
                 if followGlucoseData.timeStamp > timeStampLastBgReading || isHistoricalGapFill {
                     var newReading: BgReading?
@@ -3256,6 +3256,10 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                         )
                         existingBgReadingsInIncomingRange.append(newReading)
                         existingBgReadingsInIncomingRange.sort { $0.timeStamp < $1.timeStamp }
+
+                        if followGlucoseData.timeStamp <= previousTimeStampLastBgReading {
+                            gapFilledReadings.append(newReading)
+                        }
                     }
 
                     if firstCreatedBgReadingTimeStamp == nil {
@@ -3329,6 +3333,14 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 checkAlertsCreateNotificationAndSetAppBadge()
                 
                 healthKitManager?.storeBgReadings()
+                
+                // storeBgReadings only writes readings newer than the last one it stored, so a
+                // gap-filled reading has to be written explicitly, after post processing has set
+                // its final value and cadence suppression.
+                let visibleGapFilledReadings = gapFilledReadings.filter { !$0.isSuppressedByFiveMinuteCadence }
+                if !visibleGapFilledReadings.isEmpty {
+                    healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: visibleGapFilledReadings)
+                }
                 
                 if let bgReadingSpeaker = bgReadingSpeaker {
                     bgReadingSpeaker.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
