@@ -313,6 +313,56 @@ class BgPostProcessingManager {
         return BgPostProcessingResult(shouldProcessDownstream: shouldProcessDownstream, rewroteDownstreamHistory: false)
     }
 
+    /// Correct metadata for the existing session without treating it as a new glucose source.
+    /// Real sensor replacements still use handleSourceContextChanged().
+    @discardableResult
+    func correctSensorStartDate(_ sensor: Sensor, to startDate: Date) -> Bool {
+        guard UserDefaults.standard.isMaster,
+              sensorsAccessor.fetchActiveSensor()?.objectID == sensor.objectID else { return false }
+
+        let oldDate = sensor.startDate
+        let oldIdentifier = Self.masterSourceContextIdentifier(sensorID: sensor.id, startDate: oldDate)
+        let newIdentifier = Self.masterSourceContextIdentifier(sensorID: sensor.id, startDate: startDate)
+        let context = coreDataManager.mainManagedObjectContext
+        let request: NSFetchRequest<BgAdjustment> = BgAdjustment.fetchRequest()
+        request.predicate = NSPredicate(format: "sourceContextIdentifier == %@", oldIdentifier)
+        var adjustments = [BgAdjustment]()
+        var saved = false
+
+        context.performAndWait {
+            do {
+                // Fetch must succeed before changing the date: an empty result on fetch failure
+                // would orphan the saved adjustment. Move the whole history, including disabled rows.
+                adjustments = try context.fetch(request)
+                sensor.startDate = startDate
+                adjustments.forEach { $0.sourceContextIdentifier = newIdentifier }
+                saved = coreDataManager.saveChangesSynchronously()
+                if !saved {
+                    // Restore only this operation's edits; never roll back unrelated pending work.
+                    sensor.startDate = oldDate
+                    adjustments.forEach { $0.sourceContextIdentifier = oldIdentifier }
+                }
+            } catch {
+                trace("in correctSensorStartDate, adjustment fetch failed: %{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)
+            }
+        }
+        guard saved else { return false }
+
+        // A timestamp correction must preserve both the settings and their lookup key. Updating
+        // only the date would make refreshSourceContext reset them on the next reading. A different
+        // cached source must still go through that reset; never adopt another source's settings.
+        if UserDefaults.standard.postProcessingSourceContextIdentifier == oldIdentifier {
+            UserDefaults.standard.postProcessingSourceContextIdentifier = newIdentifier
+        }
+        UserDefaults.standard.activeSensorStartDate = startDate
+        trace("in correctSensorStartDate, preserved BG post processing for existing sensor; start date %{public}@ -> %{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, oldDate.description, startDate.description)
+        return true
+    }
+
+    private static func masterSourceContextIdentifier(sensorID: String, startDate: Date) -> String {
+        return "master|\(sensorID)|\(startDate.toMillisecondsAsDouble())"
+    }
+
     /// reset source-specific post processing whenever the active master sensor
     /// or follower source changes
     func handleSourceContextChanged() {
@@ -1233,7 +1283,7 @@ class BgPostProcessingManager {
     private func currentSourceContextIdentifier() -> String? {
         if UserDefaults.standard.isMaster {
             guard let activeSensor = sensorsAccessor.fetchActiveSensor() else { return nil }
-            return "master|\(activeSensor.id)|\(activeSensor.startDate.toMillisecondsAsDouble())"
+            return Self.masterSourceContextIdentifier(sensorID: activeSensor.id, startDate: activeSensor.startDate)
         }
 
         switch UserDefaults.standard.followerDataSourceType {

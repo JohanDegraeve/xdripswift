@@ -295,6 +295,8 @@ extension UserDefaults {
         case activeSensorTransmitterId = "activeSensorTransmitterId"
         /// active sensor description
         case activeSensorDescription = "activeSensorDescription"
+        /// confirmed local Dexcom session identity (runtime-only)
+        case dexcomSensorSessionIdentityData = "dexcomSensorSessionIdentityData"
         /// active sensor start date
         case activeSensorStartDate = "activeSensorStartDate"
         /// active sensor max days (lifetime)
@@ -1888,6 +1890,12 @@ extension UserDefaults {
         set {
             set(newValue, forKey: Key.activeSensorTransmitterId.rawValue)
         }
+    }
+
+    /// Local session identity only; never exported or restored onto another app/device.
+    var dexcomSensorSessionIdentityData: Data? {
+        get { data(forKey: Key.dexcomSensorSessionIdentityData.rawValue) }
+        set { set(newValue, forKey: Key.dexcomSensorSessionIdentityData.rawValue) }
     }
 
     /// active sensor start date. Optional as should be set to nil if there is no sensor connected or if no successful follower login has happened and/or if no active sensor is returned

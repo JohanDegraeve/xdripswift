@@ -16,6 +16,7 @@ final class BackupService: @unchecked Sendable {
     private static let accountKeys = BackupAccountCategory.allKeys
     // Runtime, sensor-specific and current post-processing values must not move between app instances.
     private static let excludedSettingKeys: Set<String> = [
+        UserDefaults.Key.dexcomSensorSessionIdentityData.rawValue,
         UserDefaults.Key.nightscoutFollowerGapFillLastAuditEndDate.rawValue,
         UserDefaults.Key.nightscoutFollowerGapFillSite.rawValue,
         UserDefaults.Key.nightscoutFollowerGapFillCoverage.rawValue,

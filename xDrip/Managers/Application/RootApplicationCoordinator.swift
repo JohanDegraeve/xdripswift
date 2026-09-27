@@ -1065,10 +1065,9 @@ import AppIntents
             detectedStartDate.description(with: .current)
         )
 
-        activeSensor.startDate = detectedStartDate
-        UserDefaults.standard.activeSensorStartDate = detectedStartDate
-        coreDataManager.saveChanges()
-        bgPostProcessingManager?.handleSourceContextChanged()
+        // This is a date correction on the same Sensor, not a new session. Preserve its
+        // adjustment history and settings, including the timestamp-based source identity.
+        guard bgPostProcessingManager?.correctSensorStartDate(activeSensor, to: detectedStartDate) == true else { return }
         sensorNoiseManager?.update(activeSensor: activeSensor)
     }
     
@@ -2403,6 +2402,8 @@ import AppIntents
         sendToTransmitter: Bool,
         startRequest: SensorStartRequest? = nil
     ) {
+        // A new internal sensor must not inherit a previous Dexcom session identity.
+        UserDefaults.standard.dexcomSensorSessionIdentityData = nil
         // create active sensor
         let newSensor = Sensor(startDate: sensorStarDate, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
         if let startRequest {
@@ -2432,6 +2433,8 @@ import AppIntents
     }
     
     private func stopSensor(cGMTransmitter: CGMTransmitter?, sendToTransmitter: Bool) {
+        // Includes internal stops, source changes and transmitter-reported SessionStopped.
+        UserDefaults.standard.dexcomSensorSessionIdentityData = nil
         dexcomG6InitialCalibrationPolicy = DexcomG6InitialCalibrationPolicy()
         dexcomG6CalibrationTransmitter = nil
         clearDexcomG6CalibrationPrompt()

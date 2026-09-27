@@ -181,6 +181,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// to temporary store the received SensorStartDate. Will be compared to sensorStartDate only after having received a glucoseRx message with a valid algorithm status
     private var receivedSensorStartDate: Date?
 
+    /// Paired with the date resolved from that clock, before a running status confirms it.
+    private var receivedSessionClock: (clock: DexcomTransmitterTimeRxMessage, resolvedStartDate: Date)?
+
     /// the start date last reported after a glucose packet confirmed the matching internal session
     private var reportedConfirmedSensorStartDate: Date?
 
@@ -1648,6 +1651,25 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             }
         }
 
+        // Queue after any newSensorDetected callback so the identity binds to the resulting
+        // active session. Do not learn identity from a time packet alone or a stopped/error state.
+        if let observation = receivedSessionClock,
+           abs(observation.resolvedStartDate.timeIntervalSince(receivedSensorStartDate)) <= Self.sensorStartDateTolerance,
+           let startCounter = observation.clock.sensorStartCounter {
+            DispatchQueue.main.async { [weak self] in
+                guard let self,
+                      let activeStartDate = UserDefaults.standard.activeSensorStartDate,
+                      !Self.shouldReportDetectedSensor(activeSensorStartDate: activeStartDate, receivedSensorStartDate: receivedSensorStartDate) else { return }
+                let identity = DexcomSensorSessionIdentity(
+                    transmitterID: self.transmitterId,
+                    startCounter: startCounter,
+                    lastTransmitterTime: observation.clock.transmitterTime,
+                    activeSensorStartDate: activeStartDate
+                )
+                UserDefaults.standard.dexcomSensorSessionIdentityData = try? JSONEncoder().encode(identity)
+            }
+        }
+
         sensorStartDate = receivedSensorStartDate
     }
 
@@ -1772,7 +1794,23 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// process transmitterTimeRxMessage
     private func processTransmitterTimeRxMessage(value:Data) {
         if let transmitterTimeRxMessage = DexcomTransmitterTimeRxMessage(data: value) {
-            if let receivedSensorStartDate = transmitterTimeRxMessage.sensorStartDate {
+            let identity = UserDefaults.standard.dexcomSensorSessionIdentityData.flatMap {
+                try? JSONDecoder().decode(DexcomSensorSessionIdentity.self, from: $0)
+            }
+            let establishedStartDate = identity?.resolvedStartDate(
+                transmitterID: transmitterId,
+                clock: transmitterTimeRxMessage,
+                activeStartDate: UserDefaults.standard.activeSensorStartDate ?? activeSensorStartDateAtInitialization
+            )
+            if let identity, !identity.matches(transmitterID: transmitterId, clock: transmitterTimeRxMessage) {
+                UserDefaults.standard.dexcomSensorSessionIdentityData = nil
+            }
+            if let receivedSensorStartDate = establishedStartDate ?? transmitterTimeRxMessage.sensorStartDate {
+                receivedSessionClock = (transmitterTimeRxMessage, receivedSensorStartDate)
+                if let establishedStartDate, let reconstructedStart = transmitterTimeRxMessage.sensorStartDate,
+                   abs(establishedStartDate.timeIntervalSince(reconstructedStart)) > Self.sensorStartDateTolerance {
+                    trace("in processTransmitterTimeRxMessage, preserving confirmed Dexcom session despite wall-clock start drift: %{public}@ -> %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, reconstructedStart.description, establishedStartDate.description)
+                }
                 trace("in processTransmitterTimeRxMessage, receivedSensorStartDate = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, receivedSensorStartDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
                 
                 // send to delegate (UI/Core Data) on main thread
