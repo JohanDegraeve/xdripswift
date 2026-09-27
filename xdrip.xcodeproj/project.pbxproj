@@ -101,6 +101,7 @@
 		47503382247420A200D2260B /* BluetoothPeripheralView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47503384247420A200D2260B /* BluetoothPeripheralView.strings */; };
 		4752B400263570DA0081D551 /* ConstantsStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */; };
 		4752B4062635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */; };
+		AE7570012026092700000001 /* SheetCloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7570012026092700000002 /* SheetCloseButton.swift */; };
 		475F2A872D0DA81400DE6019 /* ShowHideItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */; };
 		476404892EA29034006CBE03 /* XdripApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476404882EA29034006CBE03 /* XdripApp.swift */; };
 		476698662BE2572C008EB2A9 /* ConstantsSettingsIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */; };
@@ -1024,6 +1025,7 @@
 		4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsStatistics.swift; sourceTree = "<group>"; };
 		4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewStatisticsSettingsViewModel.swift; sourceTree = "<group>"; };
 		475DED96244AF92A00F78473 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Alerts.strings; sourceTree = "<group>"; };
+		AE7570012026092700000002 /* SheetCloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetCloseButton.swift; sourceTree = "<group>"; };
 		475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowHideItemsView.swift; sourceTree = "<group>"; };
 		476404882EA29034006CBE03 /* XdripApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XdripApp.swift; sourceTree = "<group>"; };
 		476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSettingsIcons.swift; sourceTree = "<group>"; };
@@ -3035,6 +3037,7 @@
 				5F219EC5BAAF4D5E924415FA /* xDrip/Managers/Therapy/TherapyMetricsManager.swift */,
 				4D20C0032FF1000100000001 /* RootHomeView.swift */,
 				4D20C0092FF1000100000001 /* RootTabView.swift */,
+				AE7570012026092700000002 /* SheetCloseButton.swift */,
 				475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */,
 				4AC0D0022F1D000100000001 /* SnoozeView.swift */,
 				47EEC2CA30112DBA0061FC8D /* BgReadings */,
@@ -4633,6 +4636,7 @@
 				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
 				F8B3A844227F090E004BA588 /* SettingsViewAlertSettingsViewModel.swift in Sources */,
 				47244D662E8318DB007357C3 /* TransmitterReadSuccessManager.swift in Sources */,
+				AE7570012026092700000001 /* SheetCloseButton.swift in Sources */,
 				475F2A872D0DA81400DE6019 /* ShowHideItemsView.swift in Sources */,
 				4AC0D0012F1D000100000001 /* SnoozeView.swift in Sources */,
 				F8D0587C24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift in Sources */,

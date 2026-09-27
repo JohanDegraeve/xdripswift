@@ -86,6 +86,7 @@
 
 /// literally 'Cancel'
 "common_cancel" = "Cancel";
+"common_close" = "Zapri";
 
 /// literally warning
 "warning" = "Warning!";

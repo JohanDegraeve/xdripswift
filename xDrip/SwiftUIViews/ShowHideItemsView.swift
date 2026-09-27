@@ -56,10 +56,9 @@ struct ShowHideItemsView: View {
             .navigationTitle(Texts_HomeView.showHideItemsTitle)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(Texts_Common.Cancel) {
+                    SheetCloseButton {
                         presentationMode.wrappedValue.dismiss()
                     }
-                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     OnlineHelpButton(topic: .quickShowHide)

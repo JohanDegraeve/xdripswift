@@ -24,6 +24,8 @@ class Texts_Common {
     static let discardChanges = NSLocalizedString("common_discardChanges", tableName: filename, bundle: .main, value: "Discard Changes", comment: "leave the editor without saving changes")
     static let back = NSLocalizedString("common_back", tableName: filename, bundle: .main, value: "Back", comment: "accessibility label for the navigation back button")
 
+    static let close = NSLocalizedString("common_close", tableName: filename, bundle: .main, value: "Close", comment: "accessibility label for a button that closes a sheet without discarding changes")
+
     static let dismiss = {
         return NSLocalizedString(
             "common_dismiss",

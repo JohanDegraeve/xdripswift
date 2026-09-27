@@ -173,10 +173,9 @@ struct BgReadingsView: View {
             })
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(Texts_Common.Cancel, action: {
+                    SheetCloseButton {
                         self.presentationMode.wrappedValue.dismiss()
-                    })
-                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
+                    }
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     OnlineHelpButton(topic: .glucoseReadings)

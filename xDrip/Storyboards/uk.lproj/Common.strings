@@ -17,6 +17,7 @@
 
 /// literally 'Cancel'
 "common_cancel" = "Cancel";
+"common_close" = "Закрити";
 
 /// literally warning
 "warning" = "Warning!";

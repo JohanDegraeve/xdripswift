@@ -58,6 +58,7 @@
 
 /// literally 'Cancel'
 "common_cancel" = "Cancel";
+"common_close" = "关闭";
 
 /// white
 "white" = "white";

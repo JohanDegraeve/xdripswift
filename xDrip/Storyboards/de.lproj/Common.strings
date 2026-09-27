@@ -86,6 +86,7 @@
 
 /// literally 'Cancel'
 "common_cancel" = "Abbrechen";
+"common_close" = "Schließen";
 
 /// literally default, will be the name of default alerttypes that will be created during initial app launch
 "common_default" = "Standard";

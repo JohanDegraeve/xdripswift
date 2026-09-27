@@ -226,10 +226,9 @@ struct SensorManagementView: View {
             .navigationTitle(Texts_HomeView.sensorManagementTitle)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(Texts_Common.Cancel, action: {
+                    SheetCloseButton {
                         self.presentationMode.wrappedValue.dismiss()
-                    })
-                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
+                    }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     OnlineHelpButton(topic: .sensorManagement)
