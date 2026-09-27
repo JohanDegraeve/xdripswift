@@ -22,6 +22,7 @@ final class BackupService: @unchecked Sendable {
         UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue,
         UserDefaults.Key.careLinkHistoryRestoreGeneration.rawValue,
         UserDefaults.Key.careLinkPatientAliases.rawValue,
+        UserDefaults.Key.careLinkDeviceOffsets.rawValue,
         "pendingHealthKitReplacements",
         "healthKitSyncVersion",
         "is15DayDexcomG7",

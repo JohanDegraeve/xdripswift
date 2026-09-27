@@ -101,6 +101,8 @@ extension UserDefaults {
         case careLinkPassword = "careLinkPassword"
         /// Non-secret CareLink environment selected explicitly or inferred on first use.
         case careLinkRegion = "careLinkRegion"
+        /// Last proven device clock offsets scoped to region, account and patient.
+        case careLinkDeviceOffsets = "careLinkDeviceOffsets"
         /// Non-secret stable identifier for the personal CareLink account represented as a patient.
         case careLinkSelectedPatientID = "careLinkSelectedPatientID"
         /// Store-wide historical repair completed and saved successfully.
@@ -721,6 +723,25 @@ extension UserDefaults {
     @objc dynamic var careLinkSelectedPatientID: String? {
         get { string(forKey: Key.careLinkSelectedPatientID.rawValue) }
         set { set(newValue, forKey: Key.careLinkSelectedPatientID.rawValue) }
+    }
+
+    /// Missing clock information must not discard a previously proven offset, including zero.
+    func careLinkDeviceOffset(region: CareLinkRegion, account: String?, patientID: String) -> TimeInterval? {
+        guard let account, !account.isEmpty else { return nil }
+        let offsets = dictionary(forKey: Key.careLinkDeviceOffsets.rawValue) as? [String: [String: [String: Double]]]
+        guard let offset = offsets?[region.rawValue]?[account]?[patientID],
+              offset.isFinite, abs(offset) <= 14 * 60 * 60 else { return nil }
+        return offset
+    }
+
+    /// Writes only changed, valid offsets supplied by CareLink for an identified account.
+    func storeCareLinkDeviceOffset(_ offset: TimeInterval?, region: CareLinkRegion, account: String?, patientID: String) {
+        guard let account, !account.isEmpty, let offset,
+              offset.isFinite, abs(offset) <= 14 * 60 * 60,
+              careLinkDeviceOffset(region: region, account: account, patientID: patientID) != offset else { return }
+        var offsets = dictionary(forKey: Key.careLinkDeviceOffsets.rawValue) as? [String: [String: [String: Double]]] ?? [:]
+        offsets[region.rawValue, default: [:]][account, default: [:]][patientID] = offset
+        set(offsets, forKey: Key.careLinkDeviceOffsets.rawValue)
     }
 
     /// CarePartner mobile app version shared by personal and Care Partner account requests.
