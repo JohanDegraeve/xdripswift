@@ -973,7 +973,9 @@ struct GlucoseChartView: View {
                         AxisValueLabel {
                             let shouldHideLabel = abs(visibleEndDate.distance(to: value)) < ConstantsGlucoseChartSwiftUI.xAxisLabelFirstClippingInMinutes || abs(visibleStartDate.distance(to: value)) < ConstantsGlucoseChartSwiftUI.xAxisLabelLastClippingInMinutes ? true : false
 
-                            Text(value.formatted(.dateTime.hour()))
+                            Text(value.formatted(.dateTime.hour(.defaultDigits(amPM: hoursToShow >= 8 ? .narrow : .abbreviated))))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
                                 .opacity(shouldHideLabel ? 0 : 1)
                                 .foregroundStyle(ConstantsGlucoseChartSwiftUI.xAxisLabelColor)
                                 .font(.footnote)
