@@ -513,3 +513,17 @@
 "homeScreen.basalPosition" = "Basal Position";
 "homeScreen.basalTop" = "Top";
 "homeScreen.basalBottom" = "Bottom";
+
+"therapy.none" = "None";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Treatment Thresholds";
+"therapy.smallBolusThreshold" = "Small Bolus";
+"therapy.smallCarbThreshold" = "Small Carbs";
+"therapy.treatmentThresholdsExplanation" = "Bolus and carb values below these thresholds are hidden on the chart. The bolus threshold also defines small boluses in the treatments list. None shows all labels.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Treatment Scale";
+"therapy.scaleStandard" = "Standard";
+"therapy.scaleSmallDoses" = "Small Doses";
+"therapy.treatmentScaleExplanation" = "Small Doses makes small treatment markers easier to see. Bolus markers scale from 0.1–2.0U and carb markers from 1–50g. Higher amounts use the largest marker.";

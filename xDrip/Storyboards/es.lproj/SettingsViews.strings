@@ -516,3 +516,17 @@
 "homeScreen.basalPosition" = "Posición de la Basal";
 "homeScreen.basalTop" = "Arriba";
 "homeScreen.basalBottom" = "Abajo";
+
+"therapy.none" = "No";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Umbrales de terapia";
+"therapy.smallBolusThreshold" = "Bolo chico";
+"therapy.smallCarbThreshold" = "Pocos HC";
+"therapy.treatmentThresholdsExplanation" = "El gráfico oculta valores de bolos y HC bajo los umbrales. El umbral de bolo también define los bolos pequeños en tratamientos. «No» muestra todos los valores.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Escala terapia";
+"therapy.scaleStandard" = "Estándar";
+"therapy.scaleSmallDoses" = "Dosis bajas";
+"therapy.treatmentScaleExplanation" = "«Dosis bajas» hace más visibles los marcadores pequeños. Bolos: 0.1–2.0U; HC: 1–50g. Cantidades mayores usan el marcador más grande.";

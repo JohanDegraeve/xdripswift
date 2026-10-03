@@ -724,3 +724,17 @@
 "homeScreen.basalTop" = "顶部";
 "homeScreen.basalBottom" = "底部";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "葡萄糖图表";
+
+"therapy.none" = "无";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "治疗阈值";
+"therapy.smallBolusThreshold" = "小剂量推注";
+"therapy.smallCarbThreshold" = "少量碳水";
+"therapy.treatmentThresholdsExplanation" = "图表隐藏低于相应阈值的推注和碳水数值。推注阈值也用于定义治疗列表中的小剂量推注。选择无可显示所有数值。";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "治疗缩放";
+"therapy.scaleStandard" = "标准";
+"therapy.scaleSmallDoses" = "小剂量";
+"therapy.treatmentScaleExplanation" = "小剂量使少量治疗的标记更清晰。推注标记在0.1–2.0U之间缩放，碳水标记在1–50g之间缩放。超过范围的量使用最大标记。";

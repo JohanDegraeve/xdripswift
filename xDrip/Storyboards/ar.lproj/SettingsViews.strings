@@ -555,3 +555,17 @@
 "homeScreen.basalTop" = "الأعلى";
 "homeScreen.basalBottom" = "الأسفل";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "الرسم البياني للجلوكوز";
+
+"therapy.none" = "لا";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "حدود العلاجات";
+"therapy.smallBolusThreshold" = "بلعة صغيرة";
+"therapy.smallCarbThreshold" = "كربوهيدرات";
+"therapy.treatmentThresholdsExplanation" = "قيم البلعات والكربوهيدرات دون الحدود مخفية على الرسم. حد البلعة يحدد أيضًا البلعات الصغيرة في قائمة العلاجات. «لا» يعرض كل القيم.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "مقياس العلاجات";
+"therapy.scaleStandard" = "عادي";
+"therapy.scaleSmallDoses" = "جرعة صغيرة";
+"therapy.treatmentScaleExplanation" = "الجرعات الصغيرة أوضح بعلامات أكبر. تتدرج علامات البلعة من 0.1–2.0U والكربوهيدرات من 1–50g. الكميات الأعلى تستخدم أكبر علامة.";

@@ -136,7 +136,7 @@ struct GlucoseChartState {
 /// Bucketed treatment and basal points in the form expected by `GlucoseChartView`.
 ///
 /// Each dose type has one series. Marker size is interpolated from its value by the renderer,
-/// while cached labels retain the existing visibility policy.
+/// and the renderer applies the selected bolus and carb thresholds to cached labels.
 struct GlucoseChartTreatmentPoints {
 
     var boluses: [GlucoseChartTreatmentPoint] = []
@@ -245,6 +245,11 @@ enum GlucoseChartTreatmentStyle {
     /// to the endpoint size. The actual dose and its label are never clamped.
     static let bolusSymbolSizing = GlucoseChartTreatmentSizeRange(minimumValue: 0.5, maximumValue: 10, minimumSize: 9, maximumSize: 30)
     static let carbsSymbolSizing = GlucoseChartTreatmentSizeRange(minimumValue: 5, maximumValue: 70, minimumSize: 9, maximumSize: 30)
+
+    /// Small Doses uses larger minimum markers and narrower dose ranges. Higher amounts use the maximum size.
+    static let smallDoseBolusSymbolSizing = GlucoseChartTreatmentSizeRange(minimumValue: 0.1, maximumValue: 2.0, minimumSize: 14, maximumSize: 26)
+    static let smallDoseCarbsSymbolSizing = GlucoseChartTreatmentSizeRange(minimumValue: 1, maximumValue: 50, minimumSize: 14, maximumSize: 28)
+
     static let treatmentSymbolSize3h = 18.0
     static let treatmentSymbolSize6h = 15.5
     static let treatmentSymbolSize12h = 13.5

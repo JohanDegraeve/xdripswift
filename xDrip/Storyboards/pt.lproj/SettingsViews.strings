@@ -559,3 +559,17 @@
 "homeScreen.basalTop" = "Em cima";
 "homeScreen.basalBottom" = "Em baixo";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Gráfico de glicose";
+
+"therapy.none" = "Não";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Limiares tratamento";
+"therapy.smallBolusThreshold" = "Bolus peq.";
+"therapy.smallCarbThreshold" = "Poucos HC";
+"therapy.treatmentThresholdsExplanation" = "O gráfico oculta valores de bolus e hidratos abaixo dos limiares. O limiar bolus define também os bolus pequenos nos tratamentos. «Não» mostra todos os valores.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Escala terapia";
+"therapy.scaleStandard" = "Padrão";
+"therapy.scaleSmallDoses" = "Doses peq.";
+"therapy.treatmentScaleExplanation" = "«Doses peq.» torna os marcadores pequenos mais visíveis. Bolus: 0.1–2.0U; hidratos: 1–50g. Valores maiores usam o marcador maior.";

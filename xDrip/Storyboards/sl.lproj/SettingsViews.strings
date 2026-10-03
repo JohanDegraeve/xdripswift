@@ -799,3 +799,17 @@
 "homeScreen.basalTop" = "Zgoraj";
 "homeScreen.basalBottom" = "Spodaj";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Graf glukoze";
+
+"therapy.none" = "Brez";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Pragovi terapij";
+"therapy.smallBolusThreshold" = "Mali bolus";
+"therapy.smallCarbThreshold" = "Malo OH";
+"therapy.treatmentThresholdsExplanation" = "Vrednosti bolusov in OH pod pragovi so na grafu skrite. Prag bolusa določa tudi male boluse na seznamu terapij. «Brez» prikaže vse vrednosti.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Merilo terapij";
+"therapy.scaleStandard" = "Običajno";
+"therapy.scaleSmallDoses" = "Mali odm.";
+"therapy.treatmentScaleExplanation" = "Mali odmerki naredijo male oznake bolj vidne. Bolusi: 0.1–2.0U; OH: 1–50g. Večje količine uporabljajo največjo oznako.";

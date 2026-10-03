@@ -573,3 +573,17 @@
 "homeScreen.basalTop" = "Överst";
 "homeScreen.basalBottom" = "Nederst";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Glukosdiagram";
+
+"therapy.none" = "Av";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Behandlingsgränser";
+"therapy.smallBolusThreshold" = "Liten bolus";
+"therapy.smallCarbThreshold" = "Lite kolh.";
+"therapy.treatmentThresholdsExplanation" = "Bolus- och kolhydratvärden under gränserna döljs i grafen. Bolusgränsen definierar även små bolus i behandlingslistan. «Av» visar alla värden.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Terapiskala";
+"therapy.scaleStandard" = "Standard";
+"therapy.scaleSmallDoses" = "Små doser";
+"therapy.treatmentScaleExplanation" = "Små doser gör små markörer tydligare. Bolusmarkörer skalas från 0.1–2.0U och kolhydratmarkörer från 1–50g. Större mängder använder den största markören.";

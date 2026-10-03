@@ -799,3 +799,17 @@
 "homeScreen.basalTop" = "Góra";
 "homeScreen.basalBottom" = "Dół";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Wykres glukozy";
+
+"therapy.none" = "Brak";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Progi terapii";
+"therapy.smallBolusThreshold" = "Mały bolus";
+"therapy.smallCarbThreshold" = "Mało węgl.";
+"therapy.treatmentThresholdsExplanation" = "Wartości bolusów i węglowodanów poniżej progów są ukryte na wykresie. Próg bolusa określa też małe bolusy na liście terapii. «Brak» pokazuje wszystkie wartości.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Skala terapii";
+"therapy.scaleStandard" = "Standard";
+"therapy.scaleSmallDoses" = "Małe dawki";
+"therapy.treatmentScaleExplanation" = "Małe dawki ułatwiają dostrzeżenie małych znaczników. Bolusy: 0.1–2.0U; węglowodany: 1–50g. Większe ilości mają największy znacznik.";

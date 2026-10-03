@@ -773,3 +773,17 @@
 "homeScreen.basalTop" = "Oben";
 "homeScreen.basalBottom" = "Unten";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Glukosediagramm";
+
+"therapy.none" = "Kein";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Behandlungsgrenzen";
+"therapy.smallBolusThreshold" = "Kleinbolus";
+"therapy.smallCarbThreshold" = "Kleine KH";
+"therapy.treatmentThresholdsExplanation" = "Bolus- und KH-Werte unter den Schwellen sind im Diagramm verborgen. Die Bolusschwelle definiert auch kleine Boli in der Behandlungsliste. «Kein» zeigt alle Werte.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Therapieskala";
+"therapy.scaleStandard" = "Standard";
+"therapy.scaleSmallDoses" = "Kleine Dos.";
+"therapy.treatmentScaleExplanation" = "«Kleine Dos.» macht kleine Marker deutlicher. Bolusmarker skalieren von 0.1–2.0U, KH-Marker von 1–50g. Größere Mengen nutzen den größten Marker.";

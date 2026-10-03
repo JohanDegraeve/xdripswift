@@ -547,3 +547,17 @@
 "homeScreen.basalTop" = "Üst";
 "homeScreen.basalBottom" = "Alt";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Glikoz Grafiği";
+
+"therapy.none" = "Yok";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Tedavi eşikleri";
+"therapy.smallBolusThreshold" = "Ufak bolus";
+"therapy.smallCarbThreshold" = "Az karb.";
+"therapy.treatmentThresholdsExplanation" = "Eşik altındaki bolus ve karbonhidrat değerleri grafikte gizlenir. Bolus eşiği tedavi listesindeki küçük bolusları da tanımlar. «Yok» tüm değerleri gösterir.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Tedavi ölçeği";
+"therapy.scaleStandard" = "Standart";
+"therapy.scaleSmallDoses" = "Düşük doz";
+"therapy.treatmentScaleExplanation" = "Düşük doz küçük işaretleri daha görünür yapar. Bolus: 0.1–2.0U; karbonhidrat: 1–50g. Daha büyük miktarlar en büyük işareti kullanır.";

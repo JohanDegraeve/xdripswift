@@ -585,3 +585,17 @@
 "homeScreen.basalTop" = "Ylhäällä";
 "homeScreen.basalBottom" = "Alhaalla";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Glukoosikaavio";
+
+"therapy.none" = "Ei";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Hoidon rajat";
+"therapy.smallBolusThreshold" = "Pieni bolus";
+"therapy.smallCarbThreshold" = "Vähän HH";
+"therapy.treatmentThresholdsExplanation" = "Rajat alittavat bolus- ja hiilihydraattiarvot piilotetaan kaaviosta. Bolusraja määrittää myös pienet bolukset hoitoluettelossa. «Ei» näyttää kaikki arvot.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Hoidon asteikko";
+"therapy.scaleStandard" = "Vakio";
+"therapy.scaleSmallDoses" = "Pienet ann.";
+"therapy.treatmentScaleExplanation" = "Pienet annokset näkyvät selvemmin. Bolusmerkit skaalautuvat välillä 0.1–2.0U, HH-merkit välillä 1–50g. Suuremmat määrät käyttävät suurinta merkkiä.";

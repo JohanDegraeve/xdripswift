@@ -615,3 +615,17 @@
 "homeScreen.basalTop" = "En haut";
 "homeScreen.basalBottom" = "En bas";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Graphique de glycémie";
+
+"therapy.none" = "Non";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Seuils traitements";
+"therapy.smallBolusThreshold" = "Petit bolus";
+"therapy.smallCarbThreshold" = "Peu gluc.";
+"therapy.treatmentThresholdsExplanation" = "Le graphe masque les valeurs de bolus et glucides sous les seuils. Le seuil bolus définit aussi les petits bolus dans les traitements. «Non» affiche tout.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Échelle soins";
+"therapy.scaleStandard" = "Standard";
+"therapy.scaleSmallDoses" = "Petites d.";
+"therapy.treatmentScaleExplanation" = "«Petites d.» rend les petits marqueurs plus visibles. Bolus : 0.1–2.0U ; glucides : 1–50g. Au-delà, les marqueurs ont la taille maximale.";

@@ -800,3 +800,17 @@
 "homeScreen.basalTop" = "In alto";
 "homeScreen.basalBottom" = "In basso";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Grafico del glucosio";
+
+"therapy.none" = "No";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Soglie trattamenti";
+"therapy.smallBolusThreshold" = "Bolo basso";
+"therapy.smallCarbThreshold" = "Pochi carb.";
+"therapy.treatmentThresholdsExplanation" = "Il grafico nasconde i valori di boli e carboidrati sotto le soglie. La soglia boli definisce anche i piccoli boli nei trattamenti. «No» mostra tutti i valori.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Scala terapie";
+"therapy.scaleStandard" = "Standard";
+"therapy.scaleSmallDoses" = "Dosi basse";
+"therapy.treatmentScaleExplanation" = "«Dosi basse» rende più visibili i piccoli marcatori. Boli: 0.1–2.0U; carboidrati: 1–50g. Quantità maggiori usano il marcatore più grande.";

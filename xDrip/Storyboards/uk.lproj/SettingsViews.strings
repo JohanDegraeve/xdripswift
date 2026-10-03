@@ -754,3 +754,17 @@
 "homeScreen.basalTop" = "Вгорі";
 "homeScreen.basalBottom" = "Внизу";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Графік глюкози";
+
+"therapy.none" = "Ні";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Пороги терапії";
+"therapy.smallBolusThreshold" = "Мал. бол.";
+"therapy.smallCarbThreshold" = "Мало вугл.";
+"therapy.treatmentThresholdsExplanation" = "Значення болюсів і вуглеводів нижче порогів приховані на графіку. Поріг болюса також визначає малі болюси у списку терапії. «Ні» показує всі значення.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Шкала терапії";
+"therapy.scaleStandard" = "Типова";
+"therapy.scaleSmallDoses" = "Малі дози";
+"therapy.treatmentScaleExplanation" = "Малі дози роблять малі маркери помітнішими. Болюси: 0.1–2.0U; вуглеводи: 1–50g. Більші кількості використовують найбільший маркер.";

@@ -232,6 +232,9 @@ struct TreatmentsListView: View {
 
 /// Persistent top controls for date selection and treatment filters.
 private struct TreatmentsControlsCard: View {
+    @AppStorage(UserDefaults.Key.smallBolusTreatmentThreshold.rawValue)
+    private var smallBolusTreatmentThreshold = ConstantsGlucoseChart.defaultSmallBolusTreatmentThreshold
+
     @ObservedObject var viewModel: TreatmentsViewModel
 
     var body: some View {
@@ -267,15 +270,18 @@ private struct TreatmentsControlsCard: View {
                         viewModel.toggleBolusFilter()
                     }
 
-                    TreatmentFilterChip(
-                        systemImage: GlucoseChartTreatmentStyle.bolusSymbol,
-                        tintColor: ConstantsGlucoseChart.bolusTreatmentColor,
-                        isSelected: viewModel.showSmallBolusTreatments,
-                        isEnabled: viewModel.showBolusTreatments,
-                        symbolScale: .medium,
-                        symbolFont: .system(size: TreatmentFilterLayout.symbolSize * GlucoseChartTreatmentStyle.smallBolusScale, weight: .regular)
-                    ) {
-                        viewModel.toggleSmallBolusFilter()
+                    // With no threshold there are no small boluses to filter.
+                    if smallBolusTreatmentThreshold > 0 {
+                        TreatmentFilterChip(
+                            systemImage: GlucoseChartTreatmentStyle.bolusSymbol,
+                            tintColor: ConstantsGlucoseChart.bolusTreatmentColor,
+                            isSelected: viewModel.showSmallBolusTreatments,
+                            isEnabled: viewModel.showBolusTreatments,
+                            symbolScale: .medium,
+                            symbolFont: .system(size: TreatmentFilterLayout.symbolSize * GlucoseChartTreatmentStyle.smallBolusScale, weight: .regular)
+                        ) {
+                            viewModel.toggleSmallBolusFilter()
+                        }
                     }
 
                     TreatmentFilterChip(

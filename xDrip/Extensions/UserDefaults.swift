@@ -204,6 +204,10 @@ extension UserDefaults {
         case automaticBasalRenderingStyle = "automaticBasalRenderingStyle"
         /// micro-bolus threshold level in units
         case smallBolusTreatmentThreshold = "smallBolusTreatmentThreshold"
+        /// carb chart label threshold in grams
+        case smallCarbTreatmentThreshold = "smallCarbTreatmentThreshold"
+        /// use larger minimum chart markers and narrower dose ranges
+        case useSmallDoseTreatmentScale = "useSmallDoseTreatmentScale"
         /// should the micro-boluses be listed in the treatment list/table?
         case showSmallBolusTreatmentsInList = "showSmallBolusTreatmentsInList"
         /// should the normal boluses be listed in the treatment list/table?
@@ -1718,22 +1722,36 @@ extension UserDefaults {
         }
     }
 
-    /// micro-bolus threshold level in units as a Double
-    @objc dynamic var smallBolusTreatmentThreshold:Double {
+    /// Small-bolus threshold in units. A stored zero means None; only an absent value uses the default.
+    @objc dynamic var smallBolusTreatmentThreshold: Double {
         get {
-
-            var returnValue = double(forKey: Key.smallBolusTreatmentThreshold.rawValue)
-            // if 0 set to defaultvalue
-            if returnValue == 0.0 {
-                returnValue = ConstantsGlucoseChart.defaultSmallBolusTreatmentThreshold
+            guard object(forKey: Key.smallBolusTreatmentThreshold.rawValue) != nil else {
+                return ConstantsGlucoseChart.defaultSmallBolusTreatmentThreshold
             }
-
-            return returnValue
+            return double(forKey: Key.smallBolusTreatmentThreshold.rawValue)
         }
         set {
-
             set(newValue, forKey: Key.smallBolusTreatmentThreshold.rawValue)
         }
+    }
+
+    /// Small-carb chart label threshold in grams. Zero means None; an absent value defaults to 5g.
+    @objc dynamic var smallCarbTreatmentThreshold: Double {
+        get {
+            guard object(forKey: Key.smallCarbTreatmentThreshold.rawValue) != nil else {
+                return ConstantsGlucoseChart.defaultSmallCarbTreatmentThreshold
+            }
+            return double(forKey: Key.smallCarbTreatmentThreshold.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.smallCarbTreatmentThreshold.rawValue)
+        }
+    }
+
+    /// Standard is the default. Small Doses changes chart marker sizing without changing labels or treatments.
+    @objc dynamic var useSmallDoseTreatmentScale: Bool {
+        get { bool(forKey: Key.useSmallDoseTreatmentScale.rawValue) }
+        set { set(newValue, forKey: Key.useSmallDoseTreatmentScale.rawValue) }
     }
 
     /// max canula age (CAGE) as Int - if nil, return default value

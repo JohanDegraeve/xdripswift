@@ -599,3 +599,17 @@
 "homeScreen.basalTop" = "Boven";
 "homeScreen.basalBottom" = "Onder";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Glucosegrafiek";
+
+"therapy.none" = "Geen";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Behandelgrenzen";
+"therapy.smallBolusThreshold" = "Minibolus";
+"therapy.smallCarbThreshold" = "Weinig KH";
+"therapy.treatmentThresholdsExplanation" = "Bolus- en koolhydraatwaarden onder de grenzen zijn verborgen in de grafiek. De bolusgrens bepaalt ook kleine bolussen in de behandellijst. «Geen» toont alles.";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Therapieschaal";
+"therapy.scaleStandard" = "Normaal";
+"therapy.scaleSmallDoses" = "Kleine dos.";
+"therapy.treatmentScaleExplanation" = "Kleine doses maken kleine markeringen beter zichtbaar. Bolus: 0.1–2.0U; koolhydraten: 1–50g. Hogere hoeveelheden gebruiken de grootste markering.";
