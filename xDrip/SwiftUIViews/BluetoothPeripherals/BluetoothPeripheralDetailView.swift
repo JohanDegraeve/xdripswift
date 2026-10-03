@@ -19,18 +19,20 @@ struct BluetoothPeripheralDetailView: View {
             Section {
                 BluetoothPeripheralStatusBannerView(state: state)
                     .listRowInsets(ConstantsUI.bluetoothPeripheralStatusBannerRowInsets)
-                    .listRowBackground(state.connectionStatus.rowBackgroundColor)
+                    .listRowBackground(state.bluetoothAccessIsBlocked ? ConstantsUI.warningSectionBackgroundColor : state.connectionStatus.rowBackgroundColor)
 
-                Button(action: state.connectButtonTapped) {
-                    Text(state.connectButtonTitle)
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
+                if !state.bluetoothAccessIsBlocked {
+                    Button(action: state.connectButtonTapped) {
+                        Text(state.connectButtonTitle)
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(connectButtonTint)
+                    .disabled(!state.connectButtonIsEnabled)
+                    .listRowInsets(ConstantsUI.bluetoothPeripheralStatusButtonRowInsets)
+                    .listRowBackground(state.connectionStatus.rowBackgroundColor)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(connectButtonTint)
-                .disabled(!state.connectButtonIsEnabled)
-                .listRowInsets(ConstantsUI.bluetoothPeripheralStatusButtonRowInsets)
-                .listRowBackground(state.connectionStatus.rowBackgroundColor)
             } footer: {
                 if let statusFooterText = state.statusFooterText {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
@@ -99,6 +101,9 @@ struct BluetoothPeripheralDetailView: View {
         }
         .onDisappear { state.setSignalStrengthVisible(false) }
         .onChange(of: scenePhase) { phase in
+            if phase == .active {
+                state.refresh()
+            }
             state.updateSignalStrengthPolling(active: phase == .active)
         }
         .frame(maxWidth: UIDevice.current.userInterfaceIdiom == .pad ? 780 : .infinity)
@@ -205,29 +210,41 @@ private struct BluetoothPeripheralStatusBannerView: View {
     @ObservedObject var state: BluetoothPeripheralDetailState
 
     var body: some View {
-        HStack(alignment: .center, spacing: 10) {
-            Image(systemName: state.connectionStatus.antennaSystemImage)
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(state.connectionStatus.tintColor)
-                .frame(width: 24)
-
-            Text(state.connectionStatus.fullStatusText)
-                .foregroundStyle(Color(.colorPrimary))
-
-            Spacer()
-
-            if let connectionWaitStartedAt = state.connectionWaitStartedAt {
-                HStack(spacing: 4) {
-                    Image(systemName: "clock")
-                        .accessibilityHidden(true)
-
-                    Text(connectionWaitStartedAt, style: .timer)
-                        .monospacedDigit()
-                }
-                    .foregroundStyle(Color(.colorSecondary))
+        if state.bluetoothAccessIsBlocked {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(Color(.systemRed))
+                    .accessibilityHidden(true)
+                Text(Texts_BluetoothPeripheralView.bluetoothAccessNotEnabled)
+                    .font(.headline)
             }
+            .foregroundStyle(Color(.colorPrimary))
+            .padding(.vertical, 3)
+        } else {
+            HStack(alignment: .center, spacing: 10) {
+                Image(systemName: state.connectionStatus.antennaSystemImage)
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(state.connectionStatus.tintColor)
+                    .frame(width: 24)
+
+                Text(state.connectionStatus.fullStatusText)
+                    .foregroundStyle(Color(.colorPrimary))
+
+                Spacer()
+
+                if let connectionWaitStartedAt = state.connectionWaitStartedAt {
+                    HStack(spacing: 4) {
+                        Image(systemName: "clock")
+                            .accessibilityHidden(true)
+
+                        Text(connectionWaitStartedAt, style: .timer)
+                            .monospacedDigit()
+                    }
+                        .foregroundStyle(Color(.colorSecondary))
+                }
+            }
+            .padding(.vertical, 3)
         }
-        .padding(.vertical, 3)
     }
 }
 

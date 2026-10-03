@@ -256,3 +256,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Läuft ab";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Bluetooth-Zugriff ist nicht aktiviert";
+"bluetoothAccessInstructions" = "Öffne zum Verbinden Einstellungen → Datenschutz & Sicherheit → Bluetooth und erlaube den Zugriff für %@.";
+"bluetoothAccessRestrictedInstructions" = "Geräteeinschränkungen verhindern den Bluetooth-Zugriff. Prüfe die Bildschirmzeit-Einstellungen oder kontaktiere den Geräteadministrator, um den Zugriff zu aktivieren.";

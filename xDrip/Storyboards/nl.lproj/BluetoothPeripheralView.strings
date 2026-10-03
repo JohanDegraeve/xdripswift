@@ -194,3 +194,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Verloopt";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Bluetooth-toegang is niet ingeschakeld";
+"bluetoothAccessInstructions" = "Open Instellingen → Privacy en beveiliging → Bluetooth en geef %@ toegang om verbinding te maken.";
+"bluetoothAccessRestrictedInstructions" = "Apparaatbeperkingen verhinderen Bluetooth-toegang. Controleer Schermtijd of neem contact op met de apparaatbeheerder om toegang in te schakelen.";

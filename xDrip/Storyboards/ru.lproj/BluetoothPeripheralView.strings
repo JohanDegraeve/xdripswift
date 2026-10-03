@@ -190,3 +190,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Истекает";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Доступ к Bluetooth не включён";
+"bluetoothAccessInstructions" = "Для подключения откройте Настройки → Конфиденциальность и безопасность → Bluetooth и разрешите доступ для %@.";
+"bluetoothAccessRestrictedInstructions" = "Ограничения устройства блокируют доступ к Bluetooth. Проверьте настройки Экранного времени или обратитесь к администратору устройства, чтобы включить доступ.";

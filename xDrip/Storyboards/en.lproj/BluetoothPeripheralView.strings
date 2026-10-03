@@ -171,3 +171,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Expires";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Bluetooth access is not enabled";
+"bluetoothAccessInstructions" = "To connect, open Settings → Privacy & Security → Bluetooth and allow access for %@.";
+"bluetoothAccessRestrictedInstructions" = "Device restrictions prevent Bluetooth access. Check Screen Time or contact your device administrator to enable access.";

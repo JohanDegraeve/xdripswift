@@ -32,6 +32,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     // Allows the status footer to show a warning without changing the banner status text.
     @Published private(set) var statusFooterIsWarning = false
     @Published private(set) var connectionStatus = BluetoothPeripheralDisplayStatus.notScanning
+    @Published private(set) var bluetoothAuthorization = CBManager.authorization
     @Published private(set) var connectionWaitStartedAt: Date?
     @Published private(set) var category = BluetoothPeripheralCategory.CGM
     @Published private(set) var canDeletePeripheral = false
@@ -84,6 +85,17 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBluetoothPeripheralViewController)
     private let m5StackRotationStrings = ["0", "90", "180", "270"]
     private let m5StackBrightnessStrings = ["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"]
+
+    var bluetoothAccessIsBlocked: Bool {
+        bluetoothAuthorization == .denied || bluetoothAuthorization == .restricted
+    }
+
+    var bluetoothAccessInstructions: String {
+        if bluetoothAuthorization == .restricted {
+            return Texts_BluetoothPeripheralView.bluetoothAccessRestrictedInstructions
+        }
+        return String(format: Texts_BluetoothPeripheralView.bluetoothAccessInstructions, ConstantsHomeView.applicationName)
+    }
 
     init(
         bluetoothPeripheral: BluetoothPeripheral?,
@@ -216,6 +228,9 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     }
 
     func refresh() {
+        // NFC success does not mean Bluetooth access is enabled. Check permission before
+        // showing the connection state, including when returning from iOS Settings.
+        bluetoothAuthorization = CBManager.authorization
         let connectButtonState = makeConnectButtonState()
         let newConnectionStatus = makeConnectionDisplayStatus()
 
@@ -223,12 +238,11 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         connectButtonIsEnabled = connectButtonState.isEnabled
         connectButtonIsStopAction = connectButtonState.isStopAction
         connectButtonTintColor = connectButtonState.tintColor
-        // Use a short footer message here. The full explanation is still shown by
-        // the alert guard when activation is attempted from any stale path.
         let activationBlockedMessage = activationBlockedFooterMessageForCurrentPeripheral()
-        statusFooterText = makeStatusFooterText(activationBlockedMessage: activationBlockedMessage)
-        statusFooterSystemImage = makeStatusFooterSystemImage(activationBlockedMessage: activationBlockedMessage)
-        statusFooterIsWarning = activationBlockedMessage != nil
+        // Permission instructions replace the usual footer while Bluetooth access is blocked.
+        statusFooterText = bluetoothAccessIsBlocked ? bluetoothAccessInstructions : makeStatusFooterText(activationBlockedMessage: activationBlockedMessage)
+        statusFooterSystemImage = bluetoothAccessIsBlocked ? nil : makeStatusFooterSystemImage(activationBlockedMessage: activationBlockedMessage)
+        statusFooterIsWarning = !bluetoothAccessIsBlocked && activationBlockedMessage != nil
         updateConnectionWaitStartedAt(for: newConnectionStatus)
         connectionStatus = newConnectionStatus
         category = expectedBluetoothPeripheralType.category()
@@ -709,7 +723,7 @@ private extension BluetoothPeripheralDetailState {
     /// Otherwise, connecting, reconnecting, and healthy Dexcom waiting are anchored to the
     /// device's last Bluetooth state change so the timer survives ordinary UI refreshes.
     func updateConnectionWaitStartedAt(for connectionStatus: BluetoothPeripheralDisplayStatus) {
-        guard connectionStatus.showsElapsedTime else {
+        guard !bluetoothAccessIsBlocked, connectionStatus.showsElapsedTime else {
             connectionWaitStartedAt = nil
             explicitlyStartedScanAt = nil
             return
@@ -869,6 +883,12 @@ private extension BluetoothPeripheralDetailState {
     }
 
     func connectButtonHandler() {
+        // Keep first-use scanning available so iOS can ask for Bluetooth permission.
+        // Block denied/restricted access here too, in case an NFC retry calls this directly.
+        guard CBManager.authorization != .denied && CBManager.authorization != .restricted else {
+            refresh()
+            return
+        }
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else { return }
 
         checkIfNFCScanIsNeeded()

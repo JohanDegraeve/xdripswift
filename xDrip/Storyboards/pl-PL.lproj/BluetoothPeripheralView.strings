@@ -263,3 +263,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Wygasa";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Dostęp do Bluetooth nie jest włączony";
+"bluetoothAccessInstructions" = "Aby się połączyć, otwórz Ustawienia → Prywatność i ochrona → Bluetooth i zezwól na dostęp aplikacji %@.";
+"bluetoothAccessRestrictedInstructions" = "Ograniczenia urządzenia uniemożliwiają dostęp do Bluetooth. Sprawdź ustawienia Czasu przed ekranem lub skontaktuj się z administratorem urządzenia, aby włączyć dostęp.";

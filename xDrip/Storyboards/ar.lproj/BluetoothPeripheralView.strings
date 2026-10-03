@@ -187,3 +187,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "تنتهي الصلاحية";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "الوصول إلى Bluetooth غير مفعّل";
+"bluetoothAccessInstructions" = "للاتصال، افتح الإعدادات ← الخصوصية والأمان ← Bluetooth واسمح بالوصول لتطبيق %@.";
+"bluetoothAccessRestrictedInstructions" = "تمنع قيود الجهاز الوصول إلى Bluetooth. تحقق من إعدادات مدة استخدام الجهاز أو تواصل مع مسؤول الجهاز لتفعيل الوصول.";

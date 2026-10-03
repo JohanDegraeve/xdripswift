@@ -196,3 +196,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Vanhenee";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Bluetoothin käyttöä ei ole otettu käyttöön";
+"bluetoothAccessInstructions" = "Muodosta yhteys avaamalla Asetukset → Tietosuoja ja suojaus → Bluetooth ja salli Bluetoothin käyttö sovellukselle %@.";
+"bluetoothAccessRestrictedInstructions" = "Laitteen rajoitukset estävät Bluetoothin käytön. Tarkista Ruutuaika tai ota yhteyttä laitteen ylläpitäjään Bluetoothin käytön sallimiseksi.";

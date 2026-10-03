@@ -4,6 +4,10 @@ class Texts_BluetoothPeripheralView {
     
     static private let filename = "BluetoothPeripheralView"
 
+    static let bluetoothAccessNotEnabled = NSLocalizedString("bluetoothAccessNotEnabled", tableName: filename, bundle: .main, value: "Bluetooth access is not enabled", comment: "Status banner when Bluetooth permission is denied or restricted")
+    static let bluetoothAccessInstructions = NSLocalizedString("bluetoothAccessInstructions", tableName: filename, bundle: .main, value: "To connect, open Settings → Privacy & Security → Bluetooth and allow access for %@.", comment: "Bluetooth permission instructions. %@ is the installed app name")
+    static let bluetoothAccessRestrictedInstructions = NSLocalizedString("bluetoothAccessRestrictedInstructions", tableName: filename, bundle: .main, value: "Device restrictions prevent Bluetooth access. Check Screen Time or contact your device administrator to enable access.", comment: "Instructions when device restrictions block Bluetooth permission")
+
     static let signalStrengthDisconnected = NSLocalizedString("signalStrengthDisconnected", tableName: filename, bundle: .main, value: "Disconnected", comment: "Signal value replacement while an always-on device is disconnected")
     static let signalStrength = NSLocalizedString("signalStrength", tableName: filename, bundle: .main, value: "Signal Strength", comment: "Bluetooth signal strength row")
     static let signalStrengthLastMeasurement = NSLocalizedString("signalStrengthLastMeasurement", tableName: filename, bundle: .main, value: "Last measurement", comment: "Elapsed time since RSSI measurement for intermittent devices")
