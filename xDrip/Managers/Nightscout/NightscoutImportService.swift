@@ -232,7 +232,7 @@ struct NightscoutImportCheckpoint: Codable, Sendable {
     }
 }
 
-/// Stores a single small checkpoint in UserDefaults; no credentials or downloaded medical data are stored.
+/// Stores a single small checkpoint in UserDefaults. No credentials or downloaded medical data are stored.
 final class NightscoutImportCheckpointStore: @unchecked Sendable {
     private static let key = "nightscoutHistoricalImportCheckpointV1"
     private let userDefaults: UserDefaults
@@ -405,7 +405,7 @@ private struct NightscoutTreatmentDocument: Decodable, Sendable {
         case notes
     }
 
-    /// Nightscout treatment documents are intentionally loose; validation happens after decoding.
+    /// Nightscout treatment documents are intentionally loose. Validation happens after decoding.
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = container.decodeLossyString(forKey: .id)
@@ -1393,6 +1393,14 @@ final class NightscoutImportService: @unchecked Sendable {
             ))
         }
 
+        // The recovery importer must use the same classification as normal treatment sync.
+        // Return here so the encoded Note cannot also create a bolus or a general Note row.
+        if eventType?.caseInsensitiveCompare(ConstantsNightscout.noteEventType) == .orderedSame,
+           let payload = BasalInjectionPayload.decode(from: document.notes) {
+            append(type: .BasalInjection, value: Double(payload.units), notes: payload.insulinDescription.toNilIfLength0())
+            return records
+        }
+
         if let carbs = document.carbs?.value, carbs >= 0 { append(type: .Carbs, value: carbs) }
         if let insulin = document.insulin?.value, insulin >= 0 { append(type: .Insulin, value: insulin) }
         if eventType?.caseInsensitiveCompare("Exercise") == .orderedSame,
@@ -1749,7 +1757,7 @@ final class NightscoutImportService: @unchecked Sendable {
 }
 
 private extension DateInterval {
-    /// DateInterval.contains includes its end; API range queries deliberately do not.
+    /// DateInterval.contains includes its end. API range queries deliberately do not.
     func containsHalfOpen(_ date: Date) -> Bool {
         date >= start && date < end
     }

@@ -2,3 +2,4 @@
 "calibration_title" = "Калибровка";
 "calibration_notification_title" = "Калибровка";
 "calibration_notification_body" = "Нажмите на уведомление для калибровки";
+"previousCalibrationPrefillMessage" = "Предыдущее значение калибровки от %@ уже введено. Перед подтверждением сравните его с текущим показанием глюкометра.";

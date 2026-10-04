@@ -36,7 +36,7 @@
 "screenlocktitle" = "تم تفعيل قفل الشاشة";
 "screenlockinfo" = "سيؤدي هذا إلى إبقاء الشاشة في حالة نشاط حتى تنتقل إلى تطبيق آخر أو تنقر فوق إلغاء القفل.\r\n\nيوصى بإبقاء الهاتف متصلاً بالشاحن لمنع استنزاف البطارية.";
 "stopSensorConfirmation" = "هل أنت متأكد أنك تريد إيقاف الحساس؟";
-"enterSensorCode" = "إذا كنت لا تعرف رمز الحساس، اتركه فارغًا لاستخدام 0000. الضغط على OK بدون رمز سيستخدم 0000 كرمز للحساس، أو سيقوم فقط بالتقاط الجلسة الحالية إذا كانت قد بدأت بالفعل.";
+"enterSensorCode" = "أدخل رمز المستشعر يدويًا، أو امسح ملصق المستشعر، أو اختر صورة.\n\nإذا لم يكن لديك الرمز، أو أردت استخدام جلسة مستشعر تعمل بالفعل على جهاز الإرسال، فاختر استخدام بدون رمز.";
 
 /// status info : literally 'Sensor End'
 "sensorend" = "ينتهي الحساس";
@@ -128,6 +128,8 @@
 
 /* Dexcom G6 sensor-label scanning */
 "scanWithCamera" = "المسح بالكاميرا";
+"manuallyEnterSensorCode" = "إدخال الرمز يدويًا";
+"dexcomG6ManualSensorCodeMessage" = "أدخل رمز المعايرة المكوّن من أربعة أرقام من ملصق المستشعر.";
 "chooseSensorLabelPhoto" = "اختيار صورة";
 "readingSensorLabel" = "جارٍ قراءة ملصق المستشعر...";
 "scanSensorLabel" = "مسح ملصق المستشعر";
@@ -141,7 +143,7 @@
 "sensorInformationTitle" = "معلومات المستشعر";
 "sensorLotNumber" = "رقم الدفعة";
 "sensorSerialNumberMetadata" = "الرقم التسلسلي للمستشعر";
-"sensorLabelReviewFooter" = "تحقق من المعلومات التي تم فكها قبل بدء المستشعر.";
+"sensorLabelReviewFooter" = "تحقق من اختيارك ومن معلومات الملصق إن وجدت، ثم اضغط على متابعة.";
 "sensorLabelScanFailed" = "تعذرت قراءة ملصق المستشعر";
 "multipleSensorLabelsFound" = "تحتوي الصورة على أكثر من ملصق مستشعر. اختر صورة تحتوي على ملصق واحد.";
 "noSensorLabelFound" = "لم يتم العثور على ملصق مستشعر Dexcom G6 صالح في الصورة.";
@@ -151,10 +153,34 @@
 "scannedSensorLabelCode" = "رمز الملصق الممسوح";
 "noCodeSensorSessionValue" = "0000 (جلسة بدون رمز)";
 "sensorCodeUnknown" = "غير معروف";
-"sensorSessionOrigin" = "مصدر الجلسة";
-"sensorSessionOriginUnknown" = "غير معروف";
-"sensorSessionOriginAwaitingTransmitter" = "في انتظار جهاز الإرسال";
-"sensorSessionOriginStartedByApp" = "بدأت بواسطة xDrip4iOS";
-"sensorSessionOriginExistingAdopted" = "تم اعتماد جلسة موجودة";
-"sensorSessionOriginTransmitterDetected" = "تم اكتشافها من جهاز الإرسال";
-"sensorSessionOriginRejected" = "تم رفض طلب البدء";
+
+"sensorManagementCalibrationInProgress" = "المعايرة قيد التقدم...";
+"sensorManagementCalibrationQueued" = "في قائمة الانتظار";
+"sensorManagementCalibrationSent" = "تم الإرسال، بانتظار الرد";
+"sensorManagementCalibrationSentShort" = "تم الإرسال";
+"sensorManagementCalibrationCompletedShort" = "اكتملت";
+"sensorManagementCalibrationRejectedShort" = "مرفوضة";
+"sensorManagementCalibrationErrorShort" = "خطأ";
+"sensorManagementCalibrationProcessing" = "قيد المعالجة";
+"sensorManagementCalibrationCompletedHigh" = "اكتملت، ثقة عالية";
+"sensorManagementCalibrationCompletedLow" = "اكتملت، ثقة منخفضة";
+"sensorManagementCalibrationRejectedFormat" = "مرفوضة: %@";
+"sensorManagementCalibrationNotPermitted" = "المعايرة غير مسموح بها";
+"sensorManagementCalibrationNotPermittedNote" = "جهاز الإرسال لا يسمح بالمعايرة حاليًا.";
+"sensorManagementCalibrationRejectedRange" = "القيمة خارج النطاق";
+"sensorManagementCalibrationRejectedTime" = "وقت معايرة غير صالح";
+"sensorManagementCalibrationRejectedDuplicate" = "تم إدخالها بالفعل";
+"sensorManagementCalibrationRejectedBounds" = "فشل التحقق من الحدود";
+"sensorManagementCalibrationRejectedUnknown" = "سبب غير معروف";
+"sensorManufactureDate" = "تاريخ التصنيع";
+"sensorExpirationDate" = "تاريخ انتهاء الصلاحية";
+"sensorManagementWaitingForSensorStart" = "في انتظار بدء تشغيل المستشعر";
+"sensorManagementStatusWarmingUp" = "جارٍ الإحماء";
+"sensorCodeContinue" = "متابعة";
+"useWithoutSensorCode" = "استخدام بدون رمز";
+"noSensorCode" = "بدون رمز (0000)";
+"dexcomG7SelectSensorCodeMessage" = "أدخل رمز الاقتران المكون من أربعة أرقام يدويًا، أو امسح أداة إدخال المستشعر الحالي، أو اختر صورة. تحقق من الرمز المحدد، ثم اضغط على متابعة.";
+"noSensorCodeSelectedTitle" = "هل تريد المتابعة بدون رمز مستشعر؟";
+"noSensorCodeSelectedMessage" = "إذا كانت هناك جلسة مستشعر تعمل بالفعل على جهاز الإرسال، فسيستخدم التطبيق تلك الجلسة مع متطلبات المعايرة الحالية الخاصة بها.\n\nيتطلب بدء جلسة جديدة بدون رمز إجراء معايرات بعد الإحماء وبشكل دوري بعد ذلك. لا يؤدي إيقاف تذكير المعايرة في التطبيق إلى إلغاء هذه المتطلبات.";
+"showHideGlucoseChartTitle" = "الرسم البياني";
+"showHideAdditionalItemsTitle" = "التنبيهات والنطق";

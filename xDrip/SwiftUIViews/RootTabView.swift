@@ -58,6 +58,7 @@ struct RootTextInputRequest: Identifiable {
     let title: String
     let placeholder: String
     let usesDecimalKeyboard: Bool
+    let message: String?
     let action: (String) -> Void
 }
 
@@ -189,13 +190,16 @@ struct RootTabDependencies {
         title: String,
         placeholder: String,
         usesDecimalKeyboard: Bool,
+        initialText: String = "",
+        message: String? = nil,
         action: @escaping (String) -> Void
     ) {
-        textInput = ""
+        textInput = initialText
         textInputRequest = RootTextInputRequest(
             title: title,
             placeholder: placeholder,
             usesDecimalKeyboard: usesDecimalKeyboard,
+            message: message,
             action: action
         )
     }
@@ -445,6 +449,10 @@ struct RootTabView: View {
                     request.action(stateModel.textInput)
                 }
             }
+        } message: {
+            if let message = stateModel.textInputRequest?.message {
+                Text(message)
+            }
         }
         .overlay {
             // Alert-driven snooze sheets should remain visually distinct from the current screen.
@@ -455,7 +463,7 @@ struct RootTabView: View {
             }
         }
         .sheet(item: $stateModel.pickerData) { pickerData in
-            // Root-level requests are alerts; the preference changes their scale, not their actions.
+            // Root-level requests are alerts. The preference changes their scale, not their actions.
             if UserDefaults.standard.preferLargeSnoozeScreen {
                 LargeSnoozePickerView(pickerData: pickerData)
                     .colorScheme(.dark)
@@ -615,10 +623,19 @@ struct RootTabView: View {
 private struct RootStatisticsTabView: View {
 
     let dependencies: RootTabDependencies
+    @ObservedObject private var rootHomeStateModel: RootHomeStateModel
+
+    init(dependencies: RootTabDependencies) {
+        self.dependencies = dependencies
+        rootHomeStateModel = dependencies.rootHomeStateModel
+    }
 
     var body: some View {
         NavigationStack {
-            StatisticsView(statisticsManager: dependencies.statisticsManager)
+            StatisticsView(
+                statisticsManager: dependencies.statisticsManager,
+                refreshRevision: rootHomeStateModel.state.chartRevision
+            )
         }
         .tint(ConstantsAppColors.navigationTint)
         .padding(.bottom, RootTabLayout.contentBottomPadding)
@@ -671,6 +688,7 @@ private struct RootHomeTabView: View {
                         nightscoutSyncManager: dependencies.nightscoutSyncManager,
                         actions: rootHomeActions(from: dependencies)
                     )
+                    .ignoresSafeArea(.keyboard, edges: .bottom)
                 }
 
             }
@@ -762,6 +780,13 @@ private struct RootHomeTabView: View {
                 SensorManagementView(
                     activeSensorProvider: dependencies.activeSensorProvider,
                     transmitterProvider: dependencies.transmitterProvider,
+                    dexcomG7Provider: {
+                        guard let transmitter = dependencies.transmitterProvider() as? BluetoothTransmitter,
+                              let dexcomG7 = dependencies.bluetoothPeripheralManager.getBluetoothPeripheral(for: transmitter) as? DexcomG7
+                        else { return nil }
+
+                        return dexcomG7
+                    },
                     calibrationsAccessor: dependencies.calibrationsAccessor,
                     bgReadingsAccessor: dependencies.bgReadingsAccessor,
                     sensorNoiseManager: dependencies.sensorNoiseManager,
@@ -842,7 +867,7 @@ private struct RootHomeTabView: View {
 ///
 /// Keeping the overlay mounted when visual dimming is disabled gives the transparent presentation
 /// exactly the same touch handling as the visibly dimmed presentations. iPhone landscape absorbs
-/// touches without unlocking; rotating back to portrait restores the established tap-to-unlock.
+/// touches without unlocking. Rotating back to portrait restores the established tap-to-unlock.
 private struct RootScreenLockOverlay: View {
     @ObservedObject var stateModel: RootHomeStateModel
     let allowsTapToUnlock: Bool
@@ -911,7 +936,8 @@ private struct RootHomeLandscapeView: View {
             } else {
                 RootHomeLandscapeChartView(
                     coreDataManager: coreDataManager,
-                    nightscoutSyncManager: nightscoutSyncManager
+                    nightscoutSyncManager: nightscoutSyncManager,
+                    refreshRevision: rootHomeStateModel.state.chartRevision
                 )
             }
         }
@@ -922,16 +948,23 @@ private struct RootHomeLandscapeView: View {
 /// Owns the landscape chart state for the lifetime of one landscape presentation.
 private struct RootHomeLandscapeChartView: View {
     @StateObject private var stateModel: LandscapeChartStateModel
+    let refreshRevision: Int
 
-    init(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager) {
+    init(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager, refreshRevision: Int) {
         _stateModel = StateObject(wrappedValue: LandscapeChartStateModel(
             coreDataManager: coreDataManager,
             nightscoutSyncManager: nightscoutSyncManager
         ))
+        self.refreshRevision = refreshRevision
     }
 
     var body: some View {
         LandscapeChartView(stateModel: stateModel)
+            .onChange(of: refreshRevision) { _ in
+                // A long-lived landscape presentation must replace both its chart snapshot and its
+                // selected-day statistics when Home reports that persisted glucose has changed.
+                stateModel.refresh()
+            }
     }
 }
 

@@ -17,51 +17,78 @@ struct XDripWidgetLiveActivity: Widget {
             LiveActivityView(context: context)
         } dynamicIsland: { context in
             DynamicIsland {
-                DynamicIslandExpandedRegion(.leading) { Text("\(context.state.bgValueStringInUserChosenUnit())\(context.state.trendArrow())")
-                        .font(.largeTitle).bold()
-                        .foregroundStyle(context.state.bgTextColor())
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.2)
+                DynamicIslandExpandedRegion(.leading) {
+                    if !context.state.showsSensorWarmupStatus {
+                        Text("\(context.state.bgValueStringInUserChosenUnit())\(context.state.trendArrow())")
+                            .font(.largeTitle).bold()
+                            .foregroundStyle(context.state.bgTextColor())
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.2)
+                    }
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
-                            HStack(alignment: .center, spacing: 10) {
-                                Text(context.state.deltaChangeStringInUserChosenUnit())
-                                    .font(.title).fontWeight(.semibold)
-                                    .foregroundStyle(context.state.deltaChangeTextColor())
-                                    .minimumScaleFactor(0.2)
+                    if !context.state.showsSensorWarmupStatus {
+                        HStack(alignment: .firstTextBaseline, spacing: 4) {
+                            if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
+                                HStack(alignment: .center, spacing: 10) {
+                                    Text(context.state.deltaChangeStringInUserChosenUnit())
+                                        .font(.title).fontWeight(.semibold)
+                                        .foregroundStyle(context.state.deltaChangeTextColor())
+                                        .minimumScaleFactor(0.2)
                                 
-                                deviceStatusIconImage
-                                    .font(.title2).bold()
-                                    .foregroundStyle(deviceStatusColor)
-                            }
-                        } else {
-                            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                                Text(context.state.deltaChangeStringInUserChosenUnit())
-                                    .font(.title).fontWeight(.semibold)
-                                    .foregroundStyle(context.state.deltaChangeTextColor())
+                                    deviceStatusIconImage
+                                        .font(.title2).bold()
+                                        .foregroundStyle(deviceStatusColor)
+                                }
+                            } else {
+                                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                                    Text(context.state.deltaChangeStringInUserChosenUnit())
+                                        .font(.title).fontWeight(.semibold)
+                                        .foregroundStyle(context.state.deltaChangeTextColor())
                                 
-                                Text(context.state.bgUnitString)
-                                    .font(.title)
-                                    .foregroundStyle(.colorSecondary)
+                                    Text(context.state.bgUnitString)
+                                        .font(.title)
+                                        .foregroundStyle(.colorSecondary)
+                                }
                             }
                         }
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.2)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                     }
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.2)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    GlucoseChartView(glucoseChartType: .dynamicIsland, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
+                    if context.state.showsSensorWarmupStatus, let endDate = context.state.sensorWarmupEndDate {
+                        LiveActivitySensorWarmupView(endDate: endDate, waitingForReading: context.state.isWaitingForSensorReading)
+                            .padding(.vertical, 12)
+                    } else {
+                        GlucoseChartView(glucoseChartType: .dynamicIsland, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
+                    }
                 }
             } compactLeading: {
-                Text("\(context.state.bgValueStringInUserChosenUnit())\(context.state.trendArrow())")
-                    .foregroundStyle(context.state.bgTextColor())
-                    .minimumScaleFactor(0.2)
+                if context.state.showsSensorWarmupStatus {
+                    Image(systemName: "hourglass")
+                        .foregroundStyle(.orange)
+                        .accessibilityLabel(context.state.isWaitingForSensorReading ? Texts_Common.sensorWaitingForReading : Texts_Common.sensorWarmingUp)
+                } else {
+                    Text("\(context.state.bgValueStringInUserChosenUnit())\(context.state.trendArrow())")
+                        .foregroundStyle(context.state.bgTextColor())
+                        .minimumScaleFactor(0.2)
+                }
             } compactTrailing: {
-                if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
+                if context.state.isWaitingForSensorReading {
+                    Image(systemName: "ellipsis")
+                        .foregroundStyle(.white)
+                        .accessibilityLabel(Texts_Common.sensorWaitingForReading)
+                } else if context.state.showsSensorWarmupStatus, let endDate = context.state.sensorWarmupEndDate {
+                    Text(endDate.formatted(date: .omitted, time: .shortened))
+                        .foregroundStyle(.white)
+                        .font(.caption)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .accessibilityLabel(String(format: Texts_Common.sensorWarmupUntilFormat, endDate.formatted(date: .omitted, time: .shortened)))
+                } else if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
                     deviceStatusIconImage
                         .bold()
                         .foregroundStyle(deviceStatusColor)
@@ -72,12 +99,18 @@ struct XDripWidgetLiveActivity: Widget {
                         .minimumScaleFactor(0.2)
                 }
             } minimal: {
-                Text("\(context.state.bgValueStringInUserChosenUnit())")
-                    .foregroundStyle(context.state.bgTextColor())
-                    .minimumScaleFactor(0.2)
+                if context.state.showsSensorWarmupStatus {
+                    Image(systemName: "hourglass")
+                        .foregroundStyle(.orange)
+                        .accessibilityLabel(context.state.isWaitingForSensorReading ? Texts_Common.sensorWaitingForReading : Texts_Common.sensorWarmingUp)
+                } else {
+                    Text("\(context.state.bgValueStringInUserChosenUnit())")
+                        .foregroundStyle(context.state.bgTextColor())
+                        .minimumScaleFactor(0.2)
+                }
             }
             .widgetURL(URL(string: "xdripswift://open"))
-            .keylineTint(context.state.bgTextColor())
+            .keylineTint(context.state.showsSensorWarmupStatus ? .orange : context.state.bgTextColor())
         }
         .addSupplementalActivityFamilies()
     }

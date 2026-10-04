@@ -20,9 +20,9 @@ class SnoozeParametersAccessor {
     
     // MARK: Public functions
     
-    /// - gets all SnoozeParameters instances from coredata
-    /// - if this the first call to this function (ie no SnoozeParameters stored yet in coredata), then they will be created for every AlertKind
-    /// - sorts them by AlertKind.rawvalue (from low to high), ie from 0 to (verylow) to 8 (fastrise)
+    /// - gets one SnoozeParameters instance for every current AlertKind
+    /// - creates records for kinds that are genuinely missing from Core Data
+    /// - returns them in raw-value order because AlertManager indexes this array by AlertKind.rawValue
     func getSnoozeParameters() -> [SnoozeParameters] {
         
         // create fetchRequest to get SnoozeParameters's as SnoozeParameters classes
@@ -46,15 +46,41 @@ class SnoozeParametersAccessor {
                 trace("in getSnoozeParameterss, Unable to Execute SnoozeParameterss Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataSnoozeParameter, type: .error, fetchError.localizedDescription)
             }
             
-            // snoozeParameters are ordered by alertKind so goes from 0 to highest value
-            // but maybe some (or all) are missing
-            // if some are missing, then it's either because it's the first time this app runs
-            // or it's because new alertKind's have been added, in which case it's at the end of the range they are added
-            for index in snoozeParameterArray.count..<AlertKind.allCases.count {
-                if let alertKind = AlertKind(rawValue: index) {
-                    snoozeParameterArray.append(SnoozeParameters(alertKind: alertKind, snoozePeriodInMinutes: 0, snoozeTimeStamp: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext))
+            // Reconcile by the persisted raw value, never by the number of fetched rows. A database
+            // can legitimately contain a raw value introduced by a newer development build, and it
+            // can contain a missing or duplicate row after an older restore. Using `count..<allCases`
+            // traps when there are more stored rows than current cases and can silently misalign the
+            // array when one kind is missing. Unknown future rows are deliberately left in Core Data
+            // so installing an older build cannot erase settings needed after upgrading again.
+            var storedByRawValue = [Int: SnoozeParameters]()
+            for parameters in snoozeParameterArray {
+                let rawValue = Int(parameters.alertKind)
+                guard AlertKind(rawValue: rawValue) != nil else { continue }
+
+                if let existing = storedByRawValue[rawValue] {
+                    // Do not return two objects for one array index. If legacy data contains a
+                    // duplicate, the most recently snoozed row carries the most useful state.
+                    if Self.shouldPrefer(parameters, over: existing) {
+                        storedByRawValue[rawValue] = parameters
+                    }
+                } else {
+                    storedByRawValue[rawValue] = parameters
                 }
             }
+
+            snoozeParameterArray = AlertKind.allCases
+                .sorted { $0.rawValue < $1.rawValue }
+                .map { alertKind in
+                    if let stored = storedByRawValue[alertKind.rawValue] {
+                        return stored
+                    }
+                    return SnoozeParameters(
+                        alertKind: alertKind,
+                        snoozePeriodInMinutes: 0,
+                        snoozeTimeStamp: nil,
+                        nsManagedObjectContext: coreDataManager.mainManagedObjectContext
+                    )
+                }
             
             // persist new SnoozeParameters if any were created
             if coreDataManager.mainManagedObjectContext.hasChanges {
@@ -68,5 +94,19 @@ class SnoozeParametersAccessor {
         }
         
         return snoozeParameterArray
+    }
+
+    /// Chooses a deterministic canonical row when legacy data contains duplicate alert kinds.
+    /// A timestamp means the row has carried a snooze, and the newest timestamp represents the
+    /// latest user action. Equal or absent timestamps retain the first fetched row.
+    private static func shouldPrefer(_ candidate: SnoozeParameters, over existing: SnoozeParameters) -> Bool {
+        switch (candidate.snoozeTimeStamp, existing.snoozeTimeStamp) {
+        case let (candidateDate?, existingDate?):
+            return candidateDate > existingDate
+        case (.some, .none):
+            return true
+        case (.none, _):
+            return false
+        }
     }
 }

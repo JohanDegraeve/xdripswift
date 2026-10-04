@@ -10,4 +10,3 @@
 "deviceMustBeConnectedToPowerOff" = "M5Stack doit être connecté pour pouvoir être éteint.";
 "powerOffConfirm" = "Etes-vous sur d'éteindre le M5Stack?";
 "powerOff" = "Eteindre";
-"connectToWiFi" = "Connecter au WiFi";

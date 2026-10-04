@@ -146,11 +146,13 @@ struct NightscoutDeviceStatus: Codable, Sendable {
     
     func uploaderBatteryImageRVCStatusView() -> (batteryImageSystemName: String, batteryImageColor: UIColor)? {
         if let uploaderBatteryPercent, let uploaderIsCharging, !uploaderIsCharging {
+            // Reuse the shared iOS 17 symbol fallback so this legacy warning also supports iOS 16.
+            guard let indicator = ConstantsHomeView.batteryIndicator(percent: uploaderBatteryPercent) else { return nil }
             switch uploaderBatteryPercent {
             case 0...10:
-                return ("battery.0percent", UIColor(.red))
+                return (indicator.systemImage, UIColor(.red))
             case 11...25:
-                return ("battery.25percent", UIColor(.yellow))
+                return (indicator.systemImage, UIColor(.yellow))
             default:
                 return nil
             }
@@ -208,19 +210,12 @@ struct NightscoutDeviceStatus: Codable, Sendable {
         aidStatus.presentation(referenceDate: referenceDate).title
     }
 
-    func deviceStatusIconImage() -> Image {
-        Image(systemName: deviceStatusIconSystemName())
+    /// The AID detail banner uses the shared renderer and supplies its own font size and color.
+    /// Preserve the existing slashed-circle fallback when Loop has no symbol to display.
+    func deviceStatusIconImage() -> AIDStatusSymbolImage {
+        AIDStatusSymbolImage(symbol: aidStatus.presentation().symbol ?? .loopUnavailable)
     }
 
-    func deviceStatusIconUIImage() -> UIImage {
-        UIImage(systemName: deviceStatusIconSystemName()) ?? UIImage()
-    }
-
-    func deviceStatusIconSystemName(referenceDate: Date = .now) -> String {
-        aidStatus.presentation(referenceDate: referenceDate).systemImage
-            ?? ConstantsHomeView.loopStatusNoDataSystemImage
-    }
-    
     func pumpReservoirColor() -> Color? {
         if let pumpReservoir {
             if pumpReservoir < ConstantsHomeView.pumpReservoirUrgent {

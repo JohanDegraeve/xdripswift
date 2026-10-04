@@ -18,7 +18,9 @@ import SwiftUI
 /// rebuilding the complete payload on every scroll update. The append, prepend and trim pattern is
 /// applied to glucose, original glucose, calibrations, treatments and derived basal points so the
 /// renderer receives stable, already-materialised data.
-final class GlucoseChartStateManager: ObservableObject {
+// Cache mutations use the serial operation queue. State publication and lifecycle changes use
+// the main queue, so the manager can be captured by the queue's Sendable closures.
+final class GlucoseChartStateManager: ObservableObject, @unchecked Sendable {
 
     // MARK: - Published State
 
@@ -31,7 +33,10 @@ final class GlucoseChartStateManager: ObservableObject {
     private let calibrationsAccessor: CalibrationsAccessor
     private let treatmentEntryAccessor: TreatmentEntryAccessor
     private let nightscoutSyncManager: NightscoutSyncManager
-    private let operationQueue = OperationQueue()
+    private let operationQueue: OperationQueue
+
+    /// Main-thread lifecycle token. Loads from before cleanup must not publish into a reopened chart.
+    @MainActor private var cacheRevision = UUID()
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryGlucoseChartManager)
 
     // MARK: - Cached Data
@@ -92,7 +97,9 @@ final class GlucoseChartStateManager: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager, showsSensorNoiseBands: Bool = false) {
+    init(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager, showsSensorNoiseBands: Bool = false, operationQueue: OperationQueue = OperationQueue()) {
+        // Allow tests to control queue progress without changing the production loading path.
+        self.operationQueue = operationQueue
         self.coreDataManager = coreDataManager
         self.nightscoutSyncManager = nightscoutSyncManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
@@ -123,8 +130,10 @@ final class GlucoseChartStateManager: ObservableObject {
     ///     when Core Data changes inside a date range that the manager has already loaded.
     ///   - showTreatments: Whether treatment and basal points should be included.
     ///   - showOriginalReadingsOnly: Temporarily render original readings instead of processed readings.
-    ///   - completionHandler: Called on the main queue after the state has been published.
+    ///   - completionHandler: Called on the main queue unless cleanup has invalidated this request.
+    @MainActor
     func updateState(endDate: Date = Date(), startDate: Date? = nil, forceReset: Bool = false, refreshCachedData: Bool = false, showTreatments: Bool = UserDefaults.standard.showTreatmentsOnChart, showOriginalReadingsOnly: Bool = false, completionHandler: ((GlucoseChartState) -> Void)? = nil) {
+        let revision = cacheRevision
         let startDateToUse = startDate ?? endDate.addingTimeInterval(-state.endDate.timeIntervalSince(state.startDate))
 
         operationQueue.addOperation { [weak self] in
@@ -132,6 +141,8 @@ final class GlucoseChartStateManager: ObservableObject {
 
             guard self.operationQueue.operations.count <= 1 else {
                 DispatchQueue.main.async {
+                    // Coalesced requests belong to the same lifecycle as fully processed requests.
+                    guard self.cacheRevision == revision else { return }
                     completionHandler?(self.state)
                 }
 
@@ -154,19 +165,29 @@ final class GlucoseChartStateManager: ObservableObject {
             let chartState = self.makeState(startDate: startDateToUse, endDate: endDate, showTreatments: showTreatments, showOriginalReadingsOnly: showOriginalReadingsOnly)
 
             DispatchQueue.main.async {
+                // Cleanup can happen after processing finishes but before this main-queue delivery.
+                guard self.cacheRevision == revision else { return }
                 self.state = chartState
                 completionHandler?(chartState)
             }
         }
     }
 
+    /// Discard pending results immediately, then release caches after any active load finishes.
+    @MainActor
     func cleanUpMemory() {
+        cacheRevision = UUID()
         operationQueue.cancelAllOperations()
-        resetCache()
+        // Cancellation does not stop an already running operation. A barrier keeps reset on the
+        // cache queue and ensures loads submitted after cleanup cannot overtake it.
+        operationQueue.addBarrierBlock { [weak self] in
+            self?.resetCache()
+        }
     }
 
     // MARK: - Cache Loading
 
+    /// Only called on the cache queue, including cleanup, so array mutations never overlap.
     private func resetCache() {
         cachedReadings.removeAll()
         cachedOriginalReadings.removeAll()
@@ -398,11 +419,7 @@ final class GlucoseChartStateManager: ObservableObject {
             return ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
         }
 
-        if endDate.timeIntervalSince(startDate) >= .hours(24) {
-            return ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal24hrChart
-        }
-
-        return ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal
+        return ConstantsGlucoseChartSwiftUI.minimumChartValueWithBottomSpace(hours: endDate.timeIntervalSince(startDate) / 3600)
     }
 
     private func chartBackgroundBands(startDate: Date, endDate: Date) -> [GlucoseChartBackgroundBand]? {
@@ -620,37 +637,29 @@ final class GlucoseChartStateManager: ObservableObject {
         var treatmentPoints = GlucoseChartTreatmentPoints()
         let treatmentOffset = treatmentSeparationOffset()
         let sortedBgReadings = bgReadings.sorted { $0.date < $1.date }
+        let doseTreatmentOffset = treatmentOffset * ConstantsGlucoseChart.doseTreatmentOffsetMultiplier
 
-        // Different bolus and carb magnitudes use separate arrays so the renderer can size and label them without
-        // recalculating thresholds inside the view.
+        // Keep one series per dose type. The renderer sizes each point directly from its value.
         for treatment in insulinTreatments {
-            let yValue = closestYAxisValue(treatmentDate: treatment.date, bgReadings: sortedBgReadings) - treatmentOffset
+            let yValue = closestYAxisValue(treatmentDate: treatment.date, bgReadings: sortedBgReadings) - doseTreatmentOffset
             let point = GlucoseChartTreatmentPoint(date: treatment.date, yValue: yValue, treatmentValue: treatment.value, label: label(for: treatment), notes: treatment.notes, idPrefix: "bolus")
 
-            if treatment.value < ConstantsGlucoseChart.smallBolusTreatmentThreshold {
-                treatmentPoints.smallBolus.append(point)
-            } else if treatment.value < ConstantsGlucoseChart.mediumBolusTreatmentThreshold {
-                treatmentPoints.mediumBolus.append(point)
-            } else if treatment.value < ConstantsGlucoseChart.largeBolusTreatmentThreshold {
-                treatmentPoints.largeBolus.append(point)
-            } else {
-                treatmentPoints.veryLargeBolus.append(point)
-            }
+            treatmentPoints.boluses.append(point)
+        }
+
+        // Use the same nearest-glucose placement as boluses, a little further below the curve.
+        // Keep this outside the pump-data gate so MDI users always see their injection markers.
+        for treatment in visibleTreatments where treatment.type == .BasalInjection {
+            let yValue = closestYAxisValue(treatmentDate: treatment.date, bgReadings: sortedBgReadings)
+                - treatmentOffset * ConstantsGlucoseChart.basalInjectionOffsetMultiplier
+            treatmentPoints.basalInjections.append(GlucoseChartTreatmentPoint(date: treatment.date, yValue: yValue, treatmentValue: treatment.value, label: label(for: treatment), notes: treatment.notes, idPrefix: "basal-injection"))
         }
 
         for treatment in carbsTreatments {
-            let yValue = closestYAxisValue(treatmentDate: treatment.date, bgReadings: sortedBgReadings) + treatmentOffset
+            let yValue = closestYAxisValue(treatmentDate: treatment.date, bgReadings: sortedBgReadings) + doseTreatmentOffset
             let point = GlucoseChartTreatmentPoint(date: treatment.date, yValue: yValue, treatmentValue: treatment.value, label: label(for: treatment), notes: treatment.notes, idPrefix: "carbs")
 
-            if treatment.value < Double(ConstantsGlucoseChart.smallCarbsTreatmentThreshold) {
-                treatmentPoints.smallCarbs.append(point)
-            } else if treatment.value < Double(ConstantsGlucoseChart.mediumCarbsTreatmentThreshold) {
-                treatmentPoints.mediumCarbs.append(point)
-            } else if treatment.value < Double(ConstantsGlucoseChart.largeCarbsTreatmentThreshold) {
-                treatmentPoints.largeCarbs.append(point)
-            } else {
-                treatmentPoints.veryLargeCarbs.append(point)
-            }
+            treatmentPoints.carbs.append(point)
         }
 
         for treatment in bgCheckTreatments {
@@ -670,9 +679,9 @@ final class GlucoseChartStateManager: ObservableObject {
             treatmentPoints.notes.append(
                 GlucoseChartTreatmentPoint(
                     date: treatment.date,
-                    yValue: closestYAxisValue(treatmentDate: treatment.date, bgReadings: sortedBgReadings) + (treatmentOffset * 0.5),
+                    yValue: closestYAxisValue(treatmentDate: treatment.date, bgReadings: sortedBgReadings) + (treatmentOffset * ConstantsGlucoseChart.noteLabelOffsetMultiplier),
                     treatmentValue: treatment.value,
-                    label: nil,
+                    label: GlucoseChartTreatmentStyle.noteLabel(treatment.notes),
                     notes: treatment.notes,
                     idPrefix: "note"
                 )
@@ -1089,6 +1098,9 @@ final class GlucoseChartStateManager: ObservableObject {
     }
 
     private func label(for treatment: CachedTreatment) -> String? {
+        // Label visibility remains independent of the continuously sized symbols.
+        if treatment.type == .Insulin, treatment.value < ConstantsGlucoseChart.minimumBolusLabelValue { return nil }
+        if treatment.type == .Carbs, treatment.value < ConstantsGlucoseChart.minimumCarbsLabelValue { return nil }
         let formatter = NumberFormatter()
 
         switch treatment.type {
@@ -1102,7 +1114,9 @@ final class GlucoseChartStateManager: ObservableObject {
             return nil
         }
 
-        return "\(formatted)\(treatment.type.unit())"
+        // The symbol identifies the treatment on the chart. Keep labels compact with just the
+        // amount. The treatment list and editor still show their units.
+        return formatted
     }
 
     // MARK: - Core Data Mapping
@@ -1154,28 +1168,18 @@ private extension GlucoseChartTreatmentPoints {
     /// This is deliberately symmetric with the raw cache merge helpers below so all chart point
     /// types get the same append/prepend performance behaviour during scrolling.
     mutating func merge(_ treatmentPoints: GlucoseChartTreatmentPoints) {
-        smallBolus.merge(treatmentPoints.smallBolus)
-        mediumBolus.merge(treatmentPoints.mediumBolus)
-        largeBolus.merge(treatmentPoints.largeBolus)
-        veryLargeBolus.merge(treatmentPoints.veryLargeBolus)
-        smallCarbs.merge(treatmentPoints.smallCarbs)
-        mediumCarbs.merge(treatmentPoints.mediumCarbs)
-        largeCarbs.merge(treatmentPoints.largeCarbs)
-        veryLargeCarbs.merge(treatmentPoints.veryLargeCarbs)
+        boluses.merge(treatmentPoints.boluses)
+        basalInjections.merge(treatmentPoints.basalInjections)
+        carbs.merge(treatmentPoints.carbs)
         bgChecks.merge(treatmentPoints.bgChecks)
         notes.merge(treatmentPoints.notes)
         automaticBasalPulses.merge(treatmentPoints.automaticBasalPulses)
     }
 
     mutating func trim(from startDate: Date, to endDate: Date) {
-        smallBolus.removeAll { $0.date < startDate || $0.date > endDate }
-        mediumBolus.removeAll { $0.date < startDate || $0.date > endDate }
-        largeBolus.removeAll { $0.date < startDate || $0.date > endDate }
-        veryLargeBolus.removeAll { $0.date < startDate || $0.date > endDate }
-        smallCarbs.removeAll { $0.date < startDate || $0.date > endDate }
-        mediumCarbs.removeAll { $0.date < startDate || $0.date > endDate }
-        largeCarbs.removeAll { $0.date < startDate || $0.date > endDate }
-        veryLargeCarbs.removeAll { $0.date < startDate || $0.date > endDate }
+        boluses.removeAll { $0.date < startDate || $0.date > endDate }
+        basalInjections.removeAll { $0.date < startDate || $0.date > endDate }
+        carbs.removeAll { $0.date < startDate || $0.date > endDate }
         bgChecks.removeAll { $0.date < startDate || $0.date > endDate }
         notes.removeAll { $0.date < startDate || $0.date > endDate }
         scheduledBasalRates.removeAll { $0.date < startDate || $0.date > endDate }

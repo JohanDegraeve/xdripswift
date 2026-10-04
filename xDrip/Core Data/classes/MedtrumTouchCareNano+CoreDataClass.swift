@@ -11,7 +11,7 @@ import CoreData
 
 public class MedtrumTouchCareNano: NSManagedObject {
 
-    /// last decoded reading counter from the pump's 669A9141 packet — used to drop duplicates across reconnects
+    /// last decoded reading counter from the pump's 669A9141 packet: used to drop duplicates across reconnects
     public var lastReadingCounter: Int = -1
 
     init(address: String, name: String, alias: String?, nsManagedObjectContext: NSManagedObjectContext) {

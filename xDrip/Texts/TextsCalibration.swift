@@ -4,6 +4,12 @@ import Foundation
 enum Texts_Calibrations {
     static private let filename = "CalibrationRequest"
 
+    static let previousCalibrationPrefillMessage = NSLocalizedString(
+        "previousCalibrationPrefillMessage", tableName: filename, bundle: .main,
+        value: "Your previous calibration from %@ is pre-filled. Check it against your current meter reading before confirming.",
+        comment: "Second initial G6 calibration alert. Placeholder is the time of the first user-entered calibration."
+    )
+
     static let calibrationNotificationRequestTitle:String = {
         return NSLocalizedString("calibration_notification_title", tableName: filename, bundle: Bundle.main, value: "Calibration", comment: "If user must calibrate, this is the title of the notification")
     }()
@@ -25,5 +31,4 @@ enum Texts_Calibrations {
     }()
     
 }
-
 

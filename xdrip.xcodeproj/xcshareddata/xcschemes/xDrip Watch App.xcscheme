@@ -45,7 +45,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "47A6ABDE2B790CC60047A4BA"
             BuildableName = "xDrip Watch App.app"
-            BlueprintName = "xDrip Watch App"
             ReferencedContainer = "container:xdrip.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,7 +61,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "47A6ABDE2B790CC60047A4BA"
             BuildableName = "xDrip Watch App.app"
-            BlueprintName = "xDrip Watch App"
             ReferencedContainer = "container:xdrip.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

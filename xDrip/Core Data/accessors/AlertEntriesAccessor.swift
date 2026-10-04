@@ -44,7 +44,7 @@ class AlertEntriesAccessor {
         }
         
         guard let current = currentEntry else {
-            // No entries exist (unexpected); return first if any, else nils or assert.
+            // No entries exist (unexpected). Return first if any, else nils or assert.
             return (alertEntries.first!, alertEntries.dropFirst().first)
         }
         

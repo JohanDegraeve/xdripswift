@@ -25,6 +25,5 @@ extension M5Stack {
     @NSManaged public var isM5StickC: Bool
     @NSManaged public var rotation: Int32
     @NSManaged public var textcolor: Int32
-    @NSManaged public var connectToWiFi: Bool
 
 }

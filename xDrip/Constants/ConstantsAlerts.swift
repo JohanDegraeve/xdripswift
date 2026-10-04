@@ -10,6 +10,10 @@ enum ConstantsAlerts {
     /// when the snooze all picker is brought up, this will be the default selected mute time
     /// unlike the specific alarms, we'll set this to a longer period such as 6 hours
     static let defaultSnoozeAllPeriodInMinutes = 6 * 60
+
+    /// number of hours to suppress Dexcom battery level alarms after the transmitter starts
+    /// G5/G6/ONE use transmitter age while G7/ONE+/Stelo use the disposable sensor age
+    static let dexcomBatteryAlertSuppressionPeriodInHours = 6
     
     // Snooze all
     /// the snooze all banner background color when not activated
@@ -36,16 +40,20 @@ enum ConstantsAlerts {
     static let notificationBannerBackgroundColor = Color(red: 0.15, green: 0.15, blue: 0.15, opacity: 1)
     
     /// The single supported set of durations for every snooze picker, in minutes.
-    static let snoozeValueMinutes = [15, 30, 60, 120, 240, 360, 720, 1440, 2880, 10080]
+    static let snoozeValueMinutes = [10, 15, 30, 45, 60, 120, 240, 360, 480, 600, 720, 1440, 2880, 10080]
 
     /// Localized labels corresponding one-to-one with `snoozeValueMinutes`.
     static let snoozeValueStrings = [
+        "10 " + Texts_Common.minutes,
         "15 " + Texts_Common.minutes,
         "30 " + Texts_Common.minutes,
+        "45 " + Texts_Common.minutes,
         "1 " + Texts_Common.hour,
         "2 " + Texts_Common.hours,
         "4 " + Texts_Common.hours,
         "6 " + Texts_Common.hours,
+        "8 " + Texts_Common.hours,
+        "10 " + Texts_Common.hours,
         "12 " + Texts_Common.hours,
         "1 " + Texts_Common.day,
         "2 " + Texts_Common.days,

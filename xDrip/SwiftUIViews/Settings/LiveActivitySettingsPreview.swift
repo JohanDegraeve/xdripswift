@@ -10,6 +10,7 @@ import SwiftUI
 
 /// Shows the selected Live Activity layout with current data or representative fallback data.
 struct LiveActivitySettingsPreview: View {
+    @AppStorage(UserDefaults.Key.liveActivityShowIOBCOB.rawValue) private var showIOBCOB = true
     @ObservedObject private var liveActivityManager = LiveActivityManager.shared
     @AppStorage(UserDefaults.Key.liveActivityType.rawValue)
     private var liveActivityTypeRawValue = LiveActivityType.disabled.rawValue
@@ -26,18 +27,20 @@ struct LiveActivitySettingsPreview: View {
             isMgDl: isMgDl
         )
         state.liveActivityType = liveActivityType
+        state.showIOBCOB = showIOBCOB
         state.warnUserToOpenApp = false
         return state
     }
 
     private var liveActivityPreviewHeight: CGFloat {
+        if previewState.showsSensorWarmupStatus { return 84 }
         switch liveActivityType {
         case .minimal:
-            return 78
+            return 84
         case .normal:
             return 104
         case .large:
-            return 166
+            return 160
         case .disabled:
             return 0
         }
@@ -60,6 +63,7 @@ struct LiveActivitySettingsPreview: View {
 /// Shows the selected CarPlay layout for the small supplemental Live Activity family.
 /// Apple Watch also uses this family.
 struct CarPlayLiveActivitySettingsPreview: View {
+    @AppStorage(UserDefaults.Key.liveActivityShowIOBCOB.rawValue) private var showIOBCOB = true
     @ObservedObject private var liveActivityManager = LiveActivityManager.shared
     @AppStorage(UserDefaults.Key.liveActivityType.rawValue)
     private var liveActivityTypeRawValue = LiveActivityType.disabled.rawValue
@@ -82,6 +86,7 @@ struct CarPlayLiveActivitySettingsPreview: View {
             isMgDl: isMgDl
         )
         state.carPlayLiveActivityType = carPlayLiveActivityType
+        state.showIOBCOB = showIOBCOB
         state.warnUserToOpenApp = false
         return state
     }
@@ -89,9 +94,10 @@ struct CarPlayLiveActivitySettingsPreview: View {
     var body: some View {
         if #available(iOS 26.0, *), liveActivityType != .disabled {
             LiveActivityViewContentActivityFamiliesState(state: previewState)
-                .frame(maxWidth: .infinity)
-                .frame(height: 112)
+                // Use a representative CarPlay size instead of the full Settings row width.
+                .frame(width: 240, height: 100)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
+                .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
                 .accessibilityElement(children: .contain)
         }

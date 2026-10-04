@@ -146,6 +146,7 @@ struct SettingsSectionModel: Identifiable {
 
 struct SettingsScreen {
     let title: String
+    let introduction: (() -> String)?
     let onlineHelpTopic: OnlineHelpTopic?
     let toolbarActions: @MainActor () -> [SettingsToolbarAction]
     let makeSections: @MainActor (SettingsActionPresenter) -> [SettingsSectionModel]
@@ -155,11 +156,13 @@ struct SettingsScreen {
     /// mix of existing section providers for the child screen.
     init(
         title: String,
+        introduction: (() -> String)? = nil,
         onlineHelpTopic: OnlineHelpTopic? = nil,
         toolbarActions: @escaping @MainActor () -> [SettingsToolbarAction] = { [] },
         makeSections: @escaping @MainActor (SettingsActionPresenter) -> [SettingsSectionModel]
     ) {
         self.title = title
+        self.introduction = introduction
         self.onlineHelpTopic = onlineHelpTopic
         self.toolbarActions = toolbarActions
         self.makeSections = makeSections
@@ -169,11 +172,12 @@ struct SettingsScreen {
     /// is just a title and a list of existing native section providers.
     init(
         title: String,
+        introduction: (() -> String)? = nil,
         onlineHelpTopic: OnlineHelpTopic? = nil,
         toolbarActions: @escaping @MainActor () -> [SettingsToolbarAction] = { [] },
         providers: @escaping () -> [SettingsNativeSectionProvider]
     ) {
-        self.init(title: title, onlineHelpTopic: onlineHelpTopic, toolbarActions: toolbarActions) { presenter in
+        self.init(title: title, introduction: introduction, onlineHelpTopic: onlineHelpTopic, toolbarActions: toolbarActions) { presenter in
             SettingsListFactory.makeSections(providers: providers(), presenter: presenter)
         }
     }
@@ -370,7 +374,6 @@ extension SettingsViewInfoViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewDevelopmentSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewHousekeeperSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewM5StackGeneralSettingsViewModel: SettingsNativeSectionProvider {}
-extension SettingsViewM5StackWiFiSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewM5StackBluetoothSettingsViewModel: SettingsNativeSectionProvider {}
 
 enum SettingsReloadScope {
@@ -598,6 +601,8 @@ private extension SettingsKeyboardType {
             return .default
         case .alphabet:
             return .alphabet
+        case .credential:
+            return .default
         case .numberPad:
             return .numberPad
         case .decimalPad:
@@ -605,6 +610,14 @@ private extension SettingsKeyboardType {
         case .URL:
             return .URL
         }
+    }
+
+    var disablesAutomaticTextChanges: Bool {
+        if case .credential = self {
+            return true
+        }
+
+        return false
     }
 }
 
@@ -652,6 +665,7 @@ struct SettingsListView: View {
     var titleDisplayMode: NavigationBarItem.TitleDisplayMode = .large
     var showsSectionHeaders = true
     var headerView: (() -> AnyView)? = nil
+    var introduction: (() -> String)? = nil
 
     var body: some View {
         List {
@@ -659,6 +673,15 @@ struct SettingsListView: View {
                 Section {
                     headerView()
                 }
+            }
+
+            if let introduction {
+                Text(introduction())
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
             }
 
             ForEach(listModel.sections) { section in
@@ -673,6 +696,14 @@ struct SettingsListView: View {
         }
         .settingsListStyle(title: title, titleDisplayMode: titleDisplayMode)
         .settingsPresentation(presenter: presenter)
+        // Attach refresh behavior to the List, never around a Section: a container such as
+        // TimelineView makes List render that entire section as one cell.
+        .modifier(SpeakReadingsSettingsRefresh(
+            isRelevant: listModel.sections.contains { section in
+                section.section().rows.contains { $0.id == "speak.schedule" || $0.id == "sharingServices.speakReadings" }
+            },
+            refresh: { listModel.reload(.all) }
+        ))
     }
 }
 
@@ -1512,7 +1543,10 @@ struct SettingsTextEntryView: View {
                     HStack(spacing: 6) {
                         TextField(textEntry.placeholder ?? "", text: $value)
                             .keyboardType(textEntry.keyboardType?.uiKeyboardType ?? .default)
+                            .textInputAutocapitalization(textEntry.keyboardType?.disablesAutomaticTextChanges == true ? .never : nil)
+                            .autocorrectionDisabled(textEntry.keyboardType?.disablesAutomaticTextChanges == true)
                             .multilineTextAlignment(.trailing)
+                            .foregroundStyle(ConstantsAppColors.rowDetailText)
                             .frame(minWidth: 70, idealWidth: 90, maxWidth: 120)
 
                         if let unitText = textEntry.unitText {
@@ -1524,6 +1558,9 @@ struct SettingsTextEntryView: View {
             } else {
                 TextField(textEntry.placeholder ?? "", text: $value)
                     .keyboardType(textEntry.keyboardType?.uiKeyboardType ?? .default)
+                    .textInputAutocapitalization(textEntry.keyboardType?.disablesAutomaticTextChanges == true ? .never : nil)
+                    .autocorrectionDisabled(textEntry.keyboardType?.disablesAutomaticTextChanges == true)
+                    .foregroundStyle(ConstantsAppColors.rowDetailText)
             }
 
             if let validationMessage {
@@ -1543,8 +1580,14 @@ struct SettingsTextEntryView: View {
                     submit()
                 }
                 .tint(ConstantsAppColors.toolbarAction)
-                .disabled(!hasModifiedValue)
+                // A validator is part of the editor contract, so an invalid value must never
+                // enable the confirmation action. This also gives version fields immediate,
+                // deterministic feedback instead of rejecting them only after OK is tapped.
+                .disabled(!canSubmit)
             }
+        }
+        .onChange(of: value) { newValue in
+            validationMessage = textEntry.validator?(newValue)
         }
         .onDisappear {
             guard !didComplete else { return }
@@ -1560,6 +1603,10 @@ struct SettingsTextEntryView: View {
         }
 
         return value != initialValue
+    }
+
+    private var canSubmit: Bool {
+        hasModifiedValue && textEntry.validator?(value) == nil
     }
 
     /// Validates and commits the text entry. Validation errors stay on the pushed

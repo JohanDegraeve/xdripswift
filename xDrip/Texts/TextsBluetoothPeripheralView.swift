@@ -3,6 +3,13 @@ import Foundation
 class Texts_BluetoothPeripheralView {
     
     static private let filename = "BluetoothPeripheralView"
+
+    static let signalStrengthDisconnected = NSLocalizedString("signalStrengthDisconnected", tableName: filename, bundle: .main, value: "Disconnected", comment: "Signal value replacement while an always-on device is disconnected")
+    static let signalStrength = NSLocalizedString("signalStrength", tableName: filename, bundle: .main, value: "Signal Strength", comment: "Bluetooth signal strength row")
+    static let signalStrengthLastMeasurement = NSLocalizedString("signalStrengthLastMeasurement", tableName: filename, bundle: .main, value: "Last measurement", comment: "Elapsed time since RSSI measurement for intermittent devices")
+    static let signalStrengthWeak = NSLocalizedString("signalStrengthWeak", tableName: filename, bundle: .main, value: "Weak", comment: "Weak reception end of RSSI gauge")
+    static let signalStrengthStrong = NSLocalizedString("signalStrengthStrong", tableName: filename, bundle: .main, value: "Strong", comment: "Strong reception end of RSSI gauge")
+    static let signalStrengthChartExplanation = NSLocalizedString("signalStrengthChartExplanation", tableName: filename, bundle: .main, value: "Live signal over the last two minutes. New measurements arrive about every second while connected.", comment: "Live RSSI chart timing and gaps")
     
     static let address: String = {
         return NSLocalizedString("address", tableName: filename, bundle: Bundle.main, value: "Address:", comment: "when M5Stack is shown, title of the cell with the address")
@@ -19,6 +26,20 @@ class Texts_BluetoothPeripheralView {
     static let runningInPrimaryMode: String = {
         return NSLocalizedString("runningInPrimaryMode", tableName: filename, bundle: Bundle.main, value: "Running in Primary mode", comment: "Dexcom bluetooth status footer. This app controls the transmitter connection.")
     }()
+
+    static let connectionDiagramOtherApp = NSLocalizedString("connectionDiagramOtherApp", tableName: filename, bundle: .main, value: "Other App", comment: "Other app label in the connection diagram")
+    static let connectionMode = NSLocalizedString("dexcomConnectionMode", tableName: filename, bundle: .main, value: "Connection Mode", comment: "Title for the first Dexcom add-device step")
+    static let primaryMode = NSLocalizedString("dexcomPrimaryMode", tableName: filename, bundle: .main, value: "Primary", comment: "Dexcom connection mode choice")
+    static let coexistenceMode = NSLocalizedString("dexcomCoexistenceMode", tableName: filename, bundle: .main, value: "Coexistence", comment: "Dexcom connection mode choice")
+    static let primaryModePickerOption = NSLocalizedString("dexcomPrimaryModePickerOption", tableName: filename, bundle: .main, value: "Primary Mode", comment: "Full title for the Dexcom primary connection mode")
+    static let coexistenceModePickerOption = NSLocalizedString("dexcomCoexistenceModePickerOption", tableName: filename, bundle: .main, value: "Coexistence Mode", comment: "Full title for the Dexcom coexistence connection mode")
+    static let dexcomConnectionModeSelectionExplanation = NSLocalizedString("dexcomConnectionModeSelectionExplanation", tableName: filename, bundle: .main, value: "Primary Mode connects this app directly and requires any other app that connects to the Dexcom device to be closed.\n\nCoexistence Mode relies on another app to maintain the Dexcom connection and receive readings.", comment: "Required explanation shown above the Dexcom connection mode picker")
+    static let primaryModeAddFlowMessage = NSLocalizedString("dexcomPrimaryModeAddFlowMessage", tableName: filename, bundle: .main, value: "Connect directly as the main app. Disconnect any other app from this Dexcom.", comment: "Explanation below the Primary choice")
+    static let coexistenceModeAddFlowMessage = NSLocalizedString("dexcomCoexistenceModeAddFlowMessage", tableName: filename, bundle: .main, value: "Share the connection with another app. Keep the Dexcom or CamAPS app working correctly in the background.", comment: "Explanation below the Coexistence choice")
+    static let dexcomG6ModeSelectionFooter = NSLocalizedString("dexcomG6ModeSelectionFooter", tableName: filename, bundle: .main, value: "You can change the G6 connection mode later in the transmitter settings.", comment: "Footer below the G6 initial connection-mode choices")
+    static let sensorCode = Texts_HomeView.sensorCode
+    static let dexcomG7NoSensorLabelFound = NSLocalizedString("dexcomG7NoSensorLabelFound", tableName: filename, bundle: .main, value: "No Dexcom G7 sensor label was found in the photo.", comment: "No G7 Data Matrix found in selected photo")
+    static let dexcomG7InvalidSensorLabelFound = NSLocalizedString("dexcomG7InvalidSensorLabelFound", tableName: filename, bundle: .main, value: "A Data Matrix was found, but it was not a valid Dexcom G7 sensor label.", comment: "Invalid G7 Data Matrix found in selected photo")
     
     static let connected: String = {
         return NSLocalizedString("connected", tableName: filename, bundle: Bundle.main, value: "Connected", comment: "when Bluetooth Peripheral is shown, connection status, connected")
@@ -58,6 +79,30 @@ class Texts_BluetoothPeripheralView {
     
     static let battery: String = {
         return NSLocalizedString("battery", tableName: filename, bundle: Bundle.main, value: "Battery", comment: "BluetoothPeripheral view, section title with battery info")
+    }()
+
+    static let batteryHistory = NSLocalizedString("batteryHistory", tableName: filename, bundle: .main, value: "Battery History", comment: "Title and row that open the saved battery history chart")
+    static let batteryHistoryTransmitterID = NSLocalizedString("batteryHistoryTransmitterID", tableName: filename, bundle: .main, value: "Transmitter ID", comment: "Battery history row showing the Bluetooth device name")
+    static let batteryHistoryNoData = NSLocalizedString("batteryHistoryNoData", tableName: filename, bundle: .main, value: "No battery history", comment: "Empty-state title before any genuine battery observation is saved")
+    static let batteryHistoryBeginsAfterReading = NSLocalizedString("batteryHistoryBeginsAfterReading", tableName: filename, bundle: .main, value: "History begins after the next genuine battery reading.", comment: "Empty-state explanation for battery history")
+    static let batteryHistoryRange = NSLocalizedString("batteryHistoryRange", tableName: filename, bundle: .main, value: "Range", comment: "Label for the battery history time-range selector")
+    static let batteryHistoryRangeAccessibility = NSLocalizedString("batteryHistoryRangeAccessibility", tableName: filename, bundle: .main, value: "Battery history range", comment: "Accessibility label for the battery history time-range selector")
+    static let batteryHistoryRangeExplanation = NSLocalizedString("batteryHistoryRangeExplanation", tableName: filename, bundle: .main, value: "Fixed ranges run from now back to the selected number of days. Gaps show periods without a reading.", comment: "Explanation below the battery history chart")
+
+    static let versionCode: String = {
+        return NSLocalizedString("versionCode", tableName: filename, bundle: Bundle.main, value: "Version Code", comment: "Dexcom G7 family firmware compatibility version code")
+    }()
+
+    static let voltageA: String = {
+        return NSLocalizedString("voltageA", tableName: filename, bundle: Bundle.main, value: "Voltage A", comment: "Dexcom transmitter battery voltage A")
+    }()
+
+    static let voltageB: String = {
+        return NSLocalizedString("voltageB", tableName: filename, bundle: Bundle.main, value: "Voltage B", comment: "Dexcom transmitter battery voltage B")
+    }()
+
+    static let waitingForData: String = {
+        return NSLocalizedString("waitingForData", tableName: filename, bundle: Bundle.main, value: "Waiting for data...", comment: "Battery row before the first transmitter battery response")
     }()
     
     static let needsTransmitterId: String = {
@@ -195,7 +240,9 @@ class Texts_BluetoothPeripheralView {
     static let transmittterExpiryDate: String = {
         return NSLocalizedString("transmittterExpiryDate", tableName: filename, bundle: Bundle.main, value: "Transmitter Expires", comment: "cell text, transmitter expiry date")
     }()
-    
+
+    static let transmitterExpiresLabel = NSLocalizedString("transmitterExpiresLabel", tableName: filename, bundle: .main, value: "Expires", comment: "Label before the transmitter expiry date in its information message")
+
     static let sensorStartDate: String = {
         return NSLocalizedString("sensorStartDate", tableName: filename, bundle: Bundle.main, value: "Sensor Started", comment: "cell text, sensor start time")
     }()
@@ -224,16 +271,16 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("confirmDisconnectMessage", tableName: filename, bundle: Bundle.main, value: "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.", comment: "Confirm that the user wants to really disconnect the transmitter, title")
     }()
     
-    static let useOtherDexcomApp: String = {
-        return NSLocalizedString("useOtherDexcomApp", tableName: filename, bundle: Bundle.main, value: "Coexistence Mode", comment: "Dexcom bluetooth screen. Toggle title. When enabled, another app such as Dexcom or CamAPS authenticates with the transmitter while this app receives alongside it.")
-    }()
-
     static let dexcomG6BluetoothSlot: String = {
         return NSLocalizedString("dexcomG6BluetoothSlot", tableName: filename, bundle: Bundle.main, value: "Bluetooth Channel", comment: "Dexcom G6 Bluetooth screen. Picker title for the authentication role/slot.")
     }()
 
+    static let dexcomBluetoothChannelSelectionExplanation: String = {
+        return NSLocalizedString("dexcomBluetoothChannelSelectionExplanation", tableName: filename, bundle: Bundle.main, value: "Choose the Bluetooth channel that this app will use. Select Mobile App unless you need to leave that channel available for another connection.", comment: "Required explanation shown above the Dexcom Bluetooth channel picker for every Dexcom model.")
+    }()
+
     static let dexcomG6MobileAppSlot: String = {
-        return NSLocalizedString("dexcomG6MobileAppSlot", tableName: filename, bundle: Bundle.main, value: "Mobile App (Default)", comment: "Dexcom G6 Bluetooth slot picker. Default mobile-app role.")
+        return NSLocalizedString("dexcomG6MobileAppSlot", tableName: filename, bundle: Bundle.main, value: "Slot 2: Mobile App (Default)", comment: "Dexcom G6 Bluetooth slot picker. Default mobile-app role.")
     }()
 
     static let dexcomG6MobileAppSlotShort: String = {
@@ -241,7 +288,7 @@ class Texts_BluetoothPeripheralView {
     }()
 
     static let dexcomG6MedicalDeviceSlot: String = {
-        return NSLocalizedString("dexcomG6MedicalDeviceSlot", tableName: filename, bundle: Bundle.main, value: "Receiver or Pump (Experimental)", comment: "Dexcom G6 Bluetooth slot picker. Experimental medical-device role.")
+        return NSLocalizedString("dexcomG6MedicalDeviceSlot", tableName: filename, bundle: Bundle.main, value: "Slot 1: Receiver or Pump", comment: "Dexcom G6 Bluetooth slot picker. Receiver-or-pump role.")
     }()
 
     static let dexcomG6MedicalDeviceSlotShort: String = {
@@ -249,7 +296,7 @@ class Texts_BluetoothPeripheralView {
     }()
 
     static let dexcomG6AnubisSlot: String = {
-        return NSLocalizedString("dexcomG6AnubisSlot", tableName: filename, bundle: Bundle.main, value: "Slot 3 (Anubis Experimental)", comment: "Dexcom G6 Bluetooth slot picker. Experimental third slot implemented by Anubis transmitters.")
+        return NSLocalizedString("dexcomG6AnubisSlot", tableName: filename, bundle: Bundle.main, value: "Slot 3: Anubis Extra", comment: "Dexcom G6 Bluetooth slot picker. Extra slot implemented by Anubis transmitters.")
     }()
 
     static let dexcomG6AnubisSlotShort: String = {
@@ -280,24 +327,64 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("dexcomG6AnubisSlotWarning", tableName: filename, bundle: Bundle.main, value: "Slot 3 is an experimental channel available only on Anubis transmitters.\n\nUse Slot 3 for testing only. The selection takes effect on the next authentication.", comment: "Safety warning before selecting the experimental Anubis third Bluetooth slot.")
     }()
 
-    static let useOtherDexcomAppCoexistenceFooter: String = {
-        return NSLocalizedString("useOtherDexcomAppCoexistenceFooter", tableName: filename, bundle: Bundle.main, value: "Coexistence mode allows us to work with another app such as the Dexcom or CamAPS apps. That app must keep running in the background.", comment: "Dexcom bluetooth screen. Footer explaining coexistence mode.")
+    static let dexcomG6CoexistenceModeFooter: String = {
+        return NSLocalizedString("useOtherDexcomAppCoexistenceFooter", tableName: filename, bundle: Bundle.main, value: "Coexistence mode is selected. Another app such as Dexcom or CamAPS must keep running in the background.", comment: "Dexcom G6 Bluetooth screen. Footer explaining the selected coexistence mode.")
     }()
 
-    static let useOtherDexcomAppPrimaryFooter: String = {
-        return NSLocalizedString("useOtherDexcomAppPrimaryFooter", tableName: filename, bundle: Bundle.main, value: "Primary mode connects as the main app and controls the connection.", comment: "Dexcom bluetooth screen. Footer explaining primary mode.")
+    static let dexcomG6PrimaryModeFooter: String = {
+        return NSLocalizedString("useOtherDexcomAppPrimaryFooter", tableName: filename, bundle: Bundle.main, value: "Primary mode is selected. This app connects as the main app and controls the connection.", comment: "Dexcom G6 Bluetooth screen. Footer explaining the selected primary mode.")
+    }()
+
+    static let dexcomG7PairingCodeMessage: String = {
+        return NSLocalizedString("dexcomG7PairingCodeMessage", tableName: filename, bundle: Bundle.main, value: "Enter the four-digit sensor pairing code from the current applicator. Primary mode cannot authenticate without this code.", comment: "Dexcom G7 bluetooth screen. Explanation for the native authentication pairing code.")
+    }()
+
+    static let dexcomG7BluetoothSlot: String = {
+        return NSLocalizedString("dexcomG7BluetoothSlot", tableName: filename, bundle: Bundle.main, value: "Bluetooth Channel", comment: "Dexcom G7 Bluetooth screen. Picker title for the authentication role/slot.")
+    }()
+
+    static let dexcomG7MobileAppSlot: String = {
+        return NSLocalizedString("dexcomG7MobileAppSlot", tableName: filename, bundle: Bundle.main, value: "Slot 2: Mobile App (Default)", comment: "Dexcom G7 Bluetooth slot picker. Default mobile-app role.")
+    }()
+
+    static let dexcomG7MobileAppSlotShort: String = {
+        return NSLocalizedString("dexcomG7MobileAppSlotShort", tableName: filename, bundle: Bundle.main, value: "Mobile App", comment: "Dexcom G7 Bluetooth screen. Compact detail for the mobile-app role.")
+    }()
+
+    static let dexcomG7MedicalDeviceSlot: String = {
+        return NSLocalizedString("dexcomG7MedicalDeviceSlot", tableName: filename, bundle: Bundle.main, value: "Slot 1: Receiver or Pump", comment: "Dexcom G7 Bluetooth slot picker. Receiver-or-pump role.")
+    }()
+
+    static let dexcomG7MedicalDeviceSlotShort: String = {
+        return NSLocalizedString("dexcomG7MedicalDeviceSlotShort", tableName: filename, bundle: Bundle.main, value: "Pump", comment: "Dexcom G7 Bluetooth screen. Compact detail for the receiver-or-pump role.")
+    }()
+
+    static let dexcomG7SmartWatchSlot: String = {
+        return NSLocalizedString("dexcomG7SmartWatchSlot", tableName: filename, bundle: Bundle.main, value: "Slot 3: Smart Watch", comment: "Dexcom G7 Bluetooth slot picker. Factory smart-watch role.")
+    }()
+
+    static let dexcomG7SmartWatchSlotShort: String = {
+        return NSLocalizedString("dexcomG7SmartWatchSlotShort", tableName: filename, bundle: Bundle.main, value: "Smart Watch", comment: "Dexcom G7 Bluetooth screen. Compact detail for the smart-watch role.")
+    }()
+
+    static let dexcomG7MobileAppSlotFooter: String = {
+        return NSLocalizedString("dexcomG7MobileAppSlotFooter", tableName: filename, bundle: Bundle.main, value: "The Mobile App channel (slot 2) is the default and is the currently validated native G7 connection.", comment: "Dexcom G7 Bluetooth screen. Footer for the default mobile-app channel.")
+    }()
+
+    static let dexcomG7MedicalDeviceSlotFooter: String = {
+        return NSLocalizedString("dexcomG7MedicalDeviceSlotFooter", tableName: filename, bundle: Bundle.main, value: "The Receiver or Pump channel uses authentication slot 1.", comment: "Dexcom G7 Bluetooth screen. Footer for the receiver-or-pump channel.")
+    }()
+
+    static let dexcomG7SmartWatchSlotFooter: String = {
+        return NSLocalizedString("dexcomG7SmartWatchSlotFooter", tableName: filename, bundle: Bundle.main, value: "The Smart Watch channel uses the factory authentication slot 3.", comment: "Dexcom G7 Bluetooth screen. Footer for the smart-watch channel.")
     }()
     
-    static let useOtherDexcomAppMessageEnabled: String = {
-        return String(format: NSLocalizedString("useOtherDexcomAppMessageEnabled", tableName: filename, bundle: Bundle.main, value: "Enabling this option will allow another app (such as Dexcom G6 or CamAPS apps) to run at the same time and connect to the G6 transmitter.\r\n\nThe other app will be responsible for providing authentication to the transmitter and must ALWAYS be running in the background or %@ will not get any readings.", comment: "Dexcom bluetooth screen. Message to explain that another app must be running to handle the authentication with the transmitter."), ConstantsHomeView.applicationName)
+    static let dexcomG6CoexistenceModeSelectionMessage: String = {
+        return String(format: NSLocalizedString("dexcomG6CoexistenceModeSelectionMessage", tableName: filename, bundle: Bundle.main, value: "Coexistence mode has been selected. Another app, such as Dexcom G6 or CamAPS, must connect to and authenticate with the G6 transmitter.\n\nKeep the other app running in the background or %@ will not receive readings.", comment: "Dexcom G6 Bluetooth screen. Message shown after selecting coexistence mode."), ConstantsHomeView.applicationName)
     }()
-    
-    static let useOtherDexcomAppMessageDisabled: String = {
-        return String(format: NSLocalizedString("useOtherDexcomAppMessageDisabled", tableName: filename, bundle: Bundle.main, value: "Disabling this option means that %@ must be the only app connecting and authenticating with the G6 transmitter.\r\n\nIf any other app is also left open and connected, then it is likely that either %@ or the other app will not get readings.", comment: "Dexcom bluetooth screen. Message to explain that this app is the only one running to handle the authentication with the transmitter"), ConstantsHomeView.applicationName, ConstantsHomeView.applicationName)
-    }()
-    
-    static let is15DayDexcomG7: String = {
-        return NSLocalizedString("is15DayDexcomG7", tableName: filename, bundle: Bundle.main, value: "15 Day Sensor", comment: "Dexcom bluetooth screen. Is this a 15-day G7 sensor?")
+
+    static let dexcomG6PrimaryModeSelectionMessage: String = {
+        return String(format: NSLocalizedString("dexcomG6PrimaryModeSelectionMessage", tableName: filename, bundle: Bundle.main, value: "Primary mode has been selected. %@ must be the only app connecting to and authenticating with the G6 transmitter.\n\nClose any other app that connects to the transmitter or disable its Bluetooth permission. Otherwise, %@ or the other app may not receive readings.", comment: "Dexcom G6 Bluetooth screen. Message shown after selecting primary mode."), ConstantsHomeView.applicationName, ConstantsHomeView.applicationName)
     }()
     
     static let nfcScanNeeded: String = {
@@ -309,7 +396,7 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let warmingUpUntil: String = {
-        return NSLocalizedString("warmingUpUntil", tableName: filename, bundle: Bundle.main, value: "Warming up until", comment: "sensor warm-up text")
+        return NSLocalizedString("warmingUpUntil", tableName: filename, bundle: Bundle.main, value: "Warmup until", comment: "Compact sensor warm-up label followed by the localized completion time")
     }()
     
     static let nativeAlgorithm: String = {

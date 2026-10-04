@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 fileprivate enum Setting:Int, CaseIterable {
 
@@ -49,6 +50,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// allow OS-AID sharing to use Medtrum Nano glucose values
     case loopShareMedtrumNano = 14
 
+    /// CarePartner mobile app version used by both personal and Care Partner account requests
+    case careLinkVersion = 15
+
 }
 
 enum SettingsViewDevelopmentSettingsRowGroup {
@@ -62,6 +66,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
     var sectionReloadClosure: (() -> Void)?
 
     private let rowGroup: SettingsViewDevelopmentSettingsRowGroup
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewDevelopmentSettingsViewModel)
 
     init(rowGroup: SettingsViewDevelopmentSettingsRowGroup = .advanced) {
         self.rowGroup = rowGroup
@@ -116,6 +121,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             nativeSettingsRow(id: "developer.NSLogEnabled", index: Setting.NSLogEnabled.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.OSLogEnabled", index: Setting.OSLogEnabled.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.libreLinkUpVersion", index: Setting.libreLinkUpVersion.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.careLinkVersion", index: Setting.careLinkVersion.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.CAGEMaxHours", index: Setting.CAGEMaxHours.rawValue, sectionID: sectionID, isVisible: developerRowsVisible)
         ]
 
@@ -193,6 +199,9 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             
         case .libreLinkUpVersion:
             return Texts_SettingsView.libreLinkUpVersion
+
+        case .careLinkVersion:
+            return Texts_SettingsView.careLinkVersion
             
         case .CAGEMaxHours:
             return Texts_SettingsView.CAGEMaxHours
@@ -223,7 +232,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp, .loopShareSmoothedData, .loopShareMedtrumNano:
             return .none
             
-        case .loopDelay, .libreLinkUpVersion, .CAGEMaxHours:
+        case .loopDelay, .libreLinkUpVersion, .careLinkVersion, .CAGEMaxHours:
             return .disclosure
             
         case .loopShareType:
@@ -246,6 +255,9 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             
         case .libreLinkUpVersion:
             return UserDefaults.standard.libreLinkUpVersion
+
+        case .careLinkVersion:
+            return UserDefaults.standard.careLinkVersion
             
         case .CAGEMaxHours:
             return "\(UserDefaults.standard.CAGEMaxHours.description) \(Texts_Common.hours)"
@@ -271,7 +283,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 accessibilityLabel: Texts_SettingsView.loopShareSmoothedDataEnabledTitle
             )
 
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopShareType, .loopDelay, .libreLinkUpVersion, .CAGEMaxHours, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopShareType, .loopDelay, .libreLinkUpVersion, .careLinkVersion, .CAGEMaxHours, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
             return nil
         }
     }
@@ -371,7 +383,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                     )
                 }
             )
-        case .loopShareType, .loopDelay, .libreLinkUpVersion, .CAGEMaxHours:
+        case .loopShareType, .loopDelay, .libreLinkUpVersion, .careLinkVersion, .CAGEMaxHours:
             return nil
         }
     }
@@ -429,14 +441,24 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         case .libreLinkUpVersion:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.libreLinkUpVersion, message:  Texts_SettingsView.libreLinkUpVersionMessage, keyboardType: .default, text: UserDefaults.standard.libreLinkUpVersion, placeHolder: nil, fieldTitle: Texts_Common.enterValue, actionTitle: nil, cancelTitle: nil, actionHandler: {(libreLinkUpVersion: String) in
                 
-                // check if the entered version is in the correct format before allowing it to help avoid problems with the server requests
-                if let versionNumber = libreLinkUpVersion.toNilIfLength0(), self.checkLibreLinkUpVersionFormat(for: libreLinkUpVersion) {
-                    
-                    UserDefaults.standard.libreLinkUpVersion = versionNumber.toNilIfLength0()
-                    
-                }
+                self.storeFollowerVersion(
+                    libreLinkUpVersion,
+                    previousVersion: UserDefaults.standard.libreLinkUpVersion,
+                    source: .libreLinkUp
+                ) { UserDefaults.standard.libreLinkUpVersion = $0 }
                 
-            }, cancelHandler: nil, inputValidator: nil)
+            }, cancelHandler: nil, inputValidator: self.followerVersionValidationMessage)
+
+        case .careLinkVersion:
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.careLinkVersion, message: Texts_SettingsView.careLinkVersionMessage(defaultVersion: ConstantsCareLink.carePartnerAppVersionDefault), keyboardType: .default, text: UserDefaults.standard.careLinkVersion, placeHolder: nil, fieldTitle: Texts_Common.enterValue, actionTitle: nil, cancelTitle: nil, actionHandler: {(careLinkVersion: String) in
+
+                self.storeFollowerVersion(
+                    careLinkVersion,
+                    previousVersion: UserDefaults.standard.careLinkVersion,
+                    source: .careLink
+                ) { UserDefaults.standard.careLinkVersion = $0 }
+
+            }, cancelHandler: nil, inputValidator: self.followerVersionValidationMessage)
             
         case .CAGEMaxHours:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.CAGEMaxHours, message:  Texts_SettingsView.CAGEMaxHoursMessage, keyboardType: .numberPad, text: UserDefaults.standard.CAGEMaxHours.description, placeHolder: "0", fieldTitle: Texts_Common.enterValue, unitText: Texts_Common.hours, actionTitle: nil, cancelTitle: nil, actionHandler: {(CAGEMaxHoursString: String) in
@@ -521,17 +543,37 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         return false
     }
     
-    // regex tested here: https://regex101.com/r/MI9vTy/2
-    /// check the LibreLinkUp version number entered to make sure it follows the required format like "4.x.x"
-    func checkLibreLinkUpVersionFormat(for text: String) -> Bool {
-        
-        let regex = try! NSRegularExpression(pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$", options: [.caseInsensitive])
-        
-        let range = NSRange(location: 0, length: text.count)
-        
-        let matches = regex.matches(in: text, options: [], range: range)
-        
-        return matches.first != nil
-        
+    /// Applies the same version rule to LibreLinkUp and CareLink before either value is stored.
+    func checkFollowerVersionFormat(for text: String) -> Bool {
+        ConstantsFollower.isValidAppVersion(text)
+    }
+
+    /// Returning nil is the shared text editor's valid state. The same closure both disables OK
+    /// while invalid and protects the commit path if the editor is submitted programmatically.
+    private func followerVersionValidationMessage(_ text: String) -> String? {
+        checkFollowerVersionFormat(for: text) ? nil : Texts_SettingsView.followerVersionFormatMessage
+    }
+
+    /// Stores and records only a genuine, validated user transition. The structured event feeds
+    /// the Activity Log while the same trace call remains available in developer diagnostics.
+    private func storeFollowerVersion(
+        _ version: String,
+        previousVersion: String?,
+        source: TroubleshootingLogSource,
+        store: (String) -> Void
+    ) {
+        guard checkFollowerVersionFormat(for: version), previousVersion != version else { return }
+        let previousVersion = previousVersion ?? "nil"
+        store(version)
+        trace(
+            "%{public}@ versions changed by user from %{public}@ to %{public}@",
+            log: log,
+            category: ConstantsLog.categorySettingsViewDevelopmentSettingsViewModel,
+            type: .info,
+            troubleshooting: .standard(.configuration(.followerVersionChanged(source: source, previousVersion: previousVersion, newVersion: version))),
+            source.name,
+            previousVersion,
+            version
+        )
     }
 }

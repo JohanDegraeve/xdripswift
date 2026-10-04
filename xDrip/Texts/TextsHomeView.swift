@@ -369,6 +369,10 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorManagementStatusWarmingUp", tableName: filename, bundle: Bundle.main, value: "Warming Up", comment: "sensor management status label")
     }()
 
+    static let sensorManagementWaitingForSensorStart:String = {
+        return NSLocalizedString("sensorManagementWaitingForSensorStart", tableName: filename, bundle: Bundle.main, value: "Waiting for Sensor Start", comment: "sensor management status shown while an automatic G7-family sensor session has not started yet")
+    }()
+
     static let sensorManagementStatusExpired:String = {
         return NSLocalizedString("sensorManagementStatusExpired", tableName: filename, bundle: Bundle.main, value: "Expired", comment: "sensor management status label")
     }()
@@ -445,8 +449,76 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorManagementCalibrationValue", tableName: filename, bundle: Bundle.main, value: "Calibration Value", comment: "calibration readiness row title for the entered fingerstick value")
     }()
 
-    static let sensorManagementCalibrationPending: String = {
-        return NSLocalizedString("sensorManagementCalibrationPending", tableName: filename, bundle: Bundle.main, value: "Pending...", comment: "calibration readiness detail before a valid fingerstick value is entered")
+    static let sensorManagementCalibrationInProgress: String = {
+        NSLocalizedString("sensorManagementCalibrationInProgress", tableName: filename, bundle: Bundle.main, value: "Calibration In Progress...", comment: "disabled calibration button while the transmitter is processing a previous calibration")
+    }()
+
+    static let sensorManagementCalibrationQueued: String = {
+        NSLocalizedString("sensorManagementCalibrationQueued", tableName: filename, bundle: Bundle.main, value: "Queued", comment: "G7 calibration is waiting to be sent")
+    }()
+
+    static let sensorManagementCalibrationSent: String = {
+        NSLocalizedString("sensorManagementCalibrationSent", tableName: filename, bundle: Bundle.main, value: "Sent, awaiting response", comment: "G7 calibration command was written and is waiting for its response")
+    }()
+
+    static let sensorManagementCalibrationSentShort: String = {
+        NSLocalizedString("sensorManagementCalibrationSentShort", tableName: filename, bundle: Bundle.main, value: "Sent", comment: "short G7 calibration status after the command was sent")
+    }()
+
+    static let sensorManagementCalibrationProcessing: String = {
+        NSLocalizedString("sensorManagementCalibrationProcessing", tableName: filename, bundle: Bundle.main, value: "Processing", comment: "G7 transmitter is processing a calibration")
+    }()
+
+    static let sensorManagementCalibrationCompletedHigh: String = {
+        NSLocalizedString("sensorManagementCalibrationCompletedHigh", tableName: filename, bundle: Bundle.main, value: "Completed, high confidence", comment: "G7 transmitter completed calibration with high confidence")
+    }()
+
+    static let sensorManagementCalibrationCompletedLow: String = {
+        NSLocalizedString("sensorManagementCalibrationCompletedLow", tableName: filename, bundle: Bundle.main, value: "Completed, low confidence", comment: "G7 transmitter completed calibration with low confidence")
+    }()
+
+    static let sensorManagementCalibrationCompletedShort: String = {
+        NSLocalizedString("sensorManagementCalibrationCompletedShort", tableName: filename, bundle: Bundle.main, value: "Completed", comment: "short G7 completed calibration status")
+    }()
+
+    static let sensorManagementCalibrationRejectedFormat: String = {
+        NSLocalizedString("sensorManagementCalibrationRejectedFormat", tableName: filename, bundle: Bundle.main, value: "Rejected: %@", comment: "G7 transmitter calibration rejection with a readable reason")
+    }()
+
+    static let sensorManagementCalibrationRejectedShort: String = {
+        NSLocalizedString("sensorManagementCalibrationRejectedShort", tableName: filename, bundle: Bundle.main, value: "Rejected", comment: "short G7 rejected calibration status")
+    }()
+
+    static let sensorManagementCalibrationErrorShort: String = {
+        NSLocalizedString("sensorManagementCalibrationErrorShort", tableName: filename, bundle: Bundle.main, value: "Error", comment: "short G7 calibration error status")
+    }()
+
+    static let sensorManagementCalibrationNotPermitted: String = {
+        NSLocalizedString("sensorManagementCalibrationNotPermitted", tableName: filename, bundle: Bundle.main, value: "Calibration not permitted", comment: "G7 transmitter does not currently permit calibration")
+    }()
+
+    static let sensorManagementCalibrationNotPermittedNote: String = {
+        NSLocalizedString("sensorManagementCalibrationNotPermittedNote", tableName: filename, bundle: Bundle.main, value: "The transmitter does not currently permit calibration.", comment: "footer shown when G7 transmitter reports calibration is unavailable")
+    }()
+
+    static let sensorManagementCalibrationRejectedRange: String = {
+        NSLocalizedString("sensorManagementCalibrationRejectedRange", tableName: filename, bundle: Bundle.main, value: "Value outside range", comment: "G7 calibration rejection reason")
+    }()
+
+    static let sensorManagementCalibrationRejectedTime: String = {
+        NSLocalizedString("sensorManagementCalibrationRejectedTime", tableName: filename, bundle: Bundle.main, value: "Invalid calibration time", comment: "G7 calibration rejection reason")
+    }()
+
+    static let sensorManagementCalibrationRejectedDuplicate: String = {
+        NSLocalizedString("sensorManagementCalibrationRejectedDuplicate", tableName: filename, bundle: Bundle.main, value: "Already entered", comment: "G7 calibration rejection reason")
+    }()
+
+    static let sensorManagementCalibrationRejectedBounds: String = {
+        NSLocalizedString("sensorManagementCalibrationRejectedBounds", tableName: filename, bundle: Bundle.main, value: "Bounds check failed", comment: "G7 calibration rejection reason")
+    }()
+
+    static let sensorManagementCalibrationRejectedUnknown: String = {
+        NSLocalizedString("sensorManagementCalibrationRejectedUnknown", tableName: filename, bundle: Bundle.main, value: "Unknown reason", comment: "G7 calibration rejection reason")
     }()
 
     static let sensorManagementCalibrationStableTrend: String = {
@@ -701,10 +773,17 @@ enum Texts_HomeView {
     }()
     
     static let enterSensorCode: String = {
-        return NSLocalizedString("enterSensorCode", tableName: filename, bundle: Bundle.main, value: "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.", comment: "When user needs to enter sensor code, to start firefly sensor")
+        return NSLocalizedString("enterSensorCode", tableName: filename, bundle: Bundle.main, value: "Enter the sensor code manually, scan the sensor label, or choose a photo.\n\nIf you don't have the code, or want to use a sensor session already running on the transmitter, choose Use Without Code.", comment: "Instructions on the G6 sensor-code selection screen")
     }()
 
+    static let sensorCodeContinue = NSLocalizedString("sensorCodeContinue", tableName: filename, bundle: .main, value: "Continue", comment: "Common advance action after reviewing a G6 or G7 sensor-code selection")
+    static let useWithoutSensorCode = NSLocalizedString("useWithoutSensorCode", tableName: filename, bundle: .main, value: "Use Without Code", comment: "Select the G6 no-code option without advancing")
+    static let noSensorCode = NSLocalizedString("noSensorCode", tableName: filename, bundle: .main, value: "No code (0000)", comment: "Selected G6 no-code option before confirmation")
+    static let dexcomG7SelectSensorCodeMessage = NSLocalizedString("dexcomG7SelectSensorCodeMessage", tableName: filename, bundle: .main, value: "Enter the four-digit pairing code manually, scan the current applicator, or choose a photo. Check the selected code, then tap Continue.", comment: "Instructions on the G7 pairing-code selection screen")
+
     static let scanWithCamera = NSLocalizedString("scanWithCamera", tableName: filename, bundle: .main, value: "Scan with Camera", comment: "button to scan a Dexcom G6 sensor label")
+    static let manuallyEnterSensorCode = NSLocalizedString("manuallyEnterSensorCode", tableName: filename, bundle: .main, value: "Manually Enter Code", comment: "label for the manual Dexcom sensor-code entry field")
+    static let dexcomG6ManualSensorCodeMessage = NSLocalizedString("dexcomG6ManualSensorCodeMessage", tableName: filename, bundle: .main, value: "Enter the four-digit calibration code from the sensor label.", comment: "instructions for manually entering a Dexcom G6 sensor calibration code")
     static let chooseSensorLabelPhoto = NSLocalizedString("chooseSensorLabelPhoto", tableName: filename, bundle: .main, value: "Choose Photo", comment: "button to decode a Dexcom G6 sensor label from a photo")
     static let readingSensorLabel = NSLocalizedString("readingSensorLabel", tableName: filename, bundle: .main, value: "Reading sensor label...", comment: "progress text while decoding a sensor label photo")
     static let scanSensorLabel = NSLocalizedString("scanSensorLabel", tableName: filename, bundle: .main, value: "Scan Sensor Label", comment: "camera scanner title")
@@ -717,8 +796,10 @@ enum Texts_HomeView {
     static let cameraUnavailableMessage = NSLocalizedString("cameraUnavailableMessage", tableName: filename, bundle: .main, value: "Enter the sensor code manually or choose a photo.", comment: "camera unavailable alert message")
     static let sensorInformationTitle = NSLocalizedString("sensorInformationTitle", tableName: filename, bundle: .main, value: "Sensor Information", comment: "section title for stored sensor-label information")
     static let sensorLotNumber = NSLocalizedString("sensorLotNumber", tableName: filename, bundle: .main, value: "Lot Number", comment: "Dexcom sensor lot number label")
+    static let sensorManufactureDate = NSLocalizedString("sensorManufactureDate", tableName: filename, bundle: .main, value: "Manufacture Date", comment: "Dexcom sensor manufacture date label")
+    static let sensorExpirationDate = NSLocalizedString("sensorExpirationDate", tableName: filename, bundle: .main, value: "Expiry Date", comment: "Dexcom sensor expiry date label")
     static let sensorSerialNumber = NSLocalizedString("sensorSerialNumberMetadata", tableName: filename, bundle: .main, value: "Sensor Serial Number", comment: "Dexcom sensor serial number label")
-    static let sensorLabelReviewFooter = NSLocalizedString("sensorLabelReviewFooter", tableName: filename, bundle: .main, value: "Check the decoded information before starting the sensor.", comment: "footer below decoded sensor-label information")
+    static let sensorLabelReviewFooter = NSLocalizedString("sensorLabelReviewFooter", tableName: filename, bundle: .main, value: "Check your selection and any label information, then tap Continue.", comment: "Review footer shared by manual, scanned and no-code selections")
     static let sensorLabelScanFailed = NSLocalizedString("sensorLabelScanFailed", tableName: filename, bundle: .main, value: "Sensor Label Not Read", comment: "sensor-label decoding alert title")
     static let multipleSensorLabelsFound = NSLocalizedString("multipleSensorLabelsFound", tableName: filename, bundle: .main, value: "The photo contains more than one sensor label. Choose a photo containing one label.", comment: "multiple sensor labels error")
     static let noSensorLabelFound = NSLocalizedString("noSensorLabelFound", tableName: filename, bundle: .main, value: "No valid Dexcom G6 sensor label was found in the photo.", comment: "no sensor label error")
@@ -728,32 +809,22 @@ enum Texts_HomeView {
     static let scannedSensorLabelCode = NSLocalizedString("scannedSensorLabelCode", tableName: filename, bundle: .main, value: "Scanned Label Code", comment: "sensor code decoded from a physical label")
     static let noCodeSensorSessionValue = NSLocalizedString("noCodeSensorSessionValue", tableName: filename, bundle: .main, value: "0000 (No-code session)", comment: "confirmed no-code Dexcom session value")
     static let sensorCodeUnknown = NSLocalizedString("sensorCodeUnknown", tableName: filename, bundle: .main, value: "Unknown", comment: "unknown active sensor code value")
-    static let sensorSessionOrigin = NSLocalizedString("sensorSessionOrigin", tableName: filename, bundle: .main, value: "Session Origin", comment: "sensor session origin label")
-    static let sensorSessionOriginUnknown = NSLocalizedString("sensorSessionOriginUnknown", tableName: filename, bundle: .main, value: "Unknown", comment: "unknown sensor session origin")
-    static let sensorSessionOriginAwaitingTransmitter = NSLocalizedString("sensorSessionOriginAwaitingTransmitter", tableName: filename, bundle: .main, value: "Awaiting transmitter", comment: "pending sensor-start request origin")
-    static let sensorSessionOriginStartedByApp = NSLocalizedString("sensorSessionOriginStartedByApp", tableName: filename, bundle: .main, value: "Started by xDrip4iOS", comment: "sensor session started by this app")
-    static let sensorSessionOriginExistingAdopted = NSLocalizedString("sensorSessionOriginExistingAdopted", tableName: filename, bundle: .main, value: "Existing session adopted", comment: "existing transmitter session adopted by this app")
-    static let sensorSessionOriginTransmitterDetected = NSLocalizedString("sensorSessionOriginTransmitterDetected", tableName: filename, bundle: .main, value: "Detected from transmitter", comment: "sensor session automatically detected from transmitter")
-    static let sensorSessionOriginRejected = NSLocalizedString("sensorSessionOriginRejected", tableName: filename, bundle: .main, value: "Start request rejected", comment: "sensor-start request rejected by transmitter")
 
     static let noSensorCodeSelectedTitle: String = {
-        return NSLocalizedString("noSensorCodeSelectedTitle", tableName: filename, bundle: Bundle.main, value: "No Sensor Code Selected", comment: "Alert title shown before starting a Dexcom G6 sensor with no code/0000")
+        return NSLocalizedString("noSensorCodeSelectedTitle", tableName: filename, bundle: Bundle.main, value: "Continue Without a Sensor Code?", comment: "Confirmation title for starting or adopting a G6 session without a code")
     }()
 
     static let noSensorCodeSelectedMessage: String = {
-        let message = "Starting a Dexcom G6 sensor with 0000 means no sensor code will be sent to the transmitter.\n\n"
-            + "The Dexcom transmitter will require calibrations for this sensor session: two calibrations after warm-up, "
-            + "another 12 hours later, another 12 hours after that, then once every 24 hours until the sensor ends.\n\n"
-            + "These calibration requests come from the Dexcom transmitter/no-code workflow. They are not caused by the "
-            + "%@ calibration reminder setting, and disabling that reminder will not stop required transmitter calibrations."
-        let localizedMessage = NSLocalizedString(
+        let message = "If a sensor session is already running on the transmitter, the app will use that session with its existing calibration requirements.\n\n"
+            + "Starting a new session without a code requires calibrations after warm-up and periodically afterward. "
+            + "Turning off the app's calibration reminder does not remove these requirements."
+        return NSLocalizedString(
             "noSensorCodeSelectedMessage",
             tableName: filename,
             bundle: Bundle.main,
             value: message,
-            comment: "Alert message shown before starting a Dexcom G6 sensor with no code/0000. Placeholder is the app display name"
+            comment: "Distinguishes adopting an existing G6 session from starting a new no-code session"
         )
-        return String(format: localizedMessage, ConstantsHomeView.applicationName)
     }()
 
     static let startSensorAnyway: String = {
@@ -833,7 +904,7 @@ enum Texts_HomeView {
     }()
 
     static let showHideGlucoseChartTitle: String = {
-        return NSLocalizedString("showHideGlucoseChartTitle", tableName: filename, bundle: Bundle.main, value: "Glucose Chart", comment: "quick show hide section title for chart items")
+        return NSLocalizedString("showHideGlucoseChartTitle", tableName: filename, bundle: Bundle.main, value: "Chart", comment: "quick show hide section title for chart items")
     }()
 
     static let showHideStandByModeTitle: String = {
@@ -845,7 +916,7 @@ enum Texts_HomeView {
     }()
 
     static let showHideAdditionalItemsTitle: String = {
-        return NSLocalizedString("showHideAdditionalItemsTitle", tableName: filename, bundle: Bundle.main, value: "Additional Items", comment: "quick show hide section title for additional items")
+        return NSLocalizedString("showHideAdditionalItemsTitle", tableName: filename, bundle: Bundle.main, value: "Alerts and Speech", comment: "quick controls for alerts and spoken readings")
     }()
     
     static let postProcessingTitle: String = {

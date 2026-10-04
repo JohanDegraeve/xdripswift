@@ -11,6 +11,10 @@
 "sensorType" = "Sensor Type";
 "serialNumber" = "Serie Nummer";
 "battery" = "Batterij";
+"versionCode" = "Versiecode";
+"voltageA" = "Spanning A";
+"voltageB" = "Spanning B";
+"waitingForData" = "Wachten op gegevens...";
 "needsTransmitterId" = "Transmitter ID mist";
 "scan" = "Scan";
 "medtrumNanoPumpScanNoticeTitle" = "Verbinding met Medtrum Nano-pomp";
@@ -46,7 +50,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Co-existentiemodus";
 "useOtherDexcomAppCoexistenceFooter" = "In co-existentiemodus kunnen we samenwerken met een andere app, zoals Dexcom of CamAPS. Die app moet op de achtergrond blijven draaien.";
 "useOtherDexcomAppPrimaryFooter" = "Primaire modus verbindt als hoofdapp en beheert de verbinding.";
 "runningInCoexistenceMode" = "Actief in co-existentiemodus";
@@ -77,7 +80,7 @@
 "nfcScanNeeded" = "NFC scan needed";
 
 /// sensor warm-up text
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "Opwarmen tot";
 
 "nativeAlgorithm" = "Native algoritme";
 "xDripAlgorithm" = "xDrip algoritme";
@@ -118,15 +121,74 @@
 
 /* Dexcom G6 Bluetooth authentication slot */
 "dexcomG6BluetoothSlot" = "Bluetooth-kanaal";
-"dexcomG6MobileAppSlot" = "Mobiele app (Standaard)";
+"dexcomG6MobileAppSlot" = "Slot 2: Mobiele app (Standaard)";
 "dexcomG6MobileAppSlotShort" = "Mobiele app";
-"dexcomG6MedicalDeviceSlot" = "Ontvanger of pomp (Experimenteel)";
+"dexcomG6MedicalDeviceSlot" = "Slot 1: Ontvanger of pomp";
 "dexcomG6MedicalDeviceSlotShort" = "Pomp";
 "dexcomG6MobileAppSlotFooter" = "Het kanaal Mobiele app is de standaard voor telefoonverbindingen.";
 "dexcomG6MedicalDeviceSlotFooter" = "Het kanaal Ontvanger of pomp is normaal gereserveerd voor de Dexcom-ontvanger of een compatibele pomp. Als deze app dit kanaal gebruikt, blijft het kanaal Mobiele app beschikbaar voor een telefoon of ander apparaat.";
 "dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Niet beschikbaar in de co-existentiemodus";
 "dexcomG6MedicalDeviceSlotWarning" = "Het kanaal Ontvanger of pomp is normaal gereserveerd voor een Dexcom-ontvanger of een compatibele pomp. Als u dit selecteert, kan dat verhinderen dat dit apparaat verbinding maakt.\n\nHet gebruik van het kanaal Ontvanger of pomp moet uitsluitend als experimenteel worden beschouwd. De selectie wordt actief bij de volgende authenticatie.";
-"dexcomG6AnubisSlot" = "Kanaal 3 (Anubis experimenteel)";
+"dexcomG6AnubisSlot" = "Slot 3: Anubis Extra";
+"dexcomG7MedicalDeviceSlot" = "Slot 1: Ontvanger of pomp";
+"dexcomG7MedicalDeviceSlotShort" = "Pomp";
+"dexcomG7MobileAppSlot" = "Slot 2: Mobiele app (Standaard)";
+"dexcomG7SmartWatchSlot" = "Slot 3: Smartwatch";
+"dexcomG7PairingCodeMessage" = "Voer de viercijferige code van de huidige sensorapplicator in. De primaire modus kan zonder deze code niet verifiëren.";
+"dexcomG7BluetoothSlot" = "Bluetooth-kanaal";
+"dexcomG7MobileAppSlotShort" = "Mobiele app";
+"dexcomG7SmartWatchSlotShort" = "Smartwatch";
+"dexcomG7MobileAppSlotFooter" = "Het kanaal Mobiele app (slot 2) is de standaard en de momenteel gevalideerde directe G7-verbinding.";
+"dexcomG7MedicalDeviceSlotFooter" = "Het kanaal Ontvanger of pomp gebruikt verificatieslot 1.";
+"dexcomG7SmartWatchSlotFooter" = "Het kanaal Smartwatch gebruikt het verificatieslot 3 uit de fabriek.";
 "dexcomG6AnubisSlotShort" = "Kanaal 3";
 "dexcomG6AnubisSlotFooter" = "Kanaal 3 is alleen beschikbaar op Anubis-zenders. Het is experimenteel en laat de kanalen Mobiele app en Ontvanger of pomp beschikbaar voor andere apparaten.";
 "dexcomG6AnubisSlotWarning" = "Kanaal 3 is een experimenteel kanaal dat alleen beschikbaar is op Anubis-zenders.\n\nGebruik Kanaal 3 alleen voor tests. De selectie wordt actief bij de volgende authenticatie.";
+"dexcomConnectionMode" = "Verbindingsmodus";
+"dexcomPrimaryMode" = "Primair";
+"dexcomCoexistenceMode" = "Co-existentie";
+"dexcomPrimaryModePickerOption" = "Primaire modus";
+"dexcomCoexistenceModePickerOption" = "Co-existentiemodus";
+"dexcomG6ModeSelectionFooter" = "U kunt de G6-verbindingsmodus later wijzigen in de zenderinstellingen.";
+"dexcomConnectionModeSelectionExplanation" = "In de primaire modus maakt deze app rechtstreeks verbinding en moeten alle andere apps die verbinding maken met het Dexcom-apparaat worden gesloten.\n\nDe co-existentiemodus is afhankelijk van een andere app om de Dexcom-verbinding te onderhouden en metingen te ontvangen.";
+"dexcomBluetoothChannelSelectionExplanation" = "Kies het Bluetooth-kanaal dat deze app zal gebruiken. Selecteer Mobiele app, tenzij u dat kanaal beschikbaar moet houden voor een andere verbinding.";
+"dexcomG6CoexistenceModeSelectionMessage" = "De co-existentiemodus is geselecteerd. Een andere app, zoals Dexcom G6 of CamAPS, moet verbinding maken met de G6-zender en deze verifiëren.\n\nLaat de andere app op de achtergrond actief, anders ontvangt %@ geen metingen.";
+"dexcomG6PrimaryModeSelectionMessage" = "De primaire modus is geselecteerd. %@ moet de enige app zijn die verbinding maakt met de G6-zender en deze verifieert.\n\nSluit elke andere app die verbinding maakt met de zender of schakel de Bluetooth-toestemming uit. Anders ontvangen %@ of de andere app mogelijk geen metingen.";
+"dexcomPrimaryModeAddFlowMessage" = "Maak rechtstreeks verbinding als hoofdapp. Verbreek de verbinding van elke andere app met deze Dexcom.";
+"dexcomCoexistenceModeAddFlowMessage" = "Deel de verbinding met een andere app. Zorg dat de Dexcom- of CamAPS-app correct op de achtergrond blijft werken.";
+"dexcomG7NoSensorLabelFound" = "Er is geen Dexcom G7-sensorlabel in de foto gevonden.";
+"dexcomG7InvalidSensorLabelFound" = "Er is een Data Matrix gevonden, maar dit was geen geldig Dexcom G7-sensorlabel.";
+
+
+/* Battery history */
+"batteryHistory" = "Batterijgeschiedenis";
+"batteryHistoryTransmitterID" = "Zender-ID";
+"batteryHistoryNoData" = "Geen batterijgeschiedenis";
+"batteryHistoryBeginsAfterReading" = "De geschiedenis begint na de volgende echte batterijmeting.";
+"batteryHistoryRange" = "Periode";
+"batteryHistoryRangeAccessibility" = "Periode van batterijgeschiedenis";
+"batteryHistoryRangeExplanation" = "Vaste periodes lopen vanaf nu terug tot het geselecteerde aantal dagen. Onderbrekingen tonen periodes zonder meting.";
+
+"connectionDiagramOtherApp" = "Andere app";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Signaalsterkte";
+
+"signalStrengthChartExplanation" = "Live signaal van de afgelopen twee minuten. Bij verbinding komen ongeveer elke seconde nieuwe metingen binnen.";
+
+"signalStrengthWeak" = "Zwak";
+"signalStrengthStrong" = "Sterk";
+"signalStrengthLastMeasurement" = "Laatste meting";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Abonnementen";
+"heartbeat.mode" = "Abonnementsmodus";
+"heartbeat.mode.automatic" = "Enkel";
+"heartbeat.mode.all" = "Alle";
+"heartbeat.footer.automatic" = "Selecteert automatisch één ondersteund Bluetooth-kanaal voor heartbeat-updates, met zo min mogelijk abonnementen. Als het abonneren mislukt, wordt een ander kanaal geprobeerd.";
+"heartbeat.footer.all" = "Abonneert op alle ondersteunde Bluetooth-kanalen, zodat updates van elk kanaal een heartbeat kunnen leveren.";
+"heartbeat.simpleFooter" = "Wijzigingen gelden bij de volgende verbinding.";
+
+"signalStrengthDisconnected" = "Verbinding verbroken";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "Verloopt";

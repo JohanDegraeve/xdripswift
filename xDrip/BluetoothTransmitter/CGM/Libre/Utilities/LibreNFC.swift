@@ -182,7 +182,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
             }
         } else {
             // Core NFC normally supplies `NFCReaderError`, but do not leave an unusual system error
-            // without a user-level outcome. The raw error remains developer-only; the delegate gets
+            // without a user-level outcome. The raw error remains developer-only. The delegate gets
             // the same closed failure result used by the shareable Activity Log.
             xdrip.trace("NFC: scan ended with an unexpected error: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .error, error.localizedDescription)
             self.libreNFCDelegate?.nfcScanResult(.failed)

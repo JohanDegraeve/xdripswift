@@ -3,12 +3,6 @@ import Foundation
 /// opcodes for writing to M5Stack
 enum M5StackTransmitterOpCodeTx: UInt8, CaseIterable {
     
-    /// client writes nightscouturl
-    case writeNightscoutUrlTx = 0x01
-    
-    /// client writes nightscoutToken
-    case writeNightscoutAPIKeyTx = 0x02
-    
     /// client writes mgdl, value 0 means mmol is used, value 1 is mgdl
     case writemgdlTx = 0x03
     
@@ -20,12 +14,6 @@ enum M5StackTransmitterOpCodeTx: UInt8, CaseIterable {
     
     /// client writes brightness3, value between 1 and 100
     case writebrightness3Tx = 0x06
-    
-    /// client writes wlan ssid, 2nd byte in data is used to indicate which wlan (from 1 to 10), next bytes is ssid as string
-    case writeWlanSSIDTx = 0x07
-    
-    /// client writes wlan Pass, 2nd byte in data is used to indicate which wlan (from 1 to 10), next bytes is Pass as string
-    case writeWlanPassTx = 0x08
     
     /// opcode to request the password
     ///
@@ -65,9 +53,6 @@ enum M5StackTransmitterOpCodeTx: UInt8, CaseIterable {
     /// send power off to M5Stack
     case writepowerOffTx = 0x22
     
-    /// send connectToWifi parameter
-    case writeConnectToWiFiTx = 0x23
-    
 }
 
 /// opcodes for message from M5stack to app
@@ -93,7 +78,7 @@ enum M5StackTransmitterOpCodeRx: UInt8, CaseIterable {
     /// M5Stack requests timestamp in seconds, local time since 1.1.1970 !!
     case readTimeStampRx = 0x11
     
-    /// M5Stack requests all parameters (textcolor, wifi names and passwords,...), this is usually after an M5Stack restart
+    /// M5Stack requests all parameters, usually after an M5Stack restart
     case readAllParametersRx = 0x16
     
     /// M5Stack sending battery level

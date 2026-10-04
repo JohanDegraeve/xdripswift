@@ -15,8 +15,9 @@
 "common_minute" = "min";
 "common_day" = "day";
 "common_days" = "days";
-"common_landscape_comparingWithLast" = "Comparing with the last:";
+"common_landscape_showAGPChartData" = "Show AGP chart data:";
 "common_landscape_comparisonDays" = "%d days";
+"common_landscape_comparisonNone" = "None";
 "common_today" = "Today";
 "common_week" = "week";
 "common_hourshort" = "h";
@@ -34,7 +35,6 @@
 "name" = "Name";
 "common_value" = "Value";
 "common_enterValue" = "Enter Value";
-"WiFi" = "WiFi";
 "on" = "On";
 "off" = "Off";
 "delete" = "Delete";
@@ -50,7 +50,6 @@
 "common_statistics_userRange" = "User Range";
 "common_statistics_high" = "High";
 "common_statistics_average" = "Average";
-"common_statistics_a1c" = "HbA1c";
 "common_statistics_cv" = "CV";
 "common_dontshowagain" = "Don't Show Again";
 "common_enabled" = "Enabled";
@@ -77,11 +76,13 @@
 "common_statistics_ambulatoryGlucoseProfile" = "Ambulatory Glucose Profile";
 "common_statistics_insufficientAGPData" = "Insufficient data for AGP percentile chart";
 "common_statistics_insufficientData" = "Insufficient data";
-"common_statistics_estimatedA1cTrend" = "Estimated HbA1c trend";
+"common_statistics_gmiTrend" = "GMI trend";
+"common_statistics_threeDay" = "3-day";
+"common_statistics_weekly" = "Weekly";
 "common_statistics_cvTrend" = "CV trend";
 "common_statistics_dailyPattern" = "Daily Pattern";
 "common_statistics_averageFormat" = "Average %@";
-"common_statistics_dailyPatternFooter" = "Bars show daily percentage in 70-180 mg/dL range. The dashed line marks the 70% clinical target.";
+"common_statistics_dailyPatternFooter" = "Bars show daily percentage in %@ range. The dashed line marks the 70%% clinical target.";
 "common_statistics_dailySummary" = "Daily Summary";
 "common_statistics_bestDay" = "Best Day";
 "common_statistics_mostLow" = "Most Low";
@@ -124,3 +125,19 @@
 "common_report_notIncluded" = "Not Included";
 "common_statistics_tempBasalDelta" = "Temp Basal Delta";
 "common_statistics_waitingForGlucoseData" = "Waiting for glucose data...";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Estimated insulin on board";
+"therapy.estimatedCOB" = "Estimated carbohydrates on board";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Unsaved Changes";
+"common_save" = "Save";
+"common_discardChanges" = "Discard Changes";
+"common_back" = "Back";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Sensor warming up";
+"common_sensorWarmupUntilFormat" = "Until %@";
+"common_sensorWarmupComplete" = "Warm-up complete";
+"common_sensorWaitingForReading" = "Waiting for first reading…";

@@ -23,7 +23,7 @@ jobs:
     secrets: inherit
   
   # Checks if GH_PAT holds workflow permissions
-  # Checks for existence of alive branch; if non-existent creates it
+  # Checks for existence of alive branch. If non-existent creates it
   check_alive_and_permissions:
     needs: validate
     runs-on: ubuntu-latest
@@ -83,7 +83,7 @@ jobs:
           -f ref='refs/heads/alive' \
           -f sha=$SHA
   
-  # Checks for changes in upstream repository; if changes exist prompts sync for build
+  # Checks for changes in upstream repository. If changes exist prompts sync for build
   # Performs keepalive to avoid stale fork
   check_latest_from_upstream:
     needs: [validate, check_alive_and_permissions]

@@ -14,8 +14,9 @@
 "common_minute" = "min";
 "common_day" = "jour";
 "common_days" = "jours";
-"common_landscape_comparingWithLast" = "Comparaison avec les derniers :";
+"common_landscape_showAGPChartData" = "Afficher les données du graphique AGP :";
 "common_landscape_comparisonDays" = "%d jours";
+"common_landscape_comparisonNone" = "Aucune";
 "common_today" = "Aujourd'hui";
 "common_week" = "sem";
 "common_hourshort" = "h";
@@ -31,7 +32,6 @@
 "white" = "blanc";
 "yellow" = "jaune";
 "name" = "Nom";
-"WiFi" = "WiFi";
 "on" = "On";
 "off" = "Off";
 "delete" = "Supprimer";
@@ -54,7 +54,6 @@
 "common_statistics_inRange" = "En gamme";
 "common_statistics_high" = "Haute";
 "common_statistics_average" = "Moyenne";
-"common_statistics_a1c" = "HbA1c";
 "common_statistics_cv" = "CV";
 
 "common_dontshowagain" = "Ne plus visualiser";
@@ -86,11 +85,13 @@
 "common_statistics_ambulatoryGlucoseProfile" = "Profil Ambulatoire du Glucose";
 "common_statistics_insufficientAGPData" = "Données insuffisantes pour le graphique percentile AGP";
 "common_statistics_insufficientData" = "Données insuffisantes";
-"common_statistics_estimatedA1cTrend" = "Tendance HbA1c estimée";
+"common_statistics_gmiTrend" = "Tendance GMI";
+"common_statistics_threeDay" = "Tous les 3 jours";
+"common_statistics_weekly" = "Hebdomadaire";
 "common_statistics_cvTrend" = "Tendance CV";
 "common_statistics_dailyPattern" = "Profil Quotidien";
 "common_statistics_averageFormat" = "Moyenne %@";
-"common_statistics_dailyPatternFooter" = "Les barres indiquent le pourcentage quotidien dans la plage 70-180 mg/dL. La ligne pointillée marque l'objectif clinique de 70%.";
+"common_statistics_dailyPatternFooter" = "Les barres indiquent le pourcentage quotidien dans la plage %@. La ligne pointillée marque l'objectif clinique de 70%%.";
 "common_statistics_dailySummary" = "Résumé Quotidien";
 "common_statistics_bestDay" = "Meilleur Jour";
 "common_statistics_mostLow" = "Plus Bas";
@@ -129,3 +130,19 @@
 "common_statistics_averageCarbs" = "Glucides moyens";
 "common_statistics_tempBasalDelta" = "Delta basal temporaire";
 "common_statistics_waitingForGlucoseData" = "En attente des données de glucose...";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Insuline active estimée";
+"therapy.estimatedCOB" = "Glucides actifs estimés";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Modifications non enregistrées";
+"common_save" = "Enregistrer";
+"common_discardChanges" = "Ignorer les modifications";
+"common_back" = "Retour";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Capteur en chauffe";
+"common_sensorWarmupUntilFormat" = "Jusqu’à %@";
+"common_sensorWarmupComplete" = "Préchauffage terminé";
+"common_sensorWaitingForReading" = "En attente de la première mesure…";

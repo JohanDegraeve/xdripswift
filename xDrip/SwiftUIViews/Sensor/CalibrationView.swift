@@ -81,10 +81,12 @@ struct CalibrationView: View {
         Section {
             readinessRow(title: Texts_HomeView.sensorManagementCalibrationStableTrend, check: readiness.stableTrend)
             readinessRow(title: Texts_HomeView.sensorManagementNoiseTitle, check: readiness.sensorNoise)
-            readinessRow(
-                title: Texts_HomeView.sensorManagementCalibrationValue,
-                check: evaluatedReadiness?.calibrationValue
-            )
+            if let evaluatedReadiness {
+                readinessRow(
+                    title: Texts_HomeView.sensorManagementCalibrationValue,
+                    check: evaluatedReadiness.calibrationValue
+                )
+            }
         } footer: {
             if let evaluatedReadiness {
                 Text(
@@ -96,15 +98,15 @@ struct CalibrationView: View {
         }
     }
 
-    private func readinessRow(title: String, check: CalibrationReadinessCheck?) -> some View {
+    private func readinessRow(title: String, check: CalibrationReadinessCheck) -> some View {
         HStack(spacing: 10) {
-            Image(systemName: check?.level.systemImage ?? "ellipsis.circle.fill")
-                .foregroundStyle(check?.level.color ?? ConstantsAppColors.tertiaryText)
+            Image(systemName: check.level.systemImage)
+                .foregroundStyle(check.level.color)
                 .frame(width: 22)
             Text(title)
             Spacer()
-            Text(check?.detail ?? Texts_HomeView.sensorManagementCalibrationPending)
-                .foregroundStyle(check?.level.color ?? ConstantsAppColors.tertiaryText)
+            Text(check.detail)
+                .foregroundStyle(check.level.color)
                 .multilineTextAlignment(.trailing)
         }
         .listRowBackground(readinessSectionBackgroundColor)

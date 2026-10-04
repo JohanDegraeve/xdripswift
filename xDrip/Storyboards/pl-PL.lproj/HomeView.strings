@@ -126,7 +126,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
+"enterSensorCode" = "Wpisz kod sensora ręcznie, zeskanuj etykietę sensora lub wybierz zdjęcie.\n\nJeśli nie masz kodu lub chcesz użyć sesji sensora już działającej w nadajniku, wybierz Użyj bez kodu.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -222,6 +222,8 @@
 
 /* Dexcom G6 sensor-label scanning */
 "scanWithCamera" = "Skanuj aparatem";
+"manuallyEnterSensorCode" = "Wprowadź kod ręcznie";
+"dexcomG6ManualSensorCodeMessage" = "Wprowadź czterocyfrowy kod kalibracyjny z etykiety sensora.";
 "chooseSensorLabelPhoto" = "Wybierz zdjęcie";
 "readingSensorLabel" = "Odczytywanie etykiety sensora...";
 "scanSensorLabel" = "Skanuj etykietę sensora";
@@ -235,7 +237,7 @@
 "sensorInformationTitle" = "Informacje o sensorze";
 "sensorLotNumber" = "Numer partii";
 "sensorSerialNumberMetadata" = "Numer seryjny sensora";
-"sensorLabelReviewFooter" = "Sprawdź odczytane informacje przed uruchomieniem sensora.";
+"sensorLabelReviewFooter" = "Sprawdź swój wybór i ewentualne dane z etykiety, a następnie stuknij Kontynuuj.";
 "sensorLabelScanFailed" = "Nie odczytano etykiety sensora";
 "multipleSensorLabelsFound" = "Zdjęcie zawiera więcej niż jedną etykietę sensora. Wybierz zdjęcie z jedną etykietą.";
 "noSensorLabelFound" = "Na zdjęciu nie znaleziono prawidłowej etykiety sensora Dexcom G6.";
@@ -245,10 +247,34 @@
 "scannedSensorLabelCode" = "Kod zeskanowanej etykiety";
 "noCodeSensorSessionValue" = "0000 (Sesja bez kodu)";
 "sensorCodeUnknown" = "Nieznany";
-"sensorSessionOrigin" = "Pochodzenie sesji";
-"sensorSessionOriginUnknown" = "Nieznane";
-"sensorSessionOriginAwaitingTransmitter" = "Oczekiwanie na nadajnik";
-"sensorSessionOriginStartedByApp" = "Uruchomiona przez xDrip4iOS";
-"sensorSessionOriginExistingAdopted" = "Przejęto istniejącą sesję";
-"sensorSessionOriginTransmitterDetected" = "Wykryta przez nadajnik";
-"sensorSessionOriginRejected" = "Żądanie uruchomienia odrzucone";
+
+"sensorManagementCalibrationInProgress" = "Kalibracja w toku...";
+"sensorManagementCalibrationQueued" = "W kolejce";
+"sensorManagementCalibrationSent" = "Wysłano, oczekiwanie na odpowiedź";
+"sensorManagementCalibrationSentShort" = "Wysłano";
+"sensorManagementCalibrationCompletedShort" = "Zakończono";
+"sensorManagementCalibrationRejectedShort" = "Odrzucono";
+"sensorManagementCalibrationErrorShort" = "Błąd";
+"sensorManagementCalibrationProcessing" = "Przetwarzanie";
+"sensorManagementCalibrationCompletedHigh" = "Zakończono, wysoka pewność";
+"sensorManagementCalibrationCompletedLow" = "Zakończono, niska pewność";
+"sensorManagementCalibrationRejectedFormat" = "Odrzucono: %@";
+"sensorManagementCalibrationNotPermitted" = "Kalibracja niedozwolona";
+"sensorManagementCalibrationNotPermittedNote" = "Nadajnik obecnie nie zezwala na kalibrację.";
+"sensorManagementCalibrationRejectedRange" = "Wartość poza zakresem";
+"sensorManagementCalibrationRejectedTime" = "Nieprawidłowy czas kalibracji";
+"sensorManagementCalibrationRejectedDuplicate" = "Już wprowadzono";
+"sensorManagementCalibrationRejectedBounds" = "Sprawdzanie granic nie powiodło się";
+"sensorManagementCalibrationRejectedUnknown" = "Nieznany powód";
+"sensorManufactureDate" = "Data produkcji";
+"sensorExpirationDate" = "Data ważności";
+"sensorManagementWaitingForSensorStart" = "Oczekiwanie na uruchomienie sensora";
+"sensorManagementStatusWarmingUp" = "Rozgrzewanie";
+"sensorCodeContinue" = "Kontynuuj";
+"useWithoutSensorCode" = "Użyj bez kodu";
+"noSensorCode" = "Brak kodu (0000)";
+"dexcomG7SelectSensorCodeMessage" = "Wpisz ręcznie czterocyfrowy kod parowania, zeskanuj bieżący aplikator lub wybierz zdjęcie. Sprawdź wybrany kod, a następnie stuknij Kontynuuj.";
+"noSensorCodeSelectedTitle" = "Kontynuować bez kodu sensora?";
+"noSensorCodeSelectedMessage" = "Jeśli w nadajniku działa już sesja sensora, aplikacja użyje jej z dotychczasowymi wymaganiami dotyczącymi kalibracji.\n\nRozpoczęcie nowej sesji bez kodu wymaga kalibracji po rozgrzewaniu, a następnie okresowo. Wyłączenie przypomnienia o kalibracji w aplikacji nie znosi tych wymagań.";
+"showHideGlucoseChartTitle" = "Wykres";
+"showHideAdditionalItemsTitle" = "Alarmy i mowa";

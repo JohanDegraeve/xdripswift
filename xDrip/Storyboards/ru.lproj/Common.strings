@@ -14,8 +14,9 @@
 "common_minute" = "мин";
 "common_day" = "день";
 "common_days" = "дней";
-"common_landscape_comparingWithLast" = "Сравнение с последними:";
+"common_landscape_showAGPChartData" = "Показать данные графика AGP:";
 "common_landscape_comparisonDays" = "%d дней";
+"common_landscape_comparisonNone" = "Нет";
 "common_today" = "Сегодня";
 "common_week" = "неделя";
 "common_hourshort" = "ч";
@@ -31,7 +32,6 @@
 "white" = "белый";
 "yellow" = "желтый";
 "name" = "Имя";
-"WiFi" = "WiFi";
 "on" = "Вкл";
 "off" = "Выкл";
 "delete" = "Удалить";
@@ -45,7 +45,11 @@
 "common_statistics_inRange" = "В диапазоне";
 "common_statistics_high" = "Выс";
 "common_statistics_average" = "Средний";
-"common_statistics_a1c" = "HbA1c";
+"common_statistics_gmiTrend" = "Тренд GMI";
+"common_statistics_threeDay" = "За 3 дня";
+"common_statistics_weekly" = "Еженедельно";
+"common_statistics_daily" = "Ежедневно";
+"common_statistics_gmi" = "GMI";
 "common_statistics_cv" = "CV";
 "common_dontshowagain" = "Не показывать снова";
 
@@ -58,3 +62,19 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Расчётный активный инсулин";
+"therapy.estimatedCOB" = "Расчётные активные углеводы";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Несохранённые изменения";
+"common_save" = "Сохранить";
+"common_discardChanges" = "Отменить изменения";
+"common_back" = "Назад";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Сенсор прогревается";
+"common_sensorWarmupUntilFormat" = "До %@";
+"common_sensorWarmupComplete" = "Прогрев завершён";
+"common_sensorWaitingForReading" = "Ожидание первого показания…";

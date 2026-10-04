@@ -40,25 +40,25 @@ private final class MedtrumBackgroundTask {
 /// Passive co-listener for the Medtrum TouchCare Nano CGM.
 ///
 /// Architecture: the CGM patch sensor talks to the Medtrum patch *pump* over a proprietary RF
-/// link; the pump then broadcasts pump status and CGM readings over BLE on service
+/// link. The pump then broadcasts pump status and CGM readings over BLE on service
 /// `669A9001-…`. The official Medtrum EasyPatch app pairs/authenticates with the pump and
 /// holds the BLE link. iOS's CoreBluetooth multiplexes a single ACL link across multiple
 /// apps once a bond exists: we subscribe to the same notification characteristics, and the
-/// raw glucose packets are delivered to us alongside EasyPatch — no auth required on our side.
+/// raw glucose packets are delivered to us alongside EasyPatch: no auth required on our side.
 ///
 /// Glucose source: notifications on characteristic `669A9141`. The packet layout (decoded
 /// empirically against EasyPatch ground-truth readings):
 /// ```
 /// offset 0:  packet type (0xb3 0x02)
 /// offset 2:  status/flag byte + constant (0x?? 0x5b)
-/// offset 4:  uint16 LE — reading counter (+1 per 2-min CGM cycle since sensor start)
+/// offset 4:  uint16 LE: reading counter (+1 per 2-min CGM cycle since sensor start)
 /// offset 6:  constant (0x07 0x14 0x00)
-/// offset 8:  uint16 LE — current glucose (raw)
-/// offset 10: uint16 LE — glucose 2 min ago
-/// offset 12: uint16 LE — glucose 4 min ago
-/// offset 14: uint16 LE — glucose 6 min ago
-/// offset 16: uint16 LE — small varying counter (observed 0x0000 ... 0x0400); unused
-/// offset 18: uint16 LE — per-sensor calibration factor (updates on each EasyPatch calibration)
+/// offset 8:  uint16 LE: current glucose (raw)
+/// offset 10: uint16 LE: glucose 2 min ago
+/// offset 12: uint16 LE: glucose 4 min ago
+/// offset 14: uint16 LE: glucose 6 min ago
+/// offset 16: uint16 LE: small varying counter (observed 0x0000 ... 0x0400), unused
+/// offset 18: uint16 LE: per-sensor calibration factor (updates on each EasyPatch calibration)
 /// ```
 /// Conversion: `mg/dL = raw × 1000 / calibrationFactor`.
 /// Confirmed across two distinct calibrations (factor 8932 and 10333) against EasyPatch ground truth.
@@ -78,10 +78,10 @@ class CGMMedtrumTouchCareNanoTransmitter: BluetoothTransmitter, CGMTransmitter {
     /// notification characteristic that carries CGM glucose packets
     private let CBUUID_ReceiveCharacteristic_MedtrumNano = "669A9141-0008-968F-E311-6050405558B3"
 
-    /// we never write — base class requires a write UUID, supply the same UUID as receive (it's harmless because we never call writeDataToPeripheral)
+    /// we never write: base class requires a write UUID, supply the same UUID as receive (it's harmless because we never call writeDataToPeripheral)
     private let CBUUID_WriteCharacteristic_MedtrumNano = "669A9141-0008-968F-E311-6050405558B3"
 
-    /// expected name pattern; Medtrum pumps advertise as "MT"
+    /// expected name pattern. Medtrum pumps advertise as "MT"
     private let expectedDeviceNameMedtrum = "MT"
 
     /// pump (= MD0201 etc) sensor system lifetime is 14 days
@@ -90,7 +90,7 @@ class CGMMedtrumTouchCareNanoTransmitter: BluetoothTransmitter, CGMTransmitter {
     /// CGM delegate (xDrip pipeline)
     private(set) weak var cgmTransmitterDelegate: CGMTransmitterDelegate?
 
-    /// last reading counter we have already emitted — used to skip duplicates within one app run
+    /// last reading counter we have already emitted: used to skip duplicates within one app run
     private var lastEmittedCounter: Int = -1
 
     /// EasyPatch owns the physical session. Back off repeated retries so a rejected passive
@@ -262,7 +262,7 @@ class CGMMedtrumTouchCareNanoTransmitter: BluetoothTransmitter, CGMTransmitter {
         let rawCurrent = uint16LE(data, offset: 8)
         let calibrationFactor = uint16LE(data, offset: 18)
 
-        // Calibration factor is required to interpret the raw value; rare safety guard against div-by-zero / corruption.
+        // Calibration factor is required to interpret the raw value. This provides a safety guard against div-by-zero / corruption.
         guard calibrationFactor > 0 else {
             trace("invalid calibration factor (0) in packet, ignoring (hex=%{public}@)", log: log, category: ConstantsLog.categoryCGMMedtrumTouchCareNano, type: .error, data.hexEncodedString())
             return
@@ -270,7 +270,7 @@ class CGMMedtrumTouchCareNanoTransmitter: BluetoothTransmitter, CGMTransmitter {
 
         let mgDl = Double(rawCurrent) * 1000.0 / Double(calibrationFactor)
 
-        // Plausibility guard — values outside a CGM-meaningful range get dropped (alarms must never fire on garbage).
+        // Plausibility guard: values outside a CGM-meaningful range get dropped (alarms must never fire on garbage).
         guard mgDl >= 40, mgDl <= 400 else {
             trace("rejected implausible glucose=%{public}.1f mg/dL (raw=%{public}d, calFactor=%{public}d, counter=%{public}d)", log: log, category: ConstantsLog.categoryCGMMedtrumTouchCareNano, type: .error, mgDl, Int(rawCurrent), Int(calibrationFactor), counter)
             return
@@ -504,12 +504,12 @@ class CGMMedtrumTouchCareNanoTransmitter: BluetoothTransmitter, CGMTransmitter {
 
     func getCBUUID_Receive() -> String { return CBUUID_ReceiveCharacteristic_MedtrumNano }
 
-    // EasyPatch handles sensor lifecycle — we deliberately implement these as no-ops.
+    // EasyPatch handles sensor lifecycle: we deliberately implement these as no-ops.
     func needsSensorStartTime() -> Bool { return false }
 
     // Glucose values delivered to xDrip are already in mg/dL after applying the Medtrum per-sensor
     // calibration factor decoded from the packet. Returning true here tells xDrip "treat these as
-    // calibrated readings"; it skips the user-calibration prompt and uses NoCalibrator (matches the
+    // calibrated readings". It skips the user-calibration prompt and uses NoCalibrator (matches the
     // RootViewController.getCalibrator switch).
     func isWebOOPEnabled() -> Bool { return true }
 

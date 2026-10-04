@@ -35,32 +35,101 @@ enum CareLinkTherapyParser {
 
         let activeInsulin = root["activeInsulin"] as? [String: Any]
         let algorithm = root["therapyAlgorithmState"] as? [String: Any]
+        let currentBasalRate = latestBasalRate ?? nonNegativeNumber(root["basal"])
+        let reservoirUnits = nonNegativeNumber(root["reservoirRemainingUnits"]) ?? nonNegativeNumber(root["reservoirAmount"])
+        let reservoirPercent = percent(root["reservoirLevelPercent"])
+        let batteryPercent = percent(root["pumpBatteryLevelPercent"])
+        let isSuspended = boolean(root["pumpSuspended"])
+        let isCommunicating = boolean(root["pumpCommunicationState"])
+        let algorithmState = string(algorithm?["autoModeShieldState"])
+        let algorithmReadiness = string(algorithm?["autoModeReadinessState"])
+        let lowGlucoseSuspendState = string(algorithm?["plgmLgsState"])
+        let maximumAutoBasalRate = nonNegativeNumber(root["maxAutoBasalRate"])
+        let maximumBolusAmount = nonNegativeNumber(root["maxBolusAmount"])
         let pump = CareLinkPumpSnapshot(
+            isReported: reportsPump(
+                currentBasalRate: currentBasalRate,
+                reservoirUnits: reservoirUnits,
+                reservoirPercent: reservoirPercent,
+                batteryPercent: batteryPercent,
+                isSuspended: isSuspended,
+                isCommunicating: isCommunicating,
+                algorithmState: algorithmState,
+                algorithmReadiness: algorithmReadiness,
+                lowGlucoseSuspendState: lowGlucoseSuspendState,
+                maximumAutoBasalRate: maximumAutoBasalRate,
+                maximumBolusAmount: maximumBolusAmount,
+                treatments: treatments
+            ),
             observedAt: deviceDate(root["medicalDeviceTime"], offset: offset),
             lastDataUpdateAt: date(root["lastMedicalDeviceDataUpdateServerTime"], offset: offset),
             activeInsulin: nonNegativeNumber(activeInsulin?["amount"]),
             activeInsulinAt: date(activeInsulin?["datetime"], offset: offset),
-            currentBasalRate: latestBasalRate ?? nonNegativeNumber(root["basal"]),
-            reservoirUnits: nonNegativeNumber(root["reservoirRemainingUnits"]) ?? nonNegativeNumber(root["reservoirAmount"]),
-            reservoirPercent: percent(root["reservoirLevelPercent"]),
-            batteryPercent: percent(root["pumpBatteryLevelPercent"]),
-            isSuspended: boolean(root["pumpSuspended"]),
-            isCommunicating: boolean(root["pumpCommunicationState"]),
+            currentBasalRate: currentBasalRate,
+            reservoirUnits: reservoirUnits,
+            reservoirPercent: reservoirPercent,
+            batteryPercent: batteryPercent,
+            isSuspended: isSuspended,
+            isCommunicating: isCommunicating,
             isInRange: boolean(root["conduitMedicalDeviceInRange"]),
-            algorithmState: string(algorithm?["autoModeShieldState"]),
-            algorithmReadiness: string(algorithm?["autoModeReadinessState"]),
-            lowGlucoseSuspendState: string(algorithm?["plgmLgsState"]),
-            maximumAutoBasalRate: nonNegativeNumber(root["maxAutoBasalRate"]),
-            maximumBolusAmount: nonNegativeNumber(root["maxBolusAmount"])
+            algorithmState: algorithmState,
+            algorithmReadiness: algorithmReadiness,
+            lowGlucoseSuspendState: lowGlucoseSuspendState,
+            maximumAutoBasalRate: maximumAutoBasalRate,
+            maximumBolusAmount: maximumBolusAmount
         )
         return CareLinkTherapyPayload(pump: pump, treatments: treatments)
     }
 
+    /// Requires a usable pump measurement or an explicitly positive pump state. CareLink's CGM-only
+    /// payloads can put a sensor model in `pumpModelNumber`, include unavailable numeric sentinels,
+    /// report `pumpSuspended = false`, and report the sensor conduit as in range. None of those facts
+    /// proves a pump exists. Parsing first also ensures a key carrying `-1` cannot become evidence.
+    private static func reportsPump(
+        currentBasalRate: Double?,
+        reservoirUnits: Double?,
+        reservoirPercent: Int?,
+        batteryPercent: Int?,
+        isSuspended: Bool?,
+        isCommunicating: Bool?,
+        algorithmState: String?,
+        algorithmReadiness: String?,
+        lowGlucoseSuspendState: String?,
+        maximumAutoBasalRate: Double?,
+        maximumBolusAmount: Double?,
+        treatments: [CareLinkTherapyRecord]
+    ) -> Bool {
+        // Zero remains meaningful for reservoir, battery and configured limits. Basal is different:
+        // a CGM-only response uses zero or a negative sentinel, so only a positive rate proves delivery.
+        let hasPumpMeasurement = currentBasalRate.map { $0 > 0 } == true
+            || reservoirUnits != nil
+            || reservoirPercent != nil
+            || batteryPercent != nil
+            || maximumAutoBasalRate != nil
+            || maximumBolusAmount != nil
+
+        // False communication/suspension flags describe an absent pump in Simplera-only payloads.
+        // Only an explicitly positive state can therefore be used as pump evidence.
+        let hasPositivePumpState = isSuspended == true || isCommunicating == true
+
+        // Algorithm state and automatic-basal records are themselves pump-specific even when the
+        // ordinary battery, reservoir and communication fields are temporarily missing.
+        let hasPumpDeliveryState = algorithmState != nil
+            || algorithmReadiness != nil
+            || lowGlucoseSuspendState != nil
+            || treatments.contains { $0.type == .AutomaticBasal }
+
+        return hasPumpMeasurement || hasPositivePumpState || hasPumpDeliveryState
+    }
+
     /// Converts only the three marker families that have unambiguous treatment semantics.
+    /// CareLink can shift historical `timestamp` values between polls while `displayTime` stays
+    /// fixed. Prefer the event display time so unchanged deliveries retain their fallback identity.
     private static func marker(_ marker: [String: Any], patientID: String, offset: TimeInterval, now: Date) -> CareLinkTherapyRecord? {
         guard let markerType = string(marker["type"]),
               markerType != "AUTO_BASAL_DELIVERY",
-              let date = date(marker["timestamp"] ?? marker["dateTime"] ?? marker["displayTime"], offset: offset),
+              let date = (date(marker["displayTime"], offset: offset)
+                  ?? date(marker["timestamp"] ?? marker["dateTime"], offset: offset)),
               date <= now.addingTimeInterval(5 * 60),
               date >= now.addingTimeInterval(-48 * 60 * 60)
         else {
@@ -104,6 +173,7 @@ enum CareLinkTherapyParser {
     }
 
     /// Stores each native auto-basal amount and retains the interval to the next marker as metadata.
+    /// As with boluses and meals, prefer stable `displayTime` over the poll-dependent `timestamp`.
     ///
     /// The interval calculation was adapted from Nocturne's CareLink treatment mapper:
     /// https://github.com/nightscout/nocturne/blob/7df0daaabe59e3430c375272e86695423c885dfa/src/Connectors/Nocturne.Connectors.CareLink/Mappers/CareLinkTreatmentMapper.cs
@@ -111,7 +181,8 @@ enum CareLinkTherapyParser {
         var seen = Set<String>()
         let values = markers.compactMap { marker -> (date: Date, amount: Double, id: String?)? in
             guard string(marker["type"])?.caseInsensitiveCompare("AUTO_BASAL_DELIVERY") == .orderedSame,
-                  let date = date(marker["timestamp"] ?? marker["dateTime"] ?? marker["displayTime"], offset: offset),
+                  let date = (date(marker["displayTime"], offset: offset)
+                      ?? date(marker["timestamp"] ?? marker["dateTime"], offset: offset)),
                   date <= now.addingTimeInterval(5 * 60),
                   date >= now.addingTimeInterval(-48 * 60 * 60),
                   let amount = number(field("bolusAmount", marker: marker)),

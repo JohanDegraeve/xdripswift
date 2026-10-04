@@ -2,3 +2,4 @@
 "calibration_title" = "Calibração";
 "calibration_notification_title" = "Calibração";
 "calibration_notification_body" = "Pressione na Notificação para Calibrar";
+"previousCalibrationPrefillMessage" = "O valor da sua calibração anterior das %@ está pré-preenchido. Compare-o com a leitura atual do seu medidor antes de confirmar.";

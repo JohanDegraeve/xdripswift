@@ -34,6 +34,7 @@ struct WidgetSharedUserDefaultsModel: Codable {
     var followerPatientName: String?
     
     var aidStatus: AIDStatus?
+    var therapyMetrics: TherapyMetricsSnapshot? = nil
     
     var allowStandByHighContrast: Bool
     var forceStandByBigNumbers: Bool

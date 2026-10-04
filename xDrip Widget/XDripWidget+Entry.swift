@@ -40,12 +40,13 @@ extension XDripWidget.Entry {
         var keepAliveDisabledMessage: String?
         
         var aidStatus: AIDStatus?
+        var therapyMetrics: TherapyMetricsSnapshot? = nil
         
         var bgUnitString: String
         var bgValueInMgDl: Double?
         var bgReadingDate: Date?
                 
-        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", followerPatientName: String?, keepAliveDisabledMessage: String? = nil, aidStatus: AIDStatus? = nil, allowStandByHighContrast: Bool? = true, forceStandByBigNumbers: Bool? = false) {
+        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", followerPatientName: String?, keepAliveDisabledMessage: String? = nil, aidStatus: AIDStatus? = nil, therapyMetrics: TherapyMetricsSnapshot? = nil, allowStandByHighContrast: Bool? = true, forceStandByBigNumbers: Bool? = false) {
             self.bgReadingValues = bgReadingValues
             self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl ?? true
@@ -62,6 +63,7 @@ extension XDripWidget.Entry {
             self.keepAliveDisabledMessage = keepAliveDisabledMessage
             
             self.aidStatus = aidStatus
+            self.therapyMetrics = therapyMetrics
             
             self.bgValueInMgDl = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0] : nil
             self.bgReadingDate = (bgReadingDates?.count ?? 0) > 0 ? bgReadingDates?[0] : nil
@@ -231,9 +233,11 @@ extension XDripWidget.Entry {
             aidStatus?.presentation().color
         }
         
-        func deviceStatusIconImage() -> Image? {
-            guard let systemImage = aidStatus?.presentation().systemImage else { return nil }
-            return Image(systemName: systemImage)
+        /// Use the common AID renderer so this surface inherits the same symbol weight as the app.
+        /// Keep a missing symbol absent so checking states do not imply an active loop.
+        func deviceStatusIconImage() -> AIDStatusSymbolImage? {
+            guard let symbol = aidStatus?.presentation().symbol else { return nil }
+            return AIDStatusSymbolImage(symbol: symbol)
         }
     }
 }

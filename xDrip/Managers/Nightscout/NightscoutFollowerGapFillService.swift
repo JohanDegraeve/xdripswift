@@ -320,7 +320,7 @@ final class NightscoutFollowerGapFillService: @unchecked Sendable {
         }
     }
 
-    /// Cancels active range work. Completed resource checkpoints remain durable; the active
+    /// Cancels active range work. Completed resource checkpoints remain durable. The active
     /// resource is deliberately left at its previous successful endpoint.
     func cancel() {
         guard Thread.isMainThread else {

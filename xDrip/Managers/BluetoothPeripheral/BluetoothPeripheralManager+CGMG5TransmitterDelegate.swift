@@ -21,7 +21,7 @@ extension BluetoothPeripheralManager: CGMG5TransmitterDelegate {
         
         guard let dexcomG5 = getDexcomG5(cGMG5Transmitter: cGMG5Transmitter) else {return}
         
-        guard case .DexcomG5(let voltA, let voltB, let res, let runt, let temp) = transmitterBatteryInfo else {return}
+        guard case .dexcom(family: .g5, let voltA, let voltB, let res, let runt, let temp) = transmitterBatteryInfo else {return}
         
         dexcomG5.batteryResist = Int32(res)
         
@@ -32,8 +32,17 @@ extension BluetoothPeripheralManager: CGMG5TransmitterDelegate {
         dexcomG5.batteryRuntime = Int32(runt)
         
         dexcomG5.batteryTemperature = Int32(temp)
-        
+        let readAt = Date()
+        dexcomG5.batteryLastReadDate = readAt
         coreDataManager.saveChanges()
+        batteryHistoryManager.record(
+            peripheralObjectID: dexcomG5.blePeripheral.objectID,
+            observedAt: readAt,
+            observation: .dexcom(
+                family: .g5, status: Int(dexcomG5.batteryStatus), voltageA: voltA,
+                voltageB: voltB, resistance: res, runtime: runt, temperature: temp, producer: .dexcomG5
+            )
+        )
         
     }
     

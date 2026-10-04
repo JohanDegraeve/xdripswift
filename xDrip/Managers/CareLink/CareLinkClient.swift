@@ -20,6 +20,7 @@ actor CareLinkClient {
     private let session: URLSession
     private let tokenStore: CareLinkTokenStoring
     private let now: () -> Date
+    private let appVersionProvider: () -> String
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCareLinkFollowManager)
     private var cachedRoute: CareLinkDataRoute?
     private var refreshTask: Task<CareLinkToken, Error>?
@@ -29,10 +30,18 @@ actor CareLinkClient {
     private var lastTokenRefreshAt: Date?
 
     /// Dependencies are injectable so URL loading, secure storage and time remain deterministic.
-    init(session: URLSession = URLSession(configuration: .ephemeral), tokenStore: CareLinkTokenStoring = CareLinkKeychainTokenStore(), now: @escaping () -> Date = Date.init) {
+    init(
+        session: URLSession = URLSession(configuration: .ephemeral),
+        tokenStore: CareLinkTokenStoring = CareLinkKeychainTokenStore(),
+        now: @escaping () -> Date = Date.init,
+        appVersionProvider: @escaping () -> String = {
+            UserDefaults.standard.careLinkVersion ?? ConstantsCareLink.carePartnerAppVersionDefault
+        }
+    ) {
         self.session = session
         self.tokenStore = tokenStore
         self.now = now
+        self.appVersionProvider = appVersionProvider
     }
 
     /// Reports authentication without returning OAuth credentials to UI code.
@@ -223,11 +232,12 @@ actor CareLinkClient {
         case .periodic:
             let accountName = username ?? patient.username
             let endpoint = cloudRoot.appendingPathComponent("connect/carepartner/v13/display/message")
-            var bodies = [["username": accountName, "role": requestRole, "patientId": patient.username, "appVersion": ConstantsCareLink.carePartnerAppVersion]]
+            let appVersion = appVersionProvider()
+            var bodies = [["username": accountName, "role": requestRole, "patientId": patient.username, "appVersion": appVersion]]
             // Personal accounts have historically accepted both body shapes. A Care Partner
             // request must remain patient-scoped so a fallback can never select another link.
             if requestRole == "patient" {
-                bodies.append(["username": accountName, "role": requestRole, "appVersion": ConstantsCareLink.carePartnerAppVersion])
+                bodies.append(["username": accountName, "role": requestRole, "appVersion": appVersion])
             }
             let currentResult = try await periodicPayload(endpoint: endpoint, bodies: bodies)
             if let data = currentResult.payload { return data }
@@ -380,7 +390,10 @@ actor CareLinkClient {
     /// Keeps Medtronic's configuration dynamic while restricting every discovered HTTPS endpoint
     /// to the selected region's CareLink domain, so discovery cannot authorize an arbitrary host.
     private func discoverOAuthConfiguration(region: CareLinkRegion) async throws -> CareLinkOAuthConfiguration {
-        let discoveryData = try await send(URLRequest(url: ConstantsCareLink.carePartnerDiscoveryURL)).data
+        guard let discoveryURL = ConstantsCareLink.carePartnerDiscoveryURL(appVersion: appVersionProvider()) else {
+            throw CareLinkError.invalidConfiguration
+        }
+        let discoveryData = try await send(URLRequest(url: discoveryURL)).data
         guard let discovery = try JSONSerialization.jsonObject(with: discoveryData) as? [String: Any],
               let regions = discovery["CP"] as? [[String: Any]],
               let selected = regions.first(where: {

@@ -76,7 +76,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "479359842B88B95A007D3CEE"
             BuildableName = "xDrip Watch Complication Extension.appex"
-            BlueprintName = "xDrip Watch Complication Extension"
             ReferencedContainer = "container:xdrip.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -119,7 +118,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "479359842B88B95A007D3CEE"
             BuildableName = "xDrip Watch Complication Extension.appex"
-            BlueprintName = "xDrip Watch Complication Extension"
             ReferencedContainer = "container:xdrip.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

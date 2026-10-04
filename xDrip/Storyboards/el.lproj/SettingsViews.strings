@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Ρυθμίσεις";
-"settingsviews_glucoseDisplaySectionTitle" = "Προβολή";
+"settingsviews_glucoseDisplaySectionTitle" = "Γενικά";
 "settingsviews_glucoseRangesSectionTitle" = "Εύρη γλυκόζης";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Συναγερμοί και ειδοποιήσεις";
 "settingsviews_sharingAndServicesSectionTitle" = "Κοινή χρήση και υπηρεσίες";
@@ -23,9 +23,9 @@
 "settingsviews_labelShowReadingInAppBadge" = "Σήμα εφαρμογής";
 "settingsviews_multipleAppBadgeValueWith10" = "Σήμα εφαρμογής x10";
 "settingsviews_allowScreenRotation" = "Περιστροφή γραφήματος";
-"settingsviews_showMiniChart" = "Εμφάνιση μίνι-γραφήματος;";
-"settingsviews_showSensorNoise" = "Εμφάνιση θορύβου αισθητήρα";
-"settingsviews_showClockWhenScreenIsLocked" = "Ρολόι οθόνης κλειδώματος";
+"settingsviews_showMiniChart" = "Μικρό γράφημα";
+"settingsviews_showSensorNoise" = "Θόρυβος αισθητήρα";
+"settingsviews_showClockWhenScreenIsLocked" = "Ρολόι";
 "settingsviews_urgentHighValue" = "Επείγον Υψηλή γλυκόζη";
 "settingsviews_highValue" = "Υψηλή γλυκόζη";
 "settingsviews_targetValue" = "Τιμή στόχου";
@@ -34,14 +34,14 @@
 "settingsviews_showcoloredobjectives" = "Έγχρωμες γραμμές";
 "settingsviews_showtarget" = "Γραμμή στόχου";
 "settingsviews_sectiontitletreatments" = "Θεραπείες";
-"settingsviews_showTreatments" = "Εμφάνιση θεραπειών στο γράφημα;";
+"settingsviews_showTreatments" = "Θεραπεία";
 "settingsviews_smallBolusTreatmentThreshold" = "Όριο Micro-bolus (ταχείας δράσης)";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Κάτω από πόσες μονάδες πρέπει να θεωρήσουμε ένα ταχείας δράσης ως μικροδιώρωση (micro-bolus);\n\n(Προτεινόμενη τιμή: 1,0U)";
 "settingsviews_sectiontitlestatistics" = "Στατιστικά";
-"settingsviews_showStatistics" = "Εμφάνιση στατιστικών;";
+"settingsviews_showStatistics" = "Στατιστικά";
 "settingsviews_daysToUseStatisticsTitle" = "Μέρες για υπολογισμό;";
 "settingsviews_daysToUseStatisticsMessage" = "Μέγιστος αριθμός ημερών για στατιστικό υπολογισμό;\n\n(Εισαγάγετε 0 για υπολογισμό από σήμερα τα μεσάνυχτα)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Πομπός";
 "settingsviews_transmittertype" = "Τύπος πομπού";
 "settingsviews_transmitterid" = "Αναγνωριστικό πομπού";
@@ -72,7 +72,8 @@
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Επιλογές μεταφόρτωσης";
 "settingsviews_nightscoutEnabled" = "Ενεργοποίηση του Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
-"settingsviews_useSchedule" = "Μεταφόρτωση με χρονοδιάγραμμα;";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "Ενεργοποίηση χρονοδιαγράμματος";
 "schedule" = "Χρονοδιάγραμμα";
 "settingsviews_giveNightscoutUrl" = "Εισαγάγετε το Nightscout URL σας";
 "settingsviews_nightscoutAPIKey" = "API_SECRET";
@@ -125,7 +126,7 @@
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Αρχική οθόνη";
-"settingsviews_mainChartHours" = "Ώρες κύριου γραφήματος";
+"settingsviews_mainChartHours" = "Χρονικό εύρος";
 "settingsviews_sectionTitleHousekeeper" = "Διαχείριση δεδομένων";
 "settingsviews_housekeeperRetentionPeriod" = "Περίοδος διατήρησης";
 "settingsviews_housekeeperRetentionPeriodMessage" = "Για πόσες ημέρες πρέπει να αποθηκεύονται τα δεδομένα; (Ελάχ. 90, μέγ. 365)\n\n(Συνιστάται: 90 ημέρες)";
@@ -244,7 +245,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Μείωση φωτεινότητας οθόνης κλειδώματος";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Σκοτείνιασμα";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -458,3 +459,63 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Γράφημα";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Βασικό";
 "settingsviews_liveActivitySectionTitle" = "Ζωντανή δραστηριότητα";
+"settingsviews_dexcomG7Message" = "Αφήστε κενό το όνομα Bluetooth. Στην επόμενη οθόνη, πατήστε Σάρωση για αυτόματη αναζήτηση του αισθητήρα.\n\nΕάν ο αισθητήρας έχει εμφανιστεί προηγουμένως στις Ρυθμίσεις > Bluetooth, μπορείτε να εισαγάγετε το όνομα Bluetooth χειροκίνητα.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Διάρκεια Υδατανθράκων";
+"therapy.local" = "Υπολογίζεται τοπικά";
+
+"settingsviews_showOriginalBGReadings" = "Αρχικές τιμές";
+
+"therapy.insulinType" = "Τύπος Ινσουλίνης";
+
+"therapy.showIOBCOB" = "IOB/COB";
+
+"therapy.treatmentSettings" = "Θεραπείες";
+
+"therapy.settingsHelp" = "Χρησιμοποιούνται για την εκτίμηση της υπολειπόμενης ινσουλίνης και των υδατανθράκων από τις καταγεγραμμένες θεραπείες.";
+
+"therapy.settingsLocal" = "Αυτές οι ρυθμίσεις εκτιμούν IOB και COB από καταγεγραμμένες θεραπείες μόνο όταν οι τιμές δεν παρέχονται από σύστημα AID.";
+"therapy.settingsExternal" = "Αυτές οι επιλογές είναι απενεργοποιημένες επειδή το σύστημα AID που βασίζεται στο %@ παρέχει IOB και COB.";
+"therapy.settingsMixed" = "Το %@ παρέχει IOB, επομένως ο τύπος ινσουλίνης είναι αυτόματος. Η διάρκεια υδατανθράκων εκτιμά το COB τοπικά από καταγεγραμμένα γεύματα.";
+"therapy.insulinModel" = "Επιλέχθηκε το μοντέλο ινσουλίνης %@. Διάρκεια δράσης ινσουλίνης (DIA): %@. Χρόνος έως τη μέγιστη δράση ινσουλίνης: %@.";
+"therapy.carbFast" = "Ταχύτερη απορρόφηση υδατανθράκων. Περιλαμβάνει καθυστέρηση 10 λεπτών πριν από την έναρξη.";
+"therapy.carbNormal" = "Κανονική απορρόφηση υδατανθράκων. Περιλαμβάνει καθυστέρηση 10 λεπτών πριν από την έναρξη.";
+"therapy.carbLong" = "Μεγαλύτερη διάρκεια απορρόφησης υδατανθράκων. Μπορεί να είναι χρήσιμη όταν φάρμακα GLP-1 επιβραδύνουν την πέψη. Περιλαμβάνει καθυστέρηση 10 λεπτών πριν από την έναρξη.";
+"therapy.automatic" = "Αυτόματο";
+
+"therapy.liveActivityMetricsFooter" = "Εμφάνιση των διαθέσιμων IOB και COB στη μεγάλη διάταξη οθόνης κλειδώματος και στη διάταξη γραφήματος CarPlay/Έξυπνης στοίβας.";
+
+"therapy.liveActivityMetricsUnavailable" = "Το IOB/COB απαιτεί καταγεγραμμένες θεραπείες ινσουλίνης ή υδατανθράκων ή δεδομένα από συνδεδεμένο σύστημα AID.";
+
+"homeScreen.renderBasalDownwards" = "Εμφάνιση βασικής προς τα κάτω";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "Ενεργό";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "Ανενεργό";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "Πρόγραμμα";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "Ενεργοποίηση στις";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "Απενεργοποίηση στις";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "Όταν η εκφώνηση γλυκόζης είναι ενεργοποιημένη, οι μετρήσεις εκφωνούνται μόνο μέσα σε αυτές τις ώρες. Το πρόγραμμα επαναλαμβάνεται καθημερινά με βάση την τοπική ώρα του τηλεφώνου και μπορεί να περνά τα μεσάνυχτα. Οι συντομεύσεις αλλάζουν μόνο τον κύριο διακόπτη εκφώνησης γλυκόζης.";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "Επιλέξτε διαφορετικές ώρες ενεργοποίησης και απενεργοποίησης.";
+"therapy.summary" = "Σύνοψη θεραπείας";
+"therapy.curves" = "Καμπύλες IOB/COB";
+"settingsviews_displayTrendInContactImage" = "Τάση";
+"homeScreen.layout" = "Διάταξη αρχικής οθόνης";
+"homeScreen.elapsed" = "Χρόνος που πέρασε";
+"homeScreen.remaining" = "Χρόνος που απομένει";
+"homeScreen.basalPosition" = "Θέση βασικής ινσουλίνης";
+"homeScreen.basalTop" = "Πάνω";
+"homeScreen.basalBottom" = "Κάτω";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Γράφημα γλυκόζης";

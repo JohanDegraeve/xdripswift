@@ -62,6 +62,10 @@
 
 /// 
 "battery" = "Battery";
+"versionCode" = "Код версії";
+"voltageA" = "Напруга A";
+"voltageB" = "Напруга B";
+"waitingForData" = "Очікування даних...";
 
 /// button text, to disconnect
 "disconnect" = "Disconnect";
@@ -102,7 +106,6 @@
 "serialNumber" = "Serial Number";
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Режим співіснування";
 "useOtherDexcomAppCoexistenceFooter" = "Режим співіснування дозволяє нам працювати з іншою програмою, наприклад Dexcom або CamAPS. Ця програма має продовжувати працювати у фоновому режимі.";
 "useOtherDexcomAppPrimaryFooter" = "Основний режим підключається як головна програма та керує з'єднанням.";
 "runningInCoexistenceMode" = "Працює в режимі співіснування";
@@ -143,13 +146,13 @@
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
 
 /// sensor warm-up text
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "Прогрів до";
 
 /// Scan again button
 "nfcScanFailedScanAgainButton" = "Scan Again";
 
 /// Tell the user the scan was successful and to just wait now for connection
-"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 
 /// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
 "readSuccessLast24Hours" = "Останні 24 години";
@@ -183,15 +186,74 @@
 
 /* Dexcom G6 Bluetooth authentication slot */
 "dexcomG6BluetoothSlot" = "Канал Bluetooth";
-"dexcomG6MobileAppSlot" = "Мобільна програма (За замовчуванням)";
+"dexcomG6MobileAppSlot" = "Слот 2: Мобільна програма (За замовчуванням)";
 "dexcomG6MobileAppSlotShort" = "Мобільна програма";
-"dexcomG6MedicalDeviceSlot" = "Приймач або помпа (Експериментально)";
+"dexcomG6MedicalDeviceSlot" = "Слот 1: Приймач або помпа";
 "dexcomG6MedicalDeviceSlotShort" = "Помпа";
 "dexcomG6MobileAppSlotFooter" = "Канал «Мобільна програма» використовується за замовчуванням для підключень телефона.";
 "dexcomG6MedicalDeviceSlotFooter" = "Канал «Приймач або помпа» зазвичай зарезервовано для приймача Dexcom або сумісної помпи. Якщо ця програма використовує його, канал «Мобільна програма» залишається доступним для телефона або іншого пристрою.";
 "dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Недоступно в режимі співіснування";
 "dexcomG6MedicalDeviceSlotWarning" = "Канал «Приймач або помпа» зазвичай зарезервовано для приймача Dexcom або сумісної помпи. Його вибір може завадити підключенню цього пристрою.\n\nВикористання каналу «Приймач або помпа» слід вважати виключно експериментальним. Вибір набуде чинності під час наступної автентифікації.";
-"dexcomG6AnubisSlot" = "Канал 3 (Anubis, експериментальний)";
+"dexcomG6AnubisSlot" = "Слот 3: Anubis Extra";
+"dexcomG7MedicalDeviceSlot" = "Слот 1: Приймач або помпа";
+"dexcomG7MedicalDeviceSlotShort" = "Помпа";
+"dexcomG7MobileAppSlot" = "Слот 2: Мобільна програма (За замовчуванням)";
+"dexcomG7SmartWatchSlot" = "Слот 3: Розумний годинник";
+"dexcomG7PairingCodeMessage" = "Введіть чотиризначний код з аплікатора поточного сенсора. Основний режим не може пройти автентифікацію без цього коду.";
+"dexcomG7BluetoothSlot" = "Канал Bluetooth";
+"dexcomG7MobileAppSlotShort" = "Мобільна програма";
+"dexcomG7SmartWatchSlotShort" = "Розумний годинник";
+"dexcomG7MobileAppSlotFooter" = "Канал мобільної програми (слот 2) використовується за замовчуванням і є перевіреним прямим підключенням G7.";
+"dexcomG7MedicalDeviceSlotFooter" = "Канал приймача або помпи використовує слот автентифікації 1.";
+"dexcomG7SmartWatchSlotFooter" = "Канал розумного годинника використовує заводський слот автентифікації 3.";
 "dexcomG6AnubisSlotShort" = "Канал 3";
 "dexcomG6AnubisSlotFooter" = "Канал 3 доступний лише в трансмітерах Anubis. Він є експериментальним і залишає канали «Мобільна програма» та «Приймач або помпа» доступними для інших пристроїв.";
 "dexcomG6AnubisSlotWarning" = "Канал 3 — експериментальний канал, доступний лише в трансмітерах Anubis.\n\nВикористовуйте Канал 3 лише для тестування. Вибір набуде чинності під час наступної автентифікації.";
+"dexcomConnectionMode" = "Режим підключення";
+"dexcomPrimaryMode" = "Основний";
+"dexcomCoexistenceMode" = "Співіснування";
+"dexcomPrimaryModePickerOption" = "Основний режим";
+"dexcomCoexistenceModePickerOption" = "Режим співіснування";
+"dexcomG6ModeSelectionFooter" = "Режим підключення G6 можна змінити пізніше в налаштуваннях трансмітера.";
+"dexcomConnectionModeSelectionExplanation" = "В основному режимі ця програма підключається безпосередньо, а всі інші програми, які підключаються до пристрою Dexcom, мають бути закриті.\n\nРежим співіснування використовує іншу програму для підтримання підключення Dexcom і отримання показників.";
+"dexcomBluetoothChannelSelectionExplanation" = "Виберіть канал Bluetooth, який використовуватиме ця програма. Виберіть Мобільна програма, якщо цей канал не потрібно залишити доступним для іншого підключення.";
+"dexcomG6CoexistenceModeSelectionMessage" = "Вибрано режим співіснування. Інша програма, наприклад Dexcom G6 або CamAPS, має підключитися до передавача G6 й автентифікувати його.\n\nЗалиште іншу програму працювати у фоновому режимі, інакше %@ не отримуватиме показники.";
+"dexcomG6PrimaryModeSelectionMessage" = "Вибрано основний режим. %@ має бути єдиною програмою, яка підключається до передавача G6 й автентифікує його.\n\nЗакрийте всі інші програми, що підключаються до передавача, або вимкніть для них дозвіл Bluetooth. Інакше %@ або інша програма можуть не отримувати показники.";
+"dexcomPrimaryModeAddFlowMessage" = "Підключайтеся безпосередньо як основна програма. Відключіть усі інші програми від цього Dexcom.";
+"dexcomCoexistenceModeAddFlowMessage" = "Спільно використовуйте підключення з іншою програмою. Програма Dexcom або CamAPS має коректно працювати у фоновому режимі.";
+"dexcomG7NoSensorLabelFound" = "На фотографії не знайдено етикетку сенсора Dexcom G7.";
+"dexcomG7InvalidSensorLabelFound" = "Знайдено код Data Matrix, але він не є дійсною етикеткою сенсора Dexcom G7.";
+
+
+/* Battery history */
+"batteryHistory" = "Історія батареї";
+"batteryHistoryTransmitterID" = "ID трансмітера";
+"batteryHistoryNoData" = "Немає історії батареї";
+"batteryHistoryBeginsAfterReading" = "Історія почнеться після наступного фактичного показання батареї.";
+"batteryHistoryRange" = "Період";
+"batteryHistoryRangeAccessibility" = "Період історії батареї";
+"batteryHistoryRangeExplanation" = "Фіксовані періоди відлічуються від поточного моменту назад на вибрану кількість днів. Проміжки позначають періоди без показань.";
+
+"connectionDiagramOtherApp" = "Інший застосунок";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Рівень сигналу";
+
+"signalStrengthChartExplanation" = "Сигнал за останні дві хвилини в реальному часі. Під час підключення нові вимірювання надходять приблизно кожну секунду.";
+
+"signalStrengthWeak" = "Слабкий";
+"signalStrengthStrong" = "Сильний";
+"signalStrengthLastMeasurement" = "Останнє вимірювання";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Підписки";
+"heartbeat.mode" = "Режим підписки";
+"heartbeat.mode.automatic" = "Одна";
+"heartbeat.mode.all" = "Усі";
+"heartbeat.footer.automatic" = "Автоматично вибирає один підтримуваний канал Bluetooth для сигналів heartbeat, зводячи кількість підписок до мінімуму. Якщо підписка не вдається, пробує інший канал.";
+"heartbeat.footer.all" = "Підписується на всі підтримувані канали Bluetooth, щоб оновлення будь-якого з них могли слугувати сигналом heartbeat.";
+"heartbeat.simpleFooter" = "Зміни діятимуть із наступного підключення.";
+
+"signalStrengthDisconnected" = "Відключено";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "Закінчується";

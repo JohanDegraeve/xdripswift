@@ -14,8 +14,9 @@
 "common_minute" = "dak";
 "common_day" = "gün";
 "common_days" = "gün";
-"common_landscape_comparingWithLast" = "Son dönemle karşılaştır:";
+"common_landscape_showAGPChartData" = "AGP grafik verilerini göster:";
 "common_landscape_comparisonDays" = "%d gün";
+"common_landscape_comparisonNone" = "Yok";
 "common_today" = "Bugün";
 "common_week" = "hafta";
 "common_hourshort" = "sa";
@@ -31,7 +32,6 @@
 "white" = "beyaz";
 "yellow" = "sarı";
 "name" = "İsim";
-"WiFi" = "WiFi";
 "on" = "Aç";
 "off" = "Kapa";
 "delete" = "Sil";
@@ -45,7 +45,11 @@
 "common_statistics_inRange" = "Hedef alanında";
 "common_statistics_high" = "Yüksek";
 "common_statistics_average" = "Ortalama";
-"common_statistics_a1c" = "HbA1c";
+"common_statistics_gmiTrend" = "GMI eğilimi";
+"common_statistics_threeDay" = "3 günlük";
+"common_statistics_weekly" = "Haftalık";
+"common_statistics_daily" = "Günlük";
+"common_statistics_gmi" = "GMI";
 "common_statistics_cv" = "CV";
 "common_dontshowagain" = "Tekrar Gösterme";
 
@@ -58,3 +62,19 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Tahmini aktif insülin";
+"therapy.estimatedCOB" = "Tahmini aktif karbonhidrat";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Kaydedilmemiş Değişiklikler";
+"common_save" = "Kaydet";
+"common_discardChanges" = "Değişiklikleri Sil";
+"common_back" = "Geri";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Sensör ısınıyor";
+"common_sensorWarmupUntilFormat" = "Bitiş: %@";
+"common_sensorWarmupComplete" = "Isınma tamamlandı";
+"common_sensorWaitingForReading" = "İlk ölçüm bekleniyor…";

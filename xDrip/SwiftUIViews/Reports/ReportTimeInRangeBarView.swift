@@ -41,9 +41,10 @@ struct GlucoseReportTimeInRangeBarView: View {
             sectionTitle(title)
 
             GeometryReader { geometry in
-                // The printed clinical TIR bar must represent the exact percentage split while
-                // still leaving tiny but visible slivers for very small low/high ranges.
-                HStack(spacing: 1) {
+                // The printed bar uses exact normalized proportions. Zero spacing and no artificial
+                // minimum widths keep its geometry at exactly 100%. Labels use the separately
+                // allocated whole percentages below.
+                HStack(spacing: 0) {
                     ForEach(buckets) { bucket in
                         RoundedRectangle(cornerRadius: 3)
                             .fill(bucket.color)
@@ -75,11 +76,11 @@ struct GlucoseReportTimeInRangeBarView: View {
                                 .minimumScaleFactor(0.7)
                         }
                         HStack(alignment: .firstTextBaseline, spacing: 3) {
-                            Text(GlucoseReportFormatting.percentage(bucket.percentage))
+                            Text(GlucoseReportFormatting.percentage(bucket.wholePercentage))
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundStyle(GlucoseReportColors.primaryText)
                                 .monospacedDigit()
-                            Text("(\(GlucoseReportFormatting.hoursPerDay(from: bucket.percentage, language: language)))")
+                            Text("(\(GlucoseReportFormatting.hoursPerDay(minutes: bucket.minutesPerDay, language: language)))")
                                 .font(.system(size: 7.5))
                                 .foregroundStyle(GlucoseReportColors.tertiaryText)
                         }
@@ -103,7 +104,6 @@ struct GlucoseReportTimeInRangeBarView: View {
     }
 
     private func segmentWidth(for bucket: GlucoseReportRangeBucket, totalWidth: CGFloat) -> CGFloat {
-        guard bucket.percentage > 0 else { return 0 }
-        return max(2, totalWidth * CGFloat(bucket.percentage / 100))
+        totalWidth * CGFloat(max(0, min(100, bucket.percentage)) / 100)
     }
 }

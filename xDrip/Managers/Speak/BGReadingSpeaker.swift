@@ -62,14 +62,16 @@ class BGReadingSpeaker:NSObject {
     ///
     /// conditions:
     ///     - speakReadings is on
+    ///     - the current local time is within the daily schedule, if scheduling is enabled
     ///     - no other sound is playing (via sharedAudioPlayer)
     ///     - there' s a recent reading less than 4.5 minutes old
     ///     - time since last spoken reading > interval defined by user (UserDefaults.standard.speakInterval)
     ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect
     public func speakNewReading(lastConnectionStatusChangeTimeStamp: Date) {
         
-        // if speak reading not enabled, then no further processing
-        if !UserDefaults.standard.speakReadings {
+        // Shortcuts control only the master switch. The optional schedule is a separate gate
+        // for new announcements and does not interrupt speech already in progress.
+        if !UserDefaults.standard.shouldSpeakReadings() {
             return
         }
         

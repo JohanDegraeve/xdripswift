@@ -27,9 +27,10 @@ class BgPostProcessingManager {
     private struct BgReadingDownstreamChange {
         let finalValueChanged: Bool
         let suppressionChanged: Bool
+        let trendChanged: Bool
 
         var affectsOlderDownstreamHistory: Bool {
-            return finalValueChanged || suppressionChanged
+            return finalValueChanged || suppressionChanged || trendChanged
         }
     }
 
@@ -116,19 +117,17 @@ class BgPostProcessingManager {
     func processBgReadings(processingStartDateOverride: Date?, fiveMinuteReadingsStartTimeStampOverride: Date? = nil, forceFullDownstreamRewrite: Bool = false, allowHistoricalDownstreamRewrite: Bool = false) -> Bool {
         refreshSourceContext()
 
-        guard let sourceContextIdentifier = currentSourceContextIdentifier() else {
-            trace("in processLatestReadings, sourceContextIdentifier is nil", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info)
-            return false
-        }
-
         let hasActivePostProcessing = hasActiveDownstreamPostProcessing()
         let isExplicitHistoricalPass = allowHistoricalDownstreamRewrite
             && (processingStartDateOverride != nil || forceFullDownstreamRewrite)
+        let shouldRecomputePostProcessing = hasActivePostProcessing || isExplicitHistoricalPass
 
-        // Automatic reading updates have nothing to recalculate when adjustment, smoothing and
-        // cadence reduction are all disabled. Explicit settings changes still process their
-        // requested history so disabling an existing configuration clears its stored values.
-        guard hasActivePostProcessing || isExplicitHistoricalPass else { return false }
+        // every display surface uses the stored slope, so it must also be recalculated when post processing is disabled
+        let sourceContextIdentifier = currentSourceContextIdentifier()
+        if shouldRecomputePostProcessing && sourceContextIdentifier == nil {
+            trace("in processLatestReadings, sourceContextIdentifier is nil", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info)
+            return false
+        }
 
         let currentSensor = UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
         let fromDate = processingStartDate(for: processingStartDateOverride, currentSensor: currentSensor)
@@ -162,13 +161,18 @@ class BgPostProcessingManager {
             )
         }
 
-        recomputeAdjustedValues(bgReadings: bgReadings, sourceContextIdentifier: sourceContextIdentifier)
-        recomputeSmoothedValues(bgReadings: bgReadings)
-        recomputeFiveMinuteCadenceSuppression(
-            bgReadings: bgReadings,
-            fiveMinuteReadingsStartTimeStampOverride: fiveMinuteReadingsStartTimeStampOverride,
-            rebuildCadenceFromStart: fiveMinuteReadingsStartTimeStampOverride != nil
-        )
+        let rebuildFiveMinuteCadenceFromStart = fiveMinuteReadingsStartTimeStampOverride != nil
+
+        if shouldRecomputePostProcessing, let sourceContextIdentifier = sourceContextIdentifier {
+            recomputeAdjustedValues(bgReadings: bgReadings, sourceContextIdentifier: sourceContextIdentifier)
+            recomputeSmoothedValues(bgReadings: bgReadings)
+            recomputeFiveMinuteCadenceSuppression(
+                bgReadings: bgReadings,
+                fiveMinuteReadingsStartTimeStampOverride: fiveMinuteReadingsStartTimeStampOverride,
+                rebuildCadenceFromStart: rebuildFiveMinuteCadenceFromStart
+            )
+        }
+
         recomputeSlopes(bgReadings: bgReadings)
 
         let latestVisibleBgReading = bgReadings.last(where: { !$0.isSuppressedByFiveMinuteCadence })
@@ -198,9 +202,12 @@ class BgPostProcessingManager {
 
         let downstreamChangesByObjectID = Dictionary(uniqueKeysWithValues: bgReadings.map { bgReading in
             let stateBeforeProcessing = statesBeforeProcessing[bgReading.objectID]
+
+            // include slope-only changes so older downstream entries do not keep a different trend
             let change = BgReadingDownstreamChange(
                 finalValueChanged: stateBeforeProcessing == nil ? true : abs(stateBeforeProcessing!.finalValue - bgReading.finalValue) > 0.001,
-                suppressionChanged: stateBeforeProcessing == nil ? true : stateBeforeProcessing!.isSuppressedByFiveMinuteCadence != bgReading.isSuppressedByFiveMinuteCadence
+                suppressionChanged: stateBeforeProcessing == nil ? true : stateBeforeProcessing!.isSuppressedByFiveMinuteCadence != bgReading.isSuppressedByFiveMinuteCadence,
+                trendChanged: stateBeforeProcessing == nil ? true : abs(stateBeforeProcessing!.calculatedValueSlope - bgReading.calculatedValueSlope) > 0.0000001 || stateBeforeProcessing!.hideSlope != bgReading.hideSlope
             )
             return (bgReading.objectID, change)
         })
@@ -238,13 +245,20 @@ class BgPostProcessingManager {
             bgReadingsToReplaceDownstream = []
         }
         let downstreamReadingsToReplace = bgReadingsToReplaceDownstream
+        // Direct value replacement cannot remove a reading that the five-minute cadence now hides.
+        // Delete only those exact suppressed readings during an explicit cadence rebuild. Automatic
+        // processing receives new readings before downstream upload, so it must not issue deletes.
+        let downstreamReadingsToDelete = rebuildFiveMinuteCadenceFromStart && UserDefaults.standard.useFiveMinuteReadings
+            ? bgReadings.filter { $0.isSuppressedByFiveMinuteCadence }
+            : []
 
-        if downstreamReadingsToReplace.count > 0 {
-            if shouldRewriteFullDownstreamWindow, let earliestBgReading = bgReadings.first, let latestBgReading = bgReadings.last {
-                nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: downstreamReadingsToReplace, deleteFromTimeStamp: earliestBgReading.timeStamp, deleteToTimeStamp: latestBgReading.timeStamp)
-            } else {
-                nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: downstreamReadingsToReplace)
-            }
+        if downstreamReadingsToReplace.count > 0 || downstreamReadingsToDelete.count > 0 {
+            nightscoutSyncManager?.replaceBgReadingsInNightscout(
+                bgReadings: downstreamReadingsToReplace,
+                bgReadingsToDelete: downstreamReadingsToDelete,
+                blocksDirectLiveUpload: shouldRewriteFullDownstreamWindow
+            )
+            healthKitManager?.deleteBgReadingsFromHealthKit(bgReadingIDs: downstreamReadingsToDelete.map { $0.id })
             healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: downstreamReadingsToReplace)
             return true
         }
@@ -365,8 +379,9 @@ class BgPostProcessingManager {
             disableCurrentAdjustment()
         }
 
-        if UserDefaults.standard.useFiveMinuteReadings != useFiveMinuteReadings {
-            UserDefaults.standard.fiveMinuteReadingsStartTimeStamp = applyFromTimeStamp
+        let rewriteStartDate = processingStartDateOverride ?? applyFromTimeStamp
+        if UserDefaults.standard.useFiveMinuteReadings != useFiveMinuteReadings || processingStartDateOverride != nil {
+            UserDefaults.standard.fiveMinuteReadingsStartTimeStamp = rewriteStartDate
         }
 
         // After "Apply from Now", the next automatic processing pass must not start
@@ -386,7 +401,6 @@ class BgPostProcessingManager {
             troubleshootingPostProcessingSettings(applyRange: troubleshootingApplyRange)
         )
 
-        let rewriteStartDate = processingStartDateOverride ?? applyFromTimeStamp
         _ = processBgReadings(processingStartDateOverride: rewriteStartDate, fiveMinuteReadingsStartTimeStampOverride: rewriteStartDate, allowHistoricalDownstreamRewrite: true)
         replacePostProcessingNote(enableAdjustment: enableAdjustment, slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: applyFromTimeStamp, enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingStrength: smoothingStrength, noteWindowStartDate: rewriteStartDate)
 
@@ -436,7 +450,7 @@ class BgPostProcessingManager {
                 !treatmentEntry.treatmentdeleted
                     && treatmentEntry.treatmentType == .Note
                     && treatmentEntry.enteredBy == appName
-                    && (treatmentEntry.notes?.hasPrefix(ConstantsNightscout.postProcessingNotePrefix) ?? false)
+                    && isPostProcessingNote(treatmentEntry.notes)
             }
 
             for existingNote in existingNotes {
@@ -458,10 +472,21 @@ class BgPostProcessingManager {
         }
     }
 
+    /// Recognize the readable format used for post-processing notes.
+    /// The caller also checks the author and treatment type before replacing a note.
+    private func isPostProcessingNote(_ notes: String?) -> Bool {
+        guard let notes = notes else { return false }
+
+        let lines = notes.components(separatedBy: "\n")
+        return lines.count == 2
+            && (lines[0].hasPrefix("Adjustment: offset ") || lines[0].hasPrefix("Adjustment: disabled. "))
+            && lines[0].contains(". Smoothing: ")
+            && lines[1].hasPrefix("Applied at ")
+            && lines[1].hasSuffix(".")
+    }
+
     private func postProcessingNoteText(enableAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, appliedAtTimeStamp: Date, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm) -> String {
         var noteComponents = [String]()
-
-        noteComponents.append(ConstantsNightscout.postProcessingNotePrefix)
 
         if enableAdjustment, let slope = slope, let intercept = intercept {
             noteComponents.append("Adjustment: offset \(intercept.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes), scale \(slope.round(toDecimalPlaces: 2).stringWithoutTrailingZeroes), emphasis \(adjustmentShapeType.description). " + smoothingNoteText(enableSmoothing: enableSmoothing, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm, useFiveMinuteReadings: useFiveMinuteReadings))
@@ -878,7 +903,8 @@ class BgPostProcessingManager {
     }
 
     private func recomputeSlopes(bgReadings: [BgReading]) {
-        var lastVisibleBgReading: BgReading?
+        var previousVisibleBgReadings = [BgReading]()
+        let maximumTimeInterval = TimeInterval(minutes: Double(ConstantsBGGraphBuilder.maxSlopeInMinutes))
 
         for bgReading in bgReadings {
             if bgReading.isSuppressedByFiveMinuteCadence {
@@ -887,16 +913,15 @@ class BgPostProcessingManager {
                 continue
             }
 
-            if let lastVisibleBgReading = lastVisibleBgReading {
-                let (calculatedValueSlope, hideSlope) = bgReading.calculateSlope(lastBgReading: lastVisibleBgReading)
-                bgReading.calculatedValueSlope = calculatedValueSlope
-                bgReading.hideSlope = hideSlope
-            } else {
-                bgReading.calculatedValueSlope = 0.0
-                bgReading.hideSlope = true
-            }
+            // readings outside the continuity window cannot be used and should not accumulate during a historical pass
+            previousVisibleBgReadings.removeAll { bgReading.timeStamp.timeIntervalSince($0.timeStamp) > maximumTimeInterval }
 
-            lastVisibleBgReading = bgReading
+            // choose the nearest older visible reading which gives a real trend interval
+            let (calculatedValueSlope, hideSlope) = bgReading.calculateSlope(lastBgReadings: previousVisibleBgReadings)
+            bgReading.calculatedValueSlope = calculatedValueSlope
+            bgReading.hideSlope = hideSlope
+
+            previousVisibleBgReadings.append(bgReading)
         }
     }
 

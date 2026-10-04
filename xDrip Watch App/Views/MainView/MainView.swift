@@ -31,6 +31,9 @@ struct MainView: View {
     @State private var fixedRowHeights: [MainViewFixedRow: CGFloat] = [:]
 
     private let rowSpacing: CGFloat = 2
+    private var showsTherapyRow: Bool {
+        watchState.aidStatusIconImage() != nil || watchState.resolvedTherapyMetrics.hasVisibleMetrics
+    }
 
     // pull the view back up towards the fixed watchOS time area
     // this offsets the extra top space added after removing the previous ZStack layout
@@ -78,7 +81,7 @@ struct MainView: View {
                         watchState.requestWatchStateUpdate()
                     }
 
-                if watchState.aidStatusIconImage() != nil {
+                if showsTherapyRow {
                     MainViewAIDStatusView()
                         .padding([.leading,], 0)
                         .padding([.trailing], 10)
@@ -88,7 +91,7 @@ struct MainView: View {
                         .measureFixedRow(.aidStatus)
                 }
 
-                GlucoseChartView(glucoseChartType: watchState.aidStatusIconImage() == nil ? .watchApp : .watchAppWithAIDStatus, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, agpBackgroundPoints: agpBackgroundPoints, agpBackgroundOpacityMultiplier: showsAGPBackground ? ConstantsGlucoseChartSwiftUI.agpOpacityMultiplierWatchApp : nil, explicitVisibleEndDate: chartRangeEndDate, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4, overrideChartHeight: chartHeight, overrideChartWidth: container.size.width, highContrast: nil)
+                GlucoseChartView(glucoseChartType: showsTherapyRow ? .watchAppWithAIDStatus : .watchApp, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, agpBackgroundPoints: agpBackgroundPoints, agpBackgroundOpacityMultiplier: showsAGPBackground ? ConstantsGlucoseChartSwiftUI.agpOpacityMultiplierWatchApp : nil, explicitVisibleEndDate: chartRangeEndDate, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4, overrideChartHeight: chartHeight, overrideChartWidth: container.size.width, highContrast: nil)
                     // make the full chart rectangle respond to swipes, not only the visible chart marks
                     .contentShape(Rectangle())
                     .gesture(
@@ -142,7 +145,7 @@ struct MainView: View {
         // everything except the chart keeps its measured height
         // the chart then fills whatever height remains
         let fixedHeight = fixedRowHeights.values.reduce(0, +)
-        let visibleRowCount = watchState.aidStatusIconImage() == nil ? 4 : 5
+        let visibleRowCount = showsTherapyRow ? 5 : 4
         let spacingHeight = CGFloat(max(visibleRowCount - 1, 0)) * rowSpacing
 
         return max(containerHeight - fixedHeight - spacingHeight, minimumChartHeight)

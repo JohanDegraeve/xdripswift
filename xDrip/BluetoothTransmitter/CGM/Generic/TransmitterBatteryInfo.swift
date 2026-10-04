@@ -1,17 +1,80 @@
 import Foundation
 
+/// Identifies the Dexcom hardware family whose battery produced a voltage measurement.
+///
+/// G5, G6 and ONE share the long-life transmitter voltage behaviour represented by `.g5`.
+/// G7, ONE+ and Stelo use the disposable-sensor behaviour represented by `.g7`. Keep this
+/// family beside the measurement so alerts never have to infer battery semantics from a global
+/// transmitter selection that may already have changed.
+enum DexcomBatteryFamily: Int16, Codable, Equatable {
+    case g5 = 1
+    case g7 = 2
+
+    /// Raw Voltage B values are stored in the Dexcom protocol's 10 mV unit.
+    /// A value below this boundary is the first value classified as red.
+    var redBelow: Int {
+        switch self {
+        case .g5:
+            return 270
+        case .g7:
+            // Android xDrip+ uses the same 215 boundary. Our initial G7-family field set also
+            // separates the two rapidly failing expired sensors from the working 2250 mV G7 15-day.
+            return 215
+        }
+    }
+
+    /// A value at or above this boundary is classified as green.
+    var greenFrom: Int {
+        switch self {
+        case .g5:
+            return 280
+        case .g7:
+            // Current working ONE+ and Stelo samples are above 2500 mV. Values from 2150 through
+            // 2490 mV remain a caution state while the family data set grows.
+            return 250
+        }
+    }
+}
+
+/// App-derived presentation of Dexcom Voltage B. This is deliberately separate from the status
+/// byte sent by the transmitter and from the sensor algorithm's warm-up/failure state.
+enum DexcomBatteryStatus: String, Codable, Equatable {
+    case unknown
+    case red
+    case yellow
+    case green
+
+    init(voltageB: Int, family: DexcomBatteryFamily) {
+        if voltageB <= 0 {
+            self = .unknown
+        } else if voltageB < family.redBelow {
+            self = .red
+        } else if voltageB < family.greenFrom {
+            self = .yellow
+        } else {
+            self = .green
+        }
+    }
+
+    static func millivolts(fromRawVoltage voltage: Int) -> Int {
+        voltage * 10
+    }
+}
+
 enum TransmitterBatteryInfo: Equatable {
     
     /// for transmitters to give battery in percentage
     case percentage (percentage:Int)
     
-    /// Dexcom G5 (and also G6 ?) voltageA, voltageB and resist
-    case DexcomG5 (voltageA:Int, voltageB:Int, resist:Int, runtime:Int, temperature:Int)
+    /// Dexcom voltage, resistance, runtime and temperature values with their battery family.
+    /// Family is interpretation metadata rather than a wire field: G5/G6 use one set of voltage
+    /// limits and G7/ONE+/Stelo use another while retaining the same five-value payload.
+    case dexcom(family: DexcomBatteryFamily, voltageA: Int, voltageB: Int, resist: Int, runtime: Int, temperature: Int)
     
     /// gives textual description of the battery level, example for percentage based, this is just the value followed by % sign
     var description: String {
         switch (self) {
-        case .DexcomG5(let voltA, let voltB, _, _, _):
+        case .dexcom(_, let voltA, let voltB, _, _, _):
             if (voltA == 0 || voltB == 0) {
                 return Texts_HomeView.waitingForDataSource // "waiting for data..."
             } else {
@@ -32,7 +95,7 @@ enum TransmitterBatteryInfo: Equatable {
             return ("battery" , percentage)
             
             
-        case .DexcomG5(voltageA: _, voltageB: let voltageB, resist: _, runtime: _, temperature: _):
+        case .dexcom(family: _, voltageA: _, voltageB: let voltageB, resist: _, runtime: _, temperature: _):
             
             return ("batteryVoltage" , voltageB)
 
@@ -71,7 +134,7 @@ enum TransmitterBatteryInfo: Equatable {
                 return nil
             }
             
-        case 1://dexcomg5 or dexcomg6
+        case 1, 3: // Existing G5/G6 value or the new family-explicit G7 value.
             
             // intialize values as nil
             var voltageA:Int?
@@ -118,7 +181,16 @@ enum TransmitterBatteryInfo: Equatable {
             }
 
             if let voltageA = voltageA, let voltageB = voltageB, let resist = resist, let runtime = runtime, let temperature = temperature {
-                self = .DexcomG5(voltageA: voltageA, voltageB: voltageB, resist: resist, runtime: runtime, temperature: temperature)
+                // Type 1 has existed since before G7 support and therefore always means the G5
+                // battery family. Type 3 is new and preserves the G7 family across app restarts.
+                self = .dexcom(
+                    family: type == 1 ? .g5 : .g7,
+                    voltageA: voltageA,
+                    voltageB: voltageB,
+                    resist: resist,
+                    runtime: runtime,
+                    temperature: temperature
+                )
             } else {
                 return nil
             }
@@ -137,7 +209,8 @@ enum TransmitterBatteryInfo: Equatable {
     /// would need to be extended if new cases are added to TransmitterBatteryInfo
     func toData() -> Data {
         
-        /// first bit will indicate enum with 0 = percentage, 1 = DexcomG5
+        /// The first byte identifies 0 = percentage, 1 = legacy/G5-family Dexcom, 3 = G7-family.
+        /// Never reuse a historical tag because this Data is persisted in UserDefaults.
         
         // start with empty array, actual result should never be empty
         var returnValueAsArray:[UInt8] = []
@@ -148,8 +221,8 @@ enum TransmitterBatteryInfo: Equatable {
             returnValueAsArray = [0]
             returnValueAsArray.append(contentsOf: percentage.toByteArray())
             
-        case .DexcomG5(let voltageA, let voltageB, let resist, let runtime, let temperature):
-            returnValueAsArray = [1]
+        case .dexcom(let family, let voltageA, let voltageB, let resist, let runtime, let temperature):
+            returnValueAsArray = [family == .g5 ? 1 : 3]
             returnValueAsArray.append(contentsOf: voltageA.toByteArray())
             returnValueAsArray.append(contentsOf: voltageB.toByteArray())
             returnValueAsArray.append(contentsOf: resist.toByteArray())

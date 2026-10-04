@@ -30,7 +30,7 @@ class DexcomShareFollowManager: NSObject {
     /// delegate to pass back glucosedata
     private(set) weak var followerDelegate: FollowerDelegate?
 
-    /// The root-owned shared keep-alive engine; this follower reports operational state only and
+    /// The root-owned shared keep-alive engine. This follower reports operational state only and
     /// does not own silent-audio playback, replay timing, or application lifecycle callbacks.
     private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
 

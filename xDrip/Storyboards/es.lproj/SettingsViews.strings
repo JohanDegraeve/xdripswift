@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Configuración";
-"settingsviews_glucoseDisplaySectionTitle" = "Visualización";
+"settingsviews_glucoseDisplaySectionTitle" = "General";
 "settingsviews_glucoseRangesSectionTitle" = "Rangos de glucosa";
 "settingsviews_glucoseRangesSectionFooter" = "Los rangos de glucosa solo afectan a los colores del gráfico principal. No están relacionados con los valores de alarma.";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alertas y notificaciones";
@@ -49,8 +49,8 @@
 "settingsviews_showReadingInNotification" = "Notificaciones de glucosa";
 "settingsviews_labelShowReadingInAppBadge" = "Globo de la app";
 "settingsviews_multipleAppBadgeValueWith10" = "Globo de app x10";
-"settingsviews_showClockWhenScreenIsLocked" = "Reloj en pantalla bloqueada";
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Atenuación en pantalla bloqueada";
+"settingsviews_showClockWhenScreenIsLocked" = "Reloj";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Atenuación";
 "settingsviews_screenLockDimmingTypeDisabled" = "Deshabilitado";
 "settingsviews_screenLockDimmingTypeDimmed" = "Atenuado";
 "settingsviews_screenLockDimmingTypeDark" = "Oscuro";
@@ -64,18 +64,18 @@
 "settingsviews_showcoloredobjectives" = "Líneas de colores";
 "settingsviews_showtarget" = "Línea objetivo";
 "settingsviews_sectiontitletreatments" = "Tratamientos";
-"settingsviews_showTreatments" = "Mostrar Tratamientos";
+"settingsviews_showTreatments" = "Terapia";
 "settingsviews_smallBolusTreatmentThreshold" = "Límite Micro-bolo";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Por debajo de cuántas unidades debemos considerar un bolo como micro-bolo?\n\n(Valor recomendado: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Estadísticas";
-"settingsviews_showStatistics" = "Mostrar Estadísticas";
+"settingsviews_showStatistics" = "Estadísticas";
 "settingsviews_daysToUseStatisticsTitle" = "Días a Calcular";
 "settingsviews_daysToUseStatisticsMessage" = "Máximos días a intentar usar para calcular las estadísticas?\n\n(Entrar 0 para calcular el día de hoy desde las 00:00hrs)";
 "settingsviews_labelTimeInRangeType" = "Tipo de Tiempo en Rango";
 "settingsviews_timeInRangeTypeStandardRange" = "Estándar";
 "settingsviews_timeInRangeTypeTightRange" = "Rango Estrecho";
 "settingsviews_timeInRangeTypeUserDefinedRange" = "Rango Usuario";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmisor";
 "settingsviews_transmittertype" = "Tipo de Transmisor";
 "settingsviews_transmitterid" = "ID del Transmisor";
@@ -108,7 +108,8 @@
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Opciones de subida";
 "settingsviews_nightscoutEnabled" = "Habilitar Nightscout";
-"settingsviews_useSchedule" = "Fijar Horario de Subida de Datos";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "Activar horario";
 "schedule" = "Horario";
 "settingsviews_giveNightscoutUrl" = "Entrar tu URL Nightscout";
 "settingsviews_giveNightscoutAPIKey" = "Entrar tu API_SECRET";
@@ -124,13 +125,13 @@
 "settingsviews_IntervalTitle" = "Intervalo entre notificaciones";
 "settingsviews_IntervalMessage" = "Intervalo mínimo entre dos notificaciones";
 "settingsviews_allowScreenRotation" = "Rotación del gráfico";
-"settingsviews_homeScreenChartDisplaySectionTitle" = "Visualización del gráfico";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Gráfico de Glucosa";
 "settingsviews_homeScreenMainChartSectionFooter" = "Estas opciones controlan cómo se muestran los datos de glucosa en el gráfico principal.";
-"settingsviews_mainChartHours" = "Horas del gráfico principal";
+"settingsviews_mainChartHours" = "Intervalo de Tiempo";
 "settingsviews_homeScreenScreenLockSectionTitle" = "Bloqueo de pantalla";
 "settingsviews_homeScreenScreenLockSectionFooter" = "Estas opciones controlan cómo se comporta la pantalla de Inicio cuando la app queda abierta o bloqueada.";
-"settingsviews_showMiniChart" = "Mostrar la mini-gráfica";
-"settingsviews_showSensorNoise" = "Mostrar ruido del sensor";
+"settingsviews_showMiniChart" = "Minigráfico";
+"settingsviews_showSensorNoise" = "Ruido del Sensor";
 "settingsviews_Version" = "Versión";
 "settingsviews_license" = "Licencia";
 "m5stack_settingsviews_settingstitle" = "Configuración M5 Stack";
@@ -176,7 +177,7 @@
 "settingsviews_infoContactsAccessRestricted" = "No has podido dar permiso a %@ para accesar a tus contactos. Esto es probablemente debido a restriciones como el control parental o similar.";
 "settingsviews_contactImageSectionTitle" = "Imagen de Contacto";
 "settingsviews_enableContactImage" = "Imagen de contacto";
-"settingsviews_displayTrendInContactImage" = "Mostrar Tendencia";
+"settingsviews_displayTrendInContactImage" = "Tendencia";
 "settingsviews_contactImageCreatedByString" = "Contacto creado automáticamente por";
 
 
@@ -457,3 +458,61 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Gráfico";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Básico";
 "settingsviews_liveActivitySectionTitle" = "Actividad en directo";
+"settingsviews_dexcomG7Message" = "Deje vacío el nombre de Bluetooth. En la pantalla siguiente, pulse Escanear para buscar el sensor automáticamente.\n\nSi el sensor ya ha aparecido en Ajustes > Bluetooth, puede introducir manualmente su nombre de Bluetooth.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Duración de Carbohidratos";
+"therapy.local" = "Calculado localmente";
+
+"settingsviews_showOriginalBGReadings" = "Valores Originales";
+
+"therapy.insulinType" = "Tipo de Insulina";
+
+"therapy.showIOBCOB" = "IOB/COB";
+
+"therapy.treatmentSettings" = "Tratamientos";
+
+"therapy.settingsHelp" = "Se utilizan para estimar la insulina y los carbohidratos restantes de los tratamientos registrados.";
+
+"therapy.settingsLocal" = "Estos ajustes estiman la IOB y los COB de los tratamientos registrados solo cuando un sistema AID no proporciona esos valores.";
+"therapy.settingsExternal" = "Estas opciones están desactivadas porque tu sistema AID basado en %@ proporciona la IOB y los COB.";
+"therapy.settingsMixed" = "%@ proporciona la IOB, por lo que el tipo de insulina es automático. La duración de carbohidratos estima los COB localmente a partir de las comidas registradas.";
+"therapy.insulinModel" = "Modelo de insulina %@ seleccionado. Duración de acción de la insulina (DIA): %@. Tiempo hasta el pico de insulina: %@.";
+"therapy.carbFast" = "Absorción de carbohidratos más rápida. Incluye un retraso de 10 minutos antes de comenzar.";
+"therapy.carbNormal" = "Absorción normal de carbohidratos. Incluye un retraso de 10 minutos antes de comenzar.";
+"therapy.carbLong" = "Absorción de carbohidratos más prolongada. Puede ser útil cuando la medicación GLP-1 ralentiza la digestión. Incluye un retraso de 10 minutos antes de comenzar.";
+"therapy.automatic" = "Automático";
+
+"therapy.liveActivityMetricsFooter" = "Mostrar la IOB y los COB disponibles en el diseño grande de la pantalla de bloqueo y en el diseño con gráfico de CarPlay/Pila inteligente.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB requiere tratamientos de insulina o carbohidratos registrados, o datos de un sistema AID conectado.";
+
+"homeScreen.renderBasalDownwards" = "Mostrar basal hacia abajo";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "Activo";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "Inactivo";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "Horario";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "Activar a las";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "Desactivar a las";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "Cuando Anunciar glucosa está activado, las lecturas solo se anuncian durante estas horas. El horario se repite cada día según la hora local del teléfono y puede cruzar la medianoche. Los atajos solo cambian el interruptor de Anunciar glucosa.";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "Elige horas de activación y desactivación diferentes.";
+"therapy.summary" = "Resumen del Tratamiento";
+"therapy.curves" = "Curvas de IOB/COB";
+"homeScreen.layout" = "Diseño de Inicio";
+"homeScreen.elapsed" = "Transcurrido";
+"homeScreen.remaining" = "Restante";
+"homeScreen.basalPosition" = "Posición de la Basal";
+"homeScreen.basalTop" = "Arriba";
+"homeScreen.basalBottom" = "Abajo";

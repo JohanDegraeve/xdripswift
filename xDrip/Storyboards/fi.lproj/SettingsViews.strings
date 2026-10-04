@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Asetukset";
-"settingsviews_glucoseDisplaySectionTitle" = "Näyttö";
+"settingsviews_glucoseDisplaySectionTitle" = "Yleiset";
 "settingsviews_glucoseRangesSectionTitle" = "Glukoosialueet";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Hälytykset ja ilmoitukset";
 "settingsviews_sharingAndServicesSectionTitle" = "Jakaminen ja palvelut";
@@ -14,7 +14,7 @@
 "settingsviews_appInstalledSince" = "Asennettu";
 "settingsviews_sectiontitleNotifications" = "Yleinen";
 "settingsviews_sectiontitlehomescreen" = "Kotinäyttö";
-"settingsviews_mainChartHours" = "Pääkaavion tunnit";
+"settingsviews_mainChartHours" = "Aikaväli";
 "settingsviews_selectbgunit" = "Verensokeriyksikkö";
 "settingsviews_urgentLowValue" = "Erittäin matala lukema";
 "settingsviews_lowValue" = "Matala lukema";
@@ -54,7 +54,8 @@
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Lähetysasetukset";
 "settingsviews_nightscoutEnabled" = "Ota Nightscout käyttöön";
 "settingsviews_nightscoutUrl" = "URL";
-"settingsviews_useSchedule" = "Käytä lähetysaikataulua";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "Ota aikataulu käyttöön";
 "schedule" = "Aikataulu";
 "settingsviews_giveNightscoutUrl" = "Anna Nightscout palvelimesi URL";
 "settingsviews_nightscoutAPIKey" = "API_SECRET";
@@ -125,16 +126,16 @@
 "settingsviews_sectiontitlestatistics" = "Tilastot";
 
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 
 /// statistics settings, show statistics on home screen
-"settingsviews_showStatistics" = "Näytä tilastot";
+"settingsviews_showStatistics" = "Tilastot";
 
 /// statistics settings, how many days to use for calculations
 "settingsviews_daysToUseStatisticsTitle" = "Päiviä laskutoimitukseen";
 
 /// general settings, should the clock also be displayed when the screen is locked?
-"settingsviews_showClockWhenScreenIsLocked" = "Lukitusnäytön kello";
+"settingsviews_showClockWhenScreenIsLocked" = "Kello";
 
 /// general settings, should the online help be translated automatically if needed
 "settingsviews_translateOnlineHelp" = "Käännä dokumentaatio";
@@ -166,7 +167,7 @@
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Kuinka monen yksikön alapuolella bolusta pitäisi pitää mikroboluksena?\n\n(Suositeltu arvo: 1,0 U)";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatments" = "Näytä hoidot kaaviossa";
+"settingsviews_showTreatments" = "Hoito";
 
 
 /// Housekeeper settings, section title
@@ -265,8 +266,8 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show Mini-Chart";
-"settingsviews_showSensorNoise" = "Show Sensor Noise";
+"settingsviews_showMiniChart" = "Pienoiskaavio";
+"settingsviews_showSensorNoise" = "Sensorin kohina";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Alias";
@@ -310,7 +311,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Lukitusnäytön himmennys";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Himmennys";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -524,3 +525,63 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Kaavio";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Perus";
 "settingsviews_liveActivitySectionTitle" = "Live-toiminto";
+"settingsviews_dexcomG7Message" = "Jätä Bluetooth-nimi tyhjäksi. Napauta seuraavassa näkymässä Skannaa, jotta sensoria etsitään automaattisesti.\n\nJos sensori on näkynyt aiemmin kohdassa Asetukset > Bluetooth, voit syöttää sen Bluetooth-nimen käsin.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Hiilihydraattien Kesto";
+"therapy.local" = "Laskettu paikallisesti";
+
+"settingsviews_showOriginalBGReadings" = "Alkuperäiset arvot";
+
+"therapy.insulinType" = "Insuliinityyppi";
+
+"therapy.showIOBCOB" = "IOB/COB";
+
+"therapy.treatmentSettings" = "Hoidot";
+
+"therapy.settingsHelp" = "Käytetään jäljellä olevan insuliinin ja hiilihydraattien arvioimiseen kirjatuista hoidoista.";
+
+"therapy.settingsLocal" = "Nämä asetukset arvioivat IOB- ja COB-arvot kirjatuista hoidoista vain, kun AID-järjestelmä ei toimita niitä.";
+"therapy.settingsExternal" = "Nämä valinnat on poistettu käytöstä, koska %@-pohjainen AID-järjestelmäsi toimittaa IOB- ja COB-arvot.";
+"therapy.settingsMixed" = "%@ toimittaa IOB-arvon, joten insuliinityyppi on automaattinen. Hiilihydraattien kesto arvioi COB-arvon paikallisesti kirjatuista aterioista.";
+"therapy.insulinModel" = "Insuliinimalli %@ valittu. Insuliinin vaikutusaika (DIA): %@. Aika insuliinin huippuvaikutukseen: %@.";
+"therapy.carbFast" = "Nopeampi hiilihydraattien imeytyminen. Sisältää 10 minuutin viiveen ennen imeytymisen alkua.";
+"therapy.carbNormal" = "Normaali hiilihydraattien imeytyminen. Sisältää 10 minuutin viiveen ennen imeytymisen alkua.";
+"therapy.carbLong" = "Pidempi hiilihydraattien imeytyminen. Voi olla hyödyllinen, kun GLP-1-lääkitys hidastaa ruoansulatusta. Sisältää 10 minuutin viiveen ennen imeytymisen alkua.";
+"therapy.automatic" = "Automaattinen";
+
+"therapy.liveActivityMetricsFooter" = "Näytä käytettävissä olevat IOB- ja COB-arvot lukitusnäytön suuressa asettelussa ja CarPlayn/Älykkään pinon kaavioasettelussa.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB edellyttää kirjattuja insuliini- tai hiilihydraattihoitoja tai tietoja yhdistetystä AID-järjestelmästä.";
+
+"homeScreen.renderBasalDownwards" = "Näytä basaali alaspäin";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "Aktiivinen";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "Ei aktiivinen";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "Aikataulu";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "Ota käyttöön klo";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "Poista käytöstä klo";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "Kun glukoosiarvojen ääneenluku on käytössä, arvot luetaan vain näiden kellonaikojen välillä. Aikataulu toistuu päivittäin puhelimen paikallisen ajan mukaan ja voi jatkua yli keskiyön. Pikakomennot muuttavat vain glukoosiarvojen ääneenluvun pääkytkintä.";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "Valitse eri kellonajat käyttöönotolle ja käytöstä poistamiselle.";
+"therapy.summary" = "Hoidon yhteenveto";
+"therapy.curves" = "IOB/COB-käyrät";
+"settingsviews_displayTrendInContactImage" = "Trendi";
+"homeScreen.layout" = "Aloitusnäytön asettelu";
+"homeScreen.elapsed" = "Kulunut";
+"homeScreen.remaining" = "Jäljellä";
+"homeScreen.basalPosition" = "Basaalin sijainti";
+"homeScreen.basalTop" = "Ylhäällä";
+"homeScreen.basalBottom" = "Alhaalla";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Glukoosikaavio";

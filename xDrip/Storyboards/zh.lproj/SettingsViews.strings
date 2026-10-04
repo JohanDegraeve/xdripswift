@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "设置";
-"settingsviews_glucoseDisplaySectionTitle" = "显示";
+"settingsviews_glucoseDisplaySectionTitle" = "通用";
 "settingsviews_glucoseRangesSectionTitle" = "葡萄糖范围";
 "settingsviews_alertsAndNotificationsSectionTitle" = "警报和通知";
 "settingsviews_sharingAndServicesSectionTitle" = "共享和服务";
@@ -120,8 +120,8 @@
 
 /// used in settings, section Info, title of the build setting
 
-/// nightscout settings, where user can select to use schedule or not
-"settingsviews_useSchedule" = "Use Upload Schedule";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "启用时间表";
 
 /// home screen settings, target value
 "settingsviews_targetValue" = "Target Value";
@@ -230,7 +230,7 @@
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
-"settingsviews_mainChartHours" = "主图表小时数";
+"settingsviews_mainChartHours" = "时间范围";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -243,10 +243,10 @@
 "settingsviews_sectiontitlestatistics" = "Statistics";
 
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 
 /// statistics settings, show statistics on home screen
-"settingsviews_showStatistics" = "Show Statistics";
+"settingsviews_showStatistics" = "统计";
 
 /// statistics settings, how many days to use for calculations
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
@@ -256,7 +256,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the clock also be displayed when the screen is locked?
-"settingsviews_showClockWhenScreenIsLocked" = "锁定屏幕时钟";
+"settingsviews_showClockWhenScreenIsLocked" = "时钟";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -302,7 +302,7 @@
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatments" = "Show Treatments";
+"settingsviews_showTreatments" = "治疗";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -405,8 +405,8 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show Mini-Chart";
-"settingsviews_showSensorNoise" = "Show Sensor Noise";
+"settingsviews_showMiniChart" = "迷你图表";
+"settingsviews_showSensorNoise" = "传感器噪声";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "别名";
@@ -450,7 +450,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "保持活动 is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "锁定屏幕调暗";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "调暗";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -664,3 +664,63 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "图表";
 "settingsviews_carPlayLiveActivityTypeBasic" = "基础";
 "settingsviews_liveActivitySectionTitle" = "实时活动";
+"settingsviews_dexcomG7Message" = "将蓝牙名称留空。在下一个屏幕中，轻点“扫描”以自动搜索传感器。\n\n如果传感器之前曾出现在“设置”>“蓝牙”中，您可以手动输入其蓝牙名称。";
+
+// Local therapy estimates
+"therapy.carbDuration" = "碳水吸收时长";
+"therapy.local" = "本地计算";
+
+"settingsviews_showOriginalBGReadings" = "原始值";
+
+"therapy.insulinType" = "胰岛素类型";
+
+"therapy.showIOBCOB" = "IOB/COB";
+
+"therapy.treatmentSettings" = "治疗";
+
+"therapy.settingsHelp" = "用于根据已记录的治疗估算剩余胰岛素和碳水化合物。";
+
+"therapy.settingsLocal" = "仅在 AID 系统未提供数值时，这些设置才用于根据已记录的治疗估算 IOB 和 COB。";
+"therapy.settingsExternal" = "这些选项已停用，因为基于 %@ 的 AID 系统会提供 IOB 和 COB。";
+"therapy.settingsMixed" = "%@ 提供 IOB，因此胰岛素类型为自动。碳水吸收时长用于根据已记录的餐食在本地估算 COB。";
+"therapy.insulinModel" = "已选择 %@ 胰岛素模型。胰岛素作用时长（DIA）：%@。胰岛素达峰时间：%@。";
+"therapy.carbFast" = "较快的碳水吸收。吸收开始前有 10 分钟延迟。";
+"therapy.carbNormal" = "正常的碳水吸收。吸收开始前有 10 分钟延迟。";
+"therapy.carbLong" = "较长的碳水吸收。当 GLP-1 药物减慢消化时可能有用。吸收开始前有 10 分钟延迟。";
+"therapy.automatic" = "自动";
+
+"therapy.liveActivityMetricsFooter" = "在锁定屏幕的大布局和 CarPlay/智能叠放的图表布局中显示可用的 IOB 和 COB。";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB 需要已记录的胰岛素或碳水化合物治疗，或来自已连接 AID 系统的数据。";
+
+"homeScreen.renderBasalDownwards" = "向下绘制基础胰岛素";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "活跃";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "非活跃";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "定时计划";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "开启时间";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "关闭时间";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "开启血糖播报后，仅在此时间段内播报读数。定时计划按照手机的当地时间每天重复，可以跨越午夜。快捷指令仅更改血糖播报的总开关。";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "请选择不同的开启和关闭时间。";
+"therapy.summary" = "治疗摘要";
+"therapy.curves" = "IOB/COB 曲线";
+"settingsviews_displayTrendInContactImage" = "趋势";
+"homeScreen.layout" = "主屏幕布局";
+"homeScreen.elapsed" = "已使用";
+"homeScreen.remaining" = "剩余";
+"homeScreen.basalPosition" = "基础胰岛素位置";
+"homeScreen.basalTop" = "顶部";
+"homeScreen.basalBottom" = "底部";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "葡萄糖图表";

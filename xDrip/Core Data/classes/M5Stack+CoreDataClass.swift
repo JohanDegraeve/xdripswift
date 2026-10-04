@@ -40,9 +40,6 @@ public class M5Stack: NSManagedObject {
         // this is creation of an M5Stack, not M5Stick, set isM5StickC to false
         self.isM5StickC = false
         
-        // by default, don't connect to WiFi
-        self.connectToWiFi = false
-        
     }
     
     private override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?) {

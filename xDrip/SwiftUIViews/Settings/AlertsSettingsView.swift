@@ -10,6 +10,15 @@ import CoreData
 import os
 import SwiftUI
 
+/// One visible alarm section backed by the persisted entries for a single AlertKind.
+/// Keeping the kind with its rows avoids translating filtered UI positions back into enum raw values.
+struct AlertsSettingsSection: Identifiable {
+    let alertKind: AlertKind
+    let entries: [AlertEntry]
+
+    var id: Int { alertKind.rawValue }
+}
+
 // Rules for which alarms and rows are shown are kept with the list model.
 @MainActor
 final class AlertsSettingsViewModel: ObservableObject {
@@ -26,10 +35,16 @@ final class AlertsSettingsViewModel: ObservableObject {
         self.alertTypesAccessor = AlertTypesAccessor(coreDataManager: coreDataManager)
     }
 
-    /// Reads the current alarms grouped by alert kind.
-    /// The grouping comes from the accessor and preserves its section order.
-    var alertEntriesPerAlertKind: [[AlertEntry]] {
-        alertEntriesAccessor.getAllEntriesPerAlertKind(alertTypesAccessor: alertTypesAccessor)
+    /// Reads every persisted configuration, then exposes only the battery family applicable to the
+    /// configured CGM. Inactive family configurations remain stored so their settings survive a
+    /// later transmitter change without cluttering this screen.
+    var sections: [AlertsSettingsSection] {
+        let entriesPerAlertKind = alertEntriesAccessor.getAllEntriesPerAlertKind(alertTypesAccessor: alertTypesAccessor)
+
+        return AlertKind.visibleAlertKinds(for: UserDefaults.standard.cgmTransmitterType).compactMap { alertKind in
+            guard alertKind.rawValue < entriesPerAlertKind.count else { return nil }
+            return AlertsSettingsSection(alertKind: alertKind, entries: entriesPerAlertKind[alertKind.rawValue])
+        }
     }
 
     /// Refreshes the SwiftUI list after an alarm is added, edited or deleted.
@@ -40,42 +55,35 @@ final class AlertsSettingsViewModel: ObservableObject {
 
     /// Returns the visible alarm rows for a section.
     /// If the first alarm for a kind is disabled, only its disabled summary row is shown.
-    func rows(for section: Int) -> [AlertEntry] {
-        let entries = alertEntriesPerAlertKind[AlertKind.alertKindRawValue(forSection: section)]
-
-        if let firstEntry = entries.first, firstEntry.isDisabled {
-            return Array(entries.prefix(1))
+    func rows(for section: AlertsSettingsSection) -> [AlertEntry] {
+        if let firstEntry = section.entries.first, firstEntry.isDisabled {
+            return Array(section.entries.prefix(1))
         }
 
-        return entries
+        return section.entries
     }
 
     /// Returns the section title for an alert kind.
     /// Urgent alert kinds include an exclamation marker in the section header.
-    func title(for section: Int) -> String {
-        let alertKind = AlertKind(forSection: section)
-
-        return (alertKind?.alertUrgencyType() == .urgent ? "\u{2757}" : "") + (alertKind?.alertTitle() ?? "")
+    func title(for alertKind: AlertKind) -> String {
+        (alertKind.alertUrgencyType() == .urgent ? "\u{2757}" : "") + alertKind.configurationTitle()
     }
 
     /// Builds the edit request for the selected alarm row.
     /// Adjacent alarms define the allowed start-time range.
-    func editData(section: Int, row: Int) -> AlertEntryEditRequest {
-        let mappedSection = AlertKind.alertKindRawValue(forSection: section)
-        let entries = alertEntriesPerAlertKind[mappedSection]
-
+    func editData(section: AlertsSettingsSection, row: Int) -> AlertEntryEditRequest {
         var minimumStart: Int16 = 0
         if row > 0 {
-            minimumStart = entries[row - 1].start + 1
+            minimumStart = section.entries[row - 1].start + 1
         }
 
         var maximumStart: Int16 = 24 * 60 - 1
-        if row < entries.count - 1 {
-            maximumStart = entries[row + 1].start - 1
+        if row < section.entries.count - 1 {
+            maximumStart = section.entries[row + 1].start - 1
         }
 
         return AlertEntryEditRequest(
-            alertEntry: entries[row],
+            alertEntry: section.entries[row],
             minimumStart: minimumStart,
             maximumStart: maximumStart
         )
@@ -95,8 +103,8 @@ struct AlertsSettingsView: View {
 
     var body: some View {
         List {
-            ForEach(viewModel.alertEntriesPerAlertKind.indices, id: \.self) { section in
-                Section(viewModel.title(for: section)) {
+            ForEach(viewModel.sections) { section in
+                Section(viewModel.title(for: section.alertKind)) {
                     let rows = viewModel.rows(for: section)
                     ForEach(Array(rows.enumerated()), id: \.element.objectID) { row, alertEntry in
                         AlertEntrySummaryRow(
@@ -149,9 +157,22 @@ private struct AlertEntrySummaryRow: View {
         }
 
         if alertEntry.alertType.enabled && alertKind.needsAlertValue() {
-            text += alertKind.valueIsABgValue()
-                ? Double(alertEntry.value).mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                : alertEntry.value.description
+            if alertKind.valueIsABgValue() {
+                text += Double(alertEntry.value).mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            } else if alertKind.isTransmitterBatteryAlert {
+                // Show Dexcom values in real mV, but keep the compact list row free of the repeated
+                // mV suffix. The editor still names the unit where it matters while changing the
+                // threshold. Percentage batteries retain their familiar % suffix.
+                text += alertKind.displayedAlertValue(fromStoredValue: Int(alertEntry.value)).description
+                if alertKind == .batterylow {
+                    let unit = alertKind.valueUnitText(transmitterType: UserDefaults.standard.cgmTransmitterType)
+                    if !unit.isEmpty {
+                        text += " " + unit
+                    }
+                }
+            } else {
+                text += alertEntry.value.description
+            }
 
             if alertKind.needsAlertTriggerValue() {
                 switch alertKind {
@@ -235,7 +256,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
                 value: alertEntry.value,
                 triggerValue: alertEntry.triggerValue,
                 alertKind: alertEntry.alertkind,
-                alertTypeName: alertEntry.alertType.name
+                alertTypeID: alertEntry.alertType.objectID
             )
 
         case let .new(alertKind, minimumStart, maximumStart):
@@ -255,13 +276,13 @@ final class AlertEntryEditorViewModel: ObservableObject {
                 value: Int16(alertKind.defaultAlertValue()),
                 triggerValue: Int16(alertKind.defaultAlertTriggerValue()),
                 alertKind: Int16(alertKind.rawValue),
-                alertTypeName: defaultAlertType.name
+                alertTypeID: defaultAlertType.objectID
             )
         }
     }
 
     /// Returns the rows that should be visible for the current alarm state.
-    /// Disabled alarms show only the enabled switch; trigger rows appear only where required.
+    /// Disabled alarms show only the enabled switch. Trigger rows appear only where required.
     var rows: [AlertEntryEditorSetting] {
         if isDisabled {
             return [.isDisabled]
@@ -283,13 +304,13 @@ final class AlertEntryEditorViewModel: ObservableObject {
     }
 
     /// Returns the navigation title for the editor.
-    /// Existing alarms use just the alert name; new alarms include the Add prefix.
+    /// Existing alarms use just the alert name. New alarms include the Add prefix.
     var title: String {
         switch mode {
         case .edit:
-            return alertKindValue.alertTitle()
+            return alertKindValue.configurationTitle()
         case .new:
-            return Texts_Common.add + " " + alertKindValue.alertTitle()
+            return Texts_Common.add + " " + alertKindValue.configurationTitle()
         }
     }
 
@@ -471,7 +492,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
         case .alertType:
             return Texts_Alerts.alerttype
         case .value:
-            return Texts_Alerts.alertValue
+            return Texts_Alerts.alertValue + alertKindValue.configurationFamilySuffix()
         case .triggerValue:
             return triggerValueText
         }
@@ -502,14 +523,14 @@ final class AlertEntryEditorViewModel: ObservableObject {
     }
 
     /// Compares the current editor state with the original alarm so toolbar buttons
-    /// can apply the enable and disable rules.
-    private var hasChanges: Bool {
+    /// can apply the enable and disable rules and Back can protect unsaved edits.
+    var hasChanges: Bool {
         isDisabled != original.isDisabled ||
             start != original.start ||
             value != original.value ||
             triggerValue != original.triggerValue ||
             alertKind != original.alertKind ||
-            alertType.name != original.alertTypeName
+            alertType.objectID != original.alertTypeID
     }
 
     /// Returns the correct trigger value label for fast drop and fast rise alarms.
@@ -542,8 +563,8 @@ final class AlertEntryEditorViewModel: ObservableObject {
     }
 
     /// Builds the text editor for alarm values and trigger values.
-    /// Converts mmol/L input back to mg/dL before
-    /// storing because AlertEntry values are persisted in mg/dL.
+    /// Converts glucose values to mg/dL and Dexcom voltage values to their raw 10 mV unit before
+    /// storing because alert evaluation compares the native persisted units.
     private func makeValueTextEntry(
         title: String,
         message: String,
@@ -555,17 +576,21 @@ final class AlertEntryEditorViewModel: ObservableObject {
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         let keyboardType: SettingsKeyboardType = valueIsBg && !isMgDl ? .decimalPad : .numberPad
 
+        let displayedCurrentValue = alertKindValue.displayedAlertValue(fromStoredValue: Int(currentValue))
+
         return SettingsTextEntryContent(
             title: title,
             message: message,
             keyboardType: keyboardType,
-            text: Double(currentValue).mgDlToMmolAndToString(mgDl: isMgDl || !valueIsBg),
+            text: valueIsBg
+                ? Double(currentValue).mgDlToMmolAndToString(mgDl: isMgDl)
+                : displayedCurrentValue.description,
             placeholder: nil,
             fieldTitle: nil,
             unitText: alertKindValue.valueUnitText(transmitterType: UserDefaults.standard.cgmTransmitterType).toNilIfLength0(),
             actionTitle: Texts_Common.Ok,
             cancelTitle: Texts_Common.Cancel,
-            action: { text in
+            action: { [weak self] text in
                 guard var newValue = text.toDouble() else { return }
 
                 var newValueIsValid = true
@@ -576,9 +601,11 @@ final class AlertEntryEditorViewModel: ObservableObject {
                         : newValue > 0.0 && newValue < ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue
                 }
 
-                if newValue < 32767.0, newValueIsValid {
-                    update(Int16(newValue))
-                }
+                guard newValue < 32767.0, newValueIsValid,
+                      let storedValue = self?.alertKindValue.storedAlertValue(fromDisplayedValue: newValue),
+                      storedValue < 32767 else { return }
+
+                update(Int16(storedValue))
             },
             cancel: nil,
             validator: nil
@@ -621,7 +648,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
                 return Double(value).mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) + " " + unitText
             }
 
-            return value.description + " " + unitText
+            return alertKindValue.displayedAlertValue(fromStoredValue: Int(value)).description + " " + unitText
         }
 
         return value.description
@@ -639,11 +666,15 @@ private struct AlertEntrySnapshot {
     let value: Int16
     let triggerValue: Int16
     let alertKind: Int16
-    let alertTypeName: String
+    // Compare the selected type itself, since different types can share a name.
+    let alertTypeID: NSManagedObjectID
 }
 
 struct AlertEntryEditorView: View {
     @StateObject private var viewModel: AlertEntryEditorViewModel
+    @State private var showsUnsavedChanges = false
+
+    let close: () -> Void
 
     let openNewAlert: (AlertEntryEditorMode) -> Void
 
@@ -661,6 +692,7 @@ struct AlertEntryEditorView: View {
             close: close
         ))
         self.openNewAlert = openNewAlert
+        self.close = close
     }
 
     var body: some View {
@@ -672,6 +704,10 @@ struct AlertEntryEditorView: View {
             }
         }
         .settingsListStyle(title: viewModel.title, titleDisplayMode: .inline)
+        // Only replace Back while the draft differs from the original. Hiding the native
+        // button also prevents a swipe or its history menu from silently discarding edits.
+        // Child pickers keep their normal navigation and return to this same draft.
+        .navigationBarBackButtonHidden(viewModel.hasChanges)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 if viewModel.showsScheduleActions {
@@ -691,7 +727,25 @@ struct AlertEntryEditorView: View {
                     .disabled(!viewModel.canSave)
             }
 
-            ToolbarItem(placement: .navigationBarLeading) {
+            ToolbarItemGroup(placement: .navigationBarLeading) {
+                if viewModel.hasChanges {
+                    Button {
+                        showsUnsavedChanges = true
+                    } label: {
+                        Image(systemName: "chevron.backward")
+                    }
+                    .accessibilityLabel(Texts_Common.back)
+                    // Specify both alert buttons explicitly so SwiftUI does not add Cancel
+                    // alongside the destructive action. Keep this separate from the delete alert.
+                    .alert(isPresented: $showsUnsavedChanges) {
+                        Alert(
+                            title: Text(Texts_Common.unsavedChanges),
+                            primaryButton: .default(Text(Texts_Common.save), action: viewModel.save),
+                            secondaryButton: .destructive(Text(Texts_Common.discardChanges), action: close)
+                        )
+                    }
+                }
+
                 if viewModel.showsScheduleActions {
                     Button(role: .destructive, action: viewModel.requestDelete) {
                         Image(systemName: "trash")
@@ -719,7 +773,7 @@ struct AlertEntryEditorView: View {
     }
 
     /// Builds the SwiftUI row for each alarm editor setting.
-    /// Toggle rows update editor state directly; value rows open the pushed
+    /// Toggle rows update editor state directly. Value rows open the pushed
     /// shared Settings editors.
     @ViewBuilder
     private func row(for setting: AlertEntryEditorSetting) -> some View {

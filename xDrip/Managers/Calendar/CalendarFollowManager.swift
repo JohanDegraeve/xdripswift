@@ -39,7 +39,7 @@ class CalendarFollowManager: NSObject {
     private let eventStore = EKEventStore()
 
     /// The root-owned shared keep-alive engine. This follower reports operational state and supplies
-    /// only its existing throttled Calendar read; it does not own audio or lifecycle callbacks.
+    /// only its existing throttled Calendar read. It does not own audio or lifecycle callbacks.
     private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
 
     /// Allows wiring tests to reconcile real manager state without querying EventKit.

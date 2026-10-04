@@ -14,3 +14,4 @@
 
 /// When calibration alert goess off, user clicks the notification, app opens, dialog pops up, this is the text in the dialog
 "enter_calibration_value" = "Enter Calibration Value";
+"previousCalibrationPrefillMessage" = "Vrednost prejšnjega umerjanja ob %@ je že vnesena. Pred potrditvijo jo primerjajte s trenutno meritvijo merilnika.";

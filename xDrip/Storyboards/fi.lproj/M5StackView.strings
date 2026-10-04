@@ -10,4 +10,3 @@
 "deviceMustBeConnectedToPowerOff" = "M5Stack on oltava yhdistetty jotta voit sammuttaa sen";
 "powerOffConfirm" = "Haluatko varmasti sammuttaa M5Stackin ?";
 "powerOff" = "Sammuta";
-"connectToWiFi" = "Yhdistä WiFi";

@@ -16,8 +16,6 @@
 /// in case M5Stack authentication failed, and M5Stack is expecting user configured password
 "blePasswordMissingWarning" = "Bitte setzten Sie ein Passwort";
 
-/// text for cell in settings view, connect to wifi yes or no
-"connectToWiFi" = "Verbinden mit WiFi";
 
 /// when Bluetooth Peripheral list is shown, title of the view
 "screenTitle" = "M5Stack";

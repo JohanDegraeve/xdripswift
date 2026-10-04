@@ -60,8 +60,6 @@
 /// white
 "white" = "white";
 
-/// WiFi
-"WiFi" = "WiFi";
 
 /// on
 "on" = "On";
@@ -100,7 +98,6 @@
 "common_statistics_average" = "Average";
 
 /// phrase HbA1c
-"common_statistics_a1c" = "HbA1c";
 
 /// to show the sensor status
 "sensorStatus" = "Sensor Status";
@@ -115,6 +112,11 @@
 "common_statistics_high" = "High";
 
 /// coefficient of variation
+"common_statistics_gmiTrend" = "Тенденція GMI";
+"common_statistics_threeDay" = "За 3 дні";
+"common_statistics_weekly" = "Щотижня";
+"common_statistics_daily" = "Щодня";
+"common_statistics_gmi" = "GMI";
 "common_statistics_cv" = "CV";
 
 /// literally update
@@ -122,8 +124,9 @@
 
 /// literal translation needed
 "common_days" = "days";
-"common_landscape_comparingWithLast" = "Порівняння з останніми:";
+"common_landscape_showAGPChartData" = "Показати дані графіка AGP:";
 "common_landscape_comparisonDays" = "%d днів";
+"common_landscape_comparisonNone" = "Немає";
 
 /// the word today
 "common_todayshort" = "Today";
@@ -158,3 +161,19 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+// Local therapy accessibility
+"therapy.estimatedIOB" = "Оцінений активний інсулін";
+"therapy.estimatedCOB" = "Оцінені активні вуглеводи";
+
+/* Actions for leaving an editor with unsaved changes. */
+"common_unsavedChanges" = "Незбережені зміни";
+"common_save" = "Зберегти";
+"common_discardChanges" = "Відхилити зміни";
+"common_back" = "Назад";
+
+// Live Activity sensor warm-up
+"common_sensorWarmingUp" = "Сенсор прогрівається";
+"common_sensorWarmupUntilFormat" = "До %@";
+"common_sensorWarmupComplete" = "Прогрів завершено";
+"common_sensorWaitingForReading" = "Очікування першого показника…";

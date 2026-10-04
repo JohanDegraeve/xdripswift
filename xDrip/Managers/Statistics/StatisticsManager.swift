@@ -43,6 +43,9 @@ public final class StatisticsManager: @unchecked Sendable {
 
     struct LandscapeAnalytics {
         let baseline: LandscapeBaseline
+        /// Selected-day TIR and TITR calculated from the same validated samples as Statistics.
+        let rangeSummary: GlucoseClinicalRangeSummary
+        let averageMgDl: Double?
         let loopalyzer: LandscapeLoopalyzerSnapshot?
     }
 
@@ -263,7 +266,7 @@ public final class StatisticsManager: @unchecked Sendable {
                 let periodEnd = self.calendar.startOfDay(for: referenceDate)
                 guard let periodStart = self.calendar.date(
                     byAdding: .day,
-                    value: -max(1, daysBack),
+                    value: -max(0, daysBack),
                     to: periodEnd
                 ) else {
                     continuation.resume(returning: StatisticsManager.emptyLandscapeBaseline())
@@ -294,11 +297,15 @@ public final class StatisticsManager: @unchecked Sendable {
 
     /// Returns the AGP baseline and optional selected-day OS-AID traces in one queued operation.
     func landscapeAnalytics(referenceDate: Date, daysBack: Int, includesAID: Bool) async -> LandscapeAnalytics {
-        await withCheckedContinuation { continuation in
+        // Keep historical metrics owned by the configured provider, including CareLink.
+        let therapySource = UserDefaults.standard.dataFlowPolicy.aidAnalyticsSource
+        return await withCheckedContinuation { continuation in
             operationQueue.addOperation { [weak self] in
                 guard let self else {
                     continuation.resume(returning: LandscapeAnalytics(
                         baseline: StatisticsManager.emptyLandscapeBaseline(),
+                        rangeSummary: .empty,
+                        averageMgDl: nil,
                         loopalyzer: nil
                     ))
                     return
@@ -311,11 +318,13 @@ public final class StatisticsManager: @unchecked Sendable {
                 )
                 guard let baselineStart = self.calendar.date(
                     byAdding: .day,
-                    value: -max(1, daysBack),
+                    value: -max(0, daysBack),
                     to: selectedDayStart
                 ) else {
                     continuation.resume(returning: LandscapeAnalytics(
                         baseline: StatisticsManager.emptyLandscapeBaseline(),
+                        rangeSummary: .empty,
+                        averageMgDl: nil,
                         loopalyzer: nil
                     ))
                     return
@@ -333,16 +342,31 @@ public final class StatisticsManager: @unchecked Sendable {
                     usesMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
                     agpPoints: self.makeAGPPoints(samples: baselineSamples)
                 )
+                // The chart state includes an off-screen cache buffer for smooth rendering. Derive
+                // TIR here from the validated selected-day samples so neighbouring days and invalid
+                // glucose values can never leak into the landscape percentages.
+                let rangeSummary = GlucoseClinicalRangeSummary(
+                    valuesMgDl: selectedDaySamples.map(\.valueMgDl)
+                )
 
-                guard includesAID else {
-                    continuation.resume(returning: LandscapeAnalytics(baseline: baseline, loopalyzer: nil))
+                let averageMgDl = selectedDaySamples.isEmpty ? nil
+                    : selectedDaySamples.reduce(0) { $0 + $1.valueMgDl } / Double(selectedDaySamples.count)
+
+                guard includesAID, let therapySource else {
+                    continuation.resume(returning: LandscapeAnalytics(
+                        baseline: baseline,
+                        rangeSummary: rangeSummary,
+                        averageMgDl: averageMgDl,
+                        loopalyzer: nil
+                    ))
                     return
                 }
 
                 let statusAccessor = NightscoutDeviceStatusAccessor(coreDataManager: self.coreDataManager)
                 let profileAccessor = NightscoutProfileAccessor(coreDataManager: self.coreDataManager)
                 let statuses = statusAccessor.fetch(fromDate: selectedDayStart, toDate: selectedDayEnd)
-                    .filter { $0.createdAt >= selectedDayStart && $0.createdAt <= selectedDayEnd }
+                    .filter { $0.createdAt >= selectedDayStart && $0.createdAt <= selectedDayEnd
+                        && therapySource.ownsDeviceStatus(with: $0.device) }
                     .sorted { $0.createdAt < $1.createdAt }
                 // Include the earliest known profile as a fallback when Nightscout has no
                 // historical profile snapshot preceding the selected day.
@@ -373,7 +397,12 @@ public final class StatisticsManager: @unchecked Sendable {
                     )
                 )
 
-                continuation.resume(returning: LandscapeAnalytics(baseline: baseline, loopalyzer: loopalyzer))
+                continuation.resume(returning: LandscapeAnalytics(
+                    baseline: baseline,
+                    rangeSummary: rangeSummary,
+                    averageMgDl: averageMgDl,
+                    loopalyzer: loopalyzer
+                ))
             }
         }
     }
@@ -411,8 +440,9 @@ public final class StatisticsManager: @unchecked Sendable {
 
     private func makeRootStatistics(fromDate: Date, toDate: Date?) -> Statistics {
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-        let lowLimitForTIR = UserDefaults.standard.timeInRangeType.lowerLimit
-        let highLimitForTIR = UserDefaults.standard.timeInRangeType.higherLimit
+        let timeInRangeType = UserDefaults.standard.timeInRangeType
+        let lowLimitForTIR = timeInRangeType.lowerLimit
+        let highLimitForTIR = timeInRangeType.higherLimit
         let samples = fetchSamples(fromDate: fromDate, toDate: toDate ?? Date())
 
         guard !samples.isEmpty else {
@@ -421,7 +451,7 @@ public final class StatisticsManager: @unchecked Sendable {
                 highStatisticValue: 0,
                 inRangeStatisticValue: 0,
                 averageStatisticValue: 0,
-                a1CStatisticValue: 0,
+                gmiPercentage: 0,
                 cVStatisticValue: 0,
                 lowLimitForTIR: lowLimitForTIR,
                 highLimitForTIR: highLimitForTIR,
@@ -429,6 +459,15 @@ public final class StatisticsManager: @unchecked Sendable {
             )
         }
 
+        // TIR must use the same stored, cadence-approved samples as Statistics and reports. The
+        // additional 4.5-minute filter below is retained only for the legacy Home average/CV
+        // calculation. Applying it to TIR made otherwise identical app surfaces count different
+        // readings.
+        let rangeDistribution = GlucoseRangeDistribution(
+            values: samples.map(\.valueMgDl),
+            lowLimit: timeInRangeType.lowerLimitInMgDl,
+            highLimit: timeInRangeType.higherLimitInMgDl
+        )
         let filteredValues = filteredRootStatisticValues(samples: samples, isMgDl: isMgDl)
         guard !filteredValues.isEmpty else {
             return Statistics(
@@ -436,7 +475,7 @@ public final class StatisticsManager: @unchecked Sendable {
                 highStatisticValue: 0,
                 inRangeStatisticValue: 0,
                 averageStatisticValue: 0,
-                a1CStatisticValue: 0,
+                gmiPercentage: 0,
                 cVStatisticValue: 0,
                 lowLimitForTIR: lowLimitForTIR,
                 highLimitForTIR: highLimitForTIR,
@@ -444,12 +483,10 @@ public final class StatisticsManager: @unchecked Sendable {
             )
         }
 
-        let lowCount = filteredValues.lazy.filter { $0 < lowLimitForTIR }.count
-        let highCount = filteredValues.lazy.filter { $0 > highLimitForTIR }.count
-        let lowStatisticValue = Double((lowCount * 200) / (filteredValues.count * 2))
-        let highStatisticValue = Double((highCount * 200) / (filteredValues.count * 2))
         let averageStatisticValue = filteredValues.reduce(0, +) / Double(filteredValues.count)
-        let a1CStatisticValue = Self.a1cValue(forAverage: averageStatisticValue, isMgDl: isMgDl)
+        // GMI shares the report sample population; only legacy average/CV retain the extra filter.
+        let averageMgDl = samples.reduce(0) { $0 + $1.valueMgDl } / Double(samples.count)
+        let gmiPercentage = GlucoseReportClinicalMath.gmiPercentage(forAverageMgDl: averageMgDl)
         let cVStatisticValue = Self.coefficientOfVariation(values: filteredValues, average: averageStatisticValue)
         let firstDate = samples.first?.date ?? Date()
         var numberOfDaysUsed = calendar.dateComponents([.day], from: firstDate - 5 * 60, to: Date()).day ?? 0
@@ -458,11 +495,11 @@ public final class StatisticsManager: @unchecked Sendable {
         numberOfDaysUsed += (numberOfDaysUsed == 89 ? 1 : 0)
 
         return Statistics(
-            lowStatisticValue: lowStatisticValue,
-            highStatisticValue: highStatisticValue,
-            inRangeStatisticValue: 100 - lowStatisticValue - highStatisticValue,
+            lowStatisticValue: rangeDistribution.belowPercentage,
+            highStatisticValue: rangeDistribution.abovePercentage,
+            inRangeStatisticValue: rangeDistribution.inRangePercentage,
             averageStatisticValue: averageStatisticValue,
-            a1CStatisticValue: a1CStatisticValue,
+            gmiPercentage: gmiPercentage,
             cVStatisticValue: cVStatisticValue,
             lowLimitForTIR: lowLimitForTIR,
             highLimitForTIR: highLimitForTIR,
@@ -487,9 +524,10 @@ public final class StatisticsManager: @unchecked Sendable {
             let values = filteredRootStatisticValues(samples: daySamples, isMgDl: isMgDl)
             statisticsByDay[day] = makeStatisticsForDay(
                 values: values,
+                gmiPercentage: daySamples.isEmpty ? 0 : GlucoseReportClinicalMath.gmiPercentage(
+                    forAverageMgDl: daySamples.reduce(0) { $0 + $1.valueMgDl } / Double(daySamples.count)),
                 lowLimitForTIR: lowLimitForTIR,
-                highLimitForTIR: highLimitForTIR,
-                isMgDl: isMgDl
+                highLimitForTIR: highLimitForTIR
             )
 
             guard let nextDay = calendar.date(byAdding: .day, value: 1, to: day) else { break }
@@ -499,14 +537,14 @@ public final class StatisticsManager: @unchecked Sendable {
         return statisticsByDay
     }
 
-    private func makeStatisticsForDay(values: [Double], lowLimitForTIR: Double, highLimitForTIR: Double, isMgDl: Bool) -> Statistics {
+    private func makeStatisticsForDay(values: [Double], gmiPercentage: Double, lowLimitForTIR: Double, highLimitForTIR: Double) -> Statistics {
         guard !values.isEmpty else {
             return Statistics(
                 lowStatisticValue: 0,
                 highStatisticValue: 0,
                 inRangeStatisticValue: 0,
                 averageStatisticValue: 0,
-                a1CStatisticValue: 0,
+                gmiPercentage: 0,
                 cVStatisticValue: 0,
                 lowLimitForTIR: lowLimitForTIR,
                 highLimitForTIR: highLimitForTIR,
@@ -514,18 +552,19 @@ public final class StatisticsManager: @unchecked Sendable {
             )
         }
 
-        let lowCount = values.lazy.filter { $0 < lowLimitForTIR }.count
-        let highCount = values.lazy.filter { $0 > highLimitForTIR }.count
-        let lowStatisticValue = Double((lowCount * 200) / (values.count * 2))
-        let highStatisticValue = Double((highCount * 200) / (values.count * 2))
+        let rangeDistribution = GlucoseRangeDistribution(
+            values: values,
+            lowLimit: lowLimitForTIR,
+            highLimit: highLimitForTIR
+        )
         let averageStatisticValue = values.reduce(0, +) / Double(values.count)
 
         return Statistics(
-            lowStatisticValue: lowStatisticValue,
-            highStatisticValue: highStatisticValue,
-            inRangeStatisticValue: 100 - lowStatisticValue - highStatisticValue,
+            lowStatisticValue: rangeDistribution.belowPercentage,
+            highStatisticValue: rangeDistribution.abovePercentage,
+            inRangeStatisticValue: rangeDistribution.inRangePercentage,
             averageStatisticValue: averageStatisticValue,
-            a1CStatisticValue: Self.a1cValue(forAverage: averageStatisticValue, isMgDl: isMgDl),
+            gmiPercentage: gmiPercentage,
             cVStatisticValue: Self.coefficientOfVariation(values: values, average: averageStatisticValue),
             lowLimitForTIR: lowLimitForTIR,
             highLimitForTIR: highLimitForTIR,
@@ -1540,17 +1579,6 @@ public final class StatisticsManager: @unchecked Sendable {
         return eventCount
     }
 
-    private static func a1cValue(forAverage average: Double, isMgDl: Bool) -> Double {
-        let averageMgDl = isMgDl ? average : average / ConstantsBloodGlucose.mgDlToMmoll
-
-        // NGSP/DCCT and IFCC conversion equations: http://www.ngsp.org/ifccngsp.asp
-        if UserDefaults.standard.useIFCCA1C {
-            return (((46.7 + averageMgDl) / 28.7) - 2.152) / 0.09148
-        } else {
-            return (46.7 + averageMgDl) / 28.7
-        }
-    }
-
     private static func coefficientOfVariation(values: [Double], average: Double) -> Double {
         guard average > 0 else { return 0 }
         return standardDeviation(values: values, average: average) / average * 100
@@ -1634,7 +1662,8 @@ public final class StatisticsManager: @unchecked Sendable {
         var highStatisticValue: Double
         var inRangeStatisticValue: Double
         var averageStatisticValue: Double
-        var a1CStatisticValue: Double
+        // Keep GMI in percentage units; convert only when displaying the result.
+        var gmiPercentage: Double
         var cVStatisticValue: Double
         var lowLimitForTIR: Double
         var highLimitForTIR: Double

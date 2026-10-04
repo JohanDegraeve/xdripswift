@@ -37,7 +37,7 @@
 "calibrationNotNecessary" = "Cuando estás usando el algoritmo nativo del transmisor, no se puede calibrar.\n\n Si quieres calibrar, debes cambiar al algoritmo xDrip en la pantalla del transmisor.";
 "dexcomBatteryTooLow" = "El nivel de batería del Transmisor es demasiado bajo!";
 "stopSensorConfirmation" = "Estás seguro que quieres para el sensor?";
-"enterSensorCode" = "Si no sabes el código del sensor, deja este campo vacío para usar 0000. Al pulsar OK sin código, se usará 0000 como código del sensor, o simplemente se capturará la sesión actual si ya está iniciada.";
+"enterSensorCode" = "Introduce el código del sensor manualmente, escanea la etiqueta del sensor o elige una foto.\n\nSi no tienes el código o quieres usar una sesión de sensor que ya está activa en el transmisor, selecciona Usar sin código.";
 "sensorend" = "Fin del sensor";
 "sensorDuration" = "Duración Sensor";
 "noSensorData" = "Sin datos";
@@ -99,7 +99,6 @@
 "sensorManagementStarted" = "Started";
 "sensorManagementEnds" = "Ends";
 "sensorManagementCalibrationValue" = "Valor de calibración";
-"sensorManagementCalibrationPending" = "Pendiente...";
 "sensorManagementCalibrationStableTrend" = "Tendencia estable";
 "sensorManagementCalibrationSlightlyLow" = "Ligeramente bajo";
 "sensorManagementCalibrationSlightlyHigh" = "Ligeramente alto";
@@ -137,6 +136,8 @@
 
 /* Dexcom G6 sensor-label scanning */
 "scanWithCamera" = "Escanear con la cámara";
+"manuallyEnterSensorCode" = "Introducir código manualmente";
+"dexcomG6ManualSensorCodeMessage" = "Introduce el código de calibración de cuatro dígitos de la etiqueta del sensor.";
 "chooseSensorLabelPhoto" = "Elegir foto";
 "readingSensorLabel" = "Leyendo la etiqueta del sensor...";
 "scanSensorLabel" = "Escanear etiqueta del sensor";
@@ -150,7 +151,7 @@
 "sensorInformationTitle" = "Información del sensor";
 "sensorLotNumber" = "Número de lote";
 "sensorSerialNumberMetadata" = "Número de serie del sensor";
-"sensorLabelReviewFooter" = "Compruebe la información decodificada antes de iniciar el sensor.";
+"sensorLabelReviewFooter" = "Comprueba tu selección y los datos de la etiqueta, si los hay, y pulsa Continuar.";
 "sensorLabelScanFailed" = "No se pudo leer la etiqueta";
 "multipleSensorLabelsFound" = "La foto contiene más de una etiqueta de sensor. Elija una foto con una sola etiqueta.";
 "noSensorLabelFound" = "No se encontró ninguna etiqueta válida de sensor Dexcom G6 en la foto.";
@@ -160,10 +161,34 @@
 "scannedSensorLabelCode" = "Código de etiqueta escaneado";
 "noCodeSensorSessionValue" = "0000 (Sesión sin código)";
 "sensorCodeUnknown" = "Desconocido";
-"sensorSessionOrigin" = "Origen de la sesión";
-"sensorSessionOriginUnknown" = "Desconocido";
-"sensorSessionOriginAwaitingTransmitter" = "Esperando al transmisor";
-"sensorSessionOriginStartedByApp" = "Iniciada por xDrip4iOS";
-"sensorSessionOriginExistingAdopted" = "Sesión existente adoptada";
-"sensorSessionOriginTransmitterDetected" = "Detectada por el transmisor";
-"sensorSessionOriginRejected" = "Solicitud de inicio rechazada";
+
+"sensorManagementCalibrationInProgress" = "Calibración en curso...";
+"sensorManagementCalibrationQueued" = "En cola";
+"sensorManagementCalibrationSent" = "Enviado, esperando respuesta";
+"sensorManagementCalibrationSentShort" = "Enviada";
+"sensorManagementCalibrationCompletedShort" = "Completada";
+"sensorManagementCalibrationRejectedShort" = "Rechazada";
+"sensorManagementCalibrationErrorShort" = "Error";
+"sensorManagementCalibrationProcessing" = "Procesando";
+"sensorManagementCalibrationCompletedHigh" = "Completada, confianza alta";
+"sensorManagementCalibrationCompletedLow" = "Completada, confianza baja";
+"sensorManagementCalibrationRejectedFormat" = "Rechazada: %@";
+"sensorManagementCalibrationNotPermitted" = "Calibración no permitida";
+"sensorManagementCalibrationNotPermittedNote" = "El transmisor no permite la calibración en este momento.";
+"sensorManagementCalibrationRejectedRange" = "Valor fuera de rango";
+"sensorManagementCalibrationRejectedTime" = "Hora de calibración no válida";
+"sensorManagementCalibrationRejectedDuplicate" = "Ya introducida";
+"sensorManagementCalibrationRejectedBounds" = "Error al comprobar los límites";
+"sensorManagementCalibrationRejectedUnknown" = "Motivo desconocido";
+"sensorManufactureDate" = "Fecha de fabricación";
+"sensorExpirationDate" = "Fecha de caducidad";
+"sensorManagementWaitingForSensorStart" = "Esperando el inicio del sensor";
+"sensorManagementStatusWarmingUp" = "Calentando";
+"sensorCodeContinue" = "Continuar";
+"useWithoutSensorCode" = "Usar sin código";
+"noSensorCode" = "Sin código (0000)";
+"dexcomG7SelectSensorCodeMessage" = "Introduce manualmente el código de emparejamiento de cuatro dígitos, escanea el aplicador actual o elige una foto. Comprueba el código seleccionado y pulsa Continuar.";
+"noSensorCodeSelectedTitle" = "¿Continuar sin código de sensor?";
+"noSensorCodeSelectedMessage" = "Si ya hay una sesión de sensor activa en el transmisor, la app la usará con sus requisitos de calibración existentes.\n\nIniciar una nueva sesión sin código requiere calibraciones después del calentamiento y periódicamente a partir de entonces. Desactivar el recordatorio de calibración de la app no elimina estos requisitos.";
+"showHideGlucoseChartTitle" = "Gráfico";
+"showHideAdditionalItemsTitle" = "Alertas y Voz";

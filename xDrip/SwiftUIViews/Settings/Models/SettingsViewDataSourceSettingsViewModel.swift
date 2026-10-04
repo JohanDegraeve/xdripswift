@@ -53,13 +53,15 @@ final class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModel
             UserDefaults.standard.timeStampOfLastFollowerConnection = nil
         }
 
-        // queue: .main would make every background UserDefaults writer wait for main (deadlock risk)
         defaultsObserver = NotificationCenter.default.addObserver(
             forName: UserDefaults.didChangeNotification,
             object: UserDefaults.standard,
             queue: nil
         ) { [weak self] _ in
-            DispatchQueue.main.async { self?.sectionReloadClosure?() }
+            // Defaults may be written on a queue that main is waiting for.
+            DispatchQueue.main.async { [weak self] in
+                self?.sectionReloadClosure?()
+            }
         }
 
         careLinkStateObserver = CareLinkAccountState.shared.$snapshot

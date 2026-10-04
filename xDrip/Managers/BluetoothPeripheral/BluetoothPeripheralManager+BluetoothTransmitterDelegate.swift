@@ -18,6 +18,20 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initiate pairing
     static let applicationManagerKeyInitiatePairing = "RootViewController-InitiatePairing"
     
+    /// Persists a genuine standard BLE Battery Level against the exact active heartbeat peripheral.
+    func didUpdateBatteryLevel(_ batteryLevel: Int, bluetoothTransmitter: BluetoothTransmitter) {
+        dispatchPrecondition(condition: .onQueue(.main))
+        guard let index = bluetoothTransmitters.firstIndex(of: bluetoothTransmitter),
+              bluetoothPeripherals.indices.contains(index) else { return }
+        batteryHistoryManager.record(
+            peripheralObjectID: bluetoothPeripherals[index].blePeripheral.objectID,
+            observation: .percentage(
+                value: batteryLevel,
+                producer: bluetoothTransmitter is DexcomG7HeartbeatBluetoothTransmitter ? .dexcomG7Heartbeat : .genericHeartbeat
+            )
+        )
+    }
+
     /// Transmitter is calling this delegate function to indicate that bluetooth pairing is needed. If the app is in the background, the user will be informed, after opening the app a pairing request will be initiated. if the app is in the foreground, the pairing request will be initiated immediately
     func transmitterNeedsPairing(bluetoothTransmitter: BluetoothTransmitter) {
 

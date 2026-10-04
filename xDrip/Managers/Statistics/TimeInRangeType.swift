@@ -55,6 +55,22 @@ public enum TimeInRangeType: Int, CaseIterable {
             return UserDefaults.standard.lowMarkValueInUserChosenUnit
         }
     }
+
+    /// Lower boundary in the canonical unit used by stored glucose readings and shared analytics.
+    ///
+    /// Statistics used to convert every reading into the display unit and compare it with rounded
+    /// mmol/L limits such as 3.9. That can classify a stored value of exactly 70 mg/dL differently
+    /// from report and landscape analytics, which compare in mg/dL. Calculations now remain in the
+    /// canonical unit. `lowerLimit` above is retained solely for user-facing text.
+    var lowerLimitInMgDl: Double {
+        switch self {
+        case .standardRange, .tightRange:
+            return ConstantsStatistics.standardisedLowValueForTIRInMgDl
+        case .userDefinedRange:
+            let storedValue = UserDefaults.standard.lowMarkValue
+            return storedValue > 0 ? storedValue : ConstantsBGGraphBuilder.defaultLowMarkInMgdl
+        }
+    }
     
     var higherLimit: Double {
         
@@ -67,6 +83,20 @@ public enum TimeInRangeType: Int, CaseIterable {
             return isMgDl ? ConstantsStatistics.standardisedHighValueForTITRInMgDl : ConstantsStatistics.standardisedHighValueForTITRInMmol
         case .userDefinedRange:
             return UserDefaults.standard.highMarkValueInUserChosenUnit
+        }
+    }
+
+    /// Upper boundary in canonical mg/dL. See `lowerLimitInMgDl` for why range calculations must
+    /// not be performed against rounded display-unit limits.
+    var higherLimitInMgDl: Double {
+        switch self {
+        case .standardRange:
+            return ConstantsStatistics.standardisedHighValueForTIRInMgDl
+        case .tightRange:
+            return ConstantsStatistics.standardisedHighValueForTITRInMgDl
+        case .userDefinedRange:
+            let storedValue = UserDefaults.standard.highMarkValue
+            return storedValue > 0 ? storedValue : ConstantsBGGraphBuilder.defaultHighMarkInMgdl
         }
     }
     

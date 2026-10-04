@@ -11,6 +11,10 @@
 
 /// 
 "battery" = "Battery";
+"versionCode" = "版本代码";
+"voltageA" = "电压 A";
+"voltageB" = "电压 B";
+"waitingForData" = "正在等待数据...";
 
 /// cell text, shows when last reset was done, if known. Only for Dexcom
 "lastReset" = "Last Reset";
@@ -103,7 +107,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "共存模式";
 "useOtherDexcomAppCoexistenceFooter" = "共存模式允许我们与其他应用（例如 Dexcom 或 CamAPS）配合使用。该应用必须持续在后台运行。";
 "useOtherDexcomAppPrimaryFooter" = "主模式作为主应用连接并控制连接。";
 "runningInCoexistenceMode" = "正在共存模式下运行";
@@ -147,13 +150,13 @@
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
 
 /// sensor warm-up text
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "预热至";
 
 /// Scan again button
 "nfcScanFailedScanAgainButton" = "Scan Again";
 
 /// Tell the user the scan was successful and to just wait now for connection
-"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 
 /// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
 "readSuccessLast24Hours" = "过去 24 小时";
@@ -187,15 +190,74 @@
 
 /* Dexcom G6 Bluetooth authentication slot */
 "dexcomG6BluetoothSlot" = "蓝牙通道";
-"dexcomG6MobileAppSlot" = "移动 App（默认）";
+"dexcomG6MobileAppSlot" = "槽位 2：移动 App（默认）";
 "dexcomG6MobileAppSlotShort" = "移动 App";
-"dexcomG6MedicalDeviceSlot" = "接收器或胰岛素泵（实验性）";
+"dexcomG6MedicalDeviceSlot" = "槽位 1：接收器或胰岛素泵";
 "dexcomG6MedicalDeviceSlotShort" = "胰岛素泵";
 "dexcomG6MobileAppSlotFooter" = "移动 App 通道是手机连接的默认通道。";
 "dexcomG6MedicalDeviceSlotFooter" = "接收器或胰岛素泵通道通常预留给 Dexcom 接收器或兼容的胰岛素泵。此 App 使用该通道后，移动 App 通道仍可供手机或其他设备使用。";
 "dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "共存模式下不可用";
 "dexcomG6MedicalDeviceSlotWarning" = "接收器或胰岛素泵通道通常预留给 Dexcom 接收器或兼容的胰岛素泵。选择此通道可能会导致该设备无法连接。\n\n接收器或胰岛素泵通道应仅用于实验用途。此选择将在下次认证时生效。";
-"dexcomG6AnubisSlot" = "通道 3（Anubis 实验性）";
+"dexcomG6AnubisSlot" = "槽位 3：Anubis Extra";
+"dexcomG7MedicalDeviceSlot" = "槽位 1：接收器或胰岛素泵";
+"dexcomG7MedicalDeviceSlotShort" = "胰岛素泵";
+"dexcomG7MobileAppSlot" = "槽位 2：移动 App（默认）";
+"dexcomG7SmartWatchSlot" = "槽位 3：智能手表";
+"dexcomG7PairingCodeMessage" = "请输入当前传感器敷贴器上的四位代码。主要模式没有此代码便无法进行身份验证。";
+"dexcomG7BluetoothSlot" = "蓝牙通道";
+"dexcomG7MobileAppSlotShort" = "移动 App";
+"dexcomG7SmartWatchSlotShort" = "智能手表";
+"dexcomG7MobileAppSlotFooter" = "移动 App 通道（槽位 2）是默认通道，也是目前经过验证的 G7 直接连接。";
+"dexcomG7MedicalDeviceSlotFooter" = "接收器或胰岛素泵通道使用身份验证槽位 1。";
+"dexcomG7SmartWatchSlotFooter" = "智能手表通道使用出厂身份验证槽位 3。";
 "dexcomG6AnubisSlotShort" = "通道 3";
 "dexcomG6AnubisSlotFooter" = "通道 3 仅适用于 Anubis 发射器。此通道为实验性通道，并会为其他设备保留移动 App 和接收器或胰岛素泵通道。";
 "dexcomG6AnubisSlotWarning" = "通道 3 是仅适用于 Anubis 发射器的实验性通道。\n\n仅将通道 3 用于测试。此选择将在下次认证时生效。";
+"dexcomConnectionMode" = "连接模式";
+"dexcomPrimaryMode" = "主要";
+"dexcomCoexistenceMode" = "共存";
+"dexcomPrimaryModePickerOption" = "主模式";
+"dexcomCoexistenceModePickerOption" = "共存模式";
+"dexcomG6ModeSelectionFooter" = "您可以稍后在发射器设置中更改 G6 连接模式。";
+"dexcomConnectionModeSelectionExplanation" = "主要模式会直接连接此应用，并要求关闭连接到 Dexcom 设备的任何其他应用。\n\n共存模式依靠另一个应用来维持 Dexcom 连接并接收读数。";
+"dexcomBluetoothChannelSelectionExplanation" = "选择此应用要使用的蓝牙通道。除非需要为其他连接保留该通道，否则请选择移动应用。";
+"dexcomG6CoexistenceModeSelectionMessage" = "已选择共存模式。另一个应用（例如 Dexcom G6 或 CamAPS）必须连接到 G6 发射器并完成身份验证。\n\n请让另一个应用在后台保持运行，否则 %@ 将无法接收读数。";
+"dexcomG6PrimaryModeSelectionMessage" = "已选择主要模式。%@ 必须是唯一连接到 G6 发射器并完成身份验证的应用。\n\n请关闭连接到发射器的任何其他应用，或禁用其蓝牙权限。否则，%@ 或另一个应用可能无法接收读数。";
+"dexcomPrimaryModeAddFlowMessage" = "作为主要应用直接连接。断开所有其他应用与此 Dexcom 的连接。";
+"dexcomCoexistenceModeAddFlowMessage" = "与另一个应用共享连接。确保 Dexcom 或 CamAPS 应用在后台正常运行。";
+"dexcomG7NoSensorLabelFound" = "照片中未找到 Dexcom G7 传感器标签。";
+"dexcomG7InvalidSensorLabelFound" = "找到了 Data Matrix，但它不是有效的 Dexcom G7 传感器标签。";
+
+
+/* Battery history */
+"batteryHistory" = "电池历史记录";
+"batteryHistoryTransmitterID" = "发射器 ID";
+"batteryHistoryNoData" = "没有电池历史记录";
+"batteryHistoryBeginsAfterReading" = "下一次获得真实电池读数后开始记录历史。";
+"batteryHistoryRange" = "范围";
+"batteryHistoryRangeAccessibility" = "电池历史记录范围";
+"batteryHistoryRangeExplanation" = "固定范围从现在回溯到所选天数。空白表示没有读数的时段。";
+
+"connectionDiagramOtherApp" = "其他应用";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "信号强度";
+
+"signalStrengthChartExplanation" = "最近两分钟的实时信号。连接期间大约每秒接收一次新测量值。";
+
+"signalStrengthWeak" = "弱";
+"signalStrengthStrong" = "强";
+"signalStrengthLastMeasurement" = "上次测量";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "订阅";
+"heartbeat.mode" = "订阅模式";
+"heartbeat.mode.automatic" = "单一";
+"heartbeat.mode.all" = "全部";
+"heartbeat.footer.automatic" = "自动选择一个受支持的蓝牙通道来接收心跳更新，将订阅数量保持在最低限度。如果订阅失败，将尝试其他通道。";
+"heartbeat.footer.all" = "订阅所有受支持的蓝牙通道，使任意通道的更新都能提供心跳。";
+"heartbeat.simpleFooter" = "更改在下次连接时生效。";
+
+"signalStrengthDisconnected" = "已断开连接";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "到期";

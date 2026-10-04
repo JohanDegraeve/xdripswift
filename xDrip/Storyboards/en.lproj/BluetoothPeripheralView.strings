@@ -11,6 +11,10 @@
 "sensorType" = "Sensor Type";
 "serialNumber" = "Serial Number";
 "battery" = "Battery";
+"versionCode" = "Version Code";
+"voltageA" = "Voltage A";
+"voltageB" = "Voltage B";
+"waitingForData" = "Waiting for data...";
 "needsTransmitterId" = "Missing Transmitter ID";
 "scan" = "Scan";
 "medtrumNanoPumpScanNoticeTitle" = "Medtrum Nano Pump Connection";
@@ -39,9 +43,19 @@
 "confirmDisconnectMessage" = "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.";
 "transmittterStartDate" = "Transmitter Started";
 "sensorStartDate" = "Sensor Started";
-"useOtherDexcomApp" = "Coexistence Mode";
-"useOtherDexcomAppCoexistenceFooter" = "Coexistence mode allows us to work with another app such as the Dexcom or CamAPS apps. That app must keep running in the background.";
-"useOtherDexcomAppPrimaryFooter" = "Primary mode connects as the main app and controls the connection.";
+"useOtherDexcomAppCoexistenceFooter" = "Coexistence mode is selected. Another app such as Dexcom or CamAPS must keep running in the background.";
+"useOtherDexcomAppPrimaryFooter" = "Primary mode is selected. This app connects as the main app and controls the connection.";
+"dexcomG7PairingCodeMessage" = "Enter the four-digit sensor pairing code from the current applicator. Primary mode cannot authenticate without this code.";
+"dexcomG7BluetoothSlot" = "Bluetooth Channel";
+"dexcomG7MobileAppSlot" = "Slot 2: Mobile App (Default)";
+"dexcomG7MobileAppSlotShort" = "Mobile App";
+"dexcomG7MedicalDeviceSlot" = "Slot 1: Receiver or Pump";
+"dexcomG7MedicalDeviceSlotShort" = "Pump";
+"dexcomG7SmartWatchSlot" = "Slot 3: Smart Watch";
+"dexcomG7SmartWatchSlotShort" = "Smart Watch";
+"dexcomG7MobileAppSlotFooter" = "The Mobile App channel (slot 2) is the default and is the currently validated native G7 connection.";
+"dexcomG7MedicalDeviceSlotFooter" = "The Receiver or Pump channel uses authentication slot 1.";
+"dexcomG7SmartWatchSlotFooter" = "The Smart Watch channel uses the factory authentication slot 3.";
 "runningInCoexistenceMode" = "Running in Coexistence mode";
 "runningInPrimaryMode" = "Running in Primary mode";
 "nfcScanNeeded" = "NFC scan needed";
@@ -53,7 +67,7 @@
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
 "nfcErrorMessageScanFailed" = "Sensor scan has failed";
 "nonFixedSlopeWarning" = "Multi-point calibration is an advanced feature.\n\nPlease do not use this feature until you have read the calibration section of the online help and understand how it works.";
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "Warmup until";
 
 "nativeAlgorithm" = "Native algorithm";
 "xDripAlgorithm" = "xDrip algorithm";
@@ -95,15 +109,63 @@
 
 /* Dexcom G6 Bluetooth authentication slot */
 "dexcomG6BluetoothSlot" = "Bluetooth Channel";
-"dexcomG6MobileAppSlot" = "Mobile App (Default)";
+"dexcomG6MobileAppSlot" = "Slot 2: Mobile App (Default)";
 "dexcomG6MobileAppSlotShort" = "Mobile App";
-"dexcomG6MedicalDeviceSlot" = "Receiver or Pump (Experimental)";
+"dexcomG6MedicalDeviceSlot" = "Slot 1: Receiver or Pump";
 "dexcomG6MedicalDeviceSlotShort" = "Pump";
 "dexcomG6MobileAppSlotFooter" = "The Mobile App channel is the default for phone connections.";
 "dexcomG6MedicalDeviceSlotFooter" = "The Receiver or Pump channel is normally reserved for the Dexcom receiver or a compatible pump. Using it for this app leaves the Mobile App channel available for a phone or another device.";
 "dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "Unavailable in Co-existence mode";
 "dexcomG6MedicalDeviceSlotWarning" = "The Receiver or Pump channel is normally reserved for a Dexcom receiver or compatible pump. Selecting it can prevent that device from connecting.\n\nUsing the Receiver or Pump channel should be considered for experimental use only. The selection takes effect on the next authentication.";
-"dexcomG6AnubisSlot" = "Slot 3 (Anubis Experimental)";
+"dexcomG6AnubisSlot" = "Slot 3: Anubis Extra";
 "dexcomG6AnubisSlotShort" = "Slot 3";
 "dexcomG6AnubisSlotFooter" = "Slot 3 is available only on Anubis transmitters. It is experimental and leaves the Mobile App and Receiver or Pump channels available for other devices.";
 "dexcomG6AnubisSlotWarning" = "Slot 3 is an experimental channel available only on Anubis transmitters.\n\nUse Slot 3 for testing only. The selection takes effect on the next authentication.";
+"dexcomConnectionMode" = "Connection Mode";
+"dexcomPrimaryMode" = "Primary";
+"dexcomCoexistenceMode" = "Coexistence";
+"dexcomPrimaryModePickerOption" = "Primary Mode";
+"dexcomCoexistenceModePickerOption" = "Coexistence Mode";
+"dexcomG6ModeSelectionFooter" = "You can change the G6 connection mode later in the transmitter settings.";
+"dexcomConnectionModeSelectionExplanation" = "Primary Mode connects this app directly and requires any other app that connects to the Dexcom device to be closed.\n\nCoexistence Mode relies on another app to maintain the Dexcom connection and receive readings.";
+"dexcomBluetoothChannelSelectionExplanation" = "Choose the Bluetooth channel that this app will use. Select Mobile App unless you need to leave that channel available for another connection.";
+"dexcomG6CoexistenceModeSelectionMessage" = "Coexistence mode has been selected. Another app, such as Dexcom G6 or CamAPS, must connect to and authenticate with the G6 transmitter.\n\nKeep the other app running in the background or %@ will not receive readings.";
+"dexcomG6PrimaryModeSelectionMessage" = "Primary mode has been selected. %@ must be the only app connecting to and authenticating with the G6 transmitter.\n\nClose any other app that connects to the transmitter or disable its Bluetooth permission. Otherwise, %@ or the other app may not receive readings.";
+"dexcomPrimaryModeAddFlowMessage" = "Connect directly as the main app. Disconnect any other app from this Dexcom.";
+"dexcomCoexistenceModeAddFlowMessage" = "Share the connection with another app. Keep the Dexcom or CamAPS app working correctly in the background.";
+"dexcomG7NoSensorLabelFound" = "No Dexcom G7 sensor label was found in the photo.";
+"dexcomG7InvalidSensorLabelFound" = "A Data Matrix was found, but it was not a valid Dexcom G7 sensor label.";
+
+
+/* Battery history */
+"batteryHistory" = "Battery History";
+"batteryHistoryTransmitterID" = "Transmitter ID";
+"batteryHistoryNoData" = "No battery history";
+"batteryHistoryBeginsAfterReading" = "History begins after the next genuine battery reading.";
+"batteryHistoryRange" = "Range";
+"batteryHistoryRangeAccessibility" = "Battery history range";
+"batteryHistoryRangeExplanation" = "Fixed ranges run from now back to the selected number of days. Gaps show periods without a reading.";
+
+"connectionDiagramOtherApp" = "Other App";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "Signal Strength";
+
+"signalStrengthChartExplanation" = "Live signal over the last two minutes. New measurements arrive about every second while connected.";
+
+"signalStrengthWeak" = "Weak";
+"signalStrengthStrong" = "Strong";
+"signalStrengthLastMeasurement" = "Last measurement";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "Subscriptions";
+"heartbeat.mode" = "Subscription mode";
+"heartbeat.mode.automatic" = "Single";
+"heartbeat.mode.all" = "All";
+"heartbeat.footer.automatic" = "Automatically selects one supported Bluetooth channel for heartbeat updates, keeping subscriptions to a minimum. If subscribing fails, another channel is tried.";
+"heartbeat.footer.all" = "Subscribes to all supported Bluetooth channels, allowing updates from any of them to provide a heartbeat.";
+"heartbeat.simpleFooter" = "Changes apply on the next connection.";
+
+"signalStrengthDisconnected" = "Disconnected";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "Expires";

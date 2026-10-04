@@ -9,77 +9,126 @@
 import Foundation
 import SwiftUI
 
-/// Owns one treatment editor model for the lifetime of its sheet.
+/// Presents treatment type selection for new entries, or opens an existing entry directly.
 struct TreatmentEditorContainerView: View {
-    // MARK: - private properties
-
+    let coreDataManager: CoreDataManager
+    let editorState: TreatmentEditorState
     let onSave: () -> Void
     let onCancel: () -> Void
 
-    @StateObject private var viewModel: TreatmentEditorViewModel
-
-    // MARK: - initialization
-
-    init(
-        coreDataManager: CoreDataManager,
-        editorState: TreatmentEditorState,
-        onSave: @escaping () -> Void,
-        onCancel: @escaping () -> Void
-    ) {
-        self.onSave = onSave
-        self.onCancel = onCancel
-
-        switch editorState {
-        case .add:
-            _viewModel = StateObject(
-                wrappedValue: TreatmentEditorViewModel(coreDataManager: coreDataManager, treatmentToEdit: nil)
-            )
-        case .edit(let treatment):
-            let treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
-            let treatmentEntry = treatmentEntryAccessor.getTreatment(objectID: treatment.objectID)
-            _viewModel = StateObject(
-                wrappedValue: TreatmentEditorViewModel(
-                    coreDataManager: coreDataManager,
-                    treatmentToEdit: treatmentEntry
-                )
-            )
-        }
-    }
-
-    // MARK: - SwiftUI views
-
     var body: some View {
         NavigationStack {
-            TreatmentEditorView(
-                viewModel: viewModel,
-                onDelete: {
-                    if viewModel.deleteTreatment() {
-                        onSave()
-                    }
-                }
-            )
-            .navigationTitle(viewModel.navigationTitle)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(Texts_Common.Cancel) {
-                        onCancel()
-                    }
-                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
-                }
-
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(Texts_TreatmentsView.saveTreatment) {
-                        if viewModel.saveTreatment() {
-                            onSave()
+            switch editorState {
+            case .add:
+                List {
+                    Section(Texts_TreatmentsView.treatmentType) {
+                        ForEach(TreatmentEditorViewModel.supportedTreatmentTypes, id: \.rawValue) { treatmentType in
+                            NavigationLink {
+                                TreatmentEditorScreen(
+                                    coreDataManager: coreDataManager,
+                                    treatmentToEdit: nil,
+                                    initialType: treatmentType,
+                                    onSave: onSave
+                                )
+                            } label: {
+                                HStack(spacing: 12) {
+                                    treatmentType.iconView()
+                                        .frame(width: 24)
+                                        .accessibilityHidden(true)
+                                    Text(treatmentType.asString())
+                                        .foregroundStyle(ConstantsAppColors.rowTitleText)
+                                }
+                            }
                         }
                     }
-                    .tint(ConstantsAppColors.toolbarAction)
-                    .disabled(!viewModel.canSaveTreatment)
+                }
+                .listStyle(.insetGrouped)
+                .ipadReadableContentWidth(720)
+                .navigationTitle(Texts_TreatmentsView.addTreatmentTitle)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(Texts_Common.Cancel, action: onCancel)
+                            .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
+                    }
+                }
+            case .edit(let treatment):
+                // A stale or deleted row must not open an empty editor in add mode.
+                if let entry = TreatmentEntryAccessor(coreDataManager: coreDataManager)
+                    .getTreatment(objectID: treatment.objectID), !entry.isDeleted, !entry.treatmentdeleted {
+                    TreatmentEditorScreen(
+                        coreDataManager: coreDataManager,
+                        treatmentToEdit: entry,
+                        onSave: onSave,
+                        onCancel: onCancel
+                    )
+                } else {
+                    Text(Texts_TreatmentsView.noTreatmentsToShow)
+                        .navigationTitle(Texts_TreatmentsView.editTreatmentTitle)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button(Texts_Common.Cancel, action: onCancel)
+                            }
+                        }
                 }
             }
         }
         .colorScheme(.dark)
+    }
+}
+
+/// Owns a separate draft for each entry form, so choosing another type starts fresh.
+private struct TreatmentEditorScreen: View {
+    @StateObject private var viewModel: TreatmentEditorViewModel
+
+    let onSave: () -> Void
+    let onCancel: (() -> Void)?
+
+    init(
+        coreDataManager: CoreDataManager,
+        treatmentToEdit: TreatmentEntry?,
+        initialType: TreatmentType = .Carbs,
+        onSave: @escaping () -> Void,
+        onCancel: (() -> Void)? = nil
+    ) {
+        _viewModel = StateObject(wrappedValue: TreatmentEditorViewModel(
+            coreDataManager: coreDataManager,
+            treatmentToEdit: treatmentToEdit,
+            initialType: initialType
+        ))
+        self.onSave = onSave
+        self.onCancel = onCancel
+    }
+
+    var body: some View {
+        TreatmentEditorView(
+            viewModel: viewModel,
+            onDelete: {
+                if viewModel.deleteTreatment() {
+                    onSave()
+                }
+            }
+        )
+        .navigationTitle(viewModel.navigationTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if let onCancel = onCancel {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(Texts_Common.Cancel, action: onCancel)
+                        .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
+                }
+            }
+
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(Texts_TreatmentsView.saveTreatment) {
+                    if viewModel.saveTreatment() {
+                        onSave()
+                    }
+                }
+                .tint(ConstantsAppColors.toolbarAction)
+                .disabled(!viewModel.canSaveTreatment)
+            }
+        }
     }
 }
 
@@ -96,53 +145,46 @@ struct TreatmentEditorView: View {
     var body: some View {
         Form {
             Section(footer: editorFooterView()) {
-                if viewModel.isAddMode {
-                    Menu {
-                        ForEach(TreatmentEditorViewModel.supportedTreatmentTypes, id: \.rawValue) { treatmentType in
-                            Button {
-                                viewModel.selectedType = treatmentType
-                            } label: {
-                                if viewModel.selectedType == treatmentType {
-                                    Label(treatmentType.asString(), systemImage: "checkmark")
-                                } else {
-                                    Text(treatmentType.asString())
-                                }
-                            }
-                        }
-                    } label: {
-                        conventionalMenuLabel(
-                            title: Texts_TreatmentsView.type,
-                            value: viewModel.selectedType.asString()
-                        )
-                    }
-                    .buttonStyle(.plain)
-                } else {
-                    HStack {
-                        Text(Texts_TreatmentsView.type)
-                        Spacer()
+                HStack {
+                    Text(Texts_TreatmentsView.type)
+                    Spacer()
+                    HStack(spacing: 8) {
+                        viewModel.selectedType.iconView()
+                            .accessibilityHidden(true)
                         Text(viewModel.selectedType.asString())
                             .foregroundStyle(Color(.colorSecondary))
                     }
                 }
 
-                DatePicker(selection: $viewModel.selectedDate, displayedComponents: [.date, .hourAndMinute]) {
+                DatePicker(selection: $viewModel.selectedDate, in: ...viewModel.latestSelectableDate, displayedComponents: [.date, .hourAndMinute]) {
                     Text(Texts_BgReadings.date)
+                        .foregroundStyle(Color(.colorPrimary))
                 }
+                .foregroundStyle(Color(.colorSecondary))
 
                 if viewModel.showsNumericValueEditor {
                     LabeledContent(Texts_TreatmentsView.value) {
                         HStack(spacing: 6) {
                             TextField(viewModel.valuePlaceholder, text: $viewModel.enteredValue)
-                                .keyboardType(.decimalPad)
+                                .keyboardType(viewModel.selectedType == .BasalInjection ? .numberPad : .decimalPad)
                                 .multilineTextAlignment(.trailing)
                                 .textFieldStyle(.plain)
-                                .foregroundStyle(Color(.colorPrimary))
+                                .foregroundStyle(Color(.colorSecondary))
                                 .frame(minWidth: 72, maxWidth: 96, alignment: .trailing)
 
                             Text(viewModel.unitText)
-                                .foregroundStyle(Color(.colorSecondary))
+                                .foregroundStyle(Color(.colorTertiary))
                         }
                         .fixedSize(horizontal: true, vertical: false)
+                    }
+                }
+
+                if viewModel.selectedType == .BasalInjection {
+                    LabeledContent(Texts_TreatmentsView.insulinDescription) {
+                        TextField(Texts_TreatmentsView.insulinDescriptionPlaceholder, text: $viewModel.enteredInsulinDescription)
+                            .multilineTextAlignment(.trailing)
+                            .textFieldStyle(.plain)
+                            .foregroundStyle(Color(.colorSecondary))
                     }
                 }
 
@@ -154,7 +196,7 @@ struct TreatmentEditorView: View {
                             .padding(6)
                             .background(ConstantsAppColors.groupedBackground)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .foregroundStyle(Color(.colorPrimary))
+                            .foregroundStyle(Color(.colorSecondary))
                             .overlay(alignment: .topLeading) {
                                 if viewModel.enteredNotesValue.isEmpty {
                                     Text(Texts_TreatmentsView.notePlaceholder)
@@ -172,7 +214,7 @@ struct TreatmentEditorView: View {
                     TextField(Texts_Common.unknown, text: $viewModel.enteredByValue)
                         .multilineTextAlignment(.trailing)
                         .textFieldStyle(.plain)
-                        .foregroundStyle(Color(.colorPrimary))
+                        .foregroundStyle(Color(.colorSecondary))
                         .frame(minWidth: 120, maxWidth: 220, alignment: .trailing)
                 }
             }
@@ -195,6 +237,9 @@ struct TreatmentEditorView: View {
                 dismissButton: .default(Text(Texts_Common.Ok))
             )
         }
+        .onAppear {
+            viewModel.validateSelectedDateIfNeeded()
+        }
         .onChange(of: viewModel.selectedType) { _ in
             viewModel.validateSelectedDateIfNeeded()
         }
@@ -203,21 +248,11 @@ struct TreatmentEditorView: View {
         }
     }
 
-    private func conventionalMenuLabel(title: String, value: String) -> some View {
-        HStack(spacing: 8) {
-            Text(title)
-                .foregroundStyle(ConstantsAppColors.rowTitleText)
-            Spacer(minLength: 8)
-            Text(value)
-                .foregroundStyle(ConstantsAppColors.rowDetailText)
-            Image(systemName: "chevron.up.chevron.down")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(ConstantsAppColors.rowDetailText)
-        }
-        .contentShape(Rectangle())
-    }
-
     @ViewBuilder private func editorFooterView() -> some View {
+        if viewModel.selectedType == .BasalInjection, viewModel.didPrefillBasalInjection {
+            Text(Texts_TreatmentsView.basalInjectionCopiedFooter)
+        }
+
         if let helperText = viewModel.helperText {
             Text(helperText)
                 .foregroundStyle(Color(.systemRed))

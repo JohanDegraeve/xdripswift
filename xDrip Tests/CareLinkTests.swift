@@ -7,6 +7,7 @@
 //
 
 import Combine
+import CoreData
 import SwiftUI
 import XCTest
 @testable import xdrip
@@ -75,6 +76,47 @@ final class CareLinkTests: XCTestCase {
         XCTAssertNil(try JSONDecoder().decode(BackupTreatment.self, from: legacyData).careLinkSourceIdentifier)
     }
 
+    @MainActor
+    func testBackupRestoresCareLinkIdentityOnlyWithTreatmentHistory() async throws {
+        let snapshot = CareLinkDefaultsSnapshot(keys: [.careLinkPatientAliases, .careLinkTimestampRepairCompleted,
+            .careLinkHistoryRestoreGeneration, .nightscoutFollowerGapFillCoverage])
+        defer { snapshot.restore() }
+        let defaults = UserDefaults.standard
+        let source = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let treatment = TreatmentEntry(date: now, value: 1, valueSecondary: 0, treatmentType: .Insulin,
+            nightscoutEventType: "Correction Bolus", enteredBy: "CareLink", nsManagedObjectContext: source.mainManagedObjectContext)
+        treatment.careLinkSourceIdentifier = "patient|INSULIN|event"
+        defaults.set(["new-patient": "patient"], forKey: UserDefaults.Key.careLinkPatientAliases.rawValue)
+        XCTAssertTrue(source.saveChangesSynchronously())
+        let exporter = BackupService(coreDataManager: source)
+        let archive = try await exporter.createBackup(options: BackupOptions(
+            includesSettings: false, includesAccounts: false, includesBgReadings: false, includesTreatments: true
+        ))
+        defer { try? FileManager.default.removeItem(at: archive.url) }
+        let inspection = try exporter.inspectBackup(at: archive.url)
+        XCTAssertNil(inspection.payload.settings)
+        XCTAssertEqual(inspection.payload.careLinkPatientAliases, ["new-patient": "patient"])
+
+        defaults.set(["existing": "root"], forKey: UserDefaults.Key.careLinkPatientAliases.rawValue)
+        defaults.set(true, forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue)
+        defaults.set(Data([1]), forKey: UserDefaults.Key.nightscoutFollowerGapFillCoverage.rawValue)
+        let destination = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let importer = BackupService(coreDataManager: destination)
+        _ = try await importer.restore(inspection: inspection, mode: .ignore,
+                                       restoresSettings: false, restoredAccountCategories: [])
+        XCTAssertTrue(defaults.bool(forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue))
+        XCTAssertEqual(defaults.dictionary(forKey: UserDefaults.Key.careLinkPatientAliases.rawValue) as? [String: String], ["existing": "root"])
+        _ = try await importer.restore(inspection: inspection, mode: .keepCurrent,
+                                       restoresSettings: false, restoredAccountCategories: [])
+        XCTAssertFalse(defaults.bool(forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue))
+        XCTAssertNotNil(defaults.string(forKey: UserDefaults.Key.careLinkHistoryRestoreGeneration.rawValue))
+        XCTAssertNil(defaults.data(forKey: UserDefaults.Key.nightscoutFollowerGapFillCoverage.rawValue))
+        XCTAssertEqual(defaults.dictionary(forKey: UserDefaults.Key.careLinkPatientAliases.rawValue) as? [String: String],
+                       ["existing": "root", "new-patient": "patient"])
+        XCTAssertEqual(try destination.mainManagedObjectContext.fetch(TreatmentEntry.fetchRequest()).first?.careLinkSourceIdentifier,
+                       treatment.careLinkSourceIdentifier)
+    }
+
     func testConnectionIndicatorPaletteDoesNotUseReadingFreshness() {
         XCTAssertEqual(CareLinkConnectionStatus.loginRequired.indicatorColor, Color.gray)
         XCTAssertEqual(CareLinkConnectionStatus.connecting.indicatorColor, ConstantsAppColors.warning)
@@ -85,33 +127,36 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(CareLinkConnectionStatus.error.indicatorColor, ConstantsAppColors.urgent)
     }
 
-    func testCareLinkAIDStatusUsesSharedSymbolAndColorRules() {
-        let checking = CareLinkStatusSnapshot().aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(checking.systemImage, ConstantsHomeView.careLinkSmartGuardSystemImage)
+    func testCareLinkAIDStatusUsesSharedSymbolAndColorRules() throws {
+        var checkingSnapshot = CareLinkStatusSnapshot()
+        checkingSnapshot.pump.isReported = true
+        let checking = try XCTUnwrap(checkingSnapshot.aidStatus).presentation(referenceDate: now)
+        XCTAssertEqual(checking.symbol, .smartGuard)
         XCTAssertEqual(checking.color, Color("colorSecondary"))
 
         var snapshot = CareLinkStatusSnapshot(status: .active)
+        snapshot.pump.isReported = true
         snapshot.pump.observedAt = now
         snapshot.pump.algorithmState = "AUTO_BASAL"
-        var presentation = snapshot.aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkSmartGuardSystemImage)
+        var presentation = try XCTUnwrap(snapshot.aidStatus).presentation(referenceDate: now)
+        XCTAssertEqual(presentation.symbol, .smartGuard)
         XCTAssertEqual(presentation.color, .green)
 
         snapshot.pump.isSuspended = true
-        presentation = snapshot.aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkSuspendedSystemImage)
+        presentation = try XCTUnwrap(snapshot.aidStatus).presentation(referenceDate: now)
+        XCTAssertEqual(presentation.symbol, .suspended)
         XCTAssertEqual(presentation.color, .yellow)
 
         snapshot.pump.isSuspended = false
         snapshot.pump.isCommunicating = false
-        presentation = snapshot.aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkDisconnectedSystemImage)
+        presentation = try XCTUnwrap(snapshot.aidStatus).presentation(referenceDate: now)
+        XCTAssertEqual(presentation.symbol, .disconnected)
         XCTAssertEqual(presentation.color, .red)
 
         snapshot.pump.isCommunicating = true
         snapshot.pump.observedAt = now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes - 1)
-        presentation = snapshot.aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.careLinkStaleSystemImage)
+        presentation = try XCTUnwrap(snapshot.aidStatus).presentation(referenceDate: now)
+        XCTAssertEqual(presentation.symbol, .stale)
         XCTAssertEqual(presentation.color, .yellow)
         XCTAssertEqual(presentation.title, Texts_SettingsView.careLinkNoData)
     }
@@ -124,39 +169,77 @@ final class CareLinkTests: XCTestCase {
 
         var presentation = deviceStatus.aidStatus.presentation(referenceDate: now)
         XCTAssertTrue(deviceStatus.aidStatus.supportsCOB)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.loopStatusRecentSystemImage)
+        XCTAssertEqual(presentation.symbol, .loop)
         XCTAssertEqual(presentation.color, .green)
 
         deviceStatus.lastLoopDate = now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes - 1)
         presentation = deviceStatus.aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.loopStatusAcceptableSystemImage)
+        XCTAssertEqual(presentation.symbol, .loop)
         XCTAssertEqual(presentation.color, .yellow)
 
         deviceStatus.lastLoopDate = now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes - 1)
         presentation = deviceStatus.aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.loopStatusNotLoopingSystemImage)
+        XCTAssertEqual(presentation.symbol, .loopUnavailable)
         XCTAssertEqual(presentation.color, .red)
 
         deviceStatus.createdAt = now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes - 1)
         presentation = deviceStatus.aidStatus.presentation(referenceDate: now)
-        XCTAssertEqual(presentation.systemImage, ConstantsHomeView.loopStatusNoDataSystemImage)
+        XCTAssertEqual(presentation.symbol, .loopUnavailable)
         XCTAssertEqual(presentation.color, .gray)
     }
 
-    func testCareLinkAIDStatusUsesPumpUpdateTimestampAndOptionalMetrics() {
+    func testCareLinkAIDStatusUsesPumpUpdateTimestampAndOptionalMetrics() throws {
         var snapshot = CareLinkStatusSnapshot(status: .active)
+        snapshot.pump.isReported = true
         snapshot.pump.lastDataUpdateAt = now
+        let aidStatus = try XCTUnwrap(snapshot.aidStatus)
 
-        XCTAssertEqual(snapshot.aidStatus.statusUpdatedAt, now)
-        XCTAssertEqual(snapshot.aidStatus.lastActivityAt, now)
-        XCTAssertNil(snapshot.aidStatus.iob)
-        XCTAssertNil(snapshot.aidStatus.cob)
-        XCTAssertFalse(snapshot.aidStatus.supportsCOB)
+        XCTAssertEqual(aidStatus.statusUpdatedAt, now)
+        XCTAssertEqual(aidStatus.lastActivityAt, now)
+        XCTAssertNil(aidStatus.iob)
+        XCTAssertNil(aidStatus.cob)
+        XCTAssertFalse(aidStatus.supportsCOB)
 
         let state = RootHomeStateModel().careLinkLoopState(snapshot: snapshot, referenceDate: now)
         XCTAssertEqual(state.iob.value, "- U")
         XCTAssertEqual(state.cob.value, "- g")
         XCTAssertFalse(state.showsCOB)
+    }
+
+    func testCareLinkNoPumpPublishesIOBFreshnessButGlucoseOnlyPublishesNoTherapyStatus() throws {
+        var snapshot = CareLinkStatusSnapshot(status: .active, lastReadingAt: now)
+        snapshot.pump.isCommunicating = false
+        snapshot.pump.isInRange = false
+        XCTAssertNil(snapshot.aidStatus)
+        XCTAssertNil(snapshot.pump.homeDeviceStatus(metadata: snapshot.metadata, checkedAt: now))
+        XCTAssertNil(RootHomeStateModel().careLinkLoopState(snapshot: snapshot, referenceDate: now).statusSymbol)
+
+        snapshot.pump.activeInsulin = 1.25
+        snapshot.pump.activeInsulinAt = now
+        var aidStatus = try XCTUnwrap(snapshot.aidStatus)
+        XCTAssertEqual(aidStatus.style, .careLinkIOB)
+        XCTAssertEqual(aidStatus.statusTitle, Texts_Common.Ok)
+        XCTAssertFalse(aidStatus.supportsCOB)
+
+        var presentation = aidStatus.presentation(referenceDate: now)
+        XCTAssertEqual(presentation.symbol, .pump)
+        XCTAssertEqual(presentation.color, .green)
+        XCTAssertTrue(presentation.hasFreshData)
+
+        snapshot.pump.activeInsulinAt = now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes - 1)
+        aidStatus = try XCTUnwrap(snapshot.aidStatus)
+        presentation = aidStatus.presentation(referenceDate: now)
+        XCTAssertEqual(presentation.symbol, .pump)
+        XCTAssertEqual(presentation.color, .yellow)
+        XCTAssertTrue(presentation.hasFreshData)
+
+        snapshot.pump.activeInsulinAt = now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes - 1)
+        aidStatus = try XCTUnwrap(snapshot.aidStatus)
+        presentation = aidStatus.presentation(referenceDate: now)
+        XCTAssertEqual(presentation.symbol, .pump)
+        XCTAssertEqual(presentation.color, .red)
+        XCTAssertFalse(presentation.hasFreshData)
+        XCTAssertEqual(presentation.title, Texts_SettingsView.careLinkNoData)
     }
 
     func testHistoricalCareLinkAIDStatusHidesCOBAfterDeviceStatusNormalization() throws {
@@ -253,9 +336,9 @@ final class CareLinkTests: XCTestCase {
 
     func testCommonAIDStatusEncodesInWatchWidgetAndLiveActivityPayloads() throws {
         var snapshot = CareLinkStatusSnapshot(status: .active)
-        snapshot.pump.observedAt = now
         snapshot.pump.activeInsulin = 1.25
-        let aidStatus = snapshot.aidStatus
+        snapshot.pump.activeInsulinAt = now
+        let aidStatus = try XCTUnwrap(snapshot.aidStatus)
 
         var watchStatus = WatchStatus()
         watchStatus.aidStatus = aidStatus
@@ -353,7 +436,11 @@ final class CareLinkTests: XCTestCase {
     }
 
     func testDiscoveredAuthorizationUsesRegionStateAndPKCE() async throws {
-        let client = CareLinkClient(session: URLSession(configuration: stubConfiguration()), tokenStore: CareLinkMemoryTokenStore())
+        let client = CareLinkClient(
+            session: URLSession(configuration: stubConfiguration()),
+            tokenStore: CareLinkMemoryTokenStore(),
+            appVersionProvider: { "9.7.6" }
+        )
         let transaction = try await client.authorizationTransaction(region: .outsideUnitedStates)
         let query = try XCTUnwrap(URLComponents(url: transaction.authorizationURL, resolvingAgainstBaseURL: false)?.queryItems)
         XCTAssertEqual(transaction.authorizationURL.host, "carelink-login.minimed.eu")
@@ -361,6 +448,17 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(query.first(where: { $0.name == "code_challenge_method" })?.value, "S256")
         XCTAssertNotNil(query.first(where: { $0.name == "code_challenge" })?.value)
         XCTAssertTrue(transaction.configuration.scope.contains("offline_access"))
+        XCTAssertTrue(URLProtocolStub.recorded(path: "/connect/carepartner/v13/discover/android/9.7"))
+    }
+
+    func testCareLinkDiscoveryVersionRequiresMajorMinorPatch() {
+        XCTAssertEqual(
+            ConstantsCareLink.carePartnerDiscoveryURL(appVersion: "3.8.0")?.path,
+            "/connect/carepartner/v13/discover/android/3.8"
+        )
+        ["", "3.8", "3.8.0.1", "3..0", "3.8.x", "٣.٨.٠"].forEach {
+            XCTAssertNil(ConstantsCareLink.carePartnerDiscoveryURL(appVersion: $0))
+        }
     }
 
     // MARK: - Glucose and therapy parsing
@@ -399,6 +497,67 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(reading.timeStamp.timeIntervalSince1970, now.timeIntervalSince1970, accuracy: 1)
     }
 
+    /// A payload without its device clock can reuse only a patient offset proven by an earlier response.
+    func testGlucoseParserRetainsProvenOffsetWhenDeviceClockIsMissing() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "currentServerTime": now.timeIntervalSince1970 * 1000,
+            "sgs": [["sg": 126, "timestamp": "2027-01-15T10:00:00"]]
+        ])
+
+        // Without trusted clock evidence the local timestamp remains in the future and is rejected.
+        let withoutOffset = try CareLinkGlucoseParser.readings(from: data, now: now)
+        XCTAssertTrue(withoutOffset.readings.isEmpty)
+        XCTAssertEqual(withoutOffset.diagnostics.futureTimestampCount, 1)
+        XCTAssertEqual(withoutOffset.diagnostics.clockSource, .unavailable)
+
+        // The retained two-hour offset normalizes the same timestamp without becoming fresh proof.
+        let retained = try CareLinkGlucoseParser.readings(
+            from: data,
+            now: now,
+            retainedDeviceOffset: 2 * 60 * 60
+        )
+        XCTAssertEqual(try XCTUnwrap(retained.readings.first).timeStamp, now)
+        XCTAssertEqual(retained.diagnostics.acceptedCount, 1)
+        XCTAssertEqual(retained.diagnostics.clockSource, .retained)
+        XCTAssertEqual(retained.diagnostics.offsetMinutes, 120)
+        XCTAssertNil(retained.payloadDeviceOffset)
+    }
+
+    /// Explicitly zoned timestamps remain absolute even when a retained device offset is available.
+    func testGlucoseParserNeverShiftsAbsoluteTimestampWithRetainedOffset() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "sgs": [["sg": 126, "timestamp": "2027-01-15T08:00:00Z"]]
+        ])
+        let result = try CareLinkGlucoseParser.readings(
+            from: data,
+            now: now,
+            retainedDeviceOffset: 2 * 60 * 60
+        )
+
+        XCTAssertEqual(try XCTUnwrap(result.readings.first).timeStamp, now)
+        XCTAssertEqual(result.diagnostics.clockSource, .retained)
+    }
+
+    /// Diagnostic counters identify why a payload produced no readings without logging medical data.
+    func testGlucoseParserReportsPrivacySafeRejectionCounts() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "sgs": [
+                ["sg": 0, "timestamp": now.timeIntervalSince1970 * 1000],
+                ["sg": 120],
+                ["sg": 121, "timestamp": now.addingTimeInterval(301).timeIntervalSince1970 * 1000],
+                ["sg": 122, "timestamp": now.addingTimeInterval(-49 * 60 * 60).timeIntervalSince1970 * 1000]
+            ]
+        ])
+        let diagnostics = try CareLinkGlucoseParser.readings(from: data, now: now).diagnostics
+
+        XCTAssertEqual(diagnostics.candidateCount, 4)
+        XCTAssertEqual(diagnostics.acceptedCount, 0)
+        XCTAssertEqual(diagnostics.invalidValueCount, 1)
+        XCTAssertEqual(diagnostics.missingTimestampCount, 1)
+        XCTAssertEqual(diagnostics.futureTimestampCount, 1)
+        XCTAssertEqual(diagnostics.expiredTimestampCount, 1)
+    }
+
     func testTherapyParserStoresNativeAutoBasalAmountAndNormalizesPumpRate() throws {
         let markers: [[String: Any]] = [
             marker(type: "AUTO_BASAL_DELIVERY", timestamp: "2027-01-15T08:55:00", values: ["bolusAmount": "0.125"]),
@@ -428,6 +587,7 @@ final class CareLinkTests: XCTestCase {
         ])
 
         let payload = try CareLinkTherapyParser.payload(from: data, patientID: "patient-1", now: now)
+        XCTAssertTrue(payload.pump.isReported)
         XCTAssertEqual(payload.treatments.count, 3)
         let basal = try XCTUnwrap(payload.treatments.first(where: { $0.type == .AutomaticBasal }))
         XCTAssertEqual(basal.value, 0.125, accuracy: 0.0001)
@@ -443,6 +603,49 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(payload.pump.batteryPercent, 75)
         XCTAssertEqual(payload.pump.algorithmState, "AUTO_BASAL")
         XCTAssertTrue(payload.pump.reportsActiveSmartGuard)
+    }
+
+    func testTherapyParserDoesNotInferPumpFromSimpleraIOBAndUnavailablePumpFields() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            // Simplera is a medical device, but MMT-5100J is a CGM sensor rather than a pump.
+            // CareLink nevertheless returns it through the historically named pump model field.
+            "pumpModelNumber": "MMT-5100J",
+            "medicalDeviceTime": now.timeIntervalSince1970 * 1000,
+            "lastMedicalDeviceDataUpdateServerTime": now.timeIntervalSince1970 * 1000,
+            "activeInsulin": ["amount": 1.25, "datetime": now.timeIntervalSince1970 * 1000],
+            "basal": -1,
+            "reservoirRemainingUnits": -1,
+            "reservoirLevelPercent": -1,
+            "pumpBatteryLevelPercent": -1,
+            "pumpSuspended": false,
+            "pumpCommunicationState": false,
+            "conduitMedicalDeviceInRange": true,
+            "maxAutoBasalRate": -1,
+            "maxBolusAmount": -1
+        ])
+
+        let pump = try CareLinkTherapyParser.payload(from: data, patientID: "patient", now: now).pump
+        XCTAssertFalse(pump.isReported)
+        XCTAssertEqual(pump.activeInsulin, 1.25)
+        XCTAssertEqual(try XCTUnwrap(pump.activeInsulinAt).timeIntervalSince1970, now.timeIntervalSince1970, accuracy: 1)
+        XCTAssertEqual(pump.isCommunicating, false)
+        XCTAssertEqual(pump.isInRange, true)
+        XCTAssertNil(pump.currentBasalRate)
+        XCTAssertNil(pump.reservoirUnits)
+        XCTAssertNil(pump.batteryPercent)
+        XCTAssertNil(pump.maximumAutoBasalRate)
+        XCTAssertNil(pump.maximumBolusAmount)
+
+        var snapshot = CareLinkStatusSnapshot(status: .active, lastReadingAt: now, pump: pump)
+        let presentation = try XCTUnwrap(snapshot.aidStatus).presentation(referenceDate: now)
+        XCTAssertEqual(presentation.symbol, .pump)
+        XCTAssertEqual(presentation.title, Texts_Common.Ok)
+        XCTAssertEqual(presentation.color, .green)
+
+        // The service connection remains healthy. Absent-pump communication flags must not turn
+        // either the service or the Home therapy strip into a red disconnected-pump warning.
+        snapshot.status = CareLinkStatePolicy.status(hasGlucose: true, lastReadingAt: now, pump: pump, now: now)
+        XCTAssertEqual(snapshot.status, .active)
     }
 
     func testAutoBasalIdentityDoesNotChangeWhenNextMarkerArrives() throws {
@@ -562,6 +765,472 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(Set(treatments.map(\.sourceIdentifier)).count, 3)
     }
 
+    @MainActor
+    func testHistoricalTimestampDriftDoesNotReimportTherapy() async throws {
+        let defaultsSnapshot = CareLinkDefaultsSnapshot(keys: [.nightscoutTreatmentsUpdateCounter, .nightscoutSyncRequired, .careLinkTimestampRepairCompleted])
+        defer { defaultsSnapshot.restore() }
+        let core = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let importer = CareLinkTherapyImporter(coreDataManager: core, isAppActive: { true })
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        let eventDate = now.addingTimeInterval(-3600)
+
+        // Reproduce the captured CareLink shape: no IDs, unchanged displayTime, but historical
+        // timestamps move by seconds between responses. Include basal, bolus and meal records.
+        func records(drift: Double, eventShift: Double = 0) throws -> [CareLinkTherapyRecord] {
+            let display = formatter.string(from: eventDate.addingTimeInterval(eventShift))
+            let timestamp = formatter.string(from: eventDate.addingTimeInterval(eventShift + drift))
+            let markers: [[String: Any]] = [
+                ["type": "INSULIN", "displayTime": display, "timestamp": timestamp,
+                 "data": ["dataValues": ["deliveredFastAmount": 2.0]]],
+                ["type": "AUTO_BASAL_DELIVERY", "displayTime": display, "timestamp": timestamp,
+                 "data": ["dataValues": ["bolusAmount": 0.25]]],
+                ["type": "MEAL", "displayTime": display, "timestamp": timestamp,
+                 "data": ["dataValues": ["amount": 39.0]]]
+            ]
+            let data = try JSONSerialization.data(withJSONObject: ["markers": markers])
+            return try CareLinkTherapyParser.payload(from: data, patientID: "patient", now: now).treatments
+        }
+        let first = try records(drift: -1)
+        XCTAssertEqual(first.count, 3)
+        XCTAssertTrue(first.allSatisfy { $0.date == eventDate })
+        var inserted = await importer.importTreatments(first)
+        XCTAssertEqual(inserted, 3)
+        for drift in [-2.0, -4.0, 0.0, -1.0] {
+            let repeated = try records(drift: drift)
+            XCTAssertEqual(Set(repeated.map(\.sourceIdentifier)), Set(first.map(\.sourceIdentifier)))
+            inserted = await importer.importTreatments(repeated)
+            XCTAssertEqual(inserted, 0)
+        }
+        var stored = try core.mainManagedObjectContext.fetch(TreatmentEntry.fetchRequest())
+        XCTAssertEqual(stored.count, 3)
+        XCTAssertEqual(stored.filter { $0.treatmentType == .Insulin || $0.treatmentType == .AutomaticBasal }.reduce(0) { $0 + $1.value }, 2.25)
+        XCTAssertEqual(stored.filter { $0.treatmentType == .Carbs }.reduce(0) { $0 + $1.value }, 39)
+
+        // Equal amounts from genuinely different events must still be imported.
+        inserted = await importer.importTreatments(try records(drift: -2, eventShift: 30))
+        XCTAssertEqual(inserted, 3)
+        stored = try core.mainManagedObjectContext.fetch(TreatmentEntry.fetchRequest())
+        XCTAssertEqual(stored.count, 6)
+    }
+
+    @MainActor
+    func testRotatingPatientNamespaceRepairsAllHistoryAndStaysDeduplicatedAfterRestart() async throws {
+        let snapshot = CareLinkDefaultsSnapshot(keys: [.isMaster, .followerDataSourceType,
+            .nightscoutTreatmentsUpdateCounter, .nightscoutSyncRequired])
+        defer { snapshot.restore() }
+        let defaults = UserDefaults.standard
+        defaults.isMaster = false
+        defaults.followerDataSourceType = .careLink
+        defaults.removeObject(forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue)
+        defaults.removeObject(forKey: UserDefaults.Key.careLinkPatientAliases.rawValue)
+        let core = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        func history(_ patient: String) -> [CareLinkTherapyRecord] {
+            (0..<4).map { repairRecord(now.addingTimeInterval(Double($0 * 600)),
+                amount: Double($0 + 1), patient: patient, type: .Insulin, id: "\(patient)-marker-\($0)") }
+            + [repairRecord(now, amount: 40, patient: patient, type: .Carbs),
+               repairRecord(now, patient: patient)]
+        }
+        for record in history("first") + history("second") {
+            let entry = TreatmentEntry(date: record.date, value: record.value, valueSecondary: record.durationMinutes,
+                treatmentType: record.type, nightscoutEventType: record.nightscoutEventType, enteredBy: "CareLink",
+                notes: record.notes, nsManagedObjectContext: core.mainManagedObjectContext)
+            entry.careLinkSourceIdentifier = record.sourceIdentifier
+        }
+        // Old damaged history is outside the currently fetched patient's window.
+        for index in 0..<3 {
+            for shift in 0..<2 {
+                let record = repairRecord(now.addingTimeInterval(-86400 + Double(index * 300 + shift)), patient: "first")
+                let entry = TreatmentEntry(date: record.date, value: record.value, valueSecondary: record.durationMinutes,
+                    treatmentType: record.type, nightscoutEventType: record.nightscoutEventType, enteredBy: "CareLink",
+                    nsManagedObjectContext: core.mainManagedObjectContext)
+                entry.careLinkSourceIdentifier = record.sourceIdentifier
+            }
+        }
+        XCTAssertTrue(core.saveChangesSynchronously())
+        let importer = CareLinkTherapyImporter(coreDataManager: core, isAppActive: { true })
+        var added = await importer.importTreatments(history("second"))
+        XCTAssertEqual(added, 0)
+        var entries = try core.mainManagedObjectContext.fetch(TreatmentEntry.fetchRequest())
+        XCTAssertEqual(entries.filter { !$0.treatmentdeleted }.count, 9)
+        XCTAssertEqual(entries.filter(\.treatmentdeleted).count, 9)
+        XCTAssertTrue(defaults.bool(forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue))
+        // Rotation after migration, including in the background, is ordinary import deduplication.
+        let restarted = CareLinkTherapyImporter(coreDataManager: core, isAppActive: { false })
+        added = await restarted.importTreatments(history("third"))
+        XCTAssertEqual(added, 0)
+        let again = CareLinkTherapyImporter(coreDataManager: core, isAppActive: { false })
+        added = await again.importTreatments([history("third")[0]])
+        XCTAssertEqual(added, 0)
+        // One coincident dose from another patient is insufficient evidence to merge histories.
+        added = await again.importTreatments([repairRecord(now, patient: "unrelated")])
+        XCTAssertEqual(added, 1)
+        entries = try core.mainManagedObjectContext.fetch(TreatmentEntry.fetchRequest())
+        XCTAssertEqual(entries.filter { !$0.treatmentdeleted }.count, 10)
+        let laterDose = repairRecord(now.addingTimeInterval(7200), amount: 10.3, patient: "third", type: .Insulin)
+        added = await again.importTreatments([laterDose])
+        XCTAssertEqual(added, 1)
+        added = await again.importTreatments([laterDose])
+        XCTAssertEqual(added, 0)
+    }
+
+    func testPatientAliasesNeedVariedAlignedHistory() {
+        let original = (0..<13).map {
+            repairRecord(now.addingTimeInterval(Double($0 * 300)), amount: Double($0 % 3 + 1) / 10, patient: "old")
+        }
+        let rotated = original.map {
+            repairRecord($0.date, amount: $0.value, patient: "new")
+        }
+        XCTAssertEqual(CareLinkPatientIdentity.aliases(stored: original, incoming: rotated, known: [:])["new"], "old")
+        XCTAssertTrue(CareLinkPatientIdentity.aliases(stored: original, incoming: Array(rotated.prefix(1)), known: [:]).isEmpty)
+        let different = rotated.map { repairRecord($0.date.addingTimeInterval(60), amount: $0.value, patient: "other") }
+        XCTAssertTrue(CareLinkPatientIdentity.aliases(stored: original, incoming: different, known: [:]).isEmpty)
+        let flat = original.map { repairRecord($0.date, patient: "flat-old") }
+        let flatOther = original.map { repairRecord($0.date, patient: "flat-new") }
+        XCTAssertTrue(CareLinkPatientIdentity.aliases(stored: flat, incoming: flatOther, known: [:]).isEmpty)
+    }
+
+    private func repairRecord(_ date: Date, amount: Double = 0.25, patient: String = "repair-patient",
+                              type: TreatmentType = .AutomaticBasal, id: String? = nil) -> CareLinkTherapyRecord {
+        let family = type == .AutomaticBasal ? "AUTO_BASAL_DELIVERY" : (type == .Insulin ? "INSULIN" : "MEAL")
+        let fallback = "\(Int64(date.timeIntervalSince1970.rounded())):\(amount)" + (type == .AutomaticBasal ? "" : ":0.0")
+        return CareLinkTherapyRecord(sourceIdentifier: "\(patient)|\(family)|\(id ?? fallback)", date: date,
+            type: type, value: amount, durationMinutes: type == .AutomaticBasal ? 5 : 0,
+            nightscoutEventType: type == .AutomaticBasal ? "Temp Basal" : (type == .Insulin ? "Bolus" : "Carbs"), notes: nil)
+    }
+
+    func testTimestampRepairRequiresVariedSequencesAndProtectsCurrentEvents() {
+        let base = now.addingTimeInterval(-86400)
+        func sequence(shift: Double, patient: String = "repair-patient", serverIDs: Bool = false) -> [CareLinkTherapyRecord] {
+            let basal = (0..<13).map { index in
+                repairRecord(base.addingTimeInterval(Double(index * 300) + shift),
+                             amount: Double(index + 1) / 100, patient: patient,
+                             id: serverIDs ? "\(index + 100)" : nil)
+            }
+            let bolus = [0, 6, 12].enumerated().map { offset, index in
+                repairRecord(base.addingTimeInterval(Double(index * 300 + 10) + shift),
+                             amount: Double(offset + 1), patient: patient, type: .Insulin,
+                             id: serverIDs ? "\(index + 200)" : nil)
+            }
+            return basal + bolus
+        }
+        for shift in [51.0, 3600.0, 3602.0, 3653.0] {
+            let original = sequence(shift: 0)
+            let duplicate = sequence(shift: shift, serverIDs: shift > 60)
+            let records = original + duplicate
+            let plan = CareLinkTimestampRepair.plan(stored: records, incoming: original)
+            // Sparse bolus anchors corroborate the entire repeated import stream.
+            XCTAssertEqual(plan.removed.count, 16, "shift \(shift)")
+            XCTAssertTrue(plan.removed.allSatisfy { $0 >= original.count })
+            let retained = records.indices.filter { !plan.removed.contains($0) }.map { records[$0] }
+            XCTAssertTrue(CareLinkTimestampRepair.plan(stored: retained, incoming: original).removed.isEmpty)
+            XCTAssertTrue(CareLinkTimestampRepair.plan(stored: records, incoming: records).removed.isEmpty)
+            // A different patient's treatment history must not supply evidence.
+            XCTAssertTrue(CareLinkTimestampRepair.plan(stored: original + sequence(shift: shift, patient: "other"), incoming: []).removed.isEmpty)
+            // Two explicit event IDs are evidence of distinct events, not timestamp fallbacks.
+            let explicit = sequence(shift: 0, serverIDs: true) + sequence(shift: shift, serverIDs: true)
+            XCTAssertTrue(CareLinkTimestampRepair.plan(stored: explicit, incoming: []).removed.isEmpty)
+            // An ID alone does not make the shifted clock authoritative.
+            let mixed = original + sequence(shift: shift, serverIDs: true)
+            let mixedPlan = CareLinkTimestampRepair.plan(stored: mixed, incoming: [])
+            XCTAssertEqual(mixedPlan.removed.count, 16)
+            XCTAssertTrue(mixedPlan.removed.allSatisfy { $0 >= original.count })
+            let currentServer = sequence(shift: shift, serverIDs: true)
+            let currentPlan = CareLinkTimestampRepair.plan(stored: mixed, incoming: currentServer)
+            XCTAssertEqual(currentPlan.removed.count, 16)
+            XCTAssertTrue(currentPlan.removed.allSatisfy { $0 < original.count })
+        }
+        let basalOnly = sequence(shift: 0).filter { $0.type == .AutomaticBasal }
+            + sequence(shift: 3600).filter { $0.type == .AutomaticBasal }
+        XCTAssertTrue(CareLinkTimestampRepair.plan(stored: basalOnly, incoming: []).removed.isEmpty)
+        let bolusOnly = sequence(shift: 0).filter { $0.type == .Insulin }
+            + sequence(shift: 3600).filter { $0.type == .Insulin }
+        XCTAssertTrue(CareLinkTimestampRepair.plan(stored: bolusOnly, incoming: []).removed.isEmpty)
+        let constantBasals = (0..<26).map { index in
+            repairRecord(base.addingTimeInterval(Double(index * 300)), amount: 0.25)
+        }
+        XCTAssertTrue(CareLinkTimestampRepair.plan(stored: constantBasals + bolusOnly, incoming: []).removed.isEmpty)
+    }
+
+    func testTimestampRepairRemovesSparseNumericStreamAndKeepsRepeatedBasalDoses() {
+        let base = now.addingTimeInterval(-86400)
+        var current = [CareLinkTherapyRecord]()
+        for index in 0..<288 {
+            // Long stretches of identical doses plus changing delivery: exactly 42 U basal.
+            let amount = index < 192 ? 0.125 : [0.125, 0.175, 0.2625][index % 3]
+            current.append(repairRecord(base.addingTimeInterval(Double(index * 300)), amount: amount))
+        }
+        for (index, amount) in [5.0, 6, 8, 9].enumerated() {
+            let date = base.addingTimeInterval(Double(index * 21600 + 1200))
+            current.append(repairRecord(date, amount: amount, type: .Insulin))
+            current.append(repairRecord(date, amount: 30 + Double(index), type: .Carbs))
+        }
+        var records = current
+        for (index, record) in current.enumerated() {
+            records.append(repairRecord(record.date.addingTimeInterval(51), amount: record.value, type: record.type))
+            let shifted = repairRecord(record.date.addingTimeInterval(3600), amount: record.value,
+                                       type: record.type, id: record.type == .Carbs ? nil : "\(index + 1000)")
+            // Basal duration depends on the next marker and is not an event identity.
+            records.append(CareLinkTherapyRecord(sourceIdentifier: shifted.sourceIdentifier, date: shifted.date,
+                type: shifted.type, value: shifted.value, durationMinutes: shifted.type == .AutomaticBasal ? 4.95 : 0,
+                nightscoutEventType: shifted.nightscoutEventType, notes: shifted.notes))
+        }
+        // An unrelated newer bolus must survive, regardless of the expected historical TDD.
+        let newer = repairRecord(now.addingTimeInterval(60), amount: 10.3, type: .Insulin)
+        records.append(newer)
+        let plan = CareLinkTimestampRepair.plan(stored: records, incoming: current)
+        let retained = records.indices.filter { !plan.removed.contains($0) }.map { plan.replacements[$0] ?? records[$0] }
+        XCTAssertEqual(retained.count, current.count + 1)
+        XCTAssertEqual(Set(retained.map(\.sourceIdentifier)), Set((current + [newer]).map(\.sourceIdentifier)))
+        XCTAssertEqual(retained.filter { $0.type != .Carbs && $0.date < now }.reduce(0) { $0 + $1.value }, 70, accuracy: 0.000001)
+        XCTAssertEqual(retained.filter { $0.type == .AutomaticBasal }.count, 288)
+        XCTAssertTrue(retained.contains(newer))
+        XCTAssertTrue(CareLinkTimestampRepair.plan(stored: retained, incoming: current).removed.isEmpty)
+    }
+
+    func testTimestampRepairRequiresCorroborationAndPreservesAmbiguity() {
+        var records = [CareLinkTherapyRecord]()
+        for event in 0..<3 {
+            for second in 0..<5 {
+                records.append(repairRecord(now.addingTimeInterval(Double(event * 300 + second))))
+            }
+        }
+        let oldCount = records.count
+        // An isolated different shift, another patient, server IDs, and a chain wider than five
+        // seconds are not repair candidates. Zero basal doses are legitimate and use the same rules.
+        records += [repairRecord(now.addingTimeInterval(2000)), repairRecord(now.addingTimeInterval(2005))]
+        records += [repairRecord(now, patient: "other"), repairRecord(now.addingTimeInterval(1), patient: "other")]
+        records += [repairRecord(now, id: "101"), repairRecord(now.addingTimeInterval(1), id: "102")]
+        records += [0.0, 4, 8].map { repairRecord(now.addingTimeInterval(3000 + $0)) }
+        let plan = CareLinkTimestampRepair.plan(stored: records, incoming: [])
+        XCTAssertEqual(plan.removed.count, 12)
+        XCTAssertTrue(plan.removed.allSatisfy { $0 < oldCount })
+        let retained = records.indices.filter { !plan.removed.contains($0) }.map { records[$0] }
+        XCTAssertTrue(CareLinkTimestampRepair.plan(stored: retained, incoming: []).removed.isEmpty)
+        let ambiguous = CareLinkTimestampRepair.plan(stored: records, incoming: [records[0], records[1]])
+        XCTAssertTrue(Set(0..<5).isDisjoint(with: ambiguous.removed))
+    }
+
+    @MainActor
+    func testTimestampRepairMigratesHistoryOnceAndReconcilesFreshIdentity() async throws {
+        let defaultsSnapshot = CareLinkDefaultsSnapshot(keys: [.isMaster, .followerDataSourceType,
+            .careLinkTimestampRepairCompleted, .nightscoutTreatmentsUpdateCounter, .nightscoutSyncRequired])
+        defer { defaultsSnapshot.restore() }
+        let defaults = UserDefaults.standard
+        defaults.isMaster = false
+        defaults.followerDataSourceType = .careLink
+        defaults.removeObject(forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue)
+        let core = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let importer = CareLinkTherapyImporter(coreDataManager: core, isAppActive: { true })
+        func seed(_ record: CareLinkTherapyRecord, enteredBy: String = "CareLink") {
+            let entry = TreatmentEntry(date: record.date, value: record.value, valueSecondary: record.durationMinutes,
+                treatmentType: record.type, nightscoutEventType: record.nightscoutEventType, enteredBy: enteredBy,
+                notes: record.notes, nsManagedObjectContext: core.mainManagedObjectContext)
+            entry.careLinkSourceIdentifier = record.sourceIdentifier
+            entry.id = "remote-\(UUID().uuidString)"
+            entry.uploaded = true
+        }
+        var incoming = [CareLinkTherapyRecord]()
+        for age in [0.0, -30 * 86400.0] {
+            for (index, type) in [TreatmentType.AutomaticBasal, .Insulin, .Carbs].enumerated() {
+                let date = now.addingTimeInterval(age + Double(index * 300))
+                for shift in 0..<5 { seed(repairRecord(date.addingTimeInterval(Double(shift)), type: type)) }
+                if age == 0 { incoming.append(repairRecord(date, type: type)) }
+            }
+        }
+        seed(repairRecord(now.addingTimeInterval(-60)), enteredBy: "Nightscout")
+        XCTAssertTrue(core.saveChangesSynchronously())
+        let inserted = await importer.importTreatments(incoming)
+        XCTAssertEqual(inserted, 0)
+        var entries = try core.mainManagedObjectContext.fetch(TreatmentEntry.fetchRequest())
+        XCTAssertEqual(entries.filter(\.treatmentdeleted).count, 24)
+        XCTAssertEqual(entries.filter { !$0.treatmentdeleted }.count, 7)
+        XCTAssertTrue(entries.filter(\.treatmentdeleted).allSatisfy { !$0.uploaded && !$0.id.isEmpty })
+        for record in incoming {
+            XCTAssertEqual(entries.filter { !$0.treatmentdeleted && $0.careLinkSourceIdentifier == record.sourceIdentifier }.count, 1)
+        }
+        XCTAssertTrue(defaults.bool(forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue))
+        let repeated = await CareLinkTherapyImporter(coreDataManager: core, isAppActive: { true }).importTreatments(incoming)
+        XCTAssertEqual(repeated, 0)
+        entries = try core.mainManagedObjectContext.fetch(TreatmentEntry.fetchRequest())
+        XCTAssertEqual(entries.filter(\.treatmentdeleted).count, 24)
+        XCTAssertEqual(entries.filter { !$0.treatmentdeleted }.count, 7)
+    }
+
+    @MainActor
+    func testTimestampRepairDoesNotRunOutsideCareLinkFollowerMode() async throws {
+        let defaultsSnapshot = CareLinkDefaultsSnapshot(keys: [.isMaster, .followerDataSourceType,
+            .careLinkTimestampRepairCompleted, .nightscoutTreatmentsUpdateCounter, .nightscoutSyncRequired])
+        defer { defaultsSnapshot.restore() }
+        UserDefaults.standard.isMaster = true
+        UserDefaults.standard.removeObject(forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue)
+        let core = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        _ = await CareLinkTherapyImporter(coreDataManager: core, isAppActive: { true }).importTreatments([repairRecord(now)])
+        XCTAssertNil(UserDefaults.standard.object(forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue))
+    }
+
+    @MainActor
+    func testTimestampRepairDefersInBackgroundAndCachesSuccessfulCompletion() async throws {
+        let defaultsSnapshot = CareLinkDefaultsSnapshot(keys: [.isMaster, .followerDataSourceType,
+            .careLinkTimestampRepairCompleted, .careLinkHistoryRestoreGeneration, .nightscoutTreatmentsUpdateCounter, .nightscoutSyncRequired])
+        defer { defaultsSnapshot.restore() }
+        let defaults = UserDefaults.standard
+        let marker = UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue
+        defaults.isMaster = false
+        defaults.followerDataSourceType = .careLink
+        defaults.removeObject(forKey: marker)
+        let core = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        var incoming = [CareLinkTherapyRecord]()
+        for event in 0..<3 {
+            let date = now.addingTimeInterval(Double(event * 300))
+            incoming.append(repairRecord(date.addingTimeInterval(2)))
+            for shift in 0..<2 {
+                let record = repairRecord(date.addingTimeInterval(Double(shift)))
+                let entry = TreatmentEntry(date: record.date, value: record.value, valueSecondary: record.durationMinutes,
+                    treatmentType: record.type, nightscoutEventType: record.nightscoutEventType,
+                    enteredBy: "CareLink", nsManagedObjectContext: core.mainManagedObjectContext)
+                entry.careLinkSourceIdentifier = record.sourceIdentifier
+            }
+        }
+        XCTAssertTrue(core.saveChangesSynchronously())
+        var active = false
+        let importer = CareLinkTherapyImporter(coreDataManager: core, isAppActive: { active })
+        var added = await importer.importTreatments(incoming)
+        XCTAssertEqual(added, 0)
+        XCTAssertNil(defaults.object(forKey: marker))
+        var entries = try core.mainManagedObjectContext.fetch(TreatmentEntry.fetchRequest())
+        XCTAssertEqual(entries.count, 6)
+        XCTAssertTrue(entries.allSatisfy { !$0.treatmentdeleted })
+
+        active = true
+        added = await importer.importTreatments(incoming)
+        XCTAssertEqual(added, 0)
+        XCTAssertTrue(defaults.bool(forKey: marker))
+        entries = try core.mainManagedObjectContext.fetch(TreatmentEntry.fetchRequest())
+        XCTAssertEqual(entries.filter(\.treatmentdeleted).count, 3)
+
+        // A new instance reads the persisted marker once, including during a background launch.
+        let restarted = CareLinkTherapyImporter(coreDataManager: core, isAppActive: { false })
+        active = false
+        // Deliberately remove the disk marker: both existing instances must use their cached state.
+        defaults.removeObject(forKey: marker)
+        added = await importer.importTreatments([repairRecord(now.addingTimeInterval(1800))])
+        XCTAssertEqual(added, 1)
+        added = await restarted.importTreatments([repairRecord(now.addingTimeInterval(2100))])
+        XCTAssertEqual(added, 1)
+        XCTAssertNil(defaults.object(forKey: marker))
+
+        // A history restore must invalidate both live instances before their next import.
+        defaults.set(UUID().uuidString, forKey: UserDefaults.Key.careLinkHistoryRestoreGeneration.rawValue)
+        added = await importer.importTreatments([repairRecord(now.addingTimeInterval(2400))])
+        XCTAssertEqual(added, 0)
+        added = await restarted.importTreatments([repairRecord(now.addingTimeInterval(2700))])
+        XCTAssertEqual(added, 0)
+    }
+
+    @MainActor
+    func testTimestampRepairPersistsSevenDayTotalsInSQLite() async throws {
+        let defaultsSnapshot = CareLinkDefaultsSnapshot(keys: [.isMaster, .followerDataSourceType,
+            .careLinkTimestampRepairCompleted, .nightscoutTreatmentsUpdateCounter, .nightscoutSyncRequired, .therapyDataSourceType])
+        defer { defaultsSnapshot.restore() }
+        UserDefaults.standard.therapyDataSourceType = .automatic
+        UserDefaults.standard.isMaster = false
+        UserDefaults.standard.followerDataSourceType = .careLink
+        UserDefaults.standard.removeObject(forKey: UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue)
+        let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let beforeURL = directory.appendingPathComponent("CareLinkRepairDemoBefore.sqlite")
+        let afterURL = directory.appendingPathComponent("CareLinkRepairDemoAfter.sqlite")
+        for url in [beforeURL, afterURL] {
+            for suffix in ["", "-wal", "-shm"] {
+                let path = url.path + suffix
+                if FileManager.default.fileExists(atPath: path) { try FileManager.default.removeItem(atPath: path) }
+            }
+        }
+        let end = Date(timeIntervalSince1970: Date().timeIntervalSince1970.rounded(.down))
+        let core = try CoreDataManager(testModelName: ConstantsCoreData.modelName, persistentStoreURL: beforeURL)
+        var incoming = [CareLinkTherapyRecord]()
+        for day in 0..<7 {
+            let start = end.addingTimeInterval(Double(day - 7) * 86400)
+            for sample in 0..<288 {
+                let reading = BgReading(timeStamp: start.addingTimeInterval(Double(sample) * 300), sensor: nil,
+                    calibration: nil, rawData: 110 + Double(sample % 30), deviceName: "Synthetic CareLink repair test",
+                    nsManagedObjectContext: core.mainManagedObjectContext)
+                reading.calculatedValue = 110 + Double(sample % 30)
+            }
+            for hour in 0..<24 {
+                let date = start.addingTimeInterval(Double(hour) * 3300 + 600)
+                var events = [repairRecord(date, amount: [1.25, 1.75, 2.25][hour % 3])] // 42 U/day basal
+                if hour % 6 == 0 { events.append(repairRecord(date, amount: [5.0, 6, 8, 9][hour / 6], type: .Insulin)) } // 28 U/day bolus
+                if hour % 8 == 0 { events.append(repairRecord(date, amount: 60, type: .Carbs)) }
+                for event in events {
+                    if day == 6 { incoming.append(repairRecord(date.addingTimeInterval(4), amount: event.value, type: event.type)) }
+                    // Four near-second imports, a short-shift fallback copy, and an hour-
+                    // shifted numeric-ID import reproduce the three historical failure modes.
+                    let copies = (0..<4).map { repairRecord(date.addingTimeInterval(Double($0)), amount: event.value, type: event.type) }
+                        + [repairRecord(date.addingTimeInterval(54), amount: event.value, type: event.type),
+                           repairRecord(date.addingTimeInterval(3600), amount: event.value, type: event.type,
+                                        id: event.type == .Carbs ? nil : "\(day * 100 + hour)")]
+                    for record in copies {
+                        let entry = TreatmentEntry(date: record.date, value: record.value, valueSecondary: record.durationMinutes,
+                            treatmentType: record.type, nightscoutEventType: record.nightscoutEventType,
+                            enteredBy: "CareLink", nsManagedObjectContext: core.mainManagedObjectContext)
+                        entry.careLinkSourceIdentifier = record.sourceIdentifier
+                    }
+                }
+            }
+        }
+        XCTAssertTrue(core.saveChangesSynchronously())
+        try core.disconnectPersistentStoresForTesting()
+        // These two test-owned stores also allow visual before/after checks in an isolated simulator.
+        for suffix in ["", "-wal", "-shm"] {
+            let source = beforeURL.path + suffix
+            if FileManager.default.fileExists(atPath: source) {
+                try FileManager.default.copyItem(atPath: source, toPath: afterURL.path + suffix)
+            }
+        }
+        let repaired = try CoreDataManager(testModelName: ConstantsCoreData.modelName, persistentStoreURL: afterURL)
+        let inserted = await CareLinkTherapyImporter(coreDataManager: repaired, isAppActive: { true }).importTreatments(incoming)
+        XCTAssertEqual(inserted, 0)
+        XCTAssertTrue(repaired.saveChangesSynchronously())
+        try repaired.disconnectPersistentStoresForTesting()
+        for (url, expected) in [(beforeURL, 420.0), (afterURL, 70.0)] {
+            let reopened = try CoreDataManager(testModelName: ConstantsCoreData.modelName, persistentStoreURL: url)
+            let entries = try reopened.mainManagedObjectContext.fetch(TreatmentEntry.fetchRequest()).filter { !$0.treatmentdeleted }
+            for day in 0..<7 {
+                let start = end.addingTimeInterval(Double(day - 7) * 86400)
+                let total = entries.filter { $0.date >= start && $0.date < start.addingTimeInterval(86400)
+                    && ($0.treatmentType == .Insulin || $0.treatmentType == .AutomaticBasal) }.reduce(0) { $0 + $1.value }
+                XCTAssertEqual(total, expected, accuracy: 0.0001)
+            }
+            let analytics = await StatisticsManager(coreDataManager: reopened).reportAnalytics(for: GlucoseReportConfiguration(
+                patientName: "Synthetic test", patientID: "", period: .seven, aidPeriod: .three,
+                paperSize: .a4, language: .english))
+            let trendTotals = analytics.trendPoints.compactMap(\.averageTDDPerDay)
+            XCTAssertEqual(trendTotals.count, 7)
+            for total in trendTotals { XCTAssertEqual(total, expected, accuracy: 0.0001) }
+            try reopened.disconnectPersistentStoresForTesting()
+        }
+    }
+
+    func testTherapyTimeFallsBackWhenDisplayTimeIsUnavailable() throws {
+        for type in ["INSULIN", "MEAL", "AUTO_BASAL_DELIVERY"] {
+            for displayTime in [NSNull() as Any, "invalid" as Any] {
+                for timeKey in ["timestamp", "dateTime"] {
+                    let marker: [String: Any] = [
+                        "type": type, "displayTime": displayTime, timeKey: now.timeIntervalSince1970,
+                        "deliveredFastAmount": 2, "amount": 39, "bolusAmount": 0.25
+                    ]
+                    let data = try JSONSerialization.data(withJSONObject: ["markers": [marker]])
+                    let treatments = try CareLinkTherapyParser.payload(from: data, patientID: "patient", now: now).treatments
+                    XCTAssertEqual(treatments.count, 1)
+                    XCTAssertEqual(treatments.first?.date, now)
+                }
+            }
+        }
+    }
+
     func testGlucoseParserUnwrapsDisplayMessage() throws {
         let data = try JSONSerialization.data(withJSONObject: ["patientData": ["lastSG": ["sg": 132, "timestamp": now.timeIntervalSince1970 * 1000]]])
         XCTAssertEqual(try CareLinkGlucoseParser.readings(from: data, now: now).readings.map(\.sgv), [132])
@@ -650,6 +1319,34 @@ final class CareLinkTests: XCTestCase {
         )
     }
 
+    /// A fresh conduit timestamp cannot turn an empty glucose response into a completed sample cycle.
+    func testCareLinkPollingIgnoresConduitUpdateWhenGlucoseIsMissing() {
+        XCTAssertEqual(
+            CareLinkPollingPolicy.nextPollDate(
+                latestReadingAt: nil,
+                lastDataUpdateAt: now,
+                now: now
+            ),
+            now.addingTimeInterval(60)
+        )
+    }
+
+    /// Heartbeat cadence opens at 270 seconds while callbacks within the same cycle remain coalesced.
+    func testCareLinkHeartbeatPollingUsesSensorCycleWithoutUploadGrace() {
+        XCTAssertFalse(
+            CareLinkPollingPolicy.heartbeatPollIsDue(
+                lastPollStartedAt: now.addingTimeInterval(-269),
+                now: now
+            )
+        )
+        XCTAssertTrue(
+            CareLinkPollingPolicy.heartbeatPollIsDue(
+                lastPollStartedAt: now.addingTimeInterval(-270),
+                now: now
+            )
+        )
+    }
+
     func testLoginPrefillAllowsPartialStoredValues() throws {
         let suiteName = "CareLinkTests.credentials.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
@@ -678,8 +1375,9 @@ final class CareLinkTests: XCTestCase {
     }
 
     func testSuccessfulResponseWithDisconnectedPumpReportsNoData() {
-        let disconnected = CareLinkPumpSnapshot(isCommunicating: false, isInRange: false)
-        let connected = CareLinkPumpSnapshot(isCommunicating: true, isInRange: true)
+        let disconnected = CareLinkPumpSnapshot(isReported: true, isCommunicating: false, isInRange: false)
+        let connected = CareLinkPumpSnapshot(isReported: true, isCommunicating: true, isInRange: true)
+        let noPump = CareLinkPumpSnapshot(isCommunicating: false, isInRange: false)
 
         XCTAssertEqual(
             CareLinkStatePolicy.status(hasGlucose: true, lastReadingAt: now.addingTimeInterval(-60), pump: disconnected, now: now),
@@ -693,12 +1391,18 @@ final class CareLinkTests: XCTestCase {
             CareLinkStatePolicy.status(hasGlucose: true, lastReadingAt: now.addingTimeInterval(-60), pump: connected, now: now),
             .active
         )
+        XCTAssertEqual(
+            CareLinkStatePolicy.status(hasGlucose: true, lastReadingAt: now.addingTimeInterval(-60), pump: noPump, now: now),
+            .active
+        )
+        XCTAssertNil(CareLinkStatePolicy.detail(hasGlucose: true, pump: noPump))
     }
 
     // MARK: - Pump history
 
     func testCareLinkPumpSnapshotCreatesStableHistoricalStatus() throws {
         let pump = CareLinkPumpSnapshot(
+            isReported: true,
             observedAt: now,
             activeInsulin: 1.25,
             currentBasalRate: 0.8,
@@ -722,6 +1426,7 @@ final class CareLinkTests: XCTestCase {
 
     func testDisconnectedCareLinkPumpStatusIsStoredConsistently() throws {
         let pump = CareLinkPumpSnapshot(
+            isReported: true,
             observedAt: now,
             isSuspended: false,
             isCommunicating: false,
@@ -761,6 +1466,7 @@ final class CareLinkTests: XCTestCase {
 
     func testSparseHistoricalStatusRetainsPriorPumpTelemetryForDisplay() throws {
         let fullStatus = try XCTUnwrap(CareLinkPumpSnapshot(
+            isReported: true,
             observedAt: now.addingTimeInterval(-600),
             activeInsulin: 1.25,
             currentBasalRate: 0.8,
@@ -838,6 +1544,94 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(delegate.received.map(\.sgv), [121])
     }
 
+    @MainActor
+    func testCareLinkVersionUpdateCatcherPromotesOlderDefaultsWithoutDowngradingNewerOverride() {
+        let defaultsSnapshot = CareLinkDefaultsSnapshot(keys: [
+            .isMaster,
+            .careLinkVersion,
+        ])
+        let defaults = UserDefaults.standard
+        defaults.isMaster = true
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+
+        func makeManager() -> CareLinkFollowManager {
+            CareLinkFollowManager(
+                coreDataManager: coreDataManager,
+                followerDelegate: FollowerDelegateSpy(),
+                backgroundKeepAliveManager: CareLinkNoOpKeepAliveManager(),
+                startsInitialDownload: false,
+                pollingSchedulerFactory: { _, _ in CareLinkNoOpTimer() }
+            )
+        }
+
+        defaults.careLinkVersion = "3.6.0"
+        var manager: CareLinkFollowManager? = makeManager()
+        XCTAssertNotNil(manager)
+        XCTAssertEqual(defaults.careLinkVersion, ConstantsCareLink.carePartnerAppVersionDefault)
+        manager = nil
+
+        defaults.careLinkVersion = "9.9.9"
+        manager = makeManager()
+        XCTAssertNotNil(manager)
+        XCTAssertEqual(defaults.careLinkVersion, "9.9.9")
+        manager = nil
+
+        defaultsSnapshot.restore()
+    }
+
+    /// One accepted heartbeat fetch owns one finite background task and immediate repeats own none.
+    @MainActor
+    func testHeartbeatPollUsesFiniteBackgroundExecutionAndRejectsImmediateRepeat() async {
+        // Isolate every default observed by CareLink lifecycle reconciliation.
+        let defaultsSnapshot = CareLinkDefaultsSnapshot(keys: [
+            .isMaster,
+            .followerDataSourceType,
+            .followerBackgroundKeepAliveType,
+            .careLinkRegion,
+            .careLinkSelectedPatientID,
+            .careLinkVersion,
+        ])
+        let defaults = UserDefaults.standard
+        defaults.isMaster = false
+        defaults.followerDataSourceType = .careLink
+        defaults.followerBackgroundKeepAliveType = .heartbeat
+        defaults.careLinkRegion = CareLinkRegion.outsideUnitedStates.rawValue
+        defaults.careLinkSelectedPatientID = nil
+
+        let keepAlive = CareLinkNoOpKeepAliveManager()
+        let backgroundExecution = CareLinkBackgroundExecutionSpy()
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        var manager: CareLinkFollowManager? = CareLinkFollowManager(
+            coreDataManager: coreDataManager,
+            followerDelegate: FollowerDelegateSpy(),
+            backgroundKeepAliveManager: keepAlive,
+            client: makeClient(),
+            startsInitialDownload: false,
+            pollingSchedulerFactory: { _, _ in CareLinkNoOpTimer() },
+            backgroundExecutionManager: backgroundExecution
+        )
+        defer {
+            manager = nil
+            defaultsSnapshot.restore()
+        }
+
+        // Authentication must finish before `download()` represents a valid heartbeat request.
+        let didStartKeepAlive = await waitUntil { keepAlive.startCount == 1 }
+        XCTAssertTrue(didStartKeepAlive)
+        manager?.download()
+        // The background task must end with the network transaction rather than remaining active.
+        let didFinishBackgroundExecution = await waitUntil { backgroundExecution.endCount == 1 }
+        XCTAssertTrue(didFinishBackgroundExecution)
+        XCTAssertEqual(backgroundExecution.beginCount, 1)
+
+        // A reconnect can generate several callbacks close together. Heartbeat cadence remains
+        // independent of the ordinary deadline without permitting another immediate cloud fetch.
+        manager?.download()
+        try? await Task.sleep(nanoseconds: 50_000_000)
+        XCTAssertEqual(backgroundExecution.beginCount, 1)
+        XCTAssertEqual(backgroundExecution.endCount, 1)
+    }
+
     func testPendingTherapyBatchRetainsUniqueRecordsAndUsesNewestValues() {
         let first = CareLinkTherapyRecord(
             sourceIdentifier: "first",
@@ -895,6 +1689,8 @@ final class CareLinkTests: XCTestCase {
 
     @MainActor
     func testBlockedTherapyImportCannotBlockGlucoseOrAnotherPoll() async throws {
+        // This manager uses the wall clock, unlike the parser tests with an injected date.
+        URLProtocolStub.usesCurrentGlucoseTime = true
         let defaultsSnapshot = CareLinkDefaultsSnapshot(keys: [
             .isMaster,
             .followerDataSourceType,
@@ -1256,7 +2052,7 @@ final class CareLinkTests: XCTestCase {
 
     func testPersonalAccountUsesBearerWithoutBrowserCookiesAndProfileFallback() async throws {
         URLProtocolStub.omitUsername = true
-        let client = makeClient()
+        let client = makeClient(appVersion: "9.7.6")
         let result = try await client.userAndPatients(region: .outsideUnitedStates)
         XCTAssertEqual(result.metadata.role, "PATIENT_OUS")
         XCTAssertEqual(result.metadata.accountName, "profile-user")
@@ -1264,6 +2060,19 @@ final class CareLinkTests: XCTestCase {
         let headers = try XCTUnwrap(URLProtocolStub.headers.last)
         XCTAssertEqual(headers["Authorization"], "Bearer valid")
         XCTAssertNil(headers["Cookie"])
+
+        URLProtocolStub.route = .periodic
+        _ = try await client.fetchPatientData(
+            region: .outsideUnitedStates,
+            patient: try XCTUnwrap(result.patients.first),
+            username: result.metadata.accountName,
+            accountRole: result.metadata.role,
+            countryCode: result.metadata.countryCode,
+            linkedPatientCount: result.patients.count
+        )
+        let bodies = URLProtocolStub.requestBodies.filter { $0["role"] == "patient" }
+        XCTAssertFalse(bodies.isEmpty)
+        XCTAssertTrue(bodies.allSatisfy { $0["appVersion"] == "9.7.6" })
     }
 
     func testCarePartnerResolvesLinkedPatientsAndScopesPeriodicRequest() async throws {
@@ -1282,6 +2091,7 @@ final class CareLinkTests: XCTestCase {
         let bodies = URLProtocolStub.requestBodies.filter { $0["role"] == "carepartner" }
         XCTAssertFalse(bodies.isEmpty)
         XCTAssertTrue(bodies.allSatisfy { $0["username"] == "patient1" && $0["patientId"] == "child2" })
+        XCTAssertTrue(bodies.allSatisfy { $0["appVersion"] == ConstantsCareLink.carePartnerAppVersionDefault })
     }
 
     func testCarePartnerWithNoLinksRemainsAValidAuthenticatedAccount() async throws {
@@ -1509,10 +2319,15 @@ final class CareLinkTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func makeClient() -> CareLinkClient {
+    private func makeClient(appVersion: String = ConstantsCareLink.carePartnerAppVersionDefault) -> CareLinkClient {
         let store = CareLinkMemoryTokenStore()
         try! store.save(credential())
-        return CareLinkClient(session: URLSession(configuration: stubConfiguration()), tokenStore: store, now: { self.now })
+        return CareLinkClient(
+            session: URLSession(configuration: stubConfiguration()),
+            tokenStore: store,
+            now: { self.now },
+            appVersionProvider: { appVersion }
+        )
     }
 
     private func dataFlowPolicy(
@@ -1608,6 +2423,7 @@ private final class URLProtocolStub: URLProtocol {
     static var refreshCount = 0
     static var directPeriodicUnavailable = false
     static var emptyPersonalAccount = false
+    static var usesCurrentGlucoseTime = false
     static var pumpOnly = false
     static var logoutDelay: TimeInterval = 0
     static var refreshDelay: TimeInterval = 0
@@ -1618,6 +2434,7 @@ private final class URLProtocolStub: URLProtocol {
     static var requestBodies: [[String: String]] = []
 
     static func reset() {
+        usesCurrentGlucoseTime = false
         lock.lock()
         role = "PATIENT_OUS"
         route = .periodic
@@ -1658,18 +2475,22 @@ private final class URLProtocolStub: URLProtocol {
 
     override func startLoading() {
         guard let url = request.url else { return fail() }
+        let requestBody = Self.bodyData(from: request)
         Self.lock.lock()
         Self.paths.append(url.path)
         Self.headers.append(request.allHTTPHeaderFields ?? [:])
-        if let body = Self.bodyData(from: request),
+        if let body = requestBody,
            let object = try? JSONSerialization.jsonObject(with: body) as? [String: String] {
             Self.requestBodies.append(object)
         }
         Self.lock.unlock()
         let path = url.path
 
-        let formFields = Self.formFields(from: request)
-        if path == "/connect/carepartner/v13/discover/android/3.6" {
+        let formFields = Self.formFields(
+            from: requestBody,
+            contentType: request.value(forHTTPHeaderField: "Content-Type")
+        )
+        if path.hasPrefix("/connect/carepartner/v13/discover/android/") {
             return respond(200, [
                 "CP": [
                     ["region": "US", "UseSSOConfiguration": "Auth0SSOConfiguration", "Auth0SSOConfiguration": "https://carelink.minimed.com/oauth-config.json"],
@@ -1781,8 +2602,10 @@ private final class URLProtocolStub: URLProtocol {
         return data
     }
 
-    private static func formFields(from request: URLRequest) -> [String: String] {
-        guard let data = bodyData(from: request), let value = String(data: data, encoding: .utf8) else { return [:] }
+    private static func formFields(from data: Data?, contentType: String?) -> [String: String] {
+        guard contentType?.hasPrefix("application/x-www-form-urlencoded") == true,
+              let data,
+              let value = String(data: data, encoding: .utf8) else { return [:] }
         var components = URLComponents()
         components.percentEncodedQuery = value
         return Dictionary(uniqueKeysWithValues: (components.queryItems ?? []).compactMap { item in
@@ -1793,7 +2616,7 @@ private final class URLProtocolStub: URLProtocol {
     private func glucose(wrapped: Bool = false) {
         let payload: [String: Any] = Self.pumpOnly
             ? ["activeInsulin": ["amount": 1.25, "datetime": 1_800_000_000_000]]
-            : ["lastSG": ["sg": 123, "timestamp": 1_800_000_000_000]]
+            : ["lastSG": ["sg": 123, "timestamp": Self.usesCurrentGlucoseTime ? Date().timeIntervalSince1970 * 1000 : 1_800_000_000_000]]
         respond(200, wrapped ? ["patientData": payload] : payload)
     }
 
@@ -1867,11 +2690,42 @@ private actor BlockingCareLinkTherapyImporter: CareLinkTherapyImporting {
     }
 }
 
+/// Records lifecycle registration without creating a real Bluetooth keep-alive in manager tests.
 private final class CareLinkNoOpKeepAliveManager: FollowerBackgroundKeepAliveManaging {
-    func start(for source: FollowerBackgroundKeepAliveSource, backgroundRefresh: (() -> Void)?) {}
+    /// Confirms that the manager reached authenticated keep-alive ownership.
+    private(set) var startCount = 0
+
+    func start(for source: FollowerBackgroundKeepAliveSource, backgroundRefresh: (() -> Void)?) {
+        startCount += 1
+    }
+
+    /// Stopping the test double intentionally has no external effect.
     func stop(for source: FollowerBackgroundKeepAliveSource) {}
 }
 
+/// Supplies stable identifiers and records balanced finite background-task ownership.
+private final class CareLinkBackgroundExecutionSpy: CareLinkBackgroundExecutionManaging {
+    /// Counts accepted CareLink requests that asked iOS for completion time.
+    private(set) var beginCount = 0
+    /// Counts the matching completion or expiration cleanup calls.
+    private(set) var endCount = 0
+    /// Mimics UIKit's unique identifier without starting system background work.
+    private var nextToken = 0
+
+    /// Returns a distinct token so the manager must close the same task that it opened.
+    func begin(name: String, expirationHandler: @escaping () -> Void) -> Int? {
+        beginCount += 1
+        nextToken += 1
+        return nextToken
+    }
+
+    /// Records cleanup without interacting with UIApplication during unit tests.
+    func end(_ token: Int) {
+        endCount += 1
+    }
+}
+
+/// Prevents lifecycle tests from starting the manager's real deadline scheduler.
 private final class CareLinkNoOpTimer: FollowerBackgroundTimer {
     func resume() {}
     func suspend() {}
@@ -1879,27 +2733,27 @@ private final class CareLinkNoOpTimer: FollowerBackgroundTimer {
 
 private final class CareLinkDefaultsSnapshot {
     private let defaults = UserDefaults.standard
-    private let keys: [UserDefaults.Key]
+    private let keys: [String]
     private var values: [String: Any] = [:]
     private var missingKeys = Set<String>()
 
     init(keys: [UserDefaults.Key]) {
-        self.keys = keys
-        for key in keys {
-            if let value = defaults.object(forKey: key.rawValue) {
-                values[key.rawValue] = value
+        self.keys = Array(Set((keys + [.careLinkPatientAliases, .careLinkTimestampRepairCompleted]).map(\.rawValue)))
+        for key in self.keys {
+            if let value = defaults.object(forKey: key) {
+                values[key] = value
             } else {
-                missingKeys.insert(key.rawValue)
+                missingKeys.insert(key)
             }
         }
     }
 
     func restore() {
         for key in keys {
-            if missingKeys.contains(key.rawValue) {
-                defaults.removeObject(forKey: key.rawValue)
+            if missingKeys.contains(key) {
+                defaults.removeObject(forKey: key)
             } else {
-                defaults.set(values[key.rawValue], forKey: key.rawValue)
+                defaults.set(values[key], forKey: key)
             }
         }
     }

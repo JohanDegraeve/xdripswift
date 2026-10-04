@@ -23,7 +23,10 @@ enum DexcomG6SensorLabelImageDecoderError: Error {
 }
 
 enum DexcomG6SensorLabelImageDecoder {
-    static func decode(_ data: Data) throws -> DexcomG6SensorLabel {
+    static func decode(
+        _ data: Data,
+        configuration: DexcomSensorLabelScannerConfiguration = .g6
+    ) throws -> DexcomG6SensorLabel {
         let request = VNDetectBarcodesRequest()
         request.symbologies = [.dataMatrix]
 
@@ -39,7 +42,7 @@ enum DexcomG6SensorLabelImageDecoder {
         }
 
         let decodedLabels: [DexcomG6SensorLabel] = payloads.compactMap { payload in
-            return try? DexcomG6SensorLabelParser.parse(payload)
+            return try? configuration.parse(payload)
         }
         let labels = Set(decodedLabels)
 
@@ -114,7 +117,7 @@ enum DexcomG6SensorLabelScanLogger {
 
     static func multipleCameraLabelsRead() {
         trace(
-            "in sensorLabelScan, camera read contained multiple valid Dexcom G6 sensor labels",
+            "in sensorLabelScan, camera read contained multiple valid Dexcom sensor labels",
             log: log,
             category: ConstantsLog.categoryApplicationDataSensors,
             type: .error,
@@ -123,8 +126,15 @@ enum DexcomG6SensorLabelScanLogger {
     }
 
     static func succeeded(source: TroubleshootingSensorLabelScanSource, label: DexcomG6SensorLabel) {
+        // Keep every value that was decoded from the label in the developer trace. G6 labels
+        // normally provide the code, lot and serial number. G7-family labels also provide the
+        // product identifier, manufacture date and package expiry date. Recording the complete
+        // decoded result makes it possible to compare a tester's scan with the human-readable
+        // applicator text without needing another photograph or access to the saved Core Data row.
+        // The date-only formatter deliberately uses UTC so the logged calendar day cannot change
+        // when the tester is in a time zone west of UTC.
         trace(
-            "in sensorLabelScan, source = %{public}@, decoded sensor code = %{public}@, lot = %{public}@, serial = %{public}@",
+            "in sensorLabelScan, source = %{public}@, decoded sensor code = %{public}@, lot = %{public}@, serial = %{public}@, product identifier = %{public}@, manufacture date = %{public}@, expiry date = %{public}@",
             log: log,
             category: ConstantsLog.categoryApplicationDataSensors,
             type: .info,
@@ -136,8 +146,11 @@ enum DexcomG6SensorLabelScanLogger {
             ))),
             source.rawValue,
             label.sensorCode,
-            label.lotNumber,
-            label.serialNumber
+            label.lotNumber.isEmpty ? "nil" : label.lotNumber,
+            label.serialNumber,
+            label.productIdentifier ?? "nil",
+            label.manufactureDate?.toDateOnlyStringForTrace() ?? "nil",
+            label.expirationDate?.toDateOnlyStringForTrace() ?? "nil"
         )
     }
 
@@ -173,6 +186,7 @@ struct DexcomG6CameraScannerView: View {
     @Environment(\.openURL) private var openURL
 
     let onScan: (DexcomG6SensorLabel) -> Void
+    var configuration: DexcomSensorLabelScannerConfiguration = .g6
 
     @State private var scannerError: DexcomG6CameraScannerError?
     @State private var isTorchAvailable = false
@@ -184,6 +198,7 @@ struct DexcomG6CameraScannerView: View {
             ZStack {
                 DexcomG6CameraScannerRepresentable(
                     isTorchOn: isTorchOn,
+                    configuration: configuration,
                     onScan: { label in
                         scanSucceeded = true
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -301,12 +316,14 @@ struct DexcomG6CameraScannerView: View {
 
 private struct DexcomG6CameraScannerRepresentable: UIViewRepresentable {
     let isTorchOn: Bool
+    let configuration: DexcomSensorLabelScannerConfiguration
     let onScan: (DexcomG6SensorLabel) -> Void
     let onError: (DexcomG6CameraScannerError) -> Void
     let onTorchAvailabilityChanged: (Bool) -> Void
 
     func makeCoordinator() -> Coordinator {
         Coordinator(
+            configuration: configuration,
             onScan: onScan,
             onError: onError,
             onTorchAvailabilityChanged: onTorchAvailabilityChanged
@@ -322,6 +339,7 @@ private struct DexcomG6CameraScannerRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: CameraPreviewView, context: Context) {
+        uiView.updateVideoOrientation()
         context.coordinator.setTorch(isTorchOn)
     }
 
@@ -333,6 +351,7 @@ private struct DexcomG6CameraScannerRepresentable: UIViewRepresentable {
         let captureSession = AVCaptureSession()
 
         private let sessionQueue = DispatchQueue(label: "com.xdripswift.dexcom-label-scanner")
+        private let configuration: DexcomSensorLabelScannerConfiguration
         private let onScan: (DexcomG6SensorLabel) -> Void
         private let onError: (DexcomG6CameraScannerError) -> Void
         private let onTorchAvailabilityChanged: (Bool) -> Void
@@ -344,10 +363,12 @@ private struct DexcomG6CameraScannerRepresentable: UIViewRepresentable {
         private var hasReportedMultipleLabels = false
 
         init(
+            configuration: DexcomSensorLabelScannerConfiguration,
             onScan: @escaping (DexcomG6SensorLabel) -> Void,
             onError: @escaping (DexcomG6CameraScannerError) -> Void,
             onTorchAvailabilityChanged: @escaping (Bool) -> Void
         ) {
+            self.configuration = configuration
             self.onScan = onScan
             self.onError = onError
             self.onTorchAvailabilityChanged = onTorchAvailabilityChanged
@@ -474,7 +495,7 @@ private struct DexcomG6CameraScannerRepresentable: UIViewRepresentable {
             var labels = Set<DexcomG6SensorLabel>()
             for payload in payloads {
                 do {
-                    labels.insert(try DexcomG6SensorLabelParser.parse(payload))
+                    labels.insert(try configuration.parse(payload))
                 } catch let error as DexcomG6SensorLabelParserError {
                     if !hasReportedMalformedLabel {
                         hasReportedMalformedLabel = true
@@ -555,5 +576,46 @@ private final class CameraPreviewView: UIView {
 
     var previewLayer: AVCaptureVideoPreviewLayer {
         layer as! AVCaptureVideoPreviewLayer
+    }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        updateVideoOrientation()
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updateVideoOrientation()
+    }
+
+    func updateVideoOrientation() {
+        guard UIDevice.current.userInterfaceIdiom == .pad,
+              let interfaceOrientation = window?.windowScene?.interfaceOrientation,
+              let videoOrientation = AVCaptureVideoOrientation(interfaceOrientation: interfaceOrientation),
+              let connection = previewLayer.connection,
+              connection.isVideoOrientationSupported else {
+            return
+        }
+
+        connection.videoOrientation = videoOrientation
+    }
+}
+
+private extension AVCaptureVideoOrientation {
+    init?(interfaceOrientation: UIInterfaceOrientation) {
+        switch interfaceOrientation {
+        case .portrait:
+            self = .portrait
+        case .portraitUpsideDown:
+            self = .portraitUpsideDown
+        case .landscapeLeft:
+            self = .landscapeLeft
+        case .landscapeRight:
+            self = .landscapeRight
+        case .unknown:
+            return nil
+        @unknown default:
+            return nil
+        }
     }
 }

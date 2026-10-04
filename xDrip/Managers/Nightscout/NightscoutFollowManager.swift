@@ -27,7 +27,7 @@ class NightscoutFollowManager: NSObject {
     /// delegate to pass back glucosedata
     private(set) weak var followerDelegate: FollowerDelegate?
 
-    /// The root-owned shared keep-alive engine; this follower reports operational state only and
+    /// The root-owned shared keep-alive engine. This follower reports operational state only and
     /// does not own silent-audio playback, replay timing, or application lifecycle callbacks.
     private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
 
@@ -224,8 +224,8 @@ class NightscoutFollowManager: NSObject {
                 let responseWasSuccessful = self.processDownloadResponse(data: data, urlResponse: response, error: error, followGlucoseDataArray: &followGlucoseDataArray)
                 
                 // Offer this typed success only so TroubleshootingLogStore can close a previously
-                // recorded Nightscout failure. Healthy 15-second downloads are discarded centrally;
-                // the readings actually accepted by the app are recorded later with their own times.
+                // recorded Nightscout failure. Healthy 15-second downloads are discarded centrally.
+                // The readings actually accepted by the app are recorded later with their own times.
                 trace(
                     "    finished download,  %{public}@ readings",
                     log: self.log,

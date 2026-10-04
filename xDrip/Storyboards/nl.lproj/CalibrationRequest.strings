@@ -4,3 +4,4 @@
 "calibration_notification_body" = "Klik op de Notificatie om te Kalibreren";
 "singlePointCalibration" = "Standaard";
 "multiPointCalibration" = "Meerpunts";
+"previousCalibrationPrefillMessage" = "Je vorige kalibratie van %@ is vooraf ingevuld. Vergelijk deze met je huidige meterwaarde voordat je bevestigt.";

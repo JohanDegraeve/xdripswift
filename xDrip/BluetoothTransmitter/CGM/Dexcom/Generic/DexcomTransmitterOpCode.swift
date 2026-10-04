@@ -14,12 +14,16 @@ enum DexcomTransmitterOpCode: UInt8 {
     case authRequestRx = 0x03
     case authChallengeTx = 0x04
     case authChallengeRx = 0x05
-    case keepAliveTx = 0x06 // auth; setAdvertisementParametersTx for control
+    case keepAliveTx = 0x06 // auth, setAdvertisementParametersTx for control
     case bondRequestTx = 0x07
     case pairRequestRx = 0x08 // comes in after having accepted the bluetooth pairing request
     
     // Control
     case disconnectTx = 0x09
+    case exchangePakePayload = 0x0A
+    case certificateExchange = 0x0B
+    case proofOfPossession = 0x0C
+    case authStatusTx = 0x0D
     
     case setAdvertisementParametersRx = 0x1c
 
@@ -57,6 +61,10 @@ enum DexcomTransmitterOpCode: UInt8 {
 
     case glucoseBackfillTx = 0x50
     case glucoseBackfillRx = 0x51
+
+    /// G7 extended-version request and response. Unlike the older transmitter protocol, the G7
+    /// uses the same `0x52` opcode in both directions and does not append a CRC to the request.
+    case extendedVersion = 0x52
     
     /// used for G7
     case backfillFinished = 0x59
@@ -117,6 +125,18 @@ extension DexcomTransmitterOpCode: CustomStringConvertible {
         
         case .disconnectTx:
             return "disconnectTx"
+
+        case .exchangePakePayload:
+            return "exchangePakePayload"
+
+        case .certificateExchange:
+            return "certificateExchange"
+
+        case .proofOfPossession:
+            return "proofOfPossession"
+
+        case .authStatusTx:
+            return "authStatusTx"
         
         case .setAdvertisementParametersRx:
             return "setAdvertisementParametersRx"
@@ -189,6 +209,9 @@ extension DexcomTransmitterOpCode: CustomStringConvertible {
         
         case .glucoseBackfillRx:
             return "glucoseBackfillRx"
+
+        case .extendedVersion:
+            return "extendedVersion"
         
         case .keepAliveRx:
             return "keepAliveRx"

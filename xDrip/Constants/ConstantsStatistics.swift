@@ -15,10 +15,11 @@ enum ConstantsStatistics {
     static let chartAxisLabelFontSize: CGFloat = 12
 
     /// fixed trailing axis column keeps the AGP and metric trend plot areas horizontally aligned
-    static let chartYAxisLabelWidth: CGFloat = 28
+    /// and is wide enough for four-character mmol/L values without wrapping
+    static let chartYAxisLabelWidth: CGFloat = 36
 
     /// total space reserved between the trailing plot edge and the edge of its Statistics card
-    static let chartTrailingAxisWidth: CGFloat = 32
+    static let chartTrailingAxisWidth: CGFloat = 40
     
     /// animation speed when drawing the pie chart
     static let pieChartAnimationSpeed = 0.3

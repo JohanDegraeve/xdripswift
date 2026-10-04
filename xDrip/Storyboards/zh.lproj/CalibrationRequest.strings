@@ -2,3 +2,4 @@
 "calibration_title" = "校准";
 "calibration_notification_title" = "校准";
 "calibration_notification_body" = "点击通知，然后校准";
+"previousCalibrationPrefillMessage" = "已预填您在 %@ 输入的上一次校准值。确认前，请将其与血糖仪的当前读数进行核对。";

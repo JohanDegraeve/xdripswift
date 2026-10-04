@@ -18,9 +18,6 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     /// write characteristic
     private let CBUUID_WriteCharacteristic_Libre2: String = "F001"
     
-    /// how many bytes should we receive from Libre 2
-    private let expectedBufferSize = 46
-    
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate: CGMTransmitterDelegate?
     
@@ -33,17 +30,11 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMLibre2)
     
-    /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
-    private var emptyArray: [GlucoseData] = []
+    /// Reassembles complete Libre frames and clears each completed frame immediately.
+    private var frameAssembler = Libre2FrameAssembler()
 
-    /// used when processing Libre 2 data packet
-    private var startDate: Date
-    
-    /// receive buffer for Libre 2 packets
-    private var rxBuffer: Data
-    
-    /// how long to wait for next packet before resetting the rxBuffer
-    private static let maxWaitForpacketInSeconds = 3.0
+    /// A monotonic clock is used only to detect an incomplete frame assembly timeout.
+    private let frameAssemblyClock = ContinuousClock()
 
     /// is the transmitter oop web enabled or not
     private var webOOPEnabled: Bool
@@ -95,12 +86,6 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         
         // initialize nonFixedSlopeEnabled
         self.nonFixedSlopeEnabled = nonFixedSlopeEnabled ?? false
-        
-        // initialize rxbuffer
-        rxBuffer = Data()
-        
-        // initialize startDate
-        startDate = Date()
         
         // initialize webOOPEnabled
         self.webOOPEnabled = webOOPEnabled ?? false
@@ -205,43 +190,49 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         }
     }
     
-    override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
-        super.peripheral(peripheral, didUpdateNotificationStateFor: characteristic, error: error)
+    override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        super.peripheral(peripheral, didDiscoverCharacteristicsFor: service, error: error)
+
+        guard
+            error == nil,
+            service.characteristics?.contains(where: { $0.uuid == CBUUID(string: CBUUID_WriteCharacteristic_Libre2) }) == true,
+            service.characteristics?.contains(where: { $0.uuid == CBUUID(string: CBUUID_ReceiveCharacteristic_Libre2) }) == true
+        else { return }
         
         // there should be already stored a value for libreSensorUID in the userdefaults at this moment, otherwise processing is not possible
         guard let libreSensorUID = UserDefaults.standard.libreSensorUID else {
-            trace("in peripheral didUpdateNotificationStateFor but libreSensorUID is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+            trace("in peripheral didDiscoverCharacteristicsFor but libreSensorUID is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
             
             return
         }
         
         // there should be already stored a value for librePatchInfo in the userdefaults at this moment, otherwise processing is not possible
         guard let librePatchInfo = UserDefaults.standard.librePatchInfo else {
-            trace("in peripheral didUpdateNotificationStateFor but librePatchInfo is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+            trace("in peripheral didDiscoverCharacteristicsFor but librePatchInfo is not known, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
             
             return
         }
 
         // the unlock algorithm reads 6 bytes directly, so invalid restored sensor metadata must be rejected before creating the payload
         guard libreSensorUID.count >= 6, librePatchInfo.count >= 6 else {
-            trace("in peripheral didUpdateNotificationStateFor but the stored sensor metadata is incomplete, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
+            trace("in peripheral didDiscoverCharacteristicsFor but the stored sensor metadata is incomplete, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
 
             return
         }
+
+        UserDefaults.standard.libreActiveSensorUnlockCount += 1
+
+        trace("sensorid as data =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.hexEncodedString(), librePatchInfo.hexEncodedString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
         
-        if error == nil && characteristic.isNotifying {
-            UserDefaults.standard.libreActiveSensorUnlockCount += 1
+        let unLockPayLoad = Data(Libre2BLEUtilities.streamingUnlockPayload(sensorUID: libreSensorUID, info: librePatchInfo, enableTime: UserDefaults.standard.libreActiveSensorUnlockCode, unlockCount: UserDefaults.standard.libreActiveSensorUnlockCount))
+
+        // Queue the unlock directly after the notification subscription. Waiting for CoreBluetooth's
+        // notification-state callback can delay it long enough for Libre 2 to disconnect.
+        trace("in peripheral didDiscoverCharacteristicsFor, writing streaming unlock payload: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, unLockPayLoad.hexEncodedString())
             
-            trace("sensorid as data =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.hexEncodedString(), librePatchInfo.hexEncodedString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
-            
-            let unLockPayLoad = Data(Libre2BLEUtilities.streamingUnlockPayload(sensorUID: libreSensorUID, info: librePatchInfo, enableTime: UserDefaults.standard.libreActiveSensorUnlockCode, unlockCount: UserDefaults.standard.libreActiveSensorUnlockCount))
-            
-            trace("in peripheral didUpdateNotificationStateFor, writing streaming unlock payload: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, unLockPayLoad.hexEncodedString())
-                
-            // user may have chosen to run xDrip4iOS in parallel with other apps, in this case suppress sending unlockpayload
-            if !UserDefaults.standard.suppressUnLockPayLoad {
-                _ = writeDataToPeripheral(data: unLockPayLoad, type: .withResponse)
-            }
+        // user may have chosen to run xDrip4iOS in parallel with other apps, in this case suppress sending unlockpayload
+        if !UserDefaults.standard.suppressUnLockPayLoad {
+            _ = writeDataToPeripheral(data: unLockPayLoad, type: .withResponse)
         }
     }
     
@@ -250,8 +241,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         super.prepareForRelease()
         // Libre2-specific transient state cleanup
         let tearDown = {
-            self.rxBuffer = Data()
-            self.startDate = Date()
+            self.frameAssembler.reset()
             self.tempSensorSerialNumber = nil
             self.libreNFC = nil
             self.libreSensorType = nil
@@ -264,18 +254,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         }
     }
 
-    deinit {
-        // Defensive: clear transient buffers
-        rxBuffer = Data()
-    }
-
     // MARK: - helpers
-    
-    /// reset rxBuffer, reset startDate, stop packetRxMonitorTimer, set resendPacketCounter to 0
-    private func resetRxBuffer() {
-        rxBuffer = Data()
-        startDate = Date()
-    }
 
     /// Returns nil when the connected peripheral cannot be validated. A missing identifier must
     /// not be reported as a wrong sensor because connection and payload authentication still
@@ -296,62 +275,118 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     /// process value received from transmitter
     public func processValue(value: Data, sensorUID: Data) {
-        // check if buffer needs to be reset
-        if Date() > startDate.addingTimeInterval(CGMLibre2Transmitter.maxWaitForpacketInSeconds) {
-            trace("in peripheral didUpdateValueFor, more than %{public}@ seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug, CGMLibre2Transmitter.maxWaitForpacketInSeconds.description)
-            
-            resetRxBuffer()
+        let arrival = frameAssemblyClock.now
+        let frameArrivalDate = Date()
+        let appendResult = frameAssembler.append(value, arrival: arrival)
+
+        if let timedOutPartialFrame = appendResult.timedOutPartialFrame {
+            trace(
+                "Libre 2 partial frame timed out: discardedBytes=%{public}@, assemblyElapsedSeconds=%{public}@, newFragmentBytes=%{public}@",
+                log: log,
+                category: ConstantsLog.categoryCGMLibre2,
+                type: .error,
+                timedOutPartialFrame.discardedByteCount.description,
+                formatted(timedOutPartialFrame.assemblyDuration),
+                value.count.description
+            )
         }
-        
-        // add new value to rxBuffer
-        rxBuffer.append(value)
-        
-        // check if enough bytes are received, and if yes start processing
-        if rxBuffer.count == expectedBufferSize {
-            // Log once per completed Libre2 frame (moved from didUpdateValueFor to avoid per-fragment duplication)
-            do {
-                var libre1DerivedAlgorithmParametersAsString: String!
-                if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters {
-                    libre1DerivedAlgorithmParametersAsString = libre1DerivedAlgorithmParameters.description
-                } else {
-                    libre1DerivedAlgorithmParametersAsString = "unknown"
-                }
-                trace("in peripheral didUpdateValueFor libreSensorUID = %{public}@, libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug, sensorUID.hexEncodedString(), libre1DerivedAlgorithmParametersAsString)
-            }
-            
-            do {
-                // if libre1DerivedAlgorithmParameters not nil, but not matching serial number, then assign to nil (copied from LibreDataParser)
-                // if weboopenabled, then don't proceed, because weboop needs libre1DerivedAlgorithmParameters
-                // if libre1DerivedAlgorithmParameters is nil, but not weboopenabled, then also no further processing
-                // this may happen in case the serialNumber is not correctly read from NFC or stored in coredata - if all goes well this shouldn't occur
-                if isWebOOPEnabled() {
-                    guard let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters, libre1DerivedAlgorithmParameters.serialNumber == sensorSerialNumber else {
-                        trace("web oop enabled but libre1DerivedAlgorithmParameters is nil or libre1DerivedAlgorithmParameters.serialNumber != sensorSerialNumber, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
-                        
-                        return
-                    }
-                }
-                
-                // decrypt buffer and parse
-                // if oop web not enabled, then don't pass libre1DerivedAlgorithmParameters
-                let parsedBLEData = try Libre2BLEUtilities.parseBLEData(Data(Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: rxBuffer)), libre1DerivedAlgorithmParameters: isWebOOPEnabled() ? UserDefaults.standard.libre1DerivedAlgorithmParameters : nil)
-                
-                // deliver glucose data and sensor age to delegates on main; use local copy for inout
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    var copy = parsedBLEData.bleGlucose
-                    self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: TimeInterval(minutes: Double(parsedBLEData.sensorTimeInMinutes)))
-                    self.cGMLibre2TransmitterDelegate?.received(sensorTimeInMinutes: Int(parsedBLEData.sensorTimeInMinutes), from: self)
-                }
-                
-                // TODO: add sensor start date -> userdefaults
-                
-            } catch {
-                trace("in peripheral didUpdateValueFor, error while parsing/decrypting data =  %{public}@ ", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, error.localizedDescription)
-                
-                resetRxBuffer()
-            }
+
+        switch appendResult.frameResult {
+        case .incomplete:
+            return
+
+        case let .oversized(receivedByteCount):
+            trace("in peripheral didUpdateValueFor, assembled Libre 2 frame contains %{public}@ bytes instead of 46, discarding it", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error, receivedByteCount.description)
+
+        case let .complete(encryptedFrame, assemblyDuration):
+            processCompleteFrame(
+                encryptedFrame,
+                sensorUID: sensorUID,
+                frameArrivalDate: frameArrivalDate,
+                assemblyDuration: assemblyDuration
+            )
         }
+    }
+
+    /// Decrypts a complete frame before parsing it with the time at which CoreBluetooth delivered
+    /// the final fragment. The Libre sensor-minute counter is an age counter, not a wall clock, and
+    /// its real cadence is not exactly 60 seconds. It must therefore never be compared with elapsed
+    /// wall-clock time to decide whether an otherwise valid frame should be accepted.
+    private func processCompleteFrame(
+        _ encryptedFrame: Data,
+        sensorUID: Data,
+        frameArrivalDate: Date,
+        assemblyDuration: TimeInterval
+    ) {
+        do {
+            let decryptedFrame = Data(try Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: encryptedFrame))
+
+            // Keep parser history and its downstream delegates on the main queue. Capturing the
+            // arrival date above prevents a scheduling delay here from giving the frame a later
+            // timestamp, without guessing its age from the sensor-minute counter.
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+
+                self.processFrameOnMain(
+                    decryptedFrame,
+                    frameArrivalDate: frameArrivalDate,
+                    assemblyDuration: assemblyDuration
+                )
+            }
+
+            // TODO: add sensor start date -> userdefaults
+        } catch {
+            trace("in peripheral didUpdateValueFor, error while parsing/decrypting data = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error, error.localizedDescription)
+        }
+    }
+
+    private func processFrameOnMain(
+        _ decryptedFrame: Data,
+        frameArrivalDate: Date,
+        assemblyDuration: TimeInterval
+    ) {
+        dispatchPrecondition(condition: .onQueue(.main))
+
+        let libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters?
+        if isWebOOPEnabled() {
+            guard let storedParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters,
+                  storedParameters.serialNumber == sensorSerialNumber else {
+                trace("web oop enabled but libre1DerivedAlgorithmParameters is nil or libre1DerivedAlgorithmParameters.serialNumber != sensorSerialNumber, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info)
+                return
+            }
+            libre1DerivedAlgorithmParameters = storedParameters
+        } else {
+            libre1DerivedAlgorithmParameters = nil
+        }
+
+        let parsedBLEData = Libre2BLEUtilities.parseBLEData(
+            decryptedFrame,
+            libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters,
+            newestReadingDate: frameArrivalDate
+        )
+
+        Libre2BLEUtilities.commitRawValueHistory(from: parsedBLEData)
+
+        trace(
+            "accepted Libre 2 frame: sensorTime=%{public}@, generatedReadingCount=%{public}@, newestGeneratedTimestampSecondsSince1970=%{public}@, assemblySeconds=%{public}@, appInForeground=%{public}@",
+            log: log,
+            category: ConstantsLog.categoryCGMLibre2,
+            type: .info,
+            parsedBLEData.sensorTimeInMinutes.description,
+            parsedBLEData.bleGlucose.count.description,
+            formatted(parsedBLEData.bleGlucose.first?.timeStamp.timeIntervalSince1970),
+            formatted(assemblyDuration),
+            UserDefaults.standard.appInForeGround.description
+        )
+
+        var copy = parsedBLEData.bleGlucose
+        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: TimeInterval(minutes: Double(parsedBLEData.sensorTimeInMinutes)))
+        cGMLibre2TransmitterDelegate?.received(sensorTimeInMinutes: Int(parsedBLEData.sensorTimeInMinutes), from: self)
+    }
+
+    private func formatted(_ value: TimeInterval?) -> String {
+        guard let value else { return "n/a" }
+        return String(format: "%.3f", value)
     }
 
     // MARK: - CGMTransmitter protocol functions

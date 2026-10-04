@@ -36,12 +36,12 @@ struct BluetoothPeripheralSettingsRow: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 4) {
             Text(title)
                 .foregroundStyle(isEnabled ? ConstantsAppColors.rowTitleText : ConstantsAppColors.disabledText)
                 .lineLimit(2)
 
-            Spacer(minLength: 12)
+            Spacer(minLength: 0)
 
             if let detail = detail, !detail.isEmpty {
                 HStack(spacing: 5) {

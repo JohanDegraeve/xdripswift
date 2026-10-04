@@ -14,3 +14,4 @@
 
 /// If user must calibrate, this is the title of the notification
 "calibration_notification_title" = "Calibration";
+"previousCalibrationPrefillMessage" = "Попереднє значення калібрування від %@ уже введено. Перед підтвердженням порівняйте його з поточним показником глюкометра.";

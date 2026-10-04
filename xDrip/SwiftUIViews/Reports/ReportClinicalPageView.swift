@@ -22,7 +22,7 @@ struct GlucoseReportClinicalPageView: View {
             header
 
             if pageNumber == 1 {
-                GlucoseReportMetricGridView(analytics: analytics, language: configuration.language)
+                GlucoseReportMetricGridView(analytics: analytics, language: configuration.language, usesIFCC: configuration.usesIFCC)
                 GlucoseReportTimeInRangeBarView(distribution: analytics.rangeDistribution, usesMgDl: analytics.usesMgDl, language: configuration.language)
                 GlucoseReportTimeInRangeBarView(
                     title: "\(configuration.text(.timeInTightRange)) (TITR)",
@@ -38,7 +38,7 @@ struct GlucoseReportClinicalPageView: View {
                 GlucoseReportDailyGlucoseProfilesPageView(analytics: analytics, language: configuration.language)
             } else if pageNumber == 3 {
                 GlucoseReportDailySummarySectionView(summaries: analytics.dailySummaries, usesMgDl: analytics.usesMgDl, language: configuration.language)
-                GlucoseReportMetricTrendSectionView(trendPoints: analytics.trendPoints, language: configuration.language)
+                GlucoseReportMetricTrendSectionView(trendPoints: analytics.trendPoints, language: configuration.language, usesIFCC: configuration.usesIFCC)
                 // Event Analysis is intentionally hidden for now because it consumes too much
                 // page space compared with the clinical value it currently adds.
                 // eventAnalysis

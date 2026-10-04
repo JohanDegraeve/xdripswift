@@ -1,5 +1,5 @@
 "settingsviews_settingstitle" = "Réglages";
-"settingsviews_glucoseDisplaySectionTitle" = "Affichage";
+"settingsviews_glucoseDisplaySectionTitle" = "Général";
 "settingsviews_glucoseRangesSectionTitle" = "Plages de glucose";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alertes et notifications";
 "settingsviews_sharingAndServicesSectionTitle" = "Partage et services";
@@ -22,16 +22,16 @@
 "settingsviews_showReadingInNotification" = "Notifications de glycémie";
 "settingsviews_labelShowReadingInAppBadge" = "Pastille d’app";
 "settingsviews_multipleAppBadgeValueWith10" = "Pastille d’app x10";
-"settingsviews_showClockWhenScreenIsLocked" = "Horloge écran verrouillé";
+"settingsviews_showClockWhenScreenIsLocked" = "Horloge";
 "settingsviews_sectiontitletreatments" = "Traitements";
-"settingsviews_showTreatments" = "Visualiser les traitements";
+"settingsviews_showTreatments" = "Thérapie";
 "settingsviews_smallBolusTreatmentThreshold" = "Seuil des micro-bolus";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "En dessous de combien d'unités un bolus est considéré micro-bolus?\n\n(Valeur conseillée: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Statistiques";
-"settingsviews_showStatistics" = "Visualiser les statistiques";
+"settingsviews_showStatistics" = "Statistiques";
 "settingsviews_daysToUseStatisticsTitle" = "Nombre de jours";
 "settingsviews_daysToUseStatisticsMessage" = "Nombre maximum de jours utilisés pour le calcul des statistiques?\n\n(Saisir 0 pour aujourd'hui depuis minuit)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmetteur";
 "settingsviews_transmittertype" = "Type de Transmetteur";
 "settingsviews_transmitterid" = "Transmetteur ID";
@@ -58,7 +58,8 @@
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Options d'envoi";
 "settingsviews_nightscoutEnabled" = "Connecter à Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
-"settingsviews_useSchedule" = "Mettre à jour à heure fixe";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "Activer la planification";
 "schedule" = "Heure";
 "settingsviews_giveNightscoutUrl" = "Entrer l'URL de Nightscout";
 "settingsviews_nightscoutAPIKey" = "API_SECRET";
@@ -154,7 +155,7 @@
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Ecran d'accueil";
-"settingsviews_mainChartHours" = "Heures du graphique principal";
+"settingsviews_mainChartHours" = "Plage horaire";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -295,8 +296,8 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show Mini-Chart";
-"settingsviews_showSensorNoise" = "Show Sensor Noise";
+"settingsviews_showMiniChart" = "Mini-graphique";
+"settingsviews_showSensorNoise" = "Bruit du capteur";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Alias";
@@ -340,7 +341,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Maintien actif is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Assombrissement écran verrouillé";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Atténuation";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -554,3 +555,63 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Graphique";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Simple";
 "settingsviews_liveActivitySectionTitle" = "Activité en direct";
+"settingsviews_dexcomG7Message" = "Laissez le nom Bluetooth vide. Sur l’écran suivant, touchez Scanner pour rechercher automatiquement le capteur.\n\nSi le capteur est déjà apparu dans Réglages > Bluetooth, vous pouvez saisir son nom Bluetooth manuellement.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Durée des Glucides";
+"therapy.local" = "Calculé localement";
+
+"settingsviews_showOriginalBGReadings" = "Valeurs originales";
+
+"therapy.insulinType" = "Type d’Insuline";
+
+"therapy.showIOBCOB" = "IOB/COB";
+
+"therapy.treatmentSettings" = "Traitements";
+
+"therapy.settingsHelp" = "Utilisés pour estimer l’insuline et les glucides restants à partir des traitements enregistrés.";
+
+"therapy.settingsLocal" = "Ces réglages estiment l’IOB et les COB à partir des traitements enregistrés uniquement lorsque ces valeurs ne sont pas fournies par un système AID.";
+"therapy.settingsExternal" = "Ces options sont désactivées car votre système AID basé sur %@ fournit l’IOB et les COB.";
+"therapy.settingsMixed" = "%@ fournit l’IOB, donc le type d’insuline est automatique. La durée des glucides sert à estimer les COB localement à partir des repas enregistrés.";
+"therapy.insulinModel" = "Modèle d’insuline %@ sélectionné. Durée d’action de l’insuline (DIA) : %@. Temps jusqu’au pic d’insuline : %@.";
+"therapy.carbFast" = "Absorption des glucides plus rapide. Comprend un délai de 10 minutes avant le début.";
+"therapy.carbNormal" = "Absorption normale des glucides. Comprend un délai de 10 minutes avant le début.";
+"therapy.carbLong" = "Absorption des glucides plus longue. Peut être utile lorsque les médicaments GLP-1 ralentissent la digestion. Comprend un délai de 10 minutes avant le début.";
+"therapy.automatic" = "Automatique";
+
+"therapy.liveActivityMetricsFooter" = "Afficher les valeurs IOB et COB disponibles dans la grande présentation de l’écran verrouillé et la présentation avec graphique de CarPlay/Pile intelligente.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB nécessite des traitements d’insuline ou de glucides enregistrés, ou les données d’un système AID connecté.";
+
+"homeScreen.renderBasalDownwards" = "Afficher le débit basal vers le bas";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "Actif";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "Inactif";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "Programmation";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "Activer à";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "Désactiver à";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "Lorsque la lecture vocale de la glycémie est activée, les mesures sont annoncées uniquement pendant ces heures. La programmation se répète chaque jour selon l’heure locale du téléphone et peut passer minuit. Les raccourcis modifient uniquement l’interrupteur de lecture vocale de la glycémie.";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "Choisissez des heures d’activation et de désactivation différentes.";
+"therapy.summary" = "Résumé du traitement";
+"therapy.curves" = "Courbes IOB/COB";
+"settingsviews_displayTrendInContactImage" = "Tendance";
+"homeScreen.layout" = "Disposition de l’accueil";
+"homeScreen.elapsed" = "Écoulée";
+"homeScreen.remaining" = "Restante";
+"homeScreen.basalPosition" = "Position du basal";
+"homeScreen.basalTop" = "En haut";
+"homeScreen.basalBottom" = "En bas";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Graphique de glycémie";

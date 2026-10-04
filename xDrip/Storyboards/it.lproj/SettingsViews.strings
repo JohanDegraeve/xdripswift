@@ -44,7 +44,7 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
-"settingsviews_glucoseDisplaySectionTitle" = "Visualizzazione";
+"settingsviews_glucoseDisplaySectionTitle" = "Generali";
 "settingsviews_glucoseRangesSectionTitle" = "Intervalli glucosio";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Avvisi e notifiche";
 "settingsviews_sharingAndServicesSectionTitle" = "Condivisione e servizi";
@@ -128,8 +128,8 @@
 /// M5 stack bluetooth  settings, pop up that asks user to enter the password
 "m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth Password";
 
-/// nightscout settings, where user can select to use schedule or not
-"settingsviews_useSchedule" = "Use Upload Schedule";
+/* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
+"settingsviews_enableSchedule" = "Attiva programmazione";
 
 /// transmitter settings, just the words that explain that the settings is about transmitter type
 "settingsviews_transmittertype" = "Transmitter Type";
@@ -299,7 +299,7 @@
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
-"settingsviews_mainChartHours" = "Ore del grafico principale";
+"settingsviews_mainChartHours" = "Intervallo di tempo";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -319,10 +319,10 @@
 "settingsviews_sectiontitlestatistics" = "Statistics";
 
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+"settingsviews_useIFCCGMI" = "GMI in mmols/mol";
 
 /// statistics settings, show statistics on home screen
-"settingsviews_showStatistics" = "Show Statistics";
+"settingsviews_showStatistics" = "Statistiche";
 
 /// statistics settings, how many days to use for calculations
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
@@ -332,7 +332,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the clock also be displayed when the screen is locked?
-"settingsviews_showClockWhenScreenIsLocked" = "Orologio schermata bloccata";
+"settingsviews_showClockWhenScreenIsLocked" = "Orologio";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -378,7 +378,7 @@
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatments" = "Show Treatments";
+"settingsviews_showTreatments" = "Terapia";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -481,8 +481,8 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show Mini-Chart";
-"settingsviews_showSensorNoise" = "Show Sensor Noise";
+"settingsviews_showMiniChart" = "Mini grafico";
+"settingsviews_showSensorNoise" = "Rumore del sensore";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Alias";
@@ -526,7 +526,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Mantieni attivo is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Oscuramento schermata bloccata";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Oscuramento";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -740,3 +740,63 @@
 "settingsviews_carPlayLiveActivityTypeChart" = "Grafico";
 "settingsviews_carPlayLiveActivityTypeBasic" = "Base";
 "settingsviews_liveActivitySectionTitle" = "Attività in tempo reale";
+"settingsviews_dexcomG7Message" = "Lascia vuoto il nome Bluetooth. Nella schermata successiva, tocca Scansiona per cercare automaticamente il sensore.\n\nSe il sensore è già apparso in Impostazioni > Bluetooth, puoi inserire manualmente il suo nome Bluetooth.";
+
+// Local therapy estimates
+"therapy.carbDuration" = "Durata dei Carboidrati";
+"therapy.local" = "Calcolato localmente";
+
+"settingsviews_showOriginalBGReadings" = "Valori originali";
+
+"therapy.insulinType" = "Tipo di Insulina";
+
+"therapy.showIOBCOB" = "IOB/COB";
+
+"therapy.treatmentSettings" = "Trattamenti";
+
+"therapy.settingsHelp" = "Usate per stimare insulina e carboidrati residui dai trattamenti registrati.";
+
+"therapy.settingsLocal" = "Queste impostazioni stimano IOB e COB dai trattamenti registrati solo quando i valori non sono forniti da un sistema AID.";
+"therapy.settingsExternal" = "Queste opzioni sono disabilitate perché il sistema AID basato su %@ fornisce IOB e COB.";
+"therapy.settingsMixed" = "%@ fornisce IOB, quindi il tipo di insulina è automatico. La durata dei carboidrati serve a stimare COB localmente dai pasti registrati.";
+"therapy.insulinModel" = "Modello di insulina %@ selezionato. Durata d’azione dell’insulina (DIA): %@. Tempo al picco di insulina: %@.";
+"therapy.carbFast" = "Assorbimento dei carboidrati più rapido. Include un ritardo di 10 minuti prima dell’inizio.";
+"therapy.carbNormal" = "Assorbimento normale dei carboidrati. Include un ritardo di 10 minuti prima dell’inizio.";
+"therapy.carbLong" = "Assorbimento dei carboidrati più lungo. Può essere utile quando i farmaci GLP-1 rallentano la digestione. Include un ritardo di 10 minuti prima dell’inizio.";
+"therapy.automatic" = "Automatico";
+
+"therapy.liveActivityMetricsFooter" = "Mostra i valori IOB e COB disponibili nel layout grande della schermata di blocco e nel layout con grafico di CarPlay/Raccolta smart.";
+
+"therapy.liveActivityMetricsUnavailable" = "IOB/COB richiede trattamenti di insulina o carboidrati registrati oppure dati da un sistema AID collegato.";
+
+"homeScreen.renderBasalDownwards" = "Mostra basale verso il basso";
+
+/* Speech is enabled and allowed now; audio is not necessarily playing. */
+"speak.schedule.active" = "Attivo";
+/* Speech remains enabled but is paused outside its daily schedule. */
+"speak.schedule.inactive" = "Inattivo";
+
+/* Daily speech schedule section title. */
+"speak.schedule.section" = "Programmazione";
+
+/* Start of the daily speech window; does not change the master switch. */
+"speak.schedule.start" = "Attiva alle";
+
+/* End of the daily speech window; may be on the following day. */
+"speak.schedule.end" = "Disattiva alle";
+
+/* The master speech switch and the daily schedule are separate. Shortcuts change only the master switch. */
+"speak.schedule.explanation" = "Quando la lettura vocale della glicemia è attiva, i valori vengono letti solo durante queste ore. La programmazione si ripete ogni giorno secondo l’ora locale del telefono e può superare la mezzanotte. I comandi rapidi modificano solo l’interruttore della lettura vocale della glicemia.";
+
+/* Validation message when both speech schedule times are equal. */
+"speak.schedule.differentTimes" = "Scegli orari di attivazione e disattivazione diversi.";
+"therapy.summary" = "Riepilogo della terapia";
+"therapy.curves" = "Curve IOB/COB";
+"settingsviews_displayTrendInContactImage" = "Tendenza";
+"homeScreen.layout" = "Layout della schermata iniziale";
+"homeScreen.elapsed" = "Trascorsa";
+"homeScreen.remaining" = "Rimanente";
+"homeScreen.basalPosition" = "Posizione della basale";
+"homeScreen.basalTop" = "In alto";
+"homeScreen.basalBottom" = "In basso";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Grafico del glucosio";

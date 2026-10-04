@@ -11,6 +11,10 @@
 "sensorType" = "نوع الحساس";
 "serialNumber" = "الرقم التسلسلي";
 "battery" = "البطارية";
+"versionCode" = "رمز الإصدار";
+"voltageA" = "الجهد A";
+"voltageB" = "الجهد B";
+"waitingForData" = "في انتظار البيانات...";
 "needsTransmitterId" = "رمز الهوية لجهاز الإرسال مفقود";
 "scan" = "بدء البحث";
 "medtrumNanoPumpScanNoticeTitle" = "الاتصال بمضخة Medtrum Nano";
@@ -35,7 +39,6 @@
 "transmitterResultResult" = "نتيجة إعادة تعيين جهاز الإرسال";
 "bootLoader" = "محمل الإقلاع";
 "cannotActiveCGMInFollowerMode" = "لا يمكنك تفعيل نظام متابعة سكر الدم المستمرة CGM في وضع المتابعة";
-"useOtherDexcomApp" = "وضع التعايش";
 "useOtherDexcomAppCoexistenceFooter" = "يتيح لنا وضع التعايش العمل مع تطبيق آخر، مثل Dexcom أو CamAPS. يجب أن يظل ذلك التطبيق قيد التشغيل في الخلفية.";
 "useOtherDexcomAppPrimaryFooter" = "يتصل الوضع الأساسي كتطبيق رئيسي ويتحكم في الاتصال.";
 "runningInCoexistenceMode" = "يعمل في وضع التعايش";
@@ -71,13 +74,13 @@
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
 
 /// sensor warm-up text
-"warmingUpUntil" = "Warming up until";
+"warmingUpUntil" = "إحماء حتى";
 
 /// Scan again button
 "nfcScanFailedScanAgainButton" = "Scan Again";
 
 /// Tell the user the scan was successful and to just wait now for connection
-"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 
 /// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
 "readSuccessLast24Hours" = "آخر 24 ساعة";
@@ -111,15 +114,74 @@
 
 /* Dexcom G6 Bluetooth authentication slot */
 "dexcomG6BluetoothSlot" = "قناة Bluetooth";
-"dexcomG6MobileAppSlot" = "تطبيق الهاتف (افتراضي)";
+"dexcomG6MobileAppSlot" = "الخانة 2: تطبيق الهاتف (الافتراضي)";
 "dexcomG6MobileAppSlotShort" = "تطبيق الهاتف";
-"dexcomG6MedicalDeviceSlot" = "جهاز استقبال أو مضخة (تجريبي)";
+"dexcomG6MedicalDeviceSlot" = "الخانة 1: جهاز استقبال أو مضخة";
 "dexcomG6MedicalDeviceSlotShort" = "مضخة";
 "dexcomG6MobileAppSlotFooter" = "قناة تطبيق الهاتف هي القناة الافتراضية لاتصالات الهاتف.";
 "dexcomG6MedicalDeviceSlotFooter" = "تكون قناة جهاز الاستقبال أو المضخة عادةً محجوزة لجهاز استقبال Dexcom أو لمضخة متوافقة. يترك استخدامها لهذا التطبيق قناة تطبيق الهاتف متاحة لهاتف أو جهاز آخر.";
 "dexcomG6BluetoothSlotUnavailableInCoexistenceMode" = "غير متاح في وضع التعايش";
 "dexcomG6MedicalDeviceSlotWarning" = "تكون قناة جهاز الاستقبال أو المضخة عادةً محجوزة لجهاز استقبال Dexcom أو لمضخة متوافقة. قد يؤدي تحديدها إلى منع ذلك الجهاز من الاتصال.\n\nيجب اعتبار استخدام قناة جهاز الاستقبال أو المضخة تجريبيًا فقط. يسري التحديد عند المصادقة التالية.";
-"dexcomG6AnubisSlot" = "القناة 3 (Anubis تجريبية)";
+"dexcomG6AnubisSlot" = "الخانة 3: Anubis Extra";
+"dexcomG7MedicalDeviceSlot" = "الخانة 1: جهاز استقبال أو مضخة";
+"dexcomG7MedicalDeviceSlotShort" = "مضخة";
+"dexcomG7MobileAppSlot" = "الخانة 2: تطبيق الهاتف (الافتراضي)";
+"dexcomG7SmartWatchSlot" = "الخانة 3: ساعة ذكية";
+"dexcomG7PairingCodeMessage" = "أدخل الرمز المكون من أربعة أرقام من أداة إدخال المستشعر الحالي. لا يمكن المصادقة في الوضع الأساسي بدون هذا الرمز.";
+"dexcomG7BluetoothSlot" = "قناة Bluetooth";
+"dexcomG7MobileAppSlotShort" = "تطبيق الهاتف";
+"dexcomG7SmartWatchSlotShort" = "ساعة ذكية";
+"dexcomG7MobileAppSlotFooter" = "قناة تطبيق الهاتف (الخانة 2) هي الافتراضية وهي اتصال G7 الأصلي المعتمد حاليًا.";
+"dexcomG7MedicalDeviceSlotFooter" = "تستخدم قناة جهاز الاستقبال أو المضخة خانة المصادقة 1.";
+"dexcomG7SmartWatchSlotFooter" = "تستخدم قناة الساعة الذكية خانة المصادقة الأصلية 3.";
 "dexcomG6AnubisSlotShort" = "القناة 3";
 "dexcomG6AnubisSlotFooter" = "تتوفر القناة 3 فقط في أجهزة إرسال Anubis. وهي تجريبية وتترك قناتي تطبيق الهاتف وجهاز الاستقبال أو المضخة متاحتين للأجهزة الأخرى.";
 "dexcomG6AnubisSlotWarning" = "القناة 3 قناة تجريبية متاحة فقط في أجهزة إرسال Anubis.\n\nاستخدم القناة 3 للاختبار فقط. يسري التحديد عند المصادقة التالية.";
+"dexcomConnectionMode" = "وضع الاتصال";
+"dexcomPrimaryMode" = "أساسي";
+"dexcomCoexistenceMode" = "تعايش";
+"dexcomPrimaryModePickerOption" = "الوضع الأساسي";
+"dexcomCoexistenceModePickerOption" = "وضع التعايش";
+"dexcomG6ModeSelectionFooter" = "يمكنك تغيير وضع اتصال G6 لاحقًا في إعدادات جهاز الإرسال.";
+"dexcomConnectionModeSelectionExplanation" = "يربط الوضع الأساسي هذا التطبيق مباشرة ويتطلب إغلاق أي تطبيق آخر يتصل بجهاز Dexcom.\n\nيعتمد وضع التعايش على تطبيق آخر للحفاظ على اتصال Dexcom وتلقي القراءات.";
+"dexcomBluetoothChannelSelectionExplanation" = "اختر قناة Bluetooth التي سيستخدمها هذا التطبيق. اختر تطبيق الهاتف المحمول ما لم تكن بحاجة إلى ترك هذه القناة متاحة لاتصال آخر.";
+"dexcomG6CoexistenceModeSelectionMessage" = "تم تحديد وضع التعايش. يجب أن يتصل تطبيق آخر، مثل Dexcom G6 أو CamAPS، بجهاز إرسال G6 ويصادق عليه.\n\nاترك التطبيق الآخر قيد التشغيل في الخلفية وإلا فلن يتلقى %@ القراءات.";
+"dexcomG6PrimaryModeSelectionMessage" = "تم تحديد الوضع الأساسي. يجب أن يكون %@ التطبيق الوحيد الذي يتصل بجهاز إرسال G6 ويصادق عليه.\n\nأغلق أي تطبيق آخر يتصل بجهاز الإرسال أو عطّل إذن Bluetooth الخاص به. وإلا فقد لا يتلقى %@ أو التطبيق الآخر القراءات.";
+"dexcomPrimaryModeAddFlowMessage" = "اتصل مباشرة باعتباره التطبيق الأساسي. افصل أي تطبيق آخر عن Dexcom هذا.";
+"dexcomCoexistenceModeAddFlowMessage" = "شارك الاتصال مع تطبيق آخر. أبقِ تطبيق Dexcom أو CamAPS يعمل بشكل صحيح في الخلفية.";
+"dexcomG7NoSensorLabelFound" = "لم يتم العثور على ملصق مستشعر Dexcom G7 في الصورة.";
+"dexcomG7InvalidSensorLabelFound" = "تم العثور على رمز Data Matrix، لكنه ليس ملصقًا صالحًا لمستشعر Dexcom G7.";
+
+
+/* Battery history */
+"batteryHistory" = "سجل البطارية";
+"batteryHistoryTransmitterID" = "معرّف جهاز الإرسال";
+"batteryHistoryNoData" = "لا يوجد سجل للبطارية";
+"batteryHistoryBeginsAfterReading" = "يبدأ السجل بعد قراءة البطارية الفعلية التالية.";
+"batteryHistoryRange" = "النطاق";
+"batteryHistoryRangeAccessibility" = "نطاق سجل البطارية";
+"batteryHistoryRangeExplanation" = "تمتد النطاقات الثابتة من الآن إلى عدد الأيام المحدد في الماضي. تشير الفجوات إلى فترات لم تتوفر فيها قراءة.";
+
+"connectionDiagramOtherApp" = "تطبيق آخر";
+
+/* Bluetooth reception measured by the phone. */
+"signalStrength" = "قوة الإشارة";
+
+"signalStrengthChartExplanation" = "الإشارة المباشرة خلال آخر دقيقتين. تصل قياسات جديدة كل ثانية تقريبًا أثناء الاتصال.";
+
+"signalStrengthWeak" = "ضعيفة";
+"signalStrengthStrong" = "قوية";
+"signalStrengthLastMeasurement" = "آخر قياس";
+// Generic heartbeat subscription controls.
+"heartbeat.title" = "الاشتراكات";
+"heartbeat.mode" = "وضع الاشتراك";
+"heartbeat.mode.automatic" = "واحد";
+"heartbeat.mode.all" = "الكل";
+"heartbeat.footer.automatic" = "يختار تلقائيًا قناة Bluetooth مدعومة واحدة لتحديثات النبض، مع تقليل الاشتراكات إلى الحد الأدنى. إذا فشل الاشتراك، تُجرَّب قناة أخرى.";
+"heartbeat.footer.all" = "يشترك في جميع قنوات Bluetooth المدعومة، مما يسمح لتحديثات أي منها بتوفير نبض.";
+"heartbeat.simpleFooter" = "تُطبَّق التغييرات عند الاتصال التالي.";
+
+"signalStrengthDisconnected" = "غير متصل";
+
+/* Label before the transmitter expiry date. */
+"transmitterExpiresLabel" = "تنتهي الصلاحية";

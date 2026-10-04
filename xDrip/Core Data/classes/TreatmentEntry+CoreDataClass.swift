@@ -28,12 +28,17 @@ import CoreData
     /// One automatic basal insulin delivery stored natively in units.
     /// `TreatmentEntry.valueSecondary` retains the observed interval to the next delivery in minutes.
     case AutomaticBasal = 9
+    /// A long-acting injection stored in whole units, separately from bolus and pump basal delivery.
+    /// Append new raw values because existing treatment types are persisted in Core Data.
+    case BasalInjection = 10
 	
 	/// String representation.
 	public func asString() -> String {
 		switch self {
 		case .Insulin:
 			return Texts_TreatmentsView.insulin
+        case .BasalInjection:
+            return Texts_TreatmentsView.basalInjection
 		case .Carbs:
 			return Texts_TreatmentsView.carbs
 		case .Exercise:
@@ -62,6 +67,8 @@ import CoreData
 		switch self {
 		case .Insulin:
 			return Texts_TreatmentsView.insulinUnit
+        case .BasalInjection:
+            return "U"
 		case .Carbs:
 			return Texts_TreatmentsView.carbsUnit
 		case .Exercise:
@@ -101,7 +108,8 @@ import CoreData
             return "rate"
         case .AutomaticBasal:
             return "rate"
-        case .Note:
+        case .Note, .BasalInjection:
+            // Keep the same remote identity when a Note is recognised as a basal injection.
             return "note"
         default:
             return ""
@@ -211,6 +219,12 @@ public class TreatmentEntry: NSManagedObject, Comparable {
             dict["eventType"] = "Sensor Start" // maybe overwritten in next statement
         case .PumpBatteryChange:
             dict["eventType"] = "Pump Battery Change" // maybe overwritten in next statement
+        case .BasalInjection:
+            // Nightscout calculates IOB from the insulin field, even for a Note. Keep the dose
+            // exclusively in our payload so a basal injection can never be uploaded as a bolus.
+            dict["eventType"] = ConstantsNightscout.noteEventType
+            dict["notes"] = BasalInjectionPayload(units: value, insulinDescription: notes ?? "")?.encodedNotes()
+            dict["created_at"] = self.date.ISOStringFromDate(reuseDateFormatter: reuseDateFormatter)
         case .Note:
             dict["eventType"] = ConstantsNightscout.noteEventType
             dict["notes"] = notes ?? ""
@@ -219,7 +233,7 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 		}
         
         // if nightscoutEventType not nil, then this is a treatment that was downloaded form NS, set the eventType as it was set at NS
-        if let nightscoutEventType = nightscoutEventType {
+        if let nightscoutEventType = nightscoutEventType, treatmentType != .BasalInjection {
             dict["eventType"] = nightscoutEventType
         }
 		
@@ -246,4 +260,48 @@ public func < (lhs: TreatmentEntry, rhs: TreatmentEntry) -> Bool {
 
     return lhs.date < rhs.date
     
+}
+
+/// Structured long-acting injection data carried by a Nightscout Note.
+///
+/// Locally, TreatmentEntry.value holds whole units and notes holds only the insulin description.
+/// The readable first line is for humans. Only the marked, versioned payload identifies an injection
+/// on download, so translating or editing the first line does not change the stored dose.
+struct BasalInjectionPayload: Codable, Equatable {
+    static let prefix = "xDrip4iOS:BasalInjection:"
+    let version: Int
+    let units: Int
+    let insulinDescription: String
+
+    init?(units: Double, insulinDescription: String) {
+        // Do not round a fractional dose or allow an integer conversion to overflow.
+        guard units.isFinite, units > 0, let wholeUnits = Int(exactly: units) else { return nil }
+        version = 1
+        self.units = wholeUnits
+        self.insulinDescription = insulinDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// Uses the same JSON/base64 envelope as Calendar Share, below a readable summary.
+    func encodedNotes() -> String? {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        guard let data = try? encoder.encode(self) else { return nil }
+        let description = insulinDescription.components(separatedBy: .newlines).joined(separator: " ")
+        let detail = description.isEmpty ? "" : description + ", "
+        // Leave a blank line after the summary, then keep the separator and payload on their own lines.
+        return "Basal injection: \(detail)\(units) U\n\n---------\n" + Self.prefix + data.base64EncodedString()
+    }
+
+    /// Invalid or future payloads remain ordinary Notes. Never infer a dose from the readable text.
+    static func decode(from notes: String?) -> BasalInjectionPayload? {
+        guard let lines = notes?.components(separatedBy: .newlines) else { return nil }
+        let payloadLines = lines.filter { $0.hasPrefix(prefix) }
+        guard payloadLines.count == 1,
+              let line = payloadLines.first,
+              let data = Data(base64Encoded: String(line.dropFirst(prefix.count))),
+              let payload = try? JSONDecoder().decode(Self.self, from: data),
+              payload.version == 1, payload.units > 0,
+              Int(exactly: Double(payload.units)) == payload.units else { return nil }
+        return payload
+    }
 }

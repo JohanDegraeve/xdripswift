@@ -28,6 +28,7 @@ import OSLog
     @Published private(set) var showCarbsTreatments = UserDefaults.standard.showCarbsTreatmentsInList
     @Published private(set) var showBasalTreatments = UserDefaults.standard.showBasalTreatmentsInList
     @Published private(set) var showBgCheckTreatments = UserDefaults.standard.showBgCheckTreatmentsInList
+    @Published private(set) var showBasalInjectionTreatments = UserDefaults.standard.showBasalInjectionTreatmentsInList
     @Published private(set) var showNoteTreatments = UserDefaults.standard.showNoteTreatmentsInList
     @Published private(set) var selectedDate = Date().toMidnight()
 
@@ -66,11 +67,24 @@ import OSLog
     func reloadTreatments() {
         syncFilterSettingsFromUserDefaults()
 
-        allTreatments = treatmentEntryAccessor
+        let treatments = treatmentEntryAccessor
             .getLatestTreatments(howOld: nil)
             .filter { !$0.treatmentdeleted }
             .sorted(by: { $0.date > $1.date })
-            .map { TreatmentSnapshot(treatmentEntry: $0) }
+
+        // Rows and edit routes retain object IDs rather than managed objects. Make those IDs
+        // permanent before publication, even when the asynchronous parent save is still pending.
+        let temporaryTreatments = treatments.filter { $0.objectID.isTemporaryID }
+        do {
+            if !temporaryTreatments.isEmpty {
+                try coreDataManager.mainManagedObjectContext.obtainPermanentIDs(for: temporaryTreatments)
+            }
+        } catch {
+            trace("failed to obtain permanent treatment IDs", log: log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error)
+            return
+        }
+
+        allTreatments = treatments.map { TreatmentSnapshot(treatmentEntry: $0) }
 
         applyFilters()
     }
@@ -120,6 +134,12 @@ import OSLog
         applyFilters()
     }
 
+    func toggleBasalInjectionFilter() {
+        UserDefaults.standard.showBasalInjectionTreatmentsInList.toggle()
+        showBasalInjectionTreatments = UserDefaults.standard.showBasalInjectionTreatmentsInList
+        applyFilters()
+    }
+
     func toggleNoteFilter() {
         UserDefaults.standard.showNoteTreatmentsInList.toggle()
         showNoteTreatments = UserDefaults.standard.showNoteTreatmentsInList
@@ -165,6 +185,7 @@ import OSLog
         showCarbsTreatments = UserDefaults.standard.showCarbsTreatmentsInList
         showBasalTreatments = UserDefaults.standard.showBasalTreatmentsInList
         showBgCheckTreatments = UserDefaults.standard.showBgCheckTreatmentsInList
+        showBasalInjectionTreatments = UserDefaults.standard.showBasalInjectionTreatmentsInList
         showNoteTreatments = UserDefaults.standard.showNoteTreatmentsInList
         showBasalFilter = UserDefaults.standard.dataFlowPolicy.showsPumpData
     }
@@ -194,6 +215,11 @@ import OSLog
 
         if !showBgCheckTreatments {
             filteredTreatments.removeAll(where: { $0.treatmentType == .BgCheck })
+        }
+
+        // Injection visibility is independent of both general Notes and pump basal rates.
+        if !showBasalInjectionTreatments {
+            filteredTreatments.removeAll(where: { $0.treatmentType == .BasalInjection })
         }
 
         if !showNoteTreatments {
@@ -256,7 +282,7 @@ struct TreatmentSnapshot: Hashable {
 
     var isEditable: Bool {
         switch treatmentType {
-        case .Insulin, .Carbs, .Exercise, .BgCheck, .Note:
+        case .Insulin, .BasalInjection, .Carbs, .Exercise, .BgCheck, .Note:
             return true
         default:
             return false
@@ -264,54 +290,12 @@ struct TreatmentSnapshot: Hashable {
     }
 
     var iconSystemName: String {
-        switch treatmentType {
-        case .Insulin:
-            return "arrowtriangle.down.fill"
-        case .Carbs:
-            return "circle.fill"
-        case .Exercise:
-            return "heart.fill"
-        case .BgCheck:
-            return "drop.fill"
-        case .Basal, .AutomaticBasal:
-            return "chart.bar.fill"
-        case .SiteChange:
-            return "cross.vial.fill"
-        case .SensorStart:
-            return "sensor.tag.radiowaves.forward.fill"
-        case .PumpBatteryChange:
-            return "battery.100percent"
-        case .Note:
-            return "note.text"
-        }
-    }
-
-    var iconColor: Color {
-        let baseColor: Color
-
-        switch treatmentType {
-        case .Insulin:
-            baseColor = ConstantsGlucoseChart.bolusTreatmentColor
-        case .Carbs:
-            baseColor = ConstantsGlucoseChart.carbsTreatmentColor
-        case .Exercise:
-            baseColor = Color(red: 1, green: 0, blue: 1)
-        case .BgCheck:
-            baseColor = ConstantsGlucoseChart.bgCheckTreatmentColorInner
-        case .Basal, .AutomaticBasal:
-            baseColor = ConstantsGlucoseChart.basalTreatmentColor
-        case .SiteChange, .SensorStart, .PumpBatteryChange:
-            baseColor = .yellow
-        case .Note:
-            baseColor = ConstantsGlucoseChart.noteTreatmentColor
-        }
-
-        return date > Date() ? baseColor.opacity(0.5) : baseColor
+        treatmentType.iconSystemName
     }
 
     var iconSize: CGFloat {
         if isSmallBolus {
-            return 11
+            return GlucoseChartTreatmentStyle.treatmentIconSize * GlucoseChartTreatmentStyle.smallBolusScale
         }
 
         if treatmentType == .BgCheck {
@@ -359,7 +343,7 @@ struct TreatmentSnapshot: Hashable {
         }
 
         if treatmentType == .Note {
-            return notePreviewText
+            return notes
         }
 
         return nil
@@ -373,25 +357,72 @@ struct TreatmentSnapshot: Hashable {
         return Color(.colorPrimary)
     }
 
-    var secondaryTextColor: Color {
-        Color(.colorTertiary)
-    }
-
     private var isSmallBolus: Bool {
         treatmentType == .Insulin && rawValue < UserDefaults.standard.smallBolusTreatmentThreshold
     }
+}
 
-    private var notePreviewText: String? {
-        guard let notes else {
-            return nil
-        }
-
-        guard notes.hasPrefix(ConstantsNightscout.postProcessingNotePrefix) else {
-            return notes
-        }
-
-        return String(notes.dropFirst(ConstantsNightscout.postProcessingNotePrefix.count))
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .toNilIfLength0()
+/// Shared symbols and colors for treatment rows and type selection.
+extension TreatmentType {
+    /// Use native symbols consistently in rows and the add/edit flow.
+    func iconView(size: Double = GlucoseChartTreatmentStyle.treatmentIconSize) -> some View {
+        Image(systemName: iconSystemName)
+            .font(.system(size: size, weight: .regular))
+            .foregroundStyle(iconColor)
     }
+
+    var iconSystemName: String {
+        switch self {
+        case .Insulin:
+            return GlucoseChartTreatmentStyle.bolusSymbol
+        case .BasalInjection:
+            return GlucoseChartTreatmentStyle.basalInjectionSymbol
+        case .Carbs:
+            return GlucoseChartTreatmentStyle.carbsSymbol
+        case .Exercise:
+            return "figure.run"
+        case .BgCheck:
+            return GlucoseChartTreatmentStyle.bgCheckSymbol
+        case .Basal, .AutomaticBasal:
+            return "chart.bar.fill"
+        case .SiteChange:
+            return "cross.vial.fill"
+        case .SensorStart:
+            return "sensor.tag.radiowaves.forward.fill"
+        case .PumpBatteryChange:
+            // Match the existing battery fallback because the percent-suffixed symbol requires iOS 17.
+            if #available(iOS 17.0, *) {
+                return "battery.100percent"
+            }
+            return "minus.plus.batteryblock.fill"
+        case .Note:
+            return GlucoseChartTreatmentStyle.noteSymbol
+        }
+    }
+
+    var iconColor: Color {
+        let baseColor: Color
+
+        switch self {
+        case .Insulin:
+            baseColor = ConstantsGlucoseChart.bolusTreatmentColor
+        case .BasalInjection:
+            baseColor = ConstantsGlucoseChart.basalInjectionTreatmentColor
+        case .Carbs:
+            baseColor = ConstantsGlucoseChart.carbsTreatmentColor
+        case .Exercise:
+            baseColor = Color(red: 0.7, green: 0.25, blue: 0.85)
+        case .BgCheck:
+            baseColor = ConstantsGlucoseChart.bgCheckTreatmentColorInner
+        case .Basal, .AutomaticBasal:
+            baseColor = ConstantsGlucoseChart.basalTreatmentColor
+        case .SiteChange, .SensorStart, .PumpBatteryChange:
+            baseColor = .yellow
+        case .Note:
+            baseColor = ConstantsGlucoseChart.noteTreatmentColor
+        }
+
+        return baseColor
+    }
+
 }

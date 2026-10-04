@@ -162,24 +162,25 @@ struct GlucoseReportDailySummarySectionView: View {
 struct GlucoseReportMetricTrendSectionView: View {
     let trendPoints: [GlucoseReportTrendPoint]
     let language: GlucoseReportLanguage
+    let usesIFCC: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
             HStack(alignment: .firstTextBaseline) {
-                sectionTitle(language.text(.estimatedA1cAndVariabilityTrend))
+                sectionTitle(language.text(.trendAnalysis))
                 Spacer()
                 legend
             }
 
             HStack(spacing: 10) {
                 trendChart(
-                    title: language.text(.estimatedA1cGMI),
+                    title: language.text(.gmi),
                     targetLabel: language.text(.lowerIsGenerallyBetter),
                     yDomain: gmiDomain,
-                    decimalPlaces: 1,
+                    decimalPlaces: usesIFCC ? 0 : 1,
                     target: nil,
-                    value: { $0.gmiPercentage },
-                    labelText: { "\(GlucoseReportFormatting.number($0, decimalPlaces: 1, locale: language.locale))%" }
+                    value: { GlucoseReportClinicalMath.gmiValue($0.gmiPercentage, usesIFCC: usesIFCC) },
+                    labelText: { GlucoseReportFormatting.number($0, decimalPlaces: usesIFCC ? 0 : 1, locale: language.locale) + (usesIFCC ? " mmol/mol" : "%") }
                 )
 
                 trendChart(
@@ -316,14 +317,7 @@ struct GlucoseReportMetricTrendSectionView: View {
     }
 
     private var gmiDomain: ClosedRange<Double> {
-        let values = trendPoints.map(\.gmiPercentage)
-        guard let minimum = values.min(), let maximum = values.max() else {
-            return 5 ... 10
-        }
-
-        let lower = max(4, floor((minimum - 0.2) * 2) / 2)
-        let upper = min(14, ceil((maximum + 0.2) * 2) / 2)
-        return lower ... max(lower + 1, upper)
+        GlucoseReportClinicalMath.gmiDomain(percentages: trendPoints.map(\.gmiPercentage), usesIFCC: usesIFCC)
     }
 
     @ViewBuilder private var treatmentTrendCharts: some View {

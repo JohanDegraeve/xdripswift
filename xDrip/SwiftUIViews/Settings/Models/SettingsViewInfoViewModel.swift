@@ -138,7 +138,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             return .nothing
             
         case .licenseInfo:
-            return SettingsSelectedRowAction.showInfoText(title: ConstantsHomeView.applicationName, message: Texts_HomeView.licenseInfo + ConstantsHomeView.infoEmailAddress)
+            return SettingsSelectedRowAction.showInfoText(title: ConstantsHomeView.applicationName, message: Texts_HomeView.licenseInfo + ConstantsHomeView.infoEmailAddress + "\n\nOpenAPS / LoopKit\n" + TherapyModelAttribution.notice)
 
         case .showGitHub:
             guard let url = URL(string: ConstantsHomeView.gitHubURL) else { return .nothing}

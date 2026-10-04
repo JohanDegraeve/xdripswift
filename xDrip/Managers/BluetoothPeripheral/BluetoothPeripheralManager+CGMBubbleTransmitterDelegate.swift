@@ -8,6 +8,7 @@ extension BluetoothPeripheralManager: CGMBubbleTransmitterDelegate {
         
         // store serial number in bubble object
         bubble.batteryLevel = batteryLevel
+        batteryHistoryManager.record(peripheralObjectID: bubble.blePeripheral.objectID, observation: .percentage(value: batteryLevel, producer: .bubble))
         
         // no coredatamanager savechanges needed because batterylevel is not stored in coredata
         

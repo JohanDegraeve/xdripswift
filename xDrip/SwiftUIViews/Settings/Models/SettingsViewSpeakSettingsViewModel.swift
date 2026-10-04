@@ -1,5 +1,6 @@
 import os
 import Foundation
+import SwiftUI
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -58,19 +59,61 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         ]
     }
 
-    override init() {
-        super.init()
-        addObservers()
+    /// Keep the saved schedule visible when the master switch is off. Only its controls are disabled.
+    static func scheduleSection() -> SettingsSection {
+        let status = speechStatus()
+        return SettingsSection(
+            title: Texts_SettingsView.speakScheduleSection,
+            footer: Texts_SettingsView.speakScheduleExplanation,
+            rows: [
+                SettingsRow(
+                    id: "speak.schedule",
+                    title: Texts_SettingsView.enableSchedule,
+                    control: .toggle(
+                        isOn: { UserDefaults.standard.speakReadingsScheduleEnabled },
+                        setIsOn: { UserDefaults.standard.speakReadingsScheduleEnabled = $0 }
+                    ),
+                    isEnabled: UserDefaults.standard.speakReadings
+                ),
+                SettingsRow(
+                    id: "speak.schedule.start",
+                    title: Texts_SettingsView.speakScheduleStart,
+                    control: .custom(content: { AnyView(SpeakScheduleTimeRow(isStart: true)) }),
+                    isEnabled: UserDefaults.standard.speakReadings,
+                    isVisible: UserDefaults.standard.speakReadingsScheduleEnabled
+                ),
+                SettingsRow(
+                    id: "speak.schedule.end",
+                    title: Texts_SettingsView.speakScheduleEnd,
+                    control: .custom(content: { AnyView(SpeakScheduleTimeRow(isStart: false)) }),
+                    isEnabled: UserDefaults.standard.speakReadings,
+                    isVisible: UserDefaults.standard.speakReadingsScheduleEnabled
+                ),
+                SettingsRow(
+                    id: "speak.schedule.status",
+                    title: Texts_HomeView.statusActionTitle,
+                    detail: status.text,
+                    detailColor: status.color,
+                    detailIndicator: SettingsIndicator(color: status.color),
+                    accessory: .none
+                )
+            ]
+        )
     }
 
-    var sectionReloadClosure: (() -> Void)?
+    /// Use the speech check for both status indicators so the displayed state matches the schedule.
+    /// A disabled master switch is gray here and red on the parent row. Yellow means the master
+    /// is enabled but the current time is outside the schedule; it does not indicate an error.
+    static func speechStatus(isParent: Bool = false) -> (text: String, color: Color) {
+        guard UserDefaults.standard.speakReadings else {
+            return (Texts_Common.disabled, isParent ? ConstantsAppColors.urgent : ConstantsAppColors.disabledText)
+        }
+        return UserDefaults.standard.shouldSpeakReadings()
+            ? (Texts_SettingsView.speakScheduleActive, ConstantsAppColors.normal)
+            : (Texts_SettingsView.speakScheduleInactive, .yellow)
+    }
 
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
-    
-    func storeSectionReloadClosure(sectionReloadClosure: @escaping (() -> Void)) {
-        self.sectionReloadClosure = sectionReloadClosure
-    }
-    
     
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
@@ -214,31 +257,78 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
             return nil
         }
     }
-    
-    
-    // MARK: - observe functions
-    
-    private func addObservers() {
-        // Listen for changes in the Speak Readings setting as it may be changed with a Quick Action
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.speakReadings.rawValue, options: .new, context: nil)
-    }
+}
 
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        guard let keyPath = keyPath,
-              let keyPathEnum = UserDefaults.Key(rawValue: keyPath)
-        else { return }
-        
-        switch keyPathEnum {
-            case UserDefaults.Key.speakReadings:
-            
-            // we have to run this in the main thread to avoid access errors
-            DispatchQueue.main.async {
-                // Speak readings setting has been changed from other model, likely by a Quick Action. Update UI to reflect current state.
-                self.sectionReloadClosure?()
-            }
+/// A compact time picker for one end of the daily window. Both rows observe the same stored
+/// minutes so validation always uses the other row's latest value, including external changes.
+private struct SpeakScheduleTimeRow: View {
+    let isStart: Bool
+    @Environment(\.isEnabled) private var isEnabled
+    @AppStorage(UserDefaults.Key.speakReadingsStartMinute.rawValue) private var startMinute = 9 * 60
+    @AppStorage(UserDefaults.Key.speakReadingsEndMinute.rawValue) private var endMinute = 22 * 60
+    @State private var showEqualTimes = false
 
-            default:
-                break
+    var body: some View {
+        DatePicker(
+            isStart ? Texts_SettingsView.speakScheduleStart : Texts_SettingsView.speakScheduleEnd,
+            selection: Binding(
+                get: {
+                    let minute = isStart ? startMinute : endMinute
+                    // The date is only a picker carrier. Use a fixed day rather than today so
+                    // a daylight-saving transition does not normalize an otherwise valid time.
+                    return Calendar.current.date(from: DateComponents(year: 2001, month: 1, day: 15, hour: minute / 60, minute: minute % 60)) ?? Date()
+                },
+                set: { date in
+                    let calendar = Calendar.current
+                    let minute = calendar.component(.hour, from: date) * 60 + calendar.component(.minute, from: date)
+                    guard minute != (isStart ? endMinute : startMinute) else {
+                        showEqualTimes = true
+                        return
+                    }
+                    if isStart { startMinute = minute } else { endMinute = minute }
+                }
+            ),
+            displayedComponents: .hourAndMinute
+        )
+        .datePickerStyle(.compact)
+        .foregroundStyle(isEnabled ? ConstantsAppColors.rowTitleText : ConstantsAppColors.disabledText)
+        .alert(Texts_SettingsView.speakScheduleDifferentTimes, isPresented: $showEqualTimes) {
+            Button(Texts_Common.Ok, role: .cancel) {}
         }
+    }
+}
+
+/// Observe all speech preferences so Settings, quick actions, and App Intents update the same UI.
+/// Attach this to the List to preserve its native sections. Clock updates run only while speech
+/// and scheduling are enabled and the screen is active; SwiftUI cancels the task on disappearance.
+struct SpeakReadingsSettingsRefresh: ViewModifier {
+    let isRelevant: Bool
+    let refresh: () -> Void
+    @AppStorage(UserDefaults.Key.speakReadings.rawValue) private var enabled = false
+    @AppStorage(UserDefaults.Key.speakReadingsScheduleEnabled.rawValue) private var scheduled = false
+    @AppStorage(UserDefaults.Key.speakReadingsStartMinute.rawValue) private var start = 9 * 60
+    @AppStorage(UserDefaults.Key.speakReadingsEndMinute.rawValue) private var end = 22 * 60
+    @Environment(\.scenePhase) private var scenePhase
+
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: [enabled ? 1 : 0, scheduled ? 1 : 0, start, end]) { _ in
+                if isRelevant { refresh() }
+            }
+            .task(id: scenePhase == .active && enabled && scheduled) { @MainActor in
+                guard isRelevant else { return }
+                // Recheck on appearance or a change of execution state. Only a running schedule
+                // needs minute-boundary updates; preference changes are handled above.
+                refresh()
+                guard scenePhase == .active, enabled, scheduled else { return }
+                while !Task.isCancelled {
+                    let delay = 60 - Date().timeIntervalSince1970.truncatingRemainder(dividingBy: 60)
+                    do {
+                        try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                    } catch { return }
+                    guard !Task.isCancelled else { return }
+                    refresh()
+                }
+            }
     }
 }

@@ -4,3 +4,4 @@
 "calibration_notification_body" = "Klicka på notis för att kalibrera";
 "singlePointCalibration" = "Standard";
 "multiPointCalibration" = "Flerpunkts";
+"previousCalibrationPrefillMessage" = "Din tidigare kalibrering från %@ är förifylld. Jämför den med ditt aktuella mätarvärde innan du bekräftar.";

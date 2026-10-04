@@ -145,6 +145,8 @@ struct GlucoseReportConfiguration {
     var aidPeriod: GlucoseReportAIDPeriod
     var paperSize: GlucoseReportPaperSize
     var language: GlucoseReportLanguage
+    // Keep every report page in the units selected when generation started.
+    var usesIFCC: Bool = false
 
     func text(_ key: GlucoseReportText) -> String {
         language.text(key)
@@ -308,11 +310,15 @@ struct GlucoseReportRangeDistribution {
     let veryHigh: Double
 
     func timeInRangeBuckets(usesMgDl: Bool) -> [GlucoseReportRangeBucket] {
-        [
-            GlucoseReportRangeBucket(key: .low, detail: rangeLabel(upperMgDl: GlucoseReportClinicalConstants.timeInRangeLowMgDl, usesMgDl: usesMgDl), percentage: veryLow + low, color: GlucoseReportColors.low),
-            GlucoseReportRangeBucket(key: .inRange, detail: rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInRangeLowMgDl, upperMgDl: GlucoseReportClinicalConstants.timeInRangeHighMgDl, usesMgDl: usesMgDl), percentage: target, color: GlucoseReportColors.target),
-            GlucoseReportRangeBucket(key: .high, detail: rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInRangeHighMgDl, usesMgDl: usesMgDl), percentage: high + veryHigh, color: GlucoseReportColors.high)
-        ]
+        makeBuckets(
+            distribution: GlucoseRangeDistribution(below: veryLow + low, inRange: target, above: high + veryHigh),
+            keys: [.low, .inRange, .high],
+            details: [
+                rangeLabel(upperMgDl: GlucoseReportClinicalConstants.timeInRangeLowMgDl, usesMgDl: usesMgDl),
+                rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInRangeLowMgDl, upperMgDl: GlucoseReportClinicalConstants.timeInRangeHighMgDl, usesMgDl: usesMgDl),
+                rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInRangeHighMgDl, usesMgDl: usesMgDl)
+            ]
+        )
     }
 
     static let timeInRangeSourceURL = "https://doi.org/10.2337/dci19-0028"
@@ -329,11 +335,40 @@ struct GlucoseReportRangeDistribution {
     }
 
     func tightRangeBuckets(usesMgDl: Bool) -> [GlucoseReportRangeBucket] {
-        [
-            GlucoseReportRangeBucket(key: .low, detail: rangeLabel(upperMgDl: GlucoseReportClinicalConstants.timeInTightRangeLowMgDl, usesMgDl: usesMgDl), percentage: low, color: GlucoseReportColors.low),
-            GlucoseReportRangeBucket(key: .tightRange, detail: rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInTightRangeLowMgDl, upperMgDl: GlucoseReportClinicalConstants.timeInTightRangeHighMgDl, usesMgDl: usesMgDl), percentage: target, color: GlucoseReportColors.target),
-            GlucoseReportRangeBucket(key: .high, detail: rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInTightRangeHighMgDl, usesMgDl: usesMgDl), percentage: high, color: GlucoseReportColors.high)
-        ]
+        makeBuckets(
+            distribution: GlucoseRangeDistribution(below: low, inRange: target, above: high),
+            keys: [.low, .tightRange, .high],
+            details: [
+                rangeLabel(upperMgDl: GlucoseReportClinicalConstants.timeInTightRangeLowMgDl, usesMgDl: usesMgDl),
+                rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInTightRangeLowMgDl, upperMgDl: GlucoseReportClinicalConstants.timeInTightRangeHighMgDl, usesMgDl: usesMgDl),
+                rangeLabel(lowerMgDl: GlucoseReportClinicalConstants.timeInTightRangeHighMgDl, usesMgDl: usesMgDl)
+            ]
+        )
+    }
+
+    /// Builds all three display buckets together so percentages and daily minutes are apportioned as
+    /// one distribution. Calculating either value independently is what previously allowed labels to
+    /// total 99/101% and report durations to total 23h59/24h01.
+    private func makeBuckets(
+        distribution: GlucoseRangeDistribution,
+        keys: [GlucoseReportText],
+        details: [String]
+    ) -> [GlucoseReportRangeBucket] {
+        let exactPercentages = distribution.percentages
+        let wholePercentages = distribution.wholePercentages
+        let minutesPerDay = distribution.allocatedUnits(total: 24 * 60)
+        let colors = [GlucoseReportColors.low, GlucoseReportColors.target, GlucoseReportColors.high]
+
+        return exactPercentages.indices.map { index in
+            GlucoseReportRangeBucket(
+                key: keys[index],
+                detail: details[index],
+                percentage: exactPercentages[index],
+                wholePercentage: wholePercentages[index],
+                minutesPerDay: minutesPerDay[index],
+                color: colors[index]
+            )
+        }
     }
 
     private func rangeLabel(lowerMgDl: Double? = nil, upperMgDl: Double? = nil, usesMgDl: Bool) -> String {
@@ -358,7 +393,12 @@ struct GlucoseReportRangeBucket: Identifiable {
     let id = UUID()
     let key: GlucoseReportText
     let detail: String
+    /// Exact normalized value used for bar geometry and clinical calculations.
     let percentage: Double
+    /// Shared largest-remainder result used by every whole-number percentage label.
+    let wholePercentage: Int
+    /// Shared 1,440-minute allocation used by clinical report duration labels.
+    let minutesPerDay: Int
     let color: Color
 
     func title(language: GlucoseReportLanguage) -> String {
@@ -455,6 +495,27 @@ enum GlucoseReportClinicalMath {
     static func gmiPercentage(forAverageMgDl averageMgDl: Double) -> Double {
         3.31 + 0.02392 * averageMgDl
     }
+
+    /// Convert the unrounded GMI percentage using the NGSP/IFCC master equation.
+    /// Source: https://ngsp.org/ifccngsp.asp
+    static func gmiValue(_ percentage: Double, usesIFCC: Bool) -> Double {
+        usesIFCC ? (percentage - 2.152) / 0.09148 : percentage
+    }
+
+    // Keep the existing percentage bounds; even IFCC bounds give three whole-number axis ticks.
+    static func gmiDomain(percentages: [Double], usesIFCC: Bool) -> ClosedRange<Double> {
+        let lower: Double
+        let upper: Double
+        if let minimum = percentages.min(), let maximum = percentages.max() {
+            lower = max(4, floor((minimum - 0.2) * 2) / 2)
+            upper = max(lower + 1, min(14, ceil((maximum + 0.2) * 2) / 2))
+        } else {
+            lower = 5
+            upper = 10
+        }
+        guard usesIFCC else { return lower ... upper }
+        return (floor(gmiValue(lower, usesIFCC: true) / 2) * 2) ... (ceil(gmiValue(upper, usesIFCC: true) / 2) * 2)
+    }
 }
 
 enum GlucoseReportAGPDisplayPoints {
@@ -545,8 +606,8 @@ enum GlucoseReportText {
     case bestTIR
     case lowestAverage
     case highestAverage
-    case estimatedA1cAndVariabilityTrend
-    case estimatedA1cGMI
+    case trendAnalysis
+    case gmi
     case lowerIsGenerallyBetter
     case cv
     case daily
@@ -619,8 +680,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Best TIR"
         case .lowestAverage: return "Lowest Avg"
         case .highestAverage: return "Highest Avg"
-        case .estimatedA1cAndVariabilityTrend: return "Trend Analysis"
-        case .estimatedA1cGMI: return "Estimated A1c / GMI"
+        case .trendAnalysis: return "Trend Analysis"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Lower is generally better"
         case .cv: return "CV"
         case .daily: return "Daily"
@@ -695,8 +756,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Mejor TIR"
         case .lowestAverage: return "Media Mínima"
         case .highestAverage: return "Media Máxima"
-        case .estimatedA1cAndVariabilityTrend: return "Análisis de Tendencias"
-        case .estimatedA1cGMI: return "A1c Estimada / GMI"
+        case .trendAnalysis: return "Análisis de Tendencias"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Más bajo suele ser mejor"
         case .cv: return "CV"
         case .daily: return "Diario"
@@ -771,8 +832,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Meilleur TIR"
         case .lowestAverage: return "Moy. la plus basse"
         case .highestAverage: return "Moy. la plus haute"
-        case .estimatedA1cAndVariabilityTrend: return "Analyse des Tendances"
-        case .estimatedA1cGMI: return "A1c Estimée / GMI"
+        case .trendAnalysis: return "Analyse des Tendances"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Plus bas est généralement meilleur"
         case .cv: return "CV"
         case .daily: return "Quotidien"
@@ -847,8 +908,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Beste TIR"
         case .lowestAverage: return "Laagste Gem."
         case .highestAverage: return "Hoogste Gem."
-        case .estimatedA1cAndVariabilityTrend: return "Trendanalyse"
-        case .estimatedA1cGMI: return "Geschatte A1c / GMI"
+        case .trendAnalysis: return "Trendanalyse"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Lager is meestal beter"
         case .cv: return "CV"
         case .daily: return "Dagelijks"
@@ -923,8 +984,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Beste TIR"
         case .lowestAverage: return "Niedrigster Ø"
         case .highestAverage: return "Höchster Ø"
-        case .estimatedA1cAndVariabilityTrend: return "Trendanalyse"
-        case .estimatedA1cGMI: return "Geschätzte A1c / GMI"
+        case .trendAnalysis: return "Trendanalyse"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Niedriger ist im Allgemeinen besser"
         case .cv: return "CV"
         case .daily: return "Täglich"
@@ -999,8 +1060,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Miglior TIR"
         case .lowestAverage: return "Media Minima"
         case .highestAverage: return "Media Massima"
-        case .estimatedA1cAndVariabilityTrend: return "Analisi delle Tendenze"
-        case .estimatedA1cGMI: return "A1c Stimata / GMI"
+        case .trendAnalysis: return "Analisi delle Tendenze"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Più basso è generalmente meglio"
         case .cv: return "CV"
         case .daily: return "Giornaliero"
@@ -1075,8 +1136,8 @@ enum GlucoseReportText {
         case .bestTIR: return "Melhor TIR"
         case .lowestAverage: return "Média Mínima"
         case .highestAverage: return "Média Máxima"
-        case .estimatedA1cAndVariabilityTrend: return "Análise de Tendências"
-        case .estimatedA1cGMI: return "A1c Estimada / GMI"
+        case .trendAnalysis: return "Análise de Tendências"
+        case .gmi: return "GMI"
         case .lowerIsGenerallyBetter: return "Mais baixo é geralmente melhor"
         case .cv: return "CV"
         case .daily: return "Diário"

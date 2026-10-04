@@ -30,7 +30,7 @@ class LibreLinkUpFollowManager: NSObject {
     /// delegate to pass back glucosedata
     private(set) weak var followerDelegate: FollowerDelegate?
 
-    /// The root-owned shared keep-alive engine; this follower reports operational state only and
+    /// The root-owned shared keep-alive engine. This follower reports operational state only and
     /// does not own silent-audio playback, replay timing, or application lifecycle callbacks.
     private let backgroundKeepAliveManager: FollowerBackgroundKeepAliveManaging
 
@@ -96,7 +96,8 @@ class LibreLinkUpFollowManager: NSObject {
         self.libreLinkUpId = nil
         self.libreLinkUpPatientId = nil
         
-        // run a quick check to see if the LibreLinkUp version stored in the constants file is newer than the one currently stored in the app. If it is, then update it. This will only happen if the user hasn't manually updated it before a new xDrip4iOS version is released.
+        // Promote the working version when this release ships a numerically newer default. Keep a
+        // stored value that is already equal or higher so a newer manual override is not downgraded.
         if ConstantsLibreLinkUp.libreLinkUpVersionDefault.compare(UserDefaults.standard.libreLinkUpVersion ?? "0.0.0", options: .numeric) == .orderedDescending {
             trace("in init, updating userdefaults LibreLinkUp version from '%{public}@' to '%{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, UserDefaults.standard.libreLinkUpVersion ?? "nil", ConstantsLibreLinkUp.libreLinkUpVersionDefault)
             

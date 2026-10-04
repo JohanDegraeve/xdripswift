@@ -4,3 +4,4 @@
 "calibration_notification_body" = "Click the Notification to Calibrate";
 "singlePointCalibration" = "Standard";
 "multiPointCalibration" = "Multi-point";
+"previousCalibrationPrefillMessage" = "Your previous calibration from %@ is pre-filled. Check it against your current meter reading before confirming.";

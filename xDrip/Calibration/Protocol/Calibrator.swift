@@ -403,7 +403,7 @@ extension Calibrator {
             x1 = thirdlatest.timeStamp.toMillisecondsAsDouble()
             
             //debuglogging("latest = " + latest.log(""))
-            //debuglogging("X3 = " + x3.description + ", Y 3 = " + y3.description + ",x2 = " + x2.description + ", y2 = " + y2.description + ", x1 = " + x1.description + ", y1 = " + y1.description);
+            //debuglogging("X3 = " + x3.description + ", Y 3 = " + y3.description + ",x2 = " + x2.description + ", y2 = " + y2.description + ", x1 = " + x1.description + ", y1 = " + y1.description)
             
             bgReading.a = y1/((x1-x2)*(x1-x3))+y2/((x2-x1)*(x2-x3))+y3/((x3-x1)*(x3-x2))
             bgReading.b = (-y1*(x2+x3)/((x1-x2)*(x1-x3))-y2*(x1+x3)/((x2-x1)*(x2-x3))-y3*(x1+x2)/((x3-x1)*(x3-x2)))
@@ -557,21 +557,18 @@ extension Calibrator {
     ///
     /// - parameters:
     ///     - bgReading : reading that will be updated
-    ///     - last2Readings result of call to BgReadings.getLatestBgReadings(2, sensor) ignoreRawData and ignoreCalculatedValue false - inout parameter to improve performance
+    ///     - last2Readings : previous readings ordered from youngest to oldest - inout parameter to improve performance
     public func findSlope(for bgReading: BgReading, last2Readings: inout Array<BgReading>) {
         bgReading.hideSlope = true;
-        if last2Readings.count >= 2 {
-            let (slope, hide) = bgReading.calculateSlope(lastBgReading: last2Readings[1])
+        if last2Readings.count > 0 {
+            let (slope, hide) = bgReading.calculateSlope(lastBgReadings: last2Readings)
             bgReading.calculatedValueSlope = slope
             bgReading.hideSlope = hide
-        } else if last2Readings.count == 1 {
-            bgReading.calculatedValueSlope = 0
         } else {
             bgReading.calculatedValueSlope = 0
         }
     }
 }
-
 
 
 

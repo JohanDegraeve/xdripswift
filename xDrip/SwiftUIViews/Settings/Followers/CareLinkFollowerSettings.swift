@@ -261,12 +261,18 @@ private final class CareLinkSettingsSectionProvider: SettingsNativeSectionProvid
 
     private func deviceRows() -> [SettingsRow] {
         var rows = [SettingsRow]()
-        appendValue(Texts_SettingsView.careLinkPump, joined(snapshot.metadata.deviceFamily, snapshot.metadata.deviceModel), id: "pump", to: &rows)
+        // The device model can be a Simplera sensor even though CareLink returns it through a
+        // pump-named field. Only expose pump labels after the therapy parser confirms a pump.
+        if snapshot.pump.isReported {
+            appendValue(Texts_SettingsView.careLinkPump, joined(snapshot.metadata.deviceFamily, snapshot.metadata.deviceModel), id: "pump", to: &rows)
+        }
         appendValue(Texts_SettingsView.careLinkSerialNumber, snapshot.metadata.deviceSerial, id: "serial", to: &rows)
         appendValue(Texts_HomeView.sensor, joined(snapshot.metadata.sensorType, snapshot.metadata.sensorState), id: "sensor", to: &rows)
         appendValue(Texts_SettingsView.careLinkDataRoute, snapshot.metadata.route?.rawValue.capitalized, id: "route", to: &rows)
-        appendValue(Texts_SettingsView.careLinkPumpBattery, percent(snapshot.pump.batteryPercent), id: "pumpBattery", to: &rows)
-        appendValue(Texts_SettingsView.careLinkReservoir, units(snapshot.pump.reservoirUnits), id: "reservoir", to: &rows)
+        if snapshot.pump.isReported {
+            appendValue(Texts_SettingsView.careLinkPumpBattery, percent(snapshot.pump.batteryPercent), id: "pumpBattery", to: &rows)
+            appendValue(Texts_SettingsView.careLinkReservoir, units(snapshot.pump.reservoirUnits), id: "reservoir", to: &rows)
+        }
         return rows
     }
 

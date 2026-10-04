@@ -431,7 +431,7 @@ struct AlertTypeEditorView: View {
     }
 
     /// Builds the SwiftUI row for each alert type editor setting.
-    /// Toggle rows bind directly to editor state; value rows use the pushed Settings
+    /// Toggle rows bind directly to editor state. Value rows use the pushed Settings
     /// editors so all Settings value rows use the same navigation behavior.
     @ViewBuilder
     private func row(for setting: AlertTypeEditorSetting) -> some View {

@@ -148,8 +148,8 @@ struct LandscapeValueView: View {
                     .scaleEffect(0.85)
                     .tint(ConstantsAppColors.primaryText)
                     .frame(width: Layout.statusSymbolSize, height: Layout.statusSymbolSize)
-            } else if let statusSystemImage = state.loop.statusSystemImage {
-                Image(systemName: statusSystemImage)
+            } else if let statusSymbol = state.loop.statusSymbol {
+                AIDStatusSymbolImage(symbol: statusSymbol)
                     .font(.system(size: Layout.statusSymbolSize, weight: .black))
                     .symbolRenderingMode(.monochrome)
                     .foregroundStyle(state.loop.statusColor)
@@ -167,6 +167,6 @@ struct LandscapeValueView: View {
     }
 
     private var showsTherapyStatus: Bool {
-        state.loop.showsActivityIndicator || state.loop.statusSystemImage != nil
+        state.loop.showsActivityIndicator || state.loop.statusSymbol != nil
     }
 }

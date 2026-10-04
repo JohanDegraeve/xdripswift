@@ -14,3 +14,4 @@
 
 /// When calibration alert goess off, user clicks the notification, app opens, dialog pops up, this is the text in the dialog
 "enter_calibration_value" = "Enter Calibration Value";
+"previousCalibrationPrefillMessage" = "È stato precompilato il valore della calibrazione precedente delle %@. Confrontalo con la lettura attuale del glucometro prima di confermare.";

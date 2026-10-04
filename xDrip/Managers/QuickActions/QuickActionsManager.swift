@@ -45,6 +45,10 @@ class QuickActionsManager: NSObject {
         // Refresh initial state
         updateAvailableQuickActions()
     }
+
+    deinit {
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.speakReadings.rawValue)
+    }
     
     /// Refresh available quick actions
     func updateAvailableQuickActions() {
@@ -82,7 +86,10 @@ class QuickActionsManager: NSObject {
         
         switch keyPathEnum {
             case UserDefaults.Key.speakReadings:
-                updateAvailableQuickActions()
+                // Defaults can be changed off-main. Update UIKit on main without blocking the writer.
+                DispatchQueue.main.async { [weak self] in
+                    self?.updateAvailableQuickActions()
+                }
                 
             default:
                 break

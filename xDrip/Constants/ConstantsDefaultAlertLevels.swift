@@ -2,6 +2,9 @@
 enum ConstantsDefaultAlertLevels {
     // default battery alert level, below this level an alert should be generated - this default value will be used when changing transmittertype
     static let defaultBatteryAlertLevelDexcomG5 = 270
+    // G7, ONE+ and Stelo use a much lower disposable-sensor Voltage B range than G5/G6/ONE.
+    // Keep this equal to the `.g7` red boundary so the battery symbol and default alarm agree.
+    static let defaultBatteryAlertLevelDexcomG7 = 215
     static let defaultBatteryAlertLevelMiaoMiao = 20
     static let defaultBatteryAlertLevelBubble = 20
     static let defaultBatteryAlertLevelLibre2 = 20

@@ -57,8 +57,30 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var dataSourceDescription: String
         var followerPatientName: String?
         var sensorNoiseStateRawValue: Int?
+        // optional so existing activities without warm-up information still decode
+        var sensorWarmupEndDate: Date?
+        var sensorWarmupConfirmationUntil: Date?
+
+        var isWaitingForSensorReading: Bool {
+            guard let endDate = sensorWarmupEndDate, let validUntil = sensorWarmupConfirmationUntil else { return false }
+            let now = Date()
+            return endDate <= now && now < validUntil
+        }
+
+        var showsSensorWarmupStatus: Bool {
+            isSensorWarmingUp || isWaitingForSensorReading
+        }
+
+        var isSensorWarmingUp: Bool {
+            sensorWarmupEndDate.map { $0 > Date() } ?? false
+        }
         
         var aidStatus: AIDStatus?
+        var therapyMetrics: TherapyMetricsSnapshot? = nil
+        // Optional so activities created before this preference still decode with metrics enabled.
+        var showIOBCOB: Bool? = nil
+        var resolvedTherapyMetrics: TherapyMetricsSnapshot { therapyMetrics ?? .external(aidStatus) }
+        var showsTherapyMetrics: Bool { showIOBCOB != false && resolvedTherapyMetrics.hasVisibleMetrics }
 
         var bgUnitString: String {
             isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
@@ -72,7 +94,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             bgReadingDates.first
         }
 
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, carPlayLiveActivityType: CarPlayLiveActivityType? = nil, dataSourceDescription: String? = "", followerPatientName: String? = nil, sensorNoiseStateRawValue: Int? = nil, aidStatus: AIDStatus?) {
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, carPlayLiveActivityType: CarPlayLiveActivityType? = nil, dataSourceDescription: String? = "", followerPatientName: String? = nil, sensorNoiseStateRawValue: Int? = nil, aidStatus: AIDStatus?, therapyMetrics: TherapyMetricsSnapshot? = nil) {
             let readings = Array(zip(bgReadingValues, bgReadingDates))
             self.bgReadingFloats = readings.map { Float16($0.0) }
 
@@ -94,6 +116,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.sensorNoiseStateRawValue = sensorNoiseStateRawValue
             
             self.aidStatus = aidStatus
+            self.therapyMetrics = therapyMetrics
         }
 
         /// Reduces chart history until the encoded state fits safely below ActivityKit's payload limit.
@@ -252,9 +275,11 @@ struct XDripWidgetAttributes: ActivityAttributes {
             aidStatus?.presentation().color
         }
         
-        func deviceStatusIconImage() -> Image? {
-            guard let systemImage = aidStatus?.presentation().systemImage else { return nil }
-            return Image(systemName: systemImage)
+        /// Use the common AID renderer so this surface inherits the same symbol weight as the app.
+        /// Keep a missing symbol absent so checking states do not imply an active loop.
+        func deviceStatusIconImage() -> AIDStatusSymbolImage? {
+            guard let symbol = aidStatus?.presentation().symbol else { return nil }
+            return AIDStatusSymbolImage(symbol: symbol)
         }
     }
 }
