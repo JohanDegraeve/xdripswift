@@ -135,3 +135,9 @@
 "common_sensorWarmupUntilFormat" = "Hasta las %@";
 "common_sensorWarmupComplete" = "Calentamiento completado";
 "common_sensorWaitingForReading" = "Esperando la primera lectura…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1cTrend" = "Tendencia de HbA1c estimada";
+
+"common_statistics_estimatedA1c" = "HbA1c estimada";

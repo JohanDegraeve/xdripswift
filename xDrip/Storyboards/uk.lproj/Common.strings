@@ -178,3 +178,7 @@
 "common_sensorWarmupUntilFormat" = "До %@";
 "common_sensorWarmupComplete" = "Прогрів завершено";
 "common_sensorWaitingForReading" = "Очікування першого показника…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "Розрахунковий HbA1c";

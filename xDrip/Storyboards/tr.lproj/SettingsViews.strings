@@ -556,6 +556,10 @@
 "therapy.smallCarbThreshold" = "Az karb.";
 "therapy.treatmentThresholdsExplanation" = "Eşik altındaki bolus ve karbonhidrat değerleri grafikte gizlenir. Bolus eşiği tedavi listesindeki küçük bolusları da tanımlar. «Yok» tüm değerleri gösterir.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Glikoz Tahmini";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Tedavi ölçeği";
 "therapy.scaleStandard" = "Standart";

@@ -552,6 +552,10 @@
 "therapy.smallCarbThreshold" = "Få kulh.";
 "therapy.treatmentThresholdsExplanation" = "Bolus- og kulhydratværdier under grænserne skjules på grafen. Bolusgrænsen definerer også små bolus i behandlingslisten. «Fra» viser alle værdier.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Glukoseestimat";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Terapiskala";
 "therapy.scaleStandard" = "Standard";

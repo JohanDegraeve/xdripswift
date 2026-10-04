@@ -528,6 +528,10 @@
 "therapy.smallCarbThreshold" = "Мало угл.";
 "therapy.treatmentThresholdsExplanation" = "Значения болюсов и углеводов ниже порогов скрыты на графике. Порог болюса также определяет малые болюсы в списке терапии. «Нет» показывает все значения.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Оценка глюкозы";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Шкала терапии";
 "therapy.scaleStandard" = "Обыч.";

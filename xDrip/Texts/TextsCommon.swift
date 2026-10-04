@@ -289,6 +289,14 @@ class Texts_Common {
         return NSLocalizedString("common_statistics_averageGlucose", tableName: filename, bundle: Bundle.main, value: "Average Glucose", comment: "statistics average glucose chart title")
     }()
 
+    static let a1cStatistics = {
+        return NSLocalizedString("common_statistics_a1c", tableName: filename, bundle: Bundle.main, value: "HbA1c", comment: "phrase HbA1c")
+    }()
+
+    static let statisticsEstimatedA1c = {
+        NSLocalizedString("common_statistics_estimatedA1c", tableName: filename, bundle: Bundle.main, value: "Estimated HbA1c", comment: "estimated HbA1c option and summary detail")
+    }()
+
     static let statisticsGMI = {
         return NSLocalizedString("common_statistics_gmi", tableName: filename, bundle: Bundle.main, value: "GMI", comment: "glucose management indicator abbreviation")
     }()
@@ -323,6 +331,10 @@ class Texts_Common {
 
     static let statisticsInsufficientData = {
         return NSLocalizedString("common_statistics_insufficientData", tableName: filename, bundle: Bundle.main, value: "Insufficient data", comment: "statistics chart empty message")
+    }()
+
+    static let statisticsEstimatedA1cTrend = {
+        return NSLocalizedString("common_statistics_estimatedA1cTrend", tableName: filename, bundle: Bundle.main, value: "Estimated HbA1c trend", comment: "statistics estimated HbA1c trend chart title")
     }()
 
     static let statisticsGMITrend = {

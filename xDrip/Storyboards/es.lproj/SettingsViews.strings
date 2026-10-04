@@ -525,6 +525,10 @@
 "therapy.smallCarbThreshold" = "Pocos HC";
 "therapy.treatmentThresholdsExplanation" = "El gráfico oculta valores de bolos y HC bajo los umbrales. El umbral de bolo también define los bolos pequeños en tratamientos. «No» muestra todos los valores.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Estimación de glucosa";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Escala terapia";
 "therapy.scaleStandard" = "Estándar";

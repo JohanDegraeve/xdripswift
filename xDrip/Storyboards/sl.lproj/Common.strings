@@ -190,3 +190,7 @@
 "common_sensorWarmupUntilFormat" = "Do %@";
 "common_sensorWarmupComplete" = "Ogrevanje končano";
 "common_sensorWaitingForReading" = "Čakanje na prvi odčitek…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "Ocenjeni HbA1c";

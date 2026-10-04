@@ -235,7 +235,9 @@ extension UserDefaults {
         case showStatistics = "showStatistics"
         /// show the objective lines in color or grey?
         case daysToUseStatistics = "daysToUseStatistics"
-        /// Display GMI in IFCC units; retain the original persisted key.
+        /// Use estimated HbA1c instead of GMI in on-screen statistics. Defaults to false.
+        case statisticsUseHbA1c = "statisticsUseHbA1c"
+        /// Display GMI or estimated HbA1c in IFCC units; retain the original persisted key.
         case useIFCCA1C = "useIFCCA1C"
         /// which type of TIR calculation is selected?
         case timeInRangeType = "timeInRangeType"
@@ -1808,7 +1810,13 @@ extension UserDefaults {
         }
     }
 
-    /// Display GMI in mmol/mol instead of a percentage.
+    /// GMI remains the default for both new and existing users.
+    @objc dynamic var statisticsUseHbA1c: Bool {
+        get { bool(forKey: Key.statisticsUseHbA1c.rawValue) }
+        set { set(newValue, forKey: Key.statisticsUseHbA1c.rawValue) }
+    }
+
+    /// Display GMI or estimated HbA1c in mmol/mol instead of a percentage.
     @objc dynamic var useIFCCA1C: Bool {
         // Default false displays GMI as a percentage. Keep this key for existing preferences.
         get {

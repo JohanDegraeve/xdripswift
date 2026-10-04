@@ -624,6 +624,10 @@
 "therapy.smallCarbThreshold" = "Peu gluc.";
 "therapy.treatmentThresholdsExplanation" = "Le graphe masque les valeurs de bolus et glucides sous les seuils. Le seuil bolus définit aussi les petits bolus dans les traitements. «Non» affiche tout.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Estimation du glucose";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Échelle soins";
 "therapy.scaleStandard" = "Standard";

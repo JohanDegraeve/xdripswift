@@ -529,6 +529,14 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_timeInRangeTypeUserDefinedRange", tableName: filename, bundle: Bundle.main, value: "User Range", comment: "statistics settings, prefer user-defined range")
     }()
     
+    static let labelStatisticsEstimate: String = {
+        NSLocalizedString("settingsviews_statisticsEstimate", tableName: filename, bundle: Bundle.main, value: "Glucose Estimate", comment: "picker for GMI or estimated HbA1c")
+    }()
+
+    static let labelUseIFCCA1C: String = {
+        NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "HbA1c in mmols/mol", comment: "statistics settings, display estimated HbA1c in IFCC units")
+    }()
+
     static let labelUseIFCCGMI: String = {
         return NSLocalizedString("settingsviews_useIFCCGMI", tableName: filename, bundle: Bundle.main, value: "GMI in mmols/mol", comment: "statistics settings, display GMI in IFCC units")
     }()

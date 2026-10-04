@@ -782,6 +782,10 @@
 "therapy.smallCarbThreshold" = "Kleine KH";
 "therapy.treatmentThresholdsExplanation" = "Bolus- und KH-Werte unter den Schwellen sind im Diagramm verborgen. Die Bolusschwelle definiert auch kleine Boli in der Behandlungsliste. «Kein» zeigt alle Werte.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Glukoseschätzung";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Therapieskala";
 "therapy.scaleStandard" = "Standard";

@@ -79,3 +79,7 @@
 "common_sensorWarmupUntilFormat" = "До %@";
 "common_sensorWarmupComplete" = "Прогрев завершён";
 "common_sensorWaitingForReading" = "Ожидание первого показания…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "Расчётный HbA1c";

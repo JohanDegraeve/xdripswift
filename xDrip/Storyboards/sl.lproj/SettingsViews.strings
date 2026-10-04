@@ -808,6 +808,10 @@
 "therapy.smallCarbThreshold" = "Malo OH";
 "therapy.treatmentThresholdsExplanation" = "Vrednosti bolusov in OH pod pragovi so na grafu skrite. Prag bolusa določa tudi male boluse na seznamu terapij. «Brez» prikaže vse vrednosti.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Ocena glukoze";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Merilo terapij";
 "therapy.scaleStandard" = "Običajno";

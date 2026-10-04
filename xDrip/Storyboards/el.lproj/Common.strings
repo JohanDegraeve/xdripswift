@@ -79,3 +79,7 @@
 "common_sensorWarmupUntilFormat" = "Έως %@";
 "common_sensorWarmupComplete" = "Η προθέρμανση ολοκληρώθηκε";
 "common_sensorWaitingForReading" = "Αναμονή πρώτης μέτρησης…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "Εκτιμώμενη HbA1c";

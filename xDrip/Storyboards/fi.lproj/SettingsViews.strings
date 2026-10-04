@@ -594,6 +594,10 @@
 "therapy.smallCarbThreshold" = "Vähän HH";
 "therapy.treatmentThresholdsExplanation" = "Rajat alittavat bolus- ja hiilihydraattiarvot piilotetaan kaaviosta. Bolusraja määrittää myös pienet bolukset hoitoluettelossa. «Ei» näyttää kaikki arvot.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Glukoosiarvio";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Hoidon asteikko";
 "therapy.scaleStandard" = "Vakio";

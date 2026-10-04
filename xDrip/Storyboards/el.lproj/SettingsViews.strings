@@ -528,6 +528,10 @@
 "therapy.smallCarbThreshold" = "Λίγοι Υ/Α";
 "therapy.treatmentThresholdsExplanation" = "Οι τιμές bolus και υδατανθράκων κάτω από τα όρια κρύβονται στο γράφημα. Το όριο bolus ορίζει και τα μικρά bolus στη λίστα θεραπειών. Το «Όχι» δείχνει όλες.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Εκτίμηση γλυκόζης";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Κλίμακα";
 "therapy.scaleStandard" = "Τυπική";

@@ -80,3 +80,7 @@
 "common_sensorWarmupUntilFormat" = "Till %@";
 "common_sensorWarmupComplete" = "Uppvärmning klar";
 "common_sensorWaitingForReading" = "Väntar på första mätvärdet…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "Beräknat HbA1c";

@@ -79,3 +79,7 @@
 "common_sensorWarmupUntilFormat" = "Indtil %@";
 "common_sensorWarmupComplete" = "Opvarmning fuldført";
 "common_sensorWaitingForReading" = "Venter på første måling…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "Estimeret HbA1c";

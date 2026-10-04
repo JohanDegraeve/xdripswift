@@ -808,6 +808,10 @@
 "therapy.smallCarbThreshold" = "Mało węgl.";
 "therapy.treatmentThresholdsExplanation" = "Wartości bolusów i węglowodanów poniżej progów są ukryte na wykresie. Próg bolusa określa też małe bolusy na liście terapii. «Brak» pokazuje wszystkie wartości.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Oszacowanie glukozy";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Skala terapii";
 "therapy.scaleStandard" = "Standard";

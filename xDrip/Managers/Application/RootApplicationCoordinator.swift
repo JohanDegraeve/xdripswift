@@ -404,6 +404,10 @@ import AppIntents
         // showing or hiding the mini-chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showMiniChart.rawValue, options: .new, context: nil)
         
+        // Update Home when the statistics estimate or its units change.
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.statisticsUseHbA1c.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.useIFCCA1C.rawValue, options: .new, context: nil)
+
         // showing or hiding the statistics view
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showStatistics.rawValue, options: .new, context: nil)
         
@@ -1402,7 +1406,7 @@ import AppIntents
             // redraw mini-chart
             updateMiniChart()
             
-        case UserDefaults.Key.daysToUseStatistics, UserDefaults.Key.showStatistics:
+        case UserDefaults.Key.daysToUseStatistics, UserDefaults.Key.showStatistics, UserDefaults.Key.statisticsUseHbA1c, UserDefaults.Key.useIFCCA1C:
             updateStatistics(animate: false, overrideApplicationState: false)
             
         case UserDefaults.Key.showTreatmentsOnChart:

@@ -460,7 +460,8 @@ class Trace {
         traceInfo.appendStringAndNewLine("    Show statistics: " + UserDefaults.standard.showStatistics.description)
         traceInfo.appendStringAndNewLine("    Statistics days: " + UserDefaults.standard.daysToUseStatistics.description)
         traceInfo.appendStringAndNewLine("    Time in Range type: " + UserDefaults.standard.timeInRangeType.description)
-        traceInfo.appendStringAndNewLine("    GMI to mmols/mol: " + UserDefaults.standard.useIFCCA1C.description)
+        traceInfo.appendStringAndNewLine("    Estimated HbA1c: " + UserDefaults.standard.statisticsUseHbA1c.description)
+        traceInfo.appendStringAndNewLine("    GMI/HbA1c to mmols/mol: " + UserDefaults.standard.useIFCCA1C.description)
           
         traceInfo.appendStringAndNewLine("\nNightscout settings:")
         traceInfo.appendStringAndNewLine("    Nightscout enabled: " + UserDefaults.standard.nightscoutEnabled.description)

@@ -568,6 +568,10 @@
 "therapy.smallCarbThreshold" = "Poucos HC";
 "therapy.treatmentThresholdsExplanation" = "O gráfico oculta valores de bolus e hidratos abaixo dos limiares. O limiar bolus define também os bolus pequenos nos tratamentos. «Não» mostra todos os valores.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Estimativa de glicose";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Escala terapia";
 "therapy.scaleStandard" = "Padrão";

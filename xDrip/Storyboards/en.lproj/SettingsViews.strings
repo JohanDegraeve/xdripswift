@@ -522,6 +522,10 @@
 "therapy.smallCarbThreshold" = "Small Carbs";
 "therapy.treatmentThresholdsExplanation" = "Bolus and carb values below these thresholds are hidden on the chart. The bolus threshold also defines small boluses in the treatments list. None shows all labels.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Glucose Estimate";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Treatment Scale";
 "therapy.scaleStandard" = "Standard";

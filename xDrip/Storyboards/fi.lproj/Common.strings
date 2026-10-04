@@ -109,3 +109,7 @@
 "common_sensorWarmupUntilFormat" = "Päättyy klo %@";
 "common_sensorWarmupComplete" = "Lämpeneminen valmis";
 "common_sensorWaitingForReading" = "Odotetaan ensimmäistä lukemaa…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "Arvioitu HbA1c";

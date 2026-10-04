@@ -564,6 +564,10 @@
 "therapy.smallCarbThreshold" = "كربوهيدرات";
 "therapy.treatmentThresholdsExplanation" = "قيم البلعات والكربوهيدرات دون الحدود مخفية على الرسم. حد البلعة يحدد أيضًا البلعات الصغيرة في قائمة العلاجات. «لا» يعرض كل القيم.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "تقدير الجلوكوز";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "مقياس العلاجات";
 "therapy.scaleStandard" = "عادي";

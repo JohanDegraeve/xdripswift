@@ -809,6 +809,10 @@
 "therapy.smallCarbThreshold" = "Pochi carb.";
 "therapy.treatmentThresholdsExplanation" = "Il grafico nasconde i valori di boli e carboidrati sotto le soglie. La soglia boli definisce anche i piccoli boli nei trattamenti. «No» mostra tutti i valori.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Stima del glucosio";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Scala terapie";
 "therapy.scaleStandard" = "Standard";

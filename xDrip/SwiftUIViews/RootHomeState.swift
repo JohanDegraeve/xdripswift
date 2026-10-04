@@ -147,7 +147,7 @@ struct RootHomeStatisticsState {
     var inRangePercentage = 0.0
     var highPercentage = 0.0
     var average = RootHomeMetricState(title: Texts_Common.averageStatistics, value: "-")
-    var gmi = RootHomeMetricState(title: Texts_Common.statisticsGMI, value: "-")
+    var gmi = RootHomeMetricState(title: UserDefaults.standard.statisticsUseHbA1c ? Texts_Common.a1cStatistics : Texts_Common.statisticsGMI, value: "-")
     var cv = RootHomeMetricState(title: Texts_Common.cvStatistics, value: "-")
     var lowLimitText = ""
     var highLimitText = ""
@@ -403,6 +403,7 @@ final class RootHomeStateModel: ObservableObject {
             state.statistics.inRangePercentage = 0
             state.statistics.highPercentage = 0
             state.statistics.average.value = "-"
+            state.statistics.gmi.title = UserDefaults.standard.statisticsUseHbA1c ? Texts_Common.a1cStatistics : Texts_Common.statisticsGMI
             state.statistics.gmi.value = "-"
             state.statistics.cv.value = "-"
         }
@@ -415,7 +416,8 @@ final class RootHomeStateModel: ObservableObject {
         let averageValue = hasData
             ? statistics.averageStatisticValue.bgValueToString(mgDl: isMgDl) + " " + glucoseUnit
             : "-"
-        let gmiValue = GlucoseReportFormatting.gmi(statistics.gmiPercentage,
+        let useHbA1c = UserDefaults.standard.statisticsUseHbA1c
+        let gmiValue = GlucoseReportFormatting.gmi(useHbA1c ? statistics.estimatedHbA1cPercentage : statistics.gmiPercentage,
             usesIFCC: UserDefaults.standard.useIFCCA1C, compactUnit: true)
         let rangeDistribution = GlucoseRangeDistribution(
             below: statistics.lowStatisticValue,
@@ -433,7 +435,7 @@ final class RootHomeStateModel: ObservableObject {
                 inRangePercentage: rangeDistribution.inRangePercentage,
                 highPercentage: rangeDistribution.abovePercentage,
                 average: RootHomeMetricState(title: Texts_Common.averageStatistics, value: averageValue),
-                gmi: RootHomeMetricState(title: Texts_Common.statisticsGMI, value: gmiValue),
+                gmi: RootHomeMetricState(title: useHbA1c ? Texts_Common.a1cStatistics : Texts_Common.statisticsGMI, value: gmiValue),
                 cv: RootHomeMetricState(title: Texts_Common.cvStatistics, value: statistics.cVStatisticValue.value > 0 ? "\(Int(statistics.cVStatisticValue.round(toDecimalPlaces: 0)))%" : "-"),
                 lowLimitText: "(<\(self.formattedLimit(statistics.lowLimitForTIR, isMgDl: isMgDl)))",
                 highLimitText: "(>\(self.formattedLimit(statistics.highLimitForTIR, isMgDl: isMgDl)))",

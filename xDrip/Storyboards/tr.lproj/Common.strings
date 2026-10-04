@@ -79,3 +79,7 @@
 "common_sensorWarmupUntilFormat" = "Bitiş: %@";
 "common_sensorWarmupComplete" = "Isınma tamamlandı";
 "common_sensorWaitingForReading" = "İlk ölçüm bekleniyor…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "Tahmini HbA1c";

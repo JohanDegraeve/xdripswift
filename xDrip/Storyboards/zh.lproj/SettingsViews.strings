@@ -733,6 +733,10 @@
 "therapy.smallCarbThreshold" = "少量碳水";
 "therapy.treatmentThresholdsExplanation" = "图表隐藏低于相应阈值的推注和碳水数值。推注阈值也用于定义治疗列表中的小剂量推注。选择无可显示所有数值。";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "血糖估算";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "治疗缩放";
 "therapy.scaleStandard" = "标准";

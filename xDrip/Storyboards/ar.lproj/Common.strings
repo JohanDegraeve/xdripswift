@@ -79,3 +79,7 @@
 "common_sensorWarmupUntilFormat" = "حتى %@";
 "common_sensorWarmupComplete" = "اكتمل الإحماء";
 "common_sensorWaitingForReading" = "بانتظار القراءة الأولى…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "HbA1c المقدّر";

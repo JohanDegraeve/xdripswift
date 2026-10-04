@@ -608,6 +608,10 @@
 "therapy.smallCarbThreshold" = "Weinig KH";
 "therapy.treatmentThresholdsExplanation" = "Bolus- en koolhydraatwaarden onder de grenzen zijn verborgen in de grafiek. De bolusgrens bepaalt ook kleine bolussen in de behandellijst. «Geen» toont alles.";
 
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Glucoseschatting";
+
 /* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
 "therapy.treatmentScale" = "Therapieschaal";
 "therapy.scaleStandard" = "Normaal";

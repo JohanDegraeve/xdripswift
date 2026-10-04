@@ -190,3 +190,7 @@
 "common_sensorWarmupUntilFormat" = "Do %@";
 "common_sensorWarmupComplete" = "Rozgrzewanie zakończone";
 "common_sensorWaitingForReading" = "Oczekiwanie na pierwszy odczyt…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "Szacowane HbA1c";
