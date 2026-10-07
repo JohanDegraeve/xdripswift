@@ -51,7 +51,13 @@ import SwiftUI
                 )
             }
             .background(ConstantsAppColors.background)
-            .onOpenURL(perform: stateModel.receiveIncomingBackup)
+            .onOpenURL { url in
+                if url.scheme == ConnectIQTransport.returnURLScheme {
+                    GarminManager.shared.handleReturn(from: url)
+                } else {
+                    stateModel.receiveIncomingBackup(url)
+                }
+            }
         }
     }
 }

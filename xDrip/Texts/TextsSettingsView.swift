@@ -40,6 +40,74 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_sharingAndServicesSectionTitle", tableName: filename, bundle: Bundle.main, value: "Sharing and Services", comment: "settings group title for sharing and external services")
     }()
 
+    // MARK: - Garmin Watch
+
+    static let garminWatchSectionTitle: String = {
+        return NSLocalizedString("settingsviews_garminWatchSectionTitle", tableName: filename, bundle: Bundle.main, value: "Garmin Watch", comment: "settings row and child screen title for Garmin watch sharing")
+    }()
+
+    static let garminWatchIntroduction: String = {
+        return NSLocalizedString("settingsviews_garminWatchIntroduction", tableName: filename, bundle: Bundle.main, value: "Send glucose readings over Bluetooth to a compatible Garmin receiver. Install Mmolio Bridge on the watch first. A completed transfer does not confirm that the watch displayed the reading.", comment: "introduction for Garmin watch settings")
+    }()
+
+    static let garminWatchConnectionSectionTitle: String = {
+        return NSLocalizedString("settingsviews_garminWatchConnectionSectionTitle", tableName: filename, bundle: Bundle.main, value: "Connection", comment: "section title for Garmin watch connection settings")
+    }()
+
+    static let garminWatchStatus: String = {
+        return NSLocalizedString("settingsviews_garminWatchStatus", tableName: filename, bundle: Bundle.main, value: "Status", comment: "Garmin watch connection status row")
+    }()
+
+    static let garminWatchDevice: String = {
+        return NSLocalizedString("settingsviews_garminWatchDevice", tableName: filename, bundle: Bundle.main, value: "Watch", comment: "selected Garmin watch row")
+    }()
+
+    static let garminWatchLastReadingSent: String = {
+        return NSLocalizedString("settingsviews_garminWatchLastReadingSent", tableName: filename, bundle: Bundle.main, value: "Last Bridge Transfer", comment: "last glucose reading sent to Garmin row")
+    }()
+
+    static let garminWatchNotConfigured: String = {
+        return NSLocalizedString("settingsviews_garminWatchNotConfigured", tableName: filename, bundle: Bundle.main, value: "Not Configured", comment: "Garmin watch is not configured")
+    }()
+
+    static let garminWatchNoDevice: String = {
+        return NSLocalizedString("settingsviews_garminWatchNoDevice", tableName: filename, bundle: Bundle.main, value: "None", comment: "no Garmin watch selected")
+    }()
+
+    static let garminWatchNoReadingSent: String = {
+        return NSLocalizedString("settingsviews_garminWatchNoReadingSent", tableName: filename, bundle: Bundle.main, value: "—", comment: "no glucose reading has been sent to Garmin yet")
+    }()
+
+    static let garminWatchEnabled: String = {
+        return NSLocalizedString("settingsviews_garminWatchEnabled", tableName: filename, bundle: Bundle.main, value: "Enable Garmin Sharing", comment: "toggle for Garmin watch sharing")
+    }()
+
+    static let garminWatchFindWatch: String = {
+        return NSLocalizedString("settingsviews_garminWatchFindWatch", tableName: filename, bundle: Bundle.main, value: "Find / Change Watch", comment: "open Garmin Connect device selection")
+    }()
+
+    static let garminWatchSendTest: String = {
+        return NSLocalizedString("settingsviews_garminWatchSendTest", tableName: filename, bundle: Bundle.main, value: "Resend Latest Reading", comment: "send the latest glucose reading to Garmin")
+    }()
+
+    static let garminWatchLastError: String = {
+        return NSLocalizedString("settingsviews_garminWatchLastError", tableName: filename, bundle: Bundle.main, value: "Last Error", comment: "last Garmin transport error row")
+    }()
+
+    static let garminWatchSDKUnavailable = NSLocalizedString("settingsviews_garminWatchSDKUnavailable", tableName: filename, bundle: Bundle.main, value: "SDK Unavailable", comment: "Connect IQ missing from build")
+
+    static let garminWatchDisabled: String = {
+        return NSLocalizedString("settingsviews_garminWatchDisabled", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "Garmin watch sharing disabled status")
+    }()
+
+    static let garminWatchConnected: String = {
+        return NSLocalizedString("settingsviews_garminWatchConnected", tableName: filename, bundle: Bundle.main, value: "Ready for Transfer", comment: "Garmin watch connected status")
+    }()
+
+    static let garminWatchDisconnected: String = {
+        return NSLocalizedString("settingsviews_garminWatchDisconnected", tableName: filename, bundle: Bundle.main, value: "Not Ready", comment: "Garmin watch disconnected status")
+    }()
+
     static let osAidLoopShareSectionTitle: String = {
         return NSLocalizedString("settingsviews_osAidLoopShareSectionTitle", tableName: filename, bundle: Bundle.main, value: "OS-AID Share", comment: "settings section title for OS-AID sharing")
     }()

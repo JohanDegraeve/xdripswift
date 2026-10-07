@@ -45,6 +45,14 @@
 				<string>xdripswift</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.xdripswift.garmin.connectiq</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>xdrip-garmin</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
@@ -69,6 +77,10 @@
 	<false/>
 	<key>IgnoreFollowerTypes</key>
 	<string>$(IGNORE_FOLLOWER_TYPES)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>gcm-ciq</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>

@@ -373,6 +373,11 @@ extension UserDefaults {
         /// - string of values, seperate by '-', values are int values and represent minutes
         case dexcomShareUploadSchedule = "dexcomShareUploadSchedule"
 
+        // Garmin Watch
+
+        /// should xDrip send new glucose readings to the selected Garmin watch?
+        case garminWatchEnabled = "garminWatchEnabled"
+
         // Healthkit
 
         /// should readings be stored in healthkit, true or false
@@ -2325,6 +2330,13 @@ extension UserDefaults {
         set {
             set(newValue, forKey: Key.storeReadingsInHealthkit.rawValue)
         }
+    }
+
+    // MARK: Garmin Watch Settings
+
+    var garminWatchEnabled: Bool {
+        get { bool(forKey: Key.garminWatchEnabled.rawValue) }
+        set { set(newValue, forKey: Key.garminWatchEnabled.rawValue) }
     }
 
     // MARK: Speak Settings

@@ -701,6 +701,8 @@ import AppIntents
             fatalError("in setupApplicationData, failed to initialize bgReadings")
         }
         
+        GarminManager.shared.configure(coreDataManager: coreDataManager)
+
         // instantiate calibrations
         calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         
@@ -1226,6 +1228,7 @@ import AppIntents
 
                 // Publish the final stored value before optional downstream consumers perform their work.
                 updateLiveActivityAndWidgets(forceRestart: false)
+                GarminManager.shared.sendLatestReading()
                 
                 // only if no webOOPEnabled and overruleIsWebOOPEnabled false : if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
                 if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && (!cgmTransmitter.isWebOOPEnabled() && !cgmTransmitter.overruleIsWebOOPEnabled()) {
@@ -1813,6 +1816,7 @@ import AppIntents
 
         self.updateLabelsAndChart(overrideApplicationState: false)
         self.bluetoothPeripheralManager?.sendLatestReading()
+        GarminManager.shared.sendLatestReading()
         self.calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
         self.loopManager?.share()
 
@@ -3299,6 +3303,7 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
 
                 // Publish the final stored value before optional downstream consumers perform their work.
                 updateLiveActivityAndWidgets(forceRestart: false)
+                GarminManager.shared.sendLatestReading()
 
                 rootHomeStateModel.invalidateCharts()
 
