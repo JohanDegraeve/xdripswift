@@ -57,6 +57,7 @@ struct TreatmentsListView: View {
 
     @ObservedObject var viewModel: TreatmentsViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showScrollToTopButton = false
     private let topScrollAnchorID = "treatmentsTop"
     private let scrollToTopButtonThresholdIndex = 4
@@ -120,6 +121,17 @@ struct TreatmentsListView: View {
                 }
             }
             .onAppear {
+                viewModel.initializeViewIfNeeded()
+            }
+            .onChange(of: scenePhase) { phase in
+                if phase == .active {
+                    viewModel.initializeViewIfNeeded()
+                }
+            }
+            // Also advance the date if the Treatments tab stays open across midnight.
+            .onReceive(
+                NotificationCenter.default.publisher(for: .NSCalendarDayChanged).receive(on: RunLoop.main)
+            ) { _ in
                 viewModel.initializeViewIfNeeded()
             }
             .onReceive(
