@@ -38,14 +38,17 @@ struct GarminGlucoseReading: Equatable {
     let mgDl: Int
     let trend: Int
     let measuredAt: Int
+    let displayUnit: Int? // optional v1 extension: 0 = mg/dL, 1 = mmol/L
     private(set) var sequence: Int
 
-    init?(mgDl: Double, xDripTrend: Int, measuredAt: Date) {
+    init?(mgDl: Double, xDripTrend: Int, measuredAt: Date, displayUnit: Int? = nil) {
         let seconds = measuredAt.timeIntervalSince1970
         // Check before converting Double to Int (NaN/infinity/out-of-range values trap).
         // Signed 32-bit integers are portable across Connect IQ devices.
-        guard mgDl.isFinite, mgDl >= 1, mgDl <= 1000,
+        guard displayUnit == nil || displayUnit == 0 || displayUnit == 1,
+              mgDl.isFinite, mgDl >= 1, mgDl <= 1000,
               seconds.isFinite, seconds >= 1, seconds <= Double(Int32.max) else { return nil }
+        self.displayUnit = displayUnit
         self.mgDl = Int(mgDl.rounded())
         self.trend = (1...7).contains(xDripTrend) ? 8 - xDripTrend : 0
         self.measuredAt = Int(seconds)
@@ -53,11 +56,13 @@ struct GarminGlucoseReading: Equatable {
     }
 
     init?(packet: [String: Int]) {
-        guard packet["v"] == 1, packet["s"] == 3,
+        guard packet["u"] == nil || packet["u"] == 0 || packet["u"] == 1,
+              packet["v"] == 1, packet["s"] == 3,
               let glucose = packet["g"], (1...1000).contains(glucose),
               let trend = packet["t"], (0...7).contains(trend),
               let timestamp = packet["m"], (1...Int(Int32.max)).contains(timestamp),
               let sequence = packet["q"], (timestamp...Int(Int32.max)).contains(sequence) else { return nil }
+        self.displayUnit = packet["u"]
         self.mgDl = glucose; self.trend = trend; self.measuredAt = timestamp; self.sequence = sequence
     }
 
@@ -77,7 +82,8 @@ struct GarminReadingSequencer {
         if let previous = latest {
             guard reading.measuredAt >= previous.measuredAt else { return nil }
             if reading.measuredAt == previous.measuredAt,
-               reading.mgDl == previous.mgDl, reading.trend == previous.trend { return previous }
+               reading.mgDl == previous.mgDl, reading.trend == previous.trend,
+               reading.displayUnit == previous.displayUnit { return previous }
             guard previous.sequence < Int(Int32.max) else { return nil }
             latest = reading.withSequence(max(reading.measuredAt, previous.sequence + 1))
         } else {
@@ -90,8 +96,10 @@ struct GarminReadingSequencer {
 struct GarminMessage {
     let reading: GarminGlucoseReading
     func encoded() -> [String: Any] {
-        ["v": 1, "g": reading.mgDl, "t": reading.trend,
-         "m": reading.measuredAt, "s": 3, "q": reading.sequence]
+        var packet: [String: Any] = ["v": 1, "g": reading.mgDl, "t": reading.trend,
+                                   "m": reading.measuredAt, "s": 3, "q": reading.sequence]
+        if let unit = reading.displayUnit { packet["u"] = unit }
+        return packet
     }
 }
 

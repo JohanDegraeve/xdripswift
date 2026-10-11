@@ -17,7 +17,8 @@ authorization, several watches, default-off/enable/disable, readiness transition
 reconnect, queue coalescing, per-destination duplicates and retries, corrected
 same-timestamp readings, persisted sequences, forced resend, late/double/missing
 callbacks, deadlines (including suspension), iOS-expiration forwarding and
-background-work completion. The tests do not execute the proprietary SDK, UIKit,
+background-work completion, automatic phone units, same-measurement unit changes,
+legacy packets and deferred unit updates while disabled/offline. The tests do not execute the proprietary SDK, UIKit,
 Core Data, settings UI or a Bluetooth radio. The fallback adapter is compiled on
 Linux; the `canImport(ConnectIQ)` branch requires the Xcode check below.
 
@@ -71,6 +72,7 @@ mode and pass/fail with times. Avoid sharing raw glucose traces or device UUIDs.
 | Missing Bridge | Meaningful transfer error, no claim that a value was displayed |
 | Manual resend and duplicate | Original timestamp/sequence retained; Bridge may ignore duplicate; sender records actual SDK transfer |
 | Calibration changes latest value | Higher q with unchanged m is accepted and shown; no artificial freshness |
+| Change mmol/L → mg/dL → mmol/L | Bridge/face/active field follow phone; glucose and age stay equivalent, including reconnect and app restart |
 | Repeated corrections / app relaunch | Sequence remains increasing; unchanged packet is stable |
 | Stale/future timestamp at receiver | Old/future readings are not shown as current; test receiver settings explicitly |
 | iOS expiration / delayed SDK callback | Logical work ends, no later destination from expired work; no overlapping SDK sends |
@@ -84,7 +86,7 @@ background only. Do not check off these rows based on those older results.
 
 ## Current evidence
 
-On 2026-10-07 the standalone suite passed on Linux with the official
+On 2026-10-11 all 40 standalone tests passed on Linux with the official
 `swift:6.3.3-noble` image (Swift 5 language mode). The container image digest was
 `sha256:cd45c27b3abc42310c33cfaf3008b18156cbdc9187834c9617e8f43a26d2675c`.
 Xcode package resolution, full iOS compilation, upstream XCTest and all physical

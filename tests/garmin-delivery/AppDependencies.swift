@@ -16,6 +16,10 @@ final class BgReadingsAccessor {
     func lastSnapshot(forSensor: String?) -> TestSnapshot? { coreDataManager.snapshot }
 }
 extension UserDefaults {
+    var bloodGlucoseUnitIsMgDl: Bool {
+        get { !bool(forKey: "bloodGlucoseUnit") }
+        set { set(!newValue, forKey: "bloodGlucoseUnit") }
+    }
     var garminWatchEnabled: Bool {
         get { bool(forKey: "garminWatchEnabled") }
         set { set(newValue, forKey: "garminWatchEnabled") }

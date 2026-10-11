@@ -9,14 +9,30 @@ final class GarminManager {
     private static let latestPacketKey = "garminWatch.latestPacket"
     private let defaults: UserDefaults
     private var sequencer: GarminReadingSequencer
+    private var defaultsObserver: NSObjectProtocol?
+    private var lastUnitIsMgDl: Bool
 
     init(transport: GarminTransport = GarminTransportFactory.make(), defaults: UserDefaults = .standard) {
         self.transport = transport
         self.defaults = defaults
+        self.lastUnitIsMgDl = defaults.bloodGlucoseUnitIsMgDl
         self.sequencer = GarminReadingSequencer(previous:
             (defaults.dictionary(forKey: Self.latestPacketKey) as? [String: Int])
                 .flatMap(GarminGlucoseReading.init(packet:)))
         transport.onReady = { [weak self] in self?.sendLatestReading(force: true) }
+        defaultsObserver = NotificationCenter.default.addObserver(
+            forName: UserDefaults.didChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            let unit = self.defaults.bloodGlucoseUnitIsMgDl
+            guard unit != self.lastUnitIsMgDl else { return }
+            self.lastUnitIsMgDl = unit
+            self.sendLatestReading()
+        }
+    }
+
+    deinit {
+        if let defaultsObserver { NotificationCenter.default.removeObserver(defaultsObserver) }
     }
 
     var devices: [GarminDevice] { transport.devices }
@@ -79,11 +95,13 @@ final class GarminManager {
     /// force retransmits the original packet; it never fabricates a fresh measurement date.
     func sendLatestReading(force: Bool = false) {
         precondition(Thread.isMainThread)
+        lastUnitIsMgDl = defaults.bloodGlucoseUnitIsMgDl
         guard started, defaults.garminWatchEnabled, isConnected,
               let snapshot = bgReadingsAccessor?.lastSnapshot(forSensor: nil),
               let reading = GarminGlucoseReading(mgDl: snapshot.finalValue,
                                                 xDripTrend: snapshot.slopeOrdinal(),
-                                                measuredAt: snapshot.timeStamp) else { return }
+                                                measuredAt: snapshot.timeStamp,
+                                                displayUnit: lastUnitIsMgDl ? 0 : 1) else { return }
         guard let packet = sequencer.prepare(reading) else { return }
         defaults.set(GarminMessage(reading: packet).encoded(), forKey: Self.latestPacketKey)
         let backgroundWork = GarminBackgroundWork("Send glucose to Garmin")

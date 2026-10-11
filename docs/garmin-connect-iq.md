@@ -41,7 +41,7 @@ The existing receiver is the public [Mmolio project](https://github.com/sejkoram
 Open **Install Mmolio on Your Watch** in Garmin settings for the
 [installation guide](https://github.com/sejkoramartin/Mmolio/blob/main/docs/GARMIN-INSTALL.md),
 including a Czech translation and model-specific release downloads.
-[Receiver prerelease 2026.10.11-rc1](https://github.com/sejkoramartin/Mmolio/releases/tag/garmin-2026.10.11-rc1)
+[Receiver prerelease 2026.10.11-rc2](https://github.com/sejkoramartin/Mmolio/releases/tag/garmin-2026.10.11-rc2)
 provides installation ZIPs for `fr165`, `fenix7xpro` and `fenix7xpronowifi`.
 These are build-verified candidates; physical validation remains pending for all
 three targets. Each ZIP includes instructions, license, disclaimers and checksums.
@@ -52,7 +52,7 @@ See its [Garmin source and guide](https://github.com/sejkoramartin/Mmolio/tree/m
 No server, Cloudflare account or Nightscout secret is required for this route.
 
 The receiver candidate corresponds to source revision
-`7489307642bf22eb5a0e9357dac6fc915b549cb8`. The iOS sender has no watch-model allow-list; actual support requires a receiver build
+`becb2742f8a539e2b335c7a6015f6c8b9d674c20`. The iOS sender has no watch-model allow-list; actual support requires a receiver build
 and testing for the exact Garmin product ID. Do not infer compatibility from a
 similar model name or Wi-Fi availability.
 
@@ -65,7 +65,7 @@ similar model name or Wi-Fi availability.
    ```sh
    git clone https://github.com/sejkoramartin/Mmolio.git
    cd Mmolio
-   git checkout 7489307642bf22eb5a0e9357dac6fc915b549cb8
+   git checkout becb2742f8a539e2b335c7a6015f6c8b9d674c20
    export CONNECTIQ_SDK="/absolute/path/to/connect-iq-sdk"
    export DEVELOPER_KEY="/absolute/path/to/your/developer_key.der"
    ./garmin/scripts/build-fr165.sh
@@ -111,9 +111,19 @@ integer values. Glucose is always mg/dL on the wire, regardless of phone units.
 | `m` | Original measurement time, Unix seconds | `1...2147483647` |
 | `s` | Source identifier | `3` for xDrip4iOS |
 | `q` | Increasing sequence within source | Initially `m`; see corrections below |
+| `u` | Optional v1 display-unit extension | `0` mg/dL, `1` mmol/L; this sender always includes it |
 
-Example: `{"v":1,"g":123,"t":4,"m":1700000000,"s":3,"q":1700000000}`.
+Example: `{"v":1,"g":123,"t":4,"m":1700000000,"s":3,"q":1700000000,"u":1}`.
 The trend mapping is `8 - slopeOrdinal()` for upstream ordinals 1...7; otherwise 0.
+
+Units follow the existing xDrip `bloodGlucoseUnitIsMgDl` preference; no additional
+Garmin toggle is added. Changing it resends the latest reading with a higher `q`,
+unchanged `g` and unchanged `m`. Disabled/offline sharing waits for readiness.
+Receiver rc2 stores the unit with the accepted reading and uses it in Bridge,
+WatchFace and DataField. Old receivers ignore `u`; updated receivers fall back to
+their local setting for old senders without `u`. Update both sides for automatic
+units and wait for a newly accepted reading after upgrading. An unchanged resend
+may be ignored as a duplicate. DataField must be active to receive its unit change.
 
 Destination IDs (preserved for compatibility):
 

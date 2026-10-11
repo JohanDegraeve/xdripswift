@@ -382,4 +382,61 @@ test("resume after deadline rejects SDK callback even before timer callback runs
     check(h.calls.count == 1); check(results == [.failure(.expired)])
     check(h.clock.tasks.isEmpty)
 }
+test("unit metadata round-trips and legacy packets remain valid") {
+    for unit in [0, 1] {
+        let value = GarminGlucoseReading(mgDl: 180, xDripTrend: 4, measuredAt: Date(timeIntervalSince1970: 1_700_000_000), displayUnit: unit)!
+        let packet = GarminMessage(reading: value).encoded() as! [String: Int]
+        check(packet["g"] == 180 && packet["u"] == unit)
+        check(GarminGlucoseReading(packet: packet) == value)
+    }
+    var legacy = GarminMessage(reading: reading()).encoded() as! [String: Int]
+    check(GarminGlucoseReading(packet: legacy)?.displayUnit == nil)
+    legacy["u"] = 2; check(GarminGlucoseReading(packet: legacy) == nil)
+}
+test("unit change sends unchanged glucose/time with a newer sequence to both targets") {
+    let h = Harness(); var sequencer = GarminReadingSequencer()
+    for unit in [1, 0, 1] {
+        let value = GarminGlucoseReading(mgDl: 180, xDripTrend: 4, measuredAt: Date(timeIntervalSince1970: 1_700_000_000), displayUnit: unit)!
+        let packet = sequencer.prepare(value)!
+        let count = h.calls.count
+        h.queue.send(packet) { check($0 == .success(.sent)) }
+        h.complete(count); h.complete(count + 1)
+        check(packet.measuredAt == 1_700_000_000 && packet.mgDl == 180)
+        check(sequencer.prepare(value) == packet)
+    }
+    check(h.calls[4].reading.sequence == 1_700_000_002)
+}
+test("manager follows xDrip units and reacts to settings without a new measurement") {
+    withManager { manager, transport, _, defaults in
+        defaults.bloodGlucoseUnitIsMgDl = false
+        manager.setEnabled(true); transport.ready()
+        let initial = transport.sent.last!.0
+        check(initial.displayUnit == 1)
+        defaults.bloodGlucoseUnitIsMgDl = true
+        NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: defaults)
+        let updated = transport.sent.last!.0
+        check(updated.displayUnit == 0 && updated.sequence == initial.sequence + 1)
+        check(updated.measuredAt == initial.measuredAt && updated.mgDl == initial.mgDl)
+        let count = transport.sent.count
+        NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: defaults)
+        check(transport.sent.count == count)
+    }
+}
+test("offline and disabled unit changes wait until enabled and ready") {
+    withManager { manager, transport, _, defaults in
+        manager.setEnabled(true); transport.ready()
+        transport.selectedDevice?.isConnected = false
+        let count = transport.sent.count
+        defaults.bloodGlucoseUnitIsMgDl = false
+        NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: defaults)
+        check(transport.sent.count == count)
+        transport.ready(); check(transport.sent.last!.0.displayUnit == 1)
+        manager.setEnabled(false)
+        defaults.bloodGlucoseUnitIsMgDl = true
+        NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: defaults)
+        check(transport.sent.count == count + 1)
+        manager.setEnabled(true); transport.ready()
+        check(transport.sent.last!.0.displayUnit == 0)
+    }
+}
 print("\(passed) Garmin tests passed")
