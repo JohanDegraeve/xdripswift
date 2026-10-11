@@ -40,30 +40,32 @@ the upstream calculation and may differ from personal builds with G7 overrides.
 The existing receiver is the public [Mmolio project](https://github.com/sejkoramartin/Mmolio).
 Open **Install Mmolio on Your Watch** in Garmin settings for the
 [installation guide](https://github.com/sejkoramartin/Mmolio/blob/main/docs/GARMIN-INSTALL.md),
-including a Czech translation and model-specific release downloads. This link is
-part of the local release preparation: publish and verify the receiver guide and
-assets before publishing this xDrip change.
+including a Czech translation and model-specific release downloads.
+[Receiver prerelease 2026.10.11-rc1](https://github.com/sejkoramartin/Mmolio/releases/tag/garmin-2026.10.11-rc1)
+provides installation ZIPs for `fr165`, `fenix7xpro` and `fenix7xpronowifi`.
+These are build-verified candidates; physical validation remains pending for all
+three targets. Each ZIP includes instructions, license, disclaimers and checksums.
 
 See its [Garmin source and guide](https://github.com/sejkoramartin/Mmolio/tree/main/garmin),
 [license](https://github.com/sejkoramartin/Mmolio/blob/main/LICENSE) and
 [disclaimer](https://github.com/sejkoramartin/Mmolio/blob/main/docs/DISCLAIMER.md).
 No server, Cloudflare account or Nightscout secret is required for this route.
 
-At the reviewed receiver revision `68ab835ac7f9f79ae5b07aca367c88de414c1072`,
-the public build targets Forerunner 165. Fenix 7X Pro additions existed in the
-maintainer's local receiver work but were not published by this change. The iOS
-sender has no watch-model allow-list; actual support requires a receiver build
+The receiver candidate corresponds to source revision
+`7489307642bf22eb5a0e9357dac6fc915b549cb8`. The iOS sender has no watch-model allow-list; actual support requires a receiver build
 and testing for the exact Garmin product ID. Do not infer compatibility from a
 similar model name or Wi-Fi availability.
 
 1. Install Garmin Connect on the iPhone, pair the watch and allow Bluetooth access.
-2. Obtain the Mmolio source and install Connect IQ SDK 9.2.0 with the device
-   definition for the target watch. For a reproducible Forerunner 165 build:
+2. Download and unpack the ZIP for the exact model from the receiver prerelease.
+   Use its `apps/` files in step 3; users do not need to compile anything.
+   Alternatively, developers can reproduce a Forerunner 165 build with Connect IQ
+   SDK 9.2.0 and the matching device definitions:
 
    ```sh
    git clone https://github.com/sejkoramartin/Mmolio.git
    cd Mmolio
-   git checkout 68ab835ac7f9f79ae5b07aca367c88de414c1072
+   git checkout 7489307642bf22eb5a0e9357dac6fc915b549cb8
    export CONNECTIQ_SDK="/absolute/path/to/connect-iq-sdk"
    export DEVELOPER_KEY="/absolute/path/to/your/developer_key.der"
    ./garmin/scripts/build-fr165.sh
@@ -74,7 +76,8 @@ similar model name or Wi-Fi availability.
    between apps signed by that developer. Keep the key private. Do not change
    the application IDs when building a compatible receiver.
 3. Connect the watch by USB and copy `MmolioBridge.prg` and
-   `MmolioWatchFace.prg` from `build/fr165/release/` into the watch's `GARMIN/APPS`
+   `MmolioWatchFace.prg` from the ZIP's `apps/` folder (or `build/fr165/release/`
+   when compiling yourself) into the watch's `GARMIN/APPS`
    folder. Copy `MmolioDataField.prg` too if activity display is wanted. Use the
    receiver's device-specific instructions for existing installations/filenames;
    do not install files compiled for another product.
