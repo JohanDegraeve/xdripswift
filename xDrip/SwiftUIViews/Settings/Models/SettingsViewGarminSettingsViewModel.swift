@@ -30,6 +30,12 @@ final class SettingsViewGarminSettingsViewModel: NSObject, SettingsViewModelProt
 
         return [
             SettingsRow(
+                id: "garminWatch.installation",
+                title: Texts_SettingsView.garminWatchInstallation,
+                accessory: .disclosure,
+                action: .legacy(action: { self.onRowSelect(index: 7) }, rowIndex: 7, viewModel: self)
+            ),
+            SettingsRow(
                 id: "garminWatch.enabled",
                 title: Texts_SettingsView.garminWatchEnabled,
                 accessory: .none,
@@ -99,11 +105,15 @@ final class SettingsViewGarminSettingsViewModel: NSObject, SettingsViewModelProt
         Texts_SettingsView.garminWatchConnectionSectionTitle
     }
 
-    func numberOfRows() -> Int { 7 }
+    func numberOfRows() -> Int { 8 }
     func settingsRowText(index: Int) -> String { "" }
     func accessoryType(index: Int) -> SettingsAccessory { .none }
     func detailedText(index: Int) -> String? { nil }
-    func onRowSelect(index: Int) -> SettingsSelectedRowAction { .nothing }
+    func onRowSelect(index: Int) -> SettingsSelectedRowAction {
+        guard index == 7,
+              let url = URL(string: "https://github.com/sejkoramartin/Mmolio/blob/main/docs/GARMIN-INSTALL.md") else { return .nothing }
+        return .openURL(url)
+    }
     func isEnabled(index: Int) -> Bool { true }
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool { false }
     func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {}

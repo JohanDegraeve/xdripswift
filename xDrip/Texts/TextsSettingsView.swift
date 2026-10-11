@@ -46,6 +46,8 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_garminWatchSectionTitle", tableName: filename, bundle: Bundle.main, value: "Garmin Watch", comment: "settings row and child screen title for Garmin watch sharing")
     }()
 
+    static let garminWatchInstallation = NSLocalizedString("settingsviews_garminWatchInstallation", tableName: filename, bundle: Bundle.main, value: "Install Mmolio on Your Watch", comment: "opens receiver installation guide and model-specific downloads")
+
     static let garminWatchIntroduction: String = {
         return NSLocalizedString("settingsviews_garminWatchIntroduction", tableName: filename, bundle: Bundle.main, value: "Send glucose readings over Bluetooth to a compatible Garmin receiver. Install Mmolio Bridge on the watch first. A completed transfer does not confirm that the watch displayed the reading.", comment: "introduction for Garmin watch settings")
     }()

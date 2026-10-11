@@ -38,6 +38,12 @@ the upstream calculation and may differ from personal builds with G7 overrides.
 ## Receiver installation
 
 The existing receiver is the public [Mmolio project](https://github.com/sejkoramartin/Mmolio).
+Open **Install Mmolio on Your Watch** in Garmin settings for the
+[installation guide](https://github.com/sejkoramartin/Mmolio/blob/main/docs/GARMIN-INSTALL.md),
+including a Czech translation and model-specific release downloads. This link is
+part of the local release preparation: publish and verify the receiver guide and
+assets before publishing this xDrip change.
+
 See its [Garmin source and guide](https://github.com/sejkoramartin/Mmolio/tree/main/garmin),
 [license](https://github.com/sejkoramartin/Mmolio/blob/main/LICENSE) and
 [disclaimer](https://github.com/sejkoramartin/Mmolio/blob/main/docs/DISCLAIMER.md).
