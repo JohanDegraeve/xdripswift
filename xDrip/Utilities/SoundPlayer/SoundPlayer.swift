@@ -14,6 +14,12 @@ class SoundPlayer {
 
     /// audioplayer
     private var audioPlayer:AVAudioPlayer?
+
+    /// Serialize audio-route negotiation away from the UI thread.
+    private static let activationQueue = DispatchQueue(label: "SoundPlayer.audioSessionActivation")
+
+    /// A stopped or superseded request must not start after activation completes.
+    private var pendingPlaybackID: UUID?
     
     // MARK: - initializer
     
@@ -27,13 +33,27 @@ class SoundPlayer {
             return
         }
         
-        do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.mixWithOthers)
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch let error {
-            trace("in playSound, could not set AVAudioSession category to playback and mixwithOthers, error = %{public}@", log: self.log, category: ConstantsLog.categoryPlaySound, type: .error, error.localizedDescription)
+        let playbackID = UUID()
+        pendingPlaybackID = playbackID
+        let log = log
+        Self.activationQueue.async { [weak self] in
+            do {
+                let session = AVAudioSession.sharedInstance()
+                try session.setCategory(.playback, options: .mixWithOthers)
+                try session.setActive(true)
+            } catch {
+                trace("in playSound, could not set AVAudioSession category to playback and mixwithOthers, error = %{public}@", log: log, category: ConstantsLog.categoryPlaySound, type: .error, error.localizedDescription)
+            }
+
+            DispatchQueue.main.async { [weak self] in
+                guard let self, self.pendingPlaybackID == playbackID else { return }
+                self.pendingPlaybackID = nil
+                self.startPlayback(url: url, soundFileName: soundFileName)
+            }
         }
-        
+    }
+
+    private func startPlayback(url: URL, soundFileName: String) {
         do {
             try audioPlayer = AVAudioPlayer(contentsOf: url)
             
@@ -49,6 +69,7 @@ class SoundPlayer {
     
     /// is the PlaySound playing or not
     public func isPlaying() -> Bool {
+        if pendingPlaybackID != nil { return true }
         if let audioPlayer = audioPlayer {
             return audioPlayer.isPlaying
         }
@@ -57,6 +78,7 @@ class SoundPlayer {
     
     /// if playSound is playing, then stop
     public func stopPlaying() {
+        pendingPlaybackID = nil
         if isPlaying() {
             if let audioPlayer = audioPlayer {
                 audioPlayer.stop()
