@@ -698,6 +698,12 @@ struct SettingsListView: View {
         .settingsPresentation(presenter: presenter)
         // Attach refresh behavior to the List, never around a Section: a container such as
         // TimelineView makes List render that entire section as one cell.
+        .modifier(DexcomShareUploadAgeRefresh(
+            isRelevant: listModel.sections.contains { section in
+                section.section().rows.contains { $0.id == "sharingServices.dexcomShare" || $0.id == "dexcomShare.connection.status" }
+            },
+            refresh: { listModel.reload(.all) }
+        ))
         .modifier(SpeakReadingsSettingsRefresh(
             isRelevant: listModel.sections.contains { section in
                 section.section().rows.contains { $0.id == "speak.schedule" || $0.id == "sharingServices.speakReadings" }

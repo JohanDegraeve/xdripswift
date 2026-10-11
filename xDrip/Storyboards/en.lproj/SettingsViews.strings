@@ -530,6 +530,19 @@
 
 /* Dexcom Share upload connection and activity */
 "settingsviews_dexcomShareUploadSectionTitle" = "Dexcom Share Upload";
+"settingsviews_shareUploadAccountVerified" = "Account verified";
+"settingsviews_shareUploadUnchecked" = "Not checked";
+"settingsviews_shareUploadPaused" = "Paused by schedule";
+"settingsviews_shareUploadLocalOnly" = "Uploading to Dexcom Share is only available with a local glucose source.";
+"settingsviews_shareUploadCheckFooter" = "Test Connection verifies your account. The receiver serial number is verified when readings are uploaded.";
+"settingsviews_shareUploadLastConnection" = "Last successful connection";
+"settingsviews_shareUploadLastUpload" = "Last successful upload";
+"settingsviews_shareUploadError" = "Upload error";
+"settingsviews_shareUploadNever" = "Not yet";
+"settingsviews_shareUploadReceiverNotAssigned" = "This receiver is not assigned to your Dexcom account. Register it using the official Dexcom app.";
+"settingsviews_shareUploadConfigurationRequired" = "Enter your username, password and receiver serial number.";
+"settingsviews_shareUploadFailed" = "Upload failed";
+"settingsviews_shareUploadTooLarge" = "Dexcom Share rejected an oversized upload.";
 
 /* Live Activity styles */
 "settingsviews_liveActivityTypeMinimal" = "Minimal";

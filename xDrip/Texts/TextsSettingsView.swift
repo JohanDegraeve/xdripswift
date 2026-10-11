@@ -1668,4 +1668,19 @@ class Texts_SettingsView {
         return String(format: NSLocalizedString("settingsviews_nightscoutImportErrorUnexpectedStatus", tableName: filename, bundle: Bundle.main, value: "Nightscout returned an unexpected response (HTTP %d).", comment: "nightscout import, unexpected HTTP status error"), status)
     }
     
+    // Dexcom Share upload connection and activity
+    static let shareUploadAccountVerified = NSLocalizedString("settingsviews_shareUploadAccountVerified", tableName: filename, bundle: Bundle.main, value: "Account verified", comment: "Dexcom Share upload settings")
+    static let shareUploadUnchecked = NSLocalizedString("settingsviews_shareUploadUnchecked", tableName: filename, bundle: Bundle.main, value: "Not checked", comment: "Dexcom Share upload settings")
+    static let shareUploadPaused = NSLocalizedString("settingsviews_shareUploadPaused", tableName: filename, bundle: Bundle.main, value: "Paused by schedule", comment: "Dexcom Share upload settings")
+    static let shareUploadLocalOnly = NSLocalizedString("settingsviews_shareUploadLocalOnly", tableName: filename, bundle: Bundle.main, value: "Uploading to Dexcom Share is only available with a local glucose source.", comment: "Dexcom Share upload settings")
+    static let shareUploadCheckFooter = NSLocalizedString("settingsviews_shareUploadCheckFooter", tableName: filename, bundle: Bundle.main, value: "Test Connection verifies your account. The receiver serial number is verified when readings are uploaded.", comment: "Dexcom Share upload settings")
+    static let shareUploadLastConnection = NSLocalizedString("settingsviews_shareUploadLastConnection", tableName: filename, bundle: Bundle.main, value: "Last successful connection", comment: "Dexcom Share upload settings")
+    static let shareUploadLastUpload = NSLocalizedString("settingsviews_shareUploadLastUpload", tableName: filename, bundle: Bundle.main, value: "Last successful upload", comment: "Dexcom Share upload settings")
+    static let shareUploadFailed = NSLocalizedString("settingsviews_shareUploadFailed", tableName: filename, bundle: Bundle.main, value: "Upload failed", comment: "Dexcom Share upload status")
+    static let shareUploadTooLarge = NSLocalizedString("settingsviews_shareUploadTooLarge", tableName: filename, bundle: Bundle.main, value: "Dexcom Share rejected an oversized upload.", comment: "Dexcom Share HTTP 413 upload error")
+    static let shareUploadError = NSLocalizedString("settingsviews_shareUploadError", tableName: filename, bundle: Bundle.main, value: "Upload error", comment: "Dexcom Share upload settings")
+    static let shareUploadNever = NSLocalizedString("settingsviews_shareUploadNever", tableName: filename, bundle: Bundle.main, value: "Not yet", comment: "Dexcom Share upload settings")
+    static let shareUploadReceiverNotAssigned = NSLocalizedString("settingsviews_shareUploadReceiverNotAssigned", tableName: filename, bundle: Bundle.main, value: "This receiver is not assigned to your Dexcom account. Register it using the official Dexcom app.", comment: "Dexcom Share upload settings")
+    static let shareUploadConfigurationRequired = NSLocalizedString("settingsviews_shareUploadConfigurationRequired", tableName: filename, bundle: Bundle.main, value: "Enter your username, password and receiver serial number.", comment: "Dexcom Share upload settings")
+
 }

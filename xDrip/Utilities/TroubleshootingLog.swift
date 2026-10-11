@@ -539,6 +539,7 @@ enum TroubleshootingConfigurationActivity: Codable, Equatable {
     case dexcomBluetoothChannelChanged(TroubleshootingDexcomBluetoothChannel)
     case therapySourceChanged(TroubleshootingTherapySource)
     case liveActivityChanged(TroubleshootingLiveActivityMode)
+    case dexcomShareUploadChanged(enabled: Bool)
     case aidFollowerChanged(TroubleshootingAIDFollowerMode)
     case patientAliasChanged(isSet: Bool)
     case credentialChanged(source: TroubleshootingLogSource, field: TroubleshootingCredentialField, isSet: Bool)
@@ -747,6 +748,9 @@ enum TroubleshootingAlertActivity: Codable, Equatable {
 /// A closed list of optional destinations whose sharing result can be exposed safely.
 enum TroubleshootingIntegration: String, Codable {
     case nightscout
+    case dexcomShareUpload
+    // Account verification must not clear an outstanding upload failure.
+    case dexcomShareUploadAccount
     case nightscoutImport
     case nightscoutBackfill
     case healthKit
@@ -759,6 +763,8 @@ enum TroubleshootingIntegration: String, Codable {
     var name: String {
         switch self {
         case .nightscout: return "Nightscout"
+        case .dexcomShareUpload: return "Dexcom Share upload"
+        case .dexcomShareUploadAccount: return "Dexcom Share upload account"
         case .nightscoutImport: return "Nightscout import"
         case .nightscoutBackfill: return "Nightscout backfill"
         case .healthKit: return "Apple Health"
@@ -1833,6 +1839,7 @@ struct TroubleshootingLogAppInfo: Equatable {
             ],
             integrationLines: [
                 "Nightscout uploads: \(nightscoutUploadsEnabled ? "Enabled" : "Disabled")",
+                "Dexcom Share uploads: \(defaults.uploadReadingstoDexcomShare && defaults.isMaster ? "Enabled" : "Disabled")",
                 "Apple Health: \(defaults.storeReadingsInHealthkit ? "Enabled" : "Disabled")",
                 "Live Activity: \(defaults.liveActivitiesEnabled ? defaults.liveActivityType.debugDescription : "Disabled")",
                 "Calendar sharing: \(defaults.createCalendarEvent ? "Enabled" : "Disabled")",
@@ -2102,6 +2109,14 @@ struct TroubleshootingLogReportBuilder {
             }
 
         case let .integration(name, activity):
+            if name == .dexcomShareUploadAccount {
+                switch activity {
+                case .succeeded: return "Dexcom Share upload account was verified."
+                case .failed, .permissionDenied: return "Dexcom Share upload account verification failed."
+                case .recovered: return "Dexcom Share upload account verification recovered."
+                default: break
+                }
+            }
             if name == .nightscoutBackfill {
                 switch activity {
                 case .started: return "Nightscout started checking for missing readings."
@@ -2140,6 +2155,8 @@ struct TroubleshootingLogReportBuilder {
 
         case let .configuration(activity):
             switch activity {
+            case let .dexcomShareUploadChanged(enabled):
+                return "Dexcom Share uploads were \(enabled ? "enabled" : "disabled")."
             case let .modeChanged(isMaster):
                 return "App mode changed to \(isMaster ? "Master" : "Follower")."
             case let .followerSourceChanged(source):

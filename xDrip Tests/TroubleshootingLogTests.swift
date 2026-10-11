@@ -887,6 +887,29 @@ final class TroubleshootingLogTests: XCTestCase {
         ])
     }
 
+    func testDexcomShareUsesHourlyUpdatesAndKeepsUploadFailureAcrossAccountVerification() {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        let kinds: [TroubleshootingLogKind] = [
+            .configuration(.dexcomShareUploadChanged(enabled: true)),
+            .integration(name: .dexcomShareUpload, activity: .succeeded(itemCount: 1)),
+            .integration(name: .dexcomShareUpload, activity: .succeeded(itemCount: 1)),
+            .integration(name: .dexcomShareUpload, activity: .succeeded(itemCount: 1)),
+            .integration(name: .dexcomShareUpload, activity: .failed),
+            .integration(name: .dexcomShareUpload, activity: .failed),
+            .integration(name: .dexcomShareUploadAccount, activity: .succeeded(itemCount: nil)),
+            .integration(name: .dexcomShareUpload, activity: .succeeded(itemCount: 1)),
+            .configuration(.dexcomShareUploadChanged(enabled: false))
+        ]
+        let times: [TimeInterval] = [0, 1, 300, 3601, 3602, 3603, 3604, 3605, 3606]
+        for (kind, offset) in zip(kinds, times) {
+            fixture.store.record(.standard(kind, timestamp: referenceDate.addingTimeInterval(offset)))
+        }
+        XCTAssertEqual(fixture.store.snapshot().map(\.kind), [
+            kinds[8], .integration(name: .dexcomShareUpload, activity: .recovered), kinds[6], kinds[4], kinds[3], kinds[1], kinds[0]
+        ])
+    }
+
     func testRoutineIntegrationSuccessIsLimitedToOnePerHour() {
         let fixture = makeStore()
         defer { removeFixture(fixture.directory) }

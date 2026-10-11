@@ -131,6 +131,7 @@ import AppIntents
     
     /// DexcomShareUploadManager instance
     private var dexcomShareUploadManager: DexcomShareUploadManager?
+    private let dexcomShareUploadState = DexcomShareUploadState()
     
     /// CalendarManager instance
     private var calendarManager: CalendarManager?
@@ -348,6 +349,10 @@ import AppIntents
                         refresh: { [weak coordinator = self] in coordinator?.refreshSelectedFollower() },
                         logIn: { [weak coordinator = self] in coordinator?.logInSelectedFollower() },
                         logOut: { [weak coordinator = self] in coordinator?.logOutSelectedFollower() }
+                    ),
+                    dexcomShareUploadActions: DexcomShareUploadActions(
+                        state: self.dexcomShareUploadState,
+                        testConnection: { [weak coordinator = self] in await coordinator?.dexcomShareUploadManager?.testConnection() }
                     ),
                     sensorProvider: self
                 )
@@ -835,7 +840,7 @@ import AppIntents
         }
         
         // setup dexcomShareUploadManager
-        dexcomShareUploadManager = DexcomShareUploadManager(bgReadingsAccessor: bgReadingsAccessor, messageHandler: { (title:String, message:String) in
+        dexcomShareUploadManager = DexcomShareUploadManager(bgReadingsAccessor: bgReadingsAccessor, state: dexcomShareUploadState, messageHandler: { (title:String, message:String) in
             self.presentAlert(title: title, message: message)
         })
         

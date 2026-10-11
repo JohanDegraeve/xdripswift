@@ -387,6 +387,7 @@ struct TroubleshootingLogView: View {
             case .liveActivity: return "iphone"
             case .calendar: return "calendar"
             case .contactImage: return "person.crop.circle"
+            case .dexcomShareUpload, .dexcomShareUploadAccount: return "icloud.and.arrow.up"
             case .osAid: return "arrow.left.arrow.right"
             case .watch: return "applewatch"
             }
@@ -401,6 +402,7 @@ struct TroubleshootingLogView: View {
             case .dexcomBluetoothChannelChanged: return "antenna.radiowaves.left.and.right"
             case .therapySourceChanged: return "cross.case.fill"
             case .liveActivityChanged: return "iphone"
+            case .dexcomShareUploadChanged: return "icloud.and.arrow.up"
             case .aidFollowerChanged: return "waveform.path.ecg"
             case .patientAliasChanged: return "person.text.rectangle.fill"
             case .credentialChanged: return "key.fill"
