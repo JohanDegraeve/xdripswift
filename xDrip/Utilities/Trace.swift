@@ -437,6 +437,8 @@ class Trace {
         traceInfo.appendStringAndNewLine("\nNotifications settings:")
         traceInfo.appendStringAndNewLine("    Show BG in notifications: " + UserDefaults.standard.showReadingInNotification.description)
         traceInfo.appendStringAndNewLine("    Notification interval: " + UserDefaults.standard.notificationInterval.description + " minutes")
+        // report enablement separately because the style is remembered whilst disabled
+        traceInfo.appendStringAndNewLine("    Live Activities enabled: " + UserDefaults.standard.liveActivitiesEnabled.description)
         traceInfo.appendStringAndNewLine("    Live Activity type: " + UserDefaults.standard.liveActivityType.debugDescription)
         traceInfo.appendStringAndNewLine("    Show BG in app badge: " + UserDefaults.standard.showReadingInAppBadge.description)
         traceInfo.appendStringAndNewLine("    Multiply app badge by 10: " + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? "\(UserDefaults.standard.multipleAppBadgeValueWith10.description) (but not used in mg/dL)" : UserDefaults.standard.multipleAppBadgeValueWith10.description))

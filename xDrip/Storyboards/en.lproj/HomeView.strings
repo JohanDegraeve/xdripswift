@@ -57,7 +57,6 @@
 "showHideGlucoseChartTitle" = "Chart";
 "showHideStandByModeTitle" = "StandBy Mode";
 "showHideStandByModeFooter" = "Changes how the StandBy mode will be displayed if activated in the iPhone settings";
-"showHideAdditionalItemsTitle" = "Alerts and Speech";
 "postProcessingTitle" = "Glucose Adjustments";
 "postProcessingPreviewHours" = "Preview Hours";
 "postProcessingAdjustment" = "Adjustment";

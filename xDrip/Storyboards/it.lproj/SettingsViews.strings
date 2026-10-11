@@ -818,3 +818,8 @@
 "therapy.scaleStandard" = "Standard";
 "therapy.scaleSmallDoses" = "Dosi basse";
 "therapy.treatmentScaleExplanation" = "«Dosi basse» rende più visibili i piccoli marcatori. Boli: 0.1–2.0U; carboidrati: 1–50g. Quantità maggiori usano il marcatore più grande.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimo";
+"settingsviews_liveActivityTypeNormal" = "Normale";
+"settingsviews_liveActivityTypeLarge" = "Grande";

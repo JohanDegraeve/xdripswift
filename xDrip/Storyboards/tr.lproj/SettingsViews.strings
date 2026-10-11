@@ -565,3 +565,8 @@
 "therapy.scaleStandard" = "Standart";
 "therapy.scaleSmallDoses" = "Düşük doz";
 "therapy.treatmentScaleExplanation" = "Düşük doz küçük işaretleri daha görünür yapar. Bolus: 0.1–2.0U; karbonhidrat: 1–50g. Daha büyük miktarlar en büyük işareti kullanır.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimal";
+"settingsviews_liveActivityTypeNormal" = "Normal";
+"settingsviews_liveActivityTypeLarge" = "Büyük";

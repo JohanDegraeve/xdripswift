@@ -791,3 +791,8 @@
 "therapy.scaleStandard" = "Standard";
 "therapy.scaleSmallDoses" = "Kleine Dos.";
 "therapy.treatmentScaleExplanation" = "«Kleine Dos.» macht kleine Marker deutlicher. Bolusmarker skalieren von 0.1–2.0U, KH-Marker von 1–50g. Größere Mengen nutzen den größten Marker.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimal";
+"settingsviews_liveActivityTypeNormal" = "Normal";
+"settingsviews_liveActivityTypeLarge" = "Groß";

@@ -915,10 +915,6 @@ enum Texts_HomeView {
         return NSLocalizedString("showHideStandByModeFooter", tableName: filename, bundle: Bundle.main, value: "Changes how the StandBy mode will be displayed if activated in the iPhone settings", comment: "quick show hide footer for standby settings")
     }()
 
-    static let showHideAdditionalItemsTitle: String = {
-        return NSLocalizedString("showHideAdditionalItemsTitle", tableName: filename, bundle: Bundle.main, value: "Alerts and Speech", comment: "quick controls for alerts and spoken readings")
-    }()
-    
     static let postProcessingTitle: String = {
         return NSLocalizedString("postProcessingTitle", tableName: filename, bundle: Bundle.main, value: "Glucose Adjustments", comment: "title for the blood glucose post processing view")
     }()

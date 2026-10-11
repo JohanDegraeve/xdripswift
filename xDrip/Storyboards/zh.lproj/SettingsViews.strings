@@ -742,3 +742,8 @@
 "therapy.scaleStandard" = "标准";
 "therapy.scaleSmallDoses" = "小剂量";
 "therapy.treatmentScaleExplanation" = "小剂量使少量治疗的标记更清晰。推注标记在0.1–2.0U之间缩放，碳水标记在1–50g之间缩放。超过范围的量使用最大标记。";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "精简";
+"settingsviews_liveActivityTypeNormal" = "标准";
+"settingsviews_liveActivityTypeLarge" = "大";

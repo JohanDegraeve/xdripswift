@@ -179,7 +179,8 @@ extension LiveActivityManager {
     /// Public API: Restart from intent/shortcut
     @MainActor
     func restartFromIntent() {
-        if (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)) && UserDefaults.standard.liveActivityType != .disabled {
+        // use enablement here so switching off retains the selected style
+        if (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)) && UserDefaults.standard.liveActivitiesEnabled {
             if persistentContentState.urgentLowLimitInMgDl > 0 {
                 trace("in restartFromIntent, will try and end/restart current Live Activity", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 Task { @MainActor [weak self] in

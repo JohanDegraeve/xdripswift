@@ -817,3 +817,8 @@
 "therapy.scaleStandard" = "Običajno";
 "therapy.scaleSmallDoses" = "Mali odm.";
 "therapy.treatmentScaleExplanation" = "Mali odmerki naredijo male oznake bolj vidne. Bolusi: 0.1–2.0U; OH: 1–50g. Večje količine uporabljajo največjo oznako.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimalno";
+"settingsviews_liveActivityTypeNormal" = "Običajno";
+"settingsviews_liveActivityTypeLarge" = "Veliko";

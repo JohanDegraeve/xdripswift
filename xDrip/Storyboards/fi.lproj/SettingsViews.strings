@@ -603,3 +603,8 @@
 "therapy.scaleStandard" = "Vakio";
 "therapy.scaleSmallDoses" = "Pienet ann.";
 "therapy.treatmentScaleExplanation" = "Pienet annokset näkyvät selvemmin. Bolusmerkit skaalautuvat välillä 0.1–2.0U, HH-merkit välillä 1–50g. Suuremmat määrät käyttävät suurinta merkkiä.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimaalinen";
+"settingsviews_liveActivityTypeNormal" = "Normaali";
+"settingsviews_liveActivityTypeLarge" = "Suuri";

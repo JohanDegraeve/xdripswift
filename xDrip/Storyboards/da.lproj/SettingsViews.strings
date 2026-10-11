@@ -561,3 +561,8 @@
 "therapy.scaleStandard" = "Standard";
 "therapy.scaleSmallDoses" = "Små doser";
 "therapy.treatmentScaleExplanation" = "Små doser gør små markører tydeligere. Bolus skaleres fra 0.1–2.0U og kulhydrater fra 1–50g. Større mængder bruger den største markør.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimal";
+"settingsviews_liveActivityTypeNormal" = "Normal";
+"settingsviews_liveActivityTypeLarge" = "Stor";

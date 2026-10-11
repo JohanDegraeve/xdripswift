@@ -772,3 +772,8 @@
 "therapy.scaleStandard" = "Типова";
 "therapy.scaleSmallDoses" = "Малі дози";
 "therapy.treatmentScaleExplanation" = "Малі дози роблять малі маркери помітнішими. Болюси: 0.1–2.0U; вуглеводи: 1–50g. Більші кількості використовують найбільший маркер.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Мінімальний";
+"settingsviews_liveActivityTypeNormal" = "Звичайний";
+"settingsviews_liveActivityTypeLarge" = "Великий";

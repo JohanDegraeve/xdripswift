@@ -617,3 +617,8 @@
 "therapy.scaleStandard" = "Normaal";
 "therapy.scaleSmallDoses" = "Kleine dos.";
 "therapy.treatmentScaleExplanation" = "Kleine doses maken kleine markeringen beter zichtbaar. Bolus: 0.1–2.0U; koolhydraten: 1–50g. Hogere hoeveelheden gebruiken de grootste markering.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimaal";
+"settingsviews_liveActivityTypeNormal" = "Normaal";
+"settingsviews_liveActivityTypeLarge" = "Groot";

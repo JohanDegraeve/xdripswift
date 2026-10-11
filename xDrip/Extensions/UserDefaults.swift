@@ -127,7 +127,9 @@ extension UserDefaults {
         case multipleAppBadgeValueWith10 = "multipleAppBadgeValueWith10"
         /// minimum time between two notifications, set by user
         case notificationInterval = "notificationInterval"
-        /// which type of live activities should be shown, if any?
+        /// should live activities be enabled independently of the selected style?
+        case liveActivitiesEnabled = "liveActivitiesEnabled"
+        /// which style should be remembered whilst live activities are disabled?
         case liveActivityType = "liveActivityType"
         /// which layout should the small Live Activity family use?
         case carPlayLiveActivityType = "carPlayLiveActivityType"
@@ -1034,15 +1036,40 @@ extension UserDefaults {
         }
     }
 
-    /// holds the enum integer of the type of live activity to be shown, if any
-    /// default to 0 (disabled)
-    var liveActivityType: LiveActivityType {
+    /// should live activities be enabled? The selected style is retained when switched off.
+    @objc dynamic var liveActivitiesEnabled: Bool {
         get {
-            let liveActivityTypeAsInt = integer(forKey: Key.liveActivityType.rawValue)
-            return LiveActivityType(rawValue: liveActivityTypeAsInt) ?? .disabled
+            migrateLiveActivitySettingsIfNeeded()
+            return bool(forKey: Key.liveActivitiesEnabled.rawValue)
         }
         set {
+            migrateLiveActivitySettingsIfNeeded()
+            set(newValue, forKey: Key.liveActivitiesEnabled.rawValue)
+        }
+    }
+
+    /// holds the selected live activity style independently of whether it is enabled
+    var liveActivityType: LiveActivityType {
+        get {
+            migrateLiveActivitySettingsIfNeeded()
+            let storedType = LiveActivityType(rawValue: integer(forKey: Key.liveActivityType.rawValue)) ?? .normal
+            return storedType == .disabled ? .normal : storedType
+        }
+        set {
+            migrateLiveActivitySettingsIfNeeded()
             set(newValue.rawValue, forKey: Key.liveActivityType.rawValue)
+        }
+    }
+
+    /// split the previous combined setting only once, preserving an explicitly stored false
+    private func migrateLiveActivitySettingsIfNeeded() {
+        guard object(forKey: Key.liveActivitiesEnabled.rawValue) == nil else { return }
+        let previousType = LiveActivityType(rawValue: integer(forKey: Key.liveActivityType.rawValue)) ?? .disabled
+
+        // store enablement before replacing Disabled with the initial Normal style
+        set(previousType != .disabled, forKey: Key.liveActivitiesEnabled.rawValue)
+        if previousType == .disabled {
+            set(LiveActivityType.normal.rawValue, forKey: Key.liveActivityType.rawValue)
         }
     }
 

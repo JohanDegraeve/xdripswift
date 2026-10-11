@@ -1834,7 +1834,7 @@ struct TroubleshootingLogAppInfo: Equatable {
             integrationLines: [
                 "Nightscout uploads: \(nightscoutUploadsEnabled ? "Enabled" : "Disabled")",
                 "Apple Health: \(defaults.storeReadingsInHealthkit ? "Enabled" : "Disabled")",
-                "Live Activity: \(defaults.liveActivityType.debugDescription)",
+                "Live Activity: \(defaults.liveActivitiesEnabled ? defaults.liveActivityType.debugDescription : "Disabled")",
                 "Calendar sharing: \(defaults.createCalendarEvent ? "Enabled" : "Disabled")",
                 "OS-AID sharing: \(osAidDescription)"
             ]

@@ -633,3 +633,8 @@
 "therapy.scaleStandard" = "Standard";
 "therapy.scaleSmallDoses" = "Petites d.";
 "therapy.treatmentScaleExplanation" = "«Petites d.» rend les petits marqueurs plus visibles. Bolus : 0.1–2.0U ; glucides : 1–50g. Au-delà, les marqueurs ont la taille maximale.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimal";
+"settingsviews_liveActivityTypeNormal" = "Normal";
+"settingsviews_liveActivityTypeLarge" = "Grand";

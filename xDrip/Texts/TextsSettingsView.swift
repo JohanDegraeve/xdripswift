@@ -92,14 +92,6 @@ class Texts_SettingsView {
     
     // MARK: - Notifications
         
-    static let labelLiveActivityType: String = {
-        return NSLocalizedString("settingsviews_labelLiveActivityType", tableName: filename, bundle: Bundle.main, value: "Live Activities", comment: "notification settings, type of live activities that should be enabled")
-    }()
-    
-    static let liveActivityTypeDisabled: String = {
-        return NSLocalizedString("settingsviews_liveActivityTypeDisabled", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "notification settings, disable live activities")
-    }()
-    
     static let liveActivityDisabledInFollowerMode: String = {
         return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerMode", tableName: filename, bundle: Bundle.main, value: "Disabled in follower mode", comment: "notification settings, live activities are not available in follower mode")
     }()

@@ -534,3 +534,8 @@
 "therapy.scaleStandard" = "Estándar";
 "therapy.scaleSmallDoses" = "Dosis bajas";
 "therapy.treatmentScaleExplanation" = "«Dosis bajas» hace más visibles los marcadores pequeños. Bolos: 0.1–2.0U; HC: 1–50g. Cantidades mayores usan el marcador más grande.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Mínimo";
+"settingsviews_liveActivityTypeNormal" = "Normal";
+"settingsviews_liveActivityTypeLarge" = "Grande";
