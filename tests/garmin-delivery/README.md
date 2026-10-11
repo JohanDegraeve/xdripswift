@@ -29,7 +29,7 @@ docker run --rm --network none --user "$(id -u):$(id -g)" \
   -v "$PWD:/src:ro" -w /src swift:6.3.3-noble bash tests/garmin-delivery/run.sh
 ```
 
-## macOS / real SDK build — pending for this branch
+## macOS / real SDK build
 
 ```sh
 bash tests/garmin-delivery/run-macos.sh
@@ -89,5 +89,10 @@ background only. Do not check off these rows based on those older results.
 On 2026-10-11 all 40 standalone tests passed on Linux with the official
 `swift:6.3.3-noble` image (Swift 5 language mode). The container image digest was
 `sha256:cd45c27b3abc42310c33cfaf3008b18156cbdc9187834c9617e8f43a26d2675c`.
-Xcode package resolution, full iOS compilation, upstream XCTest and all physical
-scenarios above remain pending. No GitHub workflow was started for this branch.
+On 2026-10-11, GitHub Actions also passed all 40 tests on macOS and the full unsigned
+iPhone build with Xcode 26.2 / real Connect IQ 1.8.0. Completed simulator comparison:
+Garmin branch 555/563 passed, upstream baseline 554/563 passed; all eight Garmin
+failures also occurred in upstream. The baseline required the same empty-build-path
+normalization already in the PR. [Full evidence and limitations](../../docs/garmin-macos-verification.md).
+All physical scenarios above remain pending. Only verification workflows on a
+separate fork branch were run; no signing or distribution workflow was invoked.

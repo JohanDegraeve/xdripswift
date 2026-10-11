@@ -197,10 +197,12 @@ packet/sequence/queue/lifecycle code and manager with fake app dependencies. Run
 whole iOS application. The latter script does not upload, sign or install a build.
 See [the test and hardware checklist](../tests/garmin-delivery/README.md).
 
-The current clean branch has not yet been built with Xcode or run on a physical
-iPhone/Garmin pair. Earlier personal-branch successes are not evidence for this
-branch. In particular, physical Fenix behavior and unattended background delivery
-remain unverified.
+The unsigned iPhone build with Xcode 26.2 and the real Connect IQ SDK passed on
+2026-10-11, along with all 40 standalone Garmin tests on macOS. The full simulator
+suite had 555 passes and 8 failures; all 8 also failed on the upstream baseline
+(554 passes, 9 failures). See [exact commits, runs and comparison limits](garmin-macos-verification.md).
+Physical iPhone/Garmin tests, Fenix behavior and unattended background delivery
+remain unverified. Earlier personal-branch successes are not validation of this branch.
 
 ## References
 
