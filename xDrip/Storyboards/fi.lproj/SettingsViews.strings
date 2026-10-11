@@ -41,9 +41,7 @@
 "settingsviews_alert_types_section_footer" = "Hälytystyypit määrittävät, miten hälytykset toimivat, mukaan lukien ääni, värinä, torkku ja mykistyksen ohitus.";
 "settingsviews_alerts_section_footer" = "Hälytykset määrittävät, milloin sovelluksen tulee ilmoittaa glukoositasoista, puuttuvista lukemista ja muista tilanteista.";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Kirjoita Apple Healthiin";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Lähetä";
 "settingsviews_dexcomShareUploadSerialNumber" = "Vastaanottimen sarjanumero";
 "settingsviews_useUSDexcomShareurl" = "US-palvelimet";
 "settingsviews_dexcomShareAccountName" = "Käyttäjätunnus";
@@ -52,7 +50,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Anna Dexcom vastaanottimen sarjanumero";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Lähetysasetukset";
-"settingsviews_nightscoutEnabled" = "Ota Nightscout käyttöön";
 "settingsviews_nightscoutUrl" = "URL";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Ota aikataulu käyttöön";
@@ -608,3 +605,6 @@
 "settingsviews_liveActivityTypeMinimal" = "Minimaalinen";
 "settingsviews_liveActivityTypeNormal" = "Normaali";
 "settingsviews_liveActivityTypeLarge" = "Suuri";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Lähetys Dexcom Shareen";

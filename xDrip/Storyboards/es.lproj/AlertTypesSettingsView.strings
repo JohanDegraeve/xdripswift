@@ -1,7 +1,6 @@
 "alerttypessettingsview_screentitle" = "Tipos de Alarma";
 "alerttypesettingsview_screentitle" = "Editar Tipo de Alarma";
 "alerttypesettingsview_name" = "Nombre";
-"alerttypesettingsview_enabled" = "Habilitado";
 "alerttypesettingsview_vibrate" = "Vibración";
 "alerttypesettingsview_snoozevianotification" = "Permitir Silenciar Via Notificación";
 "alerttypesettingsview_defaultsnoozeperiod" = "Tiempo de Silencio Por Defecto";

@@ -1,7 +1,6 @@
 "alerttypessettingsview_screentitle" = "Alarm Types";
 "alerttypesettingsview_screentitle" = "Bewerk Alarm Type";
 "alerttypesettingsview_name" = "Naam";
-"alerttypesettingsview_enabled" = "Ingeschakeld";
 "alerttypesettingsview_vibrate" = "Vibreren";
 "alerttypesettingsview_snoozevianotification" = "Sta Sluimeren Via Notificatie Toe";
 "alerttypesettingsview_defaultsnoozeperiod" = "Standaard Sluimer Tijd";

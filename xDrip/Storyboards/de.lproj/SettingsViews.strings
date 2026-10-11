@@ -3,7 +3,6 @@
 "emailbodyText" = "Problem Beschreibung: ";
 
 /// dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no
-"settingsviews_uploadReadingstoDexcomShare" = "Upload";
 
 /// for text in pop up where user can select bg unit
 "settingsviews_selectbgunit" = "Blutzucker Einheit";
@@ -106,7 +105,6 @@
 "settingsviews_labelCalibrationType" = "Kalibrierungs Typ";
 
 /// healthkit settings, literally 'healthkit'
-"settingsviews_healthkit" = "In Apple Health schreiben";
 
 /// speak settings, section title
 
@@ -176,7 +174,6 @@
 "timeScheduleViewTitle" = "An/Aus für geplanten upload ";
 
 /// nightscout settings, where user can enable or disable nightscout
-"settingsviews_nightscoutEnabled" = "Nightscout aktivieren";
 
 /// alerting settings, section title
 "settingsviews_sectiontitlealerting" = "Alarms";
@@ -587,7 +584,6 @@
 
 "settingsviews_infoContactsAccessRestricted" = "Authorisierung von %@ zum Zugriff auf Kontakte nicht möglich. Möglicherweise sind Einschränkungen, bspw. Elternkontrolle, aktiv.";
 "settingsviews_contactImageSectionTitle" = "Kontaktbild";
-"settingsviews_enableContactImage" = "Kontaktbild";
 "settingsviews_displayTrendInContactImage" = "Trend";
 "settingsviews_contactImageCreatedByString" = "Kontakt automatisch erstellt von";
 "settingsviews_backupCreate" = "Backup erstellen";
@@ -796,3 +792,6 @@
 "settingsviews_liveActivityTypeMinimal" = "Minimal";
 "settingsviews_liveActivityTypeNormal" = "Normal";
 "settingsviews_liveActivityTypeLarge" = "Groß";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Dexcom Share-Upload";

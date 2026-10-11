@@ -70,7 +70,7 @@ class SettingsViewContactImageSettingsViewModel: NSObject, SettingsViewModelProt
         
         switch setting {
         case .enableContactImage:
-            return Texts_SettingsView.enableContactImage
+            return Texts_Common.enable
             
         case .displayTrend:
             return Texts_SettingsView.displayTrendInContactImage

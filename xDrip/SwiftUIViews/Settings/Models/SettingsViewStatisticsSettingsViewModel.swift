@@ -231,7 +231,7 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
         switch setting {
                 
             case .showStatistics:
-                return Texts_SettingsView.labelShowStatistics
+                return Texts_Common.enable
                     
             case .timeInRangeType:
                 return Texts_SettingsView.labelTimeInRangeType

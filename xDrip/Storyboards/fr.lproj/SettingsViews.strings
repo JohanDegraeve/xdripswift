@@ -45,9 +45,7 @@
 "settingsviews_alert_types_section_footer" = "Les types d'alarme définissent le comportement des alarmes, notamment le son, la vibration, le rappel et l'ignorance du mode silencieux.";
 "settingsviews_alerts_section_footer" = "Les alarmes définissent quand l'app doit vous avertir pour les niveaux de glucose, les lectures manquantes et d'autres conditions.";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Écrire dans Apple Health";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Envoyer";
 "settingsviews_dexcomShareUploadSerialNumber" = "Numéro de série du receveur";
 "settingsviews_useUSDexcomShareurl" = "Serveurs US";
 "settingsviews_dexcomShareAccountName" = "Nom du compte";
@@ -56,7 +54,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Entrer le numéro de série Dexcom Receiver";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Options d'envoi";
-"settingsviews_nightscoutEnabled" = "Connecter à Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Activer la planification";
@@ -638,3 +635,6 @@
 "settingsviews_liveActivityTypeMinimal" = "Minimal";
 "settingsviews_liveActivityTypeNormal" = "Normal";
 "settingsviews_liveActivityTypeLarge" = "Grand";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Envoi vers Dexcom Share";

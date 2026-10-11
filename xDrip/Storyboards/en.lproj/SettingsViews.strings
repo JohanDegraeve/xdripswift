@@ -116,9 +116,7 @@
 "settingsviews_alerts_section_footer" = "Alarms define when the app should notify you for glucose levels, missed readings and other conditions.";
 "settingsviews_prefer_large_snooze_screen" = "Large Snooze Screen";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Write to Apple Health";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Upload";
 "settingsviews_dexcomShareUploadSerialNumber" = "Receiver Serial Number";
 "settingsviews_useUSDexcomShareurl" = "US Servers";
 "settingsviews_dexcomShareAccountName" = "Account Name";
@@ -127,7 +125,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Enter the Dexcom Receiver Serial Number";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Upload Options";
-"settingsviews_nightscoutEnabled" = "Enable Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Enable Schedule";
@@ -168,7 +165,6 @@
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calendar events";
 "settingsviews_infoContactsAccessRestricted" = "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.";
 "settingsviews_contactImageSectionTitle" = "Contact Image";
-"settingsviews_enableContactImage" = "Contact Image";
 "settingsviews_displayTrendInContactImage" = "Trend";
 "settingsviews_contactImageCreatedByString" = "Contact automatically created by";
 "sectionTitleTrace" = "Issue Reporting";
@@ -531,6 +527,9 @@
 "therapy.scaleStandard" = "Standard";
 "therapy.scaleSmallDoses" = "Small Doses";
 "therapy.treatmentScaleExplanation" = "Small Doses makes small treatment markers easier to see. Bolus markers scale from 0.1–2.0U and carb markers from 1–50g. Higher amounts use the largest marker.";
+
+/* Dexcom Share upload connection and activity */
+"settingsviews_dexcomShareUploadSectionTitle" = "Dexcom Share Upload";
 
 /* Live Activity styles */
 "settingsviews_liveActivityTypeMinimal" = "Minimal";

@@ -1,7 +1,6 @@
 "alerttypessettingsview_screentitle" = "Types d'alerte";
 "alerttypesettingsview_screentitle" = "Editer le type d'alerte";
 "alerttypesettingsview_name" = "Nom";
-"alerttypesettingsview_enabled" = "Activer";
 "alerttypesettingsview_vibrate" = "Vibrer";
 "alerttypesettingsview_snoozevianotification" = "Snooze via Notification";
 "alerttypesettingsview_defaultsnoozeperiod" = "Durée Snooze";

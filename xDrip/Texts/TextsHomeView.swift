@@ -927,10 +927,6 @@ enum Texts_HomeView {
         return NSLocalizedString("postProcessingAdjustment", tableName: filename, bundle: Bundle.main, value: "Adjustment", comment: "post processing section title for adjustment")
     }()
 
-    static let postProcessingEnable: String = {
-        return NSLocalizedString("postProcessingEnable", tableName: filename, bundle: Bundle.main, value: "Enable", comment: "post processing enable toggle title")
-    }()
-
     static let postProcessingOffset: String = {
         return NSLocalizedString("postProcessingOffset", tableName: filename, bundle: Bundle.main, value: "Offset", comment: "post processing offset label")
     }()

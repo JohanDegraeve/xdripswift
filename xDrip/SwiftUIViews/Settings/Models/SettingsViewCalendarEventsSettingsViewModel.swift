@@ -182,7 +182,7 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
         switch setting {
             
         case .createCalendarEvent:
-            return "Enable"
+            return Texts_Common.enable
             
         case .calenderId:
             return Texts_SettingsView.calenderId

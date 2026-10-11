@@ -658,7 +658,7 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
         case .nightscoutEnabled:
-            return Texts_SettingsView.labelNightscoutEnabled
+            return Texts_Common.enable
         case .nightscoutFollowType:
             return Texts_SettingsView.labelNightscoutFollowType
         case .nightscoutUrl:

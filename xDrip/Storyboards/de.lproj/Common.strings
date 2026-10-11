@@ -220,3 +220,6 @@
 "common_statistics_estimatedA1cTrend" = "Trend geschätzte HbA1c";
 
 "common_statistics_estimatedA1c" = "Geschätzter HbA1c";
+
+/* Switch title when the surrounding screen or section identifies the feature */
+"common_enable" = "Aktivieren";

@@ -141,7 +141,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
             return [
                 SettingsRow(
                     id: "notifications.liveActivitiesEnabled",
-                    title: Texts_HomeView.postProcessingEnable,
+                    title: Texts_Common.enable,
                     control: .toggle(
                         isOn: { UserDefaults.standard.liveActivitiesEnabled },
                         setIsOn: { isOn in

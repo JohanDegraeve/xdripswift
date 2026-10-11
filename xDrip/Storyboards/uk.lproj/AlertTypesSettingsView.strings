@@ -40,7 +40,6 @@
 "alerttypesettingsview_vibrate" = "Vibrate";
 
 /// when editing an alert type, field title for Enabled
-"alerttypesettingsview_enabled" = "Enabled";
 
 /// when editing an alert type, field title for Snooze Via Notification
 "alerttypesettingsview_snoozevianotification" = "Allow Snooze Via Notification";

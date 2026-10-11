@@ -18,10 +18,6 @@ class Texts_AlertTypeSettingsView {
         return NSLocalizedString("alerttypesettingsview_name", tableName: filename, bundle: Bundle.main, value: "Name", comment: "when editing an alert type, field title for name")
     }()
 
-    static let alertTypeEnabled: String = {
-        return NSLocalizedString("alerttypesettingsview_enabled", tableName: filename, bundle: Bundle.main, value: "Enabled", comment: "when editing an alert type, field title for Enabled")
-    }()
-    
     static let alertTypeVibrate: String = {
         return NSLocalizedString("alerttypesettingsview_vibrate", tableName: filename, bundle: Bundle.main, value: "Vibrate", comment: "when editing an alert type, field title for Vibrate")
     }()

@@ -254,3 +254,6 @@
 "common_statistics_estimatedA1cTrend" = "Tendenza HbA1c stimata";
 
 "common_statistics_estimatedA1c" = "HbA1c stimata";
+
+/* Switch title when the surrounding screen or section identifies the feature */
+"common_enable" = "Abilita";

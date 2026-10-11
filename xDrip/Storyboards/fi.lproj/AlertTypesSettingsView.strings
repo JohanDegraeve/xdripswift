@@ -1,7 +1,6 @@
 "alerttypessettingsview_screentitle" = "Hälytystyypit";
 "alerttypesettingsview_screentitle" = "Muokkaa hälytystyyppiä";
 "alerttypesettingsview_name" = "Nimi";
-"alerttypesettingsview_enabled" = "Käytössä";
 "alerttypesettingsview_vibrate" = "Väristys";
 "alerttypesettingsview_snoozevianotification" = "Torkku notifikaation kautta";
 "alerttypesettingsview_defaultsnoozeperiod" = "Oletus torkkujakso";

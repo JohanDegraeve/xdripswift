@@ -84,3 +84,6 @@
 "common_statistics_a1c" = "HbA1c";
 
 "common_statistics_estimatedA1c" = "Beräknat HbA1c";
+
+/* Switch title when the surrounding screen or section identifies the feature */
+"common_enable" = "Aktivera";

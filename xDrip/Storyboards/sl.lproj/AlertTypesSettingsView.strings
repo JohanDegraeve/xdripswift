@@ -31,7 +31,6 @@
 "alerttypesettingsview_sound" = "Sound";
 
 /// when editing an alert type, field title for Enabled
-"alerttypesettingsview_enabled" = "Enabled";
 
 /// 
 "alertTypeNoSound" = "No Sound";

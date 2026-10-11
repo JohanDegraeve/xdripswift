@@ -1,7 +1,6 @@
 "alerttypessettingsview_screentitle" = "Typ av larm";
 "alerttypesettingsview_screentitle" = "Ändra larmtyp";
 "alerttypesettingsview_name" = "Namn";
-"alerttypesettingsview_enabled" = "På";
 "alerttypesettingsview_vibrate" = "Vibrera";
 "alerttypesettingsview_snoozevianotification" = "Tillåt Snoozande via notis";
 "alerttypesettingsview_defaultsnoozeperiod" = "Standard Snooza-tid";

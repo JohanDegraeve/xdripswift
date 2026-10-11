@@ -194,6 +194,3 @@
 "noSensorCodeSelectedTitle" = "Fortsätta utan sensorkod?";
 "noSensorCodeSelectedMessage" = "Om en sensorsession redan är aktiv på sändaren använder appen den sessionen med dess befintliga kalibreringskrav.\n\nEn ny session utan kod kräver kalibreringar efter uppvärmningen och därefter regelbundet. Kraven försvinner inte om appens kalibreringspåminnelse stängs av.";
 "showHideGlucoseChartTitle" = "Diagram";
-
-/* Enable toggle title */
-"postProcessingEnable" = "Aktivera";

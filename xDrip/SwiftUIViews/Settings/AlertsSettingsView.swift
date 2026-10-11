@@ -486,7 +486,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
     func title(for setting: AlertEntryEditorSetting) -> String {
         switch setting {
         case .isDisabled:
-            return Texts_Common.enabled
+            return Texts_Common.enable
         case .start:
             return Texts_Alerts.alertStart
         case .alertType:

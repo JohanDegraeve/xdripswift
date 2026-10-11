@@ -644,18 +644,15 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_sectiontitlehealthkit", tableName: filename, bundle: Bundle.main, value: "Apple Health", comment: "healthkit settings, section title")
     }()
     
-    static let labelHealthKit: String = {
-        return NSLocalizedString("settingsviews_healthkit", tableName: filename, bundle: Bundle.main, value: "Write to Apple Health", comment: "healthkit settings, literally 'healthkit'")
-    }()
-    
     // MARK: - Section Dexcom Share (including Share Follower)
     
+    // keep the upload section explicit without changing the navigation title
+    static let dexcomShareUploadSectionTitle = {
+        return NSLocalizedString("settingsviews_dexcomShareUploadSectionTitle", tableName: filename, bundle: Bundle.main, value: "Dexcom Share Upload", comment: "section heading for the Dexcom Share upload enable switch; navigation titles remain Dexcom Share")
+    }()
+
     static let sectionTitleDexcomShareUpload: String = {
         return NSLocalizedString("settingsviews_sectiontitledexcomshareupload", tableName: filename, bundle: Bundle.main, value: "Dexcom Share", comment: "dexcom share upload settings, section title")
-    }()
-    
-    static let labelUploadReadingstoDexcomShare = {
-        return NSLocalizedString("settingsviews_uploadReadingstoDexcomShare", tableName: filename, bundle: Bundle.main, value: "Upload", comment: "dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no")
     }()
     
     static let labelUploadReadingstoDexcomShareDisabledMessage = {
@@ -696,10 +693,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_nightscoutUploadOptionsSectionTitle", tableName: filename, bundle: Bundle.main, value: "Upload Options", comment: "nightscout settings, section title for upload options")
     }()
     
-    static let labelNightscoutEnabled = {
-        return NSLocalizedString("settingsviews_nightscoutEnabled", tableName: filename, bundle: Bundle.main, value: "Enable Nightscout", comment: "nightscout settings, where user can enable or disable nightscout")
-    }()
-
     static let labelNightscoutUrl = {
         return NSLocalizedString("settingsviews_nightscoutUrl", tableName: filename, bundle: Bundle.main, value: "URL:", comment: "nightscout settings, where user can set the nightscout url")
     }()
@@ -1027,10 +1020,6 @@ class Texts_SettingsView {
     
     static let contactImageSectionTitle: String = {
         return NSLocalizedString("settingsviews_contactImageSectionTitle", tableName: filename, bundle: Bundle.main, value: "Contact Image", comment: "Contact Image - section title")
-    }()
-    
-    static let enableContactImage: String = {
-        return NSLocalizedString("settingsviews_enableContactImage", tableName: filename, bundle: Bundle.main, value: "Contact Image", comment: "Contact Image Settings - text in row where contact image is enabled or disabled ")
     }()
     
     static let displayTrendInContactImage: String = {

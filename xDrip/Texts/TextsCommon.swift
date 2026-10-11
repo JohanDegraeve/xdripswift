@@ -523,6 +523,11 @@ class Texts_Common {
         return NSLocalizedString("common_dontshowagain", tableName: filename, bundle: Bundle.main, value: "Don't Show Again", comment: "don't show again")
     }()
     
+    // use the feature name from the surrounding screen or section for these switches
+    static let enable = {
+        return NSLocalizedString("common_enable", tableName: filename, bundle: Bundle.main, value: "Enable", comment: "switch title when the surrounding screen or section identifies the feature")
+    }()
+
     static let enabled = {
         return NSLocalizedString("common_enabled", tableName: filename, bundle: Bundle.main, value: "Enabled", comment: "enabled")
     }()

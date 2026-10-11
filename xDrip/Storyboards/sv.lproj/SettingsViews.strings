@@ -57,9 +57,7 @@
 "settingsviews_alert_types_section_footer" = "Larmtyper definierar hur larm beter sig, inklusive ljud, vibration, snooze och åsidosättning av tyst läge.";
 "settingsviews_alerts_section_footer" = "Larm definierar när appen ska meddela dig om glukosnivåer, saknade avläsningar och andra tillstånd.";
 "settingsviews_sectiontitlehealthkit" = "Apple Hälsa";
-"settingsviews_healthkit" = "Skriv till Apple Hälsa";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Ladda upp";
 "settingsviews_dexcomShareUploadSerialNumber" = "Sändarens serienummer";
 "settingsviews_useUSDexcomShareurl" = "US-servrar";
 "settingsviews_dexcomShareAccountName" = "Användarnamn";
@@ -68,7 +66,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Ange Dexcom mottagares serienummer";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Uppladdningsalternativ";
-"settingsviews_nightscoutEnabled" = "Slå på Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Aktivera schema";
@@ -596,3 +593,6 @@
 "settingsviews_liveActivityTypeMinimal" = "Minimal";
 "settingsviews_liveActivityTypeNormal" = "Normal";
 "settingsviews_liveActivityTypeLarge" = "Stor";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Uppladdning till Dexcom Share";

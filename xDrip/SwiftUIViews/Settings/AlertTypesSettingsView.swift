@@ -235,7 +235,7 @@ final class AlertTypeEditorViewModel: ObservableObject {
     func title(for setting: AlertTypeEditorSetting) -> String {
         switch setting {
         case .enabled:
-            return Texts_AlertTypeSettingsView.alertTypeEnabled
+            return Texts_Common.enable
         case .name:
             return Texts_AlertTypeSettingsView.alertTypeName
         case .vibrate:

@@ -59,9 +59,7 @@
 "settingsviews_alert_types_section_footer" = "Οι Τύποι Συναγερμού ορίζουν πώς λειτουργούν οι συναγερμοί, συμπεριλαμβανομένων ήχου, δόνησης, αναβολής και παράκαμψης σίγασης.";
 "settingsviews_alerts_section_footer" = "Οι Συναγερμοί ορίζουν πότε η εφαρμογή πρέπει να σας ειδοποιεί για επίπεδα γλυκόζης, χαμένες μετρήσεις και άλλες συνθήκες.";
 "settingsviews_sectiontitlehealthkit" = "Apple Health (Υγεία)";
-"settingsviews_healthkit" = "Εγγραφή στο Apple Health";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Μεταφόρτωση";
 "settingsviews_dexcomShareUploadSerialNumber" = "Σειριακός αριθμός δέκτη";
 "settingsviews_useUSDexcomShareurl" = "Διακομιστές US";
 "settingsviews_dexcomShareAccountName" = "Όνομα λογαριασμού";
@@ -70,7 +68,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Εισαγάγετε τον σειριακό αριθμό του δέκτη Dexcom";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Επιλογές μεταφόρτωσης";
-"settingsviews_nightscoutEnabled" = "Ενεργοποίηση του Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Ενεργοποίηση χρονοδιαγράμματος";
@@ -542,3 +539,6 @@
 "settingsviews_liveActivityTypeMinimal" = "Ελάχιστο";
 "settingsviews_liveActivityTypeNormal" = "Κανονικό";
 "settingsviews_liveActivityTypeLarge" = "Μεγάλο";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Μεταφόρτωση στο Dexcom Share";

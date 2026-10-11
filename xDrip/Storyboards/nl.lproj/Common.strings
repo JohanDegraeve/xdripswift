@@ -144,3 +144,6 @@
 "common_statistics_estimatedA1cTrend" = "Trend geschatte HbA1c";
 
 "common_statistics_estimatedA1c" = "Geschatte HbA1c";
+
+/* Switch title when the surrounding screen or section identifies the feature */
+"common_enable" = "Inschakelen";

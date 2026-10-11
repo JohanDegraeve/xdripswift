@@ -160,3 +160,6 @@
 "common_statistics_a1c" = "HbA1c";
 
 "common_statistics_estimatedA1c" = "估算 HbA1c";
+
+/* Switch title when the surrounding screen or section identifies the feature */
+"common_enable" = "启用";

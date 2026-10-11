@@ -30,7 +30,6 @@
 "settingsviews_alerts_section_footer" = "警报定义应用何时针对血糖水平、缺失读数和其他情况通知你。";
 "settingsviews_sectiontitlehealthkit" = "苹果健康";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "上传";
 "settingsviews_dexcomShareUploadSerialNumber" = "序列号";
 "settingsviews_givedexcomShareUploadSerialNumber" = "输入Dexcom Share 序列号";
 "settingsviews_useUSDexcomShareurl" = "使用美国德康服务器";
@@ -39,7 +38,6 @@
 "settingsviews_giveDexcomSharePassword" = "输入Dexcom APP密码";
 "settingsviews_sectiontitlenightscout" = "Nightscout远程监控";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "上传选项";
-"settingsviews_nightscoutEnabled" = "Nightscout 已启用";
 "settingsviews_nightscoutUrl" = "Url(网址)";
 "settingsviews_giveNightscoutUrl" = "输入 Nightscout 网址";
 "settingsviews_nightscoutAPIKey" = "API 密钥";
@@ -174,7 +172,6 @@
 "volumeTestSoundPlayer" = "静音模式开启时";
 
 /// healthkit settings, literally 'healthkit'
-"settingsviews_healthkit" = "写入 Apple Health";
 
 /// bluetooth settings, section title - also used in bluetooth peripheral view, eg when viewing M5Stack details. This is the title of the first section
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
@@ -747,3 +744,6 @@
 "settingsviews_liveActivityTypeMinimal" = "精简";
 "settingsviews_liveActivityTypeNormal" = "标准";
 "settingsviews_liveActivityTypeLarge" = "大";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Dexcom Share 上传";

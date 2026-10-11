@@ -27,6 +27,10 @@ class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol 
     
     // MARK: - Native SwiftUI rows
 
+    func settingsSectionTitle() -> String? {
+        return Texts_SettingsView.dexcomShareUploadSectionTitle
+    }
+
     func settingsRows(sectionID: Int) -> [SettingsRow] {
         let uploadEnabled = UserDefaults.standard.uploadReadingstoDexcomShare
 
@@ -132,7 +136,7 @@ class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol 
         
         switch setting {
         case .uploadReadingstoDexcomShare:
-            return Texts_SettingsView.labelUploadReadingstoDexcomShare
+            return Texts_Common.enable
         case .dexcomSharePassword:
             return Texts_Common.password
         case .dexcomShareUploadSerialNumber:

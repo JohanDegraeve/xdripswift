@@ -68,7 +68,7 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
             rows: [
                 SettingsRow(
                     id: "speak.schedule",
-                    title: Texts_SettingsView.enableSchedule,
+                    title: Texts_Common.enable,
                     control: .toggle(
                         isOn: { UserDefaults.standard.speakReadingsScheduleEnabled },
                         setIsOn: { UserDefaults.standard.speakReadingsScheduleEnabled = $0 }
@@ -176,7 +176,7 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         
         switch setting {
         case .speakBgReadings:
-            return Texts_SettingsView.labelSpeakBgReadings
+            return Texts_Common.enable
         case .speakBgReadingLanguage:
             return Texts_SettingsView.labelSpeakLanguage
         case .speakTrend:
