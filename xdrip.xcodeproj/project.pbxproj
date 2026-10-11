@@ -825,6 +825,13 @@
 		F8FDFEAD260DE1B90047597D /* ConstantsUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */; };
 		FBA100020000000000000001 /* FollowerBackgroundKeepAliveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA100010000000000000001 /* FollowerBackgroundKeepAliveManager.swift */; };
 		FBA100040000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */; };
+		A9A000210000000000000001 /* GarminModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A000110000000000000001 /* GarminModels.swift */; };
+		A9A000220000000000000001 /* GarminTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A000120000000000000001 /* GarminTransport.swift */; };
+		A9A000230000000000000001 /* GarminBackgroundWork.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A000130000000000000001 /* GarminBackgroundWork.swift */; };
+		A9A000240000000000000001 /* ConnectIQTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A000140000000000000001 /* ConnectIQTransport.swift */; };
+		A9A000250000000000000001 /* GarminManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A000150000000000000001 /* GarminManager.swift */; };
+		A9A000260000000000000001 /* SettingsViewGarminSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A000160000000000000001 /* SettingsViewGarminSettingsViewModel.swift */; };
+		A9A000330000000000000001 /* ConnectIQ in Frameworks */ = {isa = PBXBuildFile; productRef = A9A000320000000000000001 /* ConnectIQ */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2029,6 +2036,12 @@
 		F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsUI.swift; sourceTree = "<group>"; };
 		FBA100010000000000000001 /* FollowerBackgroundKeepAliveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBackgroundKeepAliveManager.swift; sourceTree = "<group>"; };
 		FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBackgroundKeepAliveManagerTests.swift; sourceTree = "<group>"; };
+		A9A000110000000000000001 /* GarminModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarminModels.swift; sourceTree = "<group>"; };
+		A9A000120000000000000001 /* GarminTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarminTransport.swift; sourceTree = "<group>"; };
+		A9A000130000000000000001 /* GarminBackgroundWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarminBackgroundWork.swift; sourceTree = "<group>"; };
+		A9A000140000000000000001 /* ConnectIQTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectIQTransport.swift; sourceTree = "<group>"; };
+		A9A000150000000000000001 /* GarminManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarminManager.swift; sourceTree = "<group>"; };
+		A9A000160000000000000001 /* SettingsViewGarminSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewGarminSettingsViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2080,12 +2093,25 @@
 				F81F3C4225D1D91300520946 /* CoreNFC.framework in Frameworks */,
 				F821CF9722AE589E005C1E43 /* HealthKit.framework in Frameworks */,
 				47DE41AA2B860DF00041DA19 /* WatchConnectivity.framework in Frameworks */,
+				A9A000330000000000000001 /* ConnectIQ in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A9A000010000000000000001 /* Garmin */ = {
+			isa = PBXGroup;
+			children = (
+				A9A000110000000000000001 /* GarminModels.swift */,
+				A9A000120000000000000001 /* GarminTransport.swift */,
+				A9A000130000000000000001 /* GarminBackgroundWork.swift */,
+				A9A000140000000000000001 /* ConnectIQTransport.swift */,
+				A9A000150000000000000001 /* GarminManager.swift */,
+			);
+			path = Garmin;
+			sourceTree = "<group>";
+		};
 		065EEDCFBA12133E67945FEA /* CareLink */ = {
 			isa = PBXGroup;
 			children = (
@@ -2672,6 +2698,7 @@
 				47DB06C12A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift */,
 				F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */,
 				F8B3A839227F090D004BA588 /* SettingsViewDexcomShareSettingsViewModel.swift */,
+				A9A000160000000000000001 /* SettingsViewGarminSettingsViewModel.swift */,
 				F8B3A83C227F090D004BA588 /* SettingsViewHealthKitSettingsViewModel.swift */,
 				F8D0587B24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift */,
 				D41F32912827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift */,
@@ -2958,6 +2985,7 @@
 				F81D6D4622BD5F43005EFAE2 /* DexcomShare */,
 				47DB06CC2A7013EF00267BE3 /* Followers */,
 				F821CF9122ADB064005C1E43 /* HealthKit */,
+				A9A000010000000000000001 /* Garmin */,
 				47DB06DB2A7136E900267BE3 /* LibreLinkUp */,
 				4716A5122B41CA9C00419052 /* LiveActivity */,
 				F8E51D5B2448D8A3001C9E5A /* Loop */,
@@ -3964,6 +3992,7 @@
 			);
 			name = xdrip;
 			packageProductDependencies = (
+				A9A000320000000000000001 /* ConnectIQ */,
 			);
 			productName = xdrip;
 			productReference = F8AC425A21ADEBD60078C348 /* xdrip.app */;
@@ -4038,6 +4067,7 @@
 			);
 			mainGroup = F8AC425121ADEBD60078C348;
 			packageReferences = (
+				A9A000310000000000000001 /* XCRemoteSwiftPackageReference "connectiq-companion-app-sdk-ios" */,
 			);
 			productRefGroup = F8AC425B21ADEBD60078C348 /* Products */;
 			projectDirPath = "";
@@ -4454,6 +4484,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9A000210000000000000001 /* GarminModels.swift in Sources */,
+				A9A000220000000000000001 /* GarminTransport.swift in Sources */,
+				A9A000230000000000000001 /* GarminBackgroundWork.swift in Sources */,
+				A9A000240000000000000001 /* ConnectIQTransport.swift in Sources */,
+				A9A000250000000000000001 /* GarminManager.swift in Sources */,
+				A9A000260000000000000001 /* SettingsViewGarminSettingsViewModel.swift in Sources */,
 				5A0100023015000100000001 /* GlucoseRangeDistribution.swift in Sources */,
 				4D7A00023014000100000001 /* TroubleshootingLog.swift in Sources */,
 				4D7A00043014000100000001 /* TroubleshootingLogView.swift in Sources */,
@@ -5518,6 +5554,25 @@
 		};
 /* End PBXVariantGroup section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		A9A000310000000000000001 /* XCRemoteSwiftPackageReference "connectiq-companion-app-sdk-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/garmin/connectiq-companion-app-sdk-ios";
+			requirement = {
+				kind = exactVersion;
+				version = 1.8.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A9A000320000000000000001 /* ConnectIQ */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9A000310000000000000001 /* XCRemoteSwiftPackageReference "connectiq-companion-app-sdk-ios" */;
+			productName = ConnectIQ;
+		};
+/* End XCSwiftPackageProductDependency section */
+
 /* Begin XCBuildConfiguration section */
 		4716A4FF2B406C3F00419052 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -5911,15 +5966,12 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				OBJROOT = "";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				SHARED_PRECOMPS_DIR = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SYMROOT = "";
 			};
 			name = Debug;
 		};
@@ -5974,13 +6026,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				OBJROOT = "";
 				SDKROOT = iphoneos;
-				SHARED_PRECOMPS_DIR = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SYMROOT = "";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;

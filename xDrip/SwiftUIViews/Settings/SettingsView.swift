@@ -759,6 +759,23 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     }
                 ),
                 SettingsGroupedRow(
+                    id: "sharingServices.garminWatch",
+                    title: Texts_SettingsView.garminWatchSectionTitle,
+                    detail: {
+                        garminWatchParentDetail()
+                    },
+                    detailIndicator: {
+                        garminWatchParentIndicator()
+                    },
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.garminWatchSectionTitle,
+                            introduction: { Texts_SettingsView.garminWatchIntroduction },
+                            providers: { [SettingsViewGarminSettingsViewModel()] }
+                        )
+                    }
+                ),
+                SettingsGroupedRow(
                     id: "sharingServices.calendarEvents",
                     title: Texts_SettingsView.calendarEventsSectionTitle,
                     isEnabled: {
@@ -854,6 +871,20 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     }
                 )
             ]
+        )
+    }
+
+    private static func garminWatchParentDetail() -> String? {
+        guard UserDefaults.standard.garminWatchEnabled else { return nil }
+        let manager = GarminManager.shared
+        guard manager.selectedDevice != nil else { return Texts_SettingsView.garminWatchNotConfigured }
+        return manager.isConnected ? Texts_SettingsView.garminWatchConnected : Texts_SettingsView.garminWatchDisconnected
+    }
+
+    private static func garminWatchParentIndicator() -> SettingsIndicator? {
+        guard UserDefaults.standard.garminWatchEnabled else { return nil }
+        return SettingsIndicator(
+            color: GarminManager.shared.isConnected ? ConstantsAppColors.normal : ConstantsAppColors.urgent
         )
     }
 
