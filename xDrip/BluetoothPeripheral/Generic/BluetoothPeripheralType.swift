@@ -21,7 +21,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
     
     /// bubble
     case BubbleType = "Nano/Bubble/Bubble Mini"
-    
+
+    /// Ottai / Syai CGM
+    case OttaiType = "Ottai/Syai CGM"
+
     /// 2026-08-13: G5 remains supported for existing devices, but is no longer
     /// advertised as an option when adding a new Dexcom transmitter.
     case DexcomType = "Dexcom G6/ONE"
@@ -59,7 +62,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .BubbleType:
             return Bubble(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
-            
+
+        case .OttaiType:
+            return Ottai(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+
         case .MiaoMiaoType:
             return MiaoMiao(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
@@ -93,7 +99,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .M5StackType, .M5StickCType:
             return .M5Stack
             
-        case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type, .MedtrumTouchCareNanoType:
+        case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type, .OttaiType, .MedtrumTouchCareNanoType:
             return .CGM
 
         case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:

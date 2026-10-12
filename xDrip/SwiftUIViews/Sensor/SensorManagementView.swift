@@ -579,7 +579,10 @@ struct SensorManagementView: View {
 
         switch sensorType {
         case .Libre:
-            warmupMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
+            // Ottai/Syai maps to the Libre sensor type but has its own 30-minute warm-up
+            warmupMinutes = transmitter?.cgmTransmitterType() == .ottai
+                ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesOttai
+                : ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
         case .Dexcom:
             if transmitterType == .dexcomG7 {
                 warmupMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG7

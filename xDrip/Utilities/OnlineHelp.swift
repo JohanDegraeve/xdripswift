@@ -394,6 +394,10 @@ extension BluetoothPeripheralType {
             return .dexcomG7OnePlusStelo
         case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
             return .followerHeartbeat
+        case .OttaiType:
+            // No dedicated documentation page exists for the Ottai/Syai driver, so fall back to
+            // the generic "add a direct CGM" overview.
+            return .addDirectCGM
         case .MedtrumTouchCareNanoType:
             return .medtrumNano
         }

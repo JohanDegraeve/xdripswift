@@ -41,7 +41,10 @@ enum ConstantsLog {
     
     /// Libre2
     static let categoryCGMLibre2 =                          "Libre2                        "
-    
+
+    /// Ottai / Syai CGM
+    static let categoryCGMOttai =                           "CGMOttai                      "
+
     /// core data manager
     static let categoryCoreDataManager =                    "CoreDataManager               "
 
