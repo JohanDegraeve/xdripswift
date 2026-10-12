@@ -138,8 +138,12 @@ enum OttaiSyaiClient {
                       headers: ["timestamp": ts], productModel: true)
     }
 
-    static func uploadGlucose(_ body: [String: Any]) -> [String: Any]? {
-        authed("POST", path: uploadPath, body: body, absolute: true)
+    static func uploadGlucose(_ body: [String: Any], expectedUserId: String? = nil) -> [String: Any]? {
+        gate.lock(); defer { gate.unlock() }
+        if let expectedUserId = expectedUserId, userId != expectedUserId {
+            return fail("Syai account changed before upload")
+        }
+        return authed("POST", path: uploadPath, body: body, absolute: true)
     }
 
     // MARK: - session (access token refresh, one retry after an auth error)

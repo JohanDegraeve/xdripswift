@@ -13,7 +13,7 @@ import os
 final class OttaiCloudUploader {
 
     /// One reading, with the raw fields the Syai server wants.
-    struct Sample {
+    struct Sample: Codable {
         let dataNo: Int
         let runtimeSec: Int
         let voltage: Int
@@ -58,10 +58,12 @@ final class OttaiCloudUploader {
 
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMOttai)
     private let sensorId: String
-    private let queue = DispatchQueue(label: "OttaiCloudUploader.work")
-
-    private var pending: [Sample] = []
-    private var uploadedDataNos = Set<Int>()
+    // All instances share the queue and store, including briefly overlapping transmitters.
+    private static let workQueue = DispatchQueue(label: "OttaiCloudUploader.work")
+    private static var stores: [String: OttaiUploadOutbox] = [:]
+    private var queue: DispatchQueue { Self.workQueue }
+    private var outbox: OttaiUploadOutbox?
+    private var boundAccount: String?
     private var flushWork: DispatchWorkItem?
     private var inFlight = false
     private var retryDelay: TimeInterval = OttaiCloudUploader.firstRetryDelay
@@ -71,7 +73,28 @@ final class OttaiCloudUploader {
     private var bindNotice: String?
 
     init(sensorId: String) {
-        self.sensorId = sensorId
+        self.sensorId = OttaiConstants.canonicalSensorId(sensorId)
+        queue.async { [self] in scheduleFlush(after: Self.flushDelay) }
+    }
+
+    private func loadOutbox() throws -> OttaiUploadOutbox {
+        if let outbox = outbox { return outbox }
+        if let stored = Self.stores[sensorId] {
+            outbox = stored
+            return stored
+        }
+        let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask,
+                                                    appropriateFor: nil, create: true)
+            .appendingPathComponent("OttaiUploadOutbox", isDirectory: true)
+        let store = try OttaiUploadOutbox(url: directory.appendingPathComponent(sensorId + ".json"))
+        Self.stores[sensorId] = store
+        outbox = store
+        return store
+    }
+
+    private static var accountId: String {
+        guard OttaiRegistry.loadApiBase() == OttaiConstants.apiBaseSyai else { return "" }
+        return OttaiRegistry.loadUserId()
     }
 
     // MARK: - is the upload possible?
@@ -101,16 +124,15 @@ final class OttaiCloudUploader {
             originBytes: reading.record.recordBytes,
             live: live
         )
-        queue.async { [weak self] in
-            guard let self = self else { return }
-            if self.uploadedDataNos.contains(sample.dataNo) { return }
-            if let i = self.pending.firstIndex(where: { $0.dataNo == sample.dataNo }) {
-                self.pending[i] = sample
-            } else {
-                self.pending.append(sample)
-                if self.pending.count > Self.maxPending {
-                    self.pending.removeFirst(self.pending.count - Self.maxPending)
-                }
+        let account = Self.accountId
+        // Called on the transmitter's work queue. Finish persistence before it can
+        // advance xDrip's delivered watermark, otherwise a crash can still lose uploads.
+        queue.sync {
+            do {
+                try loadOutbox().enqueue(sample, account: account, limit: Self.maxPending)
+            } catch {
+                fail("Could not save upload queue: \(error.localizedDescription)")
+                return
             }
             // Only wait the short delay when no retry is already scheduled.
             if !self.inFlight && self.flushWork == nil {
@@ -133,18 +155,49 @@ final class OttaiCloudUploader {
     }
 
     private func flush() {
-        guard !inFlight, !pending.isEmpty else { return }
+        guard !inFlight else { return }
+        let store: OttaiUploadOutbox
+        do {
+            store = try loadOutbox()
+            // Retry a failed local write before sending anything to the server.
+            try store.save()
+        } catch {
+            fail("Could not open/save upload queue: \(error.localizedDescription)")
+            return
+        }
 
+        guard store.hasPending else { return }
         if let reason = Self.unavailableReason() {
             trace("cloud upload skipped: %{public}@", log: log, category: ConstantsLog.categoryCGMOttai, type: .info, reason)
-            if !OttaiRegistry.loadCloudUploadEnabled() { pending.removeAll() }
             Self.setStatus(reason)
             scheduleRetry()
             return
         }
 
+        let account = Self.accountId
+        guard !account.isEmpty else {
+            fail("No Syai account id")
+            return
+        }
+        do {
+            try store.assignUnownedSamples(to: account, limit: Self.maxPending)
+        } catch {
+            fail("Could not save upload queue: \(error.localizedDescription)")
+            return
+        }
+        let batch = Array(store.pending(account: account).prefix(Self.maxBatch))
+        guard !batch.isEmpty else {
+            // Also pick up sign-in/account changes without requiring another BLE reading.
+            scheduleFlush(after: Self.firstRetryDelay)
+            return
+        }
+        if boundAccount != account {
+            boundAccount = account
+            bindConfirmed = false
+            nextBindCheck = .distantPast
+            bindNotice = nil
+        }
         var materials = OttaiRegistry.loadMaterials(sensorId: sensorId)
-        let batch = Array(pending.prefix(Self.maxBatch))
         let id = sensorId
         inFlight = true
         // The calls wait for the server, so they run off this queue.
@@ -164,9 +217,9 @@ final class OttaiCloudUploader {
             }
             trace("cloud upload: posting %{public}d readings (dataNo %{public}d…%{public}d) deviceId=%{public}d", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .info,
                   batch.count, batch.map { $0.dataNo }.min() ?? 0, batch.map { $0.dataNo }.max() ?? 0, materials.deviceId)
-            let ok = OttaiSyaiClient.uploadGlucose(Self.uploadBody(batch: batch, materials: materials)) != nil
+            let ok = OttaiSyaiClient.uploadGlucose(Self.uploadBody(batch: batch, materials: materials), expectedUserId: account) != nil
             let failure = OttaiCloudClient.lastError
-            self.queue.async { self.handleResponse(batch: batch, ok: ok, failure: failure) }
+            self.queue.async { self.handleResponse(batch: batch, account: account, ok: ok, failure: failure) }
         }
     }
 
@@ -177,25 +230,29 @@ final class OttaiCloudUploader {
         return id
     }
 
-    private func handleResponse(batch: [Sample], ok: Bool, failure: String) {
+    private func handleResponse(batch: [Sample], account: String, ok: Bool, failure: String) {
         inFlight = false
         guard ok else {
             fail(failure.isEmpty ? "unknown error" : failure)
             return
         }
 
-        let sent = Set(batch.map { $0.dataNo })
-        uploadedDataNos.formUnion(sent)
-        pending.removeAll { sent.contains($0.dataNo) }
+        do {
+            try loadOutbox().acknowledge(batch, account: account)
+        } catch {
+            fail("Could not save upload confirmation: \(error.localizedDescription)")
+            return
+        }
+        let remaining = outbox?.pending(account: account).count ?? 0
         retryDelay = Self.firstRetryDelay
         let stamp = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .short)
         Self.setStatus("\(batch.count) reading(s) uploaded at \(stamp)" + (bindNotice.map { " — \($0)" } ?? ""))
-        trace("cloud upload: ok count=%{public}d pending=%{public}d", log: log, category: ConstantsLog.categoryCGMOttai, type: .info, batch.count, pending.count)
-        if !pending.isEmpty { scheduleFlush(after: 0.5) }
+        trace("cloud upload: ok count=%{public}d pending=%{public}d", log: log, category: ConstantsLog.categoryCGMOttai, type: .info, batch.count, remaining)
+        scheduleFlush(after: remaining > 0 ? 0.5 : Self.firstRetryDelay)
     }
 
     private func fail(_ reason: String) {
-        trace("cloud upload failed: %{public}@ (pending=%{public}d, retry in %{public}ds)", log: log, category: ConstantsLog.categoryCGMOttai, type: .error, reason, pending.count, Int(retryDelay))
+        trace("cloud upload failed: %{public}@ (pending=%{public}d, retry in %{public}ds)", log: log, category: ConstantsLog.categoryCGMOttai, type: .error, reason, outbox?.pending(account: Self.accountId).count ?? 0, Int(retryDelay))
         Self.setStatus("Failed: \(reason)")
         scheduleRetry()
     }
@@ -291,5 +348,93 @@ final class OttaiCloudUploader {
 
     private static func setStatus(_ text: String) {
         OttaiRegistry.saveCloudUploadStatus(text)
+    }
+}
+
+/// Durable raw readings, independent of xDrip's delivered-data watermark. Access only
+/// on OttaiCloudUploader.work. Kept here so every app target using the uploader includes it.
+final class OttaiUploadOutbox {
+    private struct Account: Codable {
+        var pending: [OttaiCloudUploader.Sample] = []
+        var uploadedDataNos: Set<Int> = []
+    }
+
+    private struct State: Codable {
+        var version = 1
+        var accounts: [String: Account] = [:]
+    }
+
+    private let url: URL
+    private var state: State
+    private var dirty = false
+
+    init(url: URL) throws {
+        self.url = url
+        if FileManager.default.fileExists(atPath: url.path) {
+            state = try JSONDecoder().decode(State.self, from: Data(contentsOf: url))
+            guard state.version == 1 else {
+                throw CocoaError(.fileReadCorruptFile)
+            }
+        } else {
+            state = State()
+        }
+    }
+
+    var hasPending: Bool { state.accounts.values.contains { !$0.pending.isEmpty } }
+
+    func pending(account: String) -> [OttaiCloudUploader.Sample] {
+        state.accounts[account]?.pending ?? []
+    }
+
+    func enqueue(_ sample: OttaiCloudUploader.Sample, account: String, limit: Int) throws {
+        var entry = state.accounts[account] ?? Account()
+        guard !entry.uploadedDataNos.contains(sample.dataNo) else { return }
+        if let index = entry.pending.firstIndex(where: { $0.dataNo == sample.dataNo }) {
+            entry.pending[index] = sample
+        } else {
+            entry.pending.append(sample)
+        }
+        if entry.pending.count > limit { entry.pending.removeFirst(entry.pending.count - limit) }
+        state.accounts[account] = entry
+        dirty = true
+        try save()
+    }
+
+    /// Readings collected before the first sign-in can go to that account. Readings
+    /// already owned by another account are never moved on logout or account changes.
+    func assignUnownedSamples(to account: String, limit: Int) throws {
+        guard !account.isEmpty, let unowned = state.accounts.removeValue(forKey: "") else { return }
+        var entry = state.accounts[account] ?? Account()
+        var known = entry.uploadedDataNos.union(entry.pending.map { $0.dataNo })
+        let additional = unowned.pending.filter { known.insert($0.dataNo).inserted }
+        entry.pending = (entry.pending + additional).sorted { $0.dataNo < $1.dataNo }
+        if entry.pending.count > limit { entry.pending.removeFirst(entry.pending.count - limit) }
+        state.accounts[account] = entry
+        dirty = true
+        try save()
+    }
+
+    func acknowledge(_ batch: [OttaiCloudUploader.Sample], account: String) throws {
+        let sent = Set(batch.map { $0.dataNo })
+        var entry = state.accounts[account] ?? Account()
+        entry.uploadedDataNos.formUnion(sent)
+        entry.pending.removeAll { sent.contains($0.dataNo) }
+        state.accounts[account] = entry
+        dirty = true
+        try save()
+    }
+
+    func save() throws {
+        guard dirty else { return }
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        let data = try JSONEncoder().encode(state)
+        // Atomic replacement leaves the previous queue intact on an interrupted write.
+        // BLE background uploads must be able to read it after the phone locks again.
+        #if os(iOS)
+        try data.write(to: url, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+        #else
+        try data.write(to: url, options: .atomic)
+        #endif
+        dirty = false
     }
 }

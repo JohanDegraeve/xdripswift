@@ -95,3 +95,96 @@ final class OttaiServerActivationTests: XCTestCase {
         XCTAssertEqual(OttaiCloudClient.deviceVersion(fromFirmware: "E1.1()"), "E1.1()")
     }
 }
+
+final class OttaiUploadOutboxTests: XCTestCase {
+    private var directory: URL!
+    private var file: URL { directory.appendingPathComponent("sensor.json") }
+
+    override func setUpWithError() throws {
+        directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    }
+
+    override func tearDownWithError() throws {
+        try FileManager.default.removeItem(at: directory)
+    }
+
+    private func sample(_ n: Int, mmol: Double = 5.5) -> OttaiCloudUploader.Sample {
+        OttaiCloudUploader.Sample(dataNo: n, runtimeSec: n * 60, voltage: 123, rawCurrent: 4567,
+                                  temperatureC: 31.25, mmol: mmol, sampleMs: 123456789,
+                                  receivedAtMs: 123456999, originBytes: [0, 1, 128, 255], live: true)
+    }
+
+    func testRestartRestoresCompleteRawSample() throws {
+        try OttaiUploadOutbox(url: file).enqueue(sample(7), account: "A", limit: 4000)
+        let restored = try XCTUnwrap(OttaiUploadOutbox(url: file).pending(account: "A").first)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        XCTAssertEqual(try encoder.encode(restored), try encoder.encode(sample(7)))
+    }
+
+    func testAcknowledgementSurvivesRestartAndDeduplicatesBackfill() throws {
+        let store = try OttaiUploadOutbox(url: file)
+        try store.enqueue(sample(7), account: "A", limit: 4000)
+        try store.enqueue(sample(8), account: "A", limit: 4000)
+        try store.acknowledge([sample(7)], account: "A")
+        let restored = try OttaiUploadOutbox(url: file)
+        try restored.enqueue(sample(7), account: "A", limit: 4000)
+        XCTAssertEqual(restored.pending(account: "A").map(\.dataNo), [8])
+    }
+
+    func testUnacknowledgedBatchRemainsAfterRestart() throws {
+        let store = try OttaiUploadOutbox(url: file)
+        try store.enqueue(sample(7), account: "A", limit: 4000)
+        _ = store.pending(account: "A") // Sending a batch does not remove it.
+        XCTAssertEqual(try OttaiUploadOutbox(url: file).pending(account: "A").map(\.dataNo), [7])
+    }
+
+    func testAccountsStaySeparateIncludingTheirAcknowledgements() throws {
+        let store = try OttaiUploadOutbox(url: file)
+        try store.enqueue(sample(7), account: "A", limit: 4000)
+        try store.enqueue(sample(7), account: "B", limit: 4000)
+        try store.acknowledge([sample(7)], account: "A")
+        let restored = try OttaiUploadOutbox(url: file)
+        XCTAssertTrue(restored.pending(account: "A").isEmpty)
+        XCTAssertEqual(restored.pending(account: "B").map(\.dataNo), [7])
+    }
+
+    func testUnownedReadingsAssignedOnlyOnce() throws {
+        let store = try OttaiUploadOutbox(url: file)
+        try store.enqueue(sample(7), account: "", limit: 4000)
+        try store.assignUnownedSamples(to: "A", limit: 4000)
+        try store.assignUnownedSamples(to: "B", limit: 4000)
+        let restored = try OttaiUploadOutbox(url: file)
+        XCTAssertEqual(restored.pending(account: "A").map(\.dataNo), [7])
+        XCTAssertTrue(restored.pending(account: "B").isEmpty)
+        XCTAssertTrue(restored.pending(account: "").isEmpty)
+    }
+
+    func testPendingReplacementAndCapacitySurviveRestart() throws {
+        let store = try OttaiUploadOutbox(url: file)
+        for n in 1...3 { try store.enqueue(sample(n), account: "A", limit: 2) }
+        try store.enqueue(sample(3, mmol: 6.2), account: "A", limit: 2)
+        let pending = try OttaiUploadOutbox(url: file).pending(account: "A")
+        XCTAssertEqual(pending.map(\.dataNo), [2, 3])
+        XCTAssertEqual(pending.last?.mmol, 6.2)
+    }
+
+    func testCorruptStoreIsNotSilentlyReplaced() throws {
+        let corrupt = Data("invalid JSON".utf8)
+        try corrupt.write(to: file)
+        XCTAssertThrowsError(try OttaiUploadOutbox(url: file))
+        XCTAssertEqual(try Data(contentsOf: file), corrupt)
+    }
+
+    func testFailedWriteCanBeRetriedWithoutLosingSample() throws {
+        let blocked = directory.appendingPathComponent("blocked")
+        try Data().write(to: blocked) // Parent is a file, so creating a directory fails.
+        let destination = blocked.appendingPathComponent("sensor.json")
+        let store = try OttaiUploadOutbox(url: destination)
+        XCTAssertThrowsError(try store.enqueue(sample(7), account: "A", limit: 4000))
+        try FileManager.default.removeItem(at: blocked)
+        try store.save()
+        XCTAssertEqual(try OttaiUploadOutbox(url: destination).pending(account: "A").map(\.dataNo), [7])
+    }
+}
