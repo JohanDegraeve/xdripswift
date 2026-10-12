@@ -29,6 +29,8 @@ enum OttaiRegistry {
 
     private enum K {
         static let accessToken = "ottai_access_token"
+        static let refreshToken = "ottai_refresh_token"
+        static let syaiInstallDeviceId = "ottai_syai_install_device_id"
         static let glucoseSecret = "ottai_glucose_secret_key"
         static let userId = "ottai_user_id"
         static let accountLogin = "ottai_account_login"
@@ -39,7 +41,6 @@ enum OttaiRegistry {
         static let sensorsSet = "ottai_sensors"
         // xDrip only: upload of readings to the Syai cloud (see OttaiCloudUploader)
         static let cloudUploadEnabled = "ottai_cloud_upload_enabled"
-        static let cloudUploadDeviceUuid = "ottai_cloud_upload_device_uuid"
         static let cloudUploadStatus = "ottai_cloud_upload_status"
         static let draftSensorsSet = "ottai_draft_sensors"
 
@@ -64,6 +65,8 @@ enum OttaiRegistry {
         static let deviceIdPrefix = "ottai_device_id_"
         static let activationAttemptedPrefix = "ottai_act_tried_"
         static let v3BootstrapPendingPrefix = "ottai_v3_bootstrap_pending_"
+        // xDrip only: start time of a server-activated sensor that is not bound yet
+        static let pendingBindPrefix = "ottai_pending_bind_"
         static func validatedVersion(_ id: String) -> String { "ottai_v3_validated_version_\(id)" }
     }
 
@@ -112,6 +115,22 @@ enum OttaiRegistry {
     static func loadAccessToken() -> String { d.string(forKey: K.accessToken) ?? "" }
     static func saveAccessToken(_ v: String?) { setOrRemove(K.accessToken, v) }
 
+    static func loadRefreshToken() -> String { d.string(forKey: K.refreshToken) ?? "" }
+    static func saveRefreshToken(_ v: String?) { setOrRemove(K.refreshToken, v) }
+
+    /// "Syai Tag:i:n:<uuid>", the shape the Syai Tag iOS app uses (version 3 UUID, as in SyaiKit).
+    static func loadOrCreateSyaiInstallDeviceId() -> String {
+        if let existing = d.string(forKey: K.syaiInstallDeviceId), !existing.isEmpty { return existing }
+        var bytes = (0 ..< 16).map { _ in UInt8.random(in: 0 ... 255) }
+        bytes[6] = (bytes[6] & 0x0F) | 0x30
+        bytes[8] = (bytes[8] & 0x3F) | 0x80
+        let h = bytes.map { String(format: "%02x", $0) }.joined()
+        let uuid = "\(h.prefix(8))-\(h.dropFirst(8).prefix(4))-\(h.dropFirst(12).prefix(4))-\(h.dropFirst(16).prefix(4))-\(h.dropFirst(20))"
+        let id = "Syai Tag:i:n:\(uuid)"
+        d.set(id, forKey: K.syaiInstallDeviceId)
+        return id
+    }
+
     static func loadGlucoseSecretKey() -> String { d.string(forKey: K.glucoseSecret) ?? "" }
     static func saveGlucoseSecretKey(_ v: String?) { setOrRemove(K.glucoseSecret, v) }
 
@@ -157,14 +176,6 @@ enum OttaiRegistry {
     static func loadCloudUploadStatus() -> String { d.string(forKey: K.cloudUploadStatus) ?? "" }
     static func saveCloudUploadStatus(_ v: String?) { setOrRemove(K.cloudUploadStatus, v) }
 
-    /// The uuid in the deviceId header of the upload ("Syai Tag:a:n:<uuid>"). Made once, kept forever.
-    static func loadOrCreateCloudUploadDeviceUuid() -> String {
-        if let existing = d.string(forKey: K.cloudUploadDeviceUuid), !existing.isEmpty { return existing }
-        let generated = UUID().uuidString.lowercased()
-        d.set(generated, forKey: K.cloudUploadDeviceUuid)
-        return generated
-    }
-
     static func saveLastValidatedDeviceVersion(sensorId: String, version: String) {
         let v = version.trimmingCharacters(in: .whitespaces)
         if sensorId.isEmpty || v.isEmpty { return }
@@ -205,6 +216,20 @@ enum OttaiRegistry {
 
     static func setV3CredentialBootstrapPending(_ id: String, _ pending: Bool) {
         d.set(pending, forKey: K.v3BootstrapPendingPrefix + OttaiConstants.canonicalSensorId(id))
+    }
+
+    /// Start time (ms) of a server-activated sensor that is not bound yet, 0 = none.
+    /// While it is set, the sensor is never activated again.
+    static func loadPendingBind(_ id: String) -> Int64 {
+        int64(K.pendingBindPrefix + canonical(id))
+    }
+
+    static func savePendingBind(_ id: String, activatedAtMs: Int64) {
+        d.set(NSNumber(value: activatedAtMs), forKey: K.pendingBindPrefix + canonical(id))
+    }
+
+    static func clearPendingBind(_ id: String) {
+        d.removeObject(forKey: K.pendingBindPrefix + canonical(id))
     }
 
     static func saveDeviceId(_ id: String, _ deviceId: Int) {
@@ -361,7 +386,7 @@ enum OttaiRegistry {
         for prefix in [K.keyAPrefix, K.methodPrefix, K.coeffPrefix, K.activeTimePrefix,
                        K.provisionalActiveTimePrefix, K.activeExpirePrefix, K.retainTimePrefix,
                        K.preheatPeriodPrefix, K.deviceVersionPrefix, K.lastDataNoPrefix, K.deliveredDataNoPrefix, K.recordSizePrefix,
-                       K.deviceIdPrefix, K.activationAttemptedPrefix, K.v3BootstrapPendingPrefix] {
+                       K.deviceIdPrefix, K.activationAttemptedPrefix, K.v3BootstrapPendingPrefix, K.pendingBindPrefix] {
             d.removeObject(forKey: prefix + id)
         }
         d.removeObject(forKey: K.validatedVersion(id))

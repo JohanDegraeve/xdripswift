@@ -2,33 +2,31 @@
 //  OttaiV3BootstrapPolicy.swift
 //  xdrip
 //
-//  Ottai / Syai CGM driver — decides how a new V3 sensor may get its first keys.
-//  This is a Swift copy of OttaiV3BootstrapPolicy.kt from JugglucoNG.
+//  Ottai / Syai CGM driver — how a connection starts when the sensor has no keyA yet.
 //
 
 import Foundation
 
-/// What to do after the Bluetooth services are found.
 enum OttaiAuthEntryMode {
     case storedMaterialAuth
-    case v3CredentialBootstrap
+    /// Activated through the server; only the bind (which gives keyA) is missing.
+    case awaitingBind
+    /// New sensor, the user asked to activate it: the server answers the login.
+    case serverAssistedActivation
     case blocked
 }
 
-/// A new V3 sensor has no keyA yet. It may ask the server for one only when the
-/// user asked for it, the cloud checked this sensor and version, and the China
-/// login is still there. In every other case we do nothing with the sensor's
-/// login characteristics.
+/// A sensor without keyA is only touched when the user asked for activation, the V3
+/// check marked it (`bootstrapPending`) and the login is still there.
 func ottaiAuthEntryMode(
     hasAuthKeys: Bool,
+    pendingBind: Bool,
     bootstrapPending: Bool,
-    cnSessionAvailable: Bool,
-    validatedDeviceVersion: String?
+    sessionAvailable: Bool,
+    activationRequested: Bool
 ) -> OttaiAuthEntryMode {
     if hasAuthKeys { return .storedMaterialAuth }
-    if bootstrapPending, cnSessionAvailable,
-       let v = validatedDeviceVersion, !v.trimmingCharacters(in: .whitespaces).isEmpty {
-        return .v3CredentialBootstrap
-    }
+    if pendingBind { return .awaitingBind }
+    if bootstrapPending, sessionAvailable, activationRequested { return .serverAssistedActivation }
     return .blocked
 }

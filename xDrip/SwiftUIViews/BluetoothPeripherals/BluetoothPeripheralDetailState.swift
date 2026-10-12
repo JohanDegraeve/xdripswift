@@ -2819,6 +2819,16 @@ private extension BluetoothPeripheralDetailState {
         let signedIn = ottaiIsSignedIn
         let materials = OttaiRegistry.loadMaterials(sensorId: sensorId)
         let hasMaterials = materials.authKeys != nil
+        let fetchDetail: String
+        if hasMaterials {
+            fetchDetail = "Materials present ✓"
+        } else if OttaiRegistry.loadPendingBind(sensorId) > 0 {
+            fetchDetail = "Activated — waiting for the Syai bind (tap to retry)"
+        } else if OttaiRegistry.isV3CredentialBootstrapPending(sensorId) {
+            fetchDetail = "New sensor checked ✓ — activate it below"
+        } else {
+            fetchDetail = signedIn ? "Tap to fetch" : "Sign in first"
+        }
         let uploadEnabled = OttaiRegistry.loadCloudUploadEnabled()
         let uploadStatus = OttaiRegistry.loadCloudUploadStatus()
 
@@ -2908,7 +2918,7 @@ private extension BluetoothPeripheralDetailState {
                 row(
                     id: "ottai-fetch-materials",
                     title: "Fetch sensor from cloud",
-                    detail: hasMaterials ? "Materials present ✓" : (signedIn ? "Tap to fetch" : "Sign in first"),
+                    detail: fetchDetail,
                     showsDisclosure: true,
                     action: { [weak self] in self?.requestOttaiFetchMaterials(for: ottai) }
                 ),
@@ -2961,9 +2971,7 @@ private extension BluetoothPeripheralDetailState {
 
     // MARK: Ottai helpers
 
-    var ottaiIsSignedIn: Bool {
-        !OttaiRegistry.loadAccessToken().isEmpty && !OttaiRegistry.loadGlucoseSecretKey().isEmpty
-    }
+    var ottaiIsSignedIn: Bool { OttaiCloudClient.isSignedIn }
 
     /// The cloud id of the sensor (12 hex characters). On iOS the Bluetooth address is not the MAC,
     /// so the user must type the id from the sensor box or QR code.
@@ -3068,7 +3076,12 @@ private extension BluetoothPeripheralDetailState {
             actionTitle: Texts_Common.Ok,
             cancelTitle: Texts_Common.Cancel,
             actionHandler: { [weak self] email in
-                self?.requestOttaiPassword(email: email, webBase: webBase)
+                // The email screen is popped right before this handler. Pushing the password screen
+                // in the same update leaves it half-built (no placeholder, field takes no input),
+                // so push it after the pop animation.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    self?.requestOttaiPassword(email: email, webBase: webBase)
+                }
             },
             actionIsEnabled: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty },
             inputValidator: nil
@@ -3237,7 +3250,7 @@ private extension BluetoothPeripheralDetailState {
         setOttaiBusy(busyMessage)
 
         ottaiCloudQueue.async { [weak self] in
-            let ok = OttaiCloudClient.fetchAndSaveMaterials(cloudId: sensorId)
+            let outcome = OttaiCloudClient.fetchAndSaveMaterials(cloudId: sensorId)
             let failureCode = OttaiCloudClient.lastFailure?.code ?? ""
             let failureText = OttaiCloudClient.lastError
 
@@ -3245,9 +3258,16 @@ private extension BluetoothPeripheralDetailState {
                 guard let self = self else { return }
                 self.setOttaiBusy(nil)
 
-                if ok {
+                if outcome == .saved {
                     ottai.ottaiSensorId = OttaiConstants.canonicalSensorId(sensorId)
                     self.showInfo(title: "Sensor ready", message: "Materials saved. Reconnecting to the sensor with the new credentials.")
+                    self.recreateOttaiTransmitterIfMaterialsReady(for: ottai)
+                } else if outcome == .readyForServerActivation {
+                    ottai.ottaiSensorId = OttaiConstants.canonicalSensorId(sensorId)
+                    self.showInfo(
+                        title: "New sensor checked",
+                        message: "This is a new sensor. It gets its keys from Syai only after activation.\n\nPut the sensor on, keep the phone near it and tap \"Start / activate sensor\"."
+                    )
                     self.recreateOttaiTransmitterIfMaterialsReady(for: ottai)
                 } else if failureCode.caseInsensitiveCompare(OttaiCloudClient.bizAlreadyBinding) == .orderedSame {
                     self.offerToUnbindPreviousSensor(newCloudId: sensorId, for: ottai)
@@ -3387,7 +3407,8 @@ private extension BluetoothPeripheralDetailState {
         guard let manager = bluetoothPeripheralManager else { return }
 
         let sensorId = ottaiCloudId(for: ottai)
-        guard !sensorId.isEmpty, OttaiRegistry.loadMaterials(sensorId: sensorId).authKeys != nil else { return }
+        let waitsForServer = OttaiRegistry.isV3CredentialBootstrapPending(sensorId) || OttaiRegistry.loadPendingBind(sensorId) > 0
+        guard !sensorId.isEmpty, OttaiRegistry.loadMaterials(sensorId: sensorId).authKeys != nil || waitsForServer else { return }
 
         manager.setBluetoothTransmitterToNil(forBluetoothPeripheral: ottai)
 

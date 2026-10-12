@@ -77,12 +77,24 @@ enum OttaiCloudClient {
         var isActive: Bool { unbindTime <= 0 }
     }
 
+    /// cgmAuth/verify answer (hex). cf, d, c = coefficient, duration and activate frames,
+    /// encrypted by the server for this one connection.
     struct V3AuthMaterial {
         let authHost: String
         let authFlag: String
         let keyB: String
         let cf: String
+        let d: String
+        let c: String
         var ok: Bool { !authHost.isEmpty && !authFlag.isEmpty }
+        var hasActivationFrames: Bool { !cf.isEmpty && !d.isEmpty && !c.isEmpty }
+    }
+
+    enum MaterialsOutcome {
+        case saved
+        /// New sensor: keyA comes only from the bind after the server-assisted activation.
+        case readyForServerActivation
+        case failed
     }
 
     // MARK: - identity / signature
@@ -188,6 +200,14 @@ enum OttaiCloudClient {
 
     private static func now() -> Int64 { Int64(Date().timeIntervalSince1970 * 1000) }
     private static func base() -> String { OttaiRegistry.loadApiBase() }
+    /// The Syai server goes through OttaiSyaiClient (encrypted, as the Syai Tag app).
+    private static var isSyai: Bool { base() == OttaiConstants.apiBaseSyai }
+
+    /// Syai needs a Syai Tag session (with a refresh token); an older login does not count.
+    static var isSignedIn: Bool {
+        !OttaiRegistry.loadAccessToken().isEmpty && !OttaiRegistry.loadGlucoseSecretKey().isEmpty
+            && (!isSyai || !OttaiRegistry.loadRefreshToken().isEmpty)
+    }
 
     private static func normalizePhone(_ raw: String) -> String {
         var d = raw.filter { $0.isNumber }
@@ -273,23 +293,19 @@ enum OttaiCloudClient {
     }
 
     static func logout() {
-        let ts = now()
-        _ = httpPostJson(base() + OttaiConstants.epLogout, "{}", headers(ts: ts, apiBase: base()))
+        if isSyai {
+            OttaiSyaiClient.logout()
+        } else {
+            _ = httpPostJson(base() + OttaiConstants.epLogout, "{}", headers(ts: now(), apiBase: base()))
+        }
         OttaiRegistry.saveAccessToken(nil)
+        OttaiRegistry.saveRefreshToken(nil)
         OttaiRegistry.saveGlucoseSecretKey(nil)
         OttaiRegistry.saveUserId(nil)
         OttaiRegistry.saveAccountLogin(nil)
         OttaiRegistry.saveSessionProfile(nil)
         OttaiRegistry.saveApiBase(OttaiConstants.apiBase)
         OttaiRegistry.saveCloudUploadStatus(nil)
-    }
-
-    /// The account profile (`/user/getUser`) of the signed-in session, or nil.
-    /// Used to find the customerId for the upload. Do not call this on the main thread.
-    static func fetchUserProfile() -> [String: Any]? {
-        let token = OttaiRegistry.loadAccessToken()
-        if token.isEmpty { return nil }
-        return mobileGetUser(base(), accessToken: token)
     }
 
     // MARK: - device validate / bind
@@ -303,6 +319,13 @@ enum OttaiCloudClient {
         let canonical = OttaiConstants.canonicalSensorId(mac)
         if canonical.isEmpty { return nil }
         let apiBase = base()
+        // Syai checks every sensor with V3, as the Syai Tag app does.
+        if isSyai {
+            guard let resp = OttaiSyaiClient.validateDeviceByMacV3(mac: canonical),
+                  let device = parseDeviceResp(resp, requireKeyA: false) else { return nil }
+            OttaiRegistry.saveLastValidatedDeviceVersion(sensorId: canonical, version: device.deviceVersion)
+            return DeviceValidation(device: device, requiresV3Bind: device.keyA.isEmpty)
+        }
         let ts = now()
         let profile = activeProfile(apiBase)
         let deviceId = requestDeviceId(profile)
@@ -312,18 +335,25 @@ enum OttaiCloudClient {
         if let resp = resp, let device = parseDeviceResp(resp) {
             return DeviceValidation(device: device, requiresV3Bind: false)
         }
-        if apiBase != OttaiConstants.apiBase || profile != .cnPhone ||
-            !(lastFailure?.code.caseInsensitiveEquals(bizUpgradeVersion) ?? false) {
-            return nil
-        }
+        let v2Failure = lastFailure
+        guard shouldTryValidateV3(apiBase: apiBase, profile: profile, v2FailureCode: v2Failure?.code ?? "") else { return nil }
         let v3Ts = now()
         let body: [String: Any] = ["mac": canonical, "signature": signForProfile(profile, deviceId: deviceId, ts: v3Ts, canonical)]
         guard let v3 = httpPostJson(apiBase + OttaiConstants.epValidateByMacV3, json(body), headers(ts: v3Ts, apiBase: apiBase, profileOverride: profile)),
-              let device = parseDeviceResp(v3, requireKeyA: false) else { return nil }
+              let device = parseDeviceResp(v3, requireKeyA: false) else {
+            if (lastFailure?.code ?? "").isEmpty, v2Failure != nil { lastFailure = v2Failure }
+            return nil
+        }
         OttaiRegistry.saveLastValidatedDeviceVersion(sensorId: canonical, version: device.deviceVersion)
-        return DeviceValidation(device: device, requiresV3Bind: true)
+        return DeviceValidation(device: device, requiresV3Bind: device.keyA.isEmpty)
     }
 
+    /// China only, when V2 asks for a newer app. (Syai always uses V3, see validateForSetup.)
+    static func shouldTryValidateV3(apiBase: String, profile: OttaiRegistry.SessionProfile, v2FailureCode: String) -> Bool {
+        apiBase == OttaiConstants.apiBase && profile == .cnPhone && v2FailureCode.caseInsensitiveEquals(bizUpgradeVersion)
+    }
+
+    /// legacy: activeTime in ms. v3 (China): seconds, newBindType 2. Syai binds through OttaiSyaiClient.bindV3.
     enum BindContract { case legacy, v3 }
 
     static func bindRequestBody(mac: String, deviceVersion: String, userId: String?, activeTime: Int64, contract: BindContract) -> [String: Any] {
@@ -337,19 +367,19 @@ enum OttaiCloudClient {
         bind(mac: mac, deviceVersion: deviceVersion, userId: userId, contract: .legacy)
     }
 
-    static func bindV3(mac: String, deviceVersion: String) -> DeviceResp? {
-        bind(mac: mac, deviceVersion: deviceVersion, userId: OttaiRegistry.loadUserId(), contract: .v3)
-    }
-
     private static func bind(mac: String, deviceVersion: String, userId: String?, contract: BindContract, activeTimeMs: Int64? = nil) -> DeviceResp? {
         let canonical = OttaiConstants.canonicalSensorId(mac)
         if canonical.isEmpty || deviceVersion.isEmpty { lastFailure = CloudFailure(text: "bind requires mac and deviceVersion"); return nil }
+        if isSyai {
+            let resp = OttaiSyaiClient.bindV3(mac: canonical, deviceVersion: deviceVersion.trimmingCharacters(in: .whitespaces), activeTimeMs: activeTimeMs ?? now())
+            return resp.flatMap { parseDeviceResp($0) }
+        }
         if contract == .v3 && (userId?.isEmpty ?? true) { lastFailure = CloudFailure(text: "bindV3 requires a signed-in session (userId)"); return nil }
         let ts = now()
         let activeMs = activeTimeMs ?? ts
         let body = bindRequestBody(mac: canonical, deviceVersion: deviceVersion.trimmingCharacters(in: .whitespaces), userId: userId,
                                    activeTime: contract == .v3 ? activeMs / 1000 : activeMs, contract: contract)
-        let endpoint = contract == .v3 ? OttaiConstants.epBindV3 : OttaiConstants.epBind
+        let endpoint = contract == .legacy ? OttaiConstants.epBind : OttaiConstants.epBindV3
         guard let resp = httpPostJson(base() + endpoint, json(body), headers(ts: ts, apiBase: base())) else { return nil }
         return parseDeviceResp(resp)
     }
@@ -393,27 +423,100 @@ enum OttaiCloudClient {
     static func cgmAuthVerify(mac: String, authDevHex: String, authFlagHex: String) -> V3AuthMaterial? {
         let canonical = OttaiConstants.canonicalSensorId(mac)
         if canonical.isEmpty { lastFailure = CloudFailure(text: "verify requires mac"); return nil }
-        let apiBase = base()
-        let profile = activeProfile(apiBase)
-        let deviceId = requestDeviceId(profile)
-        let ts = now()
         let paramStr = authDevHex.uppercased()
         let shaInfo = authFlagHex.uppercased()
-        let sign = cgmAuthVerifySign(profile, deviceId: deviceId, timestampMillis: ts, mac: canonical, paramStr: paramStr, shaInfo: shaInfo)
-        let body: [String: Any] = ["mac": canonical, "paramStr": paramStr, "shaInfo": shaInfo, "sign": sign, "timestamp": String(ts)]
-        guard let resp = httpPostJson(apiBase + OttaiConstants.epCgmAuthVerify, json(body), headers(ts: ts, apiBase: apiBase, profileOverride: profile), timeoutMs: 60_000) else { return nil }
+        let answer: [String: Any]?
+        if isSyai {
+            answer = OttaiSyaiClient.cgmAuthVerify(mac: canonical, paramStr: paramStr, shaInfo: shaInfo)
+        } else {
+            let apiBase = base()
+            let profile = activeProfile(apiBase)
+            let ts = now()
+            let sign = cgmAuthVerifySign(profile, deviceId: requestDeviceId(profile), timestampMillis: ts, mac: canonical, paramStr: paramStr, shaInfo: shaInfo)
+            let body: [String: Any] = ["mac": canonical, "paramStr": paramStr, "shaInfo": shaInfo, "sign": sign, "timestamp": String(ts)]
+            answer = httpPostJson(apiBase + OttaiConstants.epCgmAuthVerify, json(body), headers(ts: ts, apiBase: apiBase, profileOverride: profile), timeoutMs: 60_000)
+        }
+        guard let resp = answer else { return nil }
         let data = dataObject(resp)
-        let mat = V3AuthMaterial(authHost: str(data, "auth"), authFlag: str(data, "shaInfo"), keyB: str(data, "kb"), cf: str(data, "cf"))
+        let answeredMac = OttaiConstants.canonicalSensorId(str(data, "mac"))
+        if !answeredMac.isEmpty, answeredMac != canonical {
+            lastFailure = CloudFailure(text: "cgmAuth/verify answered for a different sensor")
+            return nil
+        }
+        let mat = V3AuthMaterial(authHost: str(data, "auth"), authFlag: str(data, "shaInfo"), keyB: str(data, "kb"),
+                                 cf: str(data, "cf"), d: str(data, "d"), c: str(data, "c"))
+        if !mat.ok, lastFailure == nil { lastFailure = CloudFailure(text: "cgmAuth/verify gave no auth answer") }
         return mat.ok ? mat : nil
+    }
+
+    // MARK: - bind after a server-assisted activation
+
+    /// The bind answer has keyA. If the bind fails (it may have worked on an earlier try),
+    /// ask for the sensor bound to the account. The server takes activatedAtMs as the start.
+    static func bindAfterServerActivation(mac: String, deviceVersion: String, activatedAtMs: Int64) -> OttaiRegistry.DeviceMaterials? {
+        let canonical = OttaiConstants.canonicalSensorId(mac)
+        let contract: BindContract = base() == OttaiConstants.apiBase ? .v3 : .legacy
+        var m: OttaiRegistry.DeviceMaterials?
+        if let resp = bind(mac: canonical, deviceVersion: deviceVersion, userId: OttaiRegistry.loadUserId(), contract: contract, activeTimeMs: activatedAtMs) {
+            m = toMaterials(mac: canonical, resp: resp).flatMap { $0.authKeys != nil ? $0 : nil }
+        }
+        if m == nil {
+            let bindFailure = lastFailure
+            m = boundSensorMaterials(canonical)
+            if m == nil { lastFailure = bindFailure ?? lastFailure ?? CloudFailure(text: "the bind gave no keys") }
+        }
+        if let current = m, current.activeTimeMs <= 0 { m?.activeTimeMs = activatedAtMs }
+        return m
+    }
+
+    /// The keys of this sensor if it is the one bound to the account. On Syai, authInfo
+    /// gives the keys like in the app; its values win over getBindDevice (as in SyaiKit).
+    private static func boundSensorMaterials(_ canonical: String) -> OttaiRegistry.DeviceMaterials? {
+        guard var raw = bindDeviceResponse(), var data = dataObject(raw) else { return nil }
+        if let vo = data["cgmDeviceRespVO"] as? [String: Any] { data = vo }
+        let boundId = OttaiConstants.canonicalSensorId(str(data, "mac"))
+        guard !boundId.isEmpty, OttaiConstants.matchesCanonicalOrKnownNativeAlias(boundId, canonical) else { return nil }
+        if isSyai, let auth = dataObject(OttaiSyaiClient.authInfo(mac: boundId)) {
+            data.merge(auth.filter { !($0.value is NSNull) }) { _, fromAuthInfo in fromAuthInfo }
+            raw = ["data": data]
+        }
+        guard let resp = parseDeviceResp(raw), let m = toMaterials(mac: boundId, resp: resp), m.authKeys != nil else { return nil }
+        return m
+    }
+
+    /// GET deviceBind/getBindDevice, raw.
+    private static func bindDeviceResponse() -> [String: Any]? {
+        if isSyai { return OttaiSyaiClient.getBindDevice() }
+        return httpGet(base() + OttaiConstants.epGetBindDevice, [:], headers(ts: now(), apiBase: base()))
+    }
+
+    /// "E2.0.3(V1.7.SH22601.3),STDRD" -> "V1.7.SH22601.3".
+    static func deviceVersion(fromFirmware firmware: String) -> String {
+        guard let open = firmware.firstIndex(of: "("),
+              let close = firmware[open...].firstIndex(of: ")"),
+              firmware.index(after: open) < close
+        else { return firmware.trimmingCharacters(in: .whitespaces) }
+        return String(firmware[firmware.index(after: open) ..< close])
     }
 
     // MARK: - unbind / list
 
     static func unbind(mac: String) -> Bool { unbind(mac: mac, headerOverride: nil) }
 
+    /// Syai: unbindType 10 = wear time over, 13 = ended early (SyaiUnbindReason).
+    static func syaiUnbindType(materials: OttaiRegistry.DeviceMaterials, acceptedMaxActiveMs: Int64, nowMs: Int64) -> Int {
+        let lifetime = OttaiConstants.expectedLifetimeMs(cloudActiveExpireMs: materials.activeExpireTimeMs, acceptedMaxActiveMs: acceptedMaxActiveMs)
+        return materials.activeTimeMs > 0 && materials.activeTimeMs + lifetime <= nowMs ? 10 : 13
+    }
+
     private static func unbind(mac: String, headerOverride: ((Int64) -> [String: String])?) -> Bool {
         let canonical = OttaiConstants.canonicalSensorId(mac)
         if canonical.isEmpty { return false }
+        if isSyai {
+            let type = syaiUnbindType(materials: OttaiRegistry.loadMaterials(sensorId: canonical),
+                                      acceptedMaxActiveMs: OttaiRegistry.loadAcceptedMaxActive(canonical), nowMs: now())
+            return OttaiSyaiClient.unbind(mac: canonical, unbindType: type) != nil || (lastFailure?.code.caseInsensitiveEquals(bizEndUsing) ?? false)
+        }
         let ts = now()
         let body: [String: Any] = ["mac": canonical, "deviceType": "cgm", "unbindType": 0]
         let requestHeaders = headerOverride?(ts) ?? headers(ts: ts, apiBase: base())
@@ -423,9 +526,7 @@ enum OttaiCloudClient {
     }
 
     static func getBindDevice() -> DeviceResp? {
-        let ts = now()
-        guard let resp = httpGet(base() + OttaiConstants.epGetBindDevice, [:], headers(ts: ts, apiBase: base())) else { return nil }
-        return parseDeviceResp(resp)
+        bindDeviceResponse().flatMap { parseDeviceResp($0) }
     }
 
     // MARK: - account binding (xDrip only)
@@ -440,8 +541,7 @@ enum OttaiCloudClient {
 
     /// Nil when the server could not be asked (see lastFailure).
     static func bindState(mac: String) -> BindState? {
-        let ts = now()
-        guard let resp = httpGet(base() + OttaiConstants.epGetBindDevice, [:], headers(ts: ts, apiBase: base())), lastFailure == nil else { return nil }
+        guard let resp = bindDeviceResponse(), lastFailure == nil else { return nil }
         let data = dataObject(resp)
         let vo = (data?["cgmDeviceRespVO"] as? [String: Any]) ?? data
         let bound = OttaiConstants.canonicalSensorId(str(vo, "mac"))
@@ -460,7 +560,7 @@ enum OttaiCloudClient {
     /// Unbinds the sensor if the account still has it bound. Same as JugglucoNG on sensor removal:
     /// a sensor left bound blocks the next one.
     static func releaseIfBound(mac: String) -> Bool {
-        guard !OttaiRegistry.loadAccessToken().isEmpty, case .thisSensor? = bindState(mac: mac) else { return false }
+        guard isSignedIn, case .thisSensor? = bindState(mac: mac) else { return false }
         return unbind(mac: mac)
     }
 
@@ -524,39 +624,60 @@ enum OttaiCloudClient {
 
     // MARK: - get and save the keys of one sensor (same as fetchOttaiMaterials in JugglucoNG)
 
-    /// After login, get the keys for [cloudId] and save them, so the Bluetooth part
-    /// can log in. It tries, in this order: keys already saved -> check by mac ->
-    /// the sensor bound to the account -> a short bind and unbind (for an old
-    /// Syai / Global sensor). Returns true if good keys were saved. Do not call
-    /// this on the main thread.
-    static func fetchAndSaveMaterials(cloudId: String) -> Bool {
+    /// After login, get the keys for [cloudId] and save them. Order: saved keys -> an open
+    /// bind after a server activation -> check by mac -> the sensor bound to the account ->
+    /// a short bind and unbind (old Syai / Global sensor). A new V3 sensor is never bound
+    /// before activation: it gets `.readyForServerActivation`. Not on the main thread.
+    static func fetchAndSaveMaterials(cloudId: String) -> MaterialsOutcome {
         let canonical = OttaiConstants.canonicalSensorId(cloudId)
-        if canonical.isEmpty { return false }
-        if OttaiRegistry.loadMaterials(sensorId: canonical).authKeys != nil { return true }
+        if canonical.isEmpty { return .failed }
+        if OttaiRegistry.loadMaterials(sensorId: canonical).authKeys != nil { return .saved }
+        func save(_ m: OttaiRegistry.DeviceMaterials) -> MaterialsOutcome {
+            OttaiRegistry.saveMaterials(sensorId: canonical, m) ? .saved : .failed
+        }
+
+        let pendingBindAtMs = OttaiRegistry.loadPendingBind(canonical)
+        if pendingBindAtMs > 0 {
+            guard let m = bindAfterServerActivation(mac: canonical, deviceVersion: serverActivationBindVersion(canonical), activatedAtMs: pendingBindAtMs) else { return .failed }
+            let outcome = save(m)
+            if outcome == .saved { OttaiRegistry.clearPendingBind(canonical) }
+            return outcome
+        }
 
         var firstFailure: CloudFailure?
         func remember() { if firstFailure == nil { firstFailure = lastFailure } }
 
-        if let v = validateForSetup(mac: canonical), !v.device.keyA.isEmpty,
-           let m = toMaterials(mac: canonical, resp: v.device), m.authKeys != nil {
-            return OttaiRegistry.saveMaterials(sensorId: canonical, m)
+        if let v = validateForSetup(mac: canonical) {
+            if !v.device.keyA.isEmpty, let m = toMaterials(mac: canonical, resp: v.device), m.authKeys != nil {
+                return save(m)
+            }
+            if v.requiresV3Bind {
+                // Maybe already started and bound, e.g. by the official app.
+                if let m = boundSensorMaterials(canonical) { return save(m) }
+                OttaiRegistry.setV3CredentialBootstrapPending(canonical, true)
+                // An old Activate tap must not start the sensor; the user taps again.
+                OttaiRegistry.setActivationAttempted(canonical, false)
+                lastFailure = nil
+                return .readyForServerActivation
+            }
         }
         remember()
 
-        if let resp = getBindDevice(),
-           OttaiConstants.matchesCanonicalOrKnownNativeAlias(OttaiConstants.canonicalSensorId(resp.mac), canonical),
-           let m = toMaterials(mac: OttaiConstants.canonicalSensorId(resp.mac), resp: resp), m.authKeys != nil {
-            return OttaiRegistry.saveMaterials(sensorId: canonical, m)
-        }
+        if let m = boundSensorMaterials(canonical) { return save(m) }
         remember()
 
         if let version = materialBindDeviceVersion(selectedDeviceVersion: nil, failureCode: firstFailure?.code),
            let resp = bindForMaterials(mac: canonical, deviceVersion: version),
            let m = toMaterials(mac: canonical, resp: resp), m.authKeys != nil {
-            return OttaiRegistry.saveMaterials(sensorId: canonical, m)
+            return save(m)
         }
         if lastFailure == nil { lastFailure = firstFailure }
-        return false
+        return .failed
+    }
+
+    /// From the V3 check, or from the firmware (the transmitter saves it there).
+    static func serverActivationBindVersion(_ sensorId: String) -> String {
+        OttaiRegistry.loadLastValidatedDeviceVersion(sensorId: sensorId) ?? OttaiRegistry.loadMaterials(sensorId: sensorId).deviceVersion
     }
 
     // MARK: - website API (email login and sign-up)
@@ -612,31 +733,17 @@ enum OttaiCloudClient {
     static func mailLogin(email: String, password: String, webBase: String = OttaiConstants.webBaseOttai) -> LoginResult? {
         let em = email.trimmingCharacters(in: .whitespaces)
         if em.isEmpty || password.isEmpty { lastFailure = CloudFailure(text: "email/password required"); return nil }
-        let resp: [String: Any]?
-        if isSyaiWeb(webBase) {
-            let encInfo = webEncrypt(json(["email": em, "password": password]))
-            resp = webPostRetry(webBase, "/user/mail/login") { apiToken, ts in
-                ["encryptInfo": encInfo, "email": em, "apiToken": apiToken, "signature": webSign(webAppSyai, String(ts), apiToken, em, password)]
-            }
-        } else {
-            let encInfo = webEncrypt(json(["username": em, "password": password]))
-            resp = webPostRetry(webBase, "/user/login/thirdLoginByPassword") { apiToken, ts in
-                ["uuid": UUID().uuidString.replacingOccurrences(of: "-", with: ""), "encryptInfo": encInfo, "apiToken": apiToken, "source": 5,
-                 "signature": webSign(webApp, webDeviceId, String(ts), apiToken, em, password)]
-            }
-        }
-        guard let resp = resp else { return nil }
+        if isSyaiWeb(webBase) { return OttaiSyaiClient.login(email: em, password: password) }
+        let encInfo = webEncrypt(json(["username": em, "password": password]))
+        guard let resp = webPostRetry(webBase, "/user/login/thirdLoginByPassword", buildBody: { apiToken, ts in
+            ["uuid": UUID().uuidString.replacingOccurrences(of: "-", with: ""), "encryptInfo": encInfo, "apiToken": apiToken, "source": 5,
+             "signature": webSign(webApp, webDeviceId, String(ts), apiToken, em, password)]
+        }) else { return nil }
         let mobileBase = webBaseToMobile(webBase)
         let webToken = str(dataObject(resp), "accessToken")
-        if !webToken.isEmpty {
-            let profile = isSyaiWeb(webBase) ? mobileGetUser(mobileBase, accessToken: webToken) : webGetUser(webBase, accessToken: webToken)
-            if let userName = str(profile, "userName").nilIfEmpty {
-                if let r = passwordLogin(account: userName, password: password, base: mobileBase, authorizationOverride: webToken), r.ok { return r }
-            }
-        }
-        if isSyaiWeb(webBase) {
-            if lastError.isEmpty { lastFailure = CloudFailure(text: "Syai mobile login upgrade failed") }
-            return nil
+        if !webToken.isEmpty, let userName = str(webGetUser(webBase, accessToken: webToken), "userName").nilIfEmpty,
+           let r = passwordLogin(account: userName, password: password, base: mobileBase, authorizationOverride: webToken), r.ok {
+            return r
         }
         return persistWebLogin(resp, mobileBase: mobileBase, webBase: webBase)
     }
@@ -666,10 +773,10 @@ enum OttaiCloudClient {
             ["type": "SIGN_UP", "validCode": validCode, "requestId": requestId, "email": em, "signature": webSign(webAppSyai, String(ts), requestId, em, validCode)]
         }), anyToString(verify["code"]).caseInsensitiveEquals("OK") else { return nil }
         let encInfo = webEncrypt(json(["email": em, "password": password]))
-        guard let resp = webPostRetry(webBase, "/user/mail/signUp", buildBody: { _, ts in
+        guard webPostRetry(webBase, "/user/mail/signUp", buildBody: { _, ts in
             ["encryptInfo": encInfo, "requestId": requestId, "signature": webSign(webAppSyai, String(ts), requestId, em)]
-        }) else { return nil }
-        return persistWebLogin(resp, mobileBase: webBaseToMobile(webBase), webBase: webBase)
+        }) != nil else { return nil }
+        return OttaiSyaiClient.login(email: em, password: password)
     }
 
     static func webBaseToMobile(_ webBase: String) -> String {
@@ -700,12 +807,6 @@ enum OttaiCloudClient {
         if isSyaiWeb(webBase) { headers["deviceId"] = webDeviceId }
         headers["Authorization"] = "Bearer \(accessToken)"
         guard let resp = httpGet("\(webBase)/user/getUser", [:], headers) else { return nil }
-        return dataObject(resp)
-    }
-
-    private static func mobileGetUser(_ mobileBase: String, accessToken: String) -> [String: Any]? {
-        let ts = now()
-        guard let resp = httpGet(mobileBase + OttaiConstants.epGetUser, [:], headers(ts: ts, apiBase: mobileBase, authorizationOverride: accessToken)) else { return nil }
         return dataObject(resp)
     }
 

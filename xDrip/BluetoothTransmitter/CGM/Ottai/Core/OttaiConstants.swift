@@ -74,8 +74,6 @@ enum OttaiConstants {
     static let epGetBindDevice = "\(prefix)/deviceBind/getBindDevice"
     static let epDeviceList = "\(prefix)/deviceBind/list"
     static let epDownloadGlucose = "\(prefix)/search/downloadGlucose"
-    /// Upload of readings, as the Syai Tag app does it (no `prefix`). Syai server only.
-    static let epCollectGlucoseV2 = "/cgm/data/collect/collect/glucose/v2"
 
     static let headerAppName = "ottai"
     static let headerPackage = "com.ottai.tag"
