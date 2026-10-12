@@ -3045,7 +3045,7 @@ private extension BluetoothPeripheralDetailState {
                 primaryAction: { [weak self] in
                     guard let self = self else { return }
                     self.ottaiCloudQueue.async {
-                        OttaiCloudClient.logout()
+                        _ = OttaiCloudClient.perform { OttaiCloudClient.logout() }
                         DispatchQueue.main.async { self.refresh() }
                     }
                 },
@@ -3130,7 +3130,8 @@ private extension BluetoothPeripheralDetailState {
         setOttaiBusy("Sending code…")
 
         ottaiCloudQueue.async { [weak self] in
-            let requestId = OttaiCloudClient.requestSmsCode(phone: phone)
+            let result = OttaiCloudClient.perform { OttaiCloudClient.requestSmsCode(phone: phone) }
+            let requestId = result.value
 
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -3139,7 +3140,7 @@ private extension BluetoothPeripheralDetailState {
                 guard let requestId = requestId else {
                     self.showInfo(
                         title: "Could not send code",
-                        message: OttaiCloudClient.lastError.isEmpty ? "The server did not accept the number." : OttaiCloudClient.lastError
+                        message: result.errorText.isEmpty ? "The server did not accept the number." : result.errorText
                     )
                     return
                 }
@@ -3173,7 +3174,8 @@ private extension BluetoothPeripheralDetailState {
         setOttaiBusy("Signing in…")
 
         ottaiCloudQueue.async { [weak self] in
-            let ok = work()
+            let result = OttaiCloudClient.perform(work)
+            let ok = result.value
 
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -3184,7 +3186,7 @@ private extension BluetoothPeripheralDetailState {
                 } else {
                     self.showInfo(
                         title: "Sign-in failed",
-                        message: OttaiCloudClient.lastError.isEmpty ? "Check your credentials and region." : OttaiCloudClient.lastError
+                        message: result.errorText.isEmpty ? "Check your credentials and region." : result.errorText
                     )
                 }
             }
@@ -3250,9 +3252,10 @@ private extension BluetoothPeripheralDetailState {
         setOttaiBusy(busyMessage)
 
         ottaiCloudQueue.async { [weak self] in
-            let outcome = OttaiCloudClient.fetchAndSaveMaterials(cloudId: sensorId)
-            let failureCode = OttaiCloudClient.lastFailure?.code ?? ""
-            let failureText = OttaiCloudClient.lastError
+            let result = OttaiCloudClient.perform { OttaiCloudClient.fetchAndSaveMaterials(cloudId: sensorId) }
+            let outcome = result.value
+            let failureCode = result.failure?.code ?? ""
+            let failureText = result.errorText
 
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -3289,7 +3292,7 @@ private extension BluetoothPeripheralDetailState {
     private func offerToUnbindPreviousSensor(newCloudId: String, for ottai: Ottai) {
         setOttaiBusy("Checking the account…")
         ottaiCloudQueue.async { [weak self] in
-            let bound = OttaiCloudClient.getBindDevice()
+            let bound = OttaiCloudClient.perform { OttaiCloudClient.getBindDevice() }.value
 
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -3320,7 +3323,8 @@ private extension BluetoothPeripheralDetailState {
     private func unbindPreviousSensorAndRetryFetch(oldMac: String, newCloudId: String, for ottai: Ottai) {
         setOttaiBusy("Unbinding \(oldMac)…")
         ottaiCloudQueue.async { [weak self] in
-            let unbound = OttaiCloudClient.unbind(mac: oldMac)
+            let result = OttaiCloudClient.perform { OttaiCloudClient.unbind(mac: oldMac) }
+            let unbound = result.value
             // Give the server a moment to release the old binding before the next fetch.
             if unbound { usleep(1_000_000) }
 
@@ -3332,7 +3336,7 @@ private extension BluetoothPeripheralDetailState {
                     self.setOttaiBusy(nil)
                     self.showInfo(
                         title: "Unbind failed",
-                        message: OttaiCloudClient.lastError.isEmpty ? "Could not unbind \(oldMac). Try again, or unbind it in the Syai app." : OttaiCloudClient.lastError
+                        message: result.errorText.isEmpty ? "Could not unbind \(oldMac). Try again, or unbind it in the Syai app." : result.errorText
                     )
                     self.refresh()
                 }
@@ -3385,7 +3389,7 @@ private extension BluetoothPeripheralDetailState {
         guard !sensorId.isEmpty, ottaiIsSignedIn else { return }
         let log = self.log
         DispatchQueue.global(qos: .utility).async {
-            if OttaiCloudClient.releaseIfBound(mac: sensorId) {
+            if OttaiCloudClient.perform({ OttaiCloudClient.releaseIfBound(mac: sensorId) }).value {
                 trace("Ottai sensor %{public}@ unbound from the cloud account", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .info, sensorId)
             }
         }

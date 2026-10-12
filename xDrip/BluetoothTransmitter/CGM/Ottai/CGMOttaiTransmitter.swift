@@ -743,8 +743,11 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         let mac = OttaiCrypto.bytesToHex(macBytes)
         let gen = connectionGeneration
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            let material = OttaiCloudClient.cgmAuthVerify(mac: mac, authDevHex: authDevHex, authFlagHex: authFlagHex)
-            let failure = OttaiCloudClient.lastFailure
+            let result = OttaiCloudClient.perform {
+                OttaiCloudClient.cgmAuthVerify(mac: mac, authDevHex: authDevHex, authFlagHex: authFlagHex)
+            }
+            let material = result.value
+            let failure = result.failure
             self?.workQueue.async { [weak self] in
                 guard let self = self, self.connectionGeneration == gen, self.phase == .auth else { return }
                 guard let m = material,
@@ -903,8 +906,11 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         pendingBindInFlight = true
         let version = OttaiCloudClient.serverActivationBindVersion(id)
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            let mats = version.isEmpty ? nil : OttaiCloudClient.bindAfterServerActivation(mac: id, deviceVersion: version, activatedAtMs: activatedAtMs)
-            let failure = OttaiCloudClient.lastFailure
+            let result = OttaiCloudClient.perform {
+                version.isEmpty ? nil : OttaiCloudClient.bindAfterServerActivation(mac: id, deviceVersion: version, activatedAtMs: activatedAtMs)
+            }
+            let mats = result.value
+            let failure = result.failure
             self?.workQueue.async { [weak self] in
                 guard let self = self else { return }
                 self.pendingBindInFlight = false

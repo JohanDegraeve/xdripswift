@@ -203,23 +203,27 @@ final class OttaiCloudUploader {
         // The calls wait for the server, so they run off this queue.
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self = self else { return }
-            self.ensureBound(&materials)
-            if materials.deviceId <= 0, let serverId = Self.serverDeviceId(id) {
-                OttaiRegistry.saveDeviceId(id, serverId)
-                materials.deviceId = serverId
+            let preparation = OttaiCloudClient.perform { () -> Bool in
+                guard self.ensureBound(&materials) else { return false }
+                if materials.deviceId <= 0, let serverId = Self.serverDeviceId(id) {
+                    OttaiRegistry.saveDeviceId(id, serverId)
+                    materials.deviceId = serverId
+                }
+                return materials.deviceId > 0
             }
-            guard materials.deviceId > 0 else {
+            guard preparation.value else {
                 self.queue.async {
                     self.inFlight = false
-                    self.fail("no cloud device id for this sensor yet")
+                    self.fail(preparation.errorText.isEmpty ? "no confirmed cloud device id for this sensor yet" : preparation.errorText)
                 }
                 return
             }
             trace("cloud upload: posting %{public}d readings (dataNo %{public}d…%{public}d) deviceId=%{public}d", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .info,
                   batch.count, batch.map { $0.dataNo }.min() ?? 0, batch.map { $0.dataNo }.max() ?? 0, materials.deviceId)
-            let ok = OttaiSyaiClient.uploadGlucose(Self.uploadBody(batch: batch, materials: materials), expectedUserId: account) != nil
-            let failure = OttaiCloudClient.lastError
-            self.queue.async { self.handleResponse(batch: batch, account: account, ok: ok, failure: failure) }
+            let result = OttaiCloudClient.perform {
+                OttaiSyaiClient.uploadGlucose(Self.uploadBody(batch: batch, materials: materials), expectedUserId: account) != nil
+            }
+            self.queue.async { self.handleResponse(batch: batch, account: account, ok: result.value, failure: result.errorText) }
         }
     }
 
@@ -267,8 +271,8 @@ final class OttaiCloudUploader {
     /// The server takes readings of an unbound sensor, but the Syai app shows only the bound one.
     /// The setup binds an old Syai sensor only for a moment, so bind it here. Another bound
     /// sensor is left alone. Readings go to the deviceId of the bound record.
-    private func ensureBound(_ materials: inout OttaiRegistry.DeviceMaterials) {
-        guard !bindConfirmed, Date() >= nextBindCheck else { return }
+    private func ensureBound(_ materials: inout OttaiRegistry.DeviceMaterials) -> Bool {
+        guard !bindConfirmed, Date() >= nextBindCheck else { return true }
         nextBindCheck = Date().addingTimeInterval(Self.bindCheckDelay)
         switch OttaiCloudClient.bindState(mac: sensorId) {
         case .thisSensor(let deviceId)?:
@@ -288,8 +292,13 @@ final class OttaiCloudUploader {
                 nextBindCheck = Date().addingTimeInterval(Self.firstRetryDelay)
             } else if OttaiCloudClient.bindPermanently(mac: sensorId, materials: materials) {
                 trace("cloud bind: sensor %{public}@ bound, activeTime=%{public}@", log: log, category: ConstantsLog.categoryCGMOttai, type: .info, sensorId, "\(materials.activeTimeMs / 1000)")
-                // check again on the next upload to take the deviceId of the new record
+                // A new binding can create a new record. Invalidate the old id on disk
+                // before looking it up, so a failed lookup or restart cannot reuse it.
                 nextBindCheck = .distantPast
+                guard Self.refreshBoundDeviceId(&materials,
+                    lookup: { OttaiCloudClient.bindState(mac: self.sensorId) },
+                    save: { OttaiRegistry.saveDeviceId(self.sensorId, $0) }) else { return false }
+                bindConfirmed = true
                 bindNotice = nil
             } else {
                 trace("cloud bind failed: %{public}@", log: log, category: ConstantsLog.categoryCGMOttai, type: .error, OttaiCloudClient.lastError)
@@ -298,6 +307,18 @@ final class OttaiCloudUploader {
         case nil:
             trace("cloud bind check failed: %{public}@", log: log, category: ConstantsLog.categoryCGMOttai, type: .error, OttaiCloudClient.lastError)
         }
+        return true
+    }
+
+    /// Persist invalidation before lookup; only the bound record can replace the old id.
+    static func refreshBoundDeviceId(_ materials: inout OttaiRegistry.DeviceMaterials,
+                                     lookup: () -> OttaiCloudClient.BindState?, save: (Int) -> Void) -> Bool {
+        materials.deviceId = 0
+        save(0)
+        guard case .thisSensor(let deviceId)? = lookup(), deviceId > 0 else { return false }
+        materials.deviceId = deviceId
+        save(deviceId)
+        return true
     }
 
     // MARK: - request

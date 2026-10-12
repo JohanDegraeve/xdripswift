@@ -188,3 +188,88 @@ final class OttaiUploadOutboxTests: XCTestCase {
         XCTAssertEqual(try OttaiUploadOutbox(url: destination).pending(account: "A").map(\.dataNo), [7])
     }
 }
+
+final class OttaiCloudOperationTests: XCTestCase {
+    func testConcurrentOperationsKeepTheirOwnFailure() {
+        let firstStarted = DispatchSemaphore(value: 0)
+        let secondFinished = DispatchSemaphore(value: 0)
+        let finished = expectation(description: "both operations finished")
+        finished.expectedFulfillmentCount = 2
+        DispatchQueue.global().async {
+            let result = OttaiCloudClient.perform {
+                OttaiCloudClient.lastFailure = .init(text: "activation refused", code: "activation")
+                firstStarted.signal()
+                XCTAssertEqual(secondFinished.wait(timeout: .now() + 3), .success)
+                return false
+            }
+            XCTAssertEqual(result.failure?.code, "activation")
+            finished.fulfill()
+        }
+        DispatchQueue.global().async {
+            XCTAssertEqual(firstStarted.wait(timeout: .now() + 3), .success)
+            let result = OttaiCloudClient.perform {
+                OttaiCloudClient.lastFailure = .init(text: "upload failed", code: "upload")
+                return false
+            }
+            XCTAssertEqual(result.failure?.code, "upload")
+            secondFinished.signal()
+            finished.fulfill()
+        }
+        wait(for: [finished], timeout: 5)
+    }
+
+    func testResultKeepsFailureAcrossQueueHandoff() {
+        let finished = expectation(description: "result delivered")
+        DispatchQueue.global().async {
+            let result = OttaiCloudClient.perform {
+                OttaiCloudClient.lastFailure = .init(text: "sign-in failed", code: "auth")
+                return false
+            }
+            _ = OttaiCloudClient.perform { OttaiCloudClient.lastFailure = nil }
+            DispatchQueue.main.async {
+                XCTAssertEqual(result.errorText, "sign-in failed")
+                XCTAssertEqual(result.failure?.code, "auth")
+                finished.fulfill()
+            }
+        }
+        wait(for: [finished], timeout: 3)
+    }
+
+    func testNestedOperationsRestoreOuterFailureAndStartClean() {
+        let outer = OttaiCloudClient.perform {
+            OttaiCloudClient.lastFailure = .init(text: "outer", code: "outer")
+            let inner = OttaiCloudClient.perform { true }
+            XCTAssertNil(inner.failure)
+            XCTAssertEqual(OttaiCloudClient.lastFailure?.code, "outer")
+            return false
+        }
+        XCTAssertEqual(outer.failure?.code, "outer")
+        XCTAssertNil(OttaiCloudClient.perform { true }.failure)
+    }
+
+    func testNewBoundIdIsSavedBeforeFirstUpload() {
+        var materials = OttaiRegistry.DeviceMaterials()
+        materials.deviceId = 10
+        var saved: [Int] = []
+        let ready = OttaiCloudUploader.refreshBoundDeviceId(&materials, lookup: {
+            XCTAssertEqual(saved, [0])
+            return .thisSensor(deviceId: 20)
+        }, save: { saved.append($0) })
+        XCTAssertTrue(ready)
+        XCTAssertEqual(materials.deviceId, 20)
+        XCTAssertEqual(saved, [0, 20])
+        XCTAssertEqual(OttaiCloudUploader.uploadBody(batch: [], materials: materials)["deviceId"] as? Int, 20)
+    }
+
+    func testFailedOrUnconfirmedLookupCannotReuseOldId() {
+        let replies: [OttaiCloudClient.BindState?] = [nil, .unbound, .other("other"), .thisSensor(deviceId: 0)]
+        for reply in replies {
+            var materials = OttaiRegistry.DeviceMaterials()
+            materials.deviceId = 10
+            var saved: [Int] = []
+            XCTAssertFalse(OttaiCloudUploader.refreshBoundDeviceId(&materials, lookup: { reply }, save: { saved.append($0) }))
+            XCTAssertEqual(materials.deviceId, 0)
+            XCTAssertEqual(saved, [0])
+        }
+    }
+}

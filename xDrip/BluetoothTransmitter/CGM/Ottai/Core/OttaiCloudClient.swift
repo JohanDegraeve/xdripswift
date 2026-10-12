@@ -34,9 +34,33 @@ enum OttaiCloudClient {
 
     struct CloudFailure { let text: String; var code: String = "" }
 
-    /// Why the last call failed (no secrets in it). Nil after a call that worked.
-    static var lastFailure: CloudFailure?
+    // The legacy synchronous helpers exchange errors through the calling thread.
+    // Never share this slot between concurrent upload, activation and UI operations.
+    private static let failureKey = "xdrip.ottai.cloud.operationFailure"
+    static var lastFailure: CloudFailure? {
+        get { Thread.current.threadDictionary[failureKey] as? CloudFailure }
+        set {
+            if let newValue = newValue { Thread.current.threadDictionary[failureKey] = newValue }
+            else { Thread.current.threadDictionary.removeObject(forKey: failureKey) }
+        }
+    }
     static var lastError: String { lastFailure?.text ?? "" }
+
+    struct OperationResult<Value> {
+        let value: Value
+        let failure: CloudFailure?
+        var errorText: String { failure?.text ?? "" }
+    }
+
+    /// Run a complete synchronous operation and carry its error with its value when
+    /// dispatching to another queue. Nested operations restore their caller's error.
+    static func perform<Value>(_ operation: () -> Value) -> OperationResult<Value> {
+        let previous = lastFailure
+        lastFailure = nil
+        defer { lastFailure = previous }
+        let value = operation()
+        return OperationResult(value: value, failure: lastFailure)
+    }
 
     struct LoginResult {
         let userId: String
