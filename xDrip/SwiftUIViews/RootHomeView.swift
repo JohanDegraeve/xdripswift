@@ -1279,6 +1279,11 @@ private final class RootHomeHistoricalDataCache: ObservableObject {
     private static let minimumBufferTimeInterval: TimeInterval = .hours(1)
     private static let maximumBufferTimeInterval: TimeInterval = .hours(6)
 
+    /// The desired end of the range is capped at Date(), which is always a few milliseconds newer than the end of the
+    /// range loaded a moment ago. Without a tolerance every completed load immediately started the next one, an endless
+    /// fetch/merge/redraw loop that used 100% CPU and got the app killed by the iOS CPU watchdog in the background.
+    private static let forwardExtensionTolerance: TimeInterval = 60
+
     init(coreDataManager: CoreDataManager) {
         deviceStatusAccessor = NightscoutDeviceStatusAccessor(coreDataManager: coreDataManager)
         treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
@@ -1311,7 +1316,7 @@ private final class RootHomeHistoricalDataCache: ObservableObject {
             } else if desiredStartDate < cacheStartDate {
                 // The initial site-change fetch already includes every older retained entry.
                 load = Load(startDate: desiredStartDate, endDate: cacheStartDate, siteChangeStartDate: nil, loadsSiteChanges: false, resetsCache: false, generation: generation)
-            } else if desiredEndDate > cacheEndDate {
+            } else if desiredEndDate.timeIntervalSince(cacheEndDate) > Self.forwardExtensionTolerance {
                 load = Load(startDate: cacheEndDate, endDate: desiredEndDate, siteChangeStartDate: cacheEndDate, loadsSiteChanges: true, resetsCache: false, generation: generation)
             } else {
                 load = nil
