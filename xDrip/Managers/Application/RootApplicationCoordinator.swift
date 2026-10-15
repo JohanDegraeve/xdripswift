@@ -1124,7 +1124,8 @@ import AppIntents
                 timeStampLastBgReading = lastReading.timeStamp
             }
             
-            let duplicateReadingWindow = TimeInterval(minutes: 2.5)
+            let isLibre3 = cgmTransmitter.cgmTransmitterType() == .Libre3
+            let duplicateReadingWindow = isLibre3 ? TimeInterval(10) : TimeInterval(minutes: 2.5)
             let oldestIncomingTimeStamp = glucoseData.map { $0.timeStamp }.min()
             let newestIncomingTimeStamp = glucoseData.map { $0.timeStamp }.max()
             var existingBgReadingsInIncomingRange = [BgReading]()
@@ -1155,7 +1156,7 @@ import AppIntents
                 
                 // timestamp of glucose being processed must be higher (ie more recent) than checktimestamp except if it's the last one (ie the first in the array), because there we don't care if it's less than 5 minutes different with the last but one
                 // adding 10 seconds to timeStampLastBgReading to handle case of G7, with backfills, because the array contains two times the same reading with a timestamp difference of a few seconds
-                if (glucose.timeStamp > checktimestamp || ((index == 0) && (glucose.timeStamp > timeStampLastBgReading.addingTimeInterval(10))) || isHistoricalGapFill) {
+                if (isLibre3 && !existingReadingInSameSlot) || (!isLibre3 && (glucose.timeStamp > checktimestamp || ((index == 0) && (glucose.timeStamp > timeStampLastBgReading.addingTimeInterval(10))) || isHistoricalGapFill)) {
                     // check on glucoseLevelRaw > 0 because I've had a case where a faulty sensor was giving negative values
                     if glucose.glucoseLevelRaw > 0 {
                         var last3ReadingsForNewReading = latest3BgReadings
@@ -1863,7 +1864,7 @@ import AppIntents
                 calibrator = DexcomCalibrator()
             }
             
-        case .dexcomG7:
+        case .dexcomG7, .Libre3:
             // received values are already calibrated
             calibrator = NoCalibrator()
             
@@ -2337,7 +2338,7 @@ import AppIntents
         // if there is a transmitter connected, pull the current maxSensorAgeInDays and store in in UserDefaults
         if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let maxDays = cgmTransmitter.maxSensorAgeInDays() {
             UserDefaults.standard.activeSensorMaxSensorAgeInDays = maxDays
-            UserDefaults.standard.activeSensorDescription = cgmTransmitter.cgmTransmitterType().detailedDescription()
+            UserDefaults.standard.activeSensorDescription = (cgmTransmitter as? CGMLibre3Transmitter)?.productName ?? cgmTransmitter.cgmTransmitterType().detailedDescription()
         }
 
         // The state model owns all visible sensor and data-source formatting. The controller keeps
@@ -2433,7 +2434,7 @@ import AppIntents
         
         // update the activeSensorDescription. Needed as otherwise it won't get done for Libre after an algorithm change
         if let cgmTransmitter = cGMTransmitter {
-            UserDefaults.standard.activeSensorDescription = cgmTransmitter.cgmTransmitterType().detailedDescription()
+            UserDefaults.standard.activeSensorDescription = (cgmTransmitter as? CGMLibre3Transmitter)?.productName ?? cgmTransmitter.cgmTransmitterType().detailedDescription()
         }
         
         // assign activeSensor to newSensor
@@ -2573,7 +2574,7 @@ import AppIntents
             startDate = sensorStartDate ?? startDate
             switch transmitter?.cgmTransmitterType().sensorType() {
             case .Libre:
-                duration = ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
+                duration = transmitter?.sensorWarmupDurationInMinutes() ?? ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
             case .Dexcom:
                 if transmitter?.cgmTransmitterType() == .dexcomG7 {
                     duration = ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG7
@@ -2888,6 +2889,11 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
         trace("new sensor detected", log: log, category: ConstantsLog.categoryRootView, type: .info, troubleshooting: .standard(.sensor(.detected)))
 
         let transmitter = bluetoothPeripheralManager?.getCGMTransmitter()
+        if transmitter?.cgmTransmitterType() == .Libre3,
+           let sensorStartDate, let activeSensor,
+           abs(activeSensor.startDate.timeIntervalSince(sensorStartDate)) < 60 {
+            return
+        }
         if transmitter?.needsSensorStartCode() == true,
            let sensorStartDate,
            let activeSensor,
@@ -2976,7 +2982,7 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
         
         if let sensorAgeInSeconds = sensorAge {
             let cgmTransmitterType = bluetoothPeripheralManager?.getCGMTransmitter()?.cgmTransmitterType()
-            let minimumWarmUpRequiredInMinutes = cgmTransmitterType == .dexcomG7 ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG7 : ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
+            let minimumWarmUpRequiredInMinutes = bluetoothPeripheralManager?.getCGMTransmitter()?.sensorWarmupDurationInMinutes() ?? (cgmTransmitterType == .dexcomG7 ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG7 : ConstantsMaster.minimumSensorWarmUpRequiredInMinutes)
             let secondsUntilWarmUpComplete = (minimumWarmUpRequiredInMinutes * 60) - sensorAgeInSeconds
 
             if Self.shouldSuppressReadingDuringWarmup(

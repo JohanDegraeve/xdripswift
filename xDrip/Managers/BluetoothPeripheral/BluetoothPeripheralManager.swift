@@ -174,7 +174,7 @@ class BluetoothPeripheralManager: NSObject {
                         _ = m5StackBluetoothTransmitter.writeBgReadingInfo(bgReading: bgReadingToSend[0])
                     }
                     
-                case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type, .MedtrumTouchCareNanoType:
+                case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .Libre3Type, .DexcomG7Type, .MedtrumTouchCareNanoType:
                     // cgm's don't receive reading, they send it
                     break
                     
@@ -211,7 +211,12 @@ class BluetoothPeripheralManager: NSObject {
 
         blePeripheral.shouldconnect = enabled
         blePeripheral.hasConnectedSinceActivation = false
-        coreDataManager.saveChanges()
+        if bluetoothPeripheral is Libre3 {
+            // Persist the user's choice to disk before a force-close can interrupt the parent save.
+            coreDataManager.saveChangesSynchronously()
+        } else {
+            coreDataManager.saveChanges()
+        }
         connectionPresentationChanged()
     }
 
@@ -333,6 +338,13 @@ class BluetoothPeripheralManager: NSObject {
                         }
                     }
                     
+                case .Libre3Type:
+                    if let libre3 = bluetoothPeripheral as? Libre3, let delegate = cgmTransmitterDelegate {
+                        let serial = libre3.blePeripheral.sensorSerialNumber ?? ""
+                        let record = (try? Libre3CredentialStore().load(serial: serial)) ?? .unavailable(serial: serial)
+                        newTransmitter = CGMLibre3Transmitter(address: libre3.blePeripheral.address, name: libre3.blePeripheral.name, record: record, bluetoothTransmitterDelegate: self, libreDelegate: self, cgmDelegate: delegate)
+                    }
+
                 case .Libre2Type:
                     
                     if let libre2 = bluetoothPeripheral as? Libre2 {
@@ -456,6 +468,8 @@ class BluetoothPeripheralManager: NSObject {
                     return .MiaoMiaoType
                 }
                 
+            case .Libre3Type:
+                if bluetoothTransmitter is CGMLibre3Transmitter { return .Libre3Type }
             case .Libre2Type:
                 if bluetoothTransmitter is CGMLibre2Transmitter {
                     return .Libre2Type
@@ -530,6 +544,11 @@ class BluetoothPeripheralManager: NSObject {
             }
             
             return CGMMiaoMiaoTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMMiaoMiaoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate,  sensorSerialNumber: nil, webOOPEnabled: nil, nonFixedSlopeEnabled: nil)
+
+        case .Libre3Type:
+            guard let delegate = cgmTransmitterDelegate else { fatalError("Missing CGM delegate") }
+            let record = (try? Libre3CredentialStore().pending()) ?? .unavailable(serial: "")
+            return CGMLibre3Transmitter(address: record.peripheralID, name: nil, record: record, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, libreDelegate: self, cgmDelegate: delegate)
 
         case .Libre2Type:
             
@@ -872,6 +891,20 @@ class BluetoothPeripheralManager: NSObject {
                         
                     }
                     
+                case .Libre3Type:
+                    if let libre3 = blePeripheral.libre3 {
+                        blePeripheralFound = true
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: libre3)
+                        let serial = blePeripheral.sensorSerialNumber ?? ""
+                        let record = (try? Libre3CredentialStore().load(serial: serial)) ?? .unavailable(serial: serial)
+                        if blePeripheral.shouldconnect {
+                            bluetoothTransmitters.insert(CGMLibre3Transmitter(address: blePeripheral.address, name: blePeripheral.name, record: record, bluetoothTransmitterDelegate: self, libreDelegate: self, cgmDelegate: cgmTransmitterDelegate), at: index)
+                            currentCgmTransmitterAddress = blePeripheral.address
+                        } else {
+                            bluetoothTransmitters.insert(nil, at: index)
+                        }
+                    }
+
                 case .Libre2Type:
                     
                     if let libre2 = blePeripheral.libre2 {
@@ -1154,7 +1187,7 @@ class BluetoothPeripheralManager: NSObject {
                     bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .DexcomG7Type, .MedtrumTouchCareNanoType:
+            case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .Libre3Type, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .DexcomG7Type, .MedtrumTouchCareNanoType:
 
                 // nothing to check
                 break
@@ -1273,6 +1306,10 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
         if let tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral {
             
             tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral.stopScanning()
+            if tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral is CGMLibre3Transmitter {
+                tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral.disconnectAndForget()
+                tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral.prepareForRelease()
+            }
             
             self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = nil
             

@@ -544,7 +544,9 @@ struct SensorManagementView: View {
         let transmitterType = transmitter?.cgmTransmitterType()
         let dexcomG7 = transmitterType == .dexcomG7 ? dexcomG7Provider() : nil
         let sensorDescription: String
-        if activeSensor != nil {
+        if let libre3 = transmitter as? CGMLibre3Transmitter {
+            sensorDescription = libre3.productName
+        } else if activeSensor != nil {
             sensorDescription = UserDefaults.standard.activeSensorDescription ?? Texts_HomeView.sensor
         } else if let dexcomG7 {
             // A G7-family sensor manages its own session. Before the first usable glucose creates
@@ -578,7 +580,7 @@ struct SensorManagementView: View {
 
         switch sensorType {
         case .Libre:
-            warmupMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
+            warmupMinutes = transmitter?.sensorWarmupDurationInMinutes() ?? ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
         case .Dexcom:
             if transmitterType == .dexcomG7 {
                 warmupMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG7

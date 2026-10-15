@@ -341,6 +341,42 @@ final class TroubleshootingLogTests: XCTestCase {
         XCTAssertTrue(report.reportText.contains("0000"))
     }
 
+    func testLegacyLibre3ReceiverActivityKeepsStorageCompatibilityAndRedactsReports() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        for confirmed in [false, true] {
+            fixture.store.record(.standard(.sensor(.libre3ReceiverID(
+                sensorSerial: "ABC123456", receiverID: 0x12345678, confirmed: confirmed
+            )), timestamp: referenceDate.addingTimeInterval(confirmed ? 1 : 0)))
+        }
+        let entries = fixture.store.snapshot()
+        XCTAssertEqual(entries.count, 2)
+        let report = makeReport(entries: entries)
+        XCTAssertEqual(entries.map(report.message(for:)), [
+            "Libre 3 NFC confirmed.",
+            "Libre 3 NFC attempt."
+        ])
+        XCTAssertFalse(report.reportText.contains("ABC123456"))
+        XCTAssertFalse(report.reportText.contains("78563412"))
+        let restored = TroubleshootingLogStore(fileURL: fixture.fileURL).snapshot()
+        XCTAssertEqual(restored.map(\.kind), entries.map(\.kind))
+    }
+
+    func testLibre3NFCActivityStoresNoRecoveryIdentifiers() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        fixture.store.record(.standard(.sensor(.libre3NFC(confirmed: true)), timestamp: referenceDate))
+        // Writes are queued. Flush this store before asking a separate reader to reopen its file.
+        _ = fixture.store.snapshot()
+        let restored = TroubleshootingLogStore(fileURL: fixture.fileURL, now: { self.referenceDate }).snapshot()
+        XCTAssertEqual(restored.count, 1)
+        let entry = try XCTUnwrap(restored.first)
+        XCTAssertEqual(makeReport(entries: restored).message(for: entry), "Libre 3 NFC confirmed.")
+        let storedText = String(decoding: try Data(contentsOf: fixture.fileURL), as: UTF8.self)
+        XCTAssertFalse(storedText.contains("receiverID"))
+        XCTAssertFalse(storedText.contains("sensorSerial"))
+    }
+
     func testSensorLabelScanActivityRetainsDecodedInformationAndFailures() throws {
         let fixture = makeStore()
         defer { removeFixture(fixture.directory) }

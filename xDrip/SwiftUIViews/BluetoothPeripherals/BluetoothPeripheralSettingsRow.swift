@@ -52,7 +52,7 @@ struct BluetoothPeripheralSettingsRow: View {
                             .accessibilityLabel(detailIndicator.accessibilityLabel ?? "")
                     }
 
-                    if let detailSymbol {
+                    if let detailSymbol, !detailSymbol.isTrailing {
                         Image(systemName: detailSymbol.systemName)
                             .foregroundStyle(isEnabled ? detailSymbol.color : .gray)
                             .imageScale(.medium)
@@ -63,6 +63,12 @@ struct BluetoothPeripheralSettingsRow: View {
                         .multilineTextAlignment(.trailing)
                         .lineLimit(detailLineLimit)
                         .truncationMode(.tail)
+
+                    if let detailSymbol, detailSymbol.isTrailing {
+                        Image(systemName: detailSymbol.systemName)
+                            .foregroundStyle(isEnabled ? detailSymbol.color : .gray)
+                            .imageScale(.medium)
+                    }
                 }
             }
 

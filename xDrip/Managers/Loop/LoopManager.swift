@@ -150,7 +150,7 @@ enum XDripCGMMetadataBuilder {
                 case .persistentNoise: return "persistent_noise"
                 case .flatline: return "flatline"
                 case .dexcomExcessNoise: return "excess_noise"
-                case .dexcomTemporarySensorIssue, .dexcomQuestionMarks: return "temporary_sensor_issue"
+                case .dexcomTemporarySensorIssue, .dexcomQuestionMarks, .libreTemporarySensorIssue: return "temporary_sensor_issue"
                 case .dexcomSensorFailure, .libreSensorFailure, .dexcomTransmitterFailure, .dexcomTransmitterBatteryFailure:
                     return "sensor_error"
                 }
@@ -254,7 +254,7 @@ enum XDripCGMMetadataBuilder {
             // transmitter. This only omits optional metadata; legacy readings are unchanged.
             guard defaults.isMaster, context.transmitter != nil else { return nil }
             let identifier = defaults.activeSensorTransmitterId
-            let transmitterModel = isAnubis ? DexcomProductNameResolver.anubisTitle : transmitterType?.detailedDescription()
+            let transmitterModel = isAnubis ? DexcomProductNameResolver.anubisTitle : (context.transmitter as? CGMLibre3Transmitter)?.productName ?? transmitterType?.detailedDescription()
             guard identifier != nil || transmitterModel != nil || battery != nil else { return nil }
             return .init(identifier: identifier, model: transmitterModel, battery: battery)
         }()
@@ -289,6 +289,7 @@ enum XDripCGMMetadataBuilder {
             if identifier.hasPrefix("DX01") { return "dexcom_stelo" }
             if identifier.hasPrefix("DX02") { return "dexcom_one_plus" }
             return "dexcom_g7"
+        case .Libre3: return "libre_3"
         case .Libre2: return "libre_2"
         case .miaomiao: return "libre_miaomiao"
         case .Bubble: return "libre_bubble"
@@ -312,7 +313,7 @@ enum XDripCGMMetadataBuilder {
     private static func directExpectedInterval(_ type: CGMTransmitterType?) -> Double? {
         switch type {
         case .dexcom, .dexcomG7: return 300
-        case .Libre2, .miaomiao, .Bubble, .medtrumTouchCareNano: return 60
+        case .Libre3, .Libre2, .miaomiao, .Bubble, .medtrumTouchCareNano: return 60
         case nil: return nil
         }
     }
@@ -326,6 +327,7 @@ enum XDripCGMMetadataBuilder {
     }
 
     private static func warmupDuration(transmitter: CGMTransmitter?, defaults: UserDefaults) -> TimeInterval {
+        if let minutes = transmitter?.sensorWarmupDurationInMinutes() { return minutes * 60 }
         if !defaults.isMaster,
            defaults.followerDataSourceType == .libreLinkUp || defaults.followerDataSourceType == .libreLinkUpRussia {
             return .minutes(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre)
@@ -337,7 +339,7 @@ enum XDripCGMMetadataBuilder {
             return .minutes(transmitter?.isAnubisG6() == true
                 ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis
                 : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6)
-        case .Libre2, .miaomiao, .Bubble, .medtrumTouchCareNano:
+        case .Libre3, .Libre2, .miaomiao, .Bubble, .medtrumTouchCareNano:
             return .minutes(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes)
         case nil:
             let description = defaults.activeSensorDescription?.lowercased() ?? ""

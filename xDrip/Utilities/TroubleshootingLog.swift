@@ -38,6 +38,7 @@ enum TroubleshootingLogSource: String, Codable {
     case miaoMiao
     case bubble
     case libre2
+    case libre3
     case libre2EU
     case libre2PlusEU
     case medtrumNano
@@ -91,6 +92,7 @@ enum TroubleshootingLogSource: String, Codable {
             self = .miaoMiao
         case .Bubble:
             self = .bubble
+        case .Libre3: self = .libre3
         case .Libre2:
             self = description == "Libre 2 Plus EU" ? .libre2PlusEU : .libre2EU
         case .medtrumTouchCareNano:
@@ -126,6 +128,7 @@ enum TroubleshootingLogSource: String, Codable {
             self = .miaoMiao
         case .BubbleType:
             self = .bubble
+        case .Libre3Type: self = .libre3
         case .Libre2Type:
             self = .libre2
         case .MedtrumTouchCareNanoType:
@@ -148,6 +151,7 @@ enum TroubleshootingLogSource: String, Codable {
         case .dexcomStelo: return "Dexcom Stelo"
         case .miaoMiao: return "MiaoMiao"
         case .bubble: return "Bubble"
+        case .libre3: return "Libre 3/3 Plus"
         case .libre2: return "Libre 2/2+ EU"
         case .libre2EU: return "Libre 2 EU"
         case .libre2PlusEU: return "Libre 2 Plus EU"
@@ -170,7 +174,7 @@ enum TroubleshootingLogSource: String, Codable {
              .medtrumEasyView, .calendar, .careLink:
             return true
         case .dexcom, .dexcomG5, .dexcomG6, .dexcomOne, .dexcomG7, .dexcomOnePlus,
-             .dexcomStelo, .miaoMiao, .bubble, .libre2, .libre2EU, .libre2PlusEU,
+             .dexcomStelo, .miaoMiao, .bubble, .libre3, .libre2, .libre2EU, .libre2PlusEU,
              .medtrumNano:
             return false
         }
@@ -694,14 +698,19 @@ enum TroubleshootingSensorHealthAlert: String, Codable, Equatable {
     case dexcomSensorFailure
     case dexcomTransmitterFailure
     case libreSensorFailure
+    case libreTemporarySensorIssue
     case dexcomTransmitterBatteryFailure
 }
 
-/// User-understandable stages of a sensor session without hardware identifiers or raw packets.
+/// User-understandable stages of a sensor session. Libre 3 recovery identifiers stay outside
+/// shared reports, including reports containing events from earlier test installations.
 enum TroubleshootingSensorActivity: Codable, Equatable {
     case detected
     case started
     case startedWithCode(sensorCode: String)
+    case libre3NFC(confirmed: Bool)
+    // Retained only to decode events recorded by earlier Libre 3 test installations.
+    case libre3ReceiverID(sensorSerial: String, receiverID: UInt32, confirmed: Bool)
     case warmingUp(minutesRemaining: Int)
     case stopped
     case notDetected
@@ -2016,6 +2025,8 @@ struct TroubleshootingLogReportBuilder {
             case .detected: return "A new sensor session was started."
             case .started: return "A sensor session started."
             case let .startedWithCode(sensorCode): return "A sensor session started with sensor code \(sensorCode)."
+            case let .libre3NFC(confirmed), let .libre3ReceiverID(_, _, confirmed):
+                return "Libre 3 NFC \(confirmed ? "confirmed" : "attempt")."
             case let .warmingUp(minutesRemaining): return "Sensor is warming up for about \(minutesRemaining) more minute\(minutesRemaining == 1 ? "" : "s")."
             case .stopped: return "The sensor session stopped."
             case .notDetected: return "No active sensor was detected."
@@ -2059,6 +2070,8 @@ struct TroubleshootingLogReportBuilder {
                 return "Dexcom reported a sensor failure."
             case .dexcomTransmitterFailure:
                 return "Dexcom reported a transmitter failure."
+            case .libreTemporarySensorIssue:
+                return "Libre reported a temporary sensor reading issue."
             case .libreSensorFailure:
                 return "Libre reported a sensor failure."
             case .dexcomTransmitterBatteryFailure:

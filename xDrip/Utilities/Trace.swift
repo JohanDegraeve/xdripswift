@@ -667,6 +667,8 @@ class Trace {
                             
                         }
                         
+                    case .Libre3Type:
+                        traceInfo.appendStringAndNewLine("        Type: " + (blePeripheral.libre3?.productName ?? "Libre 3/3 Plus"))
                     case .Libre2Type:
                         if blePeripheral.libre2 != nil {
                             
