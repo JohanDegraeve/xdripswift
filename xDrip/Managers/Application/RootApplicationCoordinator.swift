@@ -983,6 +983,9 @@ import AppIntents
         
         // initialize watchManager
         watchManager = WatchManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager!)
+        watchManager?.importDirectWatchReadings = { [weak self] readings in
+            self?.importDirectWatchReadings(readings) ?? []
+        }
         
     }
 
@@ -1082,15 +1085,70 @@ import AppIntents
         sensorNoiseManager?.update(activeSensor: activeSensor)
     }
     
+    /// Imports readings through the normal glucose path and acknowledges only saved samples.
+    private func importDirectWatchReadings(_ readings: [DirectWatchReading]) -> [String] {
+        guard UserDefaults.standard.isMaster, calibrator is NoCalibrator,
+              let configuration = DirectWatchSettings.configuration,
+              let sensor = activeSensor, let coreDataManager, let bgReadingsAccessor,
+              let transmitter = bluetoothPeripheralManager?.getCGMTransmitter() as? BluetoothTransmitter,
+              let peripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: transmitter),
+              peripheral.blePeripheral.transmitterId == configuration.transmitterID,
+              abs(sensor.startDate.timeIntervalSince(configuration.sensorStartDate)) <= 120 else { return [] }
+
+        // Both families use the same import path. G6 also supplies its session start counter.
+        let familyMatches = configuration.transmitterFamily == .g7
+            ? transmitter is CGMG7Transmitter && peripheral is DexcomG7
+            : transmitter is CGMG5Transmitter && peripheral is DexcomG5
+        guard familyMatches else { return [] }
+        let identity = UserDefaults.standard.dexcomSensorSessionIdentityData.flatMap { try? JSONDecoder().decode(DexcomSensorSessionIdentity.self, from: $0) }
+        let accepted = readings.filter { reading in
+            guard reading.belongs(to: configuration) else { return false }
+            guard configuration.transmitterFamily == .g6, let identity,
+                  identity.transmitterID == configuration.transmitterID,
+                  identity.activeSensorStartDate == sensor.startDate else { return true }
+            return identity.startCounter == reading.sensorStartCounter
+        }
+        return persistWatchReadings(accepted, sensor: sensor, coreDataManager: coreDataManager, bgReadingsAccessor: bgReadingsAccessor)
+    }
+
+    private func persistWatchReadings(_ accepted: [DirectWatchReading], sensor: Sensor,
+                                      coreDataManager: CoreDataManager, bgReadingsAccessor: BgReadingsAccessor) -> [String] {
+        guard !accepted.isEmpty else { return [] }
+        // Phone receipt time explains provenance. Watch acquisition time alone determines
+        // backfill, so an hour of offline delivery does not label normal samples as backfill.
+        let receivedAt = Date()
+        var data = accepted.sorted { $0.measuredAt > $1.measuredAt }.map { reading in
+            let glucose = GlucoseData(timeStamp: reading.measuredAt, glucoseLevelRaw: reading.mgDl,
+                                      backfilledAt: reading.isWatchBackfill ? reading.collectedAt : nil)
+            glucose.valueIsFromWatch = true
+            glucose.watchReceivedAt = receivedAt
+            glucose.watchCollectedAt = reading.collectedAt
+            return glucose
+        }
+        let live = accepted.contains { Date().timeIntervalSince($0.measuredAt) <= ConstantsDirectWatch.readingDelayedAfter }
+        processNewGlucoseData(glucoseData: &data, sensorAge: nil, allowLiveDownstream: live)
+        // A saved duplicate is also acknowledged: it confirms secondary Watch collection
+        // without replacing the source/value already supplied by the iPhone.
+        guard coreDataManager.saveChangesSynchronously() else { return [] }
+        let stored = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: accepted.map(\.measuredAt).min()?.addingTimeInterval(-ConstantsDirectWatch.nativeReadingDuplicateWindow), forSensor: sensor, ignoreRawData: false, ignoreCalculatedValue: true, includingSuppressed: true)
+        return accepted.filter { reading in stored.contains { abs($0.timeStamp.timeIntervalSince(reading.measuredAt)) <= ConstantsDirectWatch.nativeReadingDuplicateWindow } }.map(\.id)
+    }
+
     /// process new glucose data received from transmitter.
     /// - parameters:
     ///     - glucoseData : array with new readings
     ///     - sensorAge : should be present only if it's the first reading(s) being processed for a specific sensor and is needed if it's a transmitterType that returns true to the function canDetectNewSensor
-    private func processNewGlucoseData(glucoseData: inout [GlucoseData], sensorAge: TimeInterval?) {
+    private func processNewGlucoseData(glucoseData: inout [GlucoseData], sensorAge: TimeInterval?, allowLiveDownstream: Bool = true) {
         // unwrap calibrationsAccessor and coreDataManager and cgmTransmitter
         guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = coreDataManager, let cgmTransmitter = bluetoothPeripheralManager?.getCGMTransmitter() else {
             trace("in processNewGlucoseData, calibrationsAccessor or coreDataManager or cgmTransmitter is nil", log: log, category: ConstantsLog.categoryRootView, type: .error)
             return
+        }
+        var collectionProvenanceChanged = false
+        defer {
+            // A duplicate-only cycle creates no reading and normally never saves here.
+            // Persist the shared-collector confirmation and notify the readings list anyway.
+            if collectionProvenanceChanged { _ = coreDataManager.saveChangesSynchronously() }
         }
         
         synchronizeDetectedSensorStartDate(sensorAge: sensorAge, glucoseData: glucoseData, cgmTransmitter: cgmTransmitter, coreDataManager: coreDataManager)
@@ -1125,7 +1183,7 @@ import AppIntents
             }
             
             let isLibre3 = cgmTransmitter.cgmTransmitterType() == .Libre3
-            let duplicateReadingWindow = isLibre3 ? TimeInterval(10) : TimeInterval(minutes: 2.5)
+            let duplicateReadingWindow = isLibre3 ? TimeInterval(10) : ConstantsDirectWatch.nativeReadingDuplicateWindow
             let oldestIncomingTimeStamp = glucoseData.map { $0.timeStamp }.min()
             let newestIncomingTimeStamp = glucoseData.map { $0.timeStamp }.max()
             var existingBgReadingsInIncomingRange = [BgReading]()
@@ -1148,7 +1206,23 @@ import AppIntents
             for (index, glucose) in glucoseData.enumerated().reversed() {
                 // we only add new glucose values if 5 minutes - 10 seconds younger than latest already existing reading, or, if it's the latest, it needs to be just younger
                 let checktimestamp = Date(timeInterval: 5.0 * 60.0 - 10.0, since: timeStampLastBgReading)
-                let existingReadingInSameSlot = existingBgReadingsInIncomingRange.contains { abs($0.timeStamp.timeIntervalSince(glucose.timeStamp)) <= duplicateReadingWindow }
+                let matchingReading = existingBgReadingsInIncomingRange.filter {
+                    $0.sensor == activeSensor && abs($0.timeStamp.timeIntervalSince(glucose.timeStamp)) <= duplicateReadingWindow
+                }.min {
+                    abs($0.timeStamp.timeIntervalSince(glucose.timeStamp)) < abs($1.timeStamp.timeIntervalSince(glucose.timeStamp))
+                }
+                let existingReadingInSameSlot = matchingReading != nil
+                // Native Dexcom readings from the phone and Watch can describe the same
+                // transmitter cycle with slightly different timestamps. Save that cycle once.
+                let duplicateDexcomCycle = (cgmTransmitter is CGMG5Transmitter || cgmTransmitter is CGMG7Transmitter)
+                    && existingReadingInSameSlot
+                if duplicateDexcomCycle, glucose.valueIsFromWatch, let receivedAt = glucose.watchReceivedAt {
+                    matchingReading?.recordWatchCollection(at: receivedAt, collectedAt: glucose.watchCollectedAt,
+                                                           isBackfill: glucose.isHistoricalCollection)
+                } else if duplicateDexcomCycle, !glucose.valueIsFromWatch,
+                          matchingReading?.recordPhoneCollection(isBackfill: glucose.isHistoricalCollection) == true {
+                    collectionProvenanceChanged = true
+                }
                 
                 // Backfill can arrive after a newer live reading has already been stored.
                 // Accept older samples only when they fill an empty 5-minute slot.
@@ -1156,7 +1230,14 @@ import AppIntents
                 
                 // timestamp of glucose being processed must be higher (ie more recent) than checktimestamp except if it's the last one (ie the first in the array), because there we don't care if it's less than 5 minutes different with the last but one
                 // adding 10 seconds to timeStampLastBgReading to handle case of G7, with backfills, because the array contains two times the same reading with a timestamp difference of a few seconds
-                if (isLibre3 && !existingReadingInSameSlot) || (!isLibre3 && (glucose.timeStamp > checktimestamp || ((index == 0) && (glucose.timeStamp > timeStampLastBgReading.addingTimeInterval(10))) || isHistoricalGapFill)) {
+                // Libre 3 retains each minute. Native Dexcom collectors share one cycle.
+                let shouldInsertReading: Bool
+                if isLibre3 {
+                    shouldInsertReading = !existingReadingInSameSlot
+                } else {
+                    shouldInsertReading = !duplicateDexcomCycle && (glucose.timeStamp > checktimestamp || ((index == 0) && (glucose.timeStamp > timeStampLastBgReading.addingTimeInterval(10))) || isHistoricalGapFill)
+                }
+                if shouldInsertReading {
                     // check on glucoseLevelRaw > 0 because I've had a case where a faulty sensor was giving negative values
                     if glucose.glucoseLevelRaw > 0 {
                         var last3ReadingsForNewReading = latest3BgReadings
@@ -1166,8 +1247,15 @@ import AppIntents
                         }
                         
                         let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &last3ReadingsForNewReading, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                        newReading.valueIsFromWatch = glucose.valueIsFromWatch
+                        newReading.watchReceivedAt = glucose.watchReceivedAt
+                        newReading.watchCollectedAt = glucose.watchCollectedAt
+                        // Persist live participation separately from eventual recovery. A phone
+                        // backfill after a Watch-only run must not change the collection icon.
+                        newReading.phoneCollectedLive = NSNumber(value: !glucose.valueIsFromWatch && !glucose.isHistoricalCollection)
+                        newReading.watchCollectedLive = NSNumber(value: glucose.valueIsFromWatch && !glucose.isHistoricalCollection)
 
-                        if let backfilledAt = glucose.backfilledAt ?? (isHistoricalGapFill ? Date() : nil),
+                        if let backfilledAt = glucose.backfilledAt ?? (isHistoricalGapFill && !glucose.valueIsFromWatch ? Date() : nil),
                            backfilledAt.timeIntervalSince(glucose.timeStamp) > ConstantsBloodGlucose.minimumSecondsToConsiderAsBackfillDelay {
                             newReading.backfilledAt = backfilledAt
                             // Rebuild noise history when delayed readings fill a period that was
@@ -1243,6 +1331,15 @@ import AppIntents
 
                 // Suppressed source readings remain stored for post-processing context and diagnostics,
                 // but only a newer visible reading may enter the app's downstream processing pipeline.
+                if !allowLiveDownstream {
+                    updateLabelsAndChart(overrideApplicationState: false)
+                    updateLiveActivityAndWidgets(forceRestart: false)
+                    watchManager?.updateWatchApp(forceComplicationUpdate: false)
+                    nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                    healthKitManager?.storeBgReadings()
+                    return
+                }
+
                 guard shouldProcessDownstream else { return }
 
                 sensorNoiseManager?.update(activeSensor: activeSensor)
@@ -2708,7 +2805,7 @@ import AppIntents
                 // use enablement here so switching off retains the selected style
                 if (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)) && UserDefaults.standard.liveActivitiesEnabled {
                     // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                    var contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, carPlayLiveActivityType: UserDefaults.standard.carPlayLiveActivityType, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, sensorNoiseStateRawValue: sensorNoiseStateRawValue, aidStatus: aidStatus, therapyMetrics: resolvedTherapyMetrics)
+                    var contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, carPlayLiveActivityType: UserDefaults.standard.carPlayLiveActivityType, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, sensorNoiseStateRawValue: sensorNoiseStateRawValue, aidStatus: aidStatus, therapyMetrics: UserDefaults.standard.liveActivityShowIOBCOB ? resolvedTherapyMetrics : nil)
                     
                     contentState.showIOBCOB = UserDefaults.standard.liveActivityShowIOBCOB
                     contentState.sensorWarmupEndDate = sensorWarmupEndDate
@@ -2727,7 +2824,9 @@ import AppIntents
                     date.timeIntervalSince1970
                 }
                 
-                let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, aidStatus: aidStatus, therapyMetrics: resolvedTherapyMetrics, allowStandByHighContrast: UserDefaults.standard.allowStandByHighContrast, forceStandByBigNumbers: UserDefaults.standard.forceStandByBigNumbers)
+                // Widgets do not display IOB/COB. Including its changing calculation dates
+                // defeats unchanged-payload suppression and needlessly reloads their timelines.
+                let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, aidStatus: aidStatus, therapyMetrics: nil, allowStandByHighContrast: UserDefaults.standard.allowStandByHighContrast, forceStandByBigNumbers: UserDefaults.standard.forceStandByBigNumbers)
                 
                 // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
                 // the user's device - this allows several copies of the app to be installed without cross-contamination of widget data

@@ -46,10 +46,7 @@ struct BluetoothPeripheralSettingsRow: View {
             if let detail = detail, !detail.isEmpty {
                 HStack(spacing: 5) {
                     if let detailIndicator {
-                        Image(systemName: detailIndicator.symbolName)
-                            .font(.caption2)
-                            .foregroundStyle(isEnabled ? detailIndicator.color : .gray)
-                            .accessibilityLabel(detailIndicator.accessibilityLabel ?? "")
+                        SettingsIndicatorView(indicator: detailIndicator, isEnabled: isEnabled)
                     }
 
                     if let detailSymbol, !detailSymbol.isTrailing {

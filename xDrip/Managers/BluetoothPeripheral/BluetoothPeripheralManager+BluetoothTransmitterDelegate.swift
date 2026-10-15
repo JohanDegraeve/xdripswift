@@ -356,7 +356,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             (bluetoothTransmitter is CGMLibre3Transmitter &&
              tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral === bluetoothTransmitter) {
             // A Libre 3 being re-added can already have a saved Bluetooth address. Its central
-            // still starts as unknown; forward the ready/connecting/error result to the add UI.
+            // still starts as unknown. Forward the ready/connecting/error result to the add UI.
             let scanningResult = bluetoothTransmitter.startScanning()
             
             if let callBackForScanningResult = self.callBackForScanningResult {

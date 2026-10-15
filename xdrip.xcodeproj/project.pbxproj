@@ -25,6 +25,9 @@
 		377EBC0A484BFC8EA77C623C /* CareLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA4DE8668C9A16DFF21A411 /* CareLinkTests.swift */; };
 		3A28B7171D22DFBFB68828A4 /* CareLinkModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A32F780DBE240AE91ECDBB /* CareLinkModels.swift */; };
 		3A2AF75483FD1C334C88D365 /* Libre3SetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A55686C889FFC64D3F3C8483 /* Libre3SetupView.swift */; };
+		3A65AFC42A26214D568BD71C /* AuthChallengeRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971D223A5915900C3F17D /* AuthChallengeRxMessage.swift */; };
+		F916A1E10000000000000002 /* DirectWatchAlertsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916A1E10000000000000001 /* DirectWatchAlertsView.swift */; };
+		424FCFAFA0324F8284100648 /* DirectWatchCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9AB2F1AE8F46548B3DA2DD /* DirectWatchCollectionView.swift */; };
 		4374EA58DDB14111B1163758 /* xDrip/Constants/TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* xDrip/Constants/TherapyMetrics.swift */; };
 		44293D099C894F3E154A7CB5 /* Libre3RealtimeGlucoseReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433E474CC80A6F6F070C545 /* Libre3RealtimeGlucoseReading.swift */; };
 		44885576F569F7003A11DF0D /* Libre3DataFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5ABD04B5655B0E6DFA81575 /* Libre3DataFrame.swift */; };
@@ -111,7 +114,6 @@
 		47503382247420A200D2260B /* BluetoothPeripheralView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47503384247420A200D2260B /* BluetoothPeripheralView.strings */; };
 		4752B400263570DA0081D551 /* ConstantsStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */; };
 		4752B4062635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */; };
-		AE7570012026092700000001 /* SheetCloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7570012026092700000002 /* SheetCloseButton.swift */; };
 		475F2A872D0DA81400DE6019 /* ShowHideItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */; };
 		476404892EA29034006CBE03 /* XdripApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476404882EA29034006CBE03 /* XdripApp.swift */; };
 		476698662BE2572C008EB2A9 /* ConstantsSettingsIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */; };
@@ -353,6 +355,8 @@
 		4F67A33C4EC32A86ABC85882 /* CareLinkFollowerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBC8BB898BFD4C30858ED5D /* CareLinkFollowerSettings.swift */; };
 		51D7CB065BD7CB6982719FE1 /* CareLinkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40AD096DBCD9BD7C4BA770E /* CareLinkClient.swift */; };
 		52A6C5F6D047486870D35FA2 /* Libre3AuthTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B34AFE2709EB70DFFEA520 /* Libre3AuthTransport.swift */; };
+		52802DB9CFDCDC0AA4BE8BE4 /* DexcomWatchProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A899F69E74DE91DDF24C126 /* DexcomWatchProtocol.swift */; };
+		57FED30744046A2D826B81B7 /* DirectWatchCompatibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7970B360C99EBC27912166 /* DirectWatchCompatibility.swift */; };
 		5A0100023015000100000001 /* GlucoseRangeDistribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0100013015000100000001 /* GlucoseRangeDistribution.swift */; };
 		5A0100043015000100000001 /* GlucoseRangeDistributionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0100033015000100000001 /* GlucoseRangeDistributionTests.swift */; };
 		5A0921023015000100000001 /* GMIStatisticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0921013015000100000001 /* GMIStatisticsTests.swift */; };
@@ -370,6 +374,8 @@
 		7DDD89BD4ECFCE7BDA8D3AE2 /* SettingsSharedUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */; };
 		7E1BBDF0F004A5B4CB8B1470 /* Libre3ChallengeMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42BAE07714E020686C55A23B /* Libre3ChallengeMessage.swift */; };
 		909CEF817B142EF554C59BA5 /* Libre3.strings in Resources */ = {isa = PBXBuildFile; fileRef = C19B5D64EF24AAE602E8BE80 /* Libre3.strings */; };
+		80E1D0059E8A3DED391995B1 /* AuthRequestTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971C323A5915900C3F17D /* AuthRequestTxMessage.swift */; };
+		9AC8880079DB42D5B61C6905 /* DirectWatchBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32AB35C1DDA74999ABEF88B9 /* DirectWatchBridge.swift */; };
 		A10000000000000000000001 /* FollowerSettingsScreenFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* FollowerSettingsScreenFactory.swift */; };
 		A10000000000000000000002 /* NightscoutFollowerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* NightscoutFollowerSettings.swift */; };
 		A10000000000000000000003 /* LibreLinkUpFollowerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* LibreLinkUpFollowerSettings.swift */; };
@@ -387,10 +393,17 @@
 		A1000000000000000000000F /* CareLinkGlucoseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000F /* CareLinkGlucoseParser.swift */; };
 		A1A25654901902156A458396 /* CareLinkFollowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0FD9F50417D2E4B3ABA2D6 /* CareLinkFollowManager.swift */; };
 		A3E62FA9C45C8ED0422CFA19 /* Libre3HistoricalBackfill.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFE7AB5B458803F795CE6EA9 /* Libre3HistoricalBackfill.swift */; };
+		A1D1EC770000000000000002 /* DirectWatchStatusBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D1EC770000000000000001 /* DirectWatchStatusBanner.swift */; };
+		A1D1EC770000000000000003 /* DirectWatchStatusBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D1EC770000000000000001 /* DirectWatchStatusBanner.swift */; };
+		A1D1EC770000000000000005 /* ConstantsDirectWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D1EC770000000000000004 /* ConstantsDirectWatch.swift */; };
+		A1D1EC770000000000000006 /* ConstantsDirectWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D1EC770000000000000004 /* ConstantsDirectWatch.swift */; };
+		A1D1EC770000000000000008 /* DirectWatchCollectionGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D1EC770000000000000007 /* DirectWatchCollectionGesture.swift */; };
 		A40000010000000000000001 /* FollowerSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40000020000000000000001 /* FollowerSettingsTests.swift */; };
 		A41000010000000000000001 /* DexcomShareUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41000020000000000000001 /* DexcomShareUploadTests.swift */; };
 		A50000010000000000000001 /* OnlineHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50000020000000000000001 /* OnlineHelp.swift */; };
 		A50000030000000000000001 /* OnlineHelpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50000040000000000000001 /* OnlineHelpTests.swift */; };
+		A71EABC60106174DF42844F1 /* TransmitterMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971C223A5915900C3F17D /* TransmitterMessage.swift */; };
+		A93DD257332571AB2302D260 /* PairRequestTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971D323A5915900C3F17D /* PairRequestTxMessage.swift */; };
 		AB1900013014000200000001 /* LiveActivityWarmupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1900023014000200000001 /* LiveActivityWarmupTests.swift */; };
 		AB852EB5FF541C74ED44F7A7 /* Libre3ReceiverIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24211649560339B1DA365E8B /* Libre3ReceiverIDTests.swift */; };
 		ABF3E67AF35ABE4F660CD8EE /* Libre3LibreSensorGATT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614A12EB399C9C25791C5870 /* Libre3LibreSensorGATT.swift */; };
@@ -400,6 +413,11 @@
 		B1E511042026091100000001 /* BluetoothSignalStrengthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */; };
 		B25E6EE942D79C98CD184CCD /* Libre3PatchControlCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF320075EB600CCA1DE1440F /* Libre3PatchControlCommand.swift */; };
 		B3DBAE6F4DF8465BBF554DE4 /* xDrip/Managers/Therapy/TherapyMetricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F219EC5BAAF4D5E924415FA /* xDrip/Managers/Therapy/TherapyMetricsManager.swift */; };
+		AB5E04E6F6CEDAE08F65B316 /* DirectWatchCompatibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7970B360C99EBC27912166 /* DirectWatchCompatibility.swift */; };
+		AE7570012026092700000001 /* SheetCloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7570012026092700000002 /* SheetCloseButton.swift */; };
+		B1E511022026091100000001 /* BluetoothSignalStrengthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */; };
+		B1E511042026091100000001 /* BluetoothSignalStrengthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */; };
+		B3DBAE6F4DF8465BBF554DE4 /* TherapyMetricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F219EC5BAAF4D5E924415FA /* TherapyMetricsManager.swift */; };
 		BA0000010000000000000001 /* BackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000011 /* BackupModels.swift */; };
 		BA0000010000000000000002 /* BackupCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000012 /* BackupCrypto.swift */; };
 		BA0000010000000000000003 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000013 /* BackupService.swift */; };
@@ -413,7 +431,7 @@
 		BA0000020000000000000001 /* NightscoutFollowerGapFillService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000020000000000000011 /* NightscoutFollowerGapFillService.swift */; };
 		BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */; };
 		BA0709260000000000000001 /* BasalInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0709260000000000000002 /* BasalInjectionTests.swift */; };
-		C15D80D0E8DB47A6A9BE68DF /* xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05272484BD024BDAAA341C1C /* xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift */; };
+		C15D80D0E8DB47A6A9BE68DF /* TherapyMetricsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05272484BD024BDAAA341C1C /* TherapyMetricsSettingsView.swift */; };
 		C2385D0CA6579919114B060A /* AlertTypesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */; };
 		C606CA18273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606CA17273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift */; };
 		C859C6C1B4CE6B335D4C86E6 /* Libre3NFCActivationCommandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D9952479A5C8B9A161631A /* Libre3NFCActivationCommandTests.swift */; };
@@ -424,6 +442,9 @@
 		CA9F2F2E205E1D6CF189C33C /* Libre3TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC2A2C9102E6CAD34C48303E /* Libre3TestHelpers.swift */; };
 		D0D1303DCCC9823DC753DB78 /* Libre3FrameAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA73FFBD3D66403A8FD7234 /* Libre3FrameAssembler.swift */; };
 		D25CFAE63D81FEFEEE8C4373 /* Libre3PairingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 008DD8362C3D359B7EA1B6BD /* Libre3PairingFlow.swift */; };
+		CBA81ED48E274298933D189D /* DirectWatchBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32AB35C1DDA74999ABEF88B9 /* DirectWatchBridge.swift */; };
+		CC1EA9B85F7A487E86867E63 /* DirectWatchBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5DC293D34647658C22BE59 /* DirectWatchBridgeTests.swift */; };
+		D0EFC85FA53E3CDEE2198D2C /* DexcomWatchProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A899F69E74DE91DDF24C126 /* DexcomWatchProtocol.swift */; };
 		D400F8032778BD8000B57648 /* TextsTreatmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */; };
 		D40C3DA4277542C400111B73 /* TreatmentEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40C3DA3277542C400111B73 /* TreatmentEntry+CoreDataClass.swift */; };
 		D40C3DA62775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40C3DA52775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift */; };
@@ -438,16 +459,25 @@
 		DB718DBF9805AC4B21C95739 /* TimeScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */; };
 		DC083CE2E10BC05B0697B5F6 /* Libre3SessionKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = D184A5AC2BBFEC04647F27B7 /* Libre3SessionKey.swift */; };
 		DE59C307960F40F880724B66 /* xDrip/Constants/TherapyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CB0A0412324311A4F99E46 /* xDrip/Constants/TherapyMetrics.swift */; };
+		E2DE074F5A074BBEAF5EC35D /* DirectWatchSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FF0721330F7432C937F01C6 /* DirectWatchSetupView.swift */; };
 		E4C006212B3DE8EC00D59303 /* GlucoseIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C006202B3DE8EC00D59303 /* GlucoseIntent.swift */; };
 		E4D530632B418FF80018C6A4 /* AppShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D530622B418FF80018C6A4 /* AppShortcuts.swift */; };
 		E81BB05E1DD602CEA84794B4 /* Libre3Phase6Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A5CBF51446B1701E1DF6773 /* Libre3Phase6Response.swift */; };
 		ECD56B11C55F30A2A73CF95D /* Libre3+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327E7A39ACA06F8CA491D1F3 /* Libre3+CoreDataClass.swift */; };
+		F100A001ABCDEF1234567801 /* DexcomG7AuthBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 47F012D02FC9D71700112233 /* DexcomG7AuthBridge.m */; };
+		F100A002ABCDEF1234567802 /* DexcomG7ECC.c in Sources */ = {isa = PBXBuildFile; fileRef = 47F012D32FC9D71700112233 /* DexcomG7ECC.c */; };
+		F100A003ABCDEF1234567803 /* AESCrypt.m in Sources */ = {isa = PBXBuildFile; fileRef = F8F971C623A5915900C3F17D /* AESCrypt.m */; };
+		F100A004ABCDEF1234567804 /* DexcomG7AuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F012D52FC9D71700112233 /* DexcomG7AuthSession.swift */; };
+		F100A005ABCDEF1234567805 /* DexcomG7ProofSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F012D72FC9D71700112233 /* DexcomG7ProofSigner.swift */; };
+		F100A006ABCDEF1234567806 /* DexcomG7WatchAuthSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = F100B001ABCDEF1234567801 /* DexcomG7WatchAuthSupport.swift */; };
+		F1DDE78411DC49FEBFA54BE0 /* DirectWatchCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68FDB0D4F77457D858968F8 /* DirectWatchCollector.swift */; };
 		F227BF192B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF182B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift */; };
 		F227BF1C2B9E426B00CEEAAD /* ContactImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */; };
 		F51B9F7D24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */; };
 		F64039B0281C3F9D0051EFFE /* QuickActionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64039AF281C3F9D0051EFFE /* QuickActionsManager.swift */; };
 		F64039B2281E90CF0051EFFE /* QuickActions.strings in Resources */ = {isa = PBXBuildFile; fileRef = F64039B1281E90CF0051EFFE /* QuickActions.strings */; };
 		F64039B5281E91500051EFFE /* TextsQuickActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64039B4281E91500051EFFE /* TextsQuickActions.swift */; };
+		F6D1247DC13F883C0CF768A5 /* AuthRequestRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971CC23A5915900C3F17D /* AuthRequestRxMessage.swift */; };
 		F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */; };
 		F8025C1321DA683400ECF0C0 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025C1221DA683400ECF0C0 /* Data.swift */; };
 		F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4D21ED450300ECF0C0 /* Double.swift */; };
@@ -872,6 +902,11 @@
 		418A9FA9C56A427D28DDEA55 /* Libre3IdentityStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD6F1833098A8258F63E643 /* Libre3IdentityStore.swift */; };
 		A64583BE4591F44B20B79957 /* Libre3CredentialsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D7349BC700B9B66A7346F41 /* Libre3CredentialsView.swift */; };
 		4141C53E4D9615D8F706F62F /* license.md in Resources */ = {isa = PBXBuildFile; fileRef = A59571189CFCAA3E8E7F0BFC /* license.md */; };
+		FEB116F6F3B80337A255B771 /* DexcomTransmitterOpCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971C723A5915900C3F17D /* DexcomTransmitterOpCode.swift */; };
+		A1D1EC77000000000000000A /* DirectWatchCollectedReadingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D1EC770000000000000009; };
+		ACB364A6BE794436BB7EA579 /* TextsDirectWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB7E2A44F504FB1A8940A2F /* TextsDirectWatch.swift */; };
+		DE8D7DE65157474CBFCF8FF0 /* TextsDirectWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB7E2A44F504FB1A8940A2F /* TextsDirectWatch.swift */; };
+		D17EC7000000000000000001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D17EC7000000000000000002 /* InfoPlist.strings */; };
 		B4BF525DF92C9A65870E9F3F /* TextsLibre3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5DB745379C8D9E0C71E5AD /* TextsLibre3.swift */; };
 /* End PBXBuildFile section */
 
@@ -964,6 +999,8 @@
 		008DD8362C3D359B7EA1B6BD /* Libre3PairingFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3PairingFlow.swift; path = Libre3PairingFlow.swift; sourceTree = "<group>"; };
 		047632E443AF0F5D48EC5CE9 /* Libre3AESCCM.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3AESCCM.swift; path = Libre3AESCCM.swift; sourceTree = "<group>"; };
 		05272484BD024BDAAA341C1C /* xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift; sourceTree = SOURCE_ROOT; };
+		05272484BD024BDAAA341C1C /* TherapyMetricsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TherapyMetricsSettingsView.swift; sourceTree = "<group>"; };
+		0FF0721330F7432C937F01C6 /* DirectWatchSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectWatchSetupView.swift; sourceTree = "<group>"; };
 		102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertTypesSettingsView.swift; sourceTree = "<group>"; };
 		197D49EDB06F0DFE03707591 /* Libre3BleFramingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3BleFramingTests.swift; path = Libre3BleFramingTests.swift; sourceTree = "<group>"; };
 		198D44C4260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Alerts.strings; sourceTree = "<group>"; };
@@ -1005,12 +1042,14 @@
 		2867F5D925BC209B00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LibreErrors.strings; sourceTree = "<group>"; };
 		2867F5DA25BC209C00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Snooze.strings; sourceTree = "<group>"; };
 		2867F5DB25BC209C00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LibreNFC.strings; sourceTree = "<group>"; };
+		2B7970B360C99EBC27912166 /* DirectWatchCompatibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectWatchCompatibility.swift; sourceTree = "<group>"; };
 		2BBDAD3BFBEF70B1B2A1AFAD /* CareLinkTokenStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkTokenStore.swift; sourceTree = "<group>"; };
 		3101B0306AEFC2A902F5CC34 /* Libre3Phase6ResponseTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3Phase6ResponseTests.swift; path = Libre3Phase6ResponseTests.swift; sourceTree = "<group>"; };
 		327E7A39ACA06F8CA491D1F3 /* Libre3+CoreDataClass.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Libre3+CoreDataClass.swift"; path = "Libre3+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3433E474CC80A6F6F070C545 /* Libre3RealtimeGlucoseReading.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3RealtimeGlucoseReading.swift; path = Libre3RealtimeGlucoseReading.swift; sourceTree = "<group>"; };
 		34D9952479A5C8B9A161631A /* Libre3NFCActivationCommandTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3NFCActivationCommandTests.swift; path = Libre3NFCActivationCommandTests.swift; sourceTree = "<group>"; };
 		3BA0089597B41151AFB66BF5 /* Libre3DataPlaneDecoder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3DataPlaneDecoder.swift; path = Libre3DataPlaneDecoder.swift; sourceTree = "<group>"; };
+		32AB35C1DDA74999ABEF88B9 /* DirectWatchBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectWatchBridge.swift; sourceTree = "<group>"; };
 		3DBC8BB898BFD4C30858ED5D /* CareLinkFollowerSettings.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkFollowerSettings.swift; sourceTree = "<group>"; };
 		4166BFB828C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/RootTab.strings; sourceTree = "<group>"; };
 		4166BFBA28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Treatments.strings; sourceTree = "<group>"; };
@@ -1084,7 +1123,6 @@
 		4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsStatistics.swift; sourceTree = "<group>"; };
 		4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewStatisticsSettingsViewModel.swift; sourceTree = "<group>"; };
 		475DED96244AF92A00F78473 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Alerts.strings; sourceTree = "<group>"; };
-		AE7570012026092700000002 /* SheetCloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetCloseButton.swift; sourceTree = "<group>"; };
 		475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowHideItemsView.swift; sourceTree = "<group>"; };
 		476404882EA29034006CBE03 /* XdripApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XdripApp.swift; sourceTree = "<group>"; };
 		476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSettingsIcons.swift; sourceTree = "<group>"; };
@@ -1200,6 +1238,7 @@
 		47F4E09B2E699D6500087889 /* DexcomShareFollowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShareFollowManager.swift; sourceTree = "<group>"; };
 		47F4E09D2E69C59A00087889 /* DexcomShareModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShareModels.swift; sourceTree = "<group>"; };
 		47FB28072636B04200042FFB /* StatisticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsManager.swift; sourceTree = "<group>"; };
+		4A899F69E74DE91DDF24C126 /* DexcomWatchProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomWatchProtocol.swift; sourceTree = "<group>"; };
 		4A9B10112F0A000100000001 /* BgAdjustment+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgAdjustment+CoreDataClass.swift"; sourceTree = "<group>"; };
 		4A9B10122F0A000100000001 /* BgAdjustment+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgAdjustment+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		4A9B10132F0A000100000001 /* BgAdjustmentsAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgAdjustmentsAccessor.swift; sourceTree = "<group>"; };
@@ -1328,6 +1367,7 @@
 		4F3100313007000100000001 /* xdrip v31.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v31.xcdatamodel"; sourceTree = "<group>"; };
 		4F3200023008000100000001 /* BgReadingTrendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingTrendTests.swift; sourceTree = "<group>"; };
 		4F3200313008000100000001 /* xdrip v32.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v32.xcdatamodel"; sourceTree = "<group>"; };
+		4F3300313009000100000001 /* xdrip v33 Watch.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v33 Watch.xcdatamodel"; sourceTree = "<group>"; };
 		50E2401E5ED94424A2FEC5E8 /* xDrip Tests/TherapyMetricsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "xDrip Tests/TherapyMetricsTests.swift"; sourceTree = SOURCE_ROOT; };
 		530FF1F30166612F05E55CF6 /* Libre3NFCActivationCommand.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3NFCActivationCommand.swift; path = Libre3NFCActivationCommand.swift; sourceTree = "<group>"; };
 		5A0100013015000100000001 /* GlucoseRangeDistribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseRangeDistribution.swift; sourceTree = "<group>"; };
@@ -1337,6 +1377,7 @@
 		5F219EC5BAAF4D5E924415FA /* xDrip/Managers/Therapy/TherapyMetricsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDrip/Managers/Therapy/TherapyMetricsManager.swift; sourceTree = SOURCE_ROOT; };
 		614A12EB399C9C25791C5870 /* Libre3LibreSensorGATT.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3LibreSensorGATT.swift; path = Libre3LibreSensorGATT.swift; sourceTree = "<group>"; };
 		63C88269D9960C2B59BABCAD /* Libre3PairingTransport.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3PairingTransport.swift; path = Libre3PairingTransport.swift; sourceTree = "<group>"; };
+		5F219EC5BAAF4D5E924415FA /* TherapyMetricsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TherapyMetricsManager.swift; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xDrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xDrip/Version.xcconfig; sourceTree = "<group>"; };
 		685B5F8D633F5492574F0567 /* GlucoseChartStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartStateManager.swift; sourceTree = "<group>"; };
@@ -1352,6 +1393,12 @@
 		9765C9E56F9AA7343AA09463 /* Libre3DataPlaneTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3DataPlaneTests.swift; path = Libre3DataPlaneTests.swift; sourceTree = "<group>"; };
 		9B0C0DE6B53BEEF522826593 /* BluetoothPeripheralManager+CGMLibre3TransmitterDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "BluetoothPeripheralManager+CGMLibre3TransmitterDelegate.swift"; path = "BluetoothPeripheralManager+CGMLibre3TransmitterDelegate.swift"; sourceTree = "<group>"; };
 		9E708561906838D16B044415 /* Libre3SensorCert.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3SensorCert.swift; path = Libre3SensorCert.swift; sourceTree = "<group>"; };
+		8D5DC293D34647658C22BE59 /* DirectWatchBridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectWatchBridgeTests.swift; sourceTree = "<group>"; };
+		F916A1E10000000000000001 /* DirectWatchAlertsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectWatchAlertsView.swift; sourceTree = "<group>"; };
+		9A9AB2F1AE8F46548B3DA2DD /* DirectWatchCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectWatchCollectionView.swift; sourceTree = "<group>"; };
+		A1D1EC770000000000000001 /* DirectWatchStatusBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectWatchStatusBanner.swift; sourceTree = "<group>"; };
+		A1D1EC770000000000000004 /* ConstantsDirectWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsDirectWatch.swift; sourceTree = "<group>"; };
+		A1D1EC770000000000000007 /* DirectWatchCollectionGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectWatchCollectionGesture.swift; sourceTree = "<group>"; };
 		A20000000000000000000001 /* FollowerSettingsScreenFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerSettingsScreenFactory.swift; sourceTree = "<group>"; };
 		A20000000000000000000002 /* NightscoutFollowerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowerSettings.swift; sourceTree = "<group>"; };
 		A20000000000000000000003 /* LibreLinkUpFollowerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreLinkUpFollowerSettings.swift; sourceTree = "<group>"; };
@@ -1378,6 +1425,7 @@
 		AB1900023014000200000001 /* LiveActivityWarmupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityWarmupTests.swift; sourceTree = "<group>"; };
 		ABA4DE8668C9A16DFF21A411 /* CareLinkTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkTests.swift; sourceTree = "<group>"; };
 		AC2A2C9102E6CAD34C48303E /* Libre3TestHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3TestHelpers.swift; path = Libre3TestHelpers.swift; sourceTree = "<group>"; };
+		AE7570012026092700000002 /* SheetCloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetCloseButton.swift; sourceTree = "<group>"; };
 		B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothSignalStrengthTests.swift; sourceTree = "<group>"; };
 		B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothSignalStrengthView.swift; sourceTree = "<group>"; };
 		B7A32F780DBE240AE91ECDBB /* CareLinkModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkModels.swift; sourceTree = "<group>"; };
@@ -1452,6 +1500,8 @@
 		E4D530622B418FF80018C6A4 /* AppShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShortcuts.swift; sourceTree = "<group>"; };
 		E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsSharedUtilities.swift; sourceTree = "<group>"; };
 		F081BB1D5F106F950C4A8EA4 /* CareLinkAccountState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkAccountState.swift; sourceTree = "<group>"; };
+		F100B001ABCDEF1234567801 /* DexcomG7WatchAuthSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG7WatchAuthSupport.swift; sourceTree = "<group>"; };
+		F100B002ABCDEF1234567802 /* Watch-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Watch-Bridging-Header.h"; sourceTree = "<group>"; };
 		F227BF182B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewContactImageSettingsViewModel.swift; sourceTree = "<group>"; };
 		F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactImageManager.swift; sourceTree = "<group>"; };
 		F40AD096DBCD9BD7C4BA770E /* CareLinkClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkClient.swift; sourceTree = "<group>"; };
@@ -1459,6 +1509,7 @@
 		F64039AF281C3F9D0051EFFE /* QuickActionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsManager.swift; sourceTree = "<group>"; };
 		F64039B1281E90CF0051EFFE /* QuickActions.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = QuickActions.strings; sourceTree = "<group>"; };
 		F64039B4281E91500051EFFE /* TextsQuickActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsQuickActions.swift; sourceTree = "<group>"; };
+		F68FDB0D4F77457D858968F8 /* DirectWatchCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectWatchCollector.swift; sourceTree = "<group>"; };
 		F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartState.swift; sourceTree = "<group>"; };
 		F7936B31E35D82919DCDE294 /* xdrip v33.xcdatamodel */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v33.xcdatamodel"; sourceTree = "<group>"; };
 		F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBManagerState.swift; sourceTree = "<group>"; };
@@ -2131,6 +2182,32 @@
 		8CFC87D5A85A7A3686663EF8 /* nl */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = nl; path = xDrip/Storyboards/nl.lproj/Libre3.strings; sourceTree = SOURCE_ROOT; };
 		2D4ADAF244D64259BFCC150C /* pt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = pt; path = xDrip/Storyboards/pt.lproj/Libre3.strings; sourceTree = SOURCE_ROOT; };
 		A59571189CFCAA3E8E7F0BFC /* license.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = license.md; path = license.md; sourceTree = "<group>"; };
+		A1D1EC770000000000000009 /* DirectWatchCollectedReadingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DirectWatchCollectedReadingsView.swift"; sourceTree = "<group>"; };
+		3CB7E2A44F504FB1A8940A2F /* TextsDirectWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsDirectWatch.swift; sourceTree = "<group>"; };
+		D17EC7000000000000000003 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D17EC7000000000000000004 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D17EC7000000000000000005 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D17EC7000000000000000006 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D17EC7000000000000000007 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D17EC701000000010000000C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "uk"; path = "uk.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		D17EC7010000000200000002 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fr"; path = "fr.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC7010000000200000003 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "de"; path = "de.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC7010000000200000005 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "it"; path = "it.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC7010000000200000006 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt"; path = "pt.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC7010000000200000007 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "da"; path = "da.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC7010000000200000008 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "sv"; path = "sv.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC7010000000200000009 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi"; path = "fi.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC701000000020000000A /* pl-PL */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pl-PL"; path = "pl-PL.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC701000000020000000B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ru"; path = "ru.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC701000000020000000C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "uk"; path = "uk.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC701000000020000000D /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "tr"; path = "tr.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC701000000020000000E /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh"; path = "zh.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC701000000020000000F /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ar"; path = "ar.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC7010000000200000010 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "el"; path = "el.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC7010000000200000011 /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "sl"; path = "sl.lproj/BgReadings.strings"; sourceTree = "<group>"; };
+		D17EC7340000000000000001 /* xdrip v34.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v34.xcdatamodel"; sourceTree = "<group>"; };
+		D17EC7350000000000000001 /* xdrip v35.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v35.xcdatamodel"; sourceTree = "<group>"; };
+		D17EC7360000000000000001 /* xdrip v36.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v36.xcdatamodel"; sourceTree = "<group>"; };
 		6DB1082C16EEE89F23F6C2EB /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "da"; path = "xDrip/Storyboards/da.lproj/Libre3.strings"; sourceTree = SOURCE_ROOT; };
 		3B07F0A837B0A705619A1CFE /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "sv"; path = "xDrip/Storyboards/sv.lproj/Libre3.strings"; sourceTree = SOURCE_ROOT; };
 		C62A08C16FD93E899A7709C8 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi"; path = "xDrip/Storyboards/fi.lproj/Libre3.strings"; sourceTree = SOURCE_ROOT; };
@@ -2265,6 +2342,8 @@
 		472596032B76300800459D12 /* Watch */ = {
 			isa = PBXGroup;
 			children = (
+				32AB35C1DDA74999ABEF88B9 /* DirectWatchBridge.swift */,
+				2B7970B360C99EBC27912166 /* DirectWatchCompatibility.swift */,
 				472596042B76301F00459D12 /* WatchManager.swift */,
 				47DE41AC2B863D370041DA19 /* WatchState.swift */,
 			);
@@ -2371,6 +2450,9 @@
 			isa = PBXGroup;
 			children = (
 				47A6ABEE2B7949B80047A4BA /* WatchStateModel.swift */,
+				F68FDB0D4F77457D858968F8 /* DirectWatchCollector.swift */,
+				F100B001ABCDEF1234567801 /* DexcomG7WatchAuthSupport.swift */,
+				F100B002ABCDEF1234567802 /* Watch-Bridging-Header.h */,
 				474822452C01097D0052D4FB /* NotificationController.swift */,
 			);
 			path = DataModels;
@@ -2457,6 +2539,7 @@
 		47DE41B72B87B2510041DA19 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				905FC1ED6195A6E07B878727 /* DirectWatch */,
 				474822432C0108EA0052D4FB /* NotificationView.swift */,
 				4787058D2C4D76FE001C3170 /* RootView.swift */,
 				478705902C4D7B6F001C3170 /* BigNumberView */,
@@ -2486,6 +2569,7 @@
 			children = (
 				47EDD1452BDD565A00C5A286 /* TextsWatchApp.swift */,
 				47EDD1472BDD56C800C5A286 /* WatchApp.strings */,
+				D17EC7000000000000000002 /* InfoPlist.strings */,
 			);
 			path = Texts;
 			sourceTree = "<group>";
@@ -2606,12 +2690,14 @@
 			children = (
 				A55686C889FFC64D3F3C8483 /* Libre3SetupView.swift */,
 				4F3100143007000100000001 /* BatteryHistoryView.swift */,
-				B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */,
 				4C2000062F65000100000001 /* BluetoothPeripheralDetailState.swift */,
 				4C2000082F65000100000001 /* BluetoothPeripheralDetailView.swift */,
 				4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */,
 				4C2000042F65000100000001 /* BluetoothPeripheralsView.swift */,
 				4C2000022F65000100000001 /* BluetoothPeripheralsViewModel.swift */,
+				B1E511032026091100000001 /* BluetoothSignalStrengthView.swift */,
+				0FF0721330F7432C937F01C6 /* DirectWatchSetupView.swift */,
+				A1D1EC770000000000000001 /* DirectWatchStatusBanner.swift */,
 				4C20000D2F65000100000001 /* TransmitterReadSuccessView.swift */,
 			);
 			path = BluetoothPeripherals;
@@ -2750,6 +2836,7 @@
 				ABA4DE8668C9A16DFF21A411 /* CareLinkTests.swift */,
 				4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */,
 				4D7E00013017000200000001 /* DexcomG6BluetoothSlotTests.swift */,
+				8D5DC293D34647658C22BE59 /* DirectWatchBridgeTests.swift */,
 				4B0C00242F3B000100000001 /* DexcomG6SensorLabelTests.swift */,
 				4D7F00013018000100000001 /* DexcomG7CalibrationTests.swift */,
 				FBA100030000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift */,
@@ -2804,6 +2891,25 @@
 				F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		71E8A1042D9E49A5B2260C34 /* Therapy */ = {
+			isa = PBXGroup;
+			children = (
+				5F219EC5BAAF4D5E924415FA /* TherapyMetricsManager.swift */,
+			);
+			path = Therapy;
+			sourceTree = "<group>";
+		};
+		905FC1ED6195A6E07B878727 /* DirectWatch */ = {
+			isa = PBXGroup;
+			children = (
+				F916A1E10000000000000001 /* DirectWatchAlertsView.swift */,
+				9A9AB2F1AE8F46548B3DA2DD /* DirectWatchCollectionView.swift */,
+				A1D1EC770000000000000009 /* DirectWatchCollectedReadingsView.swift */,
+				A1D1EC770000000000000007 /* DirectWatchCollectionGesture.swift */,
+			);
+			path = DirectWatch;
 			sourceTree = "<group>";
 		};
 		A30000000000000000000001 /* Followers */ = {
@@ -3115,6 +3221,7 @@
 				4E6000212FF2000100000001 /* SensorNoise */,
 				F821CF9922AEF2DF005C1E43 /* Speak */,
 				47FB28052636AFE700042FFB /* Statistics */,
+				71E8A1042D9E49A5B2260C34 /* Therapy */,
 				47244D642E8318B9007357C3 /* TransmitterReadSuccess */,
 				472596032B76300800459D12 /* Watch */,
 				474606812B96357200AC9214 /* Widgets */,
@@ -3177,8 +3284,6 @@
 				47E3BEC62CD780D900B794A0 /* AIDStatusView.swift */,
 				4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */,
 				4D20C0012FF1000100000001 /* RootHomeState.swift */,
-				05272484BD024BDAAA341C1C /* xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift */,
-				5F219EC5BAAF4D5E924415FA /* xDrip/Managers/Therapy/TherapyMetricsManager.swift */,
 				4D20C0032FF1000100000001 /* RootHomeView.swift */,
 				4D20C0092FF1000100000001 /* RootTabView.swift */,
 				AE7570012026092700000002 /* SheetCloseButton.swift */,
@@ -3213,6 +3318,7 @@
 				BA0000010000000000000018 /* NightscoutImportView.swift */,
 				E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */,
 				D9C75EA5D78E3497AC44D3C8 /* SettingsView.swift */,
+				05272484BD024BDAAA341C1C /* TherapyMetricsSettingsView.swift */,
 				CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */,
 				4D7A00033014000100000001 /* TroubleshootingLogView.swift */,
 				A30000000000000000000001 /* Followers */,
@@ -3482,6 +3588,7 @@
 				F8B3A7B1226A0878004BA588 /* TextsAlerts.swift */,
 				F8B3A809227A3D11004BA588 /* TextsAlertTypeSettings.swift */,
 				47046EA32A6E8BA700A6F736 /* TextsBgReadings.swift */,
+				3CB7E2A44F504FB1A8940A2F /* TextsDirectWatch.swift */,
 				F8297F57238EE14E00D74D66 /* TextsBluetoothPeripheralsView.swift */,
 				F8297F58238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift */,
 				F81FA005228E09D40028C70F /* TextsCalibration.swift */,
@@ -3604,6 +3711,7 @@
 				F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */,
 				F8AF36142455C6F700B5977B /* ConstantsTrace.swift */,
 				F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */,
+				A1D1EC770000000000000004 /* ConstantsDirectWatch.swift */,
 				47930E812BC5A001000BD8A1 /* ConstantsWidget.swift */,
 			);
 			name = Constants;
@@ -3722,6 +3830,7 @@
 		F8F1670F27274067001AA3D8 /* Generic */ = {
 			isa = PBXGroup;
 			children = (
+				4A899F69E74DE91DDF24C126 /* DexcomWatchProtocol.swift */,
 				F8F971CA23A5915900C3F17D /* AESCrypt.h */,
 				F8F971C623A5915900C3F17D /* AESCrypt.m */,
 				47F012CF2FC9D71700112233 /* DexcomG7AuthBridge.h */,
@@ -4296,6 +4405,7 @@
 				47A6AC442B7D430D0047A4BA /* HomeView.strings in Resources */,
 				47A6ABE92B790CC70047A4BA /* Preview Assets.xcassets in Resources */,
 				47EDD1492BDD56C800C5A286 /* WatchApp.strings in Resources */,
+				D17EC7000000000000000001 /* InfoPlist.strings in Resources */,
 				47A6ABE62B790CC70047A4BA /* Assets.xcassets in Resources */,
 				47A6AC462B7D43110047A4BA /* Common.strings in Resources */,
 				472134DE2BC6A63100729850 /* Assets.xcassets in Resources */,
@@ -4565,6 +4675,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FEB116F6F3B80337A255B771 /* DexcomTransmitterOpCode.swift in Sources */,
+				A71EABC60106174DF42844F1 /* TransmitterMessage.swift in Sources */,
+				A93DD257332571AB2302D260 /* PairRequestTxMessage.swift in Sources */,
+				3A65AFC42A26214D568BD71C /* AuthChallengeRxMessage.swift in Sources */,
+				F6D1247DC13F883C0CF768A5 /* AuthRequestRxMessage.swift in Sources */,
+				80E1D0059E8A3DED391995B1 /* AuthRequestTxMessage.swift in Sources */,
+				D0EFC85FA53E3CDEE2198D2C /* DexcomWatchProtocol.swift in Sources */,
+				57FED30744046A2D826B81B7 /* DirectWatchCompatibility.swift in Sources */,
 				474822462C01097D0052D4FB /* NotificationController.swift in Sources */,
 				47A6AC2B2B7D3DE30047A4BA /* GlucoseChartView.swift in Sources */,
 				745981A52E1F1B0F85780B06 /* GlucoseChartState.swift in Sources */,
@@ -4586,6 +4704,21 @@
 				474822482C010F380052D4FB /* TextsAlerts.swift in Sources */,
 				4793599A2B8A2A4E007D3CEE /* MainViewInfoView.swift in Sources */,
 				47A6ABEF2B7949B80047A4BA /* WatchStateModel.swift in Sources */,
+				9AC8880079DB42D5B61C6905 /* DirectWatchBridge.swift in Sources */,
+				DE8D7DE65157474CBFCF8FF0 /* TextsDirectWatch.swift in Sources */,
+				A1D1EC770000000000000006 /* ConstantsDirectWatch.swift in Sources */,
+				A1D1EC770000000000000003 /* DirectWatchStatusBanner.swift in Sources */,
+				F1DDE78411DC49FEBFA54BE0 /* DirectWatchCollector.swift in Sources */,
+				F100A001ABCDEF1234567801 /* DexcomG7AuthBridge.m in Sources */,
+				F100A002ABCDEF1234567802 /* DexcomG7ECC.c in Sources */,
+				F100A003ABCDEF1234567803 /* AESCrypt.m in Sources */,
+				F100A004ABCDEF1234567804 /* DexcomG7AuthSession.swift in Sources */,
+				F100A005ABCDEF1234567805 /* DexcomG7ProofSigner.swift in Sources */,
+				F100A006ABCDEF1234567806 /* DexcomG7WatchAuthSupport.swift in Sources */,
+				F916A1E10000000000000002 /* DirectWatchAlertsView.swift in Sources */,
+				424FCFAFA0324F8284100648 /* DirectWatchCollectionView.swift in Sources */,
+				A1D1EC77000000000000000A /* DirectWatchCollectedReadingsView.swift in Sources */,
+				A1D1EC770000000000000008 /* DirectWatchCollectionGesture.swift in Sources */,
 				47A6ABE22B790CC60047A4BA /* xDripWatchApp.swift in Sources */,
 				47DE41B32B8672F90041DA19 /* MainViewDataSourceView.swift in Sources */,
 				478705932C4D7B90001C3170 /* BigNumberView.swift in Sources */,
@@ -4650,6 +4783,7 @@
 				AB1900013014000200000001 /* LiveActivityWarmupTests.swift in Sources */,
 				4B0C00252F3B000100000001 /* DexcomG6SensorLabelTests.swift in Sources */,
 				4D7E00023017000200000001 /* DexcomG6BluetoothSlotTests.swift in Sources */,
+				CC1EA9B85F7A487E86867E63 /* DirectWatchBridgeTests.swift in Sources */,
 				4D7F00023018000100000001 /* DexcomG7CalibrationTests.swift in Sources */,
 				4D7A00063014000100000001 /* TroubleshootingLogTests.swift in Sources */,
 				A50000030000000000000001 /* OnlineHelpTests.swift in Sources */,
@@ -4679,6 +4813,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52802DB9CFDCDC0AA4BE8BE4 /* DexcomWatchProtocol.swift in Sources */,
+				AB5E04E6F6CEDAE08F65B316 /* DirectWatchCompatibility.swift in Sources */,
 				5A0100023015000100000001 /* GlucoseRangeDistribution.swift in Sources */,
 				4D7A00023014000100000001 /* TroubleshootingLog.swift in Sources */,
 				4D7A00043014000100000001 /* TroubleshootingLogView.swift in Sources */,
@@ -4946,6 +5082,11 @@
 				F8A1585922EDB7C6007F5B5D /* ConstantsDefaultAlertLevels.swift in Sources */,
 				F8A54AAD22D6859200934E7A /* SlopeParameters.swift in Sources */,
 				472596052B76301F00459D12 /* WatchManager.swift in Sources */,
+				CBA81ED48E274298933D189D /* DirectWatchBridge.swift in Sources */,
+				ACB364A6BE794436BB7EA579 /* TextsDirectWatch.swift in Sources */,
+				A1D1EC770000000000000005 /* ConstantsDirectWatch.swift in Sources */,
+				A1D1EC770000000000000002 /* DirectWatchStatusBanner.swift in Sources */,
+				E2DE074F5A074BBEAF5EC35D /* DirectWatchSetupView.swift in Sources */,
 				47B136DB2BC9BB55001E7ED3 /* ContactImageRenderer.swift in Sources */,
 				47A05CCC2EF16110004DABE7 /* ConstantsMedtrumEasyView.swift in Sources */,
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,
@@ -5082,8 +5223,8 @@
 				4D10C0042FEF000100000001 /* GlucoseChartScrollCoordinator.swift in Sources */,
 				C8BA6BBA5746888144511D55 /* GlucoseChartStateManager.swift in Sources */,
 				4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */,
-				C15D80D0E8DB47A6A9BE68DF /* xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift in Sources */,
-				B3DBAE6F4DF8465BBF554DE4 /* xDrip/Managers/Therapy/TherapyMetricsManager.swift in Sources */,
+				C15D80D0E8DB47A6A9BE68DF /* TherapyMetricsSettingsView.swift in Sources */,
+				B3DBAE6F4DF8465BBF554DE4 /* TherapyMetricsManager.swift in Sources */,
 				4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */,
 				4D21B0022FF8000100000001 /* RootHomeChartRange.swift in Sources */,
 				4D21B0032FF8000100000001 /* RootHomeToolbarView.swift in Sources */,
@@ -5245,6 +5386,21 @@
 				47046EA82A6E8F7B00A6F736 /* en */,
 				47046EAA2A6E8F8200A6F736 /* es */,
 				47DB06C02A6FB3CC00267BE3 /* nl */,
+				D17EC7010000000200000002 /* fr */,
+				D17EC7010000000200000003 /* de */,
+				D17EC7010000000200000005 /* it */,
+				D17EC7010000000200000006 /* pt */,
+				D17EC7010000000200000007 /* da */,
+				D17EC7010000000200000008 /* sv */,
+				D17EC7010000000200000009 /* fi */,
+				D17EC701000000020000000A /* pl-PL */,
+				D17EC701000000020000000B /* ru */,
+				D17EC701000000020000000C /* uk */,
+				D17EC701000000020000000D /* tr */,
+				D17EC701000000020000000E /* zh */,
+				D17EC701000000020000000F /* ar */,
+				D17EC7010000000200000010 /* el */,
+				D17EC7010000000200000011 /* sl */,
 			);
 			name = BgReadings.strings;
 			sourceTree = "<group>";
@@ -5674,6 +5830,7 @@
 				4798BAD427BA78C3002583BC /* tr */,
 				F8E4DCE72805F7FC007CF822 /* da */,
 				4166BFC428C3501500199980 /* el */,
+				D17EC701000000010000000C /* uk */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -5801,6 +5958,18 @@
 				4166BFC128C3501500199980 /* el */,
 			);
 			name = DexcomShareTestResult.strings;
+			sourceTree = "<group>";
+		};
+		D17EC7000000000000000002 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D17EC7000000000000000003 /* en */,
+				D17EC7000000000000000004 /* es */,
+				D17EC7000000000000000005 /* fr */,
+				D17EC7000000000000000006 /* de */,
+				D17EC7000000000000000007 /* nl */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -5970,7 +6139,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
-				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -5984,6 +6153,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "xDrip Watch App/DataModels/Watch-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
@@ -6010,7 +6180,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
-				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -6023,6 +6193,7 @@
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "xDrip Watch App/DataModels/Watch-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
@@ -6401,6 +6572,10 @@
 		F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				D17EC7350000000000000001 /* xdrip v35.xcdatamodel */,
+				D17EC7360000000000000001 /* xdrip v36.xcdatamodel */,
+				D17EC7340000000000000001 /* xdrip v34.xcdatamodel */,
+				4F3300313009000100000001 /* xdrip v33 Watch.xcdatamodel */,
 				4F3200313008000100000001 /* xdrip v32.xcdatamodel */,
 				4F3100313007000100000001 /* xdrip v31.xcdatamodel */,
 				4F3000313006000100000001 /* xdrip v30.xcdatamodel */,
@@ -6424,7 +6599,7 @@
 				F85FF3C3252D0C32004E6FF1 /* xdrip v12.xcdatamodel */,
 				F7936B31E35D82919DCDE294 /* xdrip v33.xcdatamodel */,
 			);
-			currentVersion = F7936B31E35D82919DCDE294 /* xdrip v33.xcdatamodel */;
+			currentVersion = D17EC7360000000000000001 /* xdrip v36.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

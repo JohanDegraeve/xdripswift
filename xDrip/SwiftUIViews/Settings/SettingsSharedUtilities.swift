@@ -240,6 +240,20 @@ struct SettingsIndicator {
     var accessibilityLabel: String? = nil
 }
 
+/// The small status symbol shared by Settings and Bluetooth peripheral rows.
+struct SettingsIndicatorView: View {
+    let indicator: SettingsIndicator
+    var isEnabled = true
+
+    var body: some View {
+        Image(systemName: indicator.symbolName)
+            .font(.system(size: 8))
+            .foregroundStyle(isEnabled ? indicator.color : .gray)
+            .fixedSize()
+            .accessibilityLabel(indicator.accessibilityLabel ?? "")
+    }
+}
+
 /// One value shown by an inline Settings picker and whether it matches the stored selection.
 struct SettingsMenuOption {
     let title: String
@@ -1304,10 +1318,7 @@ struct SettingsRowTextView: View {
                     }
 
                     if let indicator {
-                        Image(systemName: indicator.symbolName)
-                            .font(.caption2)
-                            .foregroundStyle(isEnabled ? indicator.color : .gray)
-                            .accessibilityLabel(indicator.accessibilityLabel ?? "")
+                        SettingsIndicatorView(indicator: indicator, isEnabled: isEnabled)
                     }
 
                     Text(title)
@@ -1323,10 +1334,7 @@ struct SettingsRowTextView: View {
                 if let detail {
                     HStack(spacing: 5) {
                         if let detailIndicator {
-                            Image(systemName: detailIndicator.symbolName)
-                                .font(.caption2)
-                                .foregroundStyle(isEnabled ? detailIndicator.color : .gray)
-                                .accessibilityLabel(detailIndicator.accessibilityLabel ?? "")
+                            SettingsIndicatorView(indicator: detailIndicator, isEnabled: isEnabled)
                         }
 
                         Text(detail)

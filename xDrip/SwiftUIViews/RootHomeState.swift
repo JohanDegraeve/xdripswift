@@ -192,6 +192,8 @@ struct RootHomeSensorNoiseState {
 /// Current data-source description and connection indicators.
 struct RootHomeDataSourceState {
     var title = ""
+    var showsWatchCollectorIcon = false
+    var watchCollectorHealth: DirectWatchReadingStatus = .off
     var dexcomConnectionMode: DexcomConnectionMode?
     var detail = ""
     var detailColor = ConstantsAppColors.secondaryText
@@ -379,6 +381,17 @@ final class RootHomeStateModel: ObservableObject {
             }
             self.applyTherapyMetrics(to: &state.loop)
             state.visibility.showsLoop = !state.usesScreenLockNightLayout && (state.loop.showsIOB || state.loop.showsCOB || state.loop.showsAIDStatus)
+        }
+    }
+
+    func refreshWatchCollectorStatus() {
+        let enabled = watchCollectorIsEnabled()
+        let health = enabled ? DirectWatchSettings.readingStatus() : .off
+        guard state.dataSource.showsWatchCollectorIcon != enabled
+                || state.dataSource.watchCollectorHealth != health else { return }
+        updateState {
+            $0.dataSource.showsWatchCollectorIcon = enabled
+            $0.dataSource.watchCollectorHealth = health
         }
     }
 
@@ -908,6 +921,8 @@ final class RootHomeStateModel: ObservableObject {
 
         return RootHomeDataSourceState(
             title: title,
+            showsWatchCollectorIcon: isMaster && activeSensor != nil && watchCollectorIsEnabled(),
+            watchCollectorHealth: DirectWatchSettings.readingStatus(),
             dexcomConnectionMode: isMaster ? dexcomConnectionMode : nil,
             detail: detail,
             detailColor: detailColor,
@@ -920,6 +935,18 @@ final class RootHomeStateModel: ObservableObject {
             keepAliveSystemImage: UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString,
             keepAliveColor: followerKeepAliveColor
         )
+    }
+
+    private func watchCollectorIsEnabled() -> Bool {
+        guard UserDefaults.standard.isMaster,
+              let configuration = DirectWatchSettings.configuration,
+              let sensorStart = UserDefaults.standard.activeSensorStartDate,
+              abs(sensorStart.timeIntervalSince(configuration.sensorStartDate)) <= 120,
+              let transmitter = bluetoothPeripheralManager?.getCGMTransmitter() as? BluetoothTransmitter,
+              let peripheral = bluetoothPeripheralManager?.getBluetoothPeripheral(for: transmitter)
+        else { return false }
+        return peripheral.blePeripheral.transmitterId == configuration.transmitterID
+            && (configuration.transmitterFamily == .g7 ? peripheral is DexcomG7 : peripheral is DexcomG5)
     }
 
     private func sensorAgeColor(timeLeftInMinutes: Double) -> Color {

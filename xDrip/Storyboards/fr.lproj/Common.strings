@@ -156,3 +156,6 @@
 
 /* Switch title when the surrounding screen or section identifies the feature */
 "common_enable" = "Activer";
+
+/* Status label, including Direct to Watch in Advanced Settings. */
+"common_enabled" = "Activé";

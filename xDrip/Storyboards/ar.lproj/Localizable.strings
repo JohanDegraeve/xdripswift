@@ -1,1 +1,88 @@
 
+
+// Direct to Watch status and pairing guidance
+"directWatchTitle" = "مباشرة إلى Watch";
+"directWatchNoConnection" = "لم تتم إضافة اتصال";
+"directWatchSuspended" = "تم تعليق جمع البيانات";
+"directWatchWaiting" = "بانتظار قراءة Watch";
+"directWatchCollecting" = "جارٍ جمع البيانات";
+"directWatchOverdue" = "لم تصل القراءة المتوقعة";
+"directWatchDiagnosis" = "التشخيص";
+"directWatchAdded" = "تمت إضافة اتصال Watch";
+"directWatchPairingGuidance" = "مرّر لأسفل إلى شاشة «مباشرة إلى Watch» على Watch واقبل طلب اقتران Bluetooth إذا كانت هذه أول مرة تضيف فيها هذا المرسل.\n\nقد يستغرق اتصال المرسل حتى خمس دقائق.";
+
+// Direct to Watch collection control
+"directWatchPausedShort" = "متوقف مؤقتًا";
+"directWatchPaused" = "تم إيقاف جمع بيانات Watch مؤقتًا";
+"directWatchPause" = "إيقاف الجمع مؤقتًا";
+"directWatchResume" = "استئناف الجمع";
+"directWatchPausedSinceFormat" = "منذ %@";
+"directWatchConnecting" = "بانتظار الاتصال…";
+"directWatchCollectedReadings" = "القراءات المجمعة";
+"directWatchReadingGapFormat" = "(%dد %dث)";
+"directWatchNoCollectedReadings" = "لم يتم جمع قراءات عبر Watch بعد";
+
+"directWatchSessionStarted" = "بدأ في %@";
+"directWatchSessionResumed" = "استؤنف في %@";
+"directWatchSessionPaused" = "أُوقف مؤقتًا في %@";
+"directWatchSessionEnded" = "انتهى في %@";
+
+// Direct to Watch setup and diagnosis
+"directWatchBluetoothSlot" = "منفذ Bluetooth";
+"directWatchCancel" = "إلغاء";
+"directWatchTestingLogs" = "الاختبار والسجلات";
+"directWatchAddConnection" = "إضافة اتصال Watch";
+"directWatchRemoveConnection" = "إزالة اتصال Watch";
+"directWatchMedicalSlot" = "منفذ جهاز طبي";
+"directWatchWatchSlot" = "منفذ Watch";
+"directWatchConfirmUnusedSlot" = "المنفذ خالٍ: إضافة Watch";
+"directWatchSlotMedical" = "المنفذ 1 · جهاز طبي";
+"directWatchSlotMobile" = "المنفذ 2 · تطبيق الهاتف";
+"directWatchSlotWatch" = "المنفذ 3 · Watch";
+"directWatchSlotAnubis" = "المنفذ 3 · Anubis إضافي";
+"directWatchUsedWatch" = "يستخدمه هذا الـWatch";
+"directWatchUsedPhone" = "يستخدمه هذا الـiPhone";
+"directWatchSlotMedicalDetail" = "فقط إن لم تستخدمه مضخة أو جهاز استقبال";
+"directWatchSlotMobileDetail" = "فقط إن لم يستخدمه تطبيق هاتف آخر";
+"directWatchRecommendedWatch" = "موصى به لـWatch";
+"directWatchRecommendedTransmitter" = "موصى به لهذا المرسل";
+"directWatchAnubisOnly" = "مرسلات Anubis فقط";
+"directWatchWatchStatus" = "حالة Watch";
+"directWatchTestingDiagnosis" = "الاختبار والتشخيص";
+"directWatchPausePhone" = "إيقاف جمع BLE على iPhone مؤقتًا";
+"directWatchForTesting" = "لاختبار الجمع عبر Watch";
+"directWatchGetLogs" = "جلب سجلات Watch";
+"directWatchShareLogs" = "مشاركة سجلات Watch";
+"directWatchPending" = "قيد الانتظار";
+"directWatchReceivedFormat" = "استُلم %@";
+"directWatchSelectedFormat" = "%@، محدد";
+"directWatchIntro" = "يمكن لـWatch جمع القراءات مباشرةً عندما يكون iPhone بعيدًا. تظل أدوات التحكم بالمستشعر على iPhone.";
+"directWatchBackgroundAdvice" = "يعتمد الجمع في الخلفية على watchOS. اختبره على Watch قبل الاعتماد عليه بعيدًا عن iPhone.";
+"directWatchSeparateSlots" = "يحتاج Watch وiPhone إلى منفذين منفصلين. قد يؤدي استخدام المنفذ 1 إلى قطع اتصال مضخة أو جهاز استقبال يستخدمه بالفعل.";
+"directWatchNativeRequired" = "يتطلب الجمع عبر Watch تفعيل الغلوكوز المحسوب أصليًا على هذا الـiPhone.";
+"directWatchStartSensor" = "ابدأ مستشعرًا على هذا الـiPhone قبل إضافة اتصال Watch.";
+"directWatchNoSlot" = "لا يوجد منفذ متوافق متاح لـWatch.";
+"directWatchMedicalWarning" = "سيستخدم Watch المنفذ 1 المخصص عادةً لمضخة أو جهاز استقبال. لا تضف الاتصال إذا كانت مضخة أو جهاز استقبال أو جهاز طبي آخر يستخدم هذا المنفذ. قد يقطع Watch اتصال الغلوكوز لذلك الجهاز.";
+"directWatchWatchSlotWarning" = "سيستخدم Watch المنفذ 3. لا تضف الاتصال إذا كانت ساعة ذكية أخرى مقترنة بهذا المستشعر. قد يقطع هذا الـWatch اتصال الغلوكوز لتلك الساعة.";
+"directWatchSlotConflict" = "هذا المنفذ مخصص لـWatch. أزل اتصال Watch قبل تخصيصه لـiPhone.";
+"directWatchOpenForStatus" = "افتح %@ على الساعة لتلقي حالتها.";
+"directWatchCheckInstalled" = "إذا ظلت الحالة قديمة، فتحقق من ظهور التطبيق ضمن التطبيقات المثبتة على Apple Watch في تطبيق Watch على iPhone.";
+"directWatchMasterRequired" = "يجب أن يكون iPhone في الوضع الرئيسي.";
+"directWatchG6Mismatch" = "جهاز G6 المضبوط ليس مرسل iPhone النشط.";
+"directWatchG7Mismatch" = "مستشعر عائلة G7 المضبوط ليس مرسل iPhone النشط.";
+"directWatchPrimaryRequired" = "يتطلب الجمع عبر Watch اتصالًا رئيسيًا لعائلة G7 على iPhone.";
+"directWatchNativeG6Required" = "فعّل غلوكوز G6 الأصلي على iPhone.";
+"directWatchPairingCodeRequired" = "يتطلب إقران Watch رمز مستشعر من أربعة أرقام.";
+"directWatchSlotsConflict" = "يستخدم Watch وiPhone منفذ Bluetooth نفسه.";
+"directWatchAnubisRequired" = "يتطلب المنفذ 3 مرسل Anubis.";
+"directWatchNoActiveSensor" = "لا يوجد مستشعر نشط على iPhone.";
+
+/* Direct to Watch action feedback. */
+"directWatchTryAgain" = "حاول مجددًا";
+"directWatchRequestQueued" = "الطلب في الانتظار";
+"directWatchLastLogsReceived" = "آخر سجلات مستلمة";
+"directWatchWaitingForLogs" = "بانتظار سجلات جديدة…";
+"directWatchLogsFailed" = "تعذر جلب السجلات. حاول مجددًا.";
+
+/* Watch diagnostic log actions and receipt time. */
+"directWatchLogs" = "السجلات";

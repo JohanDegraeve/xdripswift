@@ -88,6 +88,7 @@ struct RootHomeView: View {
     private let actions: RootHomeActions
     private let chartRefreshTimer = Timer.publish(every: ConstantsHomeView.updateHomeViewIntervalInSeconds, on: .main, in: .common).autoconnect()
     private let clockRefreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    private let watchCollectorStatusTimer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
     private static let pannedReadingDateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.amSymbol = ConstantsUI.timeFormatAM
@@ -149,6 +150,12 @@ struct RootHomeView: View {
             glucoseChartStateManager.cleanUpMemory()
             miniChartStateManager.cleanUpMemory()
             historicalDataCache.cleanUpMemory()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: DirectWatchSettings.changed)) { _ in
+            stateModel.refreshWatchCollectorStatus()
+        }
+        .onReceive(watchCollectorStatusTimer) { _ in
+            if state.dataSource.showsWatchCollectorIcon { stateModel.refreshWatchCollectorStatus() }
         }
         .onReceive(chartRefreshTimer) { _ in
             refreshCurrentTimeRangeIfNeeded(showsLoading: false)

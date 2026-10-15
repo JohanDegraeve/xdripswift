@@ -1,1 +1,88 @@
 
+
+// Direct to Watch status and pairing guidance
+"directWatchTitle" = "直连 Watch";
+"directWatchNoConnection" = "未添加连接";
+"directWatchSuspended" = "采集已暂停";
+"directWatchWaiting" = "等待 Watch 读数";
+"directWatchCollecting" = "正在采集";
+"directWatchOverdue" = "读数超时";
+"directWatchDiagnosis" = "诊断";
+"directWatchAdded" = "已添加 Watch 连接";
+"directWatchPairingGuidance" = "在 Watch 上向下滚动到“直连 Watch”屏幕。如果这是首次添加此发射器，请接受蓝牙配对请求。\n\n发射器连接可能需要最多五分钟。";
+
+// Direct to Watch collection control
+"directWatchPausedShort" = "已暂停";
+"directWatchPaused" = "Watch 采集已暂停";
+"directWatchPause" = "暂停采集";
+"directWatchResume" = "恢复采集";
+"directWatchPausedSinceFormat" = "自 %@ 起";
+"directWatchConnecting" = "正在等待…";
+"directWatchCollectedReadings" = "已采集读数";
+"directWatchReadingGapFormat" = "（%d分 %d秒）";
+"directWatchNoCollectedReadings" = "尚未通过 Watch 采集读数";
+
+"directWatchSessionStarted" = "开始于 %@";
+"directWatchSessionResumed" = "恢复于 %@";
+"directWatchSessionPaused" = "暂停于 %@";
+"directWatchSessionEnded" = "结束于 %@";
+
+// Direct to Watch setup and diagnosis
+"directWatchBluetoothSlot" = "蓝牙槽位";
+"directWatchCancel" = "取消";
+"directWatchTestingLogs" = "测试与日志";
+"directWatchAddConnection" = "添加 Watch 连接";
+"directWatchRemoveConnection" = "移除 Watch 连接";
+"directWatchMedicalSlot" = "医疗设备槽位";
+"directWatchWatchSlot" = "Watch 槽位";
+"directWatchConfirmUnusedSlot" = "槽位空闲: 添加 Watch";
+"directWatchSlotMedical" = "槽位 1 · 医疗设备";
+"directWatchSlotMobile" = "槽位 2 · 手机应用";
+"directWatchSlotWatch" = "槽位 3 · Watch";
+"directWatchSlotAnubis" = "槽位 3 · Anubis 扩展";
+"directWatchUsedWatch" = "此 Watch 使用中";
+"directWatchUsedPhone" = "此 iPhone 使用中";
+"directWatchSlotMedicalDetail" = "仅在无泵或接收器使用时";
+"directWatchSlotMobileDetail" = "仅在无其他手机应用使用时";
+"directWatchRecommendedWatch" = "推荐用于 Watch";
+"directWatchRecommendedTransmitter" = "推荐用于此发射器";
+"directWatchAnubisOnly" = "仅限 Anubis 发射器";
+"directWatchWatchStatus" = "Watch 状态";
+"directWatchTestingDiagnosis" = "测试与诊断";
+"directWatchPausePhone" = "暂停 iPhone BLE 采集";
+"directWatchForTesting" = "用于测试 Watch 采集";
+"directWatchGetLogs" = "获取 Watch 日志";
+"directWatchShareLogs" = "分享 Watch 日志";
+"directWatchPending" = "待同步";
+"directWatchReceivedFormat" = "接收于 %@";
+"directWatchSelectedFormat" = "%@，已选中";
+"directWatchIntro" = "iPhone 不在身边时，Watch 可直接采集读数。传感器控制仍在 iPhone 上。";
+"directWatchBackgroundAdvice" = "后台采集受 watchOS 限制。离开 iPhone 前，请先在 Watch 上测试。";
+"directWatchSeparateSlots" = "Watch 和 iPhone 需要独立槽位。使用槽位 1 可能中断已占用该槽位的泵或接收器连接。";
+"directWatchNativeRequired" = "Watch 采集需要此 iPhone 启用原生计算血糖。";
+"directWatchStartSensor" = "添加 Watch 连接前，请先在此 iPhone 上启动传感器。";
+"directWatchNoSlot" = "Watch 无可用兼容槽位。";
+"directWatchMedicalWarning" = "Watch 将使用通常供泵或接收器使用的槽位 1。如果泵、接收器或其他医疗设备正在使用此槽位，请勿添加连接。添加 Watch 可能中断该设备的血糖连接。";
+"directWatchWatchSlotWarning" = "Watch 将使用槽位 3。如果已有其他智能手表与此传感器配对，请勿添加连接。添加此 Watch 可能中断其他手表的血糖连接。";
+"directWatchSlotConflict" = "此槽位已分配给 Watch。分配给 iPhone 前，请先移除 Watch 连接。";
+"directWatchOpenForStatus" = "在 Watch 上打开“%@”以接收状态。";
+"directWatchCheckInstalled" = "如果状态一直未更新，请在 iPhone 的 Watch 应用中检查该应用是否列在“已安装到 Apple Watch”下。";
+"directWatchMasterRequired" = "iPhone 必须处于主模式。";
+"directWatchG6Mismatch" = "配置的 G6 不是 iPhone 的当前发射器。";
+"directWatchG7Mismatch" = "配置的 G7 系列传感器不是 iPhone 的当前发射器。";
+"directWatchPrimaryRequired" = "Watch 采集需要 iPhone 上的 G7 系列主连接。";
+"directWatchNativeG6Required" = "请在 iPhone 上启用 G6 原生血糖。";
+"directWatchPairingCodeRequired" = "Watch 配对需要四位传感器代码。";
+"directWatchSlotsConflict" = "Watch 和 iPhone 的蓝牙槽位冲突。";
+"directWatchAnubisRequired" = "槽位 3 需要 Anubis 发射器。";
+"directWatchNoActiveSensor" = "iPhone 上无活动传感器。";
+
+/* Direct to Watch action feedback. */
+"directWatchTryAgain" = "重试";
+"directWatchRequestQueued" = "请求已排队";
+"directWatchLastLogsReceived" = "上次收到日志";
+"directWatchWaitingForLogs" = "等待新日志…";
+"directWatchLogsFailed" = "无法获取日志。请重试。";
+
+/* Watch diagnostic log actions and receipt time. */
+"directWatchLogs" = "日志";

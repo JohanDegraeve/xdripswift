@@ -55,6 +55,38 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     private let presentSignalStrengthView: (BluetoothPeripheral) -> Void
     private let presentBatteryHistoryView: (NSManagedObjectID) -> Void
 
+    var directWatchSetupContext: DirectWatchSetupContext? {
+        if let g7 = bluetoothPeripheral as? DexcomG7,
+           let id = g7.blePeripheral.transmitterId,
+           g7.blePeripheral.shouldconnect,
+           !g7.useOtherApp {
+            let code = g7.sensorCode
+            return DirectWatchSetupContext(transmitterID: id, isAnubis: false,
+                                       phoneSlot: g7.effectiveDexcomG7BluetoothSlot().rawValue,
+                                       nativeGlucose: code?.count == 4 && code?.allSatisfy(\.isNumber) == true,
+                                       family: .g7, pairingCode: code, deviceName: dexcomTitle)
+        }
+        guard let g6 = bluetoothPeripheral as? DexcomG5,
+              let id = g6.blePeripheral.transmitterId,
+              g6.blePeripheral.shouldconnect,
+              g6.isAnubis || id.hasPrefix("8") else { return nil }
+        let transmitter = bluetoothPeripheralManager?.getBluetoothTransmitter(for: g6, createANewOneIfNecesssary: false) as? CGMG5Transmitter
+        return DirectWatchSetupContext(transmitterID: id, isAnubis: g6.isAnubis,
+                                   phoneSlot: g6.effectiveDexcomG6BluetoothSlot().rawValue,
+                                   nativeGlucose: transmitter.map { $0.isWebOOPEnabled() || $0.overruleIsWebOOPEnabled() } ?? false)
+    }
+
+    var directWatchIsEnabled: Bool {
+        guard let id = bluetoothPeripheral?.blePeripheral.transmitterId,
+              let configuration = DirectWatchSettings.configuration else { return false }
+        return configuration.transmitterID == id
+            && configuration.transmitterFamily == (bluetoothPeripheral is DexcomG7 ? .g7 : .g6)
+    }
+
+    func directWatchStatus(at date: Date) -> DirectWatchReadingStatus {
+        directWatchIsEnabled ? DirectWatchSettings.readingStatus(at: date) : .off
+    }
+
     var onlineHelpTopic: OnlineHelpTopic {
         expectedBluetoothPeripheralType.onlineHelpTopic
     }
@@ -1693,7 +1725,19 @@ private extension BluetoothPeripheralDetailState {
         }
     }
 
+    func phoneBluetoothSlotIsAvailable(_ slot: UInt8, family: DirectWatchTransmitterFamily) -> Bool {
+        guard let watch = DirectWatchSettings.configuration,
+              watch.transmitterID == transmitterIdTempValue,
+              watch.transmitterFamily == family, watch.slot == slot else { return true }
+        pendingAlert = BluetoothPeripheralDetailAlert(
+            title: Texts_Common.warning,
+            message: TextsDirectWatch.slotConflict
+        )
+        return false
+    }
+
     func setDexcomG6BluetoothSlot(_ slot: DexcomG6BluetoothSlot) {
+        guard phoneBluetoothSlotIsAvailable(slot.rawValue, family: .g6) else { return }
         guard slot != .anubisExperimental || (bluetoothPeripheral as? DexcomG5)?.isAnubis == true else { return }
 
         let previousSlot = dexcomG6BluetoothSlot
@@ -1750,6 +1794,7 @@ private extension BluetoothPeripheralDetailState {
     }
 
     func setDexcomG7BluetoothSlot(_ slot: DexcomG7BluetoothSlot, dexcomG7: DexcomG7?) {
+        guard phoneBluetoothSlotIsAvailable(slot.rawValue, family: .g7) else { return }
         let previousSlot = dexcomG7BluetoothSlot
         guard slot != previousSlot else { return }
 

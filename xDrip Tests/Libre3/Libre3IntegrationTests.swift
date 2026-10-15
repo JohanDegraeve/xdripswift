@@ -103,10 +103,62 @@ extension Libre3IntegrationTests {
     func testCoreDataMigrationRetainsPreviousModelAndSupportsLibre3Inverse() throws {
         let directory = try XCTUnwrap(Bundle.main.url(forResource: "xdrip", withExtension: "momd"))
         let previous = try XCTUnwrap(NSManagedObjectModel(contentsOf: directory.appendingPathComponent("xdrip v32.mom")))
-        let current = try XCTUnwrap(NSManagedObjectModel(contentsOf: directory.appendingPathComponent("xdrip v33.mom")))
+        let current = try XCTUnwrap(NSManagedObjectModel(contentsOf: directory.appendingPathComponent("xdrip v35.mom")))
         _ = try NSMappingModel.inferredMappingModel(forSourceModel: previous, destinationModel: current)
         XCTAssertEqual(current.entitiesByName["Libre3"]?.relationshipsByName["blePeripheral"]?.inverseRelationship?.name, "libre3")
     }
+
+    func testLibre3StoreMigratesToCombinedWatchModelWithPairingAndValuesPreserved() throws {
+        let models = try XCTUnwrap(Bundle.main.url(forResource: "xdrip", withExtension: "momd"))
+        let source = try XCTUnwrap(NSManagedObjectModel(contentsOf: models.appendingPathComponent("xdrip v33.mom")))
+        let target = try XCTUnwrap(NSManagedObjectModel(contentsOf: models.appendingPathComponent("xdrip v35.mom")))
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("Libre3.sqlite")
+        let oldCoordinator = NSPersistentStoreCoordinator(managedObjectModel: source)
+        let oldStore = try oldCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: url)
+        let oldContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        oldContext.persistentStoreCoordinator = oldCoordinator
+        try oldContext.performAndWait {
+            let peripheral = NSEntityDescription.insertNewObject(forEntityName: "BLEPeripheral", into: oldContext)
+            peripheral.setValue("saved-address", forKey: "address")
+            peripheral.setValue("Libre 3", forKey: "name")
+            peripheral.setValue(false, forKey: "parameterUpdateNeededAtNextConnect")
+            peripheral.setValue(true, forKey: "shouldconnect")
+            peripheral.setValue(false, forKey: "webOOPEnabled")
+            let sensor = NSEntityDescription.insertNewObject(forEntityName: "Libre3", into: oldContext)
+            sensor.setValue(peripheral, forKey: "blePeripheral")
+            sensor.setValue("retained-status", forKey: "status")
+            let reading = NSEntityDescription.insertNewObject(forEntityName: "BgReading", into: oldContext)
+            reading.setValue("libre3-reading", forKey: "id")
+            reading.setValue(Date(timeIntervalSince1970: 1_790_000_000), forKey: "timeStamp")
+            reading.setValue(123.0, forKey: "calculatedValue")
+            reading.setValue(false, forKey: "calibrationFlag")
+            reading.setValue(false, forKey: "hideSlope")
+            try oldContext.save()
+        }
+        try oldCoordinator.remove(oldStore)
+        let coordinator = NSPersistentStoreCoordinator(managedObjectModel: target)
+        let store = try coordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: url,
+            options: [NSMigratePersistentStoresAutomaticallyOption: true, NSInferMappingModelAutomaticallyOption: true])
+        defer { try? coordinator.remove(store) }
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.persistentStoreCoordinator = coordinator
+        try context.performAndWait {
+            let sensor = try XCTUnwrap(context.fetch(NSFetchRequest<NSManagedObject>(entityName: "Libre3")).first)
+            let peripheral = try XCTUnwrap(sensor.value(forKey: "blePeripheral") as? NSManagedObject)
+            XCTAssertEqual(sensor.value(forKey: "status") as? String, "retained-status")
+            XCTAssertEqual(peripheral.value(forKey: "address") as? String, "saved-address")
+            XCTAssertEqual(peripheral.value(forKey: "libre3") as? NSManagedObject, sensor)
+            let reading = try XCTUnwrap(context.fetch(NSFetchRequest<NSManagedObject>(entityName: "BgReading")).first)
+            XCTAssertEqual(reading.value(forKey: "id") as? String, "libre3-reading")
+            XCTAssertEqual(reading.value(forKey: "calculatedValue") as? Double, 123)
+            XCTAssertEqual(reading.value(forKey: "valueIsFromWatch") as? Bool, false)
+            XCTAssertNil(reading.value(forKey: "watchCollectedAt"))
+        }
+    }
+
 }
 
 extension Libre3IntegrationTests {

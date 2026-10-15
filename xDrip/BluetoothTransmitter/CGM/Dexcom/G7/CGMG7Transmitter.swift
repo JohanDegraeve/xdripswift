@@ -168,6 +168,9 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
     /// The validated four-digit applicator code. It is required only when xDrip4iOS owns primary
     /// authentication, but is retained here so configuration boundaries can enforce that rule.
     private var pairingCode: String?
+    private var watchCollectionObserver: NSObjectProtocol?
+    private var phoneWasPaused = false
+    private var phoneCollectionIsPaused: Bool { DirectWatchSettings.phoneIsPaused(transmitterId ?? "") }
 
     /// Owns the complete primary-only authentication state machine. The transport callbacks below
     /// are the only route by which it can touch Core Bluetooth or grant primary readiness.
@@ -403,10 +406,25 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
         authSession.transport = self
         cgmTransmitterDelegate = cGMTransmitterDelegate
         self.cGMG7TransmitterDelegate = cGMG7TransmitterDelegate
+        phoneWasPaused = phoneCollectionIsPaused
+        watchCollectionObserver = NotificationCenter.default.addObserver(forName: DirectWatchSettings.changed, object: nil, queue: .main) { [weak self] _ in
+            guard let self else { return }
+            let paused = self.phoneCollectionIsPaused
+            guard paused != self.phoneWasPaused else { return }
+            self.phoneWasPaused = paused
+            if paused {
+                self.stopScanning()
+                self.disconnect()
+            } else { self.connect() }
+        }
 
         if !useOtherApp, !hasValidPairingCode {
             trace("G7 primary mode requires a four-digit pairing code. Falling back to coexistence", log: log, category: ConstantsLog.categoryCGMG7, type: .error)
         }
+    }
+
+    deinit {
+        if let watchCollectionObserver { NotificationCenter.default.removeObserver(watchCollectionObserver) }
     }
 
     override func prepareForRelease() {
@@ -434,6 +452,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
 
     private func connectOnCentral() {
         assertOnCentral()
+        guard !phoneCollectionIsPaused else { return }
         if useOtherApp, deviceAddress == nil {
             startCoexistenceObservation()
         } else if !useOtherApp, primaryAuthenticationBlocked {
@@ -593,6 +612,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
     }
 
     override func reconnectAfterDisconnect(_ central: CBCentralManager) {
+        guard !phoneCollectionIsPaused else { return }
         if useOtherApp {
             // The sensor normally sleeps between readings. An immediate system-connected lookup
             // is then empty, and background scanning may never deliver another discovery. Keep
@@ -607,6 +627,10 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
     }
 
     override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        guard !phoneCollectionIsPaused else {
+            central.cancelPeripheralConnection(peripheral)
+            return
+        }
         // Saved-peripheral and restored connections can arrive while an old discovery scan is
         // still active. Stop it so unrelated advertisements cannot replace this pending connection.
         if useOtherApp { central.stopScan() }

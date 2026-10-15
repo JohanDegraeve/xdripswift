@@ -163,3 +163,6 @@
 
 /* Switch title when the surrounding screen or section identifies the feature */
 "common_enable" = "启用";
+
+/* Status label, including Direct to Watch in Advanced Settings. */
+"common_enabled" = "已启用";

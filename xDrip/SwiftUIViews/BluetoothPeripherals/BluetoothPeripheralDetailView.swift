@@ -41,6 +41,15 @@ struct BluetoothPeripheralDetailView: View {
                                 .foregroundStyle(state.statusFooterSymbolColor)
                         }
 
+                        if state.directWatchIsEnabled {
+                            TimelineView(.periodic(from: .now, by: 10)) { timeline in
+                                let watchStatus = state.directWatchStatus(at: timeline.date)
+                                Image(systemName: ConstantsDirectWatch.watchSymbol(for: watchStatus))
+                                    .foregroundStyle(ConstantsDirectWatch.statusColor(for: watchStatus))
+                                    .accessibilityLabel(watchStatus.title)
+                            }
+                        }
+
                         Text(statusFooterText)
                     }
                         .foregroundStyle(state.statusFooterIsWarning ? Color(.systemRed) : ConstantsUI.listSectionFooterTextColor)
@@ -52,6 +61,30 @@ struct BluetoothPeripheralDetailView: View {
                 Section {
                     ForEach(section.rows) { row in
                         BluetoothPeripheralDetailRowView(row: row)
+                    }
+                    if section.id == "dexcom-g6-bluetooth-slot" || section.id == "dexcom-g7-bluetooth-slot",
+                       let context = state.directWatchSetupContext {
+                        NavigationLink {
+                            DirectWatchSetupView(context: context)
+                        } label: {
+                            HStack {
+                                Text(TextsDirectWatch.title)
+                                Spacer()
+                                if state.directWatchIsEnabled {
+                                    TimelineView(.periodic(from: .now, by: 10)) { timeline in
+                                        let watchStatus = state.directWatchStatus(at: timeline.date)
+                                        HStack(spacing: 7) {
+                                            Image(systemName: ConstantsDirectWatch.watchSymbol(for: watchStatus))
+                                                .font(.system(size: 16))
+                                                .foregroundStyle(ConstantsDirectWatch.statusColor(for: watchStatus))
+                                            Text(Texts_Common.enabled)
+                                                .foregroundStyle(ConstantsAppColors.rowDetailText)
+                                        }
+                                        .accessibilityLabel("\(Texts_Common.enabled), \(watchStatus.title)")
+                                    }
+                                }
+                            }
+                        }
                     }
                 } header: {
                     BluetoothPeripheralDetailSectionHeaderView(section: section)
@@ -100,6 +133,9 @@ struct BluetoothPeripheralDetailView: View {
             state.setSignalStrengthVisible(true)
         }
         .onDisappear { state.setSignalStrengthVisible(false) }
+        .onReceive(NotificationCenter.default.publisher(for: DirectWatchSettings.changed)) { _ in
+            state.refresh()
+        }
         .onChange(of: scenePhase) { phase in
             if phase == .active {
                 state.refresh()
