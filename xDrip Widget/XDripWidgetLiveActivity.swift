@@ -15,6 +15,9 @@ struct XDripWidgetLiveActivity: Widget {
         ActivityConfiguration(for: XDripWidgetAttributes.self) { context in
             // call a view here so that we can conditionally show one or another
             LiveActivityView(context: context)
+                // Paint an opaque background instead of relying on the system's background tint.
+                .background(Color.black)
+                .activityBackgroundTint(.black)
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {

@@ -33,11 +33,8 @@ struct LiveActivityViewContentActivityFamiliesState: View {
 
     var body: some View {
         ZStack {
-            AccessoryWidgetBackground()
-                .cornerRadius(8)
-
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color.black.opacity(0.4))
+                .fill(Color.black)
 
             if state.showsSensorWarmupStatus, let endDate = state.sensorWarmupEndDate {
                 GeometryReader { geometry in
@@ -54,7 +51,7 @@ struct LiveActivityViewContentActivityFamiliesState: View {
                 }
             }
         }
-        .activityBackgroundTint(.clear)
+        .activityBackgroundTint(.black)
     }
 
     private var chartContent: some View {
