@@ -68,6 +68,7 @@ actor Libre3IdentityStore {
     func select(_ version: String) throws {
         _ = try identities(version: version)
         try storage.write(Data(version.utf8), account: "selected")
+        Libre3Log.detail("Pairing credentials selected, version=\(version)")
     }
 
     func identities(version: String) throws -> [Libre3AppIdentity] {
@@ -100,6 +101,7 @@ actor Libre3IdentityStore {
         }
         if let download { return try await download.value }
         let work = Task { () throws -> Libre3IdentityVersion in
+            Libre3Log.detail("Pairing credentials download started, version=\(source.version)")
             var validated: Data?
             let configuration = URLSessionConfiguration.ephemeral
             configuration.timeoutIntervalForRequest = 30
@@ -117,14 +119,23 @@ actor Libre3IdentityStore {
                     _ = try Self.validate(json: json, digest: source.digest)
                     validated = json
                     break
-                } catch is CancellationError { throw CancellationError() } catch { continue }
+                } catch is CancellationError { throw CancellationError() } catch {
+                    // Only safe error metadata leaves this boundary, never the downloaded file.
+                    Libre3Log.failure("Pairing credentials download or validation", error: error)
+                    continue
+                }
             }
             guard let json = validated else { throw Libre3IdentityError.unavailable }
-            return try saveValidated(json: json, source: source)
+            let version = try saveValidated(json: json, source: source)
+            Libre3Log.detail("Pairing credentials validated and saved, version=\(version.id)")
+            return version
         }
         download = work
         defer { download = nil }
-        return try await work.value
+        do { return try await work.value } catch {
+            Libre3Log.failure("Pairing credentials provisioning", error: error)
+            throw error
+        }
     }
 
     /// Immutable version IDs prevent an update from overwriting a sensor's pinned identity set.

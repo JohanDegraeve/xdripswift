@@ -143,7 +143,6 @@ final class CGMLibre3Transmitter: BluetoothTransmitter, CGMTransmitter, @uncheck
     }
 
     override func startScanning() -> BluetoothTransmitter.startScanningResult {
-        Self.logStage("Libre 3 test implementation: plain-auth-v3 readd-handoff-v1 (2026-10-10)")
         snapshotLock.lock()
         let recoveryRequired = needsRecovery
         snapshotLock.unlock()
@@ -179,6 +178,7 @@ final class CGMLibre3Transmitter: BluetoothTransmitter, CGMTransmitter, @uncheck
 
     override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         guard error == nil else {
+            Libre3Log.failure("Characteristic discovery", error: error, channel: service.uuid.uuidString)
             fail(Libre3ConnectionError.disconnected)
             return
         }
@@ -195,6 +195,7 @@ final class CGMLibre3Transmitter: BluetoothTransmitter, CGMTransmitter, @uncheck
 
     override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         guard error == nil else {
+            Libre3Log.failure("Notification subscription", error: error, channel: characteristic.uuid.uuidString)
             fail(Libre3ConnectionError.disconnected)
             return
         }
@@ -212,7 +213,11 @@ final class CGMLibre3Transmitter: BluetoothTransmitter, CGMTransmitter, @uncheck
     }
 
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        guard error == nil, let data = characteristic.value else { return }
+        guard error == nil else {
+            Libre3Log.failure("Characteristic update", error: error, channel: characteristic.uuid.uuidString)
+            return
+        }
+        guard let data = characteristic.value else { return }
         if let channel = securityChannel(characteristic.uuid), let transport {
             let previous = securityDeliveryTask
             securityDeliveryTask = Task {
@@ -231,7 +236,9 @@ final class CGMLibre3Transmitter: BluetoothTransmitter, CGMTransmitter, @uncheck
         } catch {
             invalidPacketCount += 1
             if invalidPacketCount <= 3 || invalidPacketCount % 60 == 0 {
-                Self.logStage("Rejected data packet, channel=\(channel), bytes=\(wire.count), count=\(invalidPacketCount)")
+                // Keep the failure category, never the rejected payload or authentication material.
+                let reason = error is Libre3DataFrameError ? "framing" : error is Libre3AESCCMError ? "decryption" : "decoding"
+                Self.logStage("Rejected data packet, reason=\(reason), channel=\(channel), bytes=\(wire.count), count=\(invalidPacketCount)")
             }
             return
         }
@@ -366,6 +373,7 @@ final class CGMLibre3Transmitter: BluetoothTransmitter, CGMTransmitter, @uncheck
         }
         self.transport = transport
         let savedKey = record.phase5Key
+        if savedKey == nil { Libre3Log.event(.authenticationStarted) }
         let serial = record.serial
         let pinnedVersion = record.identityVersion
         let preferredLabel = record.identityLabel
@@ -439,6 +447,7 @@ final class CGMLibre3Transmitter: BluetoothTransmitter, CGMTransmitter, @uncheck
                         self.snapshotLock.lock()
                         self.authenticatedSnapshot = true
                         self.snapshotLock.unlock()
+                        Libre3Log.event(.authenticationSucceeded)
                         self.setStatus(.waitingForGlucose)
                         for uuid in GATT.Char.dataPlaneNotifying + [GATT.Char.historicData, GATT.Char.clinicalData] {
                             if let characteristic = self.characteristics[uuid],
@@ -695,7 +704,16 @@ final class CGMLibre3Transmitter: BluetoothTransmitter, CGMTransmitter, @uncheck
     }
 
     private func publishStatus(_ status: String) {
-        Self.logStage("Status: " + status)
+        if record.status != status {
+            Self.logStage("Status: " + status)
+            switch Libre3SensorStatus(storedValue: status) {
+            case .checkSensor: Libre3Log.event(.sensorCheckRequired)
+            case .expired: Libre3Log.event(.sensorExpired)
+            case .okay: Libre3Log.event(.sensorOkay)
+            default: break
+            }
+        }
+        // The UI still receives fresh snapshots when the status text itself has not changed.
         record.status = status
         snapshotLock.lock()
         statusSnapshot = status
@@ -728,6 +746,11 @@ final class CGMLibre3Transmitter: BluetoothTransmitter, CGMTransmitter, @uncheck
         if case .recovery = error { markRecoveryRequired() }
         reconnectDelay = min(max(5, reconnectDelay * 2), 60)
         Self.logStage("Connection failure, error=\(error), pairingStage=\(pairingStage), reconnectDelay=\(reconnectDelay)s")
+        if needsRecovery {
+            Libre3Log.event(.recoveryRequired)
+        } else if decoder == nil {
+            Libre3Log.event(.authenticationFailed)
+        }
         resetConnection()
         switch error {
         case .disconnected, .timeout:
@@ -781,5 +804,47 @@ struct Libre3BackfillSummary {
         }
         firstMinute = min(firstMinute ?? first, first)
         lastMinute = max(lastMinute ?? last, last)
+    }
+}
+
+/// Only closed outcomes enter the Activity Log. Error details stay in the developer trace.
+enum Libre3Log {
+    private static let log = OSLog(subsystem: ConstantsLog.subSystem, category: "Libre3")
+
+    static func event(_ activity: TroubleshootingCGMActivity, error: Error? = nil) {
+        let type: OSLogType
+        switch activity {
+        case .authenticationFailed, .recoveryRequired, .credentialsUnavailable, .accountLookupFailed,
+             .nfcScanFailed, .nfcScanTimedOut, .nfcUnavailable:
+            type = .error
+        default: type = .info
+        }
+        trace("Libre 3 %{public}@", log: log, category: "Libre3", type: type,
+              troubleshooting: .standard(.cgm(source: .libre3, activity: activity)), activity.rawValue)
+        if error != nil { failure(activity.rawValue, error: error, type: type) }
+    }
+
+    static func failure(_ operation: String, error: Error?, channel: String = "none", type: OSLogType = .error) {
+        guard let error else { return }
+        let category: String
+        if let lookupError = error as? Libre3AccountLookup.LookupError {
+            switch lookupError {
+            case .credentials: category = "loginRejected"
+            case .consent: category = "accountConsentRequired"
+            case .unsupported: category = "accountLookupUnavailable"
+            }
+        } else if let identityError = error as? Libre3IdentityError {
+            category = identityError == .invalidFile ? "credentialValidation" : "credentialsUnavailable"
+        } else {
+            category = "system"
+        }
+        let underlying = error as NSError
+        trace("%{public}@, category=%{public}@, channel=%{public}@, errorDomain=%{public}@, errorCode=%{public}@",
+              log: log, category: "Libre3", type: type,
+              operation, category, channel, underlying.domain, String(underlying.code))
+    }
+
+    static func detail(_ message: String) {
+        trace("%{public}@", log: log, category: "Libre3", type: .info, message)
     }
 }

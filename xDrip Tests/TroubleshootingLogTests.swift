@@ -1962,3 +1962,84 @@ private extension JSONDecoder {
 private extension Data.SubSequence {
     var data: Data { Data(self) }
 }
+
+extension TroubleshootingLogTests {
+    func testLibre3AuthenticationKeepsFailureAndOneRecoveryAcrossReplay() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        let activities: [TroubleshootingCGMActivity] = [
+            .authenticationSucceeded, .authenticationStarted, .authenticationFailed,
+            .authenticationStarted, .authenticationFailed, .authenticationSucceeded, .authenticationSucceeded
+        ]
+        for (index, activity) in activities.enumerated() {
+            fixture.store.record(.standard(.cgm(source: .libre3, activity: activity), timestamp: referenceDate.addingTimeInterval(Double(index))))
+        }
+        let entries = fixture.store.snapshot()
+        XCTAssertEqual(entries.map(\.kind), [
+            .cgm(source: .libre3, activity: .authenticationRecovered),
+            .cgm(source: .libre3, activity: .authenticationFailed)
+        ])
+        XCTAssertEqual(TroubleshootingLogStore(fileURL: fixture.fileURL).snapshot().map(\.kind), entries.map(\.kind))
+    }
+
+    func testLibre3ProvisioningKeepsOnlyProblemAndRecovery() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        for (index, activity) in [TroubleshootingCGMActivity.credentialsReady, .credentialsUnavailable, .credentialsUnavailable, .credentialsReady, .credentialsReady].enumerated() {
+            fixture.store.record(.standard(.cgm(source: .libre3, activity: activity), timestamp: referenceDate.addingTimeInterval(Double(index))))
+        }
+        XCTAssertEqual(fixture.store.snapshot().map(\.kind), [
+            .cgm(source: .libre3, activity: .credentialsReady),
+            .cgm(source: .libre3, activity: .credentialsUnavailable)
+        ])
+    }
+
+    func testLibre3NFCNextAttemptKeepsItsOwnConnectionOutcome() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        let activities: [TroubleshootingCGMActivity] = [.nfcScanStarted, .nfcScanCancelled, .nfcScanStarted, .nfcScanSucceeded, .connected, .connected]
+        for (index, activity) in activities.enumerated() {
+            fixture.store.record(.standard(.cgm(source: .libre3, activity: activity), timestamp: referenceDate.addingTimeInterval(Double(index))))
+        }
+        XCTAssertEqual(fixture.store.snapshot().count, 5)
+        XCTAssertEqual(fixture.store.snapshot().first?.kind, .cgm(source: .libre3, activity: .connected))
+    }
+
+    func testLibre3SensorExpiryIsNotReportedAsSensorFailure() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        for (index, activity) in [TroubleshootingCGMActivity.sensorOkay, .sensorCheckRequired, .sensorCheckRequired, .sensorOkay, .sensorOkay, .sensorExpired, .sensorExpired].enumerated() {
+            fixture.store.record(.standard(.cgm(source: .libre3, activity: activity), timestamp: referenceDate.addingTimeInterval(Double(index))))
+        }
+        let entries = fixture.store.snapshot()
+        XCTAssertEqual(entries.count, 3)
+        let text = makeReport(entries: entries).reportText
+        XCTAssertTrue(text.contains("sensor session ended"))
+        XCTAssertFalse(text.contains("sensor failure"))
+    }
+
+    func testLibre3LookupEventsContainNoAccountDetails() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        for (index, activity) in [TroubleshootingCGMActivity.accountLookupStarted, .accountLookupFailed, .accountLookupStarted, .accountLookupSucceeded].enumerated() {
+            fixture.store.record(.standard(.cgm(source: .libre3, activity: activity), timestamp: referenceDate.addingTimeInterval(Double(index))))
+        }
+        let entries = fixture.store.snapshot()
+        XCTAssertEqual(entries.count, 4)
+        let text = makeReport(entries: entries).reportText
+        XCTAssertTrue(text.contains("Account ID lookup succeeded"))
+        XCTAssertFalse(text.contains("password"))
+    }
+}
+
+extension TroubleshootingLogTests {
+    func testLibre3ManualReconnectDoesNotLoseAuthenticationRecovery() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        let activities: [TroubleshootingCGMActivity] = [.authenticationFailed, .disconnected, .connectionRequested, .connected, .authenticationSucceeded]
+        for (index, activity) in activities.enumerated() {
+            fixture.store.record(.standard(.cgm(source: .libre3, activity: activity), timestamp: referenceDate.addingTimeInterval(Double(index))))
+        }
+        XCTAssertEqual(fixture.store.snapshot().first?.kind, .cgm(source: .libre3, activity: .authenticationRecovered))
+    }
+}

@@ -454,7 +454,10 @@ struct TroubleshootingLogView: View {
         switch entry.kind {
         case let .bluetooth(activity) where [.connectionFailed, .connectionTimedOut, .poweredOff, .unauthorized, .pairingFailed].contains(activity):
             return .orange
-        case let .cgm(_, activity) where [.nfcScanFailed, .nfcScanTimedOut, .nfcUnavailable].contains(activity):
+        case let .cgm(_, activity) where [
+            .nfcScanFailed, .nfcScanTimedOut, .nfcUnavailable, .authenticationFailed, .recoveryRequired,
+            .credentialsUnavailable, .accountLookupFailed, .sensorCheckRequired
+        ].contains(activity):
             return .orange
         case let .follower(_, activity) where activity == .loginFailed || activity == .downloadFailed:
             return .orange

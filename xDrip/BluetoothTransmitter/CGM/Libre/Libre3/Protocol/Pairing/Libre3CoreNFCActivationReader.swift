@@ -55,6 +55,7 @@ import Foundation
 
         func scan(mode: Libre3NFCScanMode) async throws -> Libre3NFCScanResult {
             guard NFCTagReaderSession.readingAvailable else {
+                Libre3Log.event(.nfcUnavailable)
                 throw Libre3NFCError.readerUnavailable
             }
 
@@ -81,9 +82,12 @@ import Foundation
                     self.continuation = nil
                     self.mode = nil
                     lock.unlock()
+                    Libre3Log.event(.nfcUnavailable)
                     continuation.resume(throwing: Libre3NFCError.readerUnavailable)
                     return
                 }
+                // Record the start before a session callback can report its outcome.
+                Libre3Log.event(.nfcScanStarted)
                 lock.unlock()
                 session.begin()
             }
@@ -104,15 +108,32 @@ import Foundation
             self.session = nil
             lock.unlock()
 
+            // Ownership is consumed above. A late invalidation or cancellation has no second outcome.
+            guard let continuation else { return }
             switch result {
             case .success(let value):
+                Libre3Log.event(.nfcScanSucceeded)
                 session?.alertMessage = TextsLibreNFC.scanComplete
                 session?.invalidate()
-                continuation?.resume(returning: value)
+                continuation.resume(returning: value)
             case .failure(let error):
+                Libre3Log.event(Self.scanOutcome(for: error), error: error)
                 session?.invalidate(errorMessage: error.localizedDescription)
-                continuation?.resume(throwing: error)
+                continuation.resume(throwing: error)
             }
+        }
+
+        // Core NFC reports normal cancellation and timeout through its invalidation error codes.
+        static func scanOutcome(for error: Error) -> TroubleshootingCGMActivity {
+            let code = (error as? NFCReaderError)?.code
+            if error is CancellationError || code == .readerSessionInvalidationErrorUserCanceled {
+                return .nfcScanCancelled
+            }
+            if code == .readerSessionInvalidationErrorSessionTimeout { return .nfcScanTimedOut }
+            if code == .readerErrorUnsupportedFeature || (error as? Libre3NFCError) == .readerUnavailable {
+                return .nfcUnavailable
+            }
+            return .nfcScanFailed
         }
 
         private func run(tag: NFCISO15693Tag, in session: NFCTagReaderSession) async {
@@ -286,7 +307,10 @@ import Foundation
             self.mode = nil
             self.session = nil
             lock.unlock()
-            continuation?.resume(throwing: error)
+            if let continuation {
+                Libre3Log.event(Self.scanOutcome(for: error), error: error)
+                continuation.resume(throwing: error)
+            }
         }
 
         func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {

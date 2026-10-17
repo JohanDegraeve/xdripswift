@@ -8,6 +8,7 @@
 
 import XCTest
 import CoreData
+import CoreNFC
 import Security
 @testable import xdrip
 
@@ -231,5 +232,15 @@ extension Libre3IntegrationTests {
         let empty = Libre3BackfillSummary()
         XCTAssertNil(empty.firstMinute)
         XCTAssertNil(empty.lastMinute)
+    }
+}
+
+extension Libre3IntegrationTests {
+    func testNFCCancellationTimeoutAndFailureKeepDistinctOutcomes() {
+        XCTAssertEqual(Libre3NFCActivationReader.scanOutcome(for: CancellationError()), .nfcScanCancelled)
+        XCTAssertEqual(Libre3NFCActivationReader.scanOutcome(for: NSError(domain: NFCErrorDomain, code: NFCReaderError.Code.readerSessionInvalidationErrorUserCanceled.rawValue)), .nfcScanCancelled)
+        XCTAssertEqual(Libre3NFCActivationReader.scanOutcome(for: NSError(domain: NFCErrorDomain, code: NFCReaderError.Code.readerSessionInvalidationErrorSessionTimeout.rawValue)), .nfcScanTimedOut)
+        XCTAssertEqual(Libre3NFCActivationReader.scanOutcome(for: Libre3NFCError.readerUnavailable), .nfcUnavailable)
+        XCTAssertEqual(Libre3NFCActivationReader.scanOutcome(for: Libre3NFCError.noTag), .nfcScanFailed)
     }
 }

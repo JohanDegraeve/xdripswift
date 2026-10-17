@@ -197,8 +197,13 @@ struct Libre3SetupView: View {
                     // A new build can provision its new version without delaying cached setup.
                     Task { _ = try? await Libre3IdentityStore.shared.downloadCurrent() }
                 }
+                try Task.checkCancellation()
+                if !credentialsReady { Libre3Log.event(.credentialsReady) }
                 credentialsReady = true
+            } catch is CancellationError {
             } catch {
+                guard !Task.isCancelled else { return }
+                Libre3Log.event(.credentialsUnavailable, error: error)
                 credentialsReady = false
                 credentialError = error.localizedDescription
             }
@@ -299,8 +304,7 @@ struct Libre3SetupView: View {
         let context = "NFC \(operation) \(confirmed ? "confirmed" : "attempt"), wearMinutes=\(patch.wearDurationMinutes), warmupMinutes=\(patch.warmupMinutes)"
         let log = OSLog(subsystem: ConstantsLog.subSystem, category: "Libre3Setup")
         trace(
-            "%{public}@", log: log, category: "Libre3Setup", type: .info,
-            troubleshooting: .standard(.sensor(.libre3NFC(confirmed: confirmed))), context)
+            "%{public}@", log: log, category: "Libre3Setup", type: .info, context)
         if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
             let details = "NFC details, sensor=\(serial), Receiver ID=\(Libre3ReceiverID(receiver).littleEndianHex) (little-endian), region=\(patch.region), security=\(patch.securityVersion), generation=\(patch.generation), firmware=\(patch.firmwareVersion), credentials=\(version)"
             trace("%{public}@", log: log, category: "Libre3Setup", type: .debug, details)
@@ -391,6 +395,7 @@ private struct Libre3AccountLookupView: View {
         busy = true
         message = nil
         let username = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        Libre3Log.event(.accountLookupStarted)
         task = Task { @MainActor in
             defer {
                 busy = false
@@ -402,10 +407,16 @@ private struct Libre3AccountLookupView: View {
                 try Task.checkCancellation()
                 guard let id = UUID(uuidString: result) else { throw Libre3AccountLookup.LookupError.unsupported }
                 accountID = id.uuidString.lowercased()
+                Libre3Log.event(.accountLookupSucceeded)
                 dismiss()
             } catch is CancellationError {
+                Libre3Log.event(.accountLookupCancelled)
             } catch {
-                guard !Task.isCancelled else { return }
+                if Task.isCancelled {
+                    Libre3Log.event(.accountLookupCancelled)
+                    return
+                }
+                Libre3Log.event(.accountLookupFailed, error: error)
                 message = error.localizedDescription
             }
         }

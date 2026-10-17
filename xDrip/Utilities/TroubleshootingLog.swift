@@ -241,9 +241,8 @@ enum TroubleshootingBluetoothDeviceActivity: String, Codable {
 
 /// High-level actions and outcomes for the configured direct CGM.
 ///
-/// These cases intentionally describe only things the user asked the app to do, plus the single
-/// successful connection that completes that request. Routine radio connect/disconnect cycles stay
-/// in developer tracing because exposing them would make a healthy Dexcom-style session look broken.
+/// Keep explicit user actions and meaningful operating changes. Routine radio cycles and successful
+/// cached authentication stay in developer tracing unless they complete a request or resolve a problem.
 enum TroubleshootingCGMActivity: String, Codable {
     case addingStarted
     case connectionRequested
@@ -256,6 +255,20 @@ enum TroubleshootingCGMActivity: String, Codable {
     case nfcScanCancelled
     case nfcScanTimedOut
     case nfcUnavailable
+    case authenticationStarted
+    case authenticationSucceeded
+    case authenticationFailed
+    case authenticationRecovered
+    case recoveryRequired
+    case credentialsUnavailable
+    case credentialsReady
+    case accountLookupStarted
+    case accountLookupSucceeded
+    case accountLookupFailed
+    case accountLookupCancelled
+    case sensorCheckRequired
+    case sensorExpired
+    case sensorOkay
 }
 
 /// Safe follower milestones. Counts are allowed. Response bodies and server errors are not.
@@ -1232,6 +1245,9 @@ final class TroubleshootingLogStore {
         var bluetoothHealth = OperationalHealthState.healthy
         var pendingBluetoothConnectionName: TroubleshootingBluetoothDeviceName?
         var pendingCGMConnection: TroubleshootingLogSource?
+        var cgmAuthentication = [TroubleshootingLogSource: TroubleshootingCGMActivity]()
+        var cgmCredentialProblems = Set<TroubleshootingLogSource>()
+        var cgmSensorStatus = [TroubleshootingLogSource: TroubleshootingCGMActivity]()
         var lastAppActivity: TroubleshootingAppActivity?
         var lastSensorActivity: TroubleshootingSensorActivity?
         var lastSensorNoiseAt: Date?
@@ -1336,6 +1352,10 @@ final class TroubleshootingLogStore {
                     // inspecting an arbitrary CoreBluetooth peripheral name later.
                     result.append(entry)
                     pendingCGMConnection = source
+                    if activity == .addingStarted {
+                        cgmAuthentication.removeValue(forKey: source)
+                        cgmSensorStatus.removeValue(forKey: source)
+                    }
                 case .connected:
                     // CGMs such as Dexcom may make a healthy connection for every reading. Retain the
                     // connection only when it completes the user's pending Add/Connect action, or when
@@ -1355,16 +1375,58 @@ final class TroubleshootingLogStore {
                     // normal between-reading radio disconnect, so every user action remains visible.
                     result.append(entry)
                     pendingCGMConnection = nil
+                    // A manual disconnect does not resolve an authentication or sensor problem.
+                    if activity == .removed {
+                        cgmAuthentication.removeValue(forKey: source)
+                        cgmSensorStatus.removeValue(forKey: source)
+                    }
                 case .nfcScanStarted, .nfcScanSucceeded:
                     // One NFC session has one start and one outcome. Retries are separate actions and
                     // are useful when explaining why Libre Bluetooth streaming never began.
                     result.append(entry)
+                    if activity == .nfcScanStarted { pendingCGMConnection = source }
                 case .nfcScanFailed, .nfcScanCancelled, .nfcScanTimedOut, .nfcUnavailable:
                     // An unsuccessful NFC session ends this Add/Connect attempt. Clearing the pending
                     // source is essential: a later connection from some other configured CGM must not
                     // be misreported as the completion of the abandoned Libre action.
                     result.append(entry)
                     pendingCGMConnection = nil
+                case .authenticationStarted:
+                    // Fresh pairing is useful setup context. Retrying a failure must not reset it.
+                    if cgmAuthentication[source] == nil {
+                        result.append(entry)
+                        cgmAuthentication[source] = activity
+                    }
+                case .authenticationFailed, .recoveryRequired:
+                    if cgmAuthentication[source] != activity {
+                        result.append(entry)
+                        cgmAuthentication[source] = activity
+                    }
+                case .authenticationSucceeded:
+                    // A healthy cached reconnect is normal, not a new pairing or recovery.
+                    if cgmAuthentication[source] == .authenticationFailed || cgmAuthentication[source] == .recoveryRequired {
+                        result.append(entry.replacingKind(.cgm(source: source, activity: .authenticationRecovered)))
+                    } else if cgmAuthentication[source] == .authenticationStarted {
+                        result.append(entry)
+                    }
+                    cgmAuthentication[source] = activity
+                case .authenticationRecovered:
+                    // Recovery rows are already normalized when a persisted history is replayed.
+                    result.append(entry)
+                    cgmAuthentication[source] = .authenticationSucceeded
+                case .credentialsUnavailable:
+                    if cgmCredentialProblems.insert(source).inserted { result.append(entry) }
+                case .credentialsReady:
+                    if cgmCredentialProblems.remove(source) != nil { result.append(entry) }
+                case .accountLookupStarted, .accountLookupSucceeded, .accountLookupFailed, .accountLookupCancelled:
+                    // Each lookup is an explicit user action, not background account polling.
+                    result.append(entry)
+                case .sensorCheckRequired, .sensorExpired:
+                    if cgmSensorStatus[source] != activity { result.append(entry) }
+                    cgmSensorStatus[source] = activity
+                case .sensorOkay:
+                    if cgmSensorStatus[source] == .sensorCheckRequired { result.append(entry) }
+                    cgmSensorStatus[source] = activity
                 }
 
             case let .follower(source, activity):
@@ -1995,6 +2057,20 @@ struct TroubleshootingLogReportBuilder {
             case .nfcScanCancelled: return "\(source.name) NFC sensor scan was cancelled."
             case .nfcScanTimedOut: return "\(source.name) NFC sensor scan timed out."
             case .nfcUnavailable: return "NFC sensor scanning is not available on this iPhone."
+            case .authenticationStarted: return "\(source.name) sensor authentication started."
+            case .authenticationSucceeded: return "\(source.name) sensor authentication completed."
+            case .authenticationFailed: return "\(source.name) sensor authentication failed. The app will retry."
+            case .authenticationRecovered: return "\(source.name) sensor authentication recovered."
+            case .recoveryRequired: return "\(source.name) needs sensor recovery before it can reconnect."
+            case .credentialsUnavailable: return "\(source.name) pairing credentials are unavailable. Setup cannot continue."
+            case .credentialsReady: return "\(source.name) pairing credentials are available again."
+            case .accountLookupStarted: return "\(source.name) Account ID lookup started."
+            case .accountLookupSucceeded: return "\(source.name) Account ID lookup succeeded."
+            case .accountLookupFailed: return "\(source.name) Account ID lookup failed."
+            case .accountLookupCancelled: return "\(source.name) Account ID lookup was cancelled."
+            case .sensorCheckRequired: return "\(source.name) requests a sensor check."
+            case .sensorExpired: return "\(source.name) sensor session ended."
+            case .sensorOkay: return "\(source.name) sensor check cleared."
             }
 
         case let .follower(source, activity):
