@@ -608,3 +608,7 @@
 
 /* Dexcom Share upload enable section heading */
 "settingsviews_dexcomShareUploadSectionTitle" = "Lähetys Dexcom Shareen";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Lue johdanto";
+"speak.preview" = "Kokeile glukoosipuhetta";

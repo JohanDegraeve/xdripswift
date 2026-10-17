@@ -822,3 +822,7 @@
 
 /* Dexcom Share upload enable section heading */
 "settingsviews_dexcomShareUploadSectionTitle" = "Przesyłanie do Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Czytaj wprowadzenie";
+"speak.preview" = "Przetestuj odczyt glukozy";

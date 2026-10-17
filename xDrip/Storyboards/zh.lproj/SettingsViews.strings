@@ -747,3 +747,7 @@
 
 /* Dexcom Share upload enable section heading */
 "settingsviews_dexcomShareUploadSectionTitle" = "Dexcom Share 上传";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "朗读开场语";
+"speak.preview" = "预览血糖播报";

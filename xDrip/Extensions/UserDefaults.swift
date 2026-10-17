@@ -407,6 +407,8 @@ extension UserDefaults {
         case speakReadingLanguageCode = "speakReadingLanguageCode"
         /// speak delta
         case speakDelta = "speakDelta"
+        /// speak the opening phrase
+        case speakIntroduction = "speakIntroduction"
         /// speak trend
         case speakTrend = "speakTrend"
         /// speak interval
@@ -2462,6 +2464,12 @@ extension UserDefaults {
         set {
             set(newValue, forKey: Key.speakReadingLanguageCode.rawValue)
         }
+    }
+
+    /// Include the opening phrase unless the user explicitly disables it.
+    @objc dynamic var speakIntroduction: Bool {
+        get { object(forKey: Key.speakIntroduction.rawValue) as? Bool ?? true }
+        set { set(newValue, forKey: Key.speakIntroduction.rawValue) }
     }
 
     /// should trend be spoken or not

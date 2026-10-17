@@ -582,3 +582,7 @@
 
 /* Dexcom Share upload enable section heading */
 "settingsviews_dexcomShareUploadSectionTitle" = "Envio para o Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Dizer introdução";
+"speak.preview" = "Testar glicose falada";

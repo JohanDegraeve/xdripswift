@@ -570,3 +570,7 @@
 
 /* Dexcom Share upload enable section heading */
 "settingsviews_dexcomShareUploadSectionTitle" = "Dexcom Share Yüklemesi";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Giriş cümlesini söyle";
+"speak.preview" = "Glikoz sesini önizle";

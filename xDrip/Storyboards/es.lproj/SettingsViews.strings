@@ -538,3 +538,7 @@
 
 /* Dexcom Share upload enable section heading */
 "settingsviews_dexcomShareUploadSectionTitle" = "Subida a Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Decir introducción";
+"speak.preview" = "Probar glucosa hablada";

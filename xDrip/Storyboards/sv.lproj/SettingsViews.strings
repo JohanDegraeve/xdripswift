@@ -596,3 +596,7 @@
 
 /* Dexcom Share upload enable section heading */
 "settingsviews_dexcomShareUploadSectionTitle" = "Uppladdning till Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Läs upp inledning";
+"speak.preview" = "Testa glukosuppläsning";

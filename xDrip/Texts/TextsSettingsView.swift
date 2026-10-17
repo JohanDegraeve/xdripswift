@@ -783,6 +783,9 @@ class Texts_SettingsView {
 
     // MARK: - Section Speak
 
+    static let labelSpeakIntroduction = NSLocalizedString("speak.introduction", tableName: filename, bundle: .main, value: "Speak Introduction", comment: "Include the opening words before the glucose value.")
+    static let previewSpeakGlucose = NSLocalizedString("speak.preview", tableName: filename, bundle: .main, value: "Preview Speak Glucose", comment: "Play a one-shot preview using the selected speech settings.")
+
     static let speakScheduleActive = NSLocalizedString("speak.schedule.active", tableName: filename, bundle: .main, value: "Active", comment: "Speech is enabled and allowed at the current time; not a promise that audio is currently playing.")
     static let speakScheduleInactive = NSLocalizedString("speak.schedule.inactive", tableName: filename, bundle: .main, value: "Inactive", comment: "Speech is enabled but paused outside its daily schedule.")
 

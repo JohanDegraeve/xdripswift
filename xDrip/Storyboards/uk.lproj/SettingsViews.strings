@@ -777,3 +777,7 @@
 
 /* Dexcom Share upload enable section heading */
 "settingsviews_dexcomShareUploadSectionTitle" = "Завантаження в Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Промовляти вступ";
+"speak.preview" = "Прослухати приклад озвучення глюкози";

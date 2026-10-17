@@ -823,3 +823,7 @@
 
 /* Dexcom Share upload enable section heading */
 "settingsviews_dexcomShareUploadSectionTitle" = "Caricamento su Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Pronuncia introduzione";
+"speak.preview" = "Prova lettura glicemia";

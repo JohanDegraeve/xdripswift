@@ -822,3 +822,7 @@
 
 /* Dexcom Share upload enable section heading */
 "settingsviews_dexcomShareUploadSectionTitle" = "Nalaganje v Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Izgovori uvod";
+"speak.preview" = "Preizkusi izgovor glukoze";

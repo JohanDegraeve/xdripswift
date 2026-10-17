@@ -550,7 +550,7 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
         case .alertsAndNotifications:
             return SettingsViewGroupedSettingsViewModel.alertsAndNotifications()
         case .sharingAndServices:
-            return SettingsViewGroupedSettingsViewModel.sharingAndServices(dexcomShareUploadActions: dexcomShareUploadActions)
+            return SettingsViewGroupedSettingsViewModel.sharingAndServices(dexcomShareUploadActions: dexcomShareUploadActions, coreDataManager: coreDataManager)
         case .dataManagement:
             return SettingsViewDataManagementSettingsViewModel(coreDataManager: coreDataManager)
         case .troubleshooting:
@@ -707,7 +707,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
         )
     }
 
-    static func sharingAndServices(dexcomShareUploadActions: DexcomShareUploadActions = .none, uploadDefaults: UserDefaults = .standard) -> SettingsViewGroupedSettingsViewModel {
+    static func sharingAndServices(dexcomShareUploadActions: DexcomShareUploadActions = .none, uploadDefaults: UserDefaults = .standard, coreDataManager: CoreDataManager? = nil) -> SettingsViewGroupedSettingsViewModel {
         SettingsViewGroupedSettingsViewModel(
             title: Texts_SettingsView.sharingAndServicesSectionTitle,
             rows: [
@@ -851,7 +851,8 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                             title: Texts_SettingsView.sectionTitleSpeak,
                             onlineHelpTopic: .speakGlucose,
                             makeSections: { presenter in
-                                SettingsListFactory.makeSections(providers: [SettingsViewSpeakSettingsViewModel()], presenter: presenter)
+                                let viewModel = SettingsViewSpeakSettingsViewModel(coreDataManager: coreDataManager)
+                                return SettingsListFactory.makeSections(providers: [viewModel], presenter: presenter)
                                     + [SettingsSectionModel(id: 1) { SettingsViewSpeakSettingsViewModel.scheduleSection() }]
                             }
                         )

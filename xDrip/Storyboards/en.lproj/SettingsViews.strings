@@ -548,3 +548,7 @@
 "settingsviews_liveActivityTypeMinimal" = "Minimal";
 "settingsviews_liveActivityTypeNormal" = "Normal";
 "settingsviews_liveActivityTypeLarge" = "Large";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Speak Introduction";
+"speak.preview" = "Preview Speak Glucose";

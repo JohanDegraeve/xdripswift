@@ -542,3 +542,7 @@
 
 /* Dexcom Share upload enable section heading */
 "settingsviews_dexcomShareUploadSectionTitle" = "Μεταφόρτωση στο Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Εκφώνηση εισαγωγής";
+"speak.preview" = "Δοκιμή εκφώνησης γλυκόζης";
