@@ -55,8 +55,11 @@ fileprivate func getDocumentsDirectory() -> URL {
     return paths[0]
 }
 
-/// trace file currently in use, in case tracing needs to be stored on file
-fileprivate var traceFileName:URL?
+/// Trace output is shared by BLE, HealthKit, networking and main-thread callers.
+/// Keep the URL immutable so rotation cannot race its retain/release on another queue.
+/// The lock serializes formatting, appending and rotation as one file operation.
+fileprivate let traceFileName = getDocumentsDirectory().appendingPathComponent(ConstantsTrace.traceFileName + ".0.log")
+fileprivate let traceOutputLock = NSLock()
 
 /// Writes the existing developer trace and optionally offers a typed fact to the consumer log.
 ///
@@ -92,11 +95,8 @@ func trace(
         TroubleshootingLogStore.shared.record(troubleshooting)
     }
 
-    // initialize traceFileName if needed
-    if traceFileName ==  nil {
-        traceFileName = getDocumentsDirectory().appendingPathComponent(ConstantsTrace.traceFileName + ".0.log")
-    }
-    guard let traceFileName = traceFileName else {return}
+    traceOutputLock.lock()
+    defer { traceOutputLock.unlock() }
     
     // if oslog is enabled in settings, then do os_log
     if UserDefaults.standard.OSLogEnabled {
@@ -215,10 +215,11 @@ func trace(
             let textToWrite = timeStamp + " " + applicationVersion + " " + buildNumber + " " + category + " " + actualMessage + "\n"
             
             if let fileHandle = FileHandle(forWritingAtPath: traceFileName.path) {
+                defer { try? fileHandle.close() }
                 
                 // file already exists, go to end of file and append text
-                fileHandle.seekToEndOfFile()
-                fileHandle.write(textToWrite.data(using: .utf8)!)
+                try fileHandle.seekToEnd()
+                try fileHandle.write(contentsOf: Data(textToWrite.utf8))
                 
             } else {
                 
@@ -235,14 +236,12 @@ func trace(
    
     
     // check if tracefile has reached limit size and if yes rotate the files
-    // NOTE: Changed implementation after TestFlight crash report showing "URL.fileSize.getter + 20".
-    // The old version used the extension fileSize which called FileManager.attributesOfItem(atPath:) - this could
-    // crash if the file was being rotated or removed concurrently (race condition during trace log writes).
-    // Using URL.resourceValues(forKeys:) makes the lookup safe and avoids trapping on transient I/O states.
-    if let resourceValues = try? traceFileName.resourceValues(forKeys: [.fileSizeKey]),
-       let fileSizeInt = resourceValues.fileSize {
+    // Read uncached file metadata under the same lock as appends and rotation.
+    // Changing the metadata API alone cannot make concurrent writes or URL mutation safe.
+    if let attributes = try? FileManager.default.attributesOfItem(atPath: traceFileName.path),
+       let fileSizeInt = attributes[.size] as? NSNumber {
         let maxBytes = UInt64(ConstantsTrace.maximumFileSizeInMB) * 1024 * 1024
-        if UInt64(fileSizeInt) > maxBytes {
+        if fileSizeInt.uint64Value > maxBytes {
             rotateTraceFiles()
         }
     }
@@ -256,7 +255,7 @@ fileprivate func rotateTraceFiles() {
     
     // first check if last trace file exists
     let lastFile = getDocumentsDirectory().appendingPathComponent(ConstantsTrace.traceFileName + "." + (ConstantsTrace.maximumAmountOfTraceFiles - 1).description + ".log")
-    if FileHandle(forWritingAtPath: lastFile.path) != nil {
+    if fileManager.fileExists(atPath: lastFile.path) {
         
         do {
             try fileManager.removeItem(at: lastFile)
@@ -274,7 +273,7 @@ fileprivate func rotateTraceFiles() {
         let file = getDocumentsDirectory().appendingPathComponent(ConstantsTrace.traceFileName + "." + index.description + ".log")
         let newFile = getDocumentsDirectory().appendingPathComponent(ConstantsTrace.traceFileName + "." + (index + 1).description + ".log")
         
-        if FileHandle(forWritingAtPath: file.path) != nil {
+        if fileManager.fileExists(atPath: file.path) {
 
             do {
                 try fileManager.moveItem(at: file, to: newFile)
@@ -285,8 +284,7 @@ fileprivate func rotateTraceFiles() {
         }
     }
     
-    // now set tracefilename to nil, it will be reassigned to correct name, ie the one with index 0, at next usage
-    traceFileName = nil
+    // The active path stays unchanged. The next append creates a new .0 file.
     
 }
 

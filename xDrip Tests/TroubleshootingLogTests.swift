@@ -7,9 +7,39 @@
 //
 
 import XCTest
+import os
 @testable import xdrip
 
 final class TroubleshootingLogTests: XCTestCase {
+    @MainActor
+    func testConcurrentDeveloperTraceWritesSurviveRotationWithoutLostLines() throws {
+        let defaults = UserDefaults.standard
+        let osLog = defaults.object(forKey: UserDefaults.Key.OSLogEnabled.rawValue)
+        let nsLog = defaults.object(forKey: UserDefaults.Key.NSLogEnabled.rawValue)
+        defaults.OSLogEnabled = false
+        defaults.NSLogEnabled = false
+        defer {
+            defaults.set(osLog, forKey: UserDefaults.Key.OSLogEnabled.rawValue)
+            defaults.set(nsLog, forKey: UserDefaults.Key.NSLogEnabled.rawValue)
+        }
+        let marker = "TraceConcurrency-\(UUID().uuidString)"
+        let padding = String(repeating: "x", count: 1024)
+        let log = OSLog(subsystem: ConstantsLog.subSystem, category: "TraceConcurrencyTest")
+        // More than one complete trace file, written from concurrent BLE/network-style queues.
+        // Retained files must contain each complete message exactly once across rotation.
+        DispatchQueue.concurrentPerform(iterations: 3600) { index in
+            trace("%{public}@", log: log, category: "TraceConcurrencyTest", type: .info, "\(marker)-\(index) \(padding)")
+        }
+        let directory = try XCTUnwrap(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first)
+        let lines = (0..<ConstantsTrace.maximumAmountOfTraceFiles).flatMap { index -> [String] in
+            let path = directory.appendingPathComponent("\(ConstantsTrace.traceFileName).\(index).log")
+            return ((try? String(contentsOf: path, encoding: .utf8)) ?? "").components(separatedBy: "\n")
+        }.filter { $0.contains(marker) }
+        XCTAssertEqual(lines.count, 3600)
+        XCTAssertEqual(Set(lines).count, 3600)
+        XCTAssertTrue(lines.allSatisfy { $0.hasSuffix(padding) })
+    }
+
     private let referenceDate = Date(timeIntervalSince1970: 1_800_000_000)
 
     @MainActor
