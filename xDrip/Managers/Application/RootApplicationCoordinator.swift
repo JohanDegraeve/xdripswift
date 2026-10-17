@@ -63,6 +63,10 @@ import AppIntents
     
     /// for logging
     nonisolated private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryRootView)
+
+    // Remember the last widget data and warning so repeated callbacks do not reload the same timeline.
+    private var widgetPublication = CompanionPublicationCache<WidgetSharedUserDefaultsModel>()
+    private var publishedWidgetKeepAliveMessage: String?
     
     /// CoreDataManager to be used throughout the project
     private var coreDataManager: CoreDataManager?
@@ -1131,7 +1135,22 @@ import AppIntents
         // without replacing the source/value already supplied by the iPhone.
         guard coreDataManager.saveChangesSynchronously() else { return [] }
         let stored = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: accepted.map(\.measuredAt).min()?.addingTimeInterval(-ConstantsDirectWatch.nativeReadingDuplicateWindow), forSensor: sensor, ignoreRawData: false, ignoreCalculatedValue: true, includingSuppressed: true)
-        return accepted.filter { reading in stored.contains { abs($0.timeStamp.timeIntervalSince(reading.measuredAt)) <= ConstantsDirectWatch.nativeReadingDuplicateWindow } }.map(\.id)
+        let confirmed = accepted.filter { reading in stored.contains { abs($0.timeStamp.timeIntervalSince(reading.measuredAt)) <= ConstantsDirectWatch.nativeReadingDuplicateWindow } }
+        // Trio checks source communication separately from glucose freshness. Watch imports
+        // bypass the iPhone BLE callback, so its old contact time can otherwise stay stale.
+        // Use recent Watch acquisition time, never phone sync time. Old buffered batches and
+        // legacy readings without acquisition time must not advertise a fresh connection.
+        let latestWatchContact = confirmed.compactMap(\.collectedAt).filter {
+            $0.timeIntervalSince1970.isFinite
+                && receivedAt.timeIntervalSince($0) <= ConstantsDirectWatch.readingDelayedAfter
+                && $0 <= receivedAt.addingTimeInterval(60)
+        }.max()
+        if let latestWatchContact {
+            // Allow the same small clock difference as native reading validation, but do not
+            // publish a future connection time to Trio.
+            loopManager?.shareMetadata(lastCommunicationAt: min(latestWatchContact, receivedAt))
+        }
+        return confirmed.map(\.id)
     }
 
     /// process new glucose data received from transmitter.
@@ -2198,6 +2217,11 @@ import AppIntents
         lastTherapyPublication = hasLocalMetrics ? snapshot : nil
         lastTherapyPublicationAt = .now
         watchManager?.updateTherapyMetrics(snapshot)
+        // The IOB/COB switch applies to every Live Activity family. Widgets do not use
+        // therapy data, so only the Watch app needs this update when the switch is off.
+        guard UserDefaults.standard.liveActivitiesEnabled, UserDefaults.standard.liveActivityShowIOBCOB else {
+            return
+        }
         updateLiveActivityAndWidgets(forceRestart: false, therapyMetrics: snapshot)
     }
 
@@ -2699,6 +2723,7 @@ import AppIntents
     /// check if the conditions are correct to start a live activity, update it, or end it
     /// also update the widget data stored in user defaults
     private func updateLiveActivityAndWidgets(forceRestart: Bool, therapyMetrics: TherapyMetricsSnapshot? = nil, sensorStartDate: Date? = nil) {
+        let publicationDate = Date()
         let sensorWarmupEndDate = liveActivitySensorWarmupEndDate(sensorStartDate: sensorStartDate)
         let keepAliveDisabledMessage = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
             ? "\(Texts_SettingsView.labelfollowerKeepAliveType) \(Texts_SettingsView.followerKeepAliveTypeDisabled)"
@@ -2706,12 +2731,16 @@ import AppIntents
 
         // Publish this independently from glucose so a Settings change can add or remove the
         // warning even when there is no fresh reading payload to rebuild.
-        UserDefaults.storeInSharedUserDefaults(
-            value: keepAliveDisabledMessage,
-            forKey: WidgetSharedUserDefaultsModel.keepAliveDisabledMessageKey(
-                for: Bundle.main.mainAppBundleIdentifier
+        var shouldReloadWidgets = forceRestart || publishedWidgetKeepAliveMessage != keepAliveDisabledMessage
+        if publishedWidgetKeepAliveMessage != keepAliveDisabledMessage {
+            UserDefaults.storeInSharedUserDefaults(
+                value: keepAliveDisabledMessage,
+                forKey: WidgetSharedUserDefaultsModel.keepAliveDisabledMessageKey(
+                    for: Bundle.main.mainAppBundleIdentifier
+                )
             )
-        )
+            publishedWidgetKeepAliveMessage = keepAliveDisabledMessage
+        }
 
         if let bgReadingsAccessor = self.bgReadingsAccessor {
             
@@ -2799,13 +2828,16 @@ import AppIntents
                     aidStatus = nil
                 }
                 
-                let resolvedTherapyMetrics = therapyMetrics ?? TherapyMetricsManager.shared.snapshot()
                 // show the live activity if we're in master mode or (follower with a heartbeat) and only if the user has requested to show it
                 // if we should show it, then let's continue processing the lastReading array to create a valid contentState
                 // use enablement here so switching off retains the selected style
                 if (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)) && UserDefaults.standard.liveActivitiesEnabled {
+                    // IOB/COB is shared by all Live Activity families. Do not calculate or send it
+                    // when the setting is off; widgets do not use therapy data either.
+                    let resolvedTherapyMetrics = UserDefaults.standard.liveActivityShowIOBCOB
+                        ? (therapyMetrics ?? TherapyMetricsManager.shared.snapshot()) : nil
                     // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                    var contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, carPlayLiveActivityType: UserDefaults.standard.carPlayLiveActivityType, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, sensorNoiseStateRawValue: sensorNoiseStateRawValue, aidStatus: aidStatus, therapyMetrics: UserDefaults.standard.liveActivityShowIOBCOB ? resolvedTherapyMetrics : nil)
+                    var contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, carPlayLiveActivityType: UserDefaults.standard.carPlayLiveActivityType, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, sensorNoiseStateRawValue: sensorNoiseStateRawValue, aidStatus: aidStatus, therapyMetrics: resolvedTherapyMetrics)
                     
                     contentState.showIOBCOB = UserDefaults.standard.liveActivityShowIOBCOB
                     contentState.sensorWarmupEndDate = sensorWarmupEndDate
@@ -2830,19 +2862,28 @@ import AppIntents
                 
                 // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
                 // the user's device - this allows several copies of the app to be installed without cross-contamination of widget data
-                if !bgReadingValues.isEmpty, let widgetData = try? JSONEncoder().encode(widgetSharedUserDefaultsModel) {
+                // Compare the complete widget model, including history, settings and status.
+                if !bgReadingValues.isEmpty,
+                   widgetPublication.shouldPublish(widgetSharedUserDefaultsModel, at: publicationDate, force: forceRestart),
+                   let widgetData = try? JSONEncoder().encode(widgetSharedUserDefaultsModel) {
                     UserDefaults.storeInSharedUserDefaults(
                         value: widgetData,
                         forKey: WidgetSharedUserDefaultsModel.widgetDataKey(
                             for: Bundle.main.mainAppBundleIdentifier
                         )
                     )
+                    widgetPublication.record(widgetSharedUserDefaultsModel, at: publicationDate, refreshDates:
+                        companionPublicationRefreshDates(readingDate: bgReadingDates.first, aidStatus: aidStatus, therapyMetrics: nil))
+                    shouldReloadWidgets = true
                 }
             } else {
                 Task { await LiveActivityManager.shared.endAllActivities() }
             }
         }
-        WidgetCenter.shared.reloadAllTimelines()
+        // Unchanged data still reloads when a freshness boundary or an explicit refresh requires it.
+        if shouldReloadWidgets {
+            WidgetCenter.shared.reloadAllTimelines()
+        }
     }
     
     // updates the toolbar UI to show the current snooze status of the app
