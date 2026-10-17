@@ -810,12 +810,16 @@ import AppIntents
                     self?.bluetoothPeripheralManager?.getCGMTransmitter()?.isAnubisG6() ?? false
                 },
                 metadataContextProvider: { [weak self] in
-                    let activeSensor = self?.activeSensor
-                    let transmitter = self?.bluetoothPeripheralManager?.getCGMTransmitter()
+                    // A follower must not inherit status or calibration from a retained local CGM.
+                    let activeSensor = UserDefaults.standard.isMaster ? self?.activeSensor : nil
+                    let transmitter = UserDefaults.standard.isMaster ? self?.bluetoothPeripheralManager?.getCGMTransmitter() : nil
                     let peripheral = (transmitter as? BluetoothTransmitter).flatMap {
                         self?.bluetoothPeripheralManager?.getBluetoothPeripheral(for: $0)
                     }
-                    let dexcomStatus = (peripheral as? DexcomG5)?.sensorStatus
+                    // Raw-calibrated G5/G6 sessions do not use the transmitter's algorithm status.
+                    // Firefly-only transmitters use it even if the saved algorithm preference is false.
+                    let usesDexcomAlgorithm = transmitter.map { $0.isWebOOPEnabled() || !$0.nonWebOOPAllowed() } ?? false
+                    let dexcomStatus = (usesDexcomAlgorithm ? (peripheral as? DexcomG5)?.sensorStatus : nil)
                         ?? (peripheral as? DexcomG7)?.sensorStatus
                     let dexcomAlgorithmState = dexcomStatus.flatMap { status in
                         DexcomAlgorithmState.allCases.first { $0.description == status }
@@ -831,7 +835,7 @@ import AppIntents
                     return XDripCGMMetadataContext(
                         activeSensor: activeSensor,
                         transmitter: transmitter,
-                        sensorHealthIssue: self?.sensorHealthIssueManager.visibleIssue,
+                        sensorHealthIssue: UserDefaults.standard.isMaster ? self?.sensorHealthIssueManager.visibleIssue : nil,
                         hasInitialCalibration: activeSensor == nil ? nil : firstCalibration != nil,
                         lastCalibrationAt: lastCalibration?.timeStamp,
                         dexcomAlgorithmState: dexcomAlgorithmState,

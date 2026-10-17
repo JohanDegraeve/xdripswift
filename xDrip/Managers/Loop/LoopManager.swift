@@ -674,19 +674,23 @@ public class LoopManager: NSObject {
         sensorState: String? = nil,
         clearSensorState: Bool = false
     ) {
-        guard !Bundle.main.disableLoopShare,
-              UserDefaults.standard.loopShareType == .trio
-        else { return }
-
-        if let lastCommunicationAt {
-            lastSuccessfulSourceCommunication = lastCommunicationAt
-        }
+        // Session changes still matter while sharing is disabled. In particular, a new
+        // sensor must clear the previous stop override before sharing can be enabled again.
         if clearSensorState {
             explicitSensorState = nil
         } else if let sensorState {
             explicitSensorState = sensorState
         }
 
+        guard !Bundle.main.disableLoopShare,
+              UserDefaults.standard.loopShareType == .trio
+        else { return }
+
+        if let lastCommunicationAt {
+            // Watch batches can arrive after a newer iPhone connection. Keep actual source
+            // contact moving forward, independently of the order in which collectors sync.
+            lastSuccessfulSourceCommunication = max(lastSuccessfulSourceCommunication ?? lastCommunicationAt, lastCommunicationAt)
+        }
         guard Self.osAidSharingPermitted else {
             glucoseData.removeAll()
             clearBlockedSourceSharedData()
@@ -768,11 +772,19 @@ public class LoopManager: NSObject {
 
     private func publishMetadata(sharedUserDefaults: UserDefaults, latestSharedGlucoseAt: Date?) {
         let defaults = UserDefaults.standard
+        let context = metadataContextProvider()
+        // Local stop/not-started overrides describe the absence of an active sensor.
+        // Reconcile on every publication, including reading, status and foreground updates.
+        // A new local session or follower source makes that override obsolete. This does not
+        // clear the transmitter's own stopped/failed state, nor infer recovery from glucose.
+        if context.activeSensor != nil || !defaults.isMaster {
+            explicitSensorState = nil
+        }
         let communicationAt = defaults.isMaster
             ? lastSuccessfulSourceCommunication ?? latestSharedGlucoseAt
             : lastSuccessfulSourceCommunication ?? defaults.timeStampOfLastFollowerConnection
         let envelope = XDripCGMMetadataBuilder.build(
-            context: metadataContextProvider(),
+            context: context,
             latestSharedGlucoseAt: latestSharedGlucoseAt,
             lastCommunicationAt: communicationAt,
             sensorStateOverride: explicitSensorState
