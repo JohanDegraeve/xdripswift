@@ -1829,7 +1829,7 @@ final class TroubleshootingLogTests: XCTestCase {
         XCTAssertEqual(report.entries(matching: "HEARTbeat").map(\.kind), [
             .heartbeatReceived
         ])
-        XCTAssertEqual(report.entries(matching: "123 mg/dL").map(\.kind), [
+        XCTAssertEqual(report.entries(matching: "New reading: 123").map(\.kind), [
             entries[2].kind
         ])
         XCTAssertEqual(report.entries(matching: "no match"), [])

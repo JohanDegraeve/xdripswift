@@ -1313,9 +1313,14 @@ final class TroubleshootingLogStore {
 
             case let .bluetoothDevice(name, activity):
                 switch activity {
-                case .added, .reconnectedToExisting:
-                    // These are discrete outcomes of an explicit Add scan.
+                case .added:
+                    // A discovered device is a discrete Add outcome, but is not connected yet.
                     result.append(entry)
+                case .reconnectedToExisting:
+                    result.append(entry)
+                    // A stored recovery must also restore replay state. Otherwise the next
+                    // healthy heartbeat is converted into another recovery on every append.
+                    bluetoothHealth = .healthy
                 case .connectionRequested:
                     // A saved non-CGM device was explicitly enabled by the user. Retain the action
                     // and let the next matching healthy connection provide its decisive outcome.
