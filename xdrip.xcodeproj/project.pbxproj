@@ -405,6 +405,7 @@
 		A71EABC60106174DF42844F1 /* TransmitterMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971C223A5915900C3F17D /* TransmitterMessage.swift */; };
 		A93DD257332571AB2302D260 /* PairRequestTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971D323A5915900C3F17D /* PairRequestTxMessage.swift */; };
 		AB1900013014000200000001 /* LiveActivityWarmupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1900023014000200000001 /* LiveActivityWarmupTests.swift */; };
+		A77400013018000100000001 /* MissedReadingSnoozeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77400023018000100000001 /* MissedReadingSnoozeTests.swift */; };
 		AB852EB5FF541C74ED44F7A7 /* Libre3ReceiverIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24211649560339B1DA365E8B /* Libre3ReceiverIDTests.swift */; };
 		ABF3E67AF35ABE4F660CD8EE /* Libre3LibreSensorGATT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614A12EB399C9C25791C5870 /* Libre3LibreSensorGATT.swift */; };
 		AE4B81D40515C0DEF287D04A /* Libre3CredentialStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C485212BD6A40E6FD781747 /* Libre3CredentialStore.swift */; };
@@ -1423,6 +1424,7 @@
 		A5B1BEFB5B2FA090B8F13C5C /* Libre3AccountLookup.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3AccountLookup.swift; path = Libre3AccountLookup.swift; sourceTree = "<group>"; };
 		A9475ACF6F7D798F550BDF96 /* Libre3PhoneCert.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3PhoneCert.swift; path = Libre3PhoneCert.swift; sourceTree = "<group>"; };
 		AB1900023014000200000001 /* LiveActivityWarmupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityWarmupTests.swift; sourceTree = "<group>"; };
+		A77400023018000100000001 /* MissedReadingSnoozeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissedReadingSnoozeTests.swift; sourceTree = "<group>"; };
 		ABA4DE8668C9A16DFF21A411 /* CareLinkTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CareLinkTests.swift; sourceTree = "<group>"; };
 		AC2A2C9102E6CAD34C48303E /* Libre3TestHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3TestHelpers.swift; path = Libre3TestHelpers.swift; sourceTree = "<group>"; };
 		AE7570012026092700000002 /* SheetCloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetCloseButton.swift; sourceTree = "<group>"; };
@@ -2847,6 +2849,7 @@
 				5A0921013015000100000001 /* GMIStatisticsTests.swift */,
 				4D800003301F000100000001 /* Libre2FrameAssemblerTests.swift */,
 				AB1900023014000200000001 /* LiveActivityWarmupTests.swift */,
+				A77400023018000100000001 /* MissedReadingSnoozeTests.swift */,
 				BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */,
 				A50000040000000000000001 /* OnlineHelpTests.swift */,
 				4F2800113004000100000001 /* RootHomeInteractionTests.swift */,
@@ -4781,6 +4784,7 @@
 				4D7C00023015000100000001 /* CalibrationReadinessTests.swift in Sources */,
 				4D7B00023014000200000001 /* CGMG5SensorSessionDetectionTests.swift in Sources */,
 				AB1900013014000200000001 /* LiveActivityWarmupTests.swift in Sources */,
+				A77400013018000100000001 /* MissedReadingSnoozeTests.swift in Sources */,
 				4B0C00252F3B000100000001 /* DexcomG6SensorLabelTests.swift in Sources */,
 				4D7E00023017000200000001 /* DexcomG6BluetoothSlotTests.swift in Sources */,
 				CC1EA9B85F7A487E86867E63 /* DirectWatchBridgeTests.swift in Sources */,

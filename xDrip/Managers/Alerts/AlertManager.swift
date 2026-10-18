@@ -112,13 +112,14 @@ public class AlertManager: NSObject {
     /// - returns:
     ///     - if true then an immediate notification is created (immediate being not a future planned, like missed reading), which contains the bg reading in the text - so there's no need to create an additional notificationwith the text in it
     public func checkAlerts(maxAgeOfLastBgReadingInSeconds: Double) -> Bool {
-        // first of all remove all existing notifications, there should be only one open alert on the home screen. The most relevant one will be reraised
+        // Remove delivered alerts so only the most relevant one is shown after checking the latest reading.
         uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: alertNotificationIdentifers)
-        uNUserNotificationCenter.removeAllPendingNotificationRequests()
         
         // Do not return early for Snooze All. Each enabled alert must still evaluate its condition so
         // the consumer log can explain that a real alarm condition was suppressed by the snooze.
         if let snoozeAllAlertsUntilDate = UserDefaults.standard.snoozeAllAlertsUntilDate, snoozeAllAlertsUntilDate > Date() {
+            // Snooze All still cancels pending alerts, even when the latest reading is stale.
+            uNUserNotificationCenter.removeAllPendingNotificationRequests()
             trace("in checkAlerts, skipping as Snooze All is enabled for the next %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .info, snoozeAllAlertsUntilDate.daysAndHoursRemaining())
         }
         
@@ -142,6 +143,10 @@ public class AlertManager: NSObject {
             let lastBgReading = latestBgReadings[0]
 
             if abs(lastBgReading.timeStamp.timeIntervalSinceNow) < maxAgeOfLastBgReadingInSeconds {
+                // Only clear pending alerts when we can rebuild them from a fresh reading.
+                // Otherwise a stale reading would cancel the planned missed reading alert, including its snooze.
+                uNUserNotificationCenter.removeAllPendingNotificationRequests()
+
                 // reading is maxAgeOfLastBgReadingInSeconds seconds old, let's check the alerts
                 // need to call checkAlert
                 
@@ -510,6 +515,11 @@ public class AlertManager: NSObject {
         
         // save changes in coredata
         coreDataManager.saveChanges()
+
+        // Clearing the saved snooze must also bring the planned missed reading alert forward.
+        if alertKind == .missedreading {
+            rescheduleMissedReadingAlert()
+        }
     }
     
     /// creates PickerViewData which allows user to snooze an alert.
@@ -563,14 +573,14 @@ public class AlertManager: NSObject {
             
                                   // if it's a missed reading alert, then cancel any planned missed reading alerts and reschedule
                                   // if content is not nil, then it means a missed reading alert went off, the user clicked it, app opens, user clicks snooze, snoozing must be set
-                                  // if content is nil, then this is an alert snoozed via presnooze button, missed reading alert needs to recalculated.
+                                  // if content is nil, use the latest stored reading so the existing alert is replaced with the snoozed schedule.
                                   if alertKind == .missedreading {
                                       if let content = content {
                                           // schedule missed reading alert with same content
                                           self.scheduleMissedReadingAlert(snoozePeriodInMinutes: snoozePeriod, content: content)
                     
-                                      } else if UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled && UserDefaults.standard.activeSensorStartDate != nil) {
-                                          _ = self.checkAlertAndFire(alertKind: .missedreading, lastBgReading: nil, lastButOneBgReading: nil, lastCalibration: nil, transmitterBatteryInfo: nil)
+                                      } else {
+                                          self.rescheduleMissedReadingAlert()
                                       }
                                   }
             
@@ -615,19 +625,21 @@ public class AlertManager: NSObject {
             snoozePeriodInMinutes.description
         )
 
+        // Store the snooze for every alert kind so notification actions and the snooze screen use the same expiry.
+        // Missed reading alerts also need this state when a new reading rebuilds their notification.
+        getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: snoozePeriodInMinutes)
+        coreDataManager.saveChanges()
+
         // if it's a missedreading alert, then reschedule the alert with a delay of snoozePeriodInMinutes, repeating, with same content
         if alertKind == .missedreading {
             if let response = response {
                 scheduleMissedReadingAlert(snoozePeriodInMinutes: snoozePeriodInMinutes, content: response.notification.request.content)
+            } else {
+                rescheduleMissedReadingAlert()
             }
             
         } else {
-            // any other type of alert, set it to snoozed
-            getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: snoozePeriodInMinutes)
             trace("Snoozing alert '%{public}@' for %{public}@ minutes (2)", log: log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), snoozePeriodInMinutes.description)
-            
-            // save changes in coredata
-            coreDataManager.saveChanges()
         }
     }
     
@@ -661,20 +673,9 @@ public class AlertManager: NSObject {
                     // if missedReadingAlertChanged didn't change to true then no further processing
                     guard UserDefaults.standard.missedReadingAlertChanged else { return }
                     
-                    // user changed a missed reading alert setting, so we're going to call checkAlertAndFire for .missedreading, which will replan or cancel any existing missed reading alert
-                    
-                    // get last bgreading, ignore sensor, because it must also work for follower mode
-                    // to check missed reading alert, we only need one reading
-                    let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 1, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-                    
-                    if latestBgReadings.count > 0 {
-                        // first of all remove all existing missedreading notifications
-                        uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: [AlertKind.missedreading.notificationIdentifier()])
-                        uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: [AlertKind.missedreading.notificationIdentifier()])
-                        
-                        _ = checkAlertAndFire(alertKind: .missedreading, lastBgReading: latestBgReadings[0], lastButOneBgReading: nil, lastCalibration: nil, transmitterBatteryInfo: nil)
-                    }
-                    
+                    // Apply the new settings to the pending notification too.
+                    rescheduleMissedReadingAlert()
+
                     UserDefaults.standard.missedReadingAlertChanged = false
 
                 case UserDefaults.Key.notLoopingAlertChanged:
@@ -721,6 +722,19 @@ public class AlertManager: NSObject {
         return false
     }
     
+    /// Recalculates the missed reading notification after its settings or saved snooze have changed.
+    private func rescheduleMissedReadingAlert() {
+        // Remove the previous schedule even if the alert is now disabled or no reading is available.
+        uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: [AlertKind.missedreading.notificationIdentifier()])
+        uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: [AlertKind.missedreading.notificationIdentifier()])
+
+        // Ignore sensor and age so pre-snooze and unsnooze also work while readings are missing.
+        let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 1, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        if let lastBgReading = latestBgReadings.first {
+            _ = checkAlertAndFire(alertKind: .missedreading, lastBgReading: lastBgReading, lastButOneBgReading: nil, lastCalibration: nil, transmitterBatteryInfo: nil)
+        }
+    }
+
     /// will
     /// - remove any pending missed reading alert
     /// - create a new one repeating, repeat time will be equal to delay of first alert (that's what iOS allows us to do)
@@ -775,7 +789,8 @@ public class AlertManager: NSObject {
             switch alertKind {
             case .missedreading: // any alert type that would be configured with a delay
                 if getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes > 0, let snoozeTimeStamp = getSnoozeParameters(alertKind: alertKind).snoozeTimeStamp {
-                    minimumDelayInSecondsToUse = -Int(Date().timeIntervalSince(Date(timeInterval: TimeInterval(Double(getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes) * 60.0), since: snoozeTimeStamp)).rawValue)
+                    // Round up so rebuilding the notification cannot make it fire before snooze expiry.
+                    minimumDelayInSecondsToUse = Int(ceil(Date(timeInterval: TimeInterval(Double(getSnoozeParameters(alertKind: alertKind).snoozePeriodInMinutes) * 60.0), since: snoozeTimeStamp).timeIntervalSinceNow))
                     trace("in checkAlertAndFire, minimumDelayInSecondsToUse = %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .info, minimumDelayInSecondsToUse!.description)
                 } // if snoozePeriodInMinutes or snoozeTimeStamp is nil (which shouldn't be the case) continue without taking into account the snooze status
                 
@@ -843,6 +858,12 @@ public class AlertManager: NSObject {
             }
         }
         
+        // A missed reading alert may already be overdue when it is unsnoozed or its settings change.
+        // Keep it repeating, with the minimum 60-second interval allowed by iOS.
+        if alertKind == .missedreading {
+            delayInSecondsToUse = max(60, delayInSecondsToUse)
+        }
+
         let alertMayFire = UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)
         if alertNeeded && alertMayFire {
             // alert needs to be raised
