@@ -623,25 +623,50 @@ final class DexcomG7CalibrationTests: XCTestCase {
         )
 
         XCTAssertEqual(ConstantsAlerts.dexcomBatteryAlertSuppressionPeriodInHours, 6)
-        XCTAssertTrue(DexcomBatteryAlertPolicy.shouldSuppress(hardwareStartDate: nil, now: now))
-        XCTAssertTrue(
-            DexcomBatteryAlertPolicy.shouldSuppress(
-                hardwareStartDate: now.addingTimeInterval(-suppressionInterval + 1),
-                now: now
+        for alertKind in [AlertKind.dexcomG5BatteryLow, .dexcomG7BatteryLow] {
+            XCTAssertTrue(DexcomBatteryAlertPolicy.shouldSuppress(alertKind: alertKind, hardwareStartDate: nil, now: now))
+            XCTAssertTrue(
+                DexcomBatteryAlertPolicy.shouldSuppress(
+                    alertKind: alertKind,
+                    hardwareStartDate: now.addingTimeInterval(-suppressionInterval + 1),
+                    now: now
+                )
             )
-        )
-        XCTAssertFalse(
-            DexcomBatteryAlertPolicy.shouldSuppress(
-                hardwareStartDate: now.addingTimeInterval(-suppressionInterval),
-                now: now
+            XCTAssertFalse(
+                DexcomBatteryAlertPolicy.shouldSuppress(
+                    alertKind: alertKind,
+                    hardwareStartDate: now.addingTimeInterval(-suppressionInterval),
+                    now: now
+                )
             )
-        )
-        XCTAssertFalse(
-            DexcomBatteryAlertPolicy.shouldSuppress(
-                hardwareStartDate: now.addingTimeInterval(-suppressionInterval - 1),
-                now: now
+            XCTAssertFalse(
+                DexcomBatteryAlertPolicy.shouldSuppress(
+                    alertKind: alertKind,
+                    hardwareStartDate: now.addingTimeInterval(-suppressionInterval - 1),
+                    now: now
+                )
             )
-        )
+        }
+    }
+
+    func testDexcomBatterySettlingDoesNotSuppressOtherAlerts() {
+        let now = Date(timeIntervalSince1970: 2_000_000_000)
+        let hardwareStartDates: [Date?] = [nil, now.addingTimeInterval(-60 * 60)]
+
+        // Include glucose and missed-reading alerts when a cached Dexcom battery has no active
+        // hardware date, as well as when the direct transmitter is still in its settling period.
+        for alertKind in AlertKind.allCases where alertKind != .dexcomG5BatteryLow && alertKind != .dexcomG7BatteryLow {
+            for hardwareStartDate in hardwareStartDates {
+                XCTAssertFalse(
+                    DexcomBatteryAlertPolicy.shouldSuppress(
+                        alertKind: alertKind,
+                        hardwareStartDate: hardwareStartDate,
+                        now: now
+                    ),
+                    "Dexcom battery settling must not suppress \(alertKind)"
+                )
+            }
+        }
     }
 
     func testBatteryAlertRoutingSelectsThePayloadFamilyConfiguration() {

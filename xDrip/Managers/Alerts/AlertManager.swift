@@ -805,6 +805,7 @@ public class AlertManager: NSObject {
            let transmitterBatteryInfo = transmitterBatteryInfo,
            case .dexcom(let family, _, _, _, _, _) = transmitterBatteryInfo,
            DexcomBatteryAlertPolicy.shouldSuppress(
+               alertKind: alertKind,
                hardwareStartDate: blePeripheralAccessor.activeDexcomBatteryStartDate(for: family)
             ) {
             trace(

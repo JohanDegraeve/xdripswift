@@ -38,7 +38,10 @@ struct DexcomBatteryAlertPolicy {
     /// A missing start date is treated as still inside the settling period. In particular, a G6
     /// battery response can arrive before its transmitter-time response during the first message
     /// flow. Allowing the alarm at that point would recreate the false warning this policy prevents.
-    static func shouldSuppress(hardwareStartDate: Date?, now: Date = Date()) -> Bool {
+    static func shouldSuppress(alertKind: AlertKind, hardwareStartDate: Date?, now: Date = Date()) -> Bool {
+        // Only suppress Dexcom battery alerts. Cached battery data can remain after switching to
+        // follower mode, and a missing hardware start date must not suppress unrelated alarms.
+        guard alertKind == .dexcomG5BatteryLow || alertKind == .dexcomG7BatteryLow else { return false }
         guard let hardwareStartDate else { return true }
         let suppressionInterval = TimeInterval(
             ConstantsAlerts.dexcomBatteryAlertSuppressionPeriodInHours * 60 * 60
