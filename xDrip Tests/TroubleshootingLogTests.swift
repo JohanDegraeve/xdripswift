@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import Combine
 import os
 @testable import xdrip
 
@@ -1287,6 +1288,62 @@ final class TroubleshootingLogTests: XCTestCase {
 
         let reloadedStore = TroubleshootingLogStore(fileURL: fileURL, now: { self.referenceDate })
         XCTAssertEqual(reloadedStore.snapshot().map(\.kind), [.app(.terminated), .app(.started)])
+    }
+
+    @MainActor
+    func testActivityLogReloadDoesNotBlockMainWhileStoreIsBusy() async throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        let gate = DispatchGroup()
+        gate.enter()
+        let enteredStore = expectation(description: "Store is busy on its own queue")
+        enteredStore.assertForOverFulfill = false
+        let referenceDate = referenceDate
+        let store = TroubleshootingLogStore(fileURL: fixture.fileURL, now: {
+            enteredStore.fulfill()
+            _ = gate.wait(timeout: .now() + 5)
+            return referenceDate
+        })
+        store.record(.standard(.app(.started), timestamp: referenceDate))
+        await fulfillment(of: [enteredStore], timeout: 2)
+
+        let start = Date()
+        let appInfo = appInfo
+        let model = TroubleshootingLogViewModel(store: store, appInfoProvider: { appInfo })
+        XCTAssertLessThan(Date().timeIntervalSince(start), 1)
+        XCTAssertNil(model.reportText)
+        // Repeated appearances and live updates must coalesce while the snapshot is waiting.
+        model.reload()
+        model.reload()
+        let exported = expectation(description: "Complete report published after store unblocks")
+        let observation = model.$reportText.compactMap { $0 }.first().sink { text in
+            XCTAssertTrue(text.contains("App started."))
+            exported.fulfill()
+        }
+        gate.leave()
+        await fulfillment(of: [exported], timeout: 5)
+        XCTAssertEqual(model.report.entries.map(\.kind), [.app(.started)])
+        XCTAssertEqual(model.reportText, model.report.reportText)
+        observation.cancel()
+    }
+
+    func testMaximumOvernightReportKeepsEveryReadingAndFormatsWithinWatchdogBudget() {
+        let entries = (0..<TroubleshootingLogStore.maximumEntryCount).map { index in
+            let date = referenceDate.addingTimeInterval(-Double(index) * 15)
+            return TroubleshootingLogEntry.standard(
+                .glucoseAccepted(mgDl: 123, source: .libre2EU, measuredAt: date), timestamp: date
+            )
+        }
+        let report = makeReport(entries: entries)
+        let start = Date()
+        let text = report.reportText
+        let elapsed = Date().timeIntervalSince(start)
+        XCTAssertEqual(text.components(separatedBy: "New reading:").count - 1, entries.count)
+        XCTAssertTrue(text.contains("App Name: xDrip4iOS"))
+        // A generous regression guard for a simulator. Export also runs away from main, but it
+        // should not spend the scene watchdog's entire allowance constructing ICU formatters.
+        XCTAssertLessThan(elapsed, 5)
+        print("Maximum Activity Log export: \(entries.count) entries in \(elapsed) seconds")
     }
 
     func testReportAlwaysIncludesEveryRetainedEntryAndCompleteExportHeader() {

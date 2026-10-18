@@ -1937,6 +1937,32 @@ struct TroubleshootingLogReportBuilder {
     let generatedAt: Date
     let timeZone: TimeZone
 
+    // A retained overnight history can contain thousands of rows. Creating and initializing ICU
+    // date formatters for every row made building the ShareLink block the main thread long enough
+    // for the scene-update watchdog to terminate the app. Each immutable report reuses its formatters.
+    private let timeFormatter: DateFormatter
+    private let dayFormatter: DateFormatter
+    private let shortDateTimeFormatter: DateFormatter
+    private let fullDateFormatter: DateFormatter
+
+    init(
+        entries: [TroubleshootingLogEntry],
+        usesMgDl: Bool,
+        appInfo: TroubleshootingLogAppInfo,
+        generatedAt: Date,
+        timeZone: TimeZone
+    ) {
+        self.entries = entries
+        self.usesMgDl = usesMgDl
+        self.appInfo = appInfo
+        self.generatedAt = generatedAt
+        self.timeZone = timeZone
+        timeFormatter = Self.timeFormatter(timeZone: timeZone)
+        dayFormatter = Self.dayFormatter(timeZone: timeZone)
+        shortDateTimeFormatter = Self.shortDateTimeFormatter(timeZone: timeZone)
+        fullDateFormatter = Self.fullDateFormatter(timeZone: timeZone)
+    }
+
     /// Returns entries whose controlled, user-facing sentence contains the supplied text.
     ///
     /// Filtering the same sentence used by the row avoids exposing or searching developer-only
@@ -1958,7 +1984,7 @@ struct TroubleshootingLogReportBuilder {
     var headerLines: [String] {
         var lines = [
             "\(appInfo.projectName) Troubleshooting Log",
-            "Created: \(Self.fullDateFormatter(timeZone: timeZone).string(from: generatedAt)) \(timeZone.abbreviation(for: generatedAt) ?? timeZone.identifier)",
+            "Created: \(fullDateFormatter.string(from: generatedAt)) \(timeZone.abbreviation(for: generatedAt) ?? timeZone.identifier)",
             "App Name: \(appInfo.appName)",
             "Version: \(appInfo.version)",
             "Device: \(appInfo.deviceClass), iOS \(appInfo.systemVersion)",
@@ -1998,15 +2024,16 @@ struct TroubleshootingLogReportBuilder {
         }
 
         var previousDay: Date?
-        let calendar = Calendar.current
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
         for entry in entries {
             let day = calendar.startOfDay(for: entry.timestamp)
             if previousDay != day {
                 lines.append("")
-                lines.append(Self.dayFormatter(timeZone: timeZone).string(from: entry.timestamp))
+                lines.append(dayFormatter.string(from: entry.timestamp))
                 previousDay = day
             }
-            lines.append("\(Self.timeFormatter(timeZone: timeZone).string(from: entry.timestamp))  \(message(for: entry))")
+            lines.append("\(timeFormatter.string(from: entry.timestamp))  \(message(for: entry))")
         }
         return lines.joined(separator: "\n")
     }
@@ -2354,11 +2381,11 @@ struct TroubleshootingLogReportBuilder {
     }
 
     func timeText(for entry: TroubleshootingLogEntry) -> String {
-        Self.timeFormatter(timeZone: timeZone).string(from: entry.timestamp)
+        timeFormatter.string(from: entry.timestamp)
     }
 
     func dayText(for entry: TroubleshootingLogEntry) -> String {
-        Self.dayFormatter(timeZone: timeZone).string(from: entry.timestamp)
+        dayFormatter.string(from: entry.timestamp)
     }
 
     private func glucoseText(mgDl: Double, originalMgDl: Double? = nil, includeUnit: Bool = true) -> String {
@@ -2382,9 +2409,9 @@ struct TroubleshootingLogReportBuilder {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = timeZone
         if calendar.isDate(measuredAt, inSameDayAs: recordedAt) {
-            return Self.shortTimeFormatter(timeZone: timeZone).string(from: measuredAt)
+            return timeFormatter.string(from: measuredAt)
         }
-        return Self.shortDateTimeFormatter(timeZone: timeZone).string(from: measuredAt)
+        return shortDateTimeFormatter.string(from: measuredAt)
     }
 
     private static func alertName(rawValue: Int) -> String {
@@ -2415,14 +2442,6 @@ struct TroubleshootingLogReportBuilder {
     private static func timeFormatter(timeZone: TimeZone) -> DateFormatter {
         // Reports intentionally use a predictable English support vocabulary while respecting the
         // user's local time zone. POSIX locale also prevents device-language formatting surprises.
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = timeZone
-        formatter.dateFormat = "HH:mm:ss"
-        return formatter
-    }
-
-    private static func shortTimeFormatter(timeZone: TimeZone) -> DateFormatter {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = timeZone
