@@ -4,6 +4,15 @@ import os
 import UserNotifications
 import SwiftUI
 
+/// Notification operations used by alerts and their tests.
+protocol AlertNotificationScheduling: AnyObject {
+    func add(_ request: UNNotificationRequest, withCompletionHandler completionHandler: (@Sendable (Error?) -> Void)?)
+    func removeDeliveredNotifications(withIdentifiers identifiers: [String])
+    func removePendingNotificationRequests(withIdentifiers identifiers: [String])
+}
+
+extension UNUserNotificationCenter: AlertNotificationScheduling {}
+
 /// has a function to check if an alert needs to be raised, and also raised the alert notification if needed.
 ///
 /// has all the logic but should be not or almost not aware of the kind of alerts that exists. The logic that is different per type of alert is defined in type AlertKind.
@@ -54,7 +63,7 @@ public class AlertManager: NSObject {
     private var alertNotificationIdentifers = [String]()
     
     /// permanent reference to notificationcenter
-    private let uNUserNotificationCenter: UNUserNotificationCenter
+    private let uNUserNotificationCenter: AlertNotificationScheduling
 
     /// Last immediate Not Looping notification created during this app run.
     /// This throttles repeats without marking the alert as user-snoozed.
@@ -68,7 +77,7 @@ public class AlertManager: NSObject {
     
     // MARK: - initializer
     
-    init(coreDataManager: CoreDataManager, soundPlayer: SoundPlayer?) {
+    init(coreDataManager: CoreDataManager, soundPlayer: SoundPlayer?, notificationCenter: AlertNotificationScheduling = UNUserNotificationCenter.current()) {
         // initialize properties
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.alertTypesAccessor = AlertTypesAccessor(coreDataManager: coreDataManager)
@@ -77,7 +86,7 @@ public class AlertManager: NSObject {
         self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
         self.blePeripheralAccessor = BLEPeripheralAccessor(coreDataManager: coreDataManager)
         self.soundPlayer = soundPlayer
-        self.uNUserNotificationCenter = UNUserNotificationCenter.current()
+        self.uNUserNotificationCenter = notificationCenter
         self.coreDataManager = coreDataManager
         
         // call super.init
@@ -119,7 +128,7 @@ public class AlertManager: NSObject {
         // the consumer log can explain that a real alarm condition was suppressed by the snooze.
         if let snoozeAllAlertsUntilDate = UserDefaults.standard.snoozeAllAlertsUntilDate, snoozeAllAlertsUntilDate > Date() {
             // Snooze All still cancels pending alerts, even when the latest reading is stale.
-            uNUserNotificationCenter.removeAllPendingNotificationRequests()
+            uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: alertNotificationIdentifers + [AlertKind.notlooping.notificationIdentifier()])
             trace("in checkAlerts, skipping as Snooze All is enabled for the next %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .info, snoozeAllAlertsUntilDate.daysAndHoursRemaining())
         }
         
@@ -145,7 +154,7 @@ public class AlertManager: NSObject {
             if abs(lastBgReading.timeStamp.timeIntervalSinceNow) < maxAgeOfLastBgReadingInSeconds {
                 // Only clear pending alerts when we can rebuild them from a fresh reading.
                 // Otherwise a stale reading would cancel the planned missed reading alert, including its snooze.
-                uNUserNotificationCenter.removeAllPendingNotificationRequests()
+                uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: alertNotificationIdentifers + [AlertKind.notlooping.notificationIdentifier()])
 
                 // reading is maxAgeOfLastBgReadingInSeconds seconds old, let's check the alerts
                 // need to call checkAlert
@@ -308,7 +317,7 @@ public class AlertManager: NSObject {
 
     /// Resolves the user-facing Alarm Type sound name to its bundled sound file.
     /// Nil means the default iOS sound and an empty string means no sound.
-    private func resolvedSoundFileName(for alertType: AlertType) -> String? {
+    func resolvedSoundFileName(for alertType: AlertType) -> String? {
         guard let configuredName = alertType.soundname else { return nil }
         guard !configuredName.isEmpty else { return "" }
 
@@ -697,6 +706,7 @@ public class AlertManager: NSObject {
         }
     }
 
+
     // MARK: - private helper functions
     
     /// Checks group of alerts - Not to be used for alerts with delay (ie missedreading)
@@ -904,7 +914,7 @@ public class AlertManager: NSObject {
             case .verylow, .low, .high, .veryhigh, .fastdrop, .fastrise:
                 includesGlucose = true
             case .missedreading, .calibration, .batterylow, .phonebatterylow, .notlooping,
-                 .sensorTransmitterFailure, .dexcomG5BatteryLow, .dexcomG7BatteryLow:
+                 .sensorTransmitterFailure, .dexcomG5BatteryLow, .dexcomG7BatteryLow, .sensorEndingSoon, .sensorExpectedExpiry:
                 includesGlucose = false
             }
 
@@ -1082,7 +1092,7 @@ public class AlertManager: NSObject {
                     trace("Unable to Add Notification Request %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
                     if !content.attachments.isEmpty {
                         content.attachments = []
-                        let fallbackNotificationRequest = UNNotificationRequest(identifier: alertKind.notificationIdentifier(), content: content, trigger: trigger)
+                        let fallbackNotificationRequest = UNNotificationRequest(identifier: alertKind.notificationIdentifier(), content: content, trigger: notificationRequest.trigger)
                         self.uNUserNotificationCenter.add(fallbackNotificationRequest) { fallbackError in
                             if let fallbackError = fallbackError {
                                 trace("Unable to Add Notification Request without attachment %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .error, fallbackError.localizedDescription)
@@ -1148,7 +1158,7 @@ public class AlertManager: NSObject {
     // helper method used during intialization of AlertManager
     private func initAlertNotificationIdentiferArray() {
         for alertKind in AlertKind.allCases {
-            guard alertKind != .notlooping else { continue }
+            guard alertKind != .notlooping, !alertKind.isSensorExpiryReminder else { continue }
             alertNotificationIdentifers.append(alertKind.notificationIdentifier())
         }
     }

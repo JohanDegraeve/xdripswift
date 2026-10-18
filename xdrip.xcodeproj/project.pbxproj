@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7E7760013000000100000001 /* SensorExpiryReminderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E7760013000000100000002 /* SensorExpiryReminderManager.swift */; };
+		7E7760013000000100000003 /* SensorExpiryReminderManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E7760013000000100000004 /* SensorExpiryReminderManagerTests.swift */; };
 		07ECB18D91AE096E637D1393 /* AlertsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */; };
 		0A0C4A524F9EC9425BDBA231 /* Libre3BleFramingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197D49EDB06F0DFE03707591 /* Libre3BleFramingTests.swift */; };
 		0A51F9C534B04BD682E1EF4D /* xDrip Tests/TherapyMetricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E2401E5ED94424A2FEC5E8 /* xDrip Tests/TherapyMetricsTests.swift */; };
@@ -997,6 +999,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7E7760013000000100000002 /* SensorExpiryReminderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorExpiryReminderManager.swift; sourceTree = "<group>"; };
+		7E7760013000000100000004 /* SensorExpiryReminderManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorExpiryReminderManagerTests.swift; sourceTree = "<group>"; };
 		008DD8362C3D359B7EA1B6BD /* Libre3PairingFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3PairingFlow.swift; path = Libre3PairingFlow.swift; sourceTree = "<group>"; };
 		047632E443AF0F5D48EC5CE9 /* Libre3AESCCM.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3AESCCM.swift; path = Libre3AESCCM.swift; sourceTree = "<group>"; };
 		05272484BD024BDAAA341C1C /* xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDrip/SwiftUIViews/Settings/TherapyMetricsSettingsView.swift; sourceTree = SOURCE_ROOT; };
@@ -2854,6 +2858,7 @@
 				A50000040000000000000001 /* OnlineHelpTests.swift */,
 				4F2800113004000100000001 /* RootHomeInteractionTests.swift */,
 				4F2600123002000200000001 /* SensorHealthIssueManagerTests.swift */,
+				7E7760013000000100000004 /* SensorExpiryReminderManagerTests.swift */,
 				4F2600113002000200000001 /* SensorNoisePersistenceTests.swift */,
 				4D7A00053014000100000001 /* TroubleshootingLogTests.swift */,
 				50E2401E5ED94424A2FEC5E8 /* xDrip Tests/TherapyMetricsTests.swift */,
@@ -3113,6 +3118,7 @@
 			isa = PBXGroup;
 			children = (
 				F821CF49229BF43A005C1E43 /* AlertKind.swift */,
+				7E7760013000000100000002 /* SensorExpiryReminderManager.swift */,
 				F821CF4B229BF43A005C1E43 /* AlertManager.swift */,
 				47976E352BF536BA005E86EC /* AlertSnoozeStatus.swift */,
 				47CD642B2BEBEB0E002BDA68 /* AlertUrgencyType.swift */,
@@ -4795,6 +4801,7 @@
 				BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */,
 				BA0709260000000000000001 /* BasalInjectionTests.swift in Sources */,
 				4F2600023002000200000001 /* SensorHealthIssueManagerTests.swift in Sources */,
+				7E7760013000000100000003 /* SensorExpiryReminderManagerTests.swift in Sources */,
 				4F2800023004000100000001 /* GlucoseChartYAxisRetentionTests.swift in Sources */,
 				4F2800013004000100000001 /* RootHomeInteractionTests.swift in Sources */,
 				A40000010000000000000001 /* FollowerSettingsTests.swift in Sources */,
@@ -5263,6 +5270,7 @@
 				4E6000012FF2000100000001 /* SensorNoiseCalculator.swift in Sources */,
 				4E6000022FF2000100000001 /* SensorNoiseManager.swift in Sources */,
 				4F2500013002000100000001 /* SensorHealthIssueManager.swift in Sources */,
+				7E7760013000000100000001 /* SensorExpiryReminderManager.swift in Sources */,
 				4F2500143002000100000001 /* SensorHealthModels.swift in Sources */,
 				4E6100012FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift in Sources */,
 				4E6100022FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift in Sources */,

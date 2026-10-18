@@ -62,3 +62,11 @@
 
 /// When high alarm rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alarm
 "alerts_highalerttitle" = "High Alarm";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "Senzor se kmalu izteče";
+"sensorExpiry.expectedExpiry" = "Predvideni iztek senzorja";
+"sensorExpiry.hoursBefore" = "Ure pred iztekom";
+"sensorExpiry.hoursHelp" = "Vnesite celo število od 1 do 48 ur.";
+"sensorExpiry.endingSoonBody" = "Predvidena življenjska doba senzorja se izteče %@.";
+"sensorExpiry.expectedExpiryBody" = "Senzor je dosegel predvideni iztek (%@).";

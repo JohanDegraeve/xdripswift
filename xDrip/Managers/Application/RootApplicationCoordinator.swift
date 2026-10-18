@@ -155,6 +155,11 @@ import AppIntents
     /// Owns sensor-health episodes, Home banner state and one-off notification deduplication.
     /// Only confirmed terminal failures cross from this manager into `AlertManager`.
     private let sensorHealthIssueManager = SensorHealthIssueManager()
+    private let sensorExpiryReminderManager = SensorExpiryReminderManager()
+    private var sensorExpirySourceSnapshot: SensorExpirySnapshot?
+    private var sensorExpiryObservers = [NSObjectProtocol]()
+    private var sensorExpiryIsReady = false
+    private var sensorExpiryRefreshPending = false
     
     /// reference to activeSensor
     private(set) var activeSensor:Sensor?
@@ -581,6 +586,7 @@ import AppIntents
             IntentDonationManager.shared.donate(intent: GlucoseIntent())
             
             self.updateSnoozeStatus()
+            self.reconcileSensorExpiryReminders(force: true)
             
             // update the connection status immediately (this will give the user a visual feedback that the connection was lost in the background if they have disabled keep-alive)
             self.setFollowerConnectionAndHeartbeatStatus()
@@ -743,6 +749,10 @@ import AppIntents
             backgroundKeepAliveManager: followerBackgroundKeepAliveManager
         )
         
+        // Restore the saved sensor details because the display start date is cleared at launch.
+        sensorExpirySourceSnapshot = sensorExpiryReminderManager.snapshot
+        configureSensorExpiryObservers()
+
         // setup libreLinkUpFollowManager
         libreLinkUpFollowManager = LibreLinkUpFollowManager(
             coreDataManager: coreDataManager,
@@ -976,6 +986,8 @@ import AppIntents
         
         // setup alertmanager
         alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
+        sensorExpiryIsReady = true
+        reconcileSensorExpiryReminders()
         if let alertManager {
             sensorHealthIssueManager.configure(oneOffAlarmRaiser: alertManager)
         }
@@ -1091,6 +1103,7 @@ import AppIntents
         // adjustment history and settings, including the timestamp-based source identity.
         guard bgPostProcessingManager?.correctSensorStartDate(activeSensor, to: detectedStartDate) == true else { return }
         sensorNoiseManager?.update(activeSensor: activeSensor)
+        reconcileSensorExpiryReminders()
     }
     
     /// Imports readings through the normal glucose path and acknowledges only saved samples.
@@ -2447,10 +2460,84 @@ import AppIntents
         publishRootHomeState()
     }
     
+    /// Update reminders when sensor details or alert settings change.
+    private func configureSensorExpiryObservers() {
+        let center = NotificationCenter.default
+        sensorExpiryObservers.append(center.addObserver(forName: SensorExpiryReminderManager.snapshotChanged, object: nil, queue: nil) { [weak self] notification in
+            let snapshot = notification.userInfo?[SensorExpiryReminderManager.snapshotKey] as? SensorExpirySnapshot
+            let source = notification.userInfo?[SensorExpiryReminderManager.sourceKey] as? String
+            Task { @MainActor [weak self] in
+                guard let self, !UserDefaults.standard.isMaster,
+                      source == SensorExpirySnapshot.currentSource() else { return }
+                self.sensorExpirySourceSnapshot = snapshot
+                self.reconcileSensorExpiryReminders()
+            }
+        })
+        for name in [UserDefaults.didChangeNotification, NSNotification.Name.NSManagedObjectContextDidSave] {
+            sensorExpiryObservers.append(center.addObserver(forName: name, object: nil, queue: nil) { [weak self] notification in
+                if name == .NSManagedObjectContextDidSave {
+                    let keys = [NSInsertedObjectsKey, NSUpdatedObjectsKey, NSDeletedObjectsKey]
+                    let changed = keys.flatMap { (notification.userInfo?[$0] as? Set<NSManagedObject>) ?? [] }
+                    guard changed.contains(where: { $0 is AlertEntry || $0 is AlertType }) else { return }
+                }
+                Task { @MainActor [weak self] in self?.queueSensorExpiryRefresh() }
+            })
+        }
+    }
+
+    private func queueSensorExpiryRefresh() {
+        guard sensorExpiryIsReady, !sensorExpiryRefreshPending else { return }
+        sensorExpiryRefreshPending = true
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            self.sensorExpiryRefreshPending = false
+            self.reconcileSensorExpiryReminders()
+        }
+    }
+
+    private func reconcileSensorExpiryReminders(force: Bool = false) {
+        guard sensorExpiryIsReady, let coreDataManager else { return }
+        let source = SensorExpirySnapshot.currentSource()
+        if UserDefaults.standard.isMaster {
+            if let source, let activeSensor, activeSensor.endDate == nil {
+                let identity = activeSensor.objectID.uriRepresentation().absoluteString
+                if let transmitter = bluetoothPeripheralManager?.getCGMTransmitter() {
+                    // Check the transmitter still matches the selected source during a source change.
+                    sensorExpirySourceSnapshot = transmitter.cgmTransmitterType() == UserDefaults.standard.cgmTransmitterType
+                        ? SensorExpirySnapshot(source: source, sessionID: identity,
+                            startDate: activeSensor.startDate, lifetimeDays: transmitter.maxSensorAgeInDays() ?? 0)
+                        : nil
+                } else if sensorExpirySourceSnapshot?.source != source || sensorExpirySourceSnapshot?.sessionID != identity {
+                    sensorExpirySourceSnapshot = nil
+                }
+            } else {
+                sensorExpirySourceSnapshot = nil
+            }
+        } else if let source, let snapshot = sensorExpirySourceSnapshot, snapshot.source == source {
+            // Use the LibreLinkUp lifetime setting for the current sensor.
+            sensorExpirySourceSnapshot = SensorExpirySnapshot(source: source, sessionID: snapshot.sessionID,
+                startDate: snapshot.startDate, lifetimeDays: UserDefaults.standard.libreLinkUpIs15DaySensor
+                    ? ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDaysLibrePlus : ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDays)
+        } else {
+            sensorExpirySourceSnapshot = nil
+        }
+
+        let entries = AlertEntriesAccessor(coreDataManager: coreDataManager)
+        let types = AlertTypesAccessor(coreDataManager: coreDataManager)
+        let configurations = [AlertKind.sensorEndingSoon, .sensorExpectedExpiry].map { kind in
+            let entry = entries.getCurrentAndNextAlertEntry(forAlertKind: kind, forWhen: Date(), alertTypesAccessor: types).currentAlertEntry
+            let sound = alertManager?.resolvedSoundFileName(for: entry.alertType)
+            return SensorExpiryReminderConfiguration(kind: kind, enabled: !entry.isDisabled && entry.alertType.enabled,
+                hoursBefore: Int(entry.value), soundName: sound)
+        }
+        sensorExpiryReminderManager.reconcile(snapshot: sensorExpirySourceSnapshot, configurations: configurations, force: force)
+    }
+
     /// update the data source information view and also the sensor progress view (if needed)
     private func updateDataSourceInfo() {
         defer {
             publishRootHomeState()
+            reconcileSensorExpiryReminders()
         }
 
         // check if there is an active sensor connected via cgmTransmitter in master mode
@@ -2564,6 +2651,7 @@ import AppIntents
         
         // assign activeSensor to newSensor
         activeSensor = newSensor
+        reconcileSensorExpiryReminders()
         sensorNoiseManager?.update(activeSensor: newSensor)
         loopManager?.shareMetadata(clearReadings: true, clearSensorState: true)
         updateLiveActivityAndWidgets(forceRestart: false)
@@ -2599,6 +2687,7 @@ import AppIntents
         
         // asign nil to activeSensor
         self.activeSensor = nil
+        reconcileSensorExpiryReminders()
         loopManager?.shareMetadata(clearReadings: true, sensorState: "stopped")
         
         // now that the activeSensor object has been destroyed, update (hide) the data source info
@@ -3247,6 +3336,8 @@ extension RootApplicationCoordinator: @preconcurrency UNUserNotificationCenterDe
             // so actually the app was in the foreground, at the  moment the Transmitter Class called the cgmTransmitterNeedsPairing function, there's no need to show the notification, we can immediately call back the cgmTransmitter initiatePairing function
             completionHandler([])
             bluetoothPeripheralManager?.initiatePairing()
+        } else if notification.request.identifier.hasPrefix(SensorExpiryReminderManager.notificationPrefix) {
+            completionHandler([.banner, .list, .sound])
         } else if notification.request.identifier.hasPrefix(SensorHealthIssueManager.notificationIdentifierPrefix) {
             let isTerminal = notification.request.content.userInfo[SensorHealthIssueManager.notificationIsTerminalUserInfoKey] as? Bool == true
 
@@ -3285,6 +3376,10 @@ extension RootApplicationCoordinator: @preconcurrency UNUserNotificationCenterDe
             presentAlert(title: Texts_Common.warning, message: Texts_HomeView.sensorNotDetected)
         } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
             // nothing required, the pairing function will be called as it's been added to ApplicationManager in function cgmTransmitterNeedsPairing
+        } else if response.notification.request.identifier.hasPrefix(SensorExpiryReminderManager.notificationPrefix) {
+            let identifier = response.notification.request.identifier
+            center.removePendingNotificationRequests(withIdentifiers: [identifier])
+            center.removeDeliveredNotifications(withIdentifiers: [identifier])
         } else if response.notification.request.identifier.hasPrefix(SensorHealthIssueManager.notificationIdentifierPrefix) {
             let notificationIdentifier = response.notification.request.identifier
             let isTerminal = response.notification.request.content.userInfo[SensorHealthIssueManager.notificationIsTerminalUserInfoKey] as? Bool == true

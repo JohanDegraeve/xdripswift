@@ -61,3 +61,11 @@
 
 "alertWhenBelowValue" = "Nur unter";
 "alertWhenAboveValue" = "Nur über";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "Sensor endet bald";
+"sensorExpiry.expectedExpiry" = "Voraussichtliches Sensorende";
+"sensorExpiry.hoursBefore" = "Stunden vor Ablauf";
+"sensorExpiry.hoursHelp" = "Gib eine ganze Zahl von 1 bis 48 Stunden ein.";
+"sensorExpiry.endingSoonBody" = "Die voraussichtliche Laufzeit deines Sensors endet am %@.";
+"sensorExpiry.expectedExpiryBody" = "Dein Sensor hat sein voraussichtliches Ende erreicht (%@).";
