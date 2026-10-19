@@ -19,3 +19,6 @@
 
 /// 
 "alertTypeNoSound" = "No Sound";
+
+"alerttypesettingsview_repeatsound" = "重复声音";
+"alerttypesettingsview_previewalert" = "预览警报";

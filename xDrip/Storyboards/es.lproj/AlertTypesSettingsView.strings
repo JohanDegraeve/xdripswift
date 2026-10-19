@@ -13,3 +13,6 @@
 "alertTypeNoSound" = "Sin Sonido";
 "alerttypenamealreadyexistsmessages" = "Ya existe un Tipo de Alarma con este nombre. Usar otro nombre";
 "confirmdeletionalerttype" = "Borrar Tipo de Alarma: ";
+
+"alerttypesettingsview_repeatsound" = "Repetir sonido";
+"alerttypesettingsview_previewalert" = "Probar alarma";

@@ -16,3 +16,6 @@
 
 /// when editing an alert type, field title for Sound
 "alerttypesettingsview_sound" = "Son";
+
+"alerttypesettingsview_repeatsound" = "Répéter le son";
+"alerttypesettingsview_previewalert" = "Tester l’alarme";

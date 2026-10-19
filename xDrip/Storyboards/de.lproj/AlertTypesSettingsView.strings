@@ -44,3 +44,6 @@
 
 /// shown on top of the screen that allows user to edit an alert type
 "alerttypesettingsview_screentitle" = "Alarm Typ bearbeiten";
+
+"alerttypesettingsview_repeatsound" = "Ton wiederholen";
+"alerttypesettingsview_previewalert" = "Alarm vorhören";

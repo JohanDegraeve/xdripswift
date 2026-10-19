@@ -49,3 +49,6 @@
 
 /// when selecting the sound of an alert type, 
 "alerttypesettingsview_picksoundname" = "Sound Name";
+
+"alerttypesettingsview_repeatsound" = "Повторювати звук";
+"alerttypesettingsview_previewalert" = "Прослухати сигнал";

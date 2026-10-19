@@ -34,6 +34,10 @@ class Texts_AlertTypeSettingsView {
         return NSLocalizedString("alerttypesettingsview_overridemute", tableName: filename, bundle: Bundle.main, value: "Override Mute", comment: "when editing an alert type, field title for Override Mute")
     }()
     
+    static let previewAlert = NSLocalizedString("alerttypesettingsview_previewalert", tableName: filename, bundle: .main, value: "Preview Alert", comment: "Play or pause the current alarm sound")
+
+    static let alertTypeRepeatSound = NSLocalizedString("alerttypesettingsview_repeatsound", tableName: filename, bundle: .main, value: "Repeat Sound", comment: "Repeat immediate alarm audio until acknowledged")
+
     static let alertTypeSound: String = {
         return NSLocalizedString("alerttypesettingsview_sound", tableName: filename, bundle: Bundle.main, value: "Sound", comment: "when editing an alert type, field title for Sound")
     }()

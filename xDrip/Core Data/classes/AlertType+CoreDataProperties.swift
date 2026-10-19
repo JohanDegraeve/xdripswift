@@ -25,6 +25,7 @@ extension AlertType {
     @NSManaged public var soundname: String?
     @NSManaged public var alertEntries: NSSet?
     @NSManaged public var overridemute: Bool
+    @NSManaged public var repeatSound: Bool
 
 }
 

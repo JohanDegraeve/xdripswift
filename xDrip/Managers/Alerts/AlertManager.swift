@@ -1,5 +1,6 @@
 import AudioToolbox
 import Foundation
+import CoreData
 import os
 import UserNotifications
 import SwiftUI
@@ -55,7 +56,25 @@ public class AlertManager: NSObject {
     
     /// playSound instance
     private var soundPlayer: SoundPlayer?
-    
+
+    static let playbackCycleKey = "alarmPlaybackCycle"
+
+    private struct AlarmPlayback {
+        let kind: AlertKind
+        let cycleID: String
+        let alertType: AlertType
+        let entry: AlertEntry?
+        let repeats: Bool
+    }
+
+    private var activeAlarm: AlarmPlayback?
+    private var alarmConfigurationObserver: NSObjectProtocol?
+
+    var protectedAlarmNotificationIdentifier: String? {
+        guard let activeAlarm, activeAlarm.repeats else { return nil }
+        return activeAlarm.kind.notificationIdentifier()
+    }
+
     /// snooze parameters
     private var snoozeParameters = [SnoozeParameters]()
     
@@ -101,13 +120,21 @@ public class AlertManager: NSObject {
         // need to set the alert notification categories, get the existing categories first, call setAlertNotificationCategories in competionhandler
         UNUserNotificationCenter.current().getNotificationCategories(completionHandler: setAlertNotificationCategories(_:))
         
-        // alertManager may have raised an alert with a sound played by soundplayer. If user brings the app to the foreground, the soundPlayer needs to stop playing
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyStopPlayingSound, closure: {
-            if let soundPlayer = soundPlayer {
-                soundPlayer.stopPlaying()
-            }
-            
+        // Opening the app acknowledges any sound still playing.
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyStopPlayingSound, closure: { [weak self] in
+            self?.stopAlarmSound()
         })
+
+        // Saved settings can disable a repeating alarm between reading checks.
+        alarmConfigurationObserver = NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: coreDataManager.mainManagedObjectContext, queue: .main) { [weak self] notification in
+            guard let self, let active = self.activeAlarm, active.repeats else { return }
+            let changed = [NSUpdatedObjectsKey, NSDeletedObjectsKey].flatMap {
+                (notification.userInfo?[$0] as? Set<NSManagedObject>) ?? []
+            }
+            if changed.contains(where: { $0 === active.alertType || $0 === active.entry }) {
+                self.validateRepeatingAlarm()
+            }
+        }
         
         // add observer for changes in UserDefaults
         addObservers()
@@ -121,14 +148,15 @@ public class AlertManager: NSObject {
     /// - returns:
     ///     - if true then an immediate notification is created (immediate being not a future planned, like missed reading), which contains the bg reading in the text - so there's no need to create an additional notificationwith the text in it
     public func checkAlerts(maxAgeOfLastBgReadingInSeconds: Double) -> Bool {
-        // Remove delivered alerts so only the most relevant one is shown after checking the latest reading.
-        uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: alertNotificationIdentifers)
+        // Keep the repeating alarm available for snoozing from its notification.
+        validateRepeatingAlarm()
+        uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: alertNotificationIdentifers.filter { $0 != protectedAlarmNotificationIdentifier })
         
         // Do not return early for Snooze All. Each enabled alert must still evaluate its condition so
         // the consumer log can explain that a real alarm condition was suppressed by the snooze.
         if let snoozeAllAlertsUntilDate = UserDefaults.standard.snoozeAllAlertsUntilDate, snoozeAllAlertsUntilDate > Date() {
             // Snooze All still cancels pending alerts, even when the latest reading is stale.
-            uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: alertNotificationIdentifers + [AlertKind.notlooping.notificationIdentifier()])
+            removePendingAlertsPreservingPlayback()
             trace("in checkAlerts, skipping as Snooze All is enabled for the next %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .info, snoozeAllAlertsUntilDate.daysAndHoursRemaining())
         }
         
@@ -154,7 +182,7 @@ public class AlertManager: NSObject {
             if abs(lastBgReading.timeStamp.timeIntervalSinceNow) < maxAgeOfLastBgReadingInSeconds {
                 // Only clear pending alerts when we can rebuild them from a fresh reading.
                 // Otherwise a stale reading would cancel the planned missed reading alert, including its snooze.
-                uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: alertNotificationIdentifers + [AlertKind.notlooping.notificationIdentifier()])
+                removePendingAlertsPreservingPlayback()
 
                 // reading is maxAgeOfLastBgReadingInSeconds seconds old, let's check the alerts
                 // need to call checkAlert
@@ -294,7 +322,7 @@ public class AlertManager: NSObject {
     /// creating a snooze picker. Removing both notification states also prevents a delivered or
     /// not-yet-delivered copy from remaining after the app opens.
     func clearOneOffSensorFailureAlarm(notificationIdentifier: String) {
-        soundPlayer?.stopPlaying()
+        stopAlarmSound(alertKind: .sensorTransmitterFailure)
         uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: [notificationIdentifier])
         uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: [notificationIdentifier])
     }
@@ -302,17 +330,7 @@ public class AlertManager: NSObject {
     /// Applies sound behavior from an Alert Type without adding a snooze notification category.
     /// Terminal failures are episode-deduplicated and never repeat or join Snooze All.
     private func applyImmediatePresentation(from alertType: AlertType, to content: UNMutableNotificationContent) {
-        let soundFileName = resolvedSoundFileName(for: alertType)
-
-        if alertType.overridemute {
-            guard soundFileName != "" else { return }
-            soundPlayer?.playSound(soundFileName: soundFileName ?? "xdripalert.aif")
-        } else if let soundFileName {
-            guard !soundFileName.isEmpty else { return }
-            content.sound = UNNotificationSound(named: UNNotificationSoundName(soundFileName))
-        } else {
-            content.sound = .default
-        }
+        presentImmediateSound(alertKind: .sensorTransmitterFailure, alertType: alertType, entry: nil, soundFileName: resolvedSoundFileName(for: alertType), content: content)
     }
 
     /// Resolves the user-facing Alarm Type sound name to its bundled sound file.
@@ -405,9 +423,7 @@ public class AlertManager: NSObject {
         loop: for alertKind in AlertKind.allCases {
             if response.notification.request.identifier == alertKind.notificationIdentifier() {
                 // user clicked an alert notification, time to stop playing if play
-                if let soundPlayer = soundPlayer {
-                    soundPlayer.stopPlaying()
-                }
+                stopAlarmSound(alertKind: alertKind, content: response.notification.request.content)
                 
                 switch response.actionIdentifier {
                 case snoozeActionIdentifier:
@@ -541,6 +557,10 @@ public class AlertManager: NSObject {
         // find the default snooze period, so we can set selectedRow in the pickerviewdata
         let defaultSnoozePeriodInMinutes = Int(alertEntriesAccessor.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypesAccessor: alertTypesAccessor).currentAlertEntry.alertType.snoozeperiod)
         
+        // An older snooze picker must not stop a newer alarm of the same kind.
+        let pickerCycleID = content?.userInfo[Self.playbackCycleKey] as? String
+            ?? (activeAlarm?.kind == alertKind ? activeAlarm?.cycleID : nil)
+            ?? UUID().uuidString
         var defaultRow = 0
         for (index, _) in ConstantsAlerts.snoozeValueMinutes.enumerated() {
             if ConstantsAlerts.snoozeValueMinutes[index] > defaultSnoozePeriodInMinutes {
@@ -555,9 +575,7 @@ public class AlertManager: NSObject {
                                   (snoozeIndex: Int) in
             
                                   // if sound is currently playing then stop it
-                                  if let soundPlayer = self.soundPlayer {
-                                      soundPlayer.stopPlaying()
-                                  }
+                                  self.stopAlarmSound(alertKind: alertKind, cycleID: pickerCycleID)
             
                                   // get snooze period
                                   let snoozePeriod = ConstantsAlerts.snoozeValueMinutes[snoozeIndex]
@@ -601,9 +619,7 @@ public class AlertManager: NSObject {
                                   () in
             
                                   // if sound is currently playing then stop it
-                                  if let soundPlayer = self.soundPlayer {
-                                      soundPlayer.stopPlaying()
-                                  }
+                                  self.stopAlarmSound(alertKind: alertKind, cycleID: pickerCycleID)
             
                                   // if cancelHandler supplied by caller not nil, then execute it
                                   cancelHandler?()
@@ -618,6 +634,7 @@ public class AlertManager: NSObject {
     ///     - snoozePeriodInMinutes
     ///     - response  the UNNotificationResponse received from iOS when user clicks the notification
     public func snooze(alertKind: AlertKind, snoozePeriodInMinutes: Int, response: UNNotificationResponse?) {
+        stopAlarmSound(alertKind: alertKind, content: response?.notification.request.content)
         // A response means the user snoozed a notification that had already fired. Calls without a
         // response prepare the alert ahead of a possible condition, such as the short automatic
         // rise/drop suppression after calibration, and must be described as a pre-snooze.
@@ -677,6 +694,11 @@ public class AlertManager: NSObject {
         if let keyPath = keyPath {
             if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
                 switch keyPathEnum {
+                case UserDefaults.Key.snoozeAllAlertsUntilDate:
+                    if let until = UserDefaults.standard.snoozeAllAlertsUntilDate, until > Date() {
+                        stopAlarmSound()
+                    }
+
                 case UserDefaults.Key.missedReadingAlertChanged:
                     
                     // if missedReadingAlertChanged didn't change to true then no further processing
@@ -689,6 +711,7 @@ public class AlertManager: NSObject {
 
                 case UserDefaults.Key.notLoopingAlertChanged:
                     guard UserDefaults.standard.notLoopingAlertChanged else { return }
+                    stopAlarmSound(alertKind: .notlooping)
 
                     clearNotLoopingNotifications()
                     resetNotLoopingNotificationThrottle()
@@ -696,6 +719,7 @@ public class AlertManager: NSObject {
                     UserDefaults.standard.notLoopingAlertChanged = false
 
                 case UserDefaults.Key.nightscoutEnabled, UserDefaults.Key.nightscoutFollowType:
+                    stopAlarmSound(alertKind: .notlooping)
                     clearNotLoopingNotifications()
                     resetNotLoopingNotificationThrottle()
                     
@@ -706,6 +730,63 @@ public class AlertManager: NSObject {
         }
     }
 
+    /// Keep independent reminders and the active repeating alarm when rebuilding pending alerts.
+    private func removePendingAlertsPreservingPlayback() {
+        let protected = protectedAlarmNotificationIdentifier
+        let identifiers = alertNotificationIdentifers + [AlertKind.notlooping.notificationIdentifier()]
+        uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: identifiers.filter { $0 != protected })
+    }
+
+    /// Keep a repeating alarm audible unless an equally urgent or more urgent sound replaces it.
+    func presentImmediateSound(alertKind: AlertKind, alertType: AlertType, entry: AlertEntry?, soundFileName: String?, content: UNMutableNotificationContent) {
+        guard soundFileName != "" else { return }
+        if let active = activeAlarm, active.repeats {
+            guard active.kind != alertKind else { return }
+            guard alertKind.alertUrgencyType().rawValue <= active.kind.alertUrgencyType().rawValue else { return }
+        }
+
+        stopAlarmSound()
+        guard alertType.overridemute else {
+            content.sound = soundFileName.map { UNNotificationSound(named: UNNotificationSoundName($0)) } ?? .default
+            return
+        }
+        guard let soundPlayer else { return }
+        let cycleID = UUID().uuidString
+        let repeats = alertType.repeatSound && alertKind != .sensorTransmitterFailure
+            && !alertKind.isSensorExpiryReminder && alertKind != .missedreading
+        activeAlarm = AlarmPlayback(kind: alertKind, cycleID: cycleID, alertType: alertType, entry: entry, repeats: repeats)
+        content.userInfo[Self.playbackCycleKey] = cycleID
+        let repeatVibration: (() -> Void)? = alertType.vibrate ? { [weak alertType] in
+            if alertType?.vibrate == true { AudioServicesPlaySystemSound(kSystemSoundID_Vibrate) }
+        } : nil
+        soundPlayer.playSound(soundFileName: soundFileName ?? "xdripalert.aif", repeatSound: repeats, repeatVibration: repeatVibration) { [weak self] in
+            guard let self, self.activeAlarm?.cycleID == cycleID else { return }
+            self.activeAlarm = nil
+        }
+    }
+
+    /// Ignore actions from notifications or pickers created for an older alarm.
+    func stopAlarmSound(alertKind: AlertKind? = nil, cycleID: String? = nil, content: UNNotificationContent? = nil) {
+        if let alertKind {
+            guard let active = activeAlarm, active.kind == alertKind else { return }
+            let expectedCycleID = cycleID ?? (content?.userInfo[Self.playbackCycleKey] as? String)
+            if let expectedCycleID, expectedCycleID != active.cycleID { return }
+            if content != nil && expectedCycleID == nil && active.repeats { return }
+        }
+        activeAlarm = nil
+        soundPlayer?.stopPlaying()
+    }
+
+    /// Check saved settings without treating the repeat throttle as a user snooze.
+    func validateRepeatingAlarm() {
+        guard let active = activeAlarm, active.repeats else { return }
+        let type = active.alertType
+        if type.isDeleted || !type.enabled || !type.overridemute || !type.repeatSound || type.soundname == ""
+            || active.entry?.isDeleted == true || active.entry?.isDisabled == true
+            || (active.entry != nil && active.entry?.alertType !== type) {
+            stopAlarmSound(alertKind: active.kind, cycleID: active.cycleID)
+        }
+    }
 
     // MARK: - private helper functions
     
@@ -813,6 +894,9 @@ public class AlertManager: NSObject {
         // get the applicable current and next alertType from core data
         let (currentAlertEntry, nextAlertEntry) = alertEntriesAccessor.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypesAccessor: alertTypesAccessor)
         
+        validateRepeatingAlarm()
+        if activeAlarm?.kind == alertKind, activeAlarm?.repeats == true { return false }
+
         // first we'll check if the user has intentionally disabled the alert kind. If so, then just return without doing any more
         if currentAlertEntry.isDisabled {
             trace("in checkAlertAndFire, alert '%{public}@' is disabled", log: log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
@@ -1054,28 +1138,16 @@ public class AlertManager: NSObject {
                 soundToSet = "xdripalert.aif"
             }
             
-            // assign the sound to the notification, or play it here, depending on value
-            if let soundToSet = soundToSet {
-                if soundToSet == "" {
-                    // no sound to play
-                } else {
-                    // if override mute is on, then play the sound via code here
-                    // also delayInSeconds must be nil, if delayInSeconds is not nil then we can not play the sound here at now, it must be added to the notification
-                    if applicableAlertType.overridemute && delayInSecondsToUse == 0 {
-                        // play the sound
-                        if let soundPlayer = soundPlayer {
-                            soundPlayer.playSound(soundFileName: soundToSet)
-                        }
-                    } else {
-                        // mute should not be overriden, by adding the sound to the notification, we let iOS decide if the sound will be played or not
-                        content.sound = UNNotificationSound(named: UNNotificationSoundName(soundToSet))
-                    }
+            if delayInSecondsToUse == 0 {
+                presentImmediateSound(alertKind: alertKind, alertType: applicableAlertType, entry: currentAlertEntry, soundFileName: soundToSet, content: content)
+            } else if let soundToSet {
+                if !soundToSet.isEmpty {
+                    content.sound = UNNotificationSound(named: UNNotificationSoundName(soundToSet))
                 }
             } else {
-                // default sound to be played
                 content.sound = UNNotificationSound(named: UNNotificationSoundName(""))
             }
-            
+
             // create the trigger, only for notifications with delay
             var trigger: UNTimeIntervalNotificationTrigger?
             if delayInSecondsToUse > 0 {
@@ -1196,6 +1268,7 @@ public class AlertManager: NSObject {
 
     /// when user changes M5Stack related settings, then the transmitter need to get that info, add observers
     private func addObservers() {
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.snoozeAllAlertsUntilDate.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.missedReadingAlertChanged.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.notLoopingAlertChanged.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutEnabled.rawValue, options: .new, context: nil)
@@ -1203,6 +1276,7 @@ public class AlertManager: NSObject {
     }
 
     private func clearNotLoopingNotifications() {
+        guard protectedAlarmNotificationIdentifier != AlertKind.notlooping.notificationIdentifier() else { return }
         uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: [AlertKind.notlooping.notificationIdentifier()])
         uNUserNotificationCenter.removePendingNotificationRequests(withIdentifiers: [AlertKind.notlooping.notificationIdentifier()])
     }
@@ -1218,6 +1292,9 @@ public class AlertManager: NSObject {
     }
 
     deinit {
+        if let alarmConfigurationObserver { NotificationCenter.default.removeObserver(alarmConfigurationObserver) }
+        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyStopPlayingSound)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.snoozeAllAlertsUntilDate.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.missedReadingAlertChanged.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.notLoopingAlertChanged.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutEnabled.rawValue)

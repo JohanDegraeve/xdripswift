@@ -13,3 +13,6 @@
 "alertTypeNoSound" = "Ei ääntä";
 "alerttypenamealreadyexistsmessages" = "Tämän niminen hälytystyyppi on jo olemassa. Vaihda nimi";
 "confirmdeletionalerttype" = "Haluatko poistaa hälytystyypin nimellä ";
+
+"alerttypesettingsview_repeatsound" = "Toista ääntä";
+"alerttypesettingsview_previewalert" = "Esikuuntele hälytys";

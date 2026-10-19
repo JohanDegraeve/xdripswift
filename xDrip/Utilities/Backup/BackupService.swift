@@ -647,7 +647,8 @@ final class BackupService: @unchecked Sendable {
                 snoozePeriod: alertType.snoozeperiod,
                 soundName: alertType.soundname,
                 vibrate: alertType.vibrate,
-                entries: entries.sorted { $0.start < $1.start }
+                entries: entries.sorted { $0.start < $1.start },
+                repeatSound: alertType.repeatSound
             )
         }
     }
@@ -928,7 +929,8 @@ final class BackupService: @unchecked Sendable {
                 vibrate: record.vibrate,
                 soundName: record.soundName,
                 alertEntries: nil,
-                nsManagedObjectContext: context
+                nsManagedObjectContext: context,
+                repeatSound: record.repeatSound ?? false
             )
             for entry in record.entries {
                 guard let kind = AlertKind(rawValue: Int(entry.alertKind)) else { continue }

@@ -158,7 +158,6 @@ struct SettingsNavigationView: View {
             AlertTypeEditorView(
                 alertType: alertType,
                 coreDataManager: coreDataManager,
-                soundPlayer: soundPlayer,
                 close: {
                     router.closeCurrentView()
                     listViewModel.reload()

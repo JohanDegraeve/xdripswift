@@ -13,3 +13,6 @@
 "alertTypeNoSound" = "Ses yok";
 "alerttypenamealreadyexistsmessages" = "Bu isme sahip bir uyarı tipi zaten mevcut. Farklı bir isim kullanın";
 "confirmdeletionalerttype" = "Uyarı tipini sil: ";
+
+"alerttypesettingsview_repeatsound" = "Sesi Tekrarla";
+"alerttypesettingsview_previewalert" = "Alarmı Önizle";

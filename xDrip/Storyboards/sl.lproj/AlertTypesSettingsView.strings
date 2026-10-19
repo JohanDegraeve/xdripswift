@@ -49,3 +49,6 @@
 
 /// when editing an alert type, field title for Vibrate
 "alerttypesettingsview_vibrate" = "Vibrate";
+
+"alerttypesettingsview_repeatsound" = "Ponavljaj zvok";
+"alerttypesettingsview_previewalert" = "Predogled alarma";
