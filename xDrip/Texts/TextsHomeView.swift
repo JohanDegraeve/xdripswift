@@ -915,10 +915,6 @@ enum Texts_HomeView {
         return NSLocalizedString("showHideStandByModeFooter", tableName: filename, bundle: Bundle.main, value: "Changes how the StandBy mode will be displayed if activated in the iPhone settings", comment: "quick show hide footer for standby settings")
     }()
 
-    static let showHideAdditionalItemsTitle: String = {
-        return NSLocalizedString("showHideAdditionalItemsTitle", tableName: filename, bundle: Bundle.main, value: "Alerts and Speech", comment: "quick controls for alerts and spoken readings")
-    }()
-    
     static let postProcessingTitle: String = {
         return NSLocalizedString("postProcessingTitle", tableName: filename, bundle: Bundle.main, value: "Glucose Adjustments", comment: "title for the blood glucose post processing view")
     }()
@@ -929,10 +925,6 @@ enum Texts_HomeView {
 
     static let postProcessingAdjustment: String = {
         return NSLocalizedString("postProcessingAdjustment", tableName: filename, bundle: Bundle.main, value: "Adjustment", comment: "post processing section title for adjustment")
-    }()
-
-    static let postProcessingEnable: String = {
-        return NSLocalizedString("postProcessingEnable", tableName: filename, bundle: Bundle.main, value: "Enable", comment: "post processing enable toggle title")
     }()
 
     static let postProcessingOffset: String = {

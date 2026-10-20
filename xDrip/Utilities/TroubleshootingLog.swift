@@ -38,6 +38,7 @@ enum TroubleshootingLogSource: String, Codable {
     case miaoMiao
     case bubble
     case libre2
+    case libre3
     case libre2EU
     case libre2PlusEU
     case medtrumNano
@@ -91,6 +92,7 @@ enum TroubleshootingLogSource: String, Codable {
             self = .miaoMiao
         case .Bubble:
             self = .bubble
+        case .Libre3: self = .libre3
         case .Libre2:
             self = description == "Libre 2 Plus EU" ? .libre2PlusEU : .libre2EU
         case .medtrumTouchCareNano:
@@ -126,6 +128,7 @@ enum TroubleshootingLogSource: String, Codable {
             self = .miaoMiao
         case .BubbleType:
             self = .bubble
+        case .Libre3Type: self = .libre3
         case .Libre2Type:
             self = .libre2
         case .MedtrumTouchCareNanoType:
@@ -148,6 +151,7 @@ enum TroubleshootingLogSource: String, Codable {
         case .dexcomStelo: return "Dexcom Stelo"
         case .miaoMiao: return "MiaoMiao"
         case .bubble: return "Bubble"
+        case .libre3: return "Libre 3/3 Plus"
         case .libre2: return "Libre 2/2+ EU"
         case .libre2EU: return "Libre 2 EU"
         case .libre2PlusEU: return "Libre 2 Plus EU"
@@ -170,7 +174,7 @@ enum TroubleshootingLogSource: String, Codable {
              .medtrumEasyView, .calendar, .careLink:
             return true
         case .dexcom, .dexcomG5, .dexcomG6, .dexcomOne, .dexcomG7, .dexcomOnePlus,
-             .dexcomStelo, .miaoMiao, .bubble, .libre2, .libre2EU, .libre2PlusEU,
+             .dexcomStelo, .miaoMiao, .bubble, .libre3, .libre2, .libre2EU, .libre2PlusEU,
              .medtrumNano:
             return false
         }
@@ -237,9 +241,8 @@ enum TroubleshootingBluetoothDeviceActivity: String, Codable {
 
 /// High-level actions and outcomes for the configured direct CGM.
 ///
-/// These cases intentionally describe only things the user asked the app to do, plus the single
-/// successful connection that completes that request. Routine radio connect/disconnect cycles stay
-/// in developer tracing because exposing them would make a healthy Dexcom-style session look broken.
+/// Keep explicit user actions and meaningful operating changes. Routine radio cycles and successful
+/// cached authentication stay in developer tracing unless they complete a request or resolve a problem.
 enum TroubleshootingCGMActivity: String, Codable {
     case addingStarted
     case connectionRequested
@@ -252,6 +255,20 @@ enum TroubleshootingCGMActivity: String, Codable {
     case nfcScanCancelled
     case nfcScanTimedOut
     case nfcUnavailable
+    case authenticationStarted
+    case authenticationSucceeded
+    case authenticationFailed
+    case authenticationRecovered
+    case recoveryRequired
+    case credentialsUnavailable
+    case credentialsReady
+    case accountLookupStarted
+    case accountLookupSucceeded
+    case accountLookupFailed
+    case accountLookupCancelled
+    case sensorCheckRequired
+    case sensorExpired
+    case sensorOkay
 }
 
 /// Safe follower milestones. Counts are allowed. Response bodies and server errors are not.
@@ -539,6 +556,7 @@ enum TroubleshootingConfigurationActivity: Codable, Equatable {
     case dexcomBluetoothChannelChanged(TroubleshootingDexcomBluetoothChannel)
     case therapySourceChanged(TroubleshootingTherapySource)
     case liveActivityChanged(TroubleshootingLiveActivityMode)
+    case dexcomShareUploadChanged(enabled: Bool)
     case aidFollowerChanged(TroubleshootingAIDFollowerMode)
     case patientAliasChanged(isSet: Bool)
     case credentialChanged(source: TroubleshootingLogSource, field: TroubleshootingCredentialField, isSet: Bool)
@@ -693,14 +711,19 @@ enum TroubleshootingSensorHealthAlert: String, Codable, Equatable {
     case dexcomSensorFailure
     case dexcomTransmitterFailure
     case libreSensorFailure
+    case libreTemporarySensorIssue
     case dexcomTransmitterBatteryFailure
 }
 
-/// User-understandable stages of a sensor session without hardware identifiers or raw packets.
+/// User-understandable stages of a sensor session. Libre 3 recovery identifiers stay outside
+/// shared reports, including reports containing events from earlier test installations.
 enum TroubleshootingSensorActivity: Codable, Equatable {
     case detected
     case started
     case startedWithCode(sensorCode: String)
+    case libre3NFC(confirmed: Bool)
+    // Retained only to decode events recorded by earlier Libre 3 test installations.
+    case libre3ReceiverID(sensorSerial: String, receiverID: UInt32, confirmed: Bool)
     case warmingUp(minutesRemaining: Int)
     case stopped
     case notDetected
@@ -747,6 +770,9 @@ enum TroubleshootingAlertActivity: Codable, Equatable {
 /// A closed list of optional destinations whose sharing result can be exposed safely.
 enum TroubleshootingIntegration: String, Codable {
     case nightscout
+    case dexcomShareUpload
+    // Account verification must not clear an outstanding upload failure.
+    case dexcomShareUploadAccount
     case nightscoutImport
     case nightscoutBackfill
     case healthKit
@@ -759,6 +785,8 @@ enum TroubleshootingIntegration: String, Codable {
     var name: String {
         switch self {
         case .nightscout: return "Nightscout"
+        case .dexcomShareUpload: return "Dexcom Share upload"
+        case .dexcomShareUploadAccount: return "Dexcom Share upload account"
         case .nightscoutImport: return "Nightscout import"
         case .nightscoutBackfill: return "Nightscout backfill"
         case .healthKit: return "Apple Health"
@@ -1217,6 +1245,9 @@ final class TroubleshootingLogStore {
         var bluetoothHealth = OperationalHealthState.healthy
         var pendingBluetoothConnectionName: TroubleshootingBluetoothDeviceName?
         var pendingCGMConnection: TroubleshootingLogSource?
+        var cgmAuthentication = [TroubleshootingLogSource: TroubleshootingCGMActivity]()
+        var cgmCredentialProblems = Set<TroubleshootingLogSource>()
+        var cgmSensorStatus = [TroubleshootingLogSource: TroubleshootingCGMActivity]()
         var lastAppActivity: TroubleshootingAppActivity?
         var lastSensorActivity: TroubleshootingSensorActivity?
         var lastSensorNoiseAt: Date?
@@ -1282,9 +1313,14 @@ final class TroubleshootingLogStore {
 
             case let .bluetoothDevice(name, activity):
                 switch activity {
-                case .added, .reconnectedToExisting:
-                    // These are discrete outcomes of an explicit Add scan.
+                case .added:
+                    // A discovered device is a discrete Add outcome, but is not connected yet.
                     result.append(entry)
+                case .reconnectedToExisting:
+                    result.append(entry)
+                    // A stored recovery must also restore replay state. Otherwise the next
+                    // healthy heartbeat is converted into another recovery on every append.
+                    bluetoothHealth = .healthy
                 case .connectionRequested:
                     // A saved non-CGM device was explicitly enabled by the user. Retain the action
                     // and let the next matching healthy connection provide its decisive outcome.
@@ -1321,6 +1357,10 @@ final class TroubleshootingLogStore {
                     // inspecting an arbitrary CoreBluetooth peripheral name later.
                     result.append(entry)
                     pendingCGMConnection = source
+                    if activity == .addingStarted {
+                        cgmAuthentication.removeValue(forKey: source)
+                        cgmSensorStatus.removeValue(forKey: source)
+                    }
                 case .connected:
                     // CGMs such as Dexcom may make a healthy connection for every reading. Retain the
                     // connection only when it completes the user's pending Add/Connect action, or when
@@ -1340,16 +1380,58 @@ final class TroubleshootingLogStore {
                     // normal between-reading radio disconnect, so every user action remains visible.
                     result.append(entry)
                     pendingCGMConnection = nil
+                    // A manual disconnect does not resolve an authentication or sensor problem.
+                    if activity == .removed {
+                        cgmAuthentication.removeValue(forKey: source)
+                        cgmSensorStatus.removeValue(forKey: source)
+                    }
                 case .nfcScanStarted, .nfcScanSucceeded:
                     // One NFC session has one start and one outcome. Retries are separate actions and
                     // are useful when explaining why Libre Bluetooth streaming never began.
                     result.append(entry)
+                    if activity == .nfcScanStarted { pendingCGMConnection = source }
                 case .nfcScanFailed, .nfcScanCancelled, .nfcScanTimedOut, .nfcUnavailable:
                     // An unsuccessful NFC session ends this Add/Connect attempt. Clearing the pending
                     // source is essential: a later connection from some other configured CGM must not
                     // be misreported as the completion of the abandoned Libre action.
                     result.append(entry)
                     pendingCGMConnection = nil
+                case .authenticationStarted:
+                    // Fresh pairing is useful setup context. Retrying a failure must not reset it.
+                    if cgmAuthentication[source] == nil {
+                        result.append(entry)
+                        cgmAuthentication[source] = activity
+                    }
+                case .authenticationFailed, .recoveryRequired:
+                    if cgmAuthentication[source] != activity {
+                        result.append(entry)
+                        cgmAuthentication[source] = activity
+                    }
+                case .authenticationSucceeded:
+                    // A healthy cached reconnect is normal, not a new pairing or recovery.
+                    if cgmAuthentication[source] == .authenticationFailed || cgmAuthentication[source] == .recoveryRequired {
+                        result.append(entry.replacingKind(.cgm(source: source, activity: .authenticationRecovered)))
+                    } else if cgmAuthentication[source] == .authenticationStarted {
+                        result.append(entry)
+                    }
+                    cgmAuthentication[source] = activity
+                case .authenticationRecovered:
+                    // Recovery rows are already normalized when a persisted history is replayed.
+                    result.append(entry)
+                    cgmAuthentication[source] = .authenticationSucceeded
+                case .credentialsUnavailable:
+                    if cgmCredentialProblems.insert(source).inserted { result.append(entry) }
+                case .credentialsReady:
+                    if cgmCredentialProblems.remove(source) != nil { result.append(entry) }
+                case .accountLookupStarted, .accountLookupSucceeded, .accountLookupFailed, .accountLookupCancelled:
+                    // Each lookup is an explicit user action, not background account polling.
+                    result.append(entry)
+                case .sensorCheckRequired, .sensorExpired:
+                    if cgmSensorStatus[source] != activity { result.append(entry) }
+                    cgmSensorStatus[source] = activity
+                case .sensorOkay:
+                    if cgmSensorStatus[source] == .sensorCheckRequired { result.append(entry) }
+                    cgmSensorStatus[source] = activity
                 }
 
             case let .follower(source, activity):
@@ -1833,8 +1915,9 @@ struct TroubleshootingLogAppInfo: Equatable {
             ],
             integrationLines: [
                 "Nightscout uploads: \(nightscoutUploadsEnabled ? "Enabled" : "Disabled")",
+                "Dexcom Share uploads: \(defaults.uploadReadingstoDexcomShare && defaults.isMaster ? "Enabled" : "Disabled")",
                 "Apple Health: \(defaults.storeReadingsInHealthkit ? "Enabled" : "Disabled")",
-                "Live Activity: \(defaults.liveActivityType.debugDescription)",
+                "Live Activity: \(defaults.liveActivitiesEnabled ? defaults.liveActivityType.debugDescription : "Disabled")",
                 "Calendar sharing: \(defaults.createCalendarEvent ? "Enabled" : "Disabled")",
                 "OS-AID sharing: \(osAidDescription)"
             ]
@@ -1853,6 +1936,32 @@ struct TroubleshootingLogReportBuilder {
     let appInfo: TroubleshootingLogAppInfo
     let generatedAt: Date
     let timeZone: TimeZone
+
+    // A retained overnight history can contain thousands of rows. Creating and initializing ICU
+    // date formatters for every row made building the ShareLink block the main thread long enough
+    // for the scene-update watchdog to terminate the app. Each immutable report reuses its formatters.
+    private let timeFormatter: DateFormatter
+    private let dayFormatter: DateFormatter
+    private let shortDateTimeFormatter: DateFormatter
+    private let fullDateFormatter: DateFormatter
+
+    init(
+        entries: [TroubleshootingLogEntry],
+        usesMgDl: Bool,
+        appInfo: TroubleshootingLogAppInfo,
+        generatedAt: Date,
+        timeZone: TimeZone
+    ) {
+        self.entries = entries
+        self.usesMgDl = usesMgDl
+        self.appInfo = appInfo
+        self.generatedAt = generatedAt
+        self.timeZone = timeZone
+        timeFormatter = Self.timeFormatter(timeZone: timeZone)
+        dayFormatter = Self.dayFormatter(timeZone: timeZone)
+        shortDateTimeFormatter = Self.shortDateTimeFormatter(timeZone: timeZone)
+        fullDateFormatter = Self.fullDateFormatter(timeZone: timeZone)
+    }
 
     /// Returns entries whose controlled, user-facing sentence contains the supplied text.
     ///
@@ -1875,7 +1984,7 @@ struct TroubleshootingLogReportBuilder {
     var headerLines: [String] {
         var lines = [
             "\(appInfo.projectName) Troubleshooting Log",
-            "Created: \(Self.fullDateFormatter(timeZone: timeZone).string(from: generatedAt)) \(timeZone.abbreviation(for: generatedAt) ?? timeZone.identifier)",
+            "Created: \(fullDateFormatter.string(from: generatedAt)) \(timeZone.abbreviation(for: generatedAt) ?? timeZone.identifier)",
             "App Name: \(appInfo.appName)",
             "Version: \(appInfo.version)",
             "Device: \(appInfo.deviceClass), iOS \(appInfo.systemVersion)",
@@ -1915,15 +2024,16 @@ struct TroubleshootingLogReportBuilder {
         }
 
         var previousDay: Date?
-        let calendar = Calendar.current
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
         for entry in entries {
             let day = calendar.startOfDay(for: entry.timestamp)
             if previousDay != day {
                 lines.append("")
-                lines.append(Self.dayFormatter(timeZone: timeZone).string(from: entry.timestamp))
+                lines.append(dayFormatter.string(from: entry.timestamp))
                 previousDay = day
             }
-            lines.append("\(Self.timeFormatter(timeZone: timeZone).string(from: entry.timestamp))  \(message(for: entry))")
+            lines.append("\(timeFormatter.string(from: entry.timestamp))  \(message(for: entry))")
         }
         return lines.joined(separator: "\n")
     }
@@ -1979,6 +2089,20 @@ struct TroubleshootingLogReportBuilder {
             case .nfcScanCancelled: return "\(source.name) NFC sensor scan was cancelled."
             case .nfcScanTimedOut: return "\(source.name) NFC sensor scan timed out."
             case .nfcUnavailable: return "NFC sensor scanning is not available on this iPhone."
+            case .authenticationStarted: return "\(source.name) sensor authentication started."
+            case .authenticationSucceeded: return "\(source.name) sensor authentication completed."
+            case .authenticationFailed: return "\(source.name) sensor authentication failed. The app will retry."
+            case .authenticationRecovered: return "\(source.name) sensor authentication recovered."
+            case .recoveryRequired: return "\(source.name) needs sensor recovery before it can reconnect."
+            case .credentialsUnavailable: return "\(source.name) pairing credentials are unavailable. Setup cannot continue."
+            case .credentialsReady: return "\(source.name) pairing credentials are available again."
+            case .accountLookupStarted: return "\(source.name) Account ID lookup started."
+            case .accountLookupSucceeded: return "\(source.name) Account ID lookup succeeded."
+            case .accountLookupFailed: return "\(source.name) Account ID lookup failed."
+            case .accountLookupCancelled: return "\(source.name) Account ID lookup was cancelled."
+            case .sensorCheckRequired: return "\(source.name) requests a sensor check."
+            case .sensorExpired: return "\(source.name) sensor session ended."
+            case .sensorOkay: return "\(source.name) sensor check cleared."
             }
 
         case let .follower(source, activity):
@@ -2009,6 +2133,8 @@ struct TroubleshootingLogReportBuilder {
             case .detected: return "A new sensor session was started."
             case .started: return "A sensor session started."
             case let .startedWithCode(sensorCode): return "A sensor session started with sensor code \(sensorCode)."
+            case let .libre3NFC(confirmed), let .libre3ReceiverID(_, _, confirmed):
+                return "Libre 3 NFC \(confirmed ? "confirmed" : "attempt")."
             case let .warmingUp(minutesRemaining): return "Sensor is warming up for about \(minutesRemaining) more minute\(minutesRemaining == 1 ? "" : "s")."
             case .stopped: return "The sensor session stopped."
             case .notDetected: return "No active sensor was detected."
@@ -2052,6 +2178,8 @@ struct TroubleshootingLogReportBuilder {
                 return "Dexcom reported a sensor failure."
             case .dexcomTransmitterFailure:
                 return "Dexcom reported a transmitter failure."
+            case .libreTemporarySensorIssue:
+                return "Libre reported a temporary sensor reading issue."
             case .libreSensorFailure:
                 return "Libre reported a sensor failure."
             case .dexcomTransmitterBatteryFailure:
@@ -2102,6 +2230,14 @@ struct TroubleshootingLogReportBuilder {
             }
 
         case let .integration(name, activity):
+            if name == .dexcomShareUploadAccount {
+                switch activity {
+                case .succeeded: return "Dexcom Share upload account was verified."
+                case .failed, .permissionDenied: return "Dexcom Share upload account verification failed."
+                case .recovered: return "Dexcom Share upload account verification recovered."
+                default: break
+                }
+            }
             if name == .nightscoutBackfill {
                 switch activity {
                 case .started: return "Nightscout started checking for missing readings."
@@ -2140,6 +2276,8 @@ struct TroubleshootingLogReportBuilder {
 
         case let .configuration(activity):
             switch activity {
+            case let .dexcomShareUploadChanged(enabled):
+                return "Dexcom Share uploads were \(enabled ? "enabled" : "disabled")."
             case let .modeChanged(isMaster):
                 return "App mode changed to \(isMaster ? "Master" : "Follower")."
             case let .followerSourceChanged(source):
@@ -2243,11 +2381,11 @@ struct TroubleshootingLogReportBuilder {
     }
 
     func timeText(for entry: TroubleshootingLogEntry) -> String {
-        Self.timeFormatter(timeZone: timeZone).string(from: entry.timestamp)
+        timeFormatter.string(from: entry.timestamp)
     }
 
     func dayText(for entry: TroubleshootingLogEntry) -> String {
-        Self.dayFormatter(timeZone: timeZone).string(from: entry.timestamp)
+        dayFormatter.string(from: entry.timestamp)
     }
 
     private func glucoseText(mgDl: Double, originalMgDl: Double? = nil, includeUnit: Bool = true) -> String {
@@ -2271,9 +2409,9 @@ struct TroubleshootingLogReportBuilder {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = timeZone
         if calendar.isDate(measuredAt, inSameDayAs: recordedAt) {
-            return Self.shortTimeFormatter(timeZone: timeZone).string(from: measuredAt)
+            return timeFormatter.string(from: measuredAt)
         }
-        return Self.shortDateTimeFormatter(timeZone: timeZone).string(from: measuredAt)
+        return shortDateTimeFormatter.string(from: measuredAt)
     }
 
     private static func alertName(rawValue: Int) -> String {
@@ -2294,6 +2432,8 @@ struct TroubleshootingLogReportBuilder {
         case .phonebatterylow: return "Phone battery"
         case .notlooping: return "Not looping"
         case .sensorTransmitterFailure: return "Sensor/Transmitter Failure"
+        case .sensorEndingSoon: return "Sensor ending soon"
+        case .sensorExpectedExpiry: return "Expected sensor expiry"
         }
     }
 
@@ -2304,14 +2444,6 @@ struct TroubleshootingLogReportBuilder {
     private static func timeFormatter(timeZone: TimeZone) -> DateFormatter {
         // Reports intentionally use a predictable English support vocabulary while respecting the
         // user's local time zone. POSIX locale also prevents device-language formatting surprises.
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = timeZone
-        formatter.dateFormat = "HH:mm:ss"
-        return formatter
-    }
-
-    private static func shortTimeFormatter(timeZone: TimeZone) -> DateFormatter {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = timeZone

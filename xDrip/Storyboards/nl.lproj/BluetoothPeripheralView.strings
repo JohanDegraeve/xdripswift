@@ -168,6 +168,8 @@
 "batteryHistoryRange" = "Periode";
 "batteryHistoryRangeAccessibility" = "Periode van batterijgeschiedenis";
 "batteryHistoryRangeExplanation" = "Vaste periodes lopen vanaf nu terug tot het geselecteerde aantal dagen. Onderbrekingen tonen periodes zonder meting.";
+"batteryHistoryInactive" = "Zender inactief";
+"batteryHistoryHistoricalRangeExplanation" = "De periodes eindigen bij de laatst opgeslagen meting. Onderbrekingen tonen periodes zonder meting.";
 
 "connectionDiagramOtherApp" = "Andere app";
 
@@ -192,3 +194,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Verloopt";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Bluetooth-toegang is niet ingeschakeld";
+"bluetoothAccessInstructions" = "Open Instellingen → Privacy en beveiliging → Bluetooth en geef %@ toegang om verbinding te maken.";
+"bluetoothAccessRestrictedInstructions" = "Apparaatbeperkingen verhinderen Bluetooth-toegang. Controleer Schermtijd of neem contact op met de apparaatbeheerder om toegang in te schakelen.";

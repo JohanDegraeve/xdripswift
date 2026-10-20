@@ -161,6 +161,8 @@
 "batteryHistoryRange" = "Εύρος";
 "batteryHistoryRangeAccessibility" = "Εύρος ιστορικού μπαταρίας";
 "batteryHistoryRangeExplanation" = "Τα σταθερά εύρη εκτείνονται από τώρα έως τον επιλεγμένο αριθμό ημερών στο παρελθόν. Τα κενά δείχνουν περιόδους χωρίς ένδειξη.";
+"batteryHistoryInactive" = "Ανενεργός πομπός";
+"batteryHistoryHistoricalRangeExplanation" = "Τα χρονικά διαστήματα τελειώνουν στην τελευταία καταγεγραμμένη ένδειξη. Τα κενά δείχνουν περιόδους χωρίς ένδειξη.";
 
 "connectionDiagramOtherApp" = "Άλλη εφαρμογή";
 
@@ -185,3 +187,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Λήγει";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Η πρόσβαση στο Bluetooth δεν είναι ενεργοποιημένη";
+"bluetoothAccessInstructions" = "Για σύνδεση, ανοίξτε Ρυθμίσεις → Απόρρητο και ασφάλεια → Bluetooth και επιτρέψτε την πρόσβαση για το %@.";
+"bluetoothAccessRestrictedInstructions" = "Οι περιορισμοί της συσκευής εμποδίζουν την πρόσβαση στο Bluetooth. Ελέγξτε τον Χρόνο επί οθόνης ή επικοινωνήστε με τον διαχειριστή της συσκευής για να ενεργοποιήσετε την πρόσβαση.";

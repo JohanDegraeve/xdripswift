@@ -23,6 +23,12 @@ public struct G7GlucoseMessage {
     /// Wall-clock date reconstructed by subtracting the packet age from receipt time.
     let timeStamp: Date
 
+    /// Wall-clock reference for the packet's transmitter clock, used by calibration.
+    let receivedAt: Date
+
+    /// Delay between the reading and packet receipt, in seconds.
+    let messageAge: TimeInterval
+
     /// Glucose value after removing Dexcom's flag bits, expressed in mg/dL.
     let calculatedValue: Double
 
@@ -38,7 +44,7 @@ public struct G7GlucoseMessage {
     /// Optional transmitter prediction. It is decoded for packet completeness but not published.
     private let predicted: UInt16?
 
-    /// Timestamp of the reading in seconds since sensor start.
+    /// Sensor clock at packet receipt, before subtracting the age of the reading.
     let transmitterTime: UInt32
 
     /// Packet sequence number retained for protocol completeness.
@@ -50,7 +56,7 @@ public struct G7GlucoseMessage {
     /// Dexcom display-only flag decoded from the final calibration and flags byte.
     private let glucoseIsDisplayOnly: Bool
 
-    init?(data: Data) {
+    init?(data: Data, receivedAt: Date = Date()) {
         //    0  1  2 3 4 5  6 7  8  9 10 11 1213 14 15 1617 18
         //         TTTTTTTT SQSQ       AG    BGBG SS TR PRPR C
         // 0x4e 00 d5070000 0900 00 01 05 00 6100 06 01 ffff 0e
@@ -76,18 +82,22 @@ public struct G7GlucoseMessage {
         // documents the packet layout and keeps later diagnostics from guessing at byte offsets.
         sequence = data[6 ..< 8].to(UInt16.self)
 
-        // This is the reading time measured from sensor start, not the age of the BLE packet.
+        // This clock advances even when the packet repeats an older glucose reading.
         transmitterTime = data[2 ..< 6].toInt()
 
         // Time between the reading and receipt of the BLE message. This is a two-byte field. The
         // high byte becomes important for the old cached record returned after a sensor failure.
-        let messageAge = data[10 ..< 12].to(UInt16.self)
+        messageAge = TimeInterval(data[10 ..< 12].to(UInt16.self))
+        self.receivedAt = receivedAt
 
-        // Sensor age combines the reading's relative timestamp with the delay before transmission.
-        sensorAge = TimeInterval(transmitterTime) + TimeInterval(messageAge)
+        // The delegate pairs sensor age with the reading timestamp, not receipt time.
+        // Adding age here subtracts the delay twice when reconstructing sensor start,
+        // making an unchanged session appear to move backwards after missed readings.
+        guard messageAge <= TimeInterval(transmitterTime) else { return nil }
+        sensorAge = TimeInterval(transmitterTime) - messageAge
 
         // Convert the packet delay into the wall-clock time used by Core Data and chart delivery.
-        timeStamp = Date().addingTimeInterval(-TimeInterval(messageAge))
+        timeStamp = receivedAt.addingTimeInterval(-messageAge)
 
         // The upper bits carry flags. Mask them away only after recognising 0xFFFF as Dexcom's
         // unavailable sentinel. A cached value in a non-zero-status frame is still decoded for

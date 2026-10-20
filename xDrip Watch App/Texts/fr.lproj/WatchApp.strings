@@ -8,3 +8,101 @@
 "requestingData" = "Attente de données...";
 "lastReading" = "Dernière lecture";
 "noSensorData" = "Pas de données du capteur";
+
+// Direct to Watch status and pairing guidance
+"directWatchTitle" = "Direct vers la Watch";
+"directWatchNoConnection" = "Aucune connexion ajoutée";
+"directWatchSuspended" = "Collecte suspendue";
+"directWatchWaiting" = "En attente d’une mesure de la Watch";
+"directWatchCollecting" = "Collecte en cours";
+"directWatchOverdue" = "Mesure manquante";
+"directWatchDiagnosis" = "Diagnostic";
+"directWatchAdded" = "Connexion à la Watch ajoutée";
+
+// Direct to Watch collection control
+"directWatchPausedShort" = "En pause";
+"directWatchPaused" = "Collecte de la Watch en pause";
+"directWatchPause" = "Pause collecte";
+"directWatchResume" = "Reprendre collecte";
+"directWatchPausedSinceFormat" = "Depuis %@";
+"directWatchConnecting" = "En attente…";
+"directWatchCollectedReadings" = "Mesures collectées";
+"directWatchReadingGapFormat" = "(%dm %ds)";
+"directWatchNoCollectedReadings" = "Aucune mesure collectée par la Watch pour le moment";
+
+"directWatchSessionStarted" = "Démarré à %@";
+"directWatchSessionResumed" = "Repris à %@";
+"directWatchSessionPaused" = "En pause à %@";
+"directWatchSessionEnded" = "Terminé à %@";
+
+"directWatchConnectionDetails" = "Détails de connexion";
+"directWatchBluetoothSlot" = "Canal Bluetooth";
+"directWatchSendLogs" = "Envoyer les journaux";
+"directWatchResetConnection" = "Réinitialiser";
+"directWatchCancel" = "Annuler";
+"directWatchResetConnectionExplanation" = "Efface les détails de connexion enregistrés et recherche à nouveau le transmetteur. Vous devrez peut-être accepter une demande de jumelage Bluetooth.";
+
+"directWatchCGMType" = "Type de MCG";
+
+// Direct to Watch setup and diagnosis
+"directWatchAcceptPairing" = "Acceptez le jumelage Bluetooth sur le Watch";
+"directWatchAddOnPhone" = "Ajoutez le Watch depuis l’écran de l’émetteur sur l’iPhone.";
+"directWatchAuthenticating" = "Authentification de l’émetteur";
+"directWatchAway" = "Hors portée";
+"directWatchBackgroundLimit" = "Limite Bluetooth en arrière-plan de watchOS atteinte. Ouvrez cette app pour la réinitialiser.";
+"directWatchBlePaused" = "BLE en pause";
+"directWatchBluetoothErrorFormat" = "Bluetooth de l’émetteur : %@";
+"directWatchBluetoothRejected" = "Connexion Bluetooth refusée , utilisez %@";
+"directWatchBluetoothUnavailableFormat" = "Bluetooth du Watch indisponible (%d)";
+"directWatchCgm" = "MCG";
+"directWatchCheckConnection" = "Ouvrez %@ sur le Watch pour vérifier la connexion.";
+"directWatchCheckSensor" = "Vérifiez le capteur actif dans %@ sur l’iPhone.";
+"directWatchChecking" = "Vérification";
+"directWatchCheckingDiscovery" = "Vérification de la détection";
+"directWatchCollectionOff" = "Collecte Watch désactivée";
+"directWatchConnected" = "Connecté";
+"directWatchConnectingSaved" = "Connexion à l’émetteur enregistré";
+"directWatchConnectingTransmitter" = "Connexion à l’émetteur";
+"directWatchExportFailedFormat" = "Export du journal Watch impossible : %@";
+"directWatchG6AuthRejected" = "Authentification G6 refusée";
+"directWatchG6StateFormat" = "État G6 %d , vérifiez le capteur sur l’iPhone";
+"directWatchG7AuthFailed" = "Échec d’authentification G7. Consultez les journaux.";
+"directWatchG7Family" = "Gamme G7";
+"directWatchG7KeyRejected" = "G7 a refusé la clé Watch , vérifiez l’occupant du canal";
+"directWatchG7Requesting" = "G7 authentifié , demande de mesure";
+"directWatchLowGlucose" = "%@ : glucose bas";
+"directWatchNoRecentReading" = "%@ : aucune mesure récente";
+"directWatchOneReadingFormat" = "%d mesure";
+"directWatchReadingReceived" = "Mesure Watch reçue";
+"directWatchReadingsFormat" = "%d mesures";
+"directWatchReconnectingSaved" = "Reconnexion à l’émetteur enregistré";
+"directWatchRetryingSaved" = "Nouvel essai de l’émetteur enregistré";
+"directWatchScanningRetained" = "Recherche , connexion enregistrée conservée";
+"directWatchScanningToPair" = "Recherche de l’émetteur à jumeler";
+"directWatchStorageReadFailed" = "Lecture des données Watch impossible. Collecte arrêtée.";
+"directWatchStorageSaveFailedFormat" = "Enregistrement des données Watch impossible : %@";
+"directWatchSuspendedCheckPhone" = "Collecte suspendue , vérifiez l’iPhone";
+"directWatchSuspendedReasonFormat" = "Collecte suspendue : %@";
+"directWatchToSync" = "À synchroniser";
+"directWatchTransmitterTimeout" = "Délai dépassé , en attente du prochain cycle";
+"directWatchWaitingCycle" = "En attente du prochain cycle";
+"directWatchWaitingDiscovery" = "En attente de détection de l’émetteur";
+"directWatchWaitingNextReading" = "En attente de la prochaine mesure";
+"directWatchWaitingTransmitter" = "En attente de l’émetteur";
+
+/* Direct to Watch action feedback. */
+"directWatchLogsQueued" = "Journaux en attente";
+"directWatchResetStarted" = "Réinitialisation lancée";
+"directWatchTryAgain" = "Réessayer";
+
+/* Optional missed-reading notification, configured on this Watch. */
+"directWatchMissedReadings" = "Lectures manquées";
+"directWatchMissedReadingsExplanation" = "Si activé, la montre vous avertit après plus de 20 minutes sans lecture";
+
+/* Local Watch alerts use the daily alarm schedules supplied by the iPhone. */
+"directWatchAlerts" = "Alertes";
+"directWatchUrgentLow" = "Basse urgente";
+"directWatchLow" = "Basse";
+"directWatchAlertExplanation" = "Les seuils suivent les horaires des alarmes de l’iPhone. Les alertes Watch nécessitent une collecte active et plus de 60 secondes sans échange avec l’iPhone.";
+"directWatchScheduleUnavailable" = "Synchroniser les alarmes de l’iPhone";
+"directWatchUrgentLowGlucose" = "%@: glucose très bas";

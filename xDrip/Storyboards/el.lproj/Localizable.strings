@@ -1,1 +1,88 @@
 
+
+// Direct to Watch status and pairing guidance
+"directWatchTitle" = "Απευθείας στο Watch";
+"directWatchNoConnection" = "Δεν προστέθηκε σύνδεση";
+"directWatchSuspended" = "Η συλλογή ανεστάλη";
+"directWatchWaiting" = "Αναμονή μέτρησης από το Watch";
+"directWatchCollecting" = "Συλλογή δεδομένων";
+"directWatchOverdue" = "Η μέτρηση εκκρεμεί";
+"directWatchDiagnosis" = "Διάγνωση";
+"directWatchAdded" = "Προστέθηκε σύνδεση Watch";
+"directWatchPairingGuidance" = "Κάντε κύλιση προς τα κάτω στην οθόνη Απευθείας στο Watch στο Watch και αποδεχτείτε το αίτημα ζευγοποίησης Bluetooth αν προσθέτετε αυτόν τον πομπό για πρώτη φορά.\n\nΗ σύνδεση του πομπού μπορεί να διαρκέσει έως πέντε λεπτά.";
+
+// Direct to Watch collection control
+"directWatchPausedShort" = "Σε παύση";
+"directWatchPaused" = "Η συλλογή Watch είναι σε παύση";
+"directWatchPause" = "Παύση συλλογής";
+"directWatchResume" = "Συνέχιση συλλογής";
+"directWatchPausedSinceFormat" = "Από %@";
+"directWatchConnecting" = "Αναμονή…";
+"directWatchCollectedReadings" = "Συλλεγμένες μετρήσεις";
+"directWatchReadingGapFormat" = "(%dλ %dδ)";
+"directWatchNoCollectedReadings" = "Δεν έχουν συλλεχθεί ακόμη μετρήσεις μέσω Watch";
+
+"directWatchSessionStarted" = "Έναρξη στις %@";
+"directWatchSessionResumed" = "Συνέχιση στις %@";
+"directWatchSessionPaused" = "Παύση στις %@";
+"directWatchSessionEnded" = "Λήξη στις %@";
+
+// Direct to Watch setup and diagnosis
+"directWatchBluetoothSlot" = "Θέση Bluetooth";
+"directWatchCancel" = "Ακύρωση";
+"directWatchTestingLogs" = "Δοκιμές και αρχεία";
+"directWatchAddConnection" = "Σύνδεση Watch";
+"directWatchRemoveConnection" = "Αφαίρεση σύνδεσης Watch";
+"directWatchMedicalSlot" = "Θέση ιατρικής συσκευής";
+"directWatchWatchSlot" = "Θέση Watch";
+"directWatchConfirmUnusedSlot" = "Κενή θέση: σύνδεση Watch";
+"directWatchSlotMedical" = "Θέση 1 · Ιατρική συσκευή";
+"directWatchSlotMobile" = "Θέση 2 · Εφαρμογή κινητού";
+"directWatchSlotWatch" = "Θέση 3 · Watch";
+"directWatchSlotAnubis" = "Θέση 3 · Πρόσθετη Anubis";
+"directWatchUsedWatch" = "Χρήση από αυτό το Watch";
+"directWatchUsedPhone" = "Χρήση από αυτό το iPhone";
+"directWatchSlotMedicalDetail" = "Μόνο χωρίς αντλία ή δέκτη";
+"directWatchSlotMobileDetail" = "Μόνο χωρίς άλλη εφαρμογή κινητού";
+"directWatchRecommendedWatch" = "Προτείνεται για το Watch";
+"directWatchRecommendedTransmitter" = "Προτείνεται για αυτόν τον πομπό";
+"directWatchAnubisOnly" = "Μόνο πομποί Anubis";
+"directWatchWatchStatus" = "Κατάσταση Watch";
+"directWatchTestingDiagnosis" = "Δοκιμές και διάγνωση";
+"directWatchPausePhone" = "Παύση συλλογής BLE iPhone";
+"directWatchForTesting" = "Για δοκιμή συλλογής Watch";
+"directWatchGetLogs" = "Λήψη αρχείων Watch";
+"directWatchShareLogs" = "Κοινοποίηση αρχείων Watch";
+"directWatchPending" = "Σε αναμονή";
+"directWatchReceivedFormat" = "Ελήφθη %@";
+"directWatchSelectedFormat" = "%@, επιλεγμένο";
+"directWatchIntro" = "Το Watch συλλέγει μετρήσεις απευθείας χωρίς το iPhone κοντά. Ο έλεγχος του αισθητήρα παραμένει στο iPhone.";
+"directWatchBackgroundAdvice" = "Η συλλογή στο παρασκήνιο εξαρτάται από το watchOS. Δοκιμάστε τη στο Watch πριν βασιστείτε σε αυτή χωρίς iPhone.";
+"directWatchSeparateSlots" = "Το Watch και το iPhone χρειάζονται ξεχωριστές θέσεις. Η θέση 1 μπορεί να διακόψει αντλία ή δέκτη που τη χρησιμοποιεί ήδη.";
+"directWatchNativeRequired" = "Η συλλογή Watch απαιτεί εγγενώς υπολογισμένη γλυκόζη σε αυτό το iPhone.";
+"directWatchStartSensor" = "Ξεκινήστε αισθητήρα σε αυτό το iPhone πριν συνδέσετε το Watch.";
+"directWatchNoSlot" = "Δεν υπάρχει διαθέσιμη συμβατή θέση για το Watch.";
+"directWatchMedicalWarning" = "Το Watch θα χρησιμοποιήσει τη θέση 1, συνήθως για αντλία ή δέκτη. Μην προσθέσετε σύνδεση αν αντλία, δέκτης ή άλλη ιατρική συσκευή χρησιμοποιεί τη θέση. Το Watch μπορεί να διακόψει τη σύνδεση γλυκόζης αυτής της συσκευής.";
+"directWatchWatchSlotWarning" = "Το Watch θα χρησιμοποιήσει τη θέση 3. Μην προσθέσετε σύνδεση αν άλλο έξυπνο ρολόι είναι ήδη ζευγοποιημένο με τον αισθητήρα. Αυτό το Watch μπορεί να διακόψει τη σύνδεση γλυκόζης του.";
+"directWatchSlotConflict" = "Αυτή η θέση έχει εκχωρηθεί στο Watch. Αφαιρέστε τη σύνδεση Watch πριν την εκχωρήσετε στο iPhone.";
+"directWatchOpenForStatus" = "Ανοίξτε %@ στο Watch για να λάβετε την κατάστασή του.";
+"directWatchCheckInstalled" = "Αν η κατάσταση δεν ενημερώνεται, ελέγξτε ότι η εφαρμογή εμφανίζεται στις εγκατεστημένες στο Apple Watch στην εφαρμογή Watch του iPhone.";
+"directWatchMasterRequired" = "Το iPhone πρέπει να είναι σε κύρια λειτουργία.";
+"directWatchG6Mismatch" = "Το ρυθμισμένο G6 δεν είναι ο ενεργός πομπός του iPhone.";
+"directWatchG7Mismatch" = "Ο ρυθμισμένος αισθητήρας οικογένειας G7 δεν είναι ο ενεργός πομπός του iPhone.";
+"directWatchPrimaryRequired" = "Η συλλογή Watch απαιτεί κύρια σύνδεση οικογένειας G7 στο iPhone.";
+"directWatchNativeG6Required" = "Ενεργοποιήστε την εγγενή γλυκόζη G6 στο iPhone.";
+"directWatchPairingCodeRequired" = "Για ζευγοποίηση Watch απαιτείται τετραψήφιος κωδικός αισθητήρα.";
+"directWatchSlotsConflict" = "Το Watch και το iPhone χρησιμοποιούν την ίδια θέση Bluetooth.";
+"directWatchAnubisRequired" = "Η θέση 3 απαιτεί πομπό Anubis.";
+"directWatchNoActiveSensor" = "Κανένας ενεργός αισθητήρας στο iPhone.";
+
+/* Direct to Watch action feedback. */
+"directWatchTryAgain" = "Δοκιμή ξανά";
+"directWatchRequestQueued" = "Αίτημα σε αναμονή";
+"directWatchLastLogsReceived" = "Τελευταία λήψη αρχείων";
+"directWatchWaitingForLogs" = "Αναμονή νέων αρχείων…";
+"directWatchLogsFailed" = "Αδυναμία λήψης αρχείων. Δοκιμάστε ξανά.";
+
+/* Watch diagnostic log actions and receipt time. */
+"directWatchLogs" = "Καταγραφές";

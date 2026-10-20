@@ -407,6 +407,8 @@ final class SensorHealthIssueManager: ObservableObject {
             troubleshootingAlert = .dexcomSensorFailure
         case .dexcomTransmitterFailure:
             troubleshootingAlert = .dexcomTransmitterFailure
+        case .libreTemporarySensorIssue:
+            troubleshootingAlert = .libreTemporarySensorIssue
         case .libreSensorFailure:
             troubleshootingAlert = .libreSensorFailure
         case .dexcomTransmitterBatteryFailure:

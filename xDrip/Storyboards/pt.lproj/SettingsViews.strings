@@ -54,9 +54,7 @@
 "settingsviews_alert_types_section_footer" = "Os Tipos de Alarme definem como os alarmes se comportam, incluindo som, vibração, repetição e sobrepor o modo silencioso.";
 "settingsviews_alerts_section_footer" = "Os Alarmes definem quando a app deve notificar sobre níveis de glicose, leituras em falta e outras condições.";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Escrever para Apple Health";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Enviar";
 "settingsviews_dexcomShareUploadSerialNumber" = "Nº. de Série do Receptor";
 "settingsviews_useUSDexcomShareurl" = "Servidores US";
 "settingsviews_dexcomShareAccountName" = "Nome da Conta";
@@ -65,7 +63,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Introduzir nº. de série do Receptor Dexcom";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Opções de envio";
-"settingsviews_nightscoutEnabled" = "Activar Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Ativar agendamento";
@@ -559,3 +556,33 @@
 "homeScreen.basalTop" = "Em cima";
 "homeScreen.basalBottom" = "Em baixo";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Gráfico de glicose";
+
+"therapy.none" = "Não";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Limiares tratamento";
+"therapy.smallBolusThreshold" = "Bolus peq.";
+"therapy.smallCarbThreshold" = "Poucos HC";
+"therapy.treatmentThresholdsExplanation" = "O gráfico oculta valores de bolus e hidratos abaixo dos limiares. O limiar bolus define também os bolus pequenos nos tratamentos. «Não» mostra todos os valores.";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Estimativa de glicose";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Escala terapia";
+"therapy.scaleStandard" = "Padrão";
+"therapy.scaleSmallDoses" = "Doses peq.";
+"therapy.treatmentScaleExplanation" = "«Doses peq.» torna os marcadores pequenos mais visíveis. Bolus: 0.1–2.0U; hidratos: 1–50g. Valores maiores usam o marcador maior.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Mínimo";
+"settingsviews_liveActivityTypeNormal" = "Normal";
+"settingsviews_liveActivityTypeLarge" = "Grande";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Envio para o Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Dizer introdução";
+"speak.preview" = "Testar glicose falada";

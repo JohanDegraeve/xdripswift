@@ -171,6 +171,8 @@ struct BackupAlertType: Codable, Sendable {
     let soundName: String?
     let vibrate: Bool
     let entries: [BackupAlertEntry]
+    // Older backups did not store sound repetition.
+    var repeatSound: Bool? = nil
 }
 
 struct BackupAlertEntry: Codable, Sendable {

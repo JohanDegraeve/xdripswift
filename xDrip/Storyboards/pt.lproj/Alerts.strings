@@ -22,3 +22,11 @@
 "confirmdeletionalert" = "Apagar Alarme?";
 "alerts_fastdrop" = "Alarme Descida Rápida";
 "alerts_fastrise" = "Alarme Subida Rápida";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "O Sensor Termina em Breve";
+"sensorExpiry.expectedExpiry" = "Fim Previsto do Sensor";
+"sensorExpiry.hoursBefore" = "Horas antes do fim";
+"sensorExpiry.hoursHelp" = "Introduza um número inteiro de 1 a 48 horas.";
+"sensorExpiry.endingSoonBody" = "Prevê-se que o sensor chegue ao fim da sua duração em %@.";
+"sensorExpiry.expectedExpiryBody" = "O sensor atingiu o fim previsto (%@).";

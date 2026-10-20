@@ -211,6 +211,62 @@ final class FollowerSettingsTests: XCTestCase {
     }
 
     @MainActor
+    func testWatchContactClearsOldPhoneMetadataWithoutRewindingNewerContact() throws {
+        try withTemporaryStandardDefaults { standard in
+            standard.loopShareType = .trio
+            standard.isMaster = true
+            standard.cgmTransmitterTypeAsString = CGMTransmitterType.dexcom.rawValue
+            let suite = try XCTUnwrap(UserDefaults(suiteName: standard.loopShareType.sharedUserDefaultsSuiteName))
+            let keys = ["latestReadings", XDripCGMMetadataEnvelope.appGroupKey]
+            let previous = keys.map { ($0, suite.object(forKey: $0)) }
+            defer {
+                for (key, value) in previous {
+                    if let value { suite.set(value, forKey: key) }
+                    else { suite.removeObject(forKey: key) }
+                }
+            }
+            let now = Date()
+            let glucoseAt = now.addingTimeInterval(-60)
+            let readings: [[String: Any]] = [["DT": "/Date(\(Int64(glucoseAt.timeIntervalSince1970 * 1000)))/", "Value": 123.0]]
+            standard.readingsStoredInSharedUserDefaultsAsDictionary = readings
+            let data = try LoopManager.encodeLegacyReadings(readings)
+            suite.set(data, forKey: "latestReadings")
+            let manager = LoopManager(coreDataManager: CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName),
+                activeSensorIsAnubisProvider: { false }, metadataContextProvider: {
+                    XDripCGMMetadataContext(activeSensor: nil, transmitter: nil, sensorHealthIssue: nil,
+                        hasInitialCalibration: nil, lastCalibrationAt: nil, dexcomAlgorithmState: nil, libreSensorState: nil)
+                })
+            func metadata() throws -> XDripCGMMetadataEnvelope {
+                try JSONDecoder().decode(XDripCGMMetadataEnvelope.self,
+                    from: XCTUnwrap(suite.data(forKey: XDripCGMMetadataEnvelope.appGroupKey)))
+            }
+            // This is the stuck condition: the reading is fresh but Trio sees the old
+            // iPhone contact. A Watch acquisition must update that independent clock.
+            manager.shareMetadata(lastCommunicationAt: now.addingTimeInterval(-3600))
+            let old = try metadata()
+            XCTAssertGreaterThan(now.timeIntervalSince1970 - (try XCTUnwrap(old.source?.lastCommunicationAt)), 12 * 60)
+            XCTAssertEqual(try XCTUnwrap(old.latestData?.glucoseAt), glucoseAt.timeIntervalSince1970, accuracy: 0.001)
+            let watchAcquisition = now.addingTimeInterval(-30)
+            manager.shareMetadata(lastCommunicationAt: watchAcquisition)
+            XCTAssertEqual(try XCTUnwrap(metadata().source?.lastCommunicationAt), watchAcquisition.timeIntervalSince1970)
+
+            // Buffered Watch history may arrive after live contact from either collector.
+            // It must not restore a stale timestamp or replace the shared glucose array.
+            manager.shareMetadata(lastCommunicationAt: now.addingTimeInterval(-1800))
+            XCTAssertEqual(try XCTUnwrap(metadata().source?.lastCommunicationAt), watchAcquisition.timeIntervalSince1970)
+            let phoneContact = now.addingTimeInterval(-5)
+            manager.shareMetadata(lastCommunicationAt: phoneContact)
+            manager.shareMetadata(lastCommunicationAt: watchAcquisition)
+            XCTAssertEqual(try XCTUnwrap(metadata().source?.lastCommunicationAt), phoneContact.timeIntervalSince1970)
+            XCTAssertEqual(suite.data(forKey: "latestReadings"), data)
+
+            // Fresh communication does not mean a stopped sensor has recovered.
+            manager.shareMetadata(lastCommunicationAt: now, sensorState: "stopped")
+            XCTAssertEqual(try metadata().sensor?.state, "stopped")
+        }
+    }
+
+    @MainActor
     func testBlockedShareClearsPublishedAndDelayedData() throws {
         try withTemporaryStandardDefaults { standard in
             standard.loopShareType = .trio

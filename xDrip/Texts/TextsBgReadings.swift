@@ -52,6 +52,22 @@ enum Texts_BgReadings {
         return NSLocalizedString("backfilled", tableName: filename, bundle: Bundle.main, value: "Backfilled", comment: "accessibility label for a glucose reading that was added from backfill")
     }()
 
+    static let receivedViaWatch: String = {
+        NSLocalizedString("receivedViaWatch", tableName: filename, bundle: Bundle.main, value: "Received via Watch", comment: "accessibility label for a glucose reading collected by Apple Watch")
+    }()
+
+    static let alsoCollectedByWatch: String = {
+        NSLocalizedString("alsoCollectedByWatch", tableName: filename, bundle: Bundle.main, value: "Also collected by Watch", comment: "Watch independently confirmed a reading supplied by the iPhone")
+    }()
+
+    static let receivedViaWatchAtFooterFormat: String = {
+        NSLocalizedString("receivedViaWatchAtFooterFormat", tableName: filename, bundle: Bundle.main, value: "Received via Watch at %@", comment: "footer text explaining when a Watch reading arrived on iPhone")
+    }()
+
+    static let backfilledViaWatchAtFooterFormat: String = {
+        NSLocalizedString("backfilledViaWatchAtFooterFormat", tableName: filename, bundle: Bundle.main, value: "Backfilled via Watch at %@", comment: "footer text explaining when the Watch collected a delayed glucose reading")
+    }()
+
     static let backfilledAtFooterFormat: String = {
         return NSLocalizedString("backfilledAtFooterFormat", tableName: filename, bundle: Bundle.main, value: "Backfilled %@", comment: "footer text explaining when a glucose reading was backfilled")
     }()

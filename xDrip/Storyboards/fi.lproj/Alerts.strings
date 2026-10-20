@@ -22,3 +22,11 @@
 "confirmdeletionalert" = "Haluatko poistaa hälytyksen?";
 "alerts_fastdrop" = "Nopea pudotus hälytys";
 "alerts_fastrise" = "Nopea nousu hälytys";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "Sensori päättyy pian";
+"sensorExpiry.expectedExpiry" = "Sensorin arvioitu päättymisaika";
+"sensorExpiry.hoursBefore" = "Tuntia ennen päättymistä";
+"sensorExpiry.hoursHelp" = "Anna kokonaisluku väliltä 1-48 tuntia.";
+"sensorExpiry.endingSoonBody" = "Sensorisi arvioitu käyttöikä päättyy %@.";
+"sensorExpiry.expectedExpiryBody" = "Sensorisi on saavuttanut arvioidun päättymisaikansa (%@).";

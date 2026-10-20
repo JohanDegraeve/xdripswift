@@ -88,6 +88,7 @@ struct RootHomeView: View {
     private let actions: RootHomeActions
     private let chartRefreshTimer = Timer.publish(every: ConstantsHomeView.updateHomeViewIntervalInSeconds, on: .main, in: .common).autoconnect()
     private let clockRefreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    private let watchCollectorStatusTimer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
     private static let pannedReadingDateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.amSymbol = ConstantsUI.timeFormatAM
@@ -149,6 +150,12 @@ struct RootHomeView: View {
             glucoseChartStateManager.cleanUpMemory()
             miniChartStateManager.cleanUpMemory()
             historicalDataCache.cleanUpMemory()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: DirectWatchSettings.changed)) { _ in
+            stateModel.refreshWatchCollectorStatus()
+        }
+        .onReceive(watchCollectorStatusTimer) { _ in
+            if state.dataSource.showsWatchCollectorIcon { stateModel.refreshWatchCollectorStatus() }
         }
         .onReceive(chartRefreshTimer) { _ in
             refreshCurrentTimeRangeIfNeeded(showsLoading: false)
@@ -1272,6 +1279,7 @@ private final class RootHomeHistoricalDataCache: ObservableObject {
     private var cacheStartDate: Date?
     private var cacheEndDate: Date?
     private var requestedDate: Date?
+    private var requestedAt = Date.distantPast
     private var requestedVisibleTimeInterval: TimeInterval = 0
     private var isLoading = false
     private var generation = 0
@@ -1292,16 +1300,25 @@ private final class RootHomeHistoricalDataCache: ObservableObject {
     /// entry many days earlier. Later forward extensions fetch only newly possible site changes.
     func prepare(around date: Date, visibleTimeInterval: TimeInterval) {
         requestedDate = date
+        requestedAt = Date()
         requestedVisibleTimeInterval = abs(visibleTimeInterval)
 
-        guard !isLoading else { return }
+        loadRequestedRange()
+    }
+
+    /// Loads any missing range for the latest request, including changes received during a load.
+    private func loadRequestedRange() {
+        guard !isLoading, let date = requestedDate else { return }
 
         let buffer = min(
             max(requestedVisibleTimeInterval * 0.5, Self.minimumBufferTimeInterval),
             Self.maximumBufferTimeInterval
         )
         let desiredStartDate = date.addingTimeInterval(-buffer)
-        let desiredEndDate = min(date.addingTimeInterval(buffer), Date())
+
+        // Keep the upper limit fixed until the next chart request. Rechecking the range after a
+        // load must not start another fetch just because the current time has moved forward.
+        let desiredEndDate = min(date.addingTimeInterval(buffer), requestedAt)
 
         let load: Load?
 
@@ -1354,12 +1371,7 @@ private final class RootHomeHistoricalDataCache: ObservableObject {
                 self.isLoading = false
                 self.revision &+= 1
 
-                if let requestedDate = self.requestedDate {
-                    self.prepare(
-                        around: requestedDate,
-                        visibleTimeInterval: self.requestedVisibleTimeInterval
-                    )
-                }
+                self.loadRequestedRange()
             }
         }
     }
@@ -1405,6 +1417,7 @@ private final class RootHomeHistoricalDataCache: ObservableObject {
         cacheStartDate = nil
         cacheEndDate = nil
         requestedDate = nil
+        requestedAt = .distantPast
         requestedVisibleTimeInterval = 0
         isLoading = false
         revision &+= 1

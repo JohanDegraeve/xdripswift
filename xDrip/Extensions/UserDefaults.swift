@@ -101,6 +101,8 @@ extension UserDefaults {
         case careLinkPassword = "careLinkPassword"
         /// Non-secret CareLink environment selected explicitly or inferred on first use.
         case careLinkRegion = "careLinkRegion"
+        /// Last proven device clock offsets scoped to region, account and patient.
+        case careLinkDeviceOffsets = "careLinkDeviceOffsets"
         /// Non-secret stable identifier for the personal CareLink account represented as a patient.
         case careLinkSelectedPatientID = "careLinkSelectedPatientID"
         /// Store-wide historical repair completed and saved successfully.
@@ -125,7 +127,9 @@ extension UserDefaults {
         case multipleAppBadgeValueWith10 = "multipleAppBadgeValueWith10"
         /// minimum time between two notifications, set by user
         case notificationInterval = "notificationInterval"
-        /// which type of live activities should be shown, if any?
+        /// should live activities be enabled independently of the selected style?
+        case liveActivitiesEnabled = "liveActivitiesEnabled"
+        /// which style should be remembered whilst live activities are disabled?
         case liveActivityType = "liveActivityType"
         /// which layout should the small Live Activity family use?
         case carPlayLiveActivityType = "carPlayLiveActivityType"
@@ -202,6 +206,10 @@ extension UserDefaults {
         case automaticBasalRenderingStyle = "automaticBasalRenderingStyle"
         /// micro-bolus threshold level in units
         case smallBolusTreatmentThreshold = "smallBolusTreatmentThreshold"
+        /// carb chart label threshold in grams
+        case smallCarbTreatmentThreshold = "smallCarbTreatmentThreshold"
+        /// use larger minimum chart markers and narrower dose ranges
+        case useSmallDoseTreatmentScale = "useSmallDoseTreatmentScale"
         /// should the micro-boluses be listed in the treatment list/table?
         case showSmallBolusTreatmentsInList = "showSmallBolusTreatmentsInList"
         /// should the normal boluses be listed in the treatment list/table?
@@ -229,7 +237,9 @@ extension UserDefaults {
         case showStatistics = "showStatistics"
         /// show the objective lines in color or grey?
         case daysToUseStatistics = "daysToUseStatistics"
-        /// Display GMI in IFCC units; retain the original persisted key.
+        /// Use estimated HbA1c instead of GMI in on-screen statistics. Defaults to false.
+        case statisticsUseHbA1c = "statisticsUseHbA1c"
+        /// Display GMI or estimated HbA1c in IFCC units; retain the original persisted key.
         case useIFCCA1C = "useIFCCA1C"
         /// which type of TIR calculation is selected?
         case timeInRangeType = "timeInRangeType"
@@ -293,6 +303,8 @@ extension UserDefaults {
         case activeSensorTransmitterId = "activeSensorTransmitterId"
         /// active sensor description
         case activeSensorDescription = "activeSensorDescription"
+        /// confirmed local Dexcom session identity (runtime-only)
+        case dexcomSensorSessionIdentityData = "dexcomSensorSessionIdentityData"
         /// active sensor start date
         case activeSensorStartDate = "activeSensorStartDate"
         /// active sensor max days (lifetime)
@@ -395,6 +407,8 @@ extension UserDefaults {
         case speakReadingLanguageCode = "speakReadingLanguageCode"
         /// speak delta
         case speakDelta = "speakDelta"
+        /// speak the opening phrase
+        case speakIntroduction = "speakIntroduction"
         /// speak trend
         case speakTrend = "speakTrend"
         /// speak interval
@@ -723,6 +737,25 @@ extension UserDefaults {
         set { set(newValue, forKey: Key.careLinkSelectedPatientID.rawValue) }
     }
 
+    /// Missing clock information must not discard a previously proven offset, including zero.
+    func careLinkDeviceOffset(region: CareLinkRegion, account: String?, patientID: String) -> TimeInterval? {
+        guard let account, !account.isEmpty else { return nil }
+        let offsets = dictionary(forKey: Key.careLinkDeviceOffsets.rawValue) as? [String: [String: [String: Double]]]
+        guard let offset = offsets?[region.rawValue]?[account]?[patientID],
+              offset.isFinite, abs(offset) <= 14 * 60 * 60 else { return nil }
+        return offset
+    }
+
+    /// Writes only changed, valid offsets supplied by CareLink for an identified account.
+    func storeCareLinkDeviceOffset(_ offset: TimeInterval?, region: CareLinkRegion, account: String?, patientID: String) {
+        guard let account, !account.isEmpty, let offset,
+              offset.isFinite, abs(offset) <= 14 * 60 * 60,
+              careLinkDeviceOffset(region: region, account: account, patientID: patientID) != offset else { return }
+        var offsets = dictionary(forKey: Key.careLinkDeviceOffsets.rawValue) as? [String: [String: [String: Double]]] ?? [:]
+        offsets[region.rawValue, default: [:]][account, default: [:]][patientID] = offset
+        set(offsets, forKey: Key.careLinkDeviceOffsets.rawValue)
+    }
+
     /// CarePartner mobile app version shared by personal and Care Partner account requests.
     @objc dynamic var careLinkVersion: String? {
         get {
@@ -1005,15 +1038,40 @@ extension UserDefaults {
         }
     }
 
-    /// holds the enum integer of the type of live activity to be shown, if any
-    /// default to 0 (disabled)
-    var liveActivityType: LiveActivityType {
+    /// should live activities be enabled? The selected style is retained when switched off.
+    @objc dynamic var liveActivitiesEnabled: Bool {
         get {
-            let liveActivityTypeAsInt = integer(forKey: Key.liveActivityType.rawValue)
-            return LiveActivityType(rawValue: liveActivityTypeAsInt) ?? .disabled
+            migrateLiveActivitySettingsIfNeeded()
+            return bool(forKey: Key.liveActivitiesEnabled.rawValue)
         }
         set {
+            migrateLiveActivitySettingsIfNeeded()
+            set(newValue, forKey: Key.liveActivitiesEnabled.rawValue)
+        }
+    }
+
+    /// holds the selected live activity style independently of whether it is enabled
+    var liveActivityType: LiveActivityType {
+        get {
+            migrateLiveActivitySettingsIfNeeded()
+            let storedType = LiveActivityType(rawValue: integer(forKey: Key.liveActivityType.rawValue)) ?? .normal
+            return storedType == .disabled ? .normal : storedType
+        }
+        set {
+            migrateLiveActivitySettingsIfNeeded()
             set(newValue.rawValue, forKey: Key.liveActivityType.rawValue)
+        }
+    }
+
+    /// split the previous combined setting only once, preserving an explicitly stored false
+    private func migrateLiveActivitySettingsIfNeeded() {
+        guard object(forKey: Key.liveActivitiesEnabled.rawValue) == nil else { return }
+        let previousType = LiveActivityType(rawValue: integer(forKey: Key.liveActivityType.rawValue)) ?? .disabled
+
+        // store enablement before replacing Disabled with the initial Normal style
+        set(previousType != .disabled, forKey: Key.liveActivitiesEnabled.rawValue)
+        if previousType == .disabled {
+            set(LiveActivityType.normal.rawValue, forKey: Key.liveActivityType.rawValue)
         }
     }
 
@@ -1695,22 +1753,36 @@ extension UserDefaults {
         }
     }
 
-    /// micro-bolus threshold level in units as a Double
-    @objc dynamic var smallBolusTreatmentThreshold:Double {
+    /// Small-bolus threshold in units. A stored zero means None; only an absent value uses the default.
+    @objc dynamic var smallBolusTreatmentThreshold: Double {
         get {
-
-            var returnValue = double(forKey: Key.smallBolusTreatmentThreshold.rawValue)
-            // if 0 set to defaultvalue
-            if returnValue == 0.0 {
-                returnValue = ConstantsGlucoseChart.defaultSmallBolusTreatmentThreshold
+            guard object(forKey: Key.smallBolusTreatmentThreshold.rawValue) != nil else {
+                return ConstantsGlucoseChart.defaultSmallBolusTreatmentThreshold
             }
-
-            return returnValue
+            return double(forKey: Key.smallBolusTreatmentThreshold.rawValue)
         }
         set {
-
             set(newValue, forKey: Key.smallBolusTreatmentThreshold.rawValue)
         }
+    }
+
+    /// Small-carb chart label threshold in grams. Zero means None; an absent value defaults to 5g.
+    @objc dynamic var smallCarbTreatmentThreshold: Double {
+        get {
+            guard object(forKey: Key.smallCarbTreatmentThreshold.rawValue) != nil else {
+                return ConstantsGlucoseChart.defaultSmallCarbTreatmentThreshold
+            }
+            return double(forKey: Key.smallCarbTreatmentThreshold.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.smallCarbTreatmentThreshold.rawValue)
+        }
+    }
+
+    /// Standard is the default. Small Doses changes chart marker sizing without changing labels or treatments.
+    @objc dynamic var useSmallDoseTreatmentScale: Bool {
+        get { bool(forKey: Key.useSmallDoseTreatmentScale.rawValue) }
+        set { set(newValue, forKey: Key.useSmallDoseTreatmentScale.rawValue) }
     }
 
     /// max canula age (CAGE) as Int - if nil, return default value
@@ -1767,7 +1839,13 @@ extension UserDefaults {
         }
     }
 
-    /// Display GMI in mmol/mol instead of a percentage.
+    /// GMI remains the default for both new and existing users.
+    @objc dynamic var statisticsUseHbA1c: Bool {
+        get { bool(forKey: Key.statisticsUseHbA1c.rawValue) }
+        set { set(newValue, forKey: Key.statisticsUseHbA1c.rawValue) }
+    }
+
+    /// Display GMI or estimated HbA1c in mmol/mol instead of a percentage.
     @objc dynamic var useIFCCA1C: Bool {
         // Default false displays GMI as a percentage. Keep this key for existing preferences.
         get {
@@ -1867,6 +1945,12 @@ extension UserDefaults {
         set {
             set(newValue, forKey: Key.activeSensorTransmitterId.rawValue)
         }
+    }
+
+    /// Local session identity only; never exported or restored onto another app/device.
+    var dexcomSensorSessionIdentityData: Data? {
+        get { data(forKey: Key.dexcomSensorSessionIdentityData.rawValue) }
+        set { set(newValue, forKey: Key.dexcomSensorSessionIdentityData.rawValue) }
     }
 
     /// active sensor start date. Optional as should be set to nil if there is no sensor connected or if no successful follower login has happened and/or if no active sensor is returned
@@ -2380,6 +2464,12 @@ extension UserDefaults {
         set {
             set(newValue, forKey: Key.speakReadingLanguageCode.rawValue)
         }
+    }
+
+    /// Include the opening phrase unless the user explicitly disables it.
+    @objc dynamic var speakIntroduction: Bool {
+        get { object(forKey: Key.speakIntroduction.rawValue) as? Bool ?? true }
+        set { set(newValue, forKey: Key.speakIntroduction.rawValue) }
     }
 
     /// should trend be spoken or not

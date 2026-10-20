@@ -168,6 +168,8 @@
 "batteryHistoryRange" = "Intervalo";
 "batteryHistoryRangeAccessibility" = "Intervalo del historial de la batería";
 "batteryHistoryRangeExplanation" = "Los intervalos fijos van desde ahora hasta el número de días seleccionado. Los espacios muestran periodos sin lecturas.";
+"batteryHistoryInactive" = "Transmisor inactivo";
+"batteryHistoryHistoricalRangeExplanation" = "Los intervalos terminan en la última lectura registrada. Los espacios muestran periodos sin lecturas.";
 
 "connectionDiagramOtherApp" = "Otra app";
 
@@ -192,3 +194,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Caduca";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "El acceso a Bluetooth no está activado";
+"bluetoothAccessInstructions" = "Para conectar, abre Ajustes → Privacidad y seguridad → Bluetooth y permite el acceso a %@.";
+"bluetoothAccessRestrictedInstructions" = "Las restricciones del dispositivo impiden el acceso a Bluetooth. Revisa Tiempo de uso o contacta con el administrador del dispositivo para activar el acceso.";

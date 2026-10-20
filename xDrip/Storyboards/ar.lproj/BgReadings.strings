@@ -44,3 +44,10 @@
 "bgRangeUrgent" = "عاجل";
 "bgRangeNotUrgent" = "غير عاجل";
 "bgRangeInRange" = "ضمن النطاق";
+
+"alsoCollectedByWatch" = "جمعتها Watch أيضًا";
+
+// Direct to Watch setup and diagnosis
+"receivedViaWatchAtFooterFormat" = "استُلم عبر Watch في %@";
+"backfilledViaWatchAtFooterFormat" = "استُكمل عبر Watch في %@";
+"receivedViaWatch" = "استُلم عبر Watch";

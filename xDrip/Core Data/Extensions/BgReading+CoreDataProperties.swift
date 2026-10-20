@@ -12,6 +12,15 @@ extension BgReading {
     @NSManaged public var adjustedValue: NSNumber?
     @NSManaged public var ageAdjustedRawValue: Double
     @NSManaged public var backfilledAt: Date?
+    @NSManaged public var valueIsFromWatch: Bool
+    /// First iPhone receipt of this cycle from the Watch, including secondary-collector confirmations.
+    @NSManaged public var watchReceivedAt: Date?
+    /// Actual acquisition on the Watch, independent of delayed delivery to the iPhone.
+    @NSManaged public var watchCollectedAt: Date?
+    /// Nil identifies older stores whose live collection path was not recorded.
+    /// False means only historical collection, or no collection by that device yet.
+    @NSManaged public var phoneCollectedLive: NSNumber?
+    @NSManaged public var watchCollectedLive: NSNumber?
     @NSManaged public var b: Double
     @NSManaged public var c: Double
     @NSManaged public var calculatedValue: Double

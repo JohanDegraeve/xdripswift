@@ -158,6 +158,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     }
     
     func didConnectTo(bluetoothTransmitter: BluetoothTransmitter) {
+        if let libre3 = bluetoothTransmitter as? CGMLibre3Transmitter, !libre3.isAuthenticated { return }
         
         // before exiting save the changes
         defer {
@@ -238,6 +239,25 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
                     }
                 )
 
+                if let libre3 = bluetoothTransmitter as? CGMLibre3Transmitter,
+                   let index = bluetoothPeripherals.firstIndex(where: { $0.blePeripheral.address == deviceAddressNewTransmitter }) {
+                    if let previous = bluetoothTransmitters[index], previous !== libre3 {
+                        previous.disconnectAndForget()
+                        previous.prepareForRelease()
+                    }
+                    bluetoothTransmitters[index] = libre3
+                    bluetoothPeripheral.blePeripheral.shouldconnect = true
+                    if let record = try? Libre3CredentialStore().load(serial: libre3.sensorSerial) {
+                        libre3Transmitter(libre3, updated: record)
+                    }
+                    let callback = callBackAfterDiscoveringDevice
+                    callBackAfterDiscoveringDevice = nil
+                    self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = nil
+                    checkCurrentCGMTransmitterHelper()
+                    callback?(bluetoothPeripheral)
+                    return
+                }
+
                 // This is an already known BluetoothTransmitter. Do not disconnect, avoid creating a duplicate entry.
                 // Clear the temporary scanning transmitter so we do not go through the "new device" creation path below.
                 self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = nil
@@ -297,6 +317,19 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         // add new bluetoothPeripheral and bluetoothTransmitter to array of bluetoothPeripherals and bluetoothTransmitters
         bluetoothTransmitters.insert(bluetoothTransmitter, at: insertInBluetoothPeripherals(bluetoothPeripheral: newBluetoothPeripheral))
         
+        if bluetoothTransmitter is CGMLibre3Transmitter {
+            // The saved device now owns this transmitter. Detail-screen scan cleanup must not
+            // disconnect/release the active sensor or disable its automatic reconnect path.
+            self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = nil
+            self.callBackForScanningResult = nil
+            trace("Libre 3 scan handoff complete, active transmitter retained", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
+        }
+
+        if let transmitter = bluetoothTransmitter as? CGMLibre3Transmitter,
+           let record = try? Libre3CredentialStore().load(serial: transmitter.sensorSerial) {
+            libre3Transmitter(transmitter, updated: record)
+        }
+
         // call the callback function
         if let callBackAfterDiscoveringDevice = callBackAfterDiscoveringDevice {
             callBackAfterDiscoveringDevice(newBluetoothPeripheral)
@@ -319,9 +352,11 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         
         trace("in deviceDidUpdateBluetoothState", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
         
-        if bluetoothTransmitter.deviceAddress == nil {
-            
-            /// this bluetoothTransmitter is created to start scanning for a new, unknown bluetoothtransmitter, so start scanning
+        if bluetoothTransmitter.deviceAddress == nil ||
+            (bluetoothTransmitter is CGMLibre3Transmitter &&
+             tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral === bluetoothTransmitter) {
+            // A Libre 3 being re-added can already have a saved Bluetooth address. Its central
+            // still starts as unknown. Forward the ready/connecting/error result to the add UI.
             let scanningResult = bluetoothTransmitter.startScanning()
             
             if let callBackForScanningResult = self.callBackForScanningResult {

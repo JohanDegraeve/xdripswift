@@ -47,9 +47,7 @@
 "settingsviews_alert_types_section_footer" = "تحدد أنواع التنبيهات كيفية عمل التنبيهات، بما في ذلك الصوت والاهتزاز والغفوة وتجاوز وضع الصامت.";
 "settingsviews_alerts_section_footer" = "تحدد التنبيهات متى يجب أن يرسل التطبيق إشعارًا بشأن مستويات الجلوكوز والقراءات المفقودة والحالات الأخرى.";
 "settingsviews_sectiontitlehealthkit" = "تطبيق صحتي";
-"settingsviews_healthkit" = "الكتابة إلى Apple Health";
 "settingsviews_sectiontitledexcomshareupload" = "ديكسكوم شير";
-"settingsviews_uploadReadingstoDexcomShare" = "تحميل";
 "settingsviews_dexcomShareUploadSerialNumber" = "الرمز التسلسلي لجهاز الإستقبال";
 "settingsviews_useUSDexcomShareurl" = "خوادم US";
 "settingsviews_dexcomShareAccountName" = "اسم الحساب";
@@ -58,7 +56,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "أدخل الرقم التسلسلي لجهاز استقبال ديكسكوم";
 "settingsviews_sectiontitlenightscout" = "نايتسكاوت";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "خيارات الرفع";
-"settingsviews_nightscoutEnabled" = "تفعيل نايتسكاوت؟";
 "settingsviews_nightscoutUrl" = "الرابط";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "تفعيل الجدول الزمني";
@@ -555,3 +552,33 @@
 "homeScreen.basalTop" = "الأعلى";
 "homeScreen.basalBottom" = "الأسفل";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "الرسم البياني للجلوكوز";
+
+"therapy.none" = "لا";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "حدود العلاجات";
+"therapy.smallBolusThreshold" = "بلعة صغيرة";
+"therapy.smallCarbThreshold" = "كربوهيدرات";
+"therapy.treatmentThresholdsExplanation" = "قيم البلعات والكربوهيدرات دون الحدود مخفية على الرسم. حد البلعة يحدد أيضًا البلعات الصغيرة في قائمة العلاجات. «لا» يعرض كل القيم.";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "تقدير الجلوكوز";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "مقياس العلاجات";
+"therapy.scaleStandard" = "عادي";
+"therapy.scaleSmallDoses" = "جرعة صغيرة";
+"therapy.treatmentScaleExplanation" = "الجرعات الصغيرة أوضح بعلامات أكبر. تتدرج علامات البلعة من 0.1–2.0U والكربوهيدرات من 1–50g. الكميات الأعلى تستخدم أكبر علامة.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "الحد الأدنى";
+"settingsviews_liveActivityTypeNormal" = "عادي";
+"settingsviews_liveActivityTypeLarge" = "كبير";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "الرفع إلى Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "نطق المقدمة";
+"speak.preview" = "معاينة نطق الجلوكوز";

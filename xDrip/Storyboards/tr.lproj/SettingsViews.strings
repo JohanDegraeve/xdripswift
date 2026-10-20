@@ -53,9 +53,7 @@
 "settingsviews_alert_types_section_footer" = "Alarm Türleri, ses, titreşim, erteleme ve sessiz modu geçersiz kılma dahil alarmların nasıl davranacağını belirler.";
 "settingsviews_alerts_section_footer" = "Alarmlar, uygulamanın glukoz seviyeleri, eksik okumalar ve diğer durumlar için ne zaman bildirim göndereceğini belirler.";
 "settingsviews_sectiontitlehealthkit" = "Apple Sağlık";
-"settingsviews_healthkit" = "Apple Sağlığa yaz";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Yükle";
 "settingsviews_dexcomShareUploadSerialNumber" = "Alıcı Seri Numarası";
 "settingsviews_useUSDexcomShareurl" = "US sunucuları";
 "settingsviews_dexcomShareAccountName" = "Hesap Adı";
@@ -64,7 +62,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Dexcom Alıcı Seri Numarasını girin";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Yükleme Seçenekleri";
-"settingsviews_nightscoutEnabled" = "Nightscout etkinleştirilsin mi";
 "settingsviews_nightscoutUrl" = "URL";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Zamanlamayı etkinleştir";
@@ -547,3 +544,33 @@
 "homeScreen.basalTop" = "Üst";
 "homeScreen.basalBottom" = "Alt";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Glikoz Grafiği";
+
+"therapy.none" = "Yok";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Tedavi eşikleri";
+"therapy.smallBolusThreshold" = "Ufak bolus";
+"therapy.smallCarbThreshold" = "Az karb.";
+"therapy.treatmentThresholdsExplanation" = "Eşik altındaki bolus ve karbonhidrat değerleri grafikte gizlenir. Bolus eşiği tedavi listesindeki küçük bolusları da tanımlar. «Yok» tüm değerleri gösterir.";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Glikoz Tahmini";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Tedavi ölçeği";
+"therapy.scaleStandard" = "Standart";
+"therapy.scaleSmallDoses" = "Düşük doz";
+"therapy.treatmentScaleExplanation" = "Düşük doz küçük işaretleri daha görünür yapar. Bolus: 0.1–2.0U; karbonhidrat: 1–50g. Daha büyük miktarlar en büyük işareti kullanır.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimal";
+"settingsviews_liveActivityTypeNormal" = "Normal";
+"settingsviews_liveActivityTypeLarge" = "Büyük";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Dexcom Share Yüklemesi";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Giriş cümlesini söyle";
+"speak.preview" = "Glikoz sesini önizle";

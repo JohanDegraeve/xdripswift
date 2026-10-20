@@ -58,6 +58,7 @@
 
 /// literally 'Cancel'
 "common_cancel" = "Cancel";
+"common_close" = "关闭";
 
 /// white
 "white" = "white";
@@ -155,3 +156,13 @@
 "common_sensorWarmupUntilFormat" = "至 %@";
 "common_sensorWarmupComplete" = "预热完成";
 "common_sensorWaitingForReading" = "等待首次读数…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "估算 HbA1c";
+
+/* Switch title when the surrounding screen or section identifies the feature */
+"common_enable" = "启用";
+
+/* Status label, including Direct to Watch in Advanced Settings. */
+"common_enabled" = "已启用";

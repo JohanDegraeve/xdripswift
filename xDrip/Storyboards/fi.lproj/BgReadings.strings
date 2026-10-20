@@ -44,3 +44,10 @@
 "bgRangeUrgent" = "Kiireellinen";
 "bgRangeNotUrgent" = "Ei kiireellinen";
 "bgRangeInRange" = "Alueella";
+
+"alsoCollectedByWatch" = "Myös Watchin keräämä";
+
+// Direct to Watch setup and diagnosis
+"receivedViaWatchAtFooterFormat" = "Vastaanotettu Watchin kautta klo %@";
+"backfilledViaWatchAtFooterFormat" = "Täydennetty Watchin kautta klo %@";
+"receivedViaWatch" = "Vastaanotettu Watchin kautta";

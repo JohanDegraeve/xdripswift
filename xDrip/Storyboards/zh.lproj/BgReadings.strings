@@ -44,3 +44,10 @@
 "bgRangeUrgent" = "紧急";
 "bgRangeNotUrgent" = "非紧急";
 "bgRangeInRange" = "范围内";
+
+"alsoCollectedByWatch" = "Watch 也已采集";
+
+// Direct to Watch setup and diagnosis
+"receivedViaWatchAtFooterFormat" = "于 %@ 通过 Watch 接收";
+"backfilledViaWatchAtFooterFormat" = "于 %@ 通过 Watch 回填";
+"receivedViaWatch" = "通过 Watch 接收";

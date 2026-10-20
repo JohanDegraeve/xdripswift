@@ -1,7 +1,6 @@
 "alerttypessettingsview_screentitle" = "Types d'alerte";
 "alerttypesettingsview_screentitle" = "Editer le type d'alerte";
 "alerttypesettingsview_name" = "Nom";
-"alerttypesettingsview_enabled" = "Activer";
 "alerttypesettingsview_vibrate" = "Vibrer";
 "alerttypesettingsview_snoozevianotification" = "Snooze via Notification";
 "alerttypesettingsview_defaultsnoozeperiod" = "Durée Snooze";
@@ -17,3 +16,6 @@
 
 /// when editing an alert type, field title for Sound
 "alerttypesettingsview_sound" = "Son";
+
+"alerttypesettingsview_repeatsound" = "Répéter le son";
+"alerttypesettingsview_previewalert" = "Tester l’alarme";

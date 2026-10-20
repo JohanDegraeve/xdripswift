@@ -26,6 +26,10 @@ public final class LiveActivityManager: ObservableObject {
     private var shouldRun = false
     private var commandRevision = 0
     private var backgroundUpdateTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
+
+    // Only completed submissions for this activity may suppress another update.
+    private var activityPublication = CompanionPublicationCache<XDripWidgetAttributes.ContentState>()
+    private var publishedActivityID: String?
     
     // initialize an "empty" contentState and use this to hold the current context state of the live activity after each start/update
     // this makes it much easier to restart from an App Intent without needing to generate a new context to send
@@ -80,6 +84,16 @@ extension LiveActivityManager {
     func update(contentState: XDripWidgetAttributes.ContentState, forceRestart: Bool = false) {
         let contentState = contentState.limitedForActivityPayload(maximumEncodedBytes: maximumContentStateEncodedBytes)
 
+        // Only skip here when idle. If B is queued after A, a new A must replace B, even though
+        // A matches the last completed publication. The processor checks again after each await.
+        let now = Date()
+        let publicationState = preparedContentState(contentState, at: now)
+        if shouldRun, !isUpdating, pendingUpdate == nil, !forceRestart,
+           eventActivity?.activityState == .active, eventActivity?.id == publishedActivityID,
+           !activityPublication.shouldPublish(publicationState.publicationValue, at: now) {
+            return
+        }
+
         commandRevision += 1
         shouldRun = true
         persistentContentState = contentState
@@ -119,15 +133,14 @@ extension LiveActivityManager {
     private func beginBackgroundUpdateTaskIfNeeded() {
         guard backgroundUpdateTaskIdentifier == .invalid else { return }
 
-        // ActivityKit permits background updates, but the app still needs execution time to finish
-        // the asynchronous update. Request that time before queuing the processor, as recommended by:
+        // Give the queued ActivityKit update time to finish during a short Bluetooth wake.
+        // Release the assertion when the queue drains, or when UIKit expires it.
         // https://developer.apple.com/documentation/activitykit/activity/update(_:)
         // https://developer.apple.com/documentation/uikit/uiapplication/beginbackgroundtask(withname:expirationhandler:)
         backgroundUpdateTaskIdentifier = UIApplication.shared.beginBackgroundTask(
             withName: "Live Activity Update",
             expirationHandler: { [weak self] in
                 guard let self else { return }
-
                 trace("in LiveActivityManager, background update task expired", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .error)
                 self.endBackgroundUpdateTaskIfNeeded()
             }
@@ -169,6 +182,9 @@ extension LiveActivityManager {
 
     @MainActor
     private func endActivities() async {
+        // A replacement or recovered activity must receive its first payload, even if it matches.
+        activityPublication = CompanionPublicationCache()
+        publishedActivityID = nil
         for activity in Activity<XDripWidgetAttributes>.activities {
             trace("in endAll, ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: activity.id))
             await activity.end(nil, dismissalPolicy: .immediate)
@@ -179,7 +195,8 @@ extension LiveActivityManager {
     /// Public API: Restart from intent/shortcut
     @MainActor
     func restartFromIntent() {
-        if (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)) && UserDefaults.standard.liveActivityType != .disabled {
+        // use enablement here so switching off retains the selected style
+        if (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)) && UserDefaults.standard.liveActivitiesEnabled {
             if persistentContentState.urgentLowLimitInMgDl > 0 {
                 trace("in restartFromIntent, will try and end/restart current Live Activity", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 Task { @MainActor [weak self] in
@@ -248,7 +265,7 @@ extension LiveActivityManager {
             if activityAge >= minimumForceRestartAge {
                 guard UIApplication.shared.applicationState == .active else {
                     trace("in ensureActivity, deferring forced restart because application is not active", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
-                    await updateActivity(to: contentState)
+                    await updateActivity(to: contentState, force: true)
                     return
                 }
 
@@ -277,7 +294,7 @@ extension LiveActivityManager {
         }
         
         // Otherwise, update the currently activity (this would be the normal path)
-        await updateActivity(to: contentState)
+        await updateActivity(to: contentState, force: forceRestart)
     }
     
     /// end all live activities that are spawned from the app
@@ -311,6 +328,8 @@ extension LiveActivityManager {
             
             // update the persistent content state with the new/updated content state
             persistentContentState = updatedContentState
+            activityPublication.record(updatedContentState.publicationValue, at: now, refreshDates: updatedContentState.publicationRefreshDates)
+            publishedActivityID = eventActivity?.id
             
             trace("in startActivity, new live activity started: %{public}@", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, troubleshooting: .detailed(.integration(name: .liveActivity, activity: .succeeded(itemCount: nil))), String(describing: eventActivity?.id))
         } catch {
@@ -323,7 +342,7 @@ extension LiveActivityManager {
     /// update the current live activity
     /// - Parameter contentState: the updated context state of the activity
     @MainActor
-    private func updateActivity(to contentState: XDripWidgetAttributes.ContentState) async {
+    private func updateActivity(to contentState: XDripWidgetAttributes.ContentState, force: Bool = false) async {
         guard shouldRun else { return }
 
         if eventActivity?.activityState == .ended {
@@ -349,17 +368,36 @@ extension LiveActivityManager {
             trace("in updateActivity, previous live activity was dismissed by the user so it will be ended and will try to start a new one.", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
         } else {
             // update the warnUserToOpenApp flag if needed and then update the activity
-            var updatedContentState = contentState
-            
-            // if the event was started more than 'x' time ago, then let's inform the user that the live activity will soon end so that they open the app
-            updatedContentState.warnUserToOpenApp = eventStartDate < Date().addingTimeInterval(-ConstantsLiveActivity.warnLiveActivityAfterSeconds) ? true : false
+            let now = Date()
+            let updatedContentState = preparedContentState(contentState, at: now)
+            // Check again after the previous queued update completes. Pending duplicates can
+            // now match, but forced refreshes and ActivityKit recovery must still run.
+            if eventActivity?.activityState == .active, eventActivity?.id == publishedActivityID,
+               !activityPublication.shouldPublish(updatedContentState.publicationValue, at: now, force: force) {
+                return
+            }
             
             // update the persistent content state with the new/updated content state
             persistentContentState = updatedContentState
             
+            let activityID = eventActivity?.id
             await eventActivity?.update(ActivityContent(state: updatedContentState, staleDate: nil))
+            // A stop or replacement can occur while ActivityKit is updating. Do not repopulate
+            // the cache for an activity which no longer owns this manager's state.
+            if shouldRun, let activityID, eventActivity?.id == activityID, eventActivity?.activityState == .active {
+                activityPublication.record(updatedContentState.publicationValue, at: now, refreshDates: updatedContentState.publicationRefreshDates)
+                publishedActivityID = activityID
+            }
             trace("in updateActivity, live activity updated", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .debug, troubleshooting: .detailed(.integration(name: .liveActivity, activity: .succeeded(itemCount: nil))))
         }
+    }
+
+    // Use the actual activity age so an unchanged reading still publishes the open-app warning.
+    private func preparedContentState(_ contentState: XDripWidgetAttributes.ContentState, at date: Date) -> XDripWidgetAttributes.ContentState {
+        var state = contentState
+        state.eventStartDate = eventStartDate
+        state.warnUserToOpenApp = eventStartDate < date.addingTimeInterval(-ConstantsLiveActivity.warnLiveActivityAfterSeconds)
+        return state
     }
     
     @MainActor

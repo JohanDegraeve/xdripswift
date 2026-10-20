@@ -35,7 +35,7 @@ struct MainViewDataSourceView: View {
             if (watchState.activeSensorDescription != "" || watchState.sensorAgeInMinutes > 0) || !watchState.isMaster {
                 sensorLifetimeProgressView
                 
-                HStack(alignment: .center) {
+                ScaledDataSourceRow(height: isSmallScreen ? 20 : 22) {
                     if !watchState.isMaster {
                         HStack(alignment: .center, spacing: isSmallScreen ? 2 : 4) {
                             Circle()
@@ -45,18 +45,15 @@ struct MainViewDataSourceView: View {
                                     Circle()
                                         .stroke(watchState.followerConnectionIndicatorColor().opacity(0.35), lineWidth: 3)
                                 }
-                            
+
                             watchState.followerBackgroundKeepAliveType.keepAliveImage
                                 .font(.system(size: textSize))
                                 .foregroundStyle(watchState.getFollowerBackgroundKeepAliveColor())
-                            
+
                             Text(watchState.followerDataSourceType.shortDescription)
                                 .font(.system(size: textSize)).fontWeight(.semibold)
-                                .minimumScaleFactor(0.2)
-                                .allowsTightening(true)
                                 .lineLimit(1)
                         }
-                        .layoutPriority(1)
                     } else {
                         HStack(alignment: .center, spacing: isSmallScreen ? 2 : 4) {
                             if let sensorNoiseIndicatorColor = watchState.sensorNoiseIndicatorColor() {
@@ -72,19 +69,19 @@ struct MainViewDataSourceView: View {
 
                             Text(watchState.activeSensorDescription)
                                 .font(.system(size: textSize)).fontWeight(.semibold)
-                                .minimumScaleFactor(0.2)
-                                .allowsTightening(true)
                                 .lineLimit(1)
+
+                            if watchState.watchCollectionConfigured {
+                                DirectWatchCollectionIcon(symbolSize: 16)
+                            }
                         }
-                        .layoutPriority(1)
                     }
-                    
-                    Spacer()
-                    
+                } trailing: {
                     if watchState.sensorAgeInMinutes > 0 {
                         Text(watchState.activeSensorLifetimeText())
                             .font(.system(size: textSize))
                             .foregroundStyle(watchState.activeSensorProgress().textColor)
+                            .lineLimit(1)
                     }
                 }
                 .padding([.leading, .trailing], isSmallScreen ? 6 : 8)
@@ -115,6 +112,125 @@ struct MainViewDataSourceView: View {
             .scaleEffect(x: 1, y: 0.3, anchor: .center)
             .padding(.vertical, 2)
     }
+}
+
+private enum DataSourceRowSide: Hashable {
+    case leading, trailing
+}
+
+private struct DataSourceRowWidthKey: PreferenceKey {
+    static var defaultValue: [DataSourceRowSide: CGFloat] = [:]
+
+    static func reduce(value: inout [DataSourceRowSide: CGFloat], nextValue: () -> [DataSourceRowSide: CGFloat]) {
+        value.merge(nextValue(), uniquingKeysWith: { _, new in new })
+    }
+}
+
+/// Fit both ends of the line at one scale while keeping sensor age at the trailing edge.
+struct ScaledDataSourceRow<Leading: View, Trailing: View>: View {
+    let height: CGFloat
+    let leading: Leading
+    let trailing: Trailing
+    @State private var widths: [DataSourceRowSide: CGFloat] = [:]
+
+    init(height: CGFloat, @ViewBuilder leading: () -> Leading, @ViewBuilder trailing: () -> Trailing) {
+        self.height = height
+        self.leading = leading()
+        self.trailing = trailing()
+    }
+
+    var body: some View {
+        GeometryReader { available in
+            let leadingWidth = widths[.leading] ?? 0
+            let trailingWidth = widths[.trailing] ?? 0
+            let gap: CGFloat = trailingWidth > 0 ? 6 : 0
+            let naturalWidth = leadingWidth + trailingWidth + gap
+            let scale = available.size.width > 0 && naturalWidth > 0
+                ? min(1, available.size.width / naturalWidth) : 1
+
+            HStack(spacing: 0) {
+                leading
+                    .fixedSize(horizontal: true, vertical: false)
+                    .background {
+                        GeometryReader { measured in
+                            Color.clear.preference(key: DataSourceRowWidthKey.self, value: [.leading: measured.size.width])
+                        }
+                    }
+
+                Spacer(minLength: gap)
+
+                trailing
+                    .fixedSize(horizontal: true, vertical: false)
+                    .background {
+                        GeometryReader { measured in
+                            Color.clear.preference(key: DataSourceRowWidthKey.self, value: [.trailing: measured.size.width])
+                        }
+                    }
+            }
+            .frame(width: available.size.width / scale)
+            .scaleEffect(scale, anchor: .leading)
+            .frame(width: available.size.width, height: available.size.height, alignment: .leading)
+        }
+        .frame(height: height)
+        .onPreferenceChange(DataSourceRowWidthKey.self) { measured in
+            if measured != widths { widths = measured }
+        }
+    }
+}
+
+/// Glucose pages show collection status. Phone communication stays in Connection details.
+struct DirectWatchCollectionIcon: View {
+    @EnvironmentObject var watchState: WatchStateModel
+    var symbolSize: CGFloat = 16
+
+    var body: some View {
+        if watchState.watchCollectionConfigured {
+            TimelineView(.periodic(from: .now, by: 2)) { timeline in
+                let status = watchState.directWatchCollector.isPaused ? .paused : watchReadingStatus(at: timeline.date)
+                Image(systemName: ConstantsDirectWatch.watchSymbol(for: status))
+                    .foregroundStyle(ConstantsDirectWatch.statusColor(for: status))
+                    .accessibilityLabel(status.title)
+                    .font(.system(size: symbolSize))
+            }
+        }
+    }
+
+    private func watchReadingStatus(at date: Date) -> DirectWatchReadingStatus {
+        guard watchState.directWatchCollector.configuration != nil else { return .suspended }
+        let lastReading = watchState.directWatchCollector.latestReadingAt
+        return DirectWatchReadingStatus(isConfigured: true, isSuspended: false, latestReadingAt: lastReading, now: date,
+                                        resumedAt: watchState.directWatchCollector.collectionResumedAt,
+                                        lastConnectedAt: watchState.directWatchCollector.lastConnectedAt)
+    }
+}
+
+/// Scale the whole row, including SF Symbols, at one ratio without truncating its text.
+struct UniformlyScaledWatchRow<Content: View>: View {
+    let height: CGFloat
+    @ViewBuilder var content: () -> Content
+    @State private var naturalWidth: CGFloat = 0
+
+    var body: some View {
+        GeometryReader { available in
+            let scale = naturalWidth > 0 ? min(1, available.size.width / naturalWidth) : 1
+            content()
+                .fixedSize(horizontal: true, vertical: false)
+                .background {
+                    GeometryReader { measured in
+                        Color.clear.preference(key: WatchRowNaturalWidthKey.self, value: measured.size.width)
+                    }
+                }
+                .scaleEffect(scale)
+                .frame(width: available.size.width, height: available.size.height, alignment: .center)
+        }
+        .frame(height: height)
+        .onPreferenceChange(WatchRowNaturalWidthKey.self) { naturalWidth = $0 }
+    }
+}
+
+private struct WatchRowNaturalWidthKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
 }
 
 struct MainViewDataSourceView_Previews: PreviewProvider {

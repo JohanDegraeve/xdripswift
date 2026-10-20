@@ -171,6 +171,8 @@
 "batteryHistoryRange" = "Intervall";
 "batteryHistoryRangeAccessibility" = "Intervall för batterihistorik";
 "batteryHistoryRangeExplanation" = "Fasta intervall går från nu och tillbaka det valda antalet dagar. Luckor visar perioder utan avläsning.";
+"batteryHistoryInactive" = "Sändaren är inaktiv";
+"batteryHistoryHistoricalRangeExplanation" = "Intervallen slutar vid den senast registrerade avläsningen. Luckor visar perioder utan avläsning.";
 
 "connectionDiagramOtherApp" = "Annan app";
 
@@ -195,3 +197,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Upphör";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Bluetooth-åtkomst är inte aktiverad";
+"bluetoothAccessInstructions" = "För att ansluta, öppna Inställningar → Integritet och säkerhet → Bluetooth och tillåt åtkomst för %@.";
+"bluetoothAccessRestrictedInstructions" = "Enhetens begränsningar förhindrar Bluetooth-åtkomst. Kontrollera Skärmtid eller kontakta enhetens administratör för att aktivera åtkomst.";

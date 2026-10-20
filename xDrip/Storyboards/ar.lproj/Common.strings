@@ -1,5 +1,6 @@
 "common_Ok" = "تم";
 "common_cancel" = "إلغاء";
+"common_close" = "إغلاق";
 "common_mgdl" = "mg/dL";
 "common_mmol" = "mmol/L";
 "common_bloodglucoseunit" = "وحدة قياس سكر الدم";
@@ -78,3 +79,13 @@
 "common_sensorWarmupUntilFormat" = "حتى %@";
 "common_sensorWarmupComplete" = "اكتمل الإحماء";
 "common_sensorWaitingForReading" = "بانتظار القراءة الأولى…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "HbA1c المقدّر";
+
+/* Switch title when the surrounding screen or section identifies the feature */
+"common_enable" = "تفعيل";
+
+/* Status label, including Direct to Watch in Advanced Settings. */
+"common_enabled" = "مفعّل";

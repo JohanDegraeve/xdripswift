@@ -8,6 +8,7 @@ import CoreData
 /// - enabled : if false then no alert will be generated
 /// - name : the name of the alerttype as shown in the UI, should be unique
 /// - overrideMute : should alert make sound if the alert is muted
+/// - repeatSound : repeat immediate override-mute audio until acknowledged
 /// - snooze : can the alert be snoozed from the home screen notification
 /// - vibrate : should the phone vibrate when the alert fires
 /// - soundname : the name of the sound as shown in the UI. ConstantsSounds defines available sounds. Per case there a string which is the soundname as shown in the UI and the filename of the sound in the Resources folder, seperated by backslash. Some special cases : an empty string means no sound needed. A nil value means default iOS sound. Any other value should be in the list defined in ConstantsSounds, otherwise the default xDrip sound will be used (see AlertManager.swift)
@@ -22,7 +23,8 @@ public class AlertType: NSManagedObject {
         vibrate:Bool,
         soundName:String?,
         alertEntries:[AlertEntry]?,
-        nsManagedObjectContext:NSManagedObjectContext
+        nsManagedObjectContext:NSManagedObjectContext,
+        repeatSound: Bool = false
         ) {
         let entity = NSEntityDescription.entity(forEntityName: "AlertType", in: nsManagedObjectContext)!
         super.init(entity: entity, insertInto: nsManagedObjectContext)
@@ -30,6 +32,7 @@ public class AlertType: NSManagedObject {
         self.enabled = enabled
         self.name = name
         self.overridemute = overrideMute
+        self.repeatSound = repeatSound
         self.snooze = snooze
         self.snoozeperiod = Int16(snoozePeriod)
         self.vibrate = vibrate

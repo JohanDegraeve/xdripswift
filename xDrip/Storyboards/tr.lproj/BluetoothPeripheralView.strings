@@ -161,6 +161,8 @@
 "batteryHistoryRange" = "Aralık";
 "batteryHistoryRangeAccessibility" = "Pil geçmişi aralığı";
 "batteryHistoryRangeExplanation" = "Sabit aralıklar şu andan seçilen gün sayısı kadar geriye uzanır. Boşluklar okuma olmayan dönemleri gösterir.";
+"batteryHistoryInactive" = "Verici etkin değil";
+"batteryHistoryHistoricalRangeExplanation" = "Aralıklar son kaydedilen okumada sona erer. Boşluklar okuma olmayan dönemleri gösterir.";
 
 "connectionDiagramOtherApp" = "Diğer uygulama";
 
@@ -185,3 +187,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Sona erme";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Bluetooth erişimi etkin değil";
+"bluetoothAccessInstructions" = "Bağlanmak için Ayarlar → Gizlilik ve Güvenlik → Bluetooth yolunu açın ve %@ için erişime izin verin.";
+"bluetoothAccessRestrictedInstructions" = "Aygıt kısıtlamaları Bluetooth erişimini engelliyor. Erişimi etkinleştirmek için Ekran Süresi ayarlarını kontrol edin veya aygıt yöneticinizle iletişime geçin.";

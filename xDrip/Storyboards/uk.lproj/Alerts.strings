@@ -62,3 +62,11 @@
 
 /// when calibration is needed, this is the title of the alert notification, also in alert settings list, for the name of the alert
 "alerts_calibrationneeded" = "Calibration Reminder";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "Термін роботи сенсора скоро спливе";
+"sensorExpiry.expectedExpiry" = "Очікуване завершення роботи сенсора";
+"sensorExpiry.hoursBefore" = "Годин до завершення";
+"sensorExpiry.hoursHelp" = "Введіть ціле число від 1 до 48 годин.";
+"sensorExpiry.endingSoonBody" = "Очікується, що термін роботи сенсора завершиться %@.";
+"sensorExpiry.expectedExpiryBody" = "Сенсор досяг очікуваного терміну завершення роботи (%@).";
