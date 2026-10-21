@@ -128,18 +128,74 @@ final class SensorExpiryReminderManagerTests: XCTestCase {
         XCTAssertEqual(deadlines, [correctedStart.addingTimeInterval(14.5 * 86400), correctedStart.addingTimeInterval(15.5 * 86400)])
     }
 
-    func testPassedRemindersNeverReplayAfterRestartAndExpiryExtension() async {
+    func testPassedRemindersDoNotReplayAfterRestartOrReenable() async {
         let sensor = snapshot(days: 2)
         var manager = makeManager()
         await apply(manager, sensor)
         referenceDate = referenceDate.addingTimeInterval(3 * 86400)
-        scheduler.requests.removeAll() // Simulate dismissed notifications.
+        scheduler.requests.removeAll()
         manager = makeManager()
-        await apply(manager, SensorExpirySnapshot(source: sensor.source, sessionID: sensor.sessionID, startDate: sensor.startDate, lifetimeDays: 10))
+        await apply(manager, sensor)
         XCTAssertTrue(scheduler.requests.isEmpty)
         await apply(manager, sensor, enabled: false)
-        await apply(manager, snapshot(start: sensor.startDate))
+        await apply(manager, sensor)
         XCTAssertTrue(scheduler.requests.isEmpty)
+    }
+
+    func testLifetimeExtensionRearmsPassedRemindersWithoutDuplicatingOnRestart() async {
+        let sensor = snapshot(days: 2)
+        var manager = makeManager()
+        await apply(manager, sensor)
+        let identifiers = Set(scheduler.requests.keys)
+        referenceDate = referenceDate.addingTimeInterval(3 * 86400)
+        scheduler.requests.removeAll()
+        manager = makeManager()
+        let extended = snapshot(days: 4, start: sensor.startDate)
+        await apply(manager, extended, hours: 23)
+        XCTAssertEqual(Set(scheduler.requests.keys), identifiers)
+        XCTAssertEqual(deadlines, [sensor.startDate.addingTimeInterval(73 * 3600), sensor.startDate.addingTimeInterval(4 * 86400)])
+        let adds = scheduler.addCount
+        manager = makeManager()
+        await apply(manager, extended, hours: 23)
+        XCTAssertEqual(scheduler.addCount, adds)
+    }
+
+    func testRepeatedWarningHourChangesRearmOnlyTheWarning() async {
+        let sensor = snapshot(days: 4)
+        var manager = makeManager()
+        await apply(manager, sensor)
+        let identifiers = Set(scheduler.requests.keys)
+        for hours in [23, 22] {
+            referenceDate = sensor.startDate.addingTimeInterval(Double(95 - hours) * 3600 + 600)
+            scheduler.requests = scheduler.requests.filter { $0.value.content.title != AlertKind.sensorEndingSoon.alertTitle() }
+            manager = makeManager()
+            await apply(manager, sensor, hours: hours)
+            XCTAssertEqual(Set(scheduler.requests.keys), identifiers)
+            XCTAssertEqual(deadlines, [sensor.startDate.addingTimeInterval(Double(96 - hours) * 3600), sensor.startDate.addingTimeInterval(4 * 86400)])
+        }
+        XCTAssertEqual(scheduler.addCount, 4)
+    }
+
+    func testSavedConsumedWarningCanRecoverAfterLifetimeWasAlreadyEdited() async throws {
+        let sensor = snapshot(days: 2)
+        var manager = makeManager()
+        await apply(manager, sensor)
+        referenceDate = sensor.startDate.addingTimeInterval(3 * 86400)
+        scheduler.requests.removeAll()
+        await apply(manager, sensor)
+
+        // Match the old saved state after a lifetime edit left the warning marked as used.
+        let data = try XCTUnwrap(defaults.data(forKey: "sensorExpiryReminderState"))
+        var state = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var savedSnapshot = try XCTUnwrap(state["snapshot"] as? [String: Any])
+        savedSnapshot["lifetimeDays"] = 4
+        state["snapshot"] = savedSnapshot
+        defaults.set(try JSONSerialization.data(withJSONObject: state), forKey: "sensorExpiryReminderState")
+
+        manager = makeManager()
+        await apply(manager, snapshot(days: 4, start: sensor.startDate), hours: 23)
+        XCTAssertEqual(scheduler.requests.count, 2)
+        XCTAssertEqual(deadlines, [sensor.startDate.addingTimeInterval(73 * 3600), sensor.startDate.addingTimeInterval(4 * 86400)])
     }
 
     func testDisableReenableBeforeDeadlineAndSoundEdits() async {
@@ -218,7 +274,7 @@ final class SensorExpiryReminderManagerTests: XCTestCase {
         XCTAssertEqual(scheduler.addCount, 3)
     }
 
-    func testStaleAcceptanceAfterDeadlineCannotReplayAnAlreadyDueWarning() async {
+    func testStaleAcceptanceAfterDeadlineUsesTheNewFutureDeadline() async {
         let manager = makeManager()
         let sensor = snapshot(days: 2)
         scheduler.onAdd = {
@@ -227,8 +283,8 @@ final class SensorExpiryReminderManagerTests: XCTestCase {
             manager.reconcile(snapshot: self.snapshot(days: 10, start: sensor.startDate), configurations: self.configurations())
         }
         await apply(manager, sensor)
-        XCTAssertEqual(scheduler.requests.count, 1)
-        XCTAssertEqual(deadlines, [sensor.startDate.addingTimeInterval(10 * 86400)])
+        XCTAssertEqual(scheduler.requests.count, 2)
+        XCTAssertEqual(deadlines, [sensor.startDate.addingTimeInterval(9 * 86400), sensor.startDate.addingTimeInterval(10 * 86400)])
     }
 
     func testRestoredSnapshotSurvivesTransientDisplayCacheClearing() async {
