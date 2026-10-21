@@ -120,17 +120,55 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
         })
         processWatchUpdate(updateTypes: [.status, .bgReadings], forceComplicationUpdate: false)
         directWatchObservers.append(NotificationCenter.default.addObserver(forName: DirectWatchSettings.changed, object: nil, queue: .main) { [weak self] _ in self?.sendDirectWatchConfiguration() })
-        directWatchObservers.append(NotificationCenter.default.addObserver(forName: DirectWatchSettings.requestLogs, object: nil, queue: .main) { [weak self] _ in
+        directWatchObservers.append(NotificationCenter.default.addObserver(forName: DirectWatchSettings.requestLogs, object: nil, queue: .main) { [weak self] notification in
+            let requestID = notification.userInfo?[DirectWatchSettings.logRequestIDKey] as? String
             guard let self, self.session.activationState == .activated else {
-                DirectWatchSettings.recordLogRequest(queued: false)
+                DirectWatchSettings.recordLogRequest(queued: false, requestID: requestID)
                 return
             }
-            let request = DirectWatchCompatibility.outgoing(["directWatchRequestLogs": true])
-            if self.session.isReachable {
+            var payload: [String: Any] = ["directWatchRequestLogs": true]
+            payload[DirectWatchSettings.logRequestIDKey] = requestID
+            let request = DirectWatchCompatibility.outgoing(payload)
+            DirectWatchSettings.recordLogRequest(queued: true, requestID: requestID)
+            if self.session.isReachable, let requestID {
+                self.requestReportLog(requestID: requestID, deadline: ProcessInfo.processInfo.systemUptime + DirectWatchLogReply.requestTimeout)
+            } else if self.session.isReachable {
                 self.session.sendMessage(request, replyHandler: nil, errorHandler: { _ in self.session.transferUserInfo(request) })
             } else { self.session.transferUserInfo(request) }
-            DirectWatchSettings.recordLogRequest(queued: true)
         })
+    }
+
+    private func requestReportLog(requestID: String, deadline: TimeInterval, data: Data = Data(), totalBytes: Int? = nil) {
+        guard ProcessInfo.processInfo.systemUptime < deadline else { return }
+        let payload: [String: Any] = ["directWatchRequestLogs": true, DirectWatchLogReply.requestIDKey: requestID,
+                                      DirectWatchLogReply.offsetKey: data.count]
+        session.sendMessage(DirectWatchCompatibility.outgoing(payload), replyHandler: { [weak self] reply in
+            guard let self else { return }
+            guard let assembled = DirectWatchLogReply.append(reply, requestID: requestID, to: data, totalBytes: totalBytes) else {
+                DispatchQueue.main.async { DirectWatchSettings.recordLogRequest(queued: false, requestID: requestID) }
+                return
+            }
+            if assembled.data.count == assembled.totalBytes {
+                self.importDirectWatchLog(assembled.data, requestID: requestID)
+            } else {
+                self.requestReportLog(requestID: requestID, deadline: deadline, data: assembled.data, totalBytes: assembled.totalBytes)
+            }
+        }, errorHandler: { [weak self] _ in
+            // An older or unreachable Watch can still provide a queued file for manual sharing.
+            let fallback: [String: Any] = ["directWatchRequestLogs": true, DirectWatchLogReply.requestIDKey: requestID]
+            self?.session.transferUserInfo(DirectWatchCompatibility.outgoing(fallback))
+        })
+    }
+
+    private func importDirectWatchLog(_ data: Data, requestID: String?) {
+        do {
+            guard !data.isEmpty, data.count <= DirectWatchLogReply.maximumBytes else { throw CocoaError(.fileReadCorruptFile) }
+            try data.write(to: DirectWatchSettings.receivedLogURL, options: .atomic)
+            DispatchQueue.main.async { DirectWatchSettings.recordLogsReceived(requestID: requestID, data: data) }
+        } catch {
+            DispatchQueue.main.async { DirectWatchSettings.recordLogRequest(queued: false, requestID: requestID) }
+            trace("Direct to Watch log import failed: %{public}@", log: log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
+        }
     }
 
     private func sendDirectWatchConfiguration() {
@@ -219,6 +257,10 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
     private func receiveDirectWatchPayload(_ payload: [String: Any], reply: (([String: Any]) -> Void)? = nil) {
         let payload = DirectWatchCompatibility.normalized(payload)
         DispatchQueue.main.async {
+            if payload["directWatchLogFailed"] as? Bool == true,
+               let requestID = payload[DirectWatchSettings.logRequestIDKey] as? String {
+                DirectWatchSettings.recordLogRequest(queued: false, requestID: requestID)
+            }
             if let control = DirectWatchCollectionControl.decode(payload) {
                 DirectWatchSettings.receiveCollectionControl(control)
             }
@@ -648,17 +690,16 @@ extension WatchManager: WCSessionDelegate {
 
     func session(_: WCSession, didReceive file: WCSessionFile) {
         guard DirectWatchCompatibility.normalized(file.metadata ?? [:])["directWatchLog"] as? Bool == true else { return }
+        let requestID = DirectWatchCompatibility.normalized(file.metadata ?? [:])[DirectWatchSettings.logRequestIDKey] as? String
         do {
             let attributes = try FileManager.default.attributesOfItem(atPath: file.fileURL.path)
-            guard let size = (attributes[.size] as? NSNumber)?.intValue, size > 0, size <= 2_000_000 else {
+            guard let size = (attributes[.size] as? NSNumber)?.intValue, size > 0, size <= DirectWatchLogReply.maximumBytes else {
                 throw CocoaError(.fileReadCorruptFile)
             }
-            try Data(contentsOf: file.fileURL).write(to: DirectWatchSettings.receivedLogURL, options: .atomic)
-            // WCSession owns this temporary URL only during the callback. Save it before
-            // publishing receipt on the main queue so the share action can use it immediately.
-            DispatchQueue.main.async { DirectWatchSettings.recordLogsReceived() }
+            // WCSession owns this URL only during the callback. Read it before returning.
+            importDirectWatchLog(try Data(contentsOf: file.fileURL), requestID: requestID)
         } catch {
-            DispatchQueue.main.async { DirectWatchSettings.recordLogRequest(queued: false) }
+            DispatchQueue.main.async { DirectWatchSettings.recordLogRequest(queued: false, requestID: requestID) }
             trace("Direct to Watch log import failed: %{public}@", log: log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
         }
     }

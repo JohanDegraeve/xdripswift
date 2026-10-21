@@ -58,6 +58,8 @@ fileprivate enum Setting:Int, CaseIterable {
 
 enum SettingsViewDevelopmentSettingsRowGroup {
     case advanced
+    case issueReporting
+    case advancedOptions
     case osAidLoopShare
     case osAidLoopShareWarning
 }
@@ -100,15 +102,15 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             nativeSettingsRow(id: "developer.showDeveloperSettings", index: Setting.showDeveloperSettings.rawValue, sectionID: sectionID),
             SettingsRow(
                 id: "developer.issueReport",
-                title: Texts_SettingsView.issueReportTitle,
+                title: Texts_SettingsView.shareIssueReport,
                 accessory: .disclosure,
                 isVisible: developerRowsVisible,
                 action: .settingsScreen {
                     SettingsScreen(
                         title: Texts_SettingsView.issueReportTitle,
                         onlineHelpTopic: .issueReporting,
-                        providers: {
-                            [SettingsViewTraceSettingsViewModel(rowGroup: .developerReport)]
+                        makeSections: { presenter in
+                            SettingsViewTraceSettingsViewModel.issueReportSections(presenter: presenter)
                         }
                     )
                 }
@@ -141,7 +143,16 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
 
         switch rowGroup {
         case .advanced:
-            return advancedRows
+            return Array(advancedRows.prefix(1))
+        case .issueReporting:
+            let debugRow = SettingsRow(id: "trace.debugLevel", title: Texts_SettingsView.debugLevel,
+                                       control: .toggle(
+                                           isOn: { UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog },
+                                           setIsOn: { UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog = $0 }
+                                       ), isVisible: developerRowsVisible)
+            return [debugRow, advancedRows[1]]
+        case .advancedOptions:
+            return Array(advancedRows.dropFirst(2))
         case .osAidLoopShare:
             return osAidLoopShareRows
         case .osAidLoopShareWarning:
@@ -161,11 +172,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
     }
 
     func sectionTitle() -> String? {
-        if rowGroup == .osAidLoopShare || rowGroup == .osAidLoopShareWarning {
-            return nil
-        }
-
-        return Texts_SettingsView.developerSettings
+        rowGroup == .advanced ? Texts_SettingsView.developerSettings : nil
     }
 
     func sectionFooter() -> String? {

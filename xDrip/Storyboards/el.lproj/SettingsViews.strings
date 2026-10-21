@@ -102,9 +102,8 @@
 "infoCalendarAccessDeniedByUser" = "Προηγουμένως αρνηθήκατε την πρόσβαση στο Ημερολόγιό σας.\n\nΓια να το ενεργοποιήσετε, μεταβείτε στις ρυθμίσεις της συσκευής σας, απόρρητο, ημερολόγια και ενεργοποιήστε το.";
 "infoCalendarAccessRestricted" = "Δεν μπορείτε να δώσετε εξουσιοδότηση στο %@ για πρόσβαση στο ημερολόγιό σας. Αυτό οφείλεται πιθανώς σε ενεργούς περιορισμούς όπως γονικοί έλεγχοι που μπορεί να υπάρχουν.";
 "sectionTitleTrace" = "Αναφορά προβλημάτων";
-"sendTraceFile" = "Αποστολή αναφοράς προβλήματος";
+"sendTraceFile" = "Αποστολή με email";
 "settingsviews_issueReportTitle" = "Αναφορά προβλήματος";
-"describeProblem" = "Εξηγήστε γιατί πρέπει να στείλετε το αρχείο παρακολούθησης με όσο το δυνατόν περισσότερες λεπτομέρειες. Εάν έχετε ήδη αναφέρει το πρόβλημά στην ομάδα υποστήριξης του Facebook '%@', τότε αναφέρετε το facebook όνομά σας στο e-mail";
 "emailNotConfigured" = "Πρέπει να διαμορφώσετε έναν λογαριασμό e-mail στην iOS συσκευή σας.";
 "emailbodyText" = "Περιγραφή προβλήματος";
 "failedToSendEmail" = "Αποτυχία αποστολής email";
@@ -112,7 +111,7 @@
 "volumeTestiOSSoundExplanation" = "Ένας ήχος αφύπνισης αναπαράγεται τώρα με την ίδια ένταση που θα χρησιμοποιείται για έναν Τύπο συναγερμού με 'Παράκαμψη Σίγασης' = Ανενεργό\n\n(Χρησιμοποιείται επίσης πάντα για συναγερμούς Ελλιπών Μετρήσεων που χρησιμοποιούν την ένταση ήχου του iOS.)\n\nΠατήστε ένα από τα κουμπιά έντασης για να σταματήσει ο ήχος, αλλάξτε την ένταση με τα κουμπιά έντασης στην επιθυμητή ένταση και δοκιμάστε ξανά.";
 "volumeTestSoundPlayer" = "Όταν η Αθόρυβη λειτουργία είναι ενεργή";
 "volumeTestiOSSound" = "Όταν η Αθόρυβη λειτουργία είναι ανενεργή";
-"debugLevel" = "Συμπεριλάβετε λεπτομερή διαγνωστικά";
+"debugLevel" = "Χρήση επιπέδου εντοπισμού σφαλμάτων";
 "warningChangeFromMasterToFollower" = "Η εναλλαγή από κύριο σε ακόλουθο θα σταματήσει τον τρέχοντα αισθητήρα σας. Θέλετε να συνεχίσετε;";
 "nightscoutPort" = "Θύρα";
 "developerSettings" = "Ρυθμίσεις για προχωρημένους";
@@ -546,3 +545,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Εκφώνηση εισαγωγής";
 "speak.preview" = "Δοκιμή εκφώνησης γλυκόζης";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Συμπερίληψη αρχείων Watch";
+"settingsviews_reportWatchFooter" = "Λήψη αρχείων Direct to Watch από το συνδεδεμένο Watch.";
+"settingsviews_reportSendFooter" = "Προετοιμάστε ένα email προς τους προγραμματιστές του xDrip4iOS.";
+"settingsviews_requestingWatchLogs" = "Αίτημα...";
+"settingsviews_watchLogsNotReceived" = "Δεν ελήφθησαν αρχεία Watch";
+"settingsviews_watchLogsTimeout" = "Τα αρχεία Watch δεν ελήφθησαν εντός 8 δευτερολέπτων. Δοκιμάστε ξανά ή στείλτε την αναφορά χωρίς αυτά.";
+"settingsviews_watchLogsFailure" = "Δεν ήταν δυνατή η λήψη των αρχείων Watch. Δοκιμάστε ξανά ή στείλτε την αναφορά χωρίς αυτά.";
+"settingsviews_openWatchApp" = "Ανοίξτε την εφαρμογή Watch";
+"settingsviews_confirmWatchAppOpen" = "Ανοίξτε το %@ στο Watch και κρατήστε το ανοιχτό μέχρι να ληφθούν τα αρχεία.\n\nΕίναι ανοιχτό τώρα;";
+"settingsviews_reportShareFooter" = "Κοινοποίηση αρχείων καταγραφής.";
+"settingsviews_shareReport" = "Κοινοποίηση αναφοράς";
+"settingsviews_shareIssueReport" = "Κοινοποίηση αναφοράς προβλήματος";
+"settingsviews_reportShareFailed" = "Δεν ήταν δυνατή η προετοιμασία των αρχείων καταγραφής. Δοκιμάστε ξανά.";

@@ -168,9 +168,8 @@
 "settingsviews_displayTrendInContactImage" = "Trend";
 "settingsviews_contactImageCreatedByString" = "Contact automatically created by";
 "sectionTitleTrace" = "Issue Reporting";
-"sendTraceFile" = "Send Issue Report";
+"sendTraceFile" = "Send by Email";
 "settingsviews_issueReportTitle" = "Issue Report";
-"describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
 "emailNotConfigured" = "You must configure an e-mail account on your iOS device.";
 "emailbodyText" = "Problem Description: ";
 "failedToSendEmail" = "Failed to Send Email";
@@ -178,7 +177,7 @@
 "volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
 "volumeTestSoundPlayer" = "When Silent Mode is enabled";
 "volumeTestiOSSound" = "When Silent Mode is disabled";
-"debugLevel" = "Include Debug Level";
+"debugLevel" = "Use Debug Level";
 "warningChangeFromMasterToFollower" = "Switching from Master to Follower will stop your current sensor. Do you want to continue?";
 "warningChangeFromMasterToFollowerDexcomShare" = "Switch from Master to Dexcom Share Follower will stop your current sensor and will also disable 'Upload to Dexcom Share'. Do you want to continue?";
 "warningChangeToFollowerDexcomShare" = "Switching to Dexcom Share Follower mode will disable 'Upload to Dexcom Share'.";
@@ -552,3 +551,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Speak Introduction";
 "speak.preview" = "Preview Speak Glucose";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Include Watch Logs";
+"settingsviews_reportWatchFooter" = "Fetch Direct to Watch logs from your connected Watch.";
+"settingsviews_reportSendFooter" = "Prepare an email to send to the xDrip4iOS developers.";
+"settingsviews_requestingWatchLogs" = "Requesting...";
+"settingsviews_watchLogsNotReceived" = "Watch Logs Not Received";
+"settingsviews_watchLogsTimeout" = "Watch logs were not received within 8 seconds. Try again or send the report without them.";
+"settingsviews_watchLogsFailure" = "Watch logs could not be received. Try again or send the report without them.";
+"settingsviews_openWatchApp" = "Open the Watch App";
+"settingsviews_confirmWatchAppOpen" = "Open %@ on your Watch and keep it open until the logs arrive.\n\nIs it open now?";
+"settingsviews_reportShareFooter" = "Share the log files.";
+"settingsviews_shareReport" = "Share Report";
+"settingsviews_shareIssueReport" = "Share Issue Report";
+"settingsviews_reportShareFailed" = "Unable to prepare the log files. Please try again.";

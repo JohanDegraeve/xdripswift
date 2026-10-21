@@ -97,9 +97,8 @@
 "infoCalendarAccessDeniedByUser" = "Anteriormente negou accesso ao Calendário.\n\nPara activá-lo vá às definições do seu dispositivo, privacidade, calendários e active-o.";
 "infoCalendarAccessRestricted" = "Não pode autorizar %@ para aceder ao calendário. Possivelmente por restrições activas tais como controlo parental.";
 "sectionTitleTrace" = "Reportar Problema";
-"sendTraceFile" = "Enviar Relatório de Problema";
+"sendTraceFile" = "Enviar por email";
 "settingsviews_issueReportTitle" = "Relatório de Problema";
-"describeProblem" = "Explique porque precisa de enviar o ficheiro de rastreio com o máximo de informação possível. Se já reportou o problema no grupo de Facebook '%@', então mencione o seu nome utilizado no Facebook";
 "emailNotConfigured" = "Tem que configurar uma conta de e-mail no seu dispositivo iOS.";
 "emailbodyText" = "Descrição de Problema: ";
 "failedToSendEmail" = "Falha no Envio de e-mail";
@@ -107,7 +106,7 @@
 "volumeTestiOSSoundExplanation" = "Um som de alarme está a ser tocado com o mesmo volume que vai tocado para um Tipo de Alarme com 'Sobrepor Silêncio' = Desligado\n\n(Também utilizado sempre para alarmes de Leituras Perdidas que usam sempre o volume do iOS.)\n\nPressione num dos botões de volume para parar o som, depois altere o volume com os botões de volume para o volume pretendido e teste novamente.";
 "volumeTestSoundPlayer" = "Quando o Modo Silencioso está ativado";
 "volumeTestiOSSound" = "Quando o Modo Silencioso está desativado";
-"debugLevel" = "Incluir Nível de Depuração";
+"debugLevel" = "Usar nível de depuração";
 "warningChangeFromMasterToFollower" = "Aterar de Mestre para Seguidor vai parar o actual sensor. Deseja continuar?";
 "nightscoutPort" = "Porto";
 "oslog" = "OSLog";
@@ -586,3 +585,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Dizer introdução";
 "speak.preview" = "Testar glicose falada";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Incluir registos do Watch";
+"settingsviews_reportWatchFooter" = "Obter registos Direct to Watch do Watch ligado.";
+"settingsviews_reportSendFooter" = "Preparar um email para enviar aos programadores do xDrip4iOS.";
+"settingsviews_requestingWatchLogs" = "A solicitar...";
+"settingsviews_watchLogsNotReceived" = "Registos do Watch não recebidos";
+"settingsviews_watchLogsTimeout" = "Os registos do Watch não foram recebidos em 8 segundos. Tente novamente ou envie o relatório sem eles.";
+"settingsviews_watchLogsFailure" = "Não foi possível receber os registos do Watch. Tente novamente ou envie o relatório sem eles.";
+"settingsviews_openWatchApp" = "Abra a app do Watch";
+"settingsviews_confirmWatchAppOpen" = "Abra %@ no Watch e mantenha a app aberta até receber os registos.\n\nEstá aberta agora?";
+"settingsviews_reportShareFooter" = "Partilhar os ficheiros de registo.";
+"settingsviews_shareReport" = "Partilhar relatório";
+"settingsviews_shareIssueReport" = "Partilhar relatório de problema";
+"settingsviews_reportShareFailed" = "Não foi possível preparar os ficheiros de registo. Tente novamente.";

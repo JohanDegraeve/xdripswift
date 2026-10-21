@@ -85,6 +85,7 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
     private var lastUrgentLowAlert = UserDefaults.standard.object(forKey: ConstantsDirectWatch.lastUrgentLowAlertKey) as? Date
     private var lastLowAlert = UserDefaults.standard.object(forKey: ConstantsDirectWatch.lastLowAlertKey) as? Date
     private var journal: [String] = []
+    private var reportLogSnapshot: (id: String, data: Data, createdAt: TimeInterval)?
     private var pendingIDs: Set<String> = []
     private var configurationRevision: Double = 0
     private var storageFailed = false
@@ -1318,13 +1319,29 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
         } else { pendingIDs = previous }
     }
 
-    @discardableResult func sendLogs() -> Bool {
+    func reportLogReply(requestID: String, offset: Int) -> [String: Any] {
+        let now = ProcessInfo.processInfo.systemUptime
+        if offset == 0 {
+            log("Issue Report log requested")
+            reportLogSnapshot = (requestID, Data((journal.joined(separator: "\n") + "\n").utf8), now)
+        }
+        guard let snapshot = reportLogSnapshot, snapshot.id == requestID, now - snapshot.createdAt < DirectWatchLogReply.requestTimeout,
+              let reply = DirectWatchLogReply.payload(data: snapshot.data, requestID: requestID, offset: offset) else {
+            return ["directWatchLogFailed": true, DirectWatchLogReply.requestIDKey: requestID]
+        }
+        if offset + DirectWatchLogReply.chunkBytes >= snapshot.data.count { reportLogSnapshot = nil }
+        return reply
+    }
+
+    @discardableResult func sendLogs(requestID: String? = nil) -> Bool {
         guard WCSession.default.activationState == .activated else { return false }
         log("Log export requested")
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("Direct-to-Watch-\(UUID().uuidString).log")
         do {
             try (journal.joined(separator: "\n") + "\n").write(to: url, atomically: true, encoding: .utf8)
-            WCSession.default.transferFile(url, metadata: DirectWatchCompatibility.outgoing(["directWatchLog": true]))
+            var metadata: [String: Any] = ["directWatchLog": true]
+            metadata["directWatchLogRequestID"] = requestID
+            WCSession.default.transferFile(url, metadata: DirectWatchCompatibility.outgoing(metadata))
             // A queued transfer can wait for the phone. Only the phone can confirm receipt.
             return true
         } catch {

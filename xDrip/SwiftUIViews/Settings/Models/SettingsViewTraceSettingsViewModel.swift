@@ -7,205 +7,124 @@
 //
 
 import Foundation
+import SwiftUI
 
-/// Stable row indexes retained for the legacy `SettingsViewModelProtocol` bridge.
-fileprivate enum Setting:Int, CaseIterable {
-
-    /// Opens the short, consumer-safe activity history.
-    case troubleshootingLog = 0
-    
-    /// Opens the existing e-mail workflow with private developer trace attachments.
-    case sendTraceFile = 1
-    
-    /// Controls whether debug-level developer messages enter the trace files.
-    case debugLevel = 2
-    
-}
-
-/// Supplies either the visible consumer Activity Log row or the developer-report child screen.
-/// The separation is intentional: the activity log must never become an e-mail attachment, and the
-/// developer trace must never be loaded by the shareable log viewer. The developer group is opened
-/// only from the Issue Report row revealed by Show Advanced.
-enum SettingsViewTraceSettingsRowGroup {
-    case troubleshooting
-    case developerReport
-}
-
-/// Supplies consumer troubleshooting at the root or developer reporting inside its child screen.
-class SettingsViewTraceSettingsViewModel: NSObject {
-    private let rowGroup: SettingsViewTraceSettingsRowGroup
-    
-    init(rowGroup: SettingsViewTraceSettingsRowGroup = .developerReport) {
-        self.rowGroup = rowGroup
-
-        super.init()
-    }
-
-}
-
-extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
-    
-    // MARK: - Native SwiftUI rows
-
+/// Supplies the Activity Log row in Troubleshooting.
+class SettingsViewTraceSettingsViewModel: NSObject, SettingsViewModelProtocol {
     func settingsRows(sectionID: Int) -> [SettingsRow] {
-        switch rowGroup {
-        case .troubleshooting:
-            return [
-                SettingsRow(
-                    id: "trace.troubleshootingLog",
-                    title: Texts_SettingsView.viewActivityLog,
-                    accessory: .disclosure,
-                    action: .troubleshootingLog
-                )
-            ]
-
-        case .developerReport:
-            return [
-                // Debug detail changes what the report contains, so present that choice before the
-                // action that creates the e-mail. This makes the section read in workflow order.
-                nativeSettingsRow(id: "trace.debugLevel", index: Setting.debugLevel.rawValue, sectionID: sectionID),
-                SettingsRow(
-                    id: "trace.sendTraceFile",
-                    title: Texts_SettingsView.sendTraceFile,
-                    accessory: .disclosure,
-                    action: .sendTraceEmail
-                )
-            ]
-        }
+        [SettingsRow(id: "trace.troubleshootingLog", title: Texts_SettingsView.viewActivityLog,
+                     accessory: .disclosure, action: .troubleshootingLog)]
     }
 
     func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
-    
 
     func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {}
-    
-    func sectionTitle() -> String? {
-        switch rowGroup {
-        case .troubleshooting:
-            return Texts_SettingsView.troubleshootingTitle
-        case .developerReport:
-            // The child navigation title already says Issue Report, so another section title would
-            // add repetition without clarifying the two controls.
-            return nil
+
+    func sectionTitle() -> String? { Texts_SettingsView.troubleshootingTitle }
+
+    func settingsSectionFooter() -> String? { nil }
+
+    func settingsRowText(index: Int) -> String { Texts_SettingsView.viewActivityLog }
+
+    func accessoryType(index: Int) -> SettingsAccessory { .disclosure }
+
+    func detailedText(index: Int) -> String? { nil }
+
+    func numberOfRows() -> Int { 1 }
+
+    func onRowSelect(index: Int) -> SettingsSelectedRowAction { .nothing }
+
+    func isEnabled(index: Int) -> Bool { true }
+
+    func completeSettingsViewRefreshNeeded(index: Int) -> Bool { false }
+}
+
+@MainActor
+extension SettingsViewTraceSettingsViewModel {
+    static func issueReportSections(presenter: SettingsActionPresenter) -> [SettingsSectionModel] {
+        return [
+            SettingsSectionModel(id: 0) {
+                SettingsSection(rows: [SettingsRow(id: "trace.warning", title: "", control: .custom {
+                    AnyView(HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.yellow)
+                        Text(Texts_SettingsView.issueReportSectionFooter).font(.subheadline)
+                    }
+                    .listRowBackground(Color.clear))
+                })])
+            },
+            SettingsSectionModel(id: 2) {
+                SettingsSection(footer: Texts_SettingsView.reportWatchFooter, rows: [
+                    SettingsRow(id: "trace.includeWatchLogs", title: Texts_SettingsView.includeWatchLogs,
+                                control: .custom { AnyView(IssueReportWatchLogsRow(presenter: presenter)) },
+                                isEnabled: presenter.traceWatchLogsAvailable)
+                ])
+            },
+            SettingsSectionModel(id: 3) {
+                SettingsSection(footer: Texts_SettingsView.reportSendFooter, rows: [
+                    SettingsRow(id: "trace.sendTraceFile", title: Texts_SettingsView.sendTraceFile,
+                                control: .custom { AnyView(IssueReportSendRow(presenter: presenter)) })
+                ])
+            },
+            SettingsSectionModel(id: 4) {
+                SettingsSection(footer: Texts_SettingsView.reportShareFooter, rows: [
+                    SettingsRow(id: "trace.shareReport", title: Texts_SettingsView.shareReport,
+                                control: .custom { AnyView(IssueReportSendRow(presenter: presenter, share: true)) })
+                ])
+            }
+        ]
+    }
+}
+
+private struct IssueReportWatchLogsRow: View {
+    @ObservedObject var presenter: SettingsActionPresenter
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Text(Texts_SettingsView.includeWatchLogs)
+                .foregroundStyle(presenter.traceWatchLogsAvailable ? ConstantsAppColors.rowTitleText : ConstantsAppColors.disabledText)
+                .lineLimit(1).minimumScaleFactor(0.75)
+            Spacer(minLength: 8)
+            if presenter.preparingTraceEmail {
+                ProgressView().controlSize(.small).accessibilityLabel(Texts_SettingsView.requestingWatchLogs)
+            }
+            Toggle(Texts_SettingsView.includeWatchLogs, isOn: Binding(
+                get: { presenter.includeTraceWatchLogs }, set: { presenter.confirmTraceWatchLogs($0) }
+            ))
+            .labelsHidden().fixedSize().tint(.green)
+        }
+        .disabled(!presenter.traceWatchLogsAvailable)
+        .onReceive(NotificationCenter.default.publisher(for: DirectWatchSettings.changed)) { _ in
+            presenter.traceReportConfigurationChanged()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: DirectWatchSettings.statusChanged)) { _ in
+            presenter.traceReportConfigurationChanged()
         }
     }
+}
 
-    func settingsSectionFooter() -> String? {
-        switch rowGroup {
-        case .troubleshooting:
-            // The row label and Troubleshooting heading already explain the destination. The former
-            // explanatory footer made this compact root section unnecessarily visually dominant.
-            return nil
-        case .developerReport:
-            return Texts_SettingsView.issueReportSectionFooter
+private struct IssueReportSendRow: View {
+    @ObservedObject var presenter: SettingsActionPresenter
+    var share = false
+
+    var body: some View {
+        Button {
+            if share { presenter.requestTraceShare() } else { presenter.requestTraceEmail() }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: share ? "square.and.arrow.up" : "envelope").frame(width: 22)
+                Text(share ? Texts_SettingsView.shareReport : Texts_SettingsView.sendTraceFile)
+                Spacer(minLength: 8)
+                if presenter.preparingTraceEmail {
+                    Text(Texts_SettingsView.requestingWatchLogs).foregroundStyle(ConstantsAppColors.disabledText)
+                } else {
+                    SettingsDisclosureIndicator()
+                }
+            }
+            .lineLimit(1).minimumScaleFactor(0.75)
+            .foregroundStyle(presenter.preparingTraceEmail ? ConstantsAppColors.disabledText : ConstantsAppColors.navigationTint)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .disabled(presenter.preparingTraceEmail)
     }
-    
-    func settingsRowText(index: Int) -> String {
-        
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-
-        case .troubleshootingLog:
-            return Texts_SettingsView.viewActivityLog
-            
-        case .sendTraceFile:
-            return Texts_SettingsView.sendTraceFile
-            
-        case .debugLevel:
-            return Texts_SettingsView.debugLevel
-            
-        }
-    }
-    
-    func accessoryType(index: Int) -> SettingsAccessory {
-        
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-
-        case .troubleshootingLog:
-            return .disclosure
-            
-        case .sendTraceFile:
-            return .disclosure
-            
-        case .debugLevel:
-            return .none
-            
-        }
-    }
-    
-    func detailedText(index: Int) -> String? {
-        
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-
-        case .troubleshootingLog:
-            return nil
-            
-        case .sendTraceFile:
-            return nil
-            
-        case .debugLevel:
-            return nil
-            
-        }
-        
-    }
-
-    func settingsToggle(index: Int) -> SettingsToggleControl? {
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-
-        switch setting {
-        case .debugLevel:
-            return SettingsToggleControl(
-                isOn: { UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog },
-                setIsOn: { UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog = $0 }
-            )
-        case .troubleshootingLog, .sendTraceFile:
-            return nil
-        }
-    }
-    
-    
-    func numberOfRows() -> Int {
-        switch rowGroup {
-        case .troubleshooting:
-            return 1
-        case .developerReport:
-            return 2
-        }
-    }
-
-    func onRowSelect(index: Int) -> SettingsSelectedRowAction {
-        
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-
-        case .troubleshootingLog:
-            return .nothing
-            
-        case .sendTraceFile:
-            return .nothing
-            
-        case .debugLevel:
-            return .nothing
-            
-        }
-    }
-    
-    func isEnabled(index: Int) -> Bool {
-        return true
-    }
-    
-    func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
-        
-        return false
-        
-    }
-    
 }

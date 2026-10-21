@@ -96,9 +96,8 @@
 "infoCalendarAccessDeniedByUser" = "Daha önce Takviminize erişimi reddetmiştiniz.\n\nTakvimi etkinleştirmek için cihaz ayarlarınıza, gizliliğinize, takvimlerinize gidin ve etkinleştirin.";
 "infoCalendarAccessRestricted" = "Takviminize erişmesi için %@'a yetki veremezsiniz. Bu muhtemelen ebeveyn denetimlerinin yürürlükte olması gibi etkin kısıtlamalardan kaynaklanmaktadır.";
 "sectionTitleTrace" = "Sorun Raporlama";
-"sendTraceFile" = "Sorun Raporu Gönder";
+"sendTraceFile" = "E-posta ile Gönder";
 "settingsviews_issueReportTitle" = "Sorun Raporu";
-"describeProblem" = "İzleme dosyasını neden mümkün olduğunca ayrıntılı olarak göndermeniz gerektiğini açıklayın. Sorununuzu '%@' Facebook destek grubuna zaten bildirdiyseniz, e-postada facebook adınızı belirtin";
 "emailNotConfigured" = "iOS cihazınızda bir e-posta hesabı yapılandırmanız gerekir.";
 "emailbodyText" = "Sorun Açıklaması: ";
 "failedToSendEmail" = "E-posta Gönderilemedi";
@@ -106,7 +105,7 @@
 "volumeTestiOSSoundExplanation" = "Şimdi, 'Sessiz Geçersiz Kıl' = Kapalı olan bir Alarm Tipi için kullanılacak ses seviyesinde bir alarm sesi çalınıyor\n\n(Ayrıca, iOS ses seviyesini kullanan Kaçırılan Okuma alarmları için her zaman kullanılır.)\n\nBire basın Sesi durdurmak için ses düğmelerini kullanın, ardından ses düğmeleriyle ses düzeyini istediğiniz ses düzeyine getirin ve tekrar test edin.";
 "volumeTestSoundPlayer" = "Sessiz Mod etkinken";
 "volumeTestiOSSound" = "Sessiz Mod devre dışıyken";
-"debugLevel" = "Hata Ayıklama Düzeyini Dahil Et";
+"debugLevel" = "Hata Ayıklama Düzeyini Kullan";
 "warningChangeFromMasterToFollower" = "Sahip'ten Takipciye geçmek mevcut sensörünüzü durduracaktır. Devam etmek istiyor musun?";
 "nightscoutPort" = "Port";
 "developerSettings" = "Gelişmiş Ayarlar";
@@ -574,3 +573,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Giriş cümlesini söyle";
 "speak.preview" = "Glikoz sesini önizle";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Watch Günlüklerini Ekle";
+"settingsviews_reportWatchFooter" = "Bağlı Watch aygıtından Direct to Watch günlüklerini al.";
+"settingsviews_reportSendFooter" = "xDrip4iOS geliştiricilerine göndermek için bir e-posta hazırlayın.";
+"settingsviews_requestingWatchLogs" = "İsteniyor...";
+"settingsviews_watchLogsNotReceived" = "Watch Günlükleri Alınamadı";
+"settingsviews_watchLogsTimeout" = "Watch günlükleri 8 saniye içinde alınamadı. Tekrar deneyin veya raporu bunlar olmadan gönderin.";
+"settingsviews_watchLogsFailure" = "Watch günlükleri alınamadı. Tekrar deneyin veya raporu bunlar olmadan gönderin.";
+"settingsviews_openWatchApp" = "Watch Uygulamasını Açın";
+"settingsviews_confirmWatchAppOpen" = "Watch aygıtınızda %@ uygulamasını açın ve günlükler gelene kadar açık tutun.\n\nŞimdi açık mı?";
+"settingsviews_reportShareFooter" = "Günlük dosyalarını paylaş.";
+"settingsviews_shareReport" = "Raporu Paylaş";
+"settingsviews_shareIssueReport" = "Sorun Raporunu Paylaş";
+"settingsviews_reportShareFailed" = "Günlük dosyaları hazırlanamadı. Lütfen tekrar deneyin.";

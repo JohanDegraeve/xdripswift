@@ -87,9 +87,8 @@
 "infoCalendarAccessDeniedByUser" = "Vous avez refusé l'accès au calendrier.\n\nPour permettre cette fonctionnalités, modifiez les autorissations dans les réglages de votre iPhone.";
 "infoCalendarAccessRestricted" = "Vous n'avez pas donné les autorisations à %@ pour accéder à votre calendrier. Cela peut aussi être du à une restriction parentale.";
 "sectionTitleTrace" = "Trace";
-"sendTraceFile" = "Envoyer le rapport de problème";
+"sendTraceFile" = "Envoyer par e-mail";
 "settingsviews_issueReportTitle" = "Rapport de problème";
-"describeProblem" = "Décrire la raison de l'envoi du fichier de trace avec un maximum de détail. Si vous avez déjà reporté un probème via Facebook - dans le groupe'%@'-, merci de mentionner votre nom facebook dans l'email";
 "emailNotConfigured" = "Vous devez configurer un email sur votre compte IOS.";
 "emailbodyText" = "Description du problème";
 "failedToSendEmail" = "Echec d'envoi du Email";
@@ -107,7 +106,7 @@
 "settingsviews_nonfixedtransmitter" = "Calibration multipoint";
 
 /// in Settings, to enable debug level in trace file
-"debugLevel" = "Inclure le mode Debug";
+"debugLevel" = "Utiliser le niveau de débogage";
 
 /// about settings, section title
 "settingsviews_sectiontitleAbout" = "A propos %@";
@@ -642,3 +641,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Annoncer l’introduction";
 "speak.preview" = "Tester l’annonce de glycémie";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Inclure les journaux Watch";
+"settingsviews_reportWatchFooter" = "Récupérer les journaux Direct to Watch de la Watch connectée.";
+"settingsviews_reportSendFooter" = "Préparer un e-mail à envoyer aux développeurs de xDrip4iOS.";
+"settingsviews_requestingWatchLogs" = "Demande...";
+"settingsviews_watchLogsNotReceived" = "Journaux Watch non reçus";
+"settingsviews_watchLogsTimeout" = "Les journaux Watch ne sont pas arrivés sous 8 secondes. Réessayez ou envoyez le rapport sans eux.";
+"settingsviews_watchLogsFailure" = "Impossible de recevoir les journaux Watch. Réessayez ou envoyez le rapport sans eux.";
+"settingsviews_openWatchApp" = "Ouvrez l’app Watch";
+"settingsviews_confirmWatchAppOpen" = "Ouvrez %@ sur votre Watch et gardez l’app ouverte jusqu’à réception des journaux.\n\nEst-elle ouverte ?";
+"settingsviews_reportShareFooter" = "Partager les fichiers journaux.";
+"settingsviews_shareReport" = "Partager le rapport";
+"settingsviews_shareIssueReport" = "Partager un rapport de problème";
+"settingsviews_reportShareFailed" = "Impossible de préparer les fichiers journaux. Veuillez réessayer.";

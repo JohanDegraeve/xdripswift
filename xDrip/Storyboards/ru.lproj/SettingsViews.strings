@@ -102,9 +102,8 @@
 "infoCalendarAccessDeniedByUser" = "Ранее вы запретили доступ к своему календарю.\n\nЧтобы включить его, перейдите в настройки устройства, конфиденциальность, календари и включите его.";
 "infoCalendarAccessRestricted" = "Вы не можете разрешить %@ доступ к вашему календарю. Возможно, это связано с активными ограничениями, такими как родительский контроль.";
 "sectionTitleTrace" = "Сообщение о проблеме";
-"sendTraceFile" = "Отправить отчет о проблеме";
+"sendTraceFile" = "Отправить по почте";
 "settingsviews_issueReportTitle" = "Отчет о проблеме";
-"describeProblem" = "Объясните, почему вам необходимо отправить файл трассировки, как можно более подробно. Если вы уже сообщили о своей проблеме в группе поддержки Facebook '%@', укажите свое имя в Facebook в письме.";
 "emailNotConfigured" = "Вы должны настроить учетную запись электронной почты на своем устройстве iOS.";
 "emailbodyText" = "Описание проблемы: ";
 "failedToSendEmail" = "Не удалось отправить электронное письмо";
@@ -112,7 +111,7 @@
 "volumeTestiOSSoundExplanation" = "Звук будильника теперь воспроизводится с той же громкостью, которая будет использоваться для типа будильника с параметром «Переопределить звук» = 'Выкл.'\n\n(Также всегда используется для сигналов о пропущенных чтениях, для которых используется громкость iOS.)\n\nНажмите один кнопок громкости, чтобы остановить звук, затем измените громкость с помощью кнопок громкости на желаемую громкость и повторите проверку.";
 "volumeTestSoundPlayer" = "Когда беззвучный режим включен";
 "volumeTestiOSSound" = "Когда беззвучный режим выключен";
-"debugLevel" = "Включить режим отладки";
+"debugLevel" = "Использовать уровень отладки";
 "warningChangeFromMasterToFollower" = "Переключение с главного на подписчика удалит ваш текущий сенсор. Вы хотите продолжить?";
 "nightscoutPort" = "Порт";
 "developerSettings" = "Расширенные настройки";
@@ -546,3 +545,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Произносить вступление";
 "speak.preview" = "Прослушать пример озвучивания глюкозы";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Добавить журналы Watch";
+"settingsviews_reportWatchFooter" = "Получить журналы Direct to Watch с подключённых Watch.";
+"settingsviews_reportSendFooter" = "Подготовить письмо разработчикам xDrip4iOS.";
+"settingsviews_requestingWatchLogs" = "Запрос...";
+"settingsviews_watchLogsNotReceived" = "Журналы Watch не получены";
+"settingsviews_watchLogsTimeout" = "Журналы Watch не получены за 8 секунд. Повторите попытку или отправьте отчёт без них.";
+"settingsviews_watchLogsFailure" = "Не удалось получить журналы Watch. Повторите попытку или отправьте отчёт без них.";
+"settingsviews_openWatchApp" = "Откройте приложение Watch";
+"settingsviews_confirmWatchAppOpen" = "Откройте %@ на Watch и не закрывайте приложение до получения журналов.\n\nОно сейчас открыто?";
+"settingsviews_reportShareFooter" = "Поделиться файлами журналов.";
+"settingsviews_shareReport" = "Поделиться отчётом";
+"settingsviews_shareIssueReport" = "Поделиться отчётом о проблеме";
+"settingsviews_reportShareFailed" = "Не удалось подготовить файлы журналов. Попробуйте ещё раз.";

@@ -104,7 +104,7 @@
 "failedToSendEmail" = "Failed to Send Email";
 
 /// in Settings, to enable debug level in trace file
-"debugLevel" = "Include Debug Level";
+"debugLevel" = "Uporabi raven razhroščevanja";
 
 /// shown on top of the first settings screen
 "m5stack_settingsviews_settingstitle" = "M5 Stack Settings";
@@ -173,7 +173,7 @@
 "settingsviews_sectiontitleNotifications" = "Notifications";
 
 /// in Settings, row title to send settings
-"sendTraceFile" = "Pošlji poročilo o težavi";
+"sendTraceFile" = "Pošlji po e-pošti";
 "settingsviews_issueReportTitle" = "Poročilo o težavi";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
@@ -228,8 +228,6 @@
 /// dexcom share settings, section title
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
 
-/// Text in pop up shown when user wants to send the trace file
-"describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
 
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
 "warningChangeFromMasterToFollower" = "Switching from Master to Follower will stop your current sensor. Do you want to continue?";
@@ -826,3 +824,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Izgovori uvod";
 "speak.preview" = "Preizkusi izgovor glukoze";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Vključi dnevnike Watch";
+"settingsviews_reportWatchFooter" = "Pridobi dnevnike Direct to Watch s povezane ure Watch.";
+"settingsviews_reportSendFooter" = "Pripravi e-pošto za razvijalce xDrip4iOS.";
+"settingsviews_requestingWatchLogs" = "Zahtevanje...";
+"settingsviews_watchLogsNotReceived" = "Dnevniki Watch niso prejeti";
+"settingsviews_watchLogsTimeout" = "Dnevniki Watch niso bili prejeti v 8 sekundah. Poskusite znova ali pošljite poročilo brez njih.";
+"settingsviews_watchLogsFailure" = "Dnevnikov Watch ni bilo mogoče prejeti. Poskusite znova ali pošljite poročilo brez njih.";
+"settingsviews_openWatchApp" = "Odprite aplikacijo Watch";
+"settingsviews_confirmWatchAppOpen" = "Odprite %@ na uri Watch in jo pustite odprto, dokler dnevniki ne prispejo.\n\nJe zdaj odprta?";
+"settingsviews_reportShareFooter" = "Deli dnevniške datoteke.";
+"settingsviews_shareReport" = "Deli poročilo";
+"settingsviews_shareIssueReport" = "Deli poročilo o težavi";
+"settingsviews_reportShareFailed" = "Dnevniških datotek ni bilo mogoče pripraviti. Poskusite znova.";

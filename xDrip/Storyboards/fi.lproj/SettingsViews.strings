@@ -84,9 +84,8 @@
 "infoCalendarAccessDeniedByUser" = "Olet aiemmin kieltänyt pääsyn kalenteriin.\n\nOttaaksesi sen käyttöön, siirry laitteen asetuksiin, tietosuojaan, kalentereihin ja ota käyttöön.";
 "infoCalendarAccessRestricted" = "Et voi antaa %@:lle valtuutusta käyttää kalenteriasi. Tämä johtuu mahdollisesti aktiivisista rajoituksista, kuten vanhempien valvonnasta";
 "sectionTitleTrace" = "Ongelmien raportointi";
-"sendTraceFile" = "Lähetä ongelmaraportti";
+"sendTraceFile" = "Lähetä sähköpostilla";
 "settingsviews_issueReportTitle" = "Ongelmaraportti";
-"describeProblem" = "Selitä mahdollisimman yksityiskohtaisesti, miksi sinun on lähetettävä jäljitystiedosto. Jos olet jo ilmoittanut ongelmastasi Facebook-tukiryhmässä '%@', mainitse facebook-nimesi sähköpostissa";
 "emailNotConfigured" = "Sinun on määritettävä sähköpostitili iOS-laitteellasi.";
 "emailbodyText" = "Ongelman kuvaus: ";
 "failedToSendEmail" = "Sähköpostin lähetys epäonnistui";
@@ -94,7 +93,7 @@
 "volumeTestiOSSoundExplanation" = "Hälytysääni toistetaan nyt samalla äänenvoimakkuudella, jota käytetään hälytystyyppiin, jossa 'Ohita mykistys' = Pois\n\n(Käytetään myös 'puuttuva lukuma' hälytysten yhteydessä, jotka käyttävät iOS-äänenvoimakkuutta)\n\nPysäytä ääni painamalla yhtä äänenvoimakkuuspainikkeista, muuta sitten äänenvoimakkuus haluamallesi äänenvoimakkuuspainikkeella ja testaa uudelleen.";
 "volumeTestSoundPlayer" = "Kun hiljainen tila on käytössä";
 "volumeTestiOSSound" = "Kun hiljainen tila on pois käytöstä";
-"debugLevel" = "Sisällytä debug taso";
+"debugLevel" = "Käytä virheenkorjaustasoa";
 "warningChangeFromMasterToFollower" = "Vaihtaminen masterista seuraajaan pysäyttää nykyisen anturin. Haluatko jatkaa?";
 "nightscoutPort" = "Portti";
 "settingsviews_showcoloredobjectives" = "Värilliset viivat";
@@ -612,3 +611,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Lue johdanto";
 "speak.preview" = "Kokeile glukoosipuhetta";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Sisällytä Watch-lokit";
+"settingsviews_reportWatchFooter" = "Hae Direct to Watch -lokit yhdistetystä Watchista.";
+"settingsviews_reportSendFooter" = "Valmistele sähköposti xDrip4iOS-kehittäjille.";
+"settingsviews_requestingWatchLogs" = "Pyydetään...";
+"settingsviews_watchLogsNotReceived" = "Watch-lokeja ei vastaanotettu";
+"settingsviews_watchLogsTimeout" = "Watch-lokeja ei saatu 8 sekunnissa. Yritä uudelleen tai lähetä raportti ilman niitä.";
+"settingsviews_watchLogsFailure" = "Watch-lokeja ei voitu vastaanottaa. Yritä uudelleen tai lähetä raportti ilman niitä.";
+"settingsviews_openWatchApp" = "Avaa Watch-sovellus";
+"settingsviews_confirmWatchAppOpen" = "Avaa %@ Watchissa ja pidä se auki, kunnes lokit saapuvat.\n\nOnko se nyt auki?";
+"settingsviews_reportShareFooter" = "Jaa lokitiedostot.";
+"settingsviews_shareReport" = "Jaa raportti";
+"settingsviews_shareIssueReport" = "Jaa ongelmaraportti";
+"settingsviews_reportShareFailed" = "Lokitiedostojen valmistelu epäonnistui. Yritä uudelleen.";
