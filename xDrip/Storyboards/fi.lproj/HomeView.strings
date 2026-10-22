@@ -197,4 +197,3 @@
 "noSensorCodeSelectedTitle" = "Jatketaanko ilman anturin koodia?";
 "noSensorCodeSelectedMessage" = "Jos lähettimessä on jo käynnissä anturijakso, sovellus käyttää sitä sen nykyisten kalibrointivaatimusten mukaisesti.\n\nUuden jakson aloittaminen ilman koodia edellyttää kalibrointeja lämpenemisen jälkeen ja myöhemmin säännöllisesti. Sovelluksen kalibrointimuistutuksen poistaminen käytöstä ei poista näitä vaatimuksia.";
 "showHideGlucoseChartTitle" = "Kaavio";
-"showHideAdditionalItemsTitle" = "Hälytykset ja puhe";

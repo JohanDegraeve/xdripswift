@@ -1,3 +1,4 @@
+import CoreData
 import XCTest
 @testable import xdrip
 
@@ -375,10 +376,134 @@ final class DexcomG7CalibrationTests: XCTestCase {
 
         XCTAssertEqual(message.responseStatus, 0x80)
         XCTAssertEqual(message.transmitterTime, 158_626)
-        XCTAssertEqual(message.sensorAge, 173_339)
+        XCTAssertEqual(message.sensorAge, 143_913)
+        XCTAssertEqual(message.messageAge, 14_713)
         XCTAssertEqual(message.calculatedValue, 144)
         XCTAssertEqual(message.algorithmStatus, .SensorFailed8)
         XCTAssertEqual(message.algorithmStatus.sensorHealthEvent, .terminal(source: .dexcom, reason: .dexcomSensorFailure))
+    }
+
+    func testDelayedG7ReadingsKeepSessionStartAndCalibrationClockStable() throws {
+        let start = Date(timeIntervalSince1970: 1_800_000_000)
+        // Replay the frozen-reading pattern from the report: receipt clock advances while
+        // reading age grows. Include >255 seconds to exercise the complete two-byte age.
+        for delay in [4, 186, 246, 608, 906, 1206, 1504] {
+            let clock = 100_000 + delay
+            var packet = try XCTUnwrap(Data(hexadecimalString: "4e00a26b0200e8010001793990000604ab0000"))
+            for index in 0..<4 { packet[2 + index] = UInt8((clock >> (8 * index)) & 0xff) }
+            packet[10] = UInt8(delay & 0xff)
+            packet[11] = UInt8(delay >> 8)
+            let receivedAt = start.addingTimeInterval(TimeInterval(clock))
+            let message = try XCTUnwrap(G7GlucoseMessage(data: packet, receivedAt: receivedAt))
+            XCTAssertEqual(message.sensorAge, 100_000)
+            XCTAssertEqual(message.timeStamp, start.addingTimeInterval(100_000))
+            XCTAssertEqual(message.timeStamp.addingTimeInterval(-message.sensorAge), start)
+
+            let reference = DexcomG7TransmitterClockReference(transmitterTime: message.transmitterTime, referenceDate: message.receivedAt)
+            XCTAssertEqual(reference.transmitterTime(for: receivedAt.addingTimeInterval(20)), UInt32(clock + 20))
+        }
+    }
+
+    func testG7RejectsReadingAgeOlderThanSensorClock() throws {
+        let packet = try XCTUnwrap(Data(hexadecimalString: "4e000100000009000001020061000601ffff0e"))
+        XCTAssertNil(G7GlucoseMessage(data: packet))
+    }
+
+    func testG7BackfillUsesFixedSessionDate() throws {
+        let start = Date(timeIntervalSince1970: 1_800_000_000)
+        let packet = try XCTUnwrap(Data(hexadecimalString: "45a100009600060ffc"))
+        let first = try XCTUnwrap(DexcomG7BackfillMessage(data: packet, sensorStartDate: start))
+        let repeated = try XCTUnwrap(DexcomG7BackfillMessage(data: packet, sensorStartDate: start))
+        XCTAssertEqual(first.timeStamp, start.addingTimeInterval(41_285))
+        XCTAssertEqual(first, repeated)
+    }
+
+    @MainActor
+    func testSensorDateCorrectionPreservesAdjustmentHistoryAndSettings() throws {
+        let defaults = UserDefaults.standard
+        let keys: [UserDefaults.Key] = [.isMaster, .transmitterTypeAsString, .enableAdjustment, .enableSmoothing,
+            .bgSmoothingStrength, .bgSmoothingAlgorithm, .bgSmoothingPeriodInMinutes, .useFiveMinuteReadings,
+            .postProcessingSourceContextIdentifier, .activeSensorStartDate, .postProcessingApplyFromTimeStamp,
+            .postProcessingStartTimeStamp, .fiveMinuteReadingsStartTimeStamp]
+        let original = keys.map { ($0.rawValue, defaults.object(forKey: $0.rawValue)) }
+        defer { for (key, value) in original { defaults.set(value, forKey: key) } }
+        defaults.isMaster = true
+        defaults.cgmTransmitterTypeAsString = CGMTransmitterType.dexcomG7.rawValue
+        defaults.enableAdjustment = true
+        defaults.enableSmoothing = true
+        defaults.bgSmoothingStrength = 2
+        let core = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let context = core.mainManagedObjectContext
+        let start = Date(timeIntervalSince1970: 1_800_000_000)
+        let sensor = Sensor(startDate: start, nsManagedObjectContext: context)
+        let oldIdentifier = "master|\(sensor.id)|\(start.toMillisecondsAsDouble())"
+        defaults.postProcessingSourceContextIdentifier = oldIdentifier
+        defaults.postProcessingApplyFromTimeStamp = start.addingTimeInterval(3600)
+        let accessor = BgAdjustmentsAccessor(coreDataManager: core)
+        let adjustment = accessor.createBgAdjustment(timeStamp: start, applyFromTimeStamp: start,
+            slope: 1, intercept: -20, adjustmentShapeType: 0, isEnabled: true,
+            isBasicAdjustment: true, enteredBgValue: nil, sourceCalculatedValue: nil,
+            sourceDescription: nil, sourceContextIdentifier: oldIdentifier, on: context)
+        let disabled = accessor.createBgAdjustment(timeStamp: start, applyFromTimeStamp: start,
+            slope: 1, intercept: -10, adjustmentShapeType: 0, isEnabled: false,
+            isBasicAdjustment: true, enteredBgValue: nil, sourceCalculatedValue: nil,
+            sourceDescription: nil, sourceContextIdentifier: oldIdentifier, on: context)
+        XCTAssertTrue(core.saveChangesSynchronously())
+        let manager = BgPostProcessingManager(coreDataManager: core, nightscoutSyncManager: nil, healthKitManager: nil)
+        let correctedStart = start.addingTimeInterval(359)
+        // Force a validation failure without changing the real session or adjustment. Neither
+        // metadata nor the cached identity may advance when the grouped save fails.
+        let invalid = NSEntityDescription.insertNewObject(forEntityName: "BgAdjustment", into: context)
+        XCTAssertFalse(manager.correctSensorStartDate(sensor, to: correctedStart))
+        XCTAssertEqual(sensor.startDate, start)
+        XCTAssertEqual(adjustment.sourceContextIdentifier, oldIdentifier)
+        XCTAssertEqual(defaults.postProcessingSourceContextIdentifier, oldIdentifier)
+        context.delete(invalid)
+        XCTAssertTrue(manager.correctSensorStartDate(sensor, to: correctedStart))
+        manager.refreshSourceContext()
+        XCTAssertTrue(defaults.enableAdjustment)
+        XCTAssertTrue(defaults.enableSmoothing)
+        XCTAssertEqual(defaults.bgSmoothingStrength, 2)
+        XCTAssertEqual(defaults.postProcessingApplyFromTimeStamp, start.addingTimeInterval(3600))
+        XCTAssertEqual(manager.latestActiveBgAdjustment()?.intercept, -20)
+        XCTAssertEqual(adjustment.sourceContextIdentifier, defaults.postProcessingSourceContextIdentifier)
+        XCTAssertEqual(disabled.sourceContextIdentifier, adjustment.sourceContextIdentifier)
+        XCTAssertFalse(disabled.isEnabled)
+        context.refreshAllObjects()
+        XCTAssertEqual(sensor.startDate, correctedStart)
+        XCTAssertEqual(manager.latestActiveBgAdjustment()?.intercept, -20)
+
+        // A fresh manager must also find the rekeyed record without resetting either flag.
+        let reloaded = BgPostProcessingManager(coreDataManager: core, nightscoutSyncManager: nil, healthKitManager: nil)
+        reloaded.refreshSourceContext()
+        XCTAssertTrue(defaults.enableAdjustment)
+        XCTAssertTrue(defaults.enableSmoothing)
+        XCTAssertEqual(reloaded.latestActiveBgAdjustment()?.intercept, -20)
+
+        // A real replacement changes sensor identity and must retain the existing neutral reset.
+        sensor.endDate = correctedStart.addingTimeInterval(86400)
+        let replacement = Sensor(startDate: correctedStart.addingTimeInterval(86400), nsManagedObjectContext: context)
+        XCTAssertTrue(core.saveChangesSynchronously())
+        reloaded.refreshSourceContext()
+        XCTAssertFalse(defaults.enableAdjustment)
+        XCTAssertFalse(defaults.enableSmoothing)
+        XCTAssertNil(reloaded.latestActiveBgAdjustment())
+
+        // Correcting metadata never re-enables settings that were already disabled.
+        XCTAssertTrue(reloaded.correctSensorStartDate(replacement, to: replacement.startDate.addingTimeInterval(600)))
+        reloaded.refreshSourceContext()
+        XCTAssertFalse(defaults.enableAdjustment)
+        XCTAssertFalse(defaults.enableSmoothing)
+
+        // A mismatching cache belongs to another source and must not be silently adopted.
+        defaults.postProcessingSourceContextIdentifier = "nightscout|other-source"
+        defaults.enableAdjustment = true
+        defaults.enableSmoothing = true
+        XCTAssertTrue(reloaded.correctSensorStartDate(replacement, to: replacement.startDate.addingTimeInterval(600)))
+        XCTAssertEqual(defaults.postProcessingSourceContextIdentifier, "nightscout|other-source")
+        reloaded.refreshSourceContext()
+        XCTAssertFalse(defaults.enableAdjustment)
+        XCTAssertFalse(defaults.enableSmoothing)
     }
 
     func testCapturedG7BatteryResponseDecodesSharedWireValues() throws {
@@ -498,25 +623,50 @@ final class DexcomG7CalibrationTests: XCTestCase {
         )
 
         XCTAssertEqual(ConstantsAlerts.dexcomBatteryAlertSuppressionPeriodInHours, 6)
-        XCTAssertTrue(DexcomBatteryAlertPolicy.shouldSuppress(hardwareStartDate: nil, now: now))
-        XCTAssertTrue(
-            DexcomBatteryAlertPolicy.shouldSuppress(
-                hardwareStartDate: now.addingTimeInterval(-suppressionInterval + 1),
-                now: now
+        for alertKind in [AlertKind.dexcomG5BatteryLow, .dexcomG7BatteryLow] {
+            XCTAssertTrue(DexcomBatteryAlertPolicy.shouldSuppress(alertKind: alertKind, hardwareStartDate: nil, now: now))
+            XCTAssertTrue(
+                DexcomBatteryAlertPolicy.shouldSuppress(
+                    alertKind: alertKind,
+                    hardwareStartDate: now.addingTimeInterval(-suppressionInterval + 1),
+                    now: now
+                )
             )
-        )
-        XCTAssertFalse(
-            DexcomBatteryAlertPolicy.shouldSuppress(
-                hardwareStartDate: now.addingTimeInterval(-suppressionInterval),
-                now: now
+            XCTAssertFalse(
+                DexcomBatteryAlertPolicy.shouldSuppress(
+                    alertKind: alertKind,
+                    hardwareStartDate: now.addingTimeInterval(-suppressionInterval),
+                    now: now
+                )
             )
-        )
-        XCTAssertFalse(
-            DexcomBatteryAlertPolicy.shouldSuppress(
-                hardwareStartDate: now.addingTimeInterval(-suppressionInterval - 1),
-                now: now
+            XCTAssertFalse(
+                DexcomBatteryAlertPolicy.shouldSuppress(
+                    alertKind: alertKind,
+                    hardwareStartDate: now.addingTimeInterval(-suppressionInterval - 1),
+                    now: now
+                )
             )
-        )
+        }
+    }
+
+    func testDexcomBatterySettlingDoesNotSuppressOtherAlerts() {
+        let now = Date(timeIntervalSince1970: 2_000_000_000)
+        let hardwareStartDates: [Date?] = [nil, now.addingTimeInterval(-60 * 60)]
+
+        // Include glucose and missed-reading alerts when a cached Dexcom battery has no active
+        // hardware date, as well as when the direct transmitter is still in its settling period.
+        for alertKind in AlertKind.allCases where alertKind != .dexcomG5BatteryLow && alertKind != .dexcomG7BatteryLow {
+            for hardwareStartDate in hardwareStartDates {
+                XCTAssertFalse(
+                    DexcomBatteryAlertPolicy.shouldSuppress(
+                        alertKind: alertKind,
+                        hardwareStartDate: hardwareStartDate,
+                        now: now
+                    ),
+                    "Dexcom battery settling must not suppress \(alertKind)"
+                )
+            }
+        }
     }
 
     func testBatteryAlertRoutingSelectsThePayloadFamilyConfiguration() {

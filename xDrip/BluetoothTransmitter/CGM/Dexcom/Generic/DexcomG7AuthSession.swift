@@ -19,8 +19,17 @@ protocol DexcomG7AuthSessionTransport: AnyObject {
     /// Requests a new physical connection before an incomplete ownership state is rebuilt.
     func authSessionRequiresCleanReconnect()
 
+    /// Lets clients with a local diagnostic journal retain a safe failure summary.
+    func authSessionDidFail(_ message: String)
+    func authSessionDidProgress(_ message: String)
+
     /// Schedules authentication fragments on the transmitter's Core Bluetooth queue.
     func authSessionSchedule(after delay: TimeInterval, _ action: @escaping () -> Void)
+}
+
+extension DexcomG7AuthSessionTransport {
+    func authSessionDidFail(_ message: String) {}
+    func authSessionDidProgress(_ message: String) {}
 }
 
 /// Implements the G7 primary authentication and ownership protocol.
@@ -310,6 +319,7 @@ final class DexcomG7AuthSession {
                 // bond request before returning their final pairing confirmation.
                 trace("G7 primary ownership: received 0600. Sending bond request 07", log: log, category: ConstantsLog.categoryCGMG7, type: .info)
                 stage = .bondRequest
+                transport?.authSessionDidProgress("G7 ownership requested Bluetooth bonding")
                 writeControl(PairRequestTxMessage().data)
 
             case .ignore:
@@ -361,6 +371,7 @@ final class DexcomG7AuthSession {
             usingFullBootstrap = packet.first == DexcomTransmitterOpCode.exchangePakePayload.rawValue
             stage = .authenticating
             initialControlPacketSent = true
+            transport?.authSessionDidProgress(usingFullBootstrap ? "G7 full ownership exchange started" : "G7 saved-key authentication started")
             trace(
                 "G7 primary auth: starting %{public}@ on %{public}@ slot 0x%{public}@",
                 log: log,
@@ -507,6 +518,7 @@ final class DexcomG7AuthSession {
             )
             let packets = packetObjects as? [Data] ?? []
             trace("G7 primary J-PAKE phase %{public}d complete", log: log, category: ConstantsLog.categoryCGMG7, type: .info, Int(phase))
+            transport?.authSessionDidProgress("G7 ownership phase \(phase) complete")
             writeExchange(streamPackets: packets, controlPacket: control, reason: "J-PAKE phase \(phase)")
         } catch {
             fail("J-PAKE phase \(phase) failed: \(error.localizedDescription)")
@@ -525,6 +537,7 @@ final class DexcomG7AuthSession {
 
         do {
             trace("G7 primary ownership: starting certificate exchange", log: log, category: ConstantsLog.categoryCGMG7, type: .info)
+            transport?.authSessionDidProgress("G7 certificate exchange started")
             try writeControl(authBridge.certificateRequest(forPhase: 0))
         } catch {
             fail("could not create certificate phase 0: \(error.localizedDescription)")
@@ -619,6 +632,7 @@ final class DexcomG7AuthSession {
             let packets = signature.chunked(into: 20)
             stage = .proofOfPossession
             trace("G7 primary ownership: proof signed. Sending signature and 0d0002", log: log, category: ConstantsLog.categoryCGMG7, type: .info)
+            transport?.authSessionDidProgress("G7 ownership proof sent")
             writeExchange(
                 streamPackets: packets,
                 controlPacket: Data([DexcomTransmitterOpCode.authStatusTx.rawValue, 0x00, 0x02]),
@@ -669,6 +683,7 @@ final class DexcomG7AuthSession {
 
     private func fail(_ message: String, packet: Data? = nil) {
         trace("G7 primary auth failed at %{public}@: %{public}@ packet=%{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .error, stage.rawValue, message, packet?.hexEncodedString() ?? "none")
+        transport?.authSessionDidFail(message)
     }
 }
 

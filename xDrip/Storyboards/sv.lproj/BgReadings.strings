@@ -44,3 +44,10 @@
 "bgRangeUrgent" = "Akut";
 "bgRangeNotUrgent" = "Inte akut";
 "bgRangeInRange" = "Inom intervall";
+
+"alsoCollectedByWatch" = "Även insamlad av Watch";
+
+// Direct to Watch setup and diagnosis
+"receivedViaWatchAtFooterFormat" = "Mottaget via Watch kl. %@";
+"backfilledViaWatchAtFooterFormat" = "Efterhämtat via Watch kl. %@";
+"receivedViaWatch" = "Mottaget via Watch";

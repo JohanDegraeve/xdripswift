@@ -1,784 +1,440 @@
+import Combine
 import Foundation
 import os
 
-class DexcomShareUploadManager:NSObject {
- 
-    // MARK: - private properties
-    
-    /// BgReadingsAccessor instance
-    private let bgReadingsAccessor:BgReadingsAccessor
-    
-    /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
-    private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
-    
-    /// in case errors occurs or other informational message to be shown to the user,  like credential check error, then this closure will be called with title and message
-    private let messageHandler:((String, String) -> Void)?
-    
-    /// for logging
-    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryDexcomShareUploadManager)
+/// Upload diagnostics belong to this manager, not the Dexcom Share follower session.
+/// They deliberately start unchecked each launch; the persisted upload cursor is a reading date.
+final class DexcomShareUploadState: ObservableObject {
+    @Published var isChecking = false
+    @Published var lastConnection: Date?
+    @Published var lastUpload: Date?
+    @Published var authenticationError: String?
+    @Published var uploadError: String?
 
-    /// dexcom share url to use, calculated property
-    private var dexcomShareUrl:String {
-        if UserDefaults.standard.useUSDexcomShareurl {
-            return ConstantsDexcomShare.usBaseShareUrl
-        } else {
-            return ConstantsDexcomShare.globalBaseShareUrl
+    func reset() {
+        isChecking = false
+        lastConnection = nil
+        lastUpload = nil
+        authenticationError = nil
+        uploadError = nil
+    }
+}
+
+struct DexcomShareUploadBatch {
+    let readings: [[String: Any]]
+    let latestReading: Date
+}
+
+/// Owns automatic uploading and the read-only account check used by Settings.
+/// Main-actor ownership keeps Core Data access, session changes and UI diagnostics serialized.
+@MainActor final class DexcomShareUploadManager: NSObject {
+    // MARK: - Properties
+
+    /// Connection and upload activity for Settings; no account identifiers are exposed.
+    let state: DexcomShareUploadState
+    private let defaults: UserDefaults
+    private let session: URLSession
+    private let messageHandler: ((String, String) -> Void)?
+    private let activityHandler: (TroubleshootingLogEntry) -> Void
+    private let makeBatch: (Date, Date?) -> DexcomShareUploadBatch?
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryDexcomShareUploadManager)
+    private var sessionId: String?
+    /// Shared by automatic uploads and manual checks so only one login is in flight.
+    private var loginTask: Task<String, Error>?
+    private var loginTaskID: UUID?
+    private var uploadTask: Task<Void, Never>?
+    /// Invalidates responses started before the account, mode or enable setting changed.
+    private var generation = UUID()
+    private var configuration: Configuration
+    private let observedKeys: [UserDefaults.Key] = [
+        .dexcomShareAccountName, .dexcomSharePassword, .useUSDexcomShareurl,
+        .uploadReadingstoDexcomShare, .dexcomShareUploadSerialNumber,
+        .dexcomShareUploadUseSchedule, .dexcomShareUploadSchedule, .isMaster
+    ]
+
+    private struct Configuration: Equatable {
+        let username: String?
+        let password: String?
+        let serialNumber: String?
+        let useUS: Bool
+        let enabled: Bool
+        let master: Bool
+
+        init(_ defaults: UserDefaults) {
+            username = defaults.dexcomShareAccountName
+            password = defaults.dexcomSharePassword
+            serialNumber = defaults.dexcomShareUploadSerialNumber
+            useUS = defaults.useUSDexcomShareurl
+            enabled = defaults.uploadReadingstoDexcomShare
+            master = defaults.isMaster
+        }
+
+        var canAuthenticate: Bool {
+            enabled && master && username?.isEmpty == false && password?.isEmpty == false
+        }
+
+        var baseURL: URL {
+            URL(string: useUS ? ConstantsDexcomShare.usBaseShareUrl : ConstantsDexcomShare.globalBaseShareUrl)!
         }
     }
-    
-    /// session id retrieved during login, and to be used for uplaods
-    private var dexcomShareSessionId:String?
-    
-    // MARK: - initializer
-    
-    /// initializer
-    /// - parameters:
-    ///     - bgReadingsAccessor : needed to get latest readings
-    ///     - messageHandler : in case errors occurs or other informational message to be shown to the user,  like credential check error, then this closure will be called with title and message
-    init(bgReadingsAccessor:BgReadingsAccessor, messageHandler:((_ title:String, _ message:String) -> Void)?) {
-        
-        // init properties
-        self.bgReadingsAccessor = bgReadingsAccessor
+
+    // MARK: - Initializers
+
+    convenience init(bgReadingsAccessor: BgReadingsAccessor, state: DexcomShareUploadState? = nil, messageHandler: ((String, String) -> Void)?) {
+        self.init(state: state, messageHandler: messageHandler) { fromDate, lastConnectionChange in
+            let readings = bgReadingsAccessor.getLatestBgReadings(
+                limit: nil, fromDate: fromDate, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false
+            ).filter(
+                minimumTimeBetweenTwoReadingsInMinutes: ConstantsDexcomShare.minimiumTimeBetweenTwoReadingsInMinutes,
+                lastConnectionStatusChangeTimeStamp: lastConnectionChange,
+                timeStampLastProcessedBgReading: fromDate
+            )
+            guard let latest = readings.first else { return nil }
+            return DexcomShareUploadBatch(
+                readings: readings.map { $0.dictionaryRepresentationForDexcomShareUpload },
+                latestReading: latest.timeStamp
+            )
+        }
+    }
+
+    /// Inject networking and value snapshots for focused tests without accessing real accounts or Core Data.
+    init(
+        defaults: UserDefaults = .standard,
+        session: URLSession = .shared,
+        state: DexcomShareUploadState? = nil,
+        messageHandler: ((String, String) -> Void)? = nil,
+        activityHandler: @escaping (TroubleshootingLogEntry) -> Void = { TroubleshootingLogStore.shared.record($0) },
+        makeBatch: @escaping (Date, Date?) -> DexcomShareUploadBatch?
+    ) {
+        self.defaults = defaults
+        self.session = session
+        self.state = state ?? DexcomShareUploadState()
         self.messageHandler = messageHandler
-        
+        self.makeBatch = makeBatch
+        self.activityHandler = activityHandler
+        configuration = Configuration(defaults)
         super.init()
-        
-        // add observers for Dexcom share settings which may require testing and/or start upload
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomSharePassword.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareAccountName.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.useUSDexcomShareurl.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.uploadReadingstoDexcomShare.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareUploadSerialNumber.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareUploadUseSchedule.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareUploadSchedule.rawValue, options: .new, context: nil)
-
-    }
-    
-    // MARK: - public functions
-    
-    /// uploads latest BgReadings to Dexcom Share
-    /// - parameters:
-    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
-    public func uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date?) {
-        
-        // check if dexcomShare is enabled
-        guard UserDefaults.standard.uploadReadingstoDexcomShare else {
-            trace("in upload, uploadReadingstoDexcomShare not enabled", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .debug)
-            return
-        }
-        
-        // check if master is enabled
-        guard UserDefaults.standard.isMaster else {
-            trace("in upload, not master so nothing to upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .debug)
-            return
-        }
-        
-        // check if accountname and password and serial number exist
-        guard UserDefaults.standard.dexcomShareUploadSerialNumber != nil, UserDefaults.standard.dexcomShareAccountName != nil, UserDefaults.standard.dexcomSharePassword != nil else {
-            trace("in upload, dexcomShareUploadSerialNumber or dexcomShareAccountName or dexcomSharePassword is nil", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-            return
-        }
-        
-        // if schedule is on, check if upload is needed according to schedule
-        if UserDefaults.standard.dexcomShareUploadUseSchedule {
-            if let schedule = UserDefaults.standard.dexcomShareUploadSchedule {
-                if !schedule.indicatesOn(forWhen: Date()) {
-                    trace("in upload, schedule indicates 'not on' so will not upload yet", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                    return
-                }
-            }
-        }
-        
-        // upload
-        uploadBgReadingsToDexcomShare(firstAttempt: true, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
-    }
-
-    // MARK: - overriden functions
-    
-    /// when one of the observed settings get changed, possible actions to take
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        
-        if let keyPath = keyPath {
-            if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
-                
-                switch keyPathEnum {
-                case UserDefaults.Key.dexcomShareAccountName, UserDefaults.Key.dexcomSharePassword :
-                    
-                    if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
-                        
-                        if requiredSettingsAreNotNil() {
-                            
-                            loginAndStoreSessionId { (success, error) in
-                                DispatchQueue.main.async {
-                                    
-                                    self.callMessageHandler(withCredentialVerificationResult: success, errorMessage: self.translateDexcomErrorMessage(errorText: error?.localizedDescription ?? nil))
-                                    
-                                    if success {
-                                        trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                                        
-                                        // set lastConnectionStatusChangeTimeStamp to as late as possible, to make sure that the most recent reading is uploaded if user is testing the credentials
-                                        self.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date())
-                                        
-                                    } else {
-                                        trace("in observeValue, Dexcom Share credential check failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                                    }
-                                }
-
-                            }
-                            
-                        }
-                    }
-                    
-                case UserDefaults.Key.uploadReadingstoDexcomShare, UserDefaults.Key.dexcomShareUploadSerialNumber, UserDefaults.Key.useUSDexcomShareurl, UserDefaults.Key.dexcomShareUploadUseSchedule, UserDefaults.Key.dexcomShareUploadSchedule :
-                    
-                    // if changing to enabled, then do a credentials test and if ok start upload, if fail don't give warning, that's the only difference with previous cases
-                    if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
-                        
-                        // check if Dexcom Share Upload is enabled
-                        if UserDefaults.standard.uploadReadingstoDexcomShare {
-                            
-                            // check if required Dexcom Share Upload settings are not nil
-                            if requiredSettingsAreNotNil() {
-
-                                // test credentials
-                                loginAndStoreSessionId { (success, error) in
-                                    DispatchQueue.main.async {
-                                        if success {
-                                            
-                                            trace("in observeValue, start upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                                            
-                                            // set lastConnectionStatusChangeTimeStamp to as late as possible, to make sure that the most recent reading is uploaded if user is testing the credentials
-                                            self.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date())
-                                            
-                                        } else {
-                                            
-                                            trace("in observeValue, Dexcom Share credential check failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                                        }
-                                    }
-                                    
-                                }
-
-                            }
-                        } else {
-                            // Dexcom Share Upload disabled, set sessionid to nil, although this is not really necessary
-                            dexcomShareSessionId = nil
-                        }
-                    }
-                    
-                default:
-                    break
-                }
-            }
+        for key in observedKeys {
+            defaults.addObserver(self, forKeyPath: key.rawValue, options: .new, context: nil)
         }
     }
 
-    // MARK: - private helper functions
-    
-    /// will call StartRemoteMonitoringSession with serialNumber
-    /// - parameters:
-    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
-    ///
-    /// dexcomShareSessionId and UserDefaults.standard.dexcomShareUploadSerialNumber should be not nil
-    private func startRemoteMonitoringSessionAndStartUpload(lastConnectionStatusChangeTimeStamp: Date?) {
-        
-        trace("in startRemoteMonitoringSessionAndStartUpload", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-        
-        guard let url = URL(string: dexcomShareUrl), let dexcomShareSessionId = dexcomShareSessionId, let dexcomShareUploadSerialNumber = UserDefaults.standard.dexcomShareUploadSerialNumber, let dexcomShareAccountName = UserDefaults.standard.dexcomShareAccountName else {
-            trace("    failed to create url or dexcomShareSessionId or dexcomShareUploadSerialNumber or dexcomShareAccountName is nil", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-            return
-        }
-        
-        let startRemoteMonitoringSessionUrl = url.appendingPathComponent(ConstantsDexcomShare.dexcomShareUploadStartRemoteMonitoringSessionPath)
-        
-        // create NSURLComponents instance with scheme, host, queryItems
-        guard let components = NSURLComponents(url: startRemoteMonitoringSessionUrl, resolvingAgainstBaseURL: false) else {
-            trace("in startRemoteMonitoringSessionAndStartUpload, failed to create components", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-            return
-        }
-        
-        components.scheme = startRemoteMonitoringSessionUrl.scheme
-        components.host = startRemoteMonitoringSessionUrl.host
-        components.queryItems = [URLQueryItem(name: "sessionId", value: dexcomShareSessionId), URLQueryItem(name: "serialNumber", value: dexcomShareUploadSerialNumber)]
-        
-        guard let newUrl = components.url else {
-            trace("in startRemoteMonitoringSessionAndStartUpload, failed to create newUrl", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-            return
-        }
-
-        // create the request
-        var request = URLRequest(url: newUrl)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField:"Content-Type")
-        request.setValue("Dexcom Share/3.0.2.11 CFNetwork/711.2.23 Darwin/14.0.0", forHTTPHeaderField: "User-Agent")
-
-        // get shared URLSession
-        let sharedSession = URLSession.shared
-
-        // Create upload Task
-        let task = sharedSession.uploadTask(with: request, from: "".data(using: .utf8), completionHandler: { [weak self] (data, response, error) -> Void in
-            guard let self = self else { return }
-            
-            trace("in startRemoteMonitoringSessionAndStartUpload, finished task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-            
-            // log the data when existing the scope
-            defer {
-                if let data = data, let dataAsString = String(bytes: data, encoding: .utf8) {
-                    trace("    data = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, dataAsString)
-                }
-            }
-            
-            // error cases
-            if let error = error {
-                trace("    error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, error.localizedDescription)
-                return
-            }
-            
-            // check that response is HTTPURLResponse
-            if let response = response as? HTTPURLResponse {
-                
-                if let data = data {
-                    
-                    // data has sessionid (if success) or error details (if failure) which can be logged and shown to the user
-                    guard let decoded = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)
-                        else {
-                            trace("    JSONSerialization failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                            return
-                    }
-                    
-                    // if status code is not in range 200 to 299 then it's an error case
-                    guard (200...299).contains(response.statusCode) else {
-                        
-                        // failure is a JSON object containing the error code
-                        let errorCode = (decoded as? [String: String])?["Code"] ?? "unknown"
-                        
-                        trace("    statuscode = %{public}@, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, response.statusCode.description, errorCode)
-                        
-                        if errorCode == "MonitoredReceiverSerialNumberDoesNotMatch" {
-                            
-                            trace("    MonitoredReceiverSerialNumberDoesNotMatch", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                            DispatchQueue.main.async {
-                                if let messageHandler = self.messageHandler {
-                                    messageHandler(Texts_DexcomShareTestResult.uploadErrorWarning, Texts_DexcomShareTestResult.monitoredReceiverSNDoesNotMatch)
-                                }
-                            }
-                            return
-                            
-                        } else if errorCode == "MonitoredReceiverNotAssigned" {
-                            
-                            trace("    new login failed with error MonitoredReceiverNotAssigned", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                            DispatchQueue.main.async {
-                                if let messageHandler = self.messageHandler {
-                                    messageHandler(Texts_DexcomShareTestResult.uploadErrorWarning, self.createMonitoredReceiverNotAssignedMessage(acount: dexcomShareAccountName, serialNumber: dexcomShareUploadSerialNumber))
-                                }
-                            }
-                            return
-                            
-                        }
-                        
-                        return
-                    }
-                    
-                    //there's no error, call uploadBgReadingsToDexcomShare in main thread
-                    DispatchQueue.main.async {
-                        self.uploadBgReadingsToDexcomShare(firstAttempt: true, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
-                    }
-                    
-                } else {
-                    trace("    no data received", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                    return
-                }
-                
-            } else {
-                trace("    response is not HTTPURLResponse", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                return
-            }
-            
-        })
-        
-        trace("in startRemoteMonitoringSessionAndStartUpload, calling task.resume", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-        task.resume()
-
-    }
-    
-    /// will try to upload the latest readings - if dexcomShareSessionId is nil then first a login attempt will be done and after that an upload.
-    /// - parameters:
-    ///     - firstAttempt : if true, and if dexcomShareSessionId not nil, but upload attempt fails with because dexcomShareSessionId is not valid, then a new login attempt will be done, after which a new upload attempt - if false, then no new upload attempt will be done
-    ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect - if nil then  1 1 1970 is used
-    ///
-    /// firstAttempt is there to avoid that the app runs in an endless loop
-    private func uploadBgReadingsToDexcomShare(firstAttempt:Bool, lastConnectionStatusChangeTimeStamp: Date?) {
-        
-        trace("in uploadBgReadingsToDexcomShare", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-        
-        // dexcomShareUploadSerialNumber and dexcomShareAccountName needed else no further processing
-        guard let dexcomShareUploadSerialNumber = UserDefaults.standard.dexcomShareUploadSerialNumber, let dexcomShareAccountName = UserDefaults.standard.dexcomShareAccountName else {
-            trace("    dexcomShareUploadSerialNumber and/or dexcomShareAccountName are/is nil", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-            return
-        }
-        
-        guard let dexcomShareSessionId = dexcomShareSessionId else {
-            
-            trace("    dexcomShareSessionId is nil, will try to login", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-            
-            // try to login
-            loginAndStoreSessionId { (success, error) in
-                DispatchQueue.main.async {
-                    if success {
-                        trace("in uploadBgReadingsToDexcomShare, login successful, will restart uploadBgReadingsToDexcomShare", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                        // retry the upload
-                        self.uploadBgReadingsToDexcomShare(firstAttempt: firstAttempt, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
-                    } else {
-                        trace("in uploadBgReadingsToDexcomShare, login failed, no further processing", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                    }
-                }
-            }
-            return
-        }
-        
-        // get timestamp of first reading to upload, limit to 8 hours
-        var timeStamp = Date(timeIntervalSinceNow: -8*60*60)
-        if let timeStampLatestDexcomShareUploadedBgReading = UserDefaults.standard.timeStampLatestDexcomShareUploadedBgReading {
-            timeStamp = timeStampLatestDexcomShareUploadedBgReading
-        }
-        
-        // get readings to upload, applying minimumTimeBetweenTwoReadingsInMinutes filter
-        let bgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false).filter(minimumTimeBetweenTwoReadingsInMinutes: ConstantsDexcomShare.minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: timeStamp)
-        
-        trace("    number of readings to upload : %{public}@", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, bgReadingsToUpload.count.description)
-
-        // if no no readings to upload, no further processing
-        guard bgReadingsToUpload.count > 0 else {
-            trace("    no readings to upload", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-            return
-        }
-        
-        // create url request
-        guard let request = createURLRequestForUploadBgReadings(dexcomShareSessionId: dexcomShareSessionId) else {
-            trace("    failed to create request", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-            return
-        }
-        
-        // create upload data as dictionary
-        let bgReadingsDictionaryRepresentation = bgReadingsToUpload.map({$0.dictionaryRepresentationForDexcomShareUpload})
-        let uploadDataAsDictionary:[String : Any] = [
-            "Egvs" : bgReadingsDictionaryRepresentation,
-            "SN" : dexcomShareUploadSerialNumber,
-            "TA" : -5
-        ]
-        
-        // store the timestamp of the last reading to upload, here in the main thread, because we use a bgReading for it, which is retrieved in the main mangedObjectContext
-        let timeStampLastReadingToUpload = bgReadingsToUpload.first != nil ? bgReadingsToUpload.first!.timeStamp : nil
-
-        do {
-            
-            // create upload data in json format
-            let uploadData = try JSONSerialization.data(withJSONObject: uploadDataAsDictionary, options: [])
-            
-            // Create upload Task
-            let task = URLSession.shared.uploadTask(with: request, from: uploadData, completionHandler: { [weak self] (data, response, error) -> Void in
-                guard let self = self else { return }
-                
-                trace("in uploadBgReadingsToDexcomShare, finished task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                
-                // error cases
-                if let error = error {
-                    trace("    failed to upload, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, error.localizedDescription)
-                    return
-                }
-                
-                // check that response is HTTPURLResponse
-                if let response = response as? HTTPURLResponse {
-                    
-                    if let data = data {
-                        
-                        // if data is empty, then this means the upload was successful
-                        if data.count == 0 {
-                            
-                            // success
-                            self.setTimeStampLastReadingToUpload(timeStampLastReadingToUpload: timeStampLastReadingToUpload)
-                            
-                            return
-
-                        } else {
-                            
-                            // returned data, which means an error occurred - although it's still possible that it was successful, eg DuplicateEgvPosted is considered successful
-                            if let dataAsString = String(data: data, encoding: String.Encoding.utf8) {
-                                trace("    response from Dexcom = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, dataAsString)
-                            }
-
-                            // try json decoding
-                            guard let decoded = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)
-                                else {
-                                    trace("    JSONSerialization failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                                    return
-                            }
-                            
-                            // if status code is not in range 200 to 299 then it's an error case
-                            if !(200...299).contains(response.statusCode) {
-                                
-                                // failure is a JSON object containing the error code
-                                let errorCode = (decoded as? [String: String])?["Code"] ?? "unknown"
-                                
-                                trace("    failed to upload, statuscode = %{public}@, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, response.statusCode.description, errorCode)
-                                
-                                // evaluate the error code
-                                if errorCode == "SessionNotValid" || errorCode == "SessionIdNotFound" {
-                                    
-                                    // reset dexcomShareSessionId
-                                    self.dexcomShareSessionId = nil
-                                    
-                                    // try to login again and if successful retry upload readings
-                                    self.loginAndStoreSessionId { (success, error) in
-                                        DispatchQueue.main.async {
-                                            if success {
-                                                trace("in uploadBgReadingsToDexcomShare, new login successful", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                                                // retry the upload
-                                                self.uploadBgReadingsToDexcomShare(firstAttempt: false, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
-                                            } else {
-                                                trace("in uploadBgReadingsToDexcomShare, new login failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                                            }
-                                        }
-                                    }
-                                    
-                                    return
-                                    
-                                } else if errorCode == "MonitoringSessionNotActive" {
-                                    // call startRemoteMonitoringSessionAndStartUpload in main thread
-                                    DispatchQueue.main.async {
-                                        self.startRemoteMonitoringSessionAndStartUpload(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
-                                    }
-                                    return
-                                    
-                                } else if errorCode == "DuplicateEgvPosted" {
-                                    // consider as successful
-                                    // don't return
-                                    
-                                } else if errorCode == "MonitoredReceiverSerialNumberDoesNotMatch" {
-                                    trace("in uploadBgReadingsToDexcomShare, new login failed with error MonitoredReceiverSerialNumberDoesNotMatch", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                                    DispatchQueue.main.async {
-                                        if let messageHandler = self.messageHandler {
-                                            messageHandler(Texts_DexcomShareTestResult.uploadErrorWarning, Texts_DexcomShareTestResult.monitoredReceiverSNDoesNotMatch)
-                                        }
-                                    }
-                                    return
-                                    
-                                } else if errorCode == "MonitoredReceiverNotAssigned" {
-                                    trace("in uploadBgReadingsToDexcomShare, new login failed with error MonitoredReceiverNotAssigned", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                                    DispatchQueue.main.async {
-                                        if let messageHandler = self.messageHandler {
-                                            messageHandler(Texts_DexcomShareTestResult.uploadErrorWarning, self.createMonitoredReceiverNotAssignedMessage(acount: dexcomShareAccountName, serialNumber: dexcomShareUploadSerialNumber))
-                                        }
-                                    }
-                                    return
-                                    
-                                } else {
-                                    // unknown error code -  the error code value is already logged
-                                    trace("in uploadBgReadingsToDexcomShare, new login failed with unknown error code", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                                    return
-                                }
-                                
-                            }
-                            
-                            // success
-                            self.setTimeStampLastReadingToUpload(timeStampLastReadingToUpload: timeStampLastReadingToUpload)
-                            
-                            return
-                        }
-                    } else {
-                        
-                        // don't think we should every come here
-                        trace("    no data received, considered successful upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-
-                        self.setTimeStampLastReadingToUpload(timeStampLastReadingToUpload: timeStampLastReadingToUpload)
-                        
-                        return
-                        
-                    }
-                    
-                } else {
-                    trace("    failed to upload, response is not HTTPURLResponse", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                    return
-                }
-                
-            })
-            
-            trace("in uploadBgReadingsToDexcomShare, calling task.resume", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-            task.resume()
-            
-        } catch let error {
-            trace("     failed to upload, error = %{public}@", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, error.localizedDescription)
-            return
-        }
-
-    }
-    
-    /// sets UserDefaults.standard.timeStampLatestDexcomShareUploadedBgReading = timeStampLastReadingToUpload, if not nil
-    private func setTimeStampLastReadingToUpload(timeStampLastReadingToUpload: Date?) {
-        
-        if let timeStampLastReadingToUpload = timeStampLastReadingToUpload {
-            trace("    upload succeeded, setting timeStampLatestDexcomShareUploadedBgReading to %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, timeStampLastReadingToUpload.description(with: .current))
-            UserDefaults.standard.timeStampLatestDexcomShareUploadedBgReading = timeStampLastReadingToUpload
-        }
-        
-    }
-    
-    /// test dexcom share credentials (accountname, password) - the credentials must be not nil in userdefaults, otherwise completion is called with error
-    ///
-    /// in case of success, the function will store the dexcomShareSessionId
-    private func loginAndStoreSessionId( _ completion: @escaping (_ success: Bool, _ error: Error?) -> Void) {
-        
-        trace("in testDexcomShareCredentials", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-        
-        guard let url = URL(string: dexcomShareUrl), let dexcomShareAccountName = UserDefaults.standard.dexcomShareAccountName, let dexcomSharePassword = UserDefaults.standard.dexcomSharePassword else {
-            
-            trace("    required credentials are not set", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-            completion(false, NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: "required credentials are not set or failed to create url"]))
-            return
-            
-        }
-            
-        do {
-            // Step 1/2 - AUTH: Authenticate to get accountId
-            let authURL = url.appendingPathComponent(ConstantsDexcomShare.dexcomShareFollowAuthPath)
-            var authRequest = URLRequest(url: authURL)
-            authRequest.httpMethod = "POST"
-            authRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            authRequest.setValue("Dexcom%20Share/3.0.2.11 CFNetwork/1390 Darwin/22.0.0", forHTTPHeaderField: "User-Agent")
-            
-            let authBody = try JSONSerialization.data(withJSONObject: [
-                "accountName": dexcomShareAccountName,
-                "password": dexcomSharePassword,
-                "applicationId": ConstantsDexcomShare.applicationId
-            ], options: [])
-            
-            let authTask = URLSession.shared.uploadTask(with: authRequest, from: authBody) { [weak self] data, response, error in
-                guard let self = self else { return }
-                
-                trace("in loginAndStoreSessionId, finished auth task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                
-                if let error = error {
-                    trace("    failed to authenticate, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, error.localizedDescription)
-                    completion(false, error)
-                    return
-                }
-                
-                guard let response = response as? HTTPURLResponse else {
-                    trace("    auth response is not HTTPURLResponse", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                    completion(false, NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: "response is not HTTPURLResponse"]))
-                    return
-                }
-                
-                guard let data = data else {
-                    trace("    failed to authenticate, no data received", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                    completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "no data received"]))
-                    return
-                }
-                
-                guard let decoded = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) else {
-                    trace("    failed to authenticate, JSONSerialization failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                    completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "Could not do JSONSerialization of data"]))
-                    return
-                }
-                
-                guard (200...299).contains(response.statusCode) else {
-                    trace("    failed to authenticate, statuscode = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, response.statusCode.description)
-                    let errorCode = (decoded as? [String: String])?["Code"] ?? "unknown"
-                    completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: errorCode]))
-                    return
-                }
-                
-                let accountId = (String(data: data, encoding: .utf8) ?? "").trimmingCharacters(in: CharacterSet(charactersIn: "\""))
-                guard !accountId.isEmpty else {
-                    trace("    failed to authenticate, failed to get accountId, decoded is not a string", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                    completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "decoded is not a string"]))
-                    return
-                }
-                
-                // Step 2/2 - LOGIN: Login by accountId
-                let loginURL = url.appendingPathComponent(ConstantsDexcomShare.dexcomShareFollowLoginPath)
-                var loginRequest = URLRequest(url: loginURL)
-                loginRequest.httpMethod = "POST"
-                loginRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-                loginRequest.setValue("Dexcom%20Share/3.0.2.11 CFNetwork/1390 Darwin/22.0.0", forHTTPHeaderField: "User-Agent")
-                
-                do {
-                    let loginBody = try JSONSerialization.data(withJSONObject: [
-                        "accountId": accountId,
-                        "password": dexcomSharePassword,
-                        "applicationId": ConstantsDexcomShare.applicationId
-                    ], options: [])
-                    
-                    let loginTask = URLSession.shared.uploadTask(with: loginRequest, from: loginBody) { [weak self] data, response, error in
-                        guard let self = self else { return }
-                        
-                        trace("in loginAndStoreSessionId, finished login task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                        
-                        if let error = error {
-                            trace("    failed to login, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, error.localizedDescription)
-                            completion(false, error)
-                            return
-                        }
-                        
-                        guard let response = response as? HTTPURLResponse else {
-                            trace("    response is not HTTPURLResponse", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                            completion(false, NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: "response is not HTTPURLResponse"]))
-                            return
-                        }
-                        
-                        guard let data = data else {
-                            trace("    failed to login, no date received", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                            completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "no data received"]))
-                            return
-                        }
-                        
-                        guard let decoded = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) else {
-                            trace("    failed to login, JSONSerialization failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                            completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "Could not do JSONSerialization of data"]))
-                            return
-                        }
-                        
-                        guard (200...299).contains(response.statusCode) else {
-                            trace("    failed to login, statuscode = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, response.statusCode.description)
-                            let errorCode = (decoded as? [String: String])?["Code"] ?? "unknown"
-                            completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: errorCode]))
-                            return
-                        }
-                        
-                        let dexcomShareSessionId = (String(data: data, encoding: .utf8) ?? "").trimmingCharacters(in: CharacterSet(charactersIn: "\""))
-                        guard !dexcomShareSessionId.isEmpty else {
-                            trace("    failed to login, failed to get dexcomShareSessionId, decoded is not a string", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                            completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "decoded is not a string"]))
-                            return
-                        }
-                        
-                        guard dexcomShareSessionId != ConstantsDexcomShare.failedSessionId else {
-                            completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "SSO_AuthenticatePasswordInvalid"]))
-                            return
-                        }
-                        
-                        trace("    successful login", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                        self.dexcomShareSessionId = dexcomShareSessionId
-                        completion(true, nil)
-                    }
-                    
-                    trace("in loginAndStoreSessionId, calling loginTask.resume", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                    loginTask.resume()
-                } catch let error {
-                    trace("     %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, error.localizedDescription)
-                    completion(false, NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]))
-                }
-            }
-            
-            trace("in loginAndStoreSessionId, calling authTask.resume", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-            authTask.resume()
-        } catch let error {
-            trace("     %{public}@", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, error.localizedDescription)
-            completion(false, NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]))
-            return
-        }
-    }
-
-    /// calls messageHandler with title and errorMessage. Title text will depend on success.
-    private func callMessageHandler(withCredentialVerificationResult success:Bool, errorMessage:String?) {
-        // define the title text
-        var title = Texts_DexcomShareTestResult.verificationSuccessfulAlertTitle
-        if !success {
-            title = Texts_DexcomShareTestResult.verificationErrorAlertTitle
-        }
-        
-        // if error.localizedDescription one of the known Dexcom share error codes, then translate
-        
-        
-        // define the message text
-        var message = Texts_DexcomShareTestResult.verificationSuccessfulAlertBody
-        if !success {
-            if let errorMessage = errorMessage {
-                message = errorMessage
-            } else {
-                message = "unknown error"// shouldn't happen
-            }
-        }
-        
-        // call messageHandler
-        if let messageHandler = messageHandler {
-            messageHandler(title, message)
-        }
-    }
-    
-    /// if error.localizedDescription is one of the known Dexcom login error codes, then a translation will be done
-    /// - parameters:
-    ///     - errorText : if nil returnvalue will also be nil
-    /// - returns:
-    ///     - if errorText is known Dexcom error text, then returnValue will be translated text, else returns errorText
-    private func translateDexcomErrorMessage(errorText: String?) -> String? {
-        
-        guard let errorText = errorText else {return nil}
-        
-        if errorText.uppercased() == "SSO_AuthenticateAccountNotFound".uppercased() {
-            return Texts_Common.invalidAccountOrPassword
-        } else if errorText.uppercased() == "SSO_AuthenticatePasswordInvalid".uppercased() {
-            return Texts_Common.invalidAccountOrPassword
-        } else if errorText.uppercased() == "SSO_AuthenticateMaxAttemptsExceeed".uppercased() {
-            return Texts_DexcomShareTestResult.authenticateMaxAttemptsExceeded
-        } else {
-            return errorText
-        }
-        
-    }
-    
-    /// creates the message to be displayed to user when MonitoredReceiverNotAssigned error occurs
-    ///
-    /// this is just to minimize a bit the lines of code in the calling function
-    private func createMonitoredReceiverNotAssignedMessage(acount: String, serialNumber:String) -> String {
-        return Texts_DexcomShareTestResult.monitoredReceiverNotAssigned1 + " " + serialNumber + " " + Texts_DexcomShareTestResult.monitoredReceiverNotAssigned2 + " " + acount + ". " + Texts_DexcomShareTestResult.monitoredReceiverNotAssigned3
-    }
-    
-    /// will check value of UserDefaults.standard.dexcomShareAccountName, UserDefaults.standard.dexcomSharePassword, UserDefaults.standard.uploadReadingstoDexcomShare
-    private func requiredSettingsAreNotNil() -> Bool {
-        return UserDefaults.standard.dexcomShareAccountName != nil && UserDefaults.standard.dexcomSharePassword != nil && UserDefaults.standard.uploadReadingstoDexcomShare
-    }
-    
-    /// creates URLRequest to be used for uploading readings to Dexcom Share Server
-    /// - returns:
-    ///     - a URLRequest, shouldn't be nil normally, if it is looks more like a coding error
-    private func createURLRequestForUploadBgReadings(dexcomShareSessionId:String) -> URLRequest? {
-        // create url
-        guard let url = URL(string: dexcomShareUrl) else {
-            trace("in createURLRequestForUploadBgReadings, failed to create url", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-            return nil
-        }
-        let postReceiverEgvRecordsUrl = url.appendingPathComponent(ConstantsDexcomShare.dexcomShareUploadPostReceiverEgvRecordsPath)
-        
-        // create NSURLComponents instance with scheme, host, queryItems
-        guard let components = NSURLComponents(url: postReceiverEgvRecordsUrl, resolvingAgainstBaseURL: false) else {
-            trace("in createURLRequestForUploadBgReadings, failed to create components", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-            return nil
-        }
-        components.scheme = postReceiverEgvRecordsUrl.scheme
-        components.host = postReceiverEgvRecordsUrl.host
-        components.queryItems = [URLQueryItem(name: "sessionId", value: dexcomShareSessionId)]
-        
-        guard let newUrl = components.url else {
-            trace("in createURLRequestForUploadBgReadings, failed to create newUrl", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-            return nil
-        }
-        
-        //create the request
-        var request = URLRequest(url: newUrl)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField:"Content-Type")
-        request.setValue("application/json", forHTTPHeaderField:"Accept")
-        request.setValue("Dexcom Share/3.0.2.11 CFNetwork/711.2.23 Darwin/14.0.0", forHTTPHeaderField: "User-Agent")
-        
-        return request
-    }
     deinit {
-        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomSharePassword.rawValue)
-        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomShareAccountName.rawValue)
-        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.useUSDexcomShareurl.rawValue)
-        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.uploadReadingstoDexcomShare.rawValue)
-        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomShareUploadSerialNumber.rawValue)
-        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomShareUploadUseSchedule.rawValue)
-        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomShareUploadSchedule.rawValue)
+        for key in observedKeys { defaults.removeObserver(self, forKeyPath: key.rawValue) }
+        loginTask?.cancel()
+        uploadTask?.cancel()
+    }
+
+    // MARK: - Settings and account checks
+
+    nonisolated override func observeValue(
+        forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?
+    ) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            let changed = self.reconcileConfiguration()
+            // Account verification is independent of serial-number readiness and the upload schedule.
+            // Coalesced KVO callbacks must not trigger a second login after the first check finishes.
+            if changed && self.configuration.canAuthenticate { await self.checkAccount(force: false) }
+            // Settings still automatically trigger uploading; schedule edits never bypass the schedule.
+            self.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date())
+        }
+    }
+
+    /// Verifies credentials only. It never posts glucose or starts remote monitoring.
+    func testConnection() async {
+        reconcileConfiguration()
+        guard configuration.canAuthenticate else { return }
+        await checkAccount(force: true)
+    }
+
+    private func checkAccount(force: Bool) async {
+        let currentGeneration = generation
+        do {
+            _ = try await authenticate(configuration, generation: currentGeneration, force: force)
+        } catch {
+            recordAuthenticationError(error, generation: currentGeneration)
+        }
+    }
+
+    func uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date?) {
+        reconcileConfiguration()
+        guard uploadTask == nil, canUpload else { return }
+        let currentGeneration = generation
+        uploadTask = Task { [weak self] in
+            guard let self else { return }
+            await self.uploadIfNeeded(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
+            if self.generation == currentGeneration { self.uploadTask = nil }
+        }
+    }
+
+    private var canUpload: Bool {
+        configuration.canAuthenticate && configuration.serialNumber?.isEmpty == false && scheduleIsOn
+    }
+
+    private var scheduleIsOn: Bool {
+        !defaults.dexcomShareUploadUseSchedule || defaults.dexcomShareUploadSchedule?.indicatesOn(forWhen: Date()) != false
+    }
+
+    @discardableResult private func reconcileConfiguration() -> Bool {
+        let updated = Configuration(defaults)
+        guard configuration != updated else { return false }
+        if configuration.enabled != updated.enabled {
+            activityHandler(.standard(.configuration(.dexcomShareUploadChanged(enabled: updated.enabled))))
+        }
+        configuration = updated
+        generation = UUID()
+        sessionId = nil
+        loginTask?.cancel()
+        loginTask = nil
+        loginTaskID = nil
+        uploadTask?.cancel()
+        uploadTask = nil
+        state.reset()
+        return true
+    }
+
+    /// Compare the actual settings as well as the generation: KVO delivery can be queued behind a response.
+    private func requireCurrent(_ config: Configuration, generation: UUID) throws {
+        guard self.generation == generation, Configuration(defaults) == config, !Task.isCancelled else {
+            throw CancellationError()
+        }
+    }
+
+    private func authenticate(_ config: Configuration, generation: UUID, force: Bool = false) async throws -> String {
+        try requireCurrent(config, generation: generation)
+        if let loginTask { return try await loginTask.value }
+        if !force, let sessionId { return sessionId }
+        let taskID = UUID()
+        state.isChecking = true
+        let task = Task { () throws -> String in
+            let accountData = try await self.request(
+                config, path: ConstantsDexcomShare.dexcomShareFollowAuthPath,
+                body: ["accountName": config.username!, "password": config.password!, "applicationId": ConstantsDexcomShare.applicationId],
+                generation: generation, authentication: true
+            )
+            let accountID = try self.decodeIdentifier(accountData)
+            let loginData = try await self.request(
+                config, path: ConstantsDexcomShare.dexcomShareFollowLoginPath,
+                body: ["accountId": accountID, "password": config.password!, "applicationId": ConstantsDexcomShare.applicationId],
+                generation: generation, authentication: true
+            )
+            return try self.decodeIdentifier(loginData)
+        }
+        loginTask = task
+        loginTaskID = taskID
+        defer {
+            if loginTaskID == taskID {
+                loginTask = nil
+                loginTaskID = nil
+                state.isChecking = false
+            }
+        }
+        let result = try await task.value
+        try requireCurrent(config, generation: generation)
+        sessionId = result
+        // A valid account does not resolve a previous upload or receiver error.
+        state.authenticationError = nil
+        state.lastConnection = Date()
+        activityHandler(.detailed(.integration(name: .dexcomShareUploadAccount, activity: .succeeded(itemCount: nil))))
+        trace("Dexcom Share upload account verified", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+        return result
+    }
+
+    // MARK: - Uploading
+
+    /// Preserves the existing reading cursor and filtering. Acceptance time is tracked separately for the UI.
+    func uploadIfNeeded(lastConnectionStatusChangeTimeStamp: Date?) async {
+        reconcileConfiguration()
+        guard canUpload else { return }
+        let config = configuration
+        let currentGeneration = generation
+        do {
+            var token: String
+            do {
+                token = try await authenticate(config, generation: currentGeneration)
+            } catch {
+                recordAuthenticationError(error, generation: currentGeneration)
+                return
+            }
+            try requireCurrent(config, generation: currentGeneration)
+            guard canUpload else { return }
+            // A cursor from months ago must not turn the intended eight-hour upload into tens of
+            // thousands of readings (HTTP 413). Keep the stored cursor until an upload is accepted.
+            let earliest = Date(timeIntervalSinceNow: -8 * 60 * 60)
+            let fromDate = max(defaults.timeStampLatestDexcomShareUploadedBgReading ?? earliest, earliest)
+            guard let batch = makeBatch(fromDate, lastConnectionStatusChangeTimeStamp), !batch.readings.isEmpty else { return }
+            let body: [String: Any] = ["Egvs": batch.readings, "SN": config.serialNumber!, "TA": -5]
+            let uploadStartedAt = Date()
+            var retriedSession = false
+            var restartedMonitoring = false
+            while true {
+                try requireCurrent(config, generation: currentGeneration)
+                guard scheduleIsOn else { return }
+                do {
+                    _ = try await request(
+                        config, path: ConstantsDexcomShare.dexcomShareUploadPostReceiverEgvRecordsPath,
+                        body: body, query: [.init(name: "sessionId", value: token)], generation: currentGeneration
+                    )
+                    break
+                } catch let error as ShareError {
+                    if error.code == "DuplicateEgvPosted" { break }
+                    if ["SessionNotValid", "SessionIdNotFound"].contains(error.code), !retriedSession {
+                        retriedSession = true
+                        trace("Dexcom Share upload retry: renewing expired session", log: log,
+                              category: ConstantsLog.categoryDexcomShareUploadManager, type: .debug)
+                        sessionId = nil
+                        do {
+                            token = try await authenticate(config, generation: currentGeneration, force: true)
+                        } catch {
+                            recordAuthenticationError(error, generation: currentGeneration)
+                            return
+                        }
+                    } else if error.code == "MonitoringSessionNotActive", !restartedMonitoring {
+                        restartedMonitoring = true
+                        trace("Dexcom Share upload recovery: starting monitoring session", log: log,
+                              category: ConstantsLog.categoryDexcomShareUploadManager, type: .debug)
+                        _ = try await request(
+                            config, path: ConstantsDexcomShare.dexcomShareUploadStartRemoteMonitoringSessionPath,
+                            query: [.init(name: "sessionId", value: token), .init(name: "serialNumber", value: config.serialNumber!)],
+                            generation: currentGeneration
+                        )
+                    } else {
+                        throw error
+                    }
+                }
+            }
+            try requireCurrent(config, generation: currentGeneration)
+            defaults.timeStampLatestDexcomShareUploadedBgReading = batch.latestReading
+            state.lastConnection = Date()
+            state.lastUpload = state.lastConnection
+            state.uploadError = nil
+            activityHandler(.detailed(.integration(name: .dexcomShareUpload, activity: .succeeded(itemCount: batch.readings.count))))
+            trace("Dexcom Share upload accepted: readings=%{public}@ newest=%{public}@ elapsedMs=%{public}@", log: log,
+                  category: ConstantsLog.categoryDexcomShareUploadManager, type: .info,
+                  batch.readings.count.description, batch.latestReading.ISO8601Format(),
+                  Int(Date().timeIntervalSince(uploadStartedAt) * 1_000).description)
+        } catch {
+            guard isCurrent(currentGeneration), !(error is CancellationError) else { return }
+            state.uploadError = errorMessage(error)
+            activityHandler(.standard(.integration(name: .dexcomShareUpload, activity: .failed)))
+            trace("Dexcom Share upload failed: %{public}@", log: log,
+                  category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, Self.diagnosticCode(for: error))
+            if let error = error as? ShareError,
+               ["MonitoredReceiverSerialNumberDoesNotMatch", "MonitoredReceiverNotAssigned"].contains(error.code) {
+                messageHandler?(Texts_DexcomShareTestResult.uploadErrorWarning, errorMessage(error))
+            }
+        }
+    }
+
+    private func isCurrent(_ generation: UUID) -> Bool {
+        self.generation == generation && Configuration(defaults) == configuration
+    }
+
+    private func recordAuthenticationError(_ error: Error, generation: UUID) {
+        guard isCurrent(generation), !(error is CancellationError) else { return }
+        state.authenticationError = errorMessage(error)
+        activityHandler(.standard(.integration(name: .dexcomShareUploadAccount, activity: .failed)))
+        trace("Dexcom Share upload account verification failed: %{public}@", log: log,
+              category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, Self.diagnosticCode(for: error))
+        sessionId = nil
+    }
+
+    // MARK: - Requests and errors
+
+    private struct ShareError: Error {
+        let code: String
+        var httpStatus: Int? = nil
+    }
+
+    /// Only known codes are safe to put in developer traces. Error descriptions, userInfo,
+    /// unknown domains and server-provided text can contain request URLs or account/session details.
+    static func diagnosticCode(for error: Error) -> String {
+        if let error = error as? ShareError {
+            let status = error.httpStatus.map { "HTTP \($0)" }
+            switch error.code.lowercased() {
+            case "duplicateegvposted", "sessionnotvalid", "sessionidnotfound", "monitoringsessionnotactive",
+                 "monitoredreceiverserialnumberdoesnotmatch", "monitoredreceivernotassigned",
+                 "sso_authenticateaccountnotfound", "sso_authenticatepasswordinvalid",
+                 "sso_authenticatemaxattemptsexceeed", "sso_authenticatemaxattemptsexceeded",
+                 "invalidloginresponse", "invalidresponse":
+                return [status, error.code].compactMap { $0 }.joined(separator: " ")
+            default:
+                return status ?? "Unrecognized Dexcom error"
+            }
+        }
+        let error = error as NSError
+        let domain = [NSURLErrorDomain, NSCocoaErrorDomain, NSPOSIXErrorDomain].contains(error.domain) ? error.domain : "NSError"
+        return "\(domain) code=\(error.code)"
+    }
+
+    private func decodeIdentifier(_ data: Data) throws -> String {
+        guard let value = try? JSONDecoder().decode(String.self, from: data),
+              UUID(uuidString: value) != nil, value != ConstantsDexcomShare.failedSessionId else {
+            throw ShareError(code: "InvalidLoginResponse")
+        }
+        return value
+    }
+
+    private func request(
+        _ config: Configuration, path: String, body: [String: Any]? = nil,
+        query: [URLQueryItem] = [], generation: UUID, authentication: Bool = false
+    ) async throws -> Data {
+        try requireCurrent(config, generation: generation)
+        var components = URLComponents(url: config.baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
+        if !query.isEmpty { components.queryItems = query }
+        var request = URLRequest(url: components.url!)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 30
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(
+            authentication ? "Dexcom%20Share/3.0.2.11 CFNetwork/1390 Darwin/22.0.0" : "Dexcom Share/3.0.2.11 CFNetwork/711.2.23 Darwin/14.0.0",
+            forHTTPHeaderField: "User-Agent"
+        )
+        request.httpBody = try body.map { try JSONSerialization.data(withJSONObject: $0) } ?? Data()
+        trace("Dexcom Share request started: %{public}@", log: log,
+              category: ConstantsLog.categoryDexcomShareUploadManager, type: .debug, path)
+        let requestStartedAt = Date()
+        do {
+            let (data, response) = try await session.data(for: request)
+            try requireCurrent(config, generation: generation)
+            guard let response = response as? HTTPURLResponse else { throw ShareError(code: "InvalidResponse") }
+            // An empty body is only successful with a successful HTTP status. Never advance the cursor on HTTP errors.
+            guard (200...299).contains(response.statusCode) else {
+                let code = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+                throw ShareError(code: code?["Code"] as? String ?? "HTTP \(response.statusCode)", httpStatus: response.statusCode)
+            }
+            return data
+        } catch {
+            // Settings changes deliberately cancel obsolete requests; those are not service failures.
+            if isCurrent(generation), !(error is CancellationError) {
+                trace("Dexcom Share request failed: %{public}@ %{public}@ elapsedMs=%{public}@", log: log,
+                      category: ConstantsLog.categoryDexcomShareUploadManager, type: .error,
+                      path, Self.diagnosticCode(for: error), Int(Date().timeIntervalSince(requestStartedAt) * 1_000).description)
+            }
+            throw error
+        }
+    }
+
+    private func errorMessage(_ error: Error) -> String {
+        guard let error = error as? ShareError else {
+            // Use the localized message for Settings; developer traces only use diagnosticCode.
+            return (error as NSError).localizedDescription
+        }
+        switch error.code.lowercased() {
+        case "sso_authenticateaccountnotfound", "sso_authenticatepasswordinvalid":
+            return Texts_Common.invalidAccountOrPassword
+        case "sso_authenticatemaxattemptsexceeed", "sso_authenticatemaxattemptsexceeded":
+            return Texts_DexcomShareTestResult.authenticateMaxAttemptsExceeded
+        case "monitoredreceiverserialnumberdoesnotmatch":
+            return Texts_DexcomShareTestResult.monitoredReceiverSNDoesNotMatch
+        case "monitoredreceivernotassigned":
+            return Texts_SettingsView.shareUploadReceiverNotAssigned
+        case "http 413":
+            return Texts_SettingsView.shareUploadTooLarge
+        default:
+            return Texts_SettingsView.followerConnectionFailed
+        }
     }
 }

@@ -1,7 +1,6 @@
 "alerttypessettingsview_screentitle" = "Типы тревог";
 "alerttypesettingsview_screentitle" = "Редактировать тип будильника";
 "alerttypesettingsview_name" = "Имя";
-"alerttypesettingsview_enabled" = "Включено";
 "alerttypesettingsview_vibrate" = "Вибрация";
 "alerttypesettingsview_snoozevianotification" = "Разрешить повтор через уведомление";
 "alerttypesettingsview_defaultsnoozeperiod" = "Время повтора по умолчанию";
@@ -14,3 +13,6 @@
 "alertTypeNoSound" = "Нет звука";
 "alerttypenamealreadyexistsmessages" = "Тип тревоги с таким именем уже существует. Используйте другое имя";
 "confirmdeletionalerttype" = "Удалить тип тревоги: ";
+
+"alerttypesettingsview_repeatsound" = "Повторять звук";
+"alerttypesettingsview_previewalert" = "Прослушать сигнал";

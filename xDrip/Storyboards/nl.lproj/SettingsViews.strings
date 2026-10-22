@@ -53,9 +53,7 @@
 "settingsviews_alert_types_section_footer" = "Alarmtypes bepalen hoe alarmen werken, inclusief geluid, trillen, snooze en stille modus negeren.";
 "settingsviews_alerts_section_footer" = "Alarmen bepalen wanneer de app je moet waarschuwen voor glucosewaarden, gemiste metingen en andere situaties.";
 "settingsviews_sectiontitlehealthkit" = "Apple Gezondheid";
-"settingsviews_healthkit" = "Schrijf naar Apple Gezondheid";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Uploaden";
 "settingsviews_dexcomShareUploadSerialNumber" = "Ontvanger Serie Nummer";
 "settingsviews_useUSDexcomShareurl" = "US-servers";
 "settingsviews_dexcomShareAccountName" = "Account Naam";
@@ -64,7 +62,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Voer het Dexcom Ontvanger Serie Nummer In";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Uploadopties";
-"settingsviews_nightscoutEnabled" = "Nightscout Inschakelen";
 "settingsviews_nightscoutUrl" = "URL";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Schema inschakelen";
@@ -599,3 +596,33 @@
 "homeScreen.basalTop" = "Boven";
 "homeScreen.basalBottom" = "Onder";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Glucosegrafiek";
+
+"therapy.none" = "Geen";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Behandelgrenzen";
+"therapy.smallBolusThreshold" = "Minibolus";
+"therapy.smallCarbThreshold" = "Weinig KH";
+"therapy.treatmentThresholdsExplanation" = "Bolus- en koolhydraatwaarden onder de grenzen zijn verborgen in de grafiek. De bolusgrens bepaalt ook kleine bolussen in de behandellijst. «Geen» toont alles.";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Glucoseschatting";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Therapieschaal";
+"therapy.scaleStandard" = "Normaal";
+"therapy.scaleSmallDoses" = "Kleine dos.";
+"therapy.treatmentScaleExplanation" = "Kleine doses maken kleine markeringen beter zichtbaar. Bolus: 0.1–2.0U; koolhydraten: 1–50g. Hogere hoeveelheden gebruiken de grootste markering.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimaal";
+"settingsviews_liveActivityTypeNormal" = "Normaal";
+"settingsviews_liveActivityTypeLarge" = "Groot";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Dexcom Share-upload";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Inleiding uitspreken";
+"speak.preview" = "Glucose-uitspraak testen";

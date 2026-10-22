@@ -265,6 +265,14 @@ struct RootHomeDataSourceView: View {
                     .foregroundStyle(ConstantsAppColors.dataSourceText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
+
+                if state.showsWatchCollectorIcon {
+                    Image(systemName: ConstantsDirectWatch.watchSymbol(for: state.watchCollectorHealth))
+                        .font(.system(size: 14))
+                        .foregroundStyle(ConstantsDirectWatch.statusColor(for: state.watchCollectorHealth))
+                        .fixedSize()
+                        .accessibilityLabel(state.watchCollectorHealth.title)
+                }
             }
             .layoutPriority(1)
 

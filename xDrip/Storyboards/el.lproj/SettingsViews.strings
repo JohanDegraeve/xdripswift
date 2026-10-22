@@ -59,9 +59,7 @@
 "settingsviews_alert_types_section_footer" = "Οι Τύποι Συναγερμού ορίζουν πώς λειτουργούν οι συναγερμοί, συμπεριλαμβανομένων ήχου, δόνησης, αναβολής και παράκαμψης σίγασης.";
 "settingsviews_alerts_section_footer" = "Οι Συναγερμοί ορίζουν πότε η εφαρμογή πρέπει να σας ειδοποιεί για επίπεδα γλυκόζης, χαμένες μετρήσεις και άλλες συνθήκες.";
 "settingsviews_sectiontitlehealthkit" = "Apple Health (Υγεία)";
-"settingsviews_healthkit" = "Εγγραφή στο Apple Health";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Μεταφόρτωση";
 "settingsviews_dexcomShareUploadSerialNumber" = "Σειριακός αριθμός δέκτη";
 "settingsviews_useUSDexcomShareurl" = "Διακομιστές US";
 "settingsviews_dexcomShareAccountName" = "Όνομα λογαριασμού";
@@ -70,7 +68,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Εισαγάγετε τον σειριακό αριθμό του δέκτη Dexcom";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Επιλογές μεταφόρτωσης";
-"settingsviews_nightscoutEnabled" = "Ενεργοποίηση του Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Ενεργοποίηση χρονοδιαγράμματος";
@@ -519,3 +516,33 @@
 "homeScreen.basalTop" = "Πάνω";
 "homeScreen.basalBottom" = "Κάτω";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Γράφημα γλυκόζης";
+
+"therapy.none" = "Όχι";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Όρια θεραπειών";
+"therapy.smallBolusThreshold" = "Μικ. bolus";
+"therapy.smallCarbThreshold" = "Λίγοι Υ/Α";
+"therapy.treatmentThresholdsExplanation" = "Οι τιμές bolus και υδατανθράκων κάτω από τα όρια κρύβονται στο γράφημα. Το όριο bolus ορίζει και τα μικρά bolus στη λίστα θεραπειών. Το «Όχι» δείχνει όλες.";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Εκτίμηση γλυκόζης";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Κλίμακα";
+"therapy.scaleStandard" = "Τυπική";
+"therapy.scaleSmallDoses" = "Μικρές δόσ.";
+"therapy.treatmentScaleExplanation" = "Οι μικρές δόσεις κάνουν τα μικρά σημεία πιο ορατά. Η κλίμακα bolus είναι 0.1–2.0U και υδατανθράκων 1–50g. Πάνω από αυτά τα όρια, το μέγεθος είναι μέγιστο.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Ελάχιστο";
+"settingsviews_liveActivityTypeNormal" = "Κανονικό";
+"settingsviews_liveActivityTypeLarge" = "Μεγάλο";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Μεταφόρτωση στο Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Εκφώνηση εισαγωγής";
+"speak.preview" = "Δοκιμή εκφώνησης γλυκόζης";

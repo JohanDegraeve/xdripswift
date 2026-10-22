@@ -46,13 +46,10 @@ struct BluetoothPeripheralSettingsRow: View {
             if let detail = detail, !detail.isEmpty {
                 HStack(spacing: 5) {
                     if let detailIndicator {
-                        Image(systemName: detailIndicator.symbolName)
-                            .font(.caption2)
-                            .foregroundStyle(isEnabled ? detailIndicator.color : .gray)
-                            .accessibilityLabel(detailIndicator.accessibilityLabel ?? "")
+                        SettingsIndicatorView(indicator: detailIndicator, isEnabled: isEnabled)
                     }
 
-                    if let detailSymbol {
+                    if let detailSymbol, !detailSymbol.isTrailing {
                         Image(systemName: detailSymbol.systemName)
                             .foregroundStyle(isEnabled ? detailSymbol.color : .gray)
                             .imageScale(.medium)
@@ -63,6 +60,12 @@ struct BluetoothPeripheralSettingsRow: View {
                         .multilineTextAlignment(.trailing)
                         .lineLimit(detailLineLimit)
                         .truncationMode(.tail)
+
+                    if let detailSymbol, detailSymbol.isTrailing {
+                        Image(systemName: detailSymbol.systemName)
+                            .foregroundStyle(isEnabled ? detailSymbol.color : .gray)
+                            .imageScale(.medium)
+                    }
                 }
             }
 

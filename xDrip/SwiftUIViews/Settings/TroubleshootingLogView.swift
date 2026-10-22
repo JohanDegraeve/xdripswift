@@ -8,9 +8,12 @@ import UIKit
 /// open screen live updates without exposing the store's mutable cache or file queue to the view.
 @MainActor
 final class TroubleshootingLogViewModel: ObservableObject {
-    @Published private(set) var entries = [TroubleshootingLogEntry]()
-    @Published private(set) var appInfo: TroubleshootingLogAppInfo
-    @Published private(set) var refreshedAt = Date()
+    @Published private(set) var report: TroubleshootingLogReportBuilder
+    @Published private(set) var reportText: String?
+
+    private let reportQueue = DispatchQueue(label: "com.faifly.xdrip.troubleshooting-report", qos: .userInitiated)
+    private var reloadInProgress = false
+    private var reloadRequested = false
 
     private let store: TroubleshootingLogStore
     private let appInfoProvider: () -> TroubleshootingLogAppInfo
@@ -22,9 +25,12 @@ final class TroubleshootingLogViewModel: ObservableObject {
     ) {
         self.store = store
         self.appInfoProvider = appInfoProvider
-        appInfo = appInfoProvider()
-        // `snapshot()` waits behind queued writes, so the first frame and every later reload see a
-        // complete history rather than racing an append that triggered the notification.
+        report = TroubleshootingLogReportBuilder(
+            entries: [], usesMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
+            appInfo: appInfoProvider(), generatedAt: Date(), timeZone: .current
+        )
+        // Snapshotting waits behind queued store writes. Do that work and export formatting away
+        // from main so opening or resuming an overnight Activity Log cannot block scene updates.
         reload()
         changeObserver = NotificationCenter.default.addObserver(
             forName: .troubleshootingLogDidChange,
@@ -47,13 +53,35 @@ final class TroubleshootingLogViewModel: ObservableObject {
     }
 
     func reload() {
-        entries = store.snapshot()
-        // Cadence is read from the latest Core Data history once per reload. Keeping the resulting
-        // value in this main-actor snapshot avoids repeating a database query for every visible row.
-        appInfo = appInfoProvider()
-        // The header is intentionally fresh. Copy and Share should say when this exact snapshot was
-        // generated, not when the view model happened to be constructed.
-        refreshedAt = Date()
+        // Coalesce live updates while a report is being built. At most one follow-up snapshot is
+        // needed, and an older build must never overwrite a newer snapshot or its export text.
+        guard !reloadInProgress else {
+            reloadRequested = true
+            return
+        }
+        reloadInProgress = true
+        let store = store
+        // Configuration can query main-context Core Data, so capture it before crossing queues.
+        let appInfo = appInfoProvider()
+        let usesMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        let timeZone = TimeZone.current
+        reportQueue.async(execute: DispatchWorkItem { [weak self] in
+            let report = TroubleshootingLogReportBuilder(
+                entries: store.snapshot(), usesMgDl: usesMgDl, appInfo: appInfo,
+                generatedAt: Date(), timeZone: timeZone
+            )
+            let text = report.reportText
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.report = report
+                self.reportText = text
+                self.reloadInProgress = false
+                if self.reloadRequested {
+                    self.reloadRequested = false
+                    self.reload()
+                }
+            }
+        })
     }
 }
 
@@ -138,7 +166,9 @@ struct TroubleshootingLogView: View {
 
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 16) {
-                    if report.entries.isEmpty {
+                    if viewModel.reportText == nil {
+                        ProgressView().frame(maxWidth: .infinity)
+                    } else if report.entries.isEmpty {
                         emptyState
                     } else if visibleDayGroups.isEmpty {
                         noResultsState
@@ -167,12 +197,14 @@ struct TroubleshootingLogView: View {
                 }
                 .tint(ConstantsAppColors.toolbarAction)
                 .accessibilityLabel(copied ? "Copied" : "Copy Troubleshooting Log")
+                .disabled(viewModel.reportText == nil)
 
-                ShareLink(item: report.reportText) {
+                ShareLink(item: viewModel.reportText ?? "") {
                     Image(systemName: "square.and.arrow.up")
                 }
                 .tint(ConstantsAppColors.toolbarAction)
                 .accessibilityLabel("Share Troubleshooting Log")
+                .disabled(viewModel.reportText == nil)
             }
         }
         .onAppear(perform: viewModel.reload)
@@ -220,13 +252,7 @@ struct TroubleshootingLogView: View {
     /// list. `appInfo` is supplied even though it is export-only because Copy and Share place that
     /// context at the top of the plain text sent to support.
     private var report: TroubleshootingLogReportBuilder {
-        TroubleshootingLogReportBuilder(
-            entries: viewModel.entries,
-            usesMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
-            appInfo: viewModel.appInfo,
-            generatedAt: viewModel.refreshedAt,
-            timeZone: .current
-        )
+        viewModel.report
     }
 
     private var emptyState: some View {
@@ -287,7 +313,9 @@ struct TroubleshootingLogView: View {
                     .padding(.bottom, 8)
             }
 
-            VStack(spacing: 0) {
+            // A day can contain thousands of readings. Keep its rows lazy as well as the outer
+            // day list so resuming this screen formats only the rows needed for the visible area.
+            LazyVStack(spacing: 0) {
                 ForEach(Array(group.entries.enumerated()), id: \.element.id) { index, entry in
                     troubleshootingRow(entry)
                     if index < group.entries.count - 1 {
@@ -387,6 +415,7 @@ struct TroubleshootingLogView: View {
             case .liveActivity: return "iphone"
             case .calendar: return "calendar"
             case .contactImage: return "person.crop.circle"
+            case .dexcomShareUpload, .dexcomShareUploadAccount: return "icloud.and.arrow.up"
             case .osAid: return "arrow.left.arrow.right"
             case .watch: return "applewatch"
             }
@@ -401,6 +430,7 @@ struct TroubleshootingLogView: View {
             case .dexcomBluetoothChannelChanged: return "antenna.radiowaves.left.and.right"
             case .therapySourceChanged: return "cross.case.fill"
             case .liveActivityChanged: return "iphone"
+            case .dexcomShareUploadChanged: return "icloud.and.arrow.up"
             case .aidFollowerChanged: return "waveform.path.ecg"
             case .patientAliasChanged: return "person.text.rectangle.fill"
             case .credentialChanged: return "key.fill"
@@ -452,7 +482,10 @@ struct TroubleshootingLogView: View {
         switch entry.kind {
         case let .bluetooth(activity) where [.connectionFailed, .connectionTimedOut, .poweredOff, .unauthorized, .pairingFailed].contains(activity):
             return .orange
-        case let .cgm(_, activity) where [.nfcScanFailed, .nfcScanTimedOut, .nfcUnavailable].contains(activity):
+        case let .cgm(_, activity) where [
+            .nfcScanFailed, .nfcScanTimedOut, .nfcUnavailable, .authenticationFailed, .recoveryRequired,
+            .credentialsUnavailable, .accountLookupFailed, .sensorCheckRequired
+        ].contains(activity):
             return .orange
         case let .follower(_, activity) where activity == .loginFailed || activity == .downloadFailed:
             return .orange
@@ -490,9 +523,10 @@ struct TroubleshootingLogView: View {
     }
 
     private func copyReport() {
-        // Do not reconstruct text for the pasteboard. `reportText` is the parity contract shared with
-        // `ShareLink`, including every retained entry, the export-only header and empty-state wording.
-        UIPasteboard.general.string = report.reportText
+        // Copy and Share use the same complete text prepared with the visible snapshot. Neither
+        // action should format thousands of retained entries synchronously on the main thread.
+        guard let text = viewModel.reportText else { return }
+        UIPasteboard.general.string = text
         copied = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             copied = false

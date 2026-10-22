@@ -490,6 +490,18 @@ enum GlucoseReportClinicalConstants {
 }
 
 enum GlucoseReportClinicalMath {
+    // Inverse ADAG equation, Nathan et al., Diabetes Care 2008, 31(8), 1473-1478.
+    // Keep the same sample population as GMI and convert units only for display.
+    static func estimatedHbA1cPercentage(forAverageMgDl averageMgDl: Double) -> Double {
+        averageMgDl > 0 ? (averageMgDl + 46.7) / 28.7 : 0
+    }
+
+    static func statisticsPercentage(forAverageMgDl averageMgDl: Double, useHbA1c: Bool) -> Double {
+        guard averageMgDl > 0 else { return 0 }
+        return useHbA1c ? estimatedHbA1cPercentage(forAverageMgDl: averageMgDl)
+            : gmiPercentage(forAverageMgDl: averageMgDl)
+    }
+
     // GMI formula from Bergenstal et al., Diabetes Care 2018, 41(11), 2275-2280.
     // Source: https://doi.org/10.2337/dc18-1581
     static func gmiPercentage(forAverageMgDl averageMgDl: Double) -> Double {

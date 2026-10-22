@@ -26,21 +26,48 @@ struct BgReadingsDetailView: View {
 
         List {
             Section {
-                row(title: Texts_BgReadings.deviceName, data: bgReading.deviceName ?? nilString)
+                row(title: Texts_BgReadings.deviceName, data: bgReading.deviceName ?? nilString,
+                    showsWatchIcon: bgReading.valueIsFromWatch || bgReading.wasAlsoCollectedByWatch,
+                    secondaryWatchIcon: bgReading.wasAlsoCollectedByWatch)
                 row(title: Texts_BgReadings.finalGlucose, data: displayBgValue(bgReading.finalValue))
                 row(title: Texts_BgReadings.glucoseRange, data: bgRangeDescriptionText(bgRangeDescription), indicatorColor: bgRangeIndicatorColor(bgRangeDescription: bgRangeDescription))
                 row(title: Texts_BgReadings.timestamp, data: bgReading.timeStamp.formatted(date: .abbreviated, time: .shortened))
             } header: {
                 Text(Texts_BgReadings.generalSectionHeader)
             } footer: {
-                if let backfilledAt = bgReading.backfilledAt {
-                    HStack(alignment: .center, spacing: 6) {
-                        BackfilledReadingIndicatorDot()
-
-                        Text(backfilledAtFooterText(backfilledAt: backfilledAt))
-                            .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                VStack(alignment: .leading, spacing: 4) {
+                    if let backfilledAt = bgReading.backfilledAt {
+                        HStack(alignment: .center, spacing: 6) {
+                            BackfilledReadingIndicatorDot()
+                            if bgReading.valueIsFromWatch {
+                                WatchReadingIndicator(size: 15, color: Color(.colorPrimary))
+                                Text(String(format: Texts_BgReadings.backfilledViaWatchAtFooterFormat,
+                                            backfilledAt.formatted(date: .abbreviated, time: .shortened)))
+                                    .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                            } else {
+                                Text(backfilledAtFooterText(backfilledAt: backfilledAt))
+                                    .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                            }
+                        }
+                        .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
+                    } else if bgReading.valueIsFromWatch, let receivedAt = bgReading.watchReceivedAt {
+                        HStack(alignment: .center, spacing: 6) {
+                            WatchReadingIndicator(size: 15, color: Color(.colorPrimary))
+                            Text(String(format: Texts_BgReadings.receivedViaWatchAtFooterFormat,
+                                        receivedAt.formatted(date: .abbreviated, time: .shortened)))
+                                .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                        }
+                        .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
                     }
-                    .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
+                    if bgReading.wasAlsoCollectedByWatch {
+                        HStack(alignment: .center, spacing: 6) {
+                            WatchReadingIndicator(size: 15, color: Color(.colorPrimary),
+                                                  accessibilityText: Texts_BgReadings.alsoCollectedByWatch)
+                            Text(Texts_BgReadings.alsoCollectedByWatch)
+                                .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                        }
+                        .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
+                    }
                 }
             }
             
@@ -87,7 +114,7 @@ struct BgReadingsDetailView: View {
     ///   - indicatorColor: optional colour for the dot before the value
     /// - returns:
     ///   - a view with the formatted row inside it
-    private func row(title: String, data: String, indicatorColor: Color? = nil) -> AnyView {
+    private func row(title: String, data: String, indicatorColor: Color? = nil, showsWatchIcon: Bool = false, secondaryWatchIcon: Bool = false) -> AnyView {
         // wrap the HStack in an AnyView so that it can be returned back to the caller
         let rowView = AnyView(HStack {
             Text(title)
@@ -99,6 +126,11 @@ struct BgReadingsDetailView: View {
                 Image(systemName: "circle.fill")
                     .font(.caption2)
                     .foregroundStyle(indicatorColor)
+            }
+
+            if showsWatchIcon {
+                WatchReadingIndicator(size: 18, color: secondaryWatchIcon ? Color(.colorTertiary) : Color(.colorSecondary),
+                                      accessibilityText: secondaryWatchIcon ? Texts_BgReadings.alsoCollectedByWatch : Texts_BgReadings.receivedViaWatch)
             }
             
             Text(data)

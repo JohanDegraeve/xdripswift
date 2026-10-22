@@ -116,9 +116,7 @@
 "settingsviews_alerts_section_footer" = "Alarms define when the app should notify you for glucose levels, missed readings and other conditions.";
 "settingsviews_prefer_large_snooze_screen" = "Large Snooze Screen";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Write to Apple Health";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Upload";
 "settingsviews_dexcomShareUploadSerialNumber" = "Receiver Serial Number";
 "settingsviews_useUSDexcomShareurl" = "US Servers";
 "settingsviews_dexcomShareAccountName" = "Account Name";
@@ -127,7 +125,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Enter the Dexcom Receiver Serial Number";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Upload Options";
-"settingsviews_nightscoutEnabled" = "Enable Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Enable Schedule";
@@ -168,7 +165,6 @@
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calendar events";
 "settingsviews_infoContactsAccessRestricted" = "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.";
 "settingsviews_contactImageSectionTitle" = "Contact Image";
-"settingsviews_enableContactImage" = "Contact Image";
 "settingsviews_displayTrendInContactImage" = "Trend";
 "settingsviews_contactImageCreatedByString" = "Contact automatically created by";
 "sectionTitleTrace" = "Issue Reporting";
@@ -513,3 +509,46 @@
 "homeScreen.basalPosition" = "Basal Position";
 "homeScreen.basalTop" = "Top";
 "homeScreen.basalBottom" = "Bottom";
+
+"therapy.none" = "None";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Treatment Thresholds";
+"therapy.smallBolusThreshold" = "Small Bolus";
+"therapy.smallCarbThreshold" = "Small Carbs";
+"therapy.treatmentThresholdsExplanation" = "Bolus and carb values below these thresholds are hidden on the chart. The bolus threshold also defines small boluses in the treatments list. None shows all labels.";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Glucose Estimate";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Treatment Scale";
+"therapy.scaleStandard" = "Standard";
+"therapy.scaleSmallDoses" = "Small Doses";
+"therapy.treatmentScaleExplanation" = "Small Doses makes small treatment markers easier to see. Bolus markers scale from 0.1–2.0U and carb markers from 1–50g. Higher amounts use the largest marker.";
+
+/* Dexcom Share upload connection and activity */
+"settingsviews_dexcomShareUploadSectionTitle" = "Dexcom Share Upload";
+"settingsviews_shareUploadAccountVerified" = "Account verified";
+"settingsviews_shareUploadUnchecked" = "Not checked";
+"settingsviews_shareUploadPaused" = "Paused by schedule";
+"settingsviews_shareUploadLocalOnly" = "Uploading to Dexcom Share is only available with a local glucose source.";
+"settingsviews_shareUploadCheckFooter" = "Test Connection verifies your account. The receiver serial number is verified when readings are uploaded.";
+"settingsviews_shareUploadLastConnection" = "Last successful connection";
+"settingsviews_shareUploadLastUpload" = "Last successful upload";
+"settingsviews_shareUploadError" = "Upload error";
+"settingsviews_shareUploadNever" = "Not yet";
+"settingsviews_shareUploadReceiverNotAssigned" = "This receiver is not assigned to your Dexcom account. Register it using the official Dexcom app.";
+"settingsviews_shareUploadConfigurationRequired" = "Enter your username, password and receiver serial number.";
+"settingsviews_shareUploadFailed" = "Upload failed";
+"settingsviews_shareUploadTooLarge" = "Dexcom Share rejected an oversized upload.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimal";
+"settingsviews_liveActivityTypeNormal" = "Normal";
+"settingsviews_liveActivityTypeLarge" = "Large";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Speak Introduction";
+"speak.preview" = "Preview Speak Glucose";

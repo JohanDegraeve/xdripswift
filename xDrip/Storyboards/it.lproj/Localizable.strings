@@ -1,1 +1,88 @@
 
+
+// Direct to Watch status and pairing guidance
+"directWatchTitle" = "Diretto al Watch";
+"directWatchNoConnection" = "Nessuna connessione aggiunta";
+"directWatchSuspended" = "Raccolta sospesa";
+"directWatchWaiting" = "In attesa di una lettura dal Watch";
+"directWatchCollecting" = "Raccolta in corso";
+"directWatchOverdue" = "Lettura mancante";
+"directWatchDiagnosis" = "Diagnosi";
+"directWatchAdded" = "Connessione al Watch aggiunta";
+"directWatchPairingGuidance" = "Scorri verso il basso fino alla schermata Diretto al Watch sul Watch e accetta la richiesta di abbinamento Bluetooth se aggiungi questo trasmettitore per la prima volta.\n\nAttendi fino a cinque minuti affinché il trasmettitore si connetta.";
+
+// Direct to Watch collection control
+"directWatchPausedShort" = "In pausa";
+"directWatchPaused" = "Raccolta del Watch in pausa";
+"directWatchPause" = "Pausa raccolta";
+"directWatchResume" = "Riprendi raccolta";
+"directWatchPausedSinceFormat" = "Dal %@";
+"directWatchConnecting" = "In attesa…";
+"directWatchCollectedReadings" = "Letture raccolte";
+"directWatchReadingGapFormat" = "(%dm %ds)";
+"directWatchNoCollectedReadings" = "Nessuna lettura ancora raccolta tramite Watch";
+
+"directWatchSessionStarted" = "Avviata alle %@";
+"directWatchSessionResumed" = "Ripresa alle %@";
+"directWatchSessionPaused" = "In pausa alle %@";
+"directWatchSessionEnded" = "Terminata alle %@";
+
+// Direct to Watch setup and diagnosis
+"directWatchBluetoothSlot" = "Slot Bluetooth";
+"directWatchCancel" = "Annulla";
+"directWatchTestingLogs" = "Test e registri";
+"directWatchAddConnection" = "Collega Watch";
+"directWatchRemoveConnection" = "Rimuovi connessione Watch";
+"directWatchMedicalSlot" = "Slot dispositivo medico";
+"directWatchWatchSlot" = "Slot Watch";
+"directWatchConfirmUnusedSlot" = "Slot libero: collega Watch";
+"directWatchSlotMedical" = "Slot 1 · Dispositivo medico";
+"directWatchSlotMobile" = "Slot 2 · App mobile";
+"directWatchSlotWatch" = "Slot 3 · Watch";
+"directWatchSlotAnubis" = "Slot 3 · Extra Anubis";
+"directWatchUsedWatch" = "Usato da questo Watch";
+"directWatchUsedPhone" = "Usato da questo iPhone";
+"directWatchSlotMedicalDetail" = "Solo se libero da pompa o ricevitore";
+"directWatchSlotMobileDetail" = "Solo se libero da altre app mobili";
+"directWatchRecommendedWatch" = "Consigliato per Watch";
+"directWatchRecommendedTransmitter" = "Consigliato per questo trasmettitore";
+"directWatchAnubisOnly" = "Solo trasmettitori Anubis";
+"directWatchWatchStatus" = "Stato Watch";
+"directWatchTestingDiagnosis" = "Test e diagnosi";
+"directWatchPausePhone" = "Sospendi raccolta BLE iPhone";
+"directWatchForTesting" = "Per testare la raccolta Watch";
+"directWatchGetLogs" = "Richiedi log Watch";
+"directWatchShareLogs" = "Condividi log Watch";
+"directWatchPending" = "In attesa";
+"directWatchReceivedFormat" = "Ricevuto %@";
+"directWatchSelectedFormat" = "%@, selezionato";
+"directWatchIntro" = "Il Watch può raccogliere letture direttamente senza l’iPhone vicino. I controlli del sensore restano sull’iPhone.";
+"directWatchBackgroundAdvice" = "La raccolta in background dipende da watchOS. Provala sul Watch prima di usarla senza iPhone.";
+"directWatchSeparateSlots" = "Watch e iPhone richiedono slot distinti. Lo slot 1 può interrompere una pompa o un ricevitore che lo usa già.";
+"directWatchNativeRequired" = "La raccolta Watch richiede il glucosio nativo calcolato su questo iPhone.";
+"directWatchStartSensor" = "Avvia un sensore su questo iPhone prima di collegare il Watch.";
+"directWatchNoSlot" = "Nessuno slot compatibile libero per Watch.";
+"directWatchMedicalWarning" = "Il Watch userà lo slot 1, normalmente usato da una pompa o un ricevitore. Non aggiungere la connessione se una pompa, un ricevitore o un altro dispositivo medico usa questo slot. Il Watch potrebbe interrompere la connessione del glucosio di quel dispositivo.";
+"directWatchWatchSlotWarning" = "Il Watch userà lo slot 3. Non aggiungere la connessione se un altro smartwatch è già abbinato al sensore. Questo Watch potrebbe interrompere la sua connessione del glucosio.";
+"directWatchSlotConflict" = "Questo slot è assegnato al Watch. Rimuovi la connessione Watch prima di assegnarlo all’iPhone.";
+"directWatchOpenForStatus" = "Apri %@ sul Watch per riceverne lo stato.";
+"directWatchCheckInstalled" = "Se lo stato non si aggiorna, verifica che l’app sia tra quelle installate su Apple Watch nell’app Watch dell’iPhone.";
+"directWatchMasterRequired" = "L’iPhone deve essere in modalità master.";
+"directWatchG6Mismatch" = "Il G6 configurato non è il trasmettitore attivo dell’iPhone.";
+"directWatchG7Mismatch" = "Il sensore della famiglia G7 configurato non è il trasmettitore attivo dell’iPhone.";
+"directWatchPrimaryRequired" = "La raccolta Watch richiede una connessione primaria della famiglia G7 sull’iPhone.";
+"directWatchNativeG6Required" = "Abilita il glucosio nativo G6 sull’iPhone.";
+"directWatchPairingCodeRequired" = "Serve un codice sensore di quattro cifre per abbinare il Watch.";
+"directWatchSlotsConflict" = "Watch e iPhone usano lo stesso slot Bluetooth.";
+"directWatchAnubisRequired" = "Lo slot 3 richiede un trasmettitore Anubis.";
+"directWatchNoActiveSensor" = "Nessun sensore attivo sull’iPhone.";
+
+/* Direct to Watch action feedback. */
+"directWatchTryAgain" = "Riprova";
+"directWatchRequestQueued" = "Richiesta in coda";
+"directWatchLastLogsReceived" = "Ultimi log ricevuti";
+"directWatchWaitingForLogs" = "In attesa di nuovi log…";
+"directWatchLogsFailed" = "Impossibile ottenere i log. Riprova.";
+
+/* Watch diagnostic log actions and receipt time. */
+"directWatchLogs" = "Log";

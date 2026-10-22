@@ -16,6 +16,11 @@ struct ShowHideItemsView: View {
     @AppStorage(UserDefaults.Key.showTreatmentsOnChart.rawValue) private var hidesTherapy = false
     @AppStorage(UserDefaults.Key.allowScreenRotation.rawValue) private var preventsChartRotation = false
     @AppStorage(UserDefaults.Key.showSensorNoise.rawValue) private var hidesSensorNoise = false
+    // use the same enable preference as Settings without changing the remembered style
+    @AppStorage(UserDefaults.Key.liveActivitiesEnabled.rawValue) private var liveActivitiesEnabled = UserDefaults.standard.liveActivitiesEnabled
+    // the legacy isMaster key stores true for follower mode
+    @AppStorage(UserDefaults.Key.isMaster.rawValue) private var isFollower = false
+    @AppStorage(UserDefaults.Key.followerBackgroundKeepAliveType.rawValue) private var followerKeepAliveType = FollowerBackgroundKeepAliveType.normal.rawValue
     @AppStorage(UserDefaults.Key.speakReadings.rawValue) private var speakReadings = false
     @AppStorage(UserDefaults.Key.preferLargeSnoozeScreen.rawValue) private var preferLargeSnoozeScreen = true
     @AppStorage(UserDefaults.KeysCharts.chartWidthInHours.rawValue) private var chartWidthInHours = ConstantsGlucoseChart.defaultChartWidthInHours
@@ -46,7 +51,12 @@ struct ShowHideItemsView: View {
                     ))
                 }
 
-                Section(header: Text(Texts_HomeView.showHideAdditionalItemsTitle)) {
+                // reuse the existing General localization for these quick controls
+                Section(header: Text(Texts_SettingsView.glucoseDisplaySectionTitle)) {
+                    // match the availability of the switch in Notifications settings
+                    if !isFollower || followerKeepAliveType == FollowerBackgroundKeepAliveType.heartbeat.rawValue {
+                        Toggle(Texts_SettingsView.liveActivitySectionTitle, isOn: $liveActivitiesEnabled)
+                    }
                     Toggle(Texts_SettingsView.labelSpeakBgReadings, isOn: $speakReadings)
                     Toggle(Texts_SettingsView.preferLargeSnoozeScreen, isOn: $preferLargeSnoozeScreen)
                 }
@@ -56,10 +66,9 @@ struct ShowHideItemsView: View {
             .navigationTitle(Texts_HomeView.showHideItemsTitle)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(Texts_Common.Cancel) {
+                    SheetCloseButton {
                         presentationMode.wrappedValue.dismiss()
                     }
-                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     OnlineHelpButton(topic: .quickShowHide)

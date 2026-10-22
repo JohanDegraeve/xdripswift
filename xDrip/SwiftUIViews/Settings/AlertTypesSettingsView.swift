@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import AudioToolbox
 
 // Alert-type Core Data and validation behavior is owned by the list and editor models.
 @MainActor
@@ -76,19 +77,32 @@ enum AlertTypeEditorSetting: Int, CaseIterable {
     case vibrate
     case soundName
     case overrideMute
+    case repeatSound
+    case previewAlert
     case snoozeViaNotification
     case defaultSnoozePeriod
 }
 
 @MainActor
 final class AlertTypeEditorViewModel: ObservableObject {
-    @Published var enabled = ConstantsDefaultAlertTypeSettings.enabled
+    @Published var enabled = ConstantsDefaultAlertTypeSettings.enabled {
+        didSet { if enabled != oldValue { stopSoundPlayerIfPlaying() } }
+    }
     @Published var name = ConstantsDefaultAlertTypeSettings.name
-    @Published var overrideMute = ConstantsDefaultAlertTypeSettings.overrideMute
+    @Published var overrideMute = ConstantsDefaultAlertTypeSettings.overrideMute {
+        didSet { if overrideMute != oldValue { stopSoundPlayerIfPlaying() } }
+    }
+    @Published var repeatSound = ConstantsDefaultAlertTypeSettings.repeatSound {
+        didSet { if repeatSound != oldValue { stopSoundPlayerIfPlaying() } }
+    }
     @Published var snooze = ConstantsDefaultAlertTypeSettings.snooze
     @Published var snoozePeriod = ConstantsDefaultAlertTypeSettings.snoozePeriod
-    @Published var vibrate = ConstantsDefaultAlertTypeSettings.vibrate
-    @Published var soundName = ConstantsDefaultAlertTypeSettings.soundName
+    @Published var vibrate = ConstantsDefaultAlertTypeSettings.vibrate {
+        didSet { if vibrate != oldValue { stopSoundPlayerIfPlaying() } }
+    }
+    @Published var soundName = ConstantsDefaultAlertTypeSettings.soundName {
+        didSet { if soundName != oldValue { stopSoundPlayerIfPlaying() } }
+    }
     @Published var alert: SettingsAlertContent?
     @Published var confirmation: SettingsConfirmationContent?
     @Published var textEntry: SettingsTextEntryContent?
@@ -97,16 +111,40 @@ final class AlertTypeEditorViewModel: ObservableObject {
     private var alertType: AlertType?
     private let coreDataManager: CoreDataManager
     private let soundPlayer: SoundPlayer
+    @Published private(set) var isPreviewPlaying = false
+    private var previewIsPaused = false
+
+    private struct Snapshot: Equatable {
+        let enabled: Bool
+        let name: String
+        let overrideMute: Bool
+        let repeatSound: Bool
+        let snooze: Bool
+        let snoozePeriod: Int16
+        let vibrate: Bool
+        let soundName: String?
+    }
+
+    private var original: Snapshot?
+
+    private var snapshot: Snapshot {
+        Snapshot(enabled: enabled, name: name, overrideMute: overrideMute, repeatSound: repeatSound,
+                 snooze: snooze, snoozePeriod: snoozePeriod, vibrate: vibrate, soundName: soundName)
+    }
+
+    /// Reverted edits must disable Save and restore the normal Back button.
+    var hasChanges: Bool { original.map { $0 != snapshot } ?? false }
+
+    var canPreview: Bool { enabled && (soundName != "" || vibrate) }
     private let close: () -> Void
 
     init(
         alertType: AlertType?,
         coreDataManager: CoreDataManager,
-        soundPlayer: SoundPlayer,
+        soundPlayer: SoundPlayer = SoundPlayer(),
         close: @escaping () -> Void
     ) {
-        // Copy the existing alert type into editable SwiftUI state. The original
-        // The Core Data object is updated only when Save is tapped.
+        // Keep edits in the draft until Save is tapped.
         self.alertType = alertType
         self.coreDataManager = coreDataManager
         self.soundPlayer = soundPlayer
@@ -116,20 +154,24 @@ final class AlertTypeEditorViewModel: ObservableObject {
             enabled = alertType.enabled
             name = alertType.name
             overrideMute = alertType.overridemute
+            repeatSound = alertType.repeatSound
             snooze = alertType.snooze
             snoozePeriod = alertType.snoozeperiod
             vibrate = alertType.vibrate
             soundName = alertType.soundname
         }
+        original = snapshot
     }
 
     /// Hides advanced rows when the alert type is disabled.
     var rows: [AlertTypeEditorSetting] {
-        enabled ? AlertTypeEditorSetting.allCases : [.enabled, .name]
+        guard enabled else { return [.enabled, .name] }
+        return AlertTypeEditorSetting.allCases.filter {
+            $0 != .repeatSound || (overrideMute && soundName != "")
+        }
     }
 
     /// Alert types that are still used by alarms cannot be deleted.
-    /// Alert types that are still referenced by alarms remain protected.
     var canDelete: Bool {
         guard let alertType else { return false }
 
@@ -140,6 +182,8 @@ final class AlertTypeEditorViewModel: ObservableObject {
     /// closes the editor. New alert types are created with the same defaults as the
     /// standard Settings defaults.
     func save() {
+        guard hasChanges else { return }
+        stopSoundPlayerIfPlaying()
         let alertTypesAccessor = AlertTypesAccessor(coreDataManager: coreDataManager)
         for storedAlertType in alertTypesAccessor.getAllAlertTypes() {
             if storedAlertType.name == name && (alertType == nil || storedAlertType != alertType) {
@@ -157,6 +201,7 @@ final class AlertTypeEditorViewModel: ObservableObject {
             alertType.name = name
             alertType.enabled = enabled
             alertType.overridemute = overrideMute
+            alertType.repeatSound = repeatSound
             alertType.snooze = snooze
             alertType.snoozeperiod = snoozePeriod
             alertType.vibrate = vibrate
@@ -171,11 +216,13 @@ final class AlertTypeEditorViewModel: ObservableObject {
                 vibrate: vibrate,
                 soundName: soundName,
                 alertEntries: nil,
-                nsManagedObjectContext: coreDataManager.mainManagedObjectContext
+                nsManagedObjectContext: coreDataManager.mainManagedObjectContext,
+                repeatSound: repeatSound
             )
         }
 
         coreDataManager.saveChanges()
+        original = snapshot
         close()
     }
 
@@ -225,7 +272,10 @@ final class AlertTypeEditorViewModel: ObservableObject {
         case .soundName:
             showSoundSelection()
 
-        case .enabled, .vibrate, .overrideMute, .snoozeViaNotification, .defaultSnoozePeriod:
+        case .previewAlert:
+            togglePreview()
+
+        case .enabled, .vibrate, .overrideMute, .repeatSound, .snoozeViaNotification, .defaultSnoozePeriod:
             break
         }
     }
@@ -235,13 +285,17 @@ final class AlertTypeEditorViewModel: ObservableObject {
     func title(for setting: AlertTypeEditorSetting) -> String {
         switch setting {
         case .enabled:
-            return Texts_AlertTypeSettingsView.alertTypeEnabled
+            return Texts_Common.enable
         case .name:
             return Texts_AlertTypeSettingsView.alertTypeName
         case .vibrate:
             return Texts_AlertTypeSettingsView.alertTypeVibrate
         case .soundName:
             return Texts_AlertTypeSettingsView.alertTypeSound
+        case .previewAlert:
+            return Texts_AlertTypeSettingsView.previewAlert
+        case .repeatSound:
+            return Texts_AlertTypeSettingsView.alertTypeRepeatSound
         case .overrideMute:
             return Texts_AlertTypeSettingsView.alertTypeOverrideMute
         case .snoozeViaNotification:
@@ -267,7 +321,7 @@ final class AlertTypeEditorViewModel: ObservableObject {
             return Texts_AlertTypeSettingsView.alertTypeDefaultIOSSound
         case .defaultSnoozePeriod:
             return snoozePeriodLabel
-        case .vibrate, .overrideMute, .snoozeViaNotification:
+        case .vibrate, .overrideMute, .repeatSound, .previewAlert, .snoozeViaNotification:
             return nil
         }
     }
@@ -355,29 +409,61 @@ final class AlertTypeEditorViewModel: ObservableObject {
         }
     }
 
-    /// Stops a preview sound before another sound is played or the picker closes.
-    private func stopSoundPlayerIfPlaying() {
-        if soundPlayer.isPlaying() {
-            soundPlayer.stopPlaying()
+    /// Preview the draft using a separate player so real alarm audio remains independent.
+    func togglePreview() {
+        guard canPreview else { return }
+        if isPreviewPlaying {
+            soundPlayer.pausePlaying()
+            isPreviewPlaying = false
+            previewIsPaused = true
+            return
         }
+        if previewIsPaused {
+            previewIsPaused = false
+            isPreviewPlaying = true
+            soundPlayer.resumePlaying()
+            return
+        }
+
+        stopSoundPlayerIfPlaying()
+        if vibrate { AudioServicesPlaySystemSound(kSystemSoundID_Vibrate) }
+        guard soundName != "" else { return }
+        let sounds = ConstantsSounds.allSoundsBySoundNameAndFileName()
+        let fileName = sounds.soundNames.firstIndex(where: { $0 == soundName }).map { sounds.fileNames[$0] } ?? "xdripalert.aif"
+        isPreviewPlaying = true
+        let repeatVibration: (() -> Void)? = vibrate ? { [weak self] in
+            if self?.vibrate == true { AudioServicesPlaySystemSound(kSystemSoundID_Vibrate) }
+        } : nil
+        soundPlayer.playSound(soundFileName: fileName, repeatSound: overrideMute && repeatSound, repeatVibration: repeatVibration) { [weak self] in
+            self?.isPreviewPlaying = false
+            self?.previewIsPaused = false
+        }
+    }
+
+    /// Stops a preview sound before another sound is played or the picker closes.
+    func stopSoundPlayerIfPlaying() {
+        soundPlayer.stopPlaying()
+        isPreviewPlaying = false
+        previewIsPaused = false
     }
 }
 
 struct AlertTypeEditorView: View {
     @StateObject private var viewModel: AlertTypeEditorViewModel
+    @State private var showsUnsavedChanges = false
+    private let close: () -> Void
 
     init(
         alertType: AlertType?,
         coreDataManager: CoreDataManager,
-        soundPlayer: SoundPlayer,
         close: @escaping () -> Void
     ) {
+        self.close = close
         // The editor owns its view model so pushed screens keep their in-progress
         // edits even while selection and text-entry child screens are opened.
         _viewModel = StateObject(wrappedValue: AlertTypeEditorViewModel(
             alertType: alertType,
             coreDataManager: coreDataManager,
-            soundPlayer: soundPlayer,
             close: close
         ))
     }
@@ -385,14 +471,45 @@ struct AlertTypeEditorView: View {
     var body: some View {
         List {
             Section {
-                ForEach(viewModel.rows, id: \.rawValue) { setting in
-                    row(for: setting)
+                row(for: .enabled)
+                row(for: .name)
+            }
+            if viewModel.enabled {
+                Section(header: Text(Texts_AlertTypeSettingsView.alertTypeSound)) {
+                    ForEach(viewModel.rows.filter { [.vibrate, .soundName, .overrideMute, .repeatSound, .previewAlert].contains($0) }, id: \.rawValue) { setting in
+                        row(for: setting)
+                    }
+                }
+                Section(header: Text(Texts_Alerts.snooze)) {
+                    row(for: .snoozeViaNotification)
+                    row(for: .defaultSnoozePeriod)
                 }
             }
         }
+        .onDisappear { viewModel.stopSoundPlayerIfPlaying() }
         .settingsListStyle(title: Texts_AlertTypeSettingsView.editAlertTypeScreenTitle, titleDisplayMode: .inline)
+        // Replace Back while there are unsaved changes so swiping cannot discard the draft.
+        .navigationBarBackButtonHidden(viewModel.hasChanges)
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
+            ToolbarItemGroup(placement: .navigationBarLeading) {
+                if viewModel.hasChanges {
+                    Button {
+                        showsUnsavedChanges = true
+                    } label: {
+                        Image(systemName: "chevron.backward")
+                    }
+                    .accessibilityLabel(Texts_Common.back)
+                    .alert(isPresented: $showsUnsavedChanges) {
+                        Alert(
+                            title: Text(Texts_Common.unsavedChanges),
+                            primaryButton: .default(Text(Texts_Common.save), action: viewModel.save),
+                            secondaryButton: .destructive(Text(Texts_Common.discardChanges), action: {
+                                viewModel.stopSoundPlayerIfPlaying()
+                                close()
+                            })
+                        )
+                    }
+                }
                 Button(role: .destructive, action: viewModel.requestDelete) {
                     Image(systemName: "trash")
                 }
@@ -401,8 +518,9 @@ struct AlertTypeEditorView: View {
             }
 
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(Texts_Common.Ok, action: viewModel.save)
+                Button(Texts_Common.save, action: viewModel.save)
                     .tint(ConstantsAppColors.toolbarAction)
+                    .disabled(!viewModel.hasChanges)
             }
         }
         .alert(item: $viewModel.alert) { alert in
@@ -453,6 +571,23 @@ struct AlertTypeEditorView: View {
                 SettingsRowTextView(title: viewModel.title(for: setting), detail: nil, isEnabled: true)
             }
             .tint(.green)
+
+        case .repeatSound:
+            Toggle(isOn: $viewModel.repeatSound) {
+                SettingsRowTextView(title: viewModel.title(for: setting), detail: nil, isEnabled: true)
+            }
+            .tint(.green)
+
+        case .previewAlert:
+            SettingsStaticRowView(
+                title: viewModel.title(for: setting),
+                detail: nil,
+                isEnabled: viewModel.canPreview,
+                showsDisclosure: false,
+                titleColor: .accentColor,
+                icon: SettingsIcon(symbolName: viewModel.isPreviewPlaying ? "pause.fill" : "play.fill", color: .accentColor),
+                action: viewModel.togglePreview
+            )
 
         case .snoozeViaNotification:
             Toggle(isOn: $viewModel.snooze) {

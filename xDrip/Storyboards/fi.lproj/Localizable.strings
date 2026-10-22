@@ -1,1 +1,88 @@
 
+
+// Direct to Watch status and pairing guidance
+"directWatchTitle" = "Suoraan Watchiin";
+"directWatchNoConnection" = "Yhteyttä ei ole lisätty";
+"directWatchSuspended" = "Keräys keskeytetty";
+"directWatchWaiting" = "Odotetaan Watch-lukemaa";
+"directWatchCollecting" = "Kerätään";
+"directWatchOverdue" = "Lukema puuttuu";
+"directWatchDiagnosis" = "Diagnostiikka";
+"directWatchAdded" = "Watch-yhteys lisätty";
+"directWatchPairingGuidance" = "Vieritä Watchissa alaspäin Suoraan Watchiin -näyttöön ja hyväksy Bluetooth-pariliitospyyntö, jos lisäät tämän lähettimen ensimmäistä kertaa.\n\nLähettimen yhdistäminen voi kestää enintään viisi minuuttia.";
+
+// Direct to Watch collection control
+"directWatchPausedShort" = "Keskeytetty";
+"directWatchPaused" = "Watch-keräys keskeytetty";
+"directWatchPause" = "Keskeytä keräys";
+"directWatchResume" = "Jatka keräystä";
+"directWatchPausedSinceFormat" = "Alkaen %@";
+"directWatchConnecting" = "Odotetaan…";
+"directWatchCollectedReadings" = "Kerätyt lukemat";
+"directWatchReadingGapFormat" = "(%dm %ds)";
+"directWatchNoCollectedReadings" = "Watch ei ole vielä kerännyt lukemia";
+
+"directWatchSessionStarted" = "Aloitettu klo %@";
+"directWatchSessionResumed" = "Jatkettu klo %@";
+"directWatchSessionPaused" = "Keskeytetty klo %@";
+"directWatchSessionEnded" = "Päättynyt klo %@";
+
+// Direct to Watch setup and diagnosis
+"directWatchBluetoothSlot" = "Bluetooth-paikka";
+"directWatchCancel" = "Peruuta";
+"directWatchTestingLogs" = "Testaus ja lokit";
+"directWatchAddConnection" = "Yhdistä Watch";
+"directWatchRemoveConnection" = "Poista Watch-yhteys";
+"directWatchMedicalSlot" = "Lääkintälaitteen paikka";
+"directWatchWatchSlot" = "Watch-paikka";
+"directWatchConfirmUnusedSlot" = "Vapaa paikka: yhdistä Watch";
+"directWatchSlotMedical" = "Paikka 1 · Lääkintälaite";
+"directWatchSlotMobile" = "Paikka 2 · Mobiilisovellus";
+"directWatchSlotWatch" = "Paikka 3 · Watch";
+"directWatchSlotAnubis" = "Paikka 3 · Anubis-lisä";
+"directWatchUsedWatch" = "Tämän Watchin käytössä";
+"directWatchUsedPhone" = "Tämän iPhonen käytössä";
+"directWatchSlotMedicalDetail" = "Vain ilman pumppua tai vastaanotinta";
+"directWatchSlotMobileDetail" = "Vain ilman muuta puhelinsovellusta";
+"directWatchRecommendedWatch" = "Suositeltu Watchille";
+"directWatchRecommendedTransmitter" = "Suositeltu tälle lähettimelle";
+"directWatchAnubisOnly" = "Vain Anubis-lähettimet";
+"directWatchWatchStatus" = "Watchin tila";
+"directWatchTestingDiagnosis" = "Testaus ja vianmääritys";
+"directWatchPausePhone" = "Keskeytä iPhonen BLE-keruu";
+"directWatchForTesting" = "Watch-keruun testaamiseen";
+"directWatchGetLogs" = "Hae Watch-lokit";
+"directWatchShareLogs" = "Jaa Watch-lokit";
+"directWatchPending" = "Odottaa";
+"directWatchReceivedFormat" = "Vastaanotettu %@";
+"directWatchSelectedFormat" = "%@, valittu";
+"directWatchIntro" = "Watch voi kerätä lukemia suoraan ilman lähellä olevaa iPhonea. Sensoria ohjataan edelleen iPhonella.";
+"directWatchBackgroundAdvice" = "Taustakeruu riippuu watchOS:stä. Testaa sitä Watchilla ennen kuin luotat siihen ilman iPhonea.";
+"directWatchSeparateSlots" = "Watch ja iPhone tarvitsevat eri paikat. Paikka 1 voi katkaista sitä jo käyttävän pumpun tai vastaanottimen yhteyden.";
+"directWatchNativeRequired" = "Watch-keruu vaatii lähettimen laskemat glukoosiarvot tällä iPhonella.";
+"directWatchStartSensor" = "Käynnistä sensori tällä iPhonella ennen Watchin yhdistämistä.";
+"directWatchNoSlot" = "Watchille ei ole vapaata yhteensopivaa paikkaa.";
+"directWatchMedicalWarning" = "Watch käyttää paikkaa 1, joka on yleensä pumpun tai vastaanottimen käytössä. Älä lisää yhteyttä, jos pumppu, vastaanotin tai muu lääkintälaite käyttää paikkaa. Watch voi katkaista laitteen glukoosiyhteyden.";
+"directWatchWatchSlotWarning" = "Watch käyttää paikkaa 3. Älä lisää yhteyttä, jos toinen älykello on jo paritettu sensoriin. Tämä Watch voi katkaista sen glukoosiyhteyden.";
+"directWatchSlotConflict" = "Paikka on varattu Watchille. Poista Watch-yhteys ennen kuin määrität sen iPhonelle.";
+"directWatchOpenForStatus" = "Avaa %@ Watchilla saadaksesi sen tilan.";
+"directWatchCheckInstalled" = "Jos tila ei päivity, tarkista iPhonen Watch-sovelluksesta, että sovellus näkyy Apple Watchiin asennettuna.";
+"directWatchMasterRequired" = "iPhonen on oltava isäntätilassa.";
+"directWatchG6Mismatch" = "Määritetty G6 ei ole iPhonen aktiivinen lähetin.";
+"directWatchG7Mismatch" = "Määritetty G7-perheen sensori ei ole iPhonen aktiivinen lähetin.";
+"directWatchPrimaryRequired" = "Watch-keruu vaatii G7-perheen ensisijaisen yhteyden iPhonessa.";
+"directWatchNativeG6Required" = "Ota G6:n omat glukoosiarvot käyttöön iPhonessa.";
+"directWatchPairingCodeRequired" = "Watchin paritus vaatii nelinumeroisen sensorikoodin.";
+"directWatchSlotsConflict" = "Watch ja iPhone käyttävät samaa Bluetooth-paikkaa.";
+"directWatchAnubisRequired" = "Paikka 3 vaatii Anubis-lähettimen.";
+"directWatchNoActiveSensor" = "iPhonessa ei ole aktiivista sensoria.";
+
+/* Direct to Watch action feedback. */
+"directWatchTryAgain" = "Yritä uudelleen";
+"directWatchRequestQueued" = "Pyyntö jonossa";
+"directWatchLastLogsReceived" = "Viimeksi saadut lokit";
+"directWatchWaitingForLogs" = "Odotetaan uusia lokeja…";
+"directWatchLogsFailed" = "Lokeja ei saatu. Yritä uudelleen.";
+
+/* Watch diagnostic log actions and receipt time. */
+"directWatchLogs" = "Lokit";

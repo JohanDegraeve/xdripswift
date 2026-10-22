@@ -1098,9 +1098,7 @@ final class GlucoseChartStateManager: ObservableObject, @unchecked Sendable {
     }
 
     private func label(for treatment: CachedTreatment) -> String? {
-        // Label visibility remains independent of the continuously sized symbols.
-        if treatment.type == .Insulin, treatment.value < ConstantsGlucoseChart.minimumBolusLabelValue { return nil }
-        if treatment.type == .Carbs, treatment.value < ConstantsGlucoseChart.minimumCarbsLabelValue { return nil }
+        // Keep bolus and carb labels cached so visibility can change without reloading data.
         let formatter = NumberFormatter()
 
         switch treatment.type {

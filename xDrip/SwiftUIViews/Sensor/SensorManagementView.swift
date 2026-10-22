@@ -226,10 +226,9 @@ struct SensorManagementView: View {
             .navigationTitle(Texts_HomeView.sensorManagementTitle)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(Texts_Common.Cancel, action: {
+                    SheetCloseButton {
                         self.presentationMode.wrappedValue.dismiss()
-                    })
-                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
+                    }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     OnlineHelpButton(topic: .sensorManagement)
@@ -545,7 +544,9 @@ struct SensorManagementView: View {
         let transmitterType = transmitter?.cgmTransmitterType()
         let dexcomG7 = transmitterType == .dexcomG7 ? dexcomG7Provider() : nil
         let sensorDescription: String
-        if activeSensor != nil {
+        if let libre3 = transmitter as? CGMLibre3Transmitter {
+            sensorDescription = libre3.productName
+        } else if activeSensor != nil {
             sensorDescription = UserDefaults.standard.activeSensorDescription ?? Texts_HomeView.sensor
         } else if let dexcomG7 {
             // A G7-family sensor manages its own session. Before the first usable glucose creates
@@ -561,7 +562,7 @@ struct SensorManagementView: View {
             sensorDescription = Texts_HomeView.sensorManagementNoSensor
         }
         let startDate = activeSensor?.startDate
-        let maxSensorAgeInDays = UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? transmitter?.maxSensorAgeInDays() ?? 0
+        let maxSensorAgeInDays = transmitter?.maxSensorAgeInDays() ?? 0
 
         let sensorType = transmitterType?.sensorType()
         let dexcomConnectionMode: DexcomConnectionMode?
@@ -579,7 +580,7 @@ struct SensorManagementView: View {
 
         switch sensorType {
         case .Libre:
-            warmupMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
+            warmupMinutes = transmitter?.sensorWarmupDurationInMinutes() ?? ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
         case .Dexcom:
             if transmitterType == .dexcomG7 {
                 warmupMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG7
@@ -594,7 +595,7 @@ struct SensorManagementView: View {
 
         let elapsedMinutes = startDate.map { Double(Calendar.current.dateComponents([.minute], from: $0, to: Date()).minute ?? 0) }
         let remainingMinutes = (elapsedMinutes != nil && maxSensorAgeInDays > 0) ? ((maxSensorAgeInDays * 24 * 60) - (elapsedMinutes ?? 0)) : nil
-        let expiryDate = startDate.map { $0.addingTimeInterval(TimeInterval(days: maxSensorAgeInDays)) }
+        let expiryDate = SensorExpirySnapshot.expiryDate(startDate: startDate, lifetimeDays: maxSensorAgeInDays)
 
         let warmupReadyTimeString: String?
         if let startDate = startDate, let warmupMinutes = warmupMinutes, let elapsedMinutes = elapsedMinutes, elapsedMinutes < warmupMinutes {
