@@ -232,6 +232,59 @@ final class NightscoutFollowLinkTests: XCTestCase {
         XCTAssertNil(defaults.nightscoutAPIKey)
     }
 
+    /// The connection as an observer sees it during one change notification.
+    private struct ConnectionSnapshot: Equatable {
+        let url: String?
+        let token: String?
+        let apiKey: String?
+    }
+
+    /// Snapshots the connection on every change to one of its settings, as the follower and upload
+    /// managers read it when they react.
+    private final class ConnectionRecorder: NSObject {
+        private let defaults: UserDefaults
+        private let keys: [UserDefaults.Key] = [.nightscoutUrl, .nightscoutPort, .nightscoutToken, .nightscoutAPIKey]
+        private(set) var snapshots: [ConnectionSnapshot] = []
+
+        init(observing defaults: UserDefaults) {
+            self.defaults = defaults
+            super.init()
+            keys.forEach { defaults.addObserver(self, forKeyPath: $0.rawValue, options: .new, context: nil) }
+        }
+
+        func stop() {
+            keys.forEach { defaults.removeObserver(self, forKeyPath: $0.rawValue) }
+        }
+
+        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+            snapshots.append(ConnectionSnapshot(url: defaults.nightscoutUrl, token: defaults.nightscoutToken, apiKey: defaults.nightscoutAPIKey))
+        }
+    }
+
+    func testCredentialsAreNeverPairedWithTheOtherSite() throws {
+        let defaults = try makeDefaults()
+        defer { defaults.removePersistentDomain(forName: Self.suiteName) }
+        storeExistingConnection(in: defaults)
+        let recorder = ConnectionRecorder(observing: defaults)
+        defer { recorder.stop() }
+
+        NightscoutFollowLink(url: "https://a.example.com", port: 8443, token: "new-token").apply(to: defaults)
+
+        XCTAssertFalse(recorder.snapshots.isEmpty)
+        for snapshot in recorder.snapshots {
+            switch snapshot.url {
+            case "https://old.example.com":
+                XCTAssertTrue([nil, "old-token"].contains(snapshot.token), "the old site was offered the token \(snapshot.token ?? "")")
+            case "https://a.example.com":
+                XCTAssertTrue([nil, "new-token"].contains(snapshot.token), "the new site was offered the token \(snapshot.token ?? "")")
+                XCTAssertNil(snapshot.apiKey, "the new site was offered the old site's API secret")
+            default:
+                XCTFail("unexpected site \(snapshot.url ?? "nil")")
+            }
+        }
+        XCTAssertEqual(recorder.snapshots.last, ConnectionSnapshot(url: "https://a.example.com", token: "new-token", apiKey: nil))
+    }
+
     // MARK: - Confirmation before anything changes
 
     @MainActor private func makeStateModel(

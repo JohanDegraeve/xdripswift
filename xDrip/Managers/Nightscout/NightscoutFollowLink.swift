@@ -208,10 +208,13 @@ struct NightscoutFollowLink: Equatable {
     /// replaced as a whole, because a port, token or API secret left from another site would be
     /// sent to this one. Nothing else the user has set is touched.
     func apply(to defaults: UserDefaults = .standard) {
+        // The managers connect on every change to these, so the old credentials go before the URL
+        // and the new token after it.
+        defaults.nightscoutAPIKey = nil
+        defaults.nightscoutToken = nil
         defaults.nightscoutUrl = url
         defaults.nightscoutPort = port
         defaults.nightscoutToken = token
-        defaults.nightscoutAPIKey = nil
         defaults.nightscoutEnabled = true
         defaults.followerDataSourceType = .nightscout
         defaults.timeStampOfLastFollowerConnection = nil
