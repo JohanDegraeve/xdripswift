@@ -887,13 +887,7 @@ private struct SettingsNativeRowView: View {
                 .listRowBackground(severity.backgroundColor)
 
         case let .some(.statusBanner(message, symbolName, symbolColor, titleColor, backgroundColor)):
-            SettingsStatusBannerView(
-                title: row.title,
-                message: message,
-                symbolName: symbolName,
-                symbolColor: symbolColor,
-                titleColor: titleColor
-            )
+            statusBanner(message: message, symbolName: symbolName, symbolColor: symbolColor, titleColor: titleColor)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                 .listRowBackground(backgroundColor)
 
@@ -1055,6 +1049,27 @@ private struct SettingsNativeRowView: View {
         }
     }
 
+    /// A banner that carries an action is a link, for example to the screen that fixes what it reports.
+    @ViewBuilder private func statusBanner(message: String, symbolName: String, symbolColor: Color, titleColor: Color) -> some View {
+        let banner = SettingsStatusBannerView(
+            title: row.title,
+            message: message,
+            symbolName: symbolName,
+            symbolColor: symbolColor,
+            titleColor: titleColor,
+            showsDisclosure: row.action != nil
+        )
+
+        if row.action != nil {
+            Button(action: selectRow) {
+                banner.contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        } else {
+            banner
+        }
+    }
+
     private var rowText: some View {
         SettingsRowTextView(
             title: row.title,
@@ -1174,6 +1189,7 @@ private struct SettingsStatusBannerView: View {
     let symbolName: String
     let symbolColor: Color
     let titleColor: Color
+    var showsDisclosure = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -1190,6 +1206,11 @@ private struct SettingsStatusBannerView: View {
                     .font(.caption)
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if showsDisclosure {
+                Spacer(minLength: 0)
+                SettingsDisclosureIndicator()
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

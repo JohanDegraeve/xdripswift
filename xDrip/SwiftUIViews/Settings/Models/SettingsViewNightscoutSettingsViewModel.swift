@@ -241,6 +241,15 @@ class SettingsViewNightscoutSettingsViewModel {
         return SettingsIndicator(color: connectionIsRecent ? ConstantsAppColors.normal : ConstantsAppColors.urgent)
     }
 
+    // MARK: - Connection test
+
+    /// Runs the same check as the Test Connection row for the stored Nightscout settings, and
+    /// passes its title and message to `messageHandler` on the main thread.
+    func verifyConnection(reportingTo messageHandler: @escaping (String, String) -> Void) {
+        self.messageHandler = messageHandler
+        testNightscoutCredentials()
+    }
+
     // MARK: - private functions
     
     /// test the nightscout url and api key and send result to messageHandler

@@ -706,6 +706,22 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
         )
     }
 
+    /// The Nightscout screen under Sharing and Services, also opened from the Nightscout follower status.
+    static func nightscoutSettingsScreen() -> SettingsScreen {
+        SettingsScreen(
+            title: Texts_SettingsView.sectionTitleNightscout,
+            onlineHelpTopic: .nightscoutService,
+            providers: {
+                [
+                    SettingsViewNightscoutSettingsViewModel(rowGroup: .nightscout),
+                    SettingsViewNightscoutSettingsViewModel(rowGroup: .connectionSettings),
+                    SettingsViewNightscoutSettingsViewModel(rowGroup: .actions),
+                    SettingsViewNightscoutSettingsViewModel(rowGroup: .uploadSchedule)
+                ]
+            }
+        )
+    }
+
     static func sharingAndServices(dexcomShareUploadActions: DexcomShareUploadActions = .none, uploadDefaults: UserDefaults = .standard, coreDataManager: CoreDataManager? = nil) -> SettingsViewGroupedSettingsViewModel {
         SettingsViewGroupedSettingsViewModel(
             title: Texts_SettingsView.sharingAndServicesSectionTitle,
@@ -719,20 +735,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     detailIndicator: {
                         nightscoutConnectionIndicator()
                     },
-                    settingsScreen: {
-                        SettingsScreen(
-                            title: Texts_SettingsView.sectionTitleNightscout,
-                            onlineHelpTopic: .nightscoutService,
-                            providers: {
-                                [
-                                    SettingsViewNightscoutSettingsViewModel(rowGroup: .nightscout),
-                                    SettingsViewNightscoutSettingsViewModel(rowGroup: .connectionSettings),
-                                    SettingsViewNightscoutSettingsViewModel(rowGroup: .actions),
-                                    SettingsViewNightscoutSettingsViewModel(rowGroup: .uploadSchedule)
-                                ]
-                            }
-                        )
-                    }
+                    settingsScreen: nightscoutSettingsScreen
                 ),
                 SettingsGroupedRow(
                     id: "sharingServices.dexcomShare",

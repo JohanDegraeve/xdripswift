@@ -191,7 +191,8 @@ struct FollowerConnectionPresentation: Equatable {
         }
     }
 
-    static func bannerRow(id: String, presentation: FollowerConnectionPresentation) -> SettingsRow {
+    /// A banner that opens `action` when tapped, if one is given.
+    static func bannerRow(id: String, presentation: FollowerConnectionPresentation, action: SettingsRowAction? = nil) -> SettingsRow {
         SettingsRow(
             id: id,
             title: presentation.title,
@@ -201,7 +202,8 @@ struct FollowerConnectionPresentation: Equatable {
                 symbolColor: presentation.color,
                 titleColor: presentation.state.titleColor,
                 backgroundColor: presentation.state.backgroundColor
-            )
+            ),
+            action: action
         )
     }
 

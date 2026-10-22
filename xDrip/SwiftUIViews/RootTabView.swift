@@ -123,6 +123,8 @@ struct RootTabDependencies {
     @Published var textInput = ""
     @Published var pickerData: SnoozePickerData?
     weak var sensorProvider: ActiveSensorProviding?
+    private let settingsDefaults: UserDefaults
+    private let nightscoutConnectionVerifier: (@escaping (String, String) -> Void) -> Void
     private var pendingAlertRequests: [RootAlertRequest] = []
     private var isAdvancingAlertQueue = false
     private var isAlertDismissalPending = false
@@ -130,6 +132,20 @@ struct RootTabDependencies {
         subsystem: ConstantsLog.subSystem,
         category: ConstantsLog.categoryDataManagement
     )
+
+    /// - Parameters:
+    ///   - settingsDefaults: where a confirmed Nightscout follow link is written.
+    ///   - nightscoutConnectionVerifier: runs the Nightscout connection test after a follow link
+    ///     was applied, and passes its title and message to the closure it is given.
+    init(
+        settingsDefaults: UserDefaults = .standard,
+        nightscoutConnectionVerifier: @escaping (@escaping (String, String) -> Void) -> Void = { report in
+            SettingsViewNightscoutSettingsViewModel().verifyConnection(reportingTo: report)
+        }
+    ) {
+        self.settingsDefaults = settingsDefaults
+        self.nightscoutConnectionVerifier = nightscoutConnectionVerifier
+    }
 
     // MARK: - Presentation
 
@@ -215,12 +231,60 @@ struct RootTabDependencies {
         sensorHealthHomeRequest += 1
     }
 
-    /// Copies a document supplied by iOS before handing it to the restore workflow.
-    func receiveIncomingBackup(_ sourceURL: URL) {
-        // The Live Activity uses xdripswift://open only to bring the app to the foreground.
-        guard sourceURL.isFileURL,
-              sourceURL.pathExtension.caseInsensitiveCompare("xdripbackup") == .orderedSame else { return }
+    /// Sends every URL iOS hands to the app to the workflow that owns it.
+    func receiveIncomingURL(_ url: URL) {
+        switch IncomingURLRoute.resolve(url) {
+        case .backupDocument:
+            receiveIncomingBackup(url)
+        case let .nightscoutFollow(result):
+            receiveNightscoutFollowLink(result)
+        case .openApp, .ignored:
+            // The Live Activity uses xdripswift://open only to bring the app to the foreground.
+            break
+        }
+    }
 
+    /// Never applies a follow link silently: the user sees what will change and confirms it first.
+    private func receiveNightscoutFollowLink(_ result: Result<NightscoutFollowLink, NightscoutFollowLinkError>) {
+        let log = dataManagementLog
+
+        switch result {
+        case let .failure(error):
+            trace(
+                "in receiveNightscoutFollowLink, link refused. error = %{public}@",
+                log: log,
+                category: ConstantsLog.categoryDataManagement,
+                type: .info,
+                String(describing: error)
+            )
+            presentAlert(title: Texts_SettingsView.nightscoutFollowLinkTitle, message: error.message)
+
+        case let .success(link):
+            let defaults = settingsDefaults
+
+            presentAlert(
+                title: Texts_SettingsView.nightscoutFollowLinkTitle,
+                message: link.confirmationMessage(isCurrentlyMaster: defaults.isMaster),
+                actionTitle: Texts_SettingsView.nightscoutFollowLinkAction,
+                cancelTitle: Texts_Common.Cancel,
+                action: { [weak self] in
+                    link.apply(to: defaults)
+                    trace(
+                        "in receiveNightscoutFollowLink, follow link confirmed and applied",
+                        log: log,
+                        category: ConstantsLog.categoryDataManagement,
+                        type: .info
+                    )
+                    self?.nightscoutConnectionVerifier { title, message in
+                        self?.presentAlert(title: title, message: message)
+                    }
+                }
+            )
+        }
+    }
+
+    /// Copies a document supplied by iOS before handing it to the restore workflow.
+    private func receiveIncomingBackup(_ sourceURL: URL) {
         guard !isPreparingIncomingBackup else { return }
 
         isPreparingIncomingBackup = true

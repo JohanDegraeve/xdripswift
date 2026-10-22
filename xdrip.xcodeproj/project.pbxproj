@@ -434,6 +434,8 @@
 		BA000001000000000000000A /* ImportDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA000001000000000000001A /* ImportDataView.swift */; };
 		BA0000020000000000000001 /* NightscoutFollowerGapFillService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000020000000000000011 /* NightscoutFollowerGapFillService.swift */; };
 		BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */; };
+		BA0000030000000000000001 /* NightscoutFollowLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000030000000000000011 /* NightscoutFollowLink.swift */; };
+		BA0000030000000000000002 /* NightscoutFollowLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000030000000000000012 /* NightscoutFollowLinkTests.swift */; };
 		BA0709260000000000000001 /* BasalInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0709260000000000000002 /* BasalInjectionTests.swift */; };
 		C15D80D0E8DB47A6A9BE68DF /* TherapyMetricsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05272484BD024BDAAA341C1C /* TherapyMetricsSettingsView.swift */; };
 		C2385D0CA6579919114B060A /* AlertTypesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */; };
@@ -1449,6 +1451,8 @@
 		BA000001000000000000001A /* ImportDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportDataView.swift; sourceTree = "<group>"; };
 		BA0000020000000000000011 /* NightscoutFollowerGapFillService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowerGapFillService.swift; sourceTree = "<group>"; };
 		BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowerGapFillTests.swift; sourceTree = "<group>"; };
+		BA0000030000000000000011 /* NightscoutFollowLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowLink.swift; sourceTree = "<group>"; };
+		BA0000030000000000000012 /* NightscoutFollowLinkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowLinkTests.swift; sourceTree = "<group>"; };
 		BA0709260000000000000002 /* BasalInjectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasalInjectionTests.swift; sourceTree = "<group>"; };
 		BAE9D53EDF7C9B2239B733AA /* Libre3HistoricalReadingPage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3HistoricalReadingPage.swift; path = Libre3HistoricalReadingPage.swift; sourceTree = "<group>"; };
 		BF320075EB600CCA1DE1440F /* Libre3PatchControlCommand.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3PatchControlCommand.swift; path = Libre3PatchControlCommand.swift; sourceTree = "<group>"; };
@@ -2858,6 +2862,7 @@
 				AB1900023014000200000001 /* LiveActivityWarmupTests.swift */,
 				A77400023018000100000001 /* MissedReadingSnoozeTests.swift */,
 				BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */,
+				BA0000030000000000000012 /* NightscoutFollowLinkTests.swift */,
 				A50000040000000000000001 /* OnlineHelpTests.swift */,
 				A19A00370000000000000002 /* RepeatingAlarmTests.swift */,
 				4F2800113004000100000001 /* RootHomeInteractionTests.swift */,
@@ -3151,6 +3156,7 @@
 				47AECB9D2CD2B618005F1814 /* NightscoutDeviceStatusModels.swift */,
 				F821CF65229EE68B005C1E43 /* NightscoutFollowManager.swift */,
 				BA0000020000000000000011 /* NightscoutFollowerGapFillService.swift */,
+				BA0000030000000000000011 /* NightscoutFollowLink.swift */,
 				476A897D2CCA7E680073ED83 /* NightscoutFollowType.swift */,
 				476A897B2CC963AF0073ED83 /* NightscoutProfileModels.swift */,
 				BA0000010000000000000017 /* NightscoutImportService.swift */,
@@ -4803,6 +4809,7 @@
 				A50000030000000000000001 /* OnlineHelpTests.swift in Sources */,
 				FBA100040000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift in Sources */,
 				BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */,
+				BA0000030000000000000002 /* NightscoutFollowLinkTests.swift in Sources */,
 				BA0709260000000000000001 /* BasalInjectionTests.swift in Sources */,
 				4F2600023002000200000001 /* SensorHealthIssueManagerTests.swift in Sources */,
 				A19A00370000000000000001 /* RepeatingAlarmTests.swift in Sources */,
@@ -4837,6 +4844,7 @@
 				A50000010000000000000001 /* OnlineHelp.swift in Sources */,
 				FBA100020000000000000001 /* FollowerBackgroundKeepAliveManager.swift in Sources */,
 				BA0000020000000000000001 /* NightscoutFollowerGapFillService.swift in Sources */,
+				BA0000030000000000000001 /* NightscoutFollowLink.swift in Sources */,
 				DAF100012E7A000100000001 /* DataFlowPolicy.swift in Sources */,
 				BA0000010000000000000001 /* BackupModels.swift in Sources */,
 				BA0000010000000000000002 /* BackupCrypto.swift in Sources */,

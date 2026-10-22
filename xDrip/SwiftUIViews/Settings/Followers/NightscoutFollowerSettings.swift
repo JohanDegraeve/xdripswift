@@ -17,7 +17,11 @@ enum NightscoutFollowerSettingsScreen {
             [
                 FollowerSettingsSectionProvider(title: { Texts_SettingsView.followerSectionConnection }, refreshEvery: 30) { _ in
                     let presentation = FollowerConnectionPresentation.resolve(source: .nightscout)
-                    return [FollowerConnectionPresentation.bannerRow(id: "nightscout.connection.banner", presentation: presentation)]
+                    // Nightscout is configured in Sharing and Services, so an unconfigured banner leads there.
+                    let setUp: SettingsRowAction? = presentation.state == .notConfigured
+                        ? .settingsScreen { SettingsViewGroupedSettingsViewModel.nightscoutSettingsScreen() }
+                        : nil
+                    return [FollowerConnectionPresentation.bannerRow(id: "nightscout.connection.banner", presentation: presentation, action: setUp)]
                 },
                 FollowerSettingsSectionProvider(title: { Texts_SettingsView.followerSectionProfile }) { _ in
                     [FollowerSettingsRows.aliasRow(id: "nightscout.profile.alias")]
