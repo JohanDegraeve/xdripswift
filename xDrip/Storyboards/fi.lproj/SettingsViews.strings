@@ -41,9 +41,7 @@
 "settingsviews_alert_types_section_footer" = "Hälytystyypit määrittävät, miten hälytykset toimivat, mukaan lukien ääni, värinä, torkku ja mykistyksen ohitus.";
 "settingsviews_alerts_section_footer" = "Hälytykset määrittävät, milloin sovelluksen tulee ilmoittaa glukoositasoista, puuttuvista lukemista ja muista tilanteista.";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Kirjoita Apple Healthiin";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Lähetä";
 "settingsviews_dexcomShareUploadSerialNumber" = "Vastaanottimen sarjanumero";
 "settingsviews_useUSDexcomShareurl" = "US-palvelimet";
 "settingsviews_dexcomShareAccountName" = "Käyttäjätunnus";
@@ -52,7 +50,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Anna Dexcom vastaanottimen sarjanumero";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Lähetysasetukset";
-"settingsviews_nightscoutEnabled" = "Ota Nightscout käyttöön";
 "settingsviews_nightscoutUrl" = "URL";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Ota aikataulu käyttöön";
@@ -585,3 +582,33 @@
 "homeScreen.basalTop" = "Ylhäällä";
 "homeScreen.basalBottom" = "Alhaalla";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Glukoosikaavio";
+
+"therapy.none" = "Ei";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Hoidon rajat";
+"therapy.smallBolusThreshold" = "Pieni bolus";
+"therapy.smallCarbThreshold" = "Vähän HH";
+"therapy.treatmentThresholdsExplanation" = "Rajat alittavat bolus- ja hiilihydraattiarvot piilotetaan kaaviosta. Bolusraja määrittää myös pienet bolukset hoitoluettelossa. «Ei» näyttää kaikki arvot.";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Glukoosiarvio";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Hoidon asteikko";
+"therapy.scaleStandard" = "Vakio";
+"therapy.scaleSmallDoses" = "Pienet ann.";
+"therapy.treatmentScaleExplanation" = "Pienet annokset näkyvät selvemmin. Bolusmerkit skaalautuvat välillä 0.1–2.0U, HH-merkit välillä 1–50g. Suuremmat määrät käyttävät suurinta merkkiä.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimaalinen";
+"settingsviews_liveActivityTypeNormal" = "Normaali";
+"settingsviews_liveActivityTypeLarge" = "Suuri";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Lähetys Dexcom Shareen";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Lue johdanto";
+"speak.preview" = "Kokeile glukoosipuhetta";

@@ -44,3 +44,10 @@
 "bgRangeUrgent" = "Nujno";
 "bgRangeNotUrgent" = "Ni nujno";
 "bgRangeInRange" = "V območju";
+
+"alsoCollectedByWatch" = "Zbrano tudi z Watch";
+
+// Direct to Watch setup and diagnosis
+"receivedViaWatchAtFooterFormat" = "Prejeto prek Watch ob %@";
+"backfilledViaWatchAtFooterFormat" = "Dopolnjeno prek Watch ob %@";
+"receivedViaWatch" = "Prejeto prek Watch";

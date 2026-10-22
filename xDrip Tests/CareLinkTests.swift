@@ -504,10 +504,11 @@ final class CareLinkTests: XCTestCase {
             "sgs": [["sg": 126, "timestamp": "2027-01-15T10:00:00"]]
         ])
 
-        // Without trusted clock evidence the local timestamp remains in the future and is rejected.
+        // Without trusted clock evidence the local timestamp cannot safely be interpreted.
         let withoutOffset = try CareLinkGlucoseParser.readings(from: data, now: now)
         XCTAssertTrue(withoutOffset.readings.isEmpty)
-        XCTAssertEqual(withoutOffset.diagnostics.futureTimestampCount, 1)
+        XCTAssertEqual(withoutOffset.diagnostics.unknownClockCount, 1)
+        XCTAssertEqual(withoutOffset.diagnostics.futureTimestampCount, 0)
         XCTAssertEqual(withoutOffset.diagnostics.clockSource, .unavailable)
 
         // The retained two-hour offset normalizes the same timestamp without becoming fresh proof.
@@ -521,6 +522,102 @@ final class CareLinkTests: XCTestCase {
         XCTAssertEqual(retained.diagnostics.clockSource, .retained)
         XCTAssertEqual(retained.diagnostics.offsetMinutes, 120)
         XCTAssertNil(retained.payloadDeviceOffset)
+    }
+
+    func testGlucoseClockPersistsAcrossDefaultsInstancesAndUpdatesFromPayload() throws {
+        let suiteName = "CareLinkTests.clock.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let region = CareLinkRegion.outsideUnitedStates
+        let account = "account"
+        let patientID = "patient"
+
+        // A clock-only response can establish the offset before any glucose is available.
+        let clockData = try JSONSerialization.data(withJSONObject: [
+            "currentServerTime": now.timeIntervalSince1970 * 1000,
+            "sMedicalDeviceTime": "2027-01-15T10:00:00"
+        ])
+        let clock = try CareLinkGlucoseParser.readings(from: clockData, now: now)
+        XCTAssertTrue(clock.readings.isEmpty)
+        XCTAssertEqual(clock.payloadDeviceOffset, 7200)
+        defaults.storeCareLinkDeviceOffset(clock.payloadDeviceOffset, region: region, account: account, patientID: patientID)
+
+        let reopened = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        let savedOffset = reopened.careLinkDeviceOffset(region: region, account: account, patientID: patientID)
+        XCTAssertEqual(savedOffset, 7200)
+        let glucoseData = try JSONSerialization.data(withJSONObject: [
+            "sgs": [["sg": 126, "datetime": "2027-01-15T10:00:00"]]
+        ])
+        let retained = try CareLinkGlucoseParser.readings(from: glucoseData, now: now, retainedDeviceOffset: savedOffset)
+        XCTAssertEqual(retained.readings.first?.timeStamp, now)
+        XCTAssertEqual(retained.diagnostics.clockSource, .retained)
+        reopened.storeCareLinkDeviceOffset(retained.payloadDeviceOffset, region: region, account: account, patientID: patientID)
+        XCTAssertEqual(reopened.careLinkDeviceOffset(region: region, account: account, patientID: patientID), 7200)
+
+        // A fresh valid clock overrides the saved offset in the same response.
+        let changedData = try JSONSerialization.data(withJSONObject: [
+            "currentServerTime": now.timeIntervalSince1970 * 1000,
+            "sMedicalDeviceTime": "2027-01-15T09:00:00",
+            "sgs": [["sg": 127, "datetime": "2027-01-15T09:00:00"]]
+        ])
+        let changed = try CareLinkGlucoseParser.readings(from: changedData, now: now, retainedDeviceOffset: savedOffset)
+        XCTAssertEqual(changed.readings.first?.timeStamp, now)
+        XCTAssertEqual(changed.diagnostics.clockSource, .payload)
+        reopened.storeCareLinkDeviceOffset(changed.payloadDeviceOffset, region: region, account: account, patientID: patientID)
+        XCTAssertEqual(reopened.careLinkDeviceOffset(region: region, account: account, patientID: patientID), 3600)
+
+        let invalidClockData = try JSONSerialization.data(withJSONObject: [
+            "currentServerTime": now.timeIntervalSince1970 * 1000,
+            "sMedicalDeviceTime": "2027-01-17T09:00:00",
+            "sgs": [["sg": 127, "datetime": "2027-01-15T09:00:00"]]
+        ])
+        let invalidClock = try CareLinkGlucoseParser.readings(from: invalidClockData, now: now, retainedDeviceOffset: 3600)
+        XCTAssertEqual(invalidClock.readings.first?.timeStamp, now)
+        XCTAssertNil(invalidClock.payloadDeviceOffset)
+        reopened.storeCareLinkDeviceOffset(invalidClock.payloadDeviceOffset, region: region, account: account, patientID: patientID)
+        XCTAssertEqual(reopened.careLinkDeviceOffset(region: region, account: account, patientID: patientID), 3600)
+    }
+
+    func testStoredGlucoseClockIsScopedAndPreservesZeroAndValidValues() throws {
+        let suiteName = "CareLinkTests.clockScope.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let region = CareLinkRegion.outsideUnitedStates
+        defaults.storeCareLinkDeviceOffset(0, region: region, account: "account", patientID: "patient")
+        XCTAssertEqual(defaults.careLinkDeviceOffset(region: region, account: "account", patientID: "patient"), 0)
+        XCTAssertNil(defaults.careLinkDeviceOffset(region: .unitedStates, account: "account", patientID: "patient"))
+        XCTAssertNil(defaults.careLinkDeviceOffset(region: region, account: "other", patientID: "patient"))
+        XCTAssertNil(defaults.careLinkDeviceOffset(region: region, account: "account", patientID: "other"))
+        XCTAssertNil(defaults.careLinkDeviceOffset(region: region, account: nil, patientID: "patient"))
+        let invalidOrUnchangedOffsets: [TimeInterval?] = [nil, .nan, .infinity, 15 * 3600, -15 * 3600, 0]
+        for offset in invalidOrUnchangedOffsets {
+            defaults.storeCareLinkDeviceOffset(offset, region: region, account: "account", patientID: "patient")
+            XCTAssertEqual(defaults.careLinkDeviceOffset(region: region, account: "account", patientID: "patient"), 0)
+        }
+        let before = defaults.dictionary(forKey: UserDefaults.Key.careLinkDeviceOffsets.rawValue)! as NSDictionary
+        defaults.storeCareLinkDeviceOffset(7200, region: region, account: nil, patientID: "patient")
+        defaults.storeCareLinkDeviceOffset(7200, region: region, account: "", patientID: "patient")
+        XCTAssertEqual(defaults.dictionary(forKey: UserDefaults.Key.careLinkDeviceOffsets.rawValue)! as NSDictionary, before)
+        XCTAssertFalse(BackupService.isPortableSetting(UserDefaults.Key.careLinkDeviceOffsets.rawValue))
+    }
+
+    /// Old local readings must not be mistaken for current readings when the clock is unknown.
+    func testGlucoseParserRejectsApparentlyCurrentLocalHistoryWithoutClock() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "sgs": [
+                ["sg": 126, "datetime": "2027-01-15T08:00:00"],
+                ["sg": 127, "timestamp": now.timeIntervalSince1970 * 1000],
+                ["sg": 128, "datetime": "2027-01-15T07:55:00Z"]
+            ]
+        ])
+        let unknown = try CareLinkGlucoseParser.readings(from: data, now: now)
+        XCTAssertEqual(unknown.readings.map(\.sgv), [127, 128])
+        XCTAssertEqual(unknown.diagnostics.unknownClockCount, 1)
+        XCTAssertEqual(unknown.diagnostics.futureTimestampCount, 0)
+        let known = try CareLinkGlucoseParser.readings(from: data, now: now, retainedDeviceOffset: 7200)
+        XCTAssertEqual(known.readings.map(\.sgv), [127, 128, 126])
+        XCTAssertEqual(known.readings.last?.timeStamp, now.addingTimeInterval(-7200))
+        XCTAssertEqual(known.diagnostics.unknownClockCount, 0)
     }
 
     /// Explicitly zoned timestamps remain absolute even when a retained device offset is available.

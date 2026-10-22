@@ -49,6 +49,7 @@ extension BLEPeripheral {
     @NSManaged public var miaoMiao: MiaoMiao?
     
     // a BLEPeripheral should only have one of dexcomG5, m5Stack, ...
+    @NSManaged public var libre3: Libre3?
     @NSManaged public var libre2: Libre2?
     
     // a BLEPeripheral should only have one of dexcomG5, m5Stack, ...

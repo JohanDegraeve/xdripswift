@@ -1,7 +1,6 @@
 "alerttypessettingsview_screentitle" = "Hälytystyypit";
 "alerttypesettingsview_screentitle" = "Muokkaa hälytystyyppiä";
 "alerttypesettingsview_name" = "Nimi";
-"alerttypesettingsview_enabled" = "Käytössä";
 "alerttypesettingsview_vibrate" = "Väristys";
 "alerttypesettingsview_snoozevianotification" = "Torkku notifikaation kautta";
 "alerttypesettingsview_defaultsnoozeperiod" = "Oletus torkkujakso";
@@ -14,3 +13,6 @@
 "alertTypeNoSound" = "Ei ääntä";
 "alerttypenamealreadyexistsmessages" = "Tämän niminen hälytystyyppi on jo olemassa. Vaihda nimi";
 "confirmdeletionalerttype" = "Haluatko poistaa hälytystyypin nimellä ";
+
+"alerttypesettingsview_repeatsound" = "Toista ääntä";
+"alerttypesettingsview_previewalert" = "Esikuuntele hälytys";

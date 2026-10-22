@@ -17,8 +17,11 @@ fileprivate enum Setting:Int, CaseIterable {
     //which TIR type should be used?
     case timeInRangeType = 1
     
-    //urgent low value
-    case useIFCCA1C = 2
+    //which glucose estimate should be displayed?
+    case statisticsUseHbA1c = 2
+
+    //display the estimate in mmol/mol?
+    case useIFCCA1C = 3
     
 }
 
@@ -51,14 +54,36 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
             }
         )
 
+        var estimateRow = nativeSettingsRow(
+            id: "statistics.statisticsUseHbA1c",
+            index: Setting.statisticsUseHbA1c.rawValue,
+            sectionID: sectionID
+        )
+        estimateRow.accessory = .none
+        estimateRow.control = .menuWithSelectionTitle(
+            options: {
+                [
+                    SettingsMenuOption(title: Texts_Common.statisticsGMI, isSelected: !UserDefaults.standard.statisticsUseHbA1c),
+                    SettingsMenuOption(title: Texts_Common.statisticsEstimatedA1c, isSelected: UserDefaults.standard.statisticsUseHbA1c)
+                ]
+            },
+            selectionTitle: {
+                UserDefaults.standard.statisticsUseHbA1c ? Texts_Common.statisticsEstimatedA1c : Texts_Common.statisticsGMI
+            },
+            selectOption: { index in
+                guard (0...1).contains(index) else { return }
+                UserDefaults.standard.statisticsUseHbA1c = index == 1
+            }
+        )
+
         return [
             nativeSettingsRow(id: "statistics.showStatistics", index: Setting.showStatistics.rawValue, sectionID: sectionID),
             timeInRangeTypeRow,
+            estimateRow,
             nativeSettingsRow(
                 id: "statistics.useIFCCA1C",
                 index: Setting.useIFCCA1C.rawValue,
-                sectionID: sectionID,
-                isVisible: UserDefaults.standard.showStatistics
+                sectionID: sectionID
             )
         ]
     }
@@ -85,7 +110,7 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
                 isOn: { UserDefaults.standard.useIFCCA1C },
                 setIsOn: { UserDefaults.standard.useIFCCA1C = $0 }
             )
-        case .timeInRangeType:
+        case .timeInRangeType, .statisticsUseHbA1c:
             return nil
         }
     }
@@ -164,6 +189,16 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
                 
             }, cancelHandler: nil, didSelectRowHandler: nil)
             
+        case .statisticsUseHbA1c:
+            return SettingsSelectedRowAction.selectFromList(
+                title: Texts_SettingsView.labelStatisticsEstimate,
+                data: [Texts_Common.statisticsGMI, Texts_Common.statisticsEstimatedA1c],
+                selectedRow: UserDefaults.standard.statisticsUseHbA1c ? 1 : 0,
+                actionTitle: nil, cancelTitle: nil,
+                actionHandler: { UserDefaults.standard.statisticsUseHbA1c = $0 == 1 },
+                cancelHandler: nil, didSelectRowHandler: nil
+            )
+
         case .useIFCCA1C:
             return SettingsSelectedRowAction.callFunction(function: {
                 if UserDefaults.standard.useIFCCA1C {
@@ -186,7 +221,7 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
         if UserDefaults.standard.showStatistics {
             return Setting.allCases.count
         } else {
-            return Setting.allCases.count - 2
+            return Setting.allCases.count - 1
         }
     }
 
@@ -196,13 +231,16 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
         switch setting {
                 
             case .showStatistics:
-                return Texts_SettingsView.labelShowStatistics
+                return Texts_Common.enable
                     
             case .timeInRangeType:
                 return Texts_SettingsView.labelTimeInRangeType
                     
             case .useIFCCA1C:
-                return Texts_SettingsView.labelUseIFCCGMI
+                return UserDefaults.standard.statisticsUseHbA1c ? Texts_SettingsView.labelUseIFCCA1C : Texts_SettingsView.labelUseIFCCGMI
+
+            case .statisticsUseHbA1c:
+                return Texts_SettingsView.labelStatisticsEstimate
                 
         }
     }
@@ -215,7 +253,7 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .showStatistics, .useIFCCA1C:
             return SettingsAccessory.none
             
-        case .timeInRangeType:
+        case .timeInRangeType, .statisticsUseHbA1c:
             return SettingsAccessory.disclosure
             
         }
@@ -231,6 +269,9 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
             
         case .timeInRangeType:
             return UserDefaults.standard.timeInRangeType.description
+
+        case .statisticsUseHbA1c:
+            return UserDefaults.standard.statisticsUseHbA1c ? Texts_Common.statisticsEstimatedA1c : Texts_Common.statisticsGMI
             
         }
     }
@@ -240,6 +281,8 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
     
     private func addObservers() {
         
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.statisticsUseHbA1c.rawValue, options: .new, context: nil)
+
         // Listen for changes in the timeInRangeType to trigger the UI to be updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.timeInRangeType.rawValue, options: .new, context: nil)
         
@@ -255,7 +298,7 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
         else { return }
         
         switch keyPathEnum {
-        case UserDefaults.Key.timeInRangeType, UserDefaults.Key.showStatistics:
+        case UserDefaults.Key.timeInRangeType, UserDefaults.Key.showStatistics, UserDefaults.Key.statisticsUseHbA1c:
             
             // we have to run this in the main thread to avoid access errors
             DispatchQueue.main.async {

@@ -217,4 +217,3 @@
 "noSensorCodeSelectedTitle" = "Continuar sem código do sensor?";
 "noSensorCodeSelectedMessage" = "Se já existir uma sessão de sensor ativa no transmissor, a app usará essa sessão com os seus requisitos de calibração existentes.\n\nIniciar uma nova sessão sem código exige calibrações após o aquecimento e periodicamente depois disso. Desativar o lembrete de calibração da app não elimina estes requisitos.";
 "showHideGlucoseChartTitle" = "Gráfico";
-"showHideAdditionalItemsTitle" = "Alertas e voz";

@@ -94,6 +94,20 @@ struct XDripWidgetAttributes: ActivityAttributes {
             bgReadingDates.first
         }
 
+        // Compare content independently of the activity identity, which the manager tracks separately.
+        // This copy is never sent to ActivityKit; the published state keeps its real timestamps.
+        var publicationValue: Self {
+            var value = self
+            value.eventStartDate = .distantPast
+            value.therapyMetrics = therapyMetrics?.publicationValue
+            return value
+        }
+
+        var publicationRefreshDates: [Date] {
+            companionPublicationRefreshDates(readingDate: bgReadingDate, aidStatus: aidStatus, therapyMetrics: therapyMetrics)
+                + [sensorWarmupEndDate, sensorWarmupConfirmationUntil].compactMap { $0 }
+        }
+
         init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, carPlayLiveActivityType: CarPlayLiveActivityType? = nil, dataSourceDescription: String? = "", followerPatientName: String? = nil, sensorNoiseStateRawValue: Int? = nil, aidStatus: AIDStatus?, therapyMetrics: TherapyMetricsSnapshot? = nil) {
             let readings = Array(zip(bgReadingValues, bgReadingDates))
             self.bgReadingFloats = readings.map { Float16($0.0) }

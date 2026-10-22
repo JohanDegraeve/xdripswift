@@ -170,6 +170,8 @@
 "batteryHistoryRange" = "Aikaväli";
 "batteryHistoryRangeAccessibility" = "Akkuhistorian aikaväli";
 "batteryHistoryRangeExplanation" = "Kiinteät aikavälit ulottuvat nykyhetkestä valitun päivämäärän verran taaksepäin. Aukot osoittavat ajanjaksot, joilta lukema puuttuu.";
+"batteryHistoryInactive" = "Lähetin ei ole aktiivinen";
+"batteryHistoryHistoricalRangeExplanation" = "Aikavälit päättyvät viimeiseen tallennettuun lukemaan. Aukot osoittavat ajanjaksot, joilta lukema puuttuu.";
 
 "connectionDiagramOtherApp" = "Muu sovellus";
 
@@ -194,3 +196,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Vanhenee";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Bluetoothin käyttöä ei ole otettu käyttöön";
+"bluetoothAccessInstructions" = "Muodosta yhteys avaamalla Asetukset → Tietosuoja ja suojaus → Bluetooth ja salli Bluetoothin käyttö sovellukselle %@.";
+"bluetoothAccessRestrictedInstructions" = "Laitteen rajoitukset estävät Bluetoothin käytön. Tarkista Ruutuaika tai ota yhteyttä laitteen ylläpitäjään Bluetoothin käytön sallimiseksi.";

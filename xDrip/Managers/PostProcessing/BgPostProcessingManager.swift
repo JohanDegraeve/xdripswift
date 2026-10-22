@@ -10,6 +10,37 @@ import Foundation
 import os
 import CoreData
 
+struct BgReadingDownstreamPolicy {
+    static func shouldProcess(previousVisibleReadingTimeStamp: Date?, currentVisibleReadingTimeStamp: Date?) -> Bool {
+        guard let currentVisibleReadingTimeStamp = currentVisibleReadingTimeStamp else { return false }
+        guard let previousVisibleReadingTimeStamp = previousVisibleReadingTimeStamp else { return true }
+
+        return currentVisibleReadingTimeStamp > previousVisibleReadingTimeStamp
+    }
+}
+
+enum BgPostProcessingDownstreamGate {
+    case unrestricted
+    case newerVisibleReading(previousTimeStamp: Date?)
+
+    func shouldProcess(currentVisibleReadingTimeStamp: Date?) -> Bool {
+        switch self {
+        case .unrestricted:
+            return true
+        case .newerVisibleReading(let previousTimeStamp):
+            return BgReadingDownstreamPolicy.shouldProcess(
+                previousVisibleReadingTimeStamp: previousTimeStamp,
+                currentVisibleReadingTimeStamp: currentVisibleReadingTimeStamp
+            )
+        }
+    }
+}
+
+struct BgPostProcessingResult {
+    let shouldProcessDownstream: Bool
+    let rewroteDownstreamHistory: Bool
+}
+
 /// manages glucose post processing, including adjustment, smoothing and downstream updates
 class BgPostProcessingManager {
 
@@ -72,10 +103,15 @@ class BgPostProcessingManager {
     ///
     /// Automatic live processing should run immediately. If post processing is
     /// active, the recent visible downstream history is rewritten straight away
-    /// using the bounded automatic processing window.
+    /// using the bounded automatic processing window. The result indicates whether
+    /// the visible reading advanced and whether recent downstream history was rewritten.
     @discardableResult
-    func processLatestReadings() -> Bool {
-        return processBgReadings(processingStartDateOverride: nil, allowHistoricalDownstreamRewrite: true)
+    func processLatestReadings(previousVisibleReadingTimeStamp: Date?) -> BgPostProcessingResult {
+        return processBgReadings(
+            processingStartDateOverride: nil,
+            allowHistoricalDownstreamRewrite: true,
+            downstreamGate: .newerVisibleReading(previousTimeStamp: previousVisibleReadingTimeStamp)
+        )
     }
 
     /// compare the resolved source context against the stored one and reset the
@@ -114,7 +150,7 @@ class BgPostProcessingManager {
     /// when post processing is active. Manual historical apply explicitly opts
     /// into a full selected-window rewrite.
     @discardableResult
-    func processBgReadings(processingStartDateOverride: Date?, fiveMinuteReadingsStartTimeStampOverride: Date? = nil, forceFullDownstreamRewrite: Bool = false, allowHistoricalDownstreamRewrite: Bool = false) -> Bool {
+    func processBgReadings(processingStartDateOverride: Date?, fiveMinuteReadingsStartTimeStampOverride: Date? = nil, forceFullDownstreamRewrite: Bool = false, allowHistoricalDownstreamRewrite: Bool = false, downstreamGate: BgPostProcessingDownstreamGate = .unrestricted) -> BgPostProcessingResult {
         refreshSourceContext()
 
         let hasActivePostProcessing = hasActiveDownstreamPostProcessing()
@@ -126,7 +162,7 @@ class BgPostProcessingManager {
         let sourceContextIdentifier = currentSourceContextIdentifier()
         if shouldRecomputePostProcessing && sourceContextIdentifier == nil {
             trace("in processLatestReadings, sourceContextIdentifier is nil", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info)
-            return false
+            return BgPostProcessingResult(shouldProcessDownstream: false, rewroteDownstreamHistory: false)
         }
 
         let currentSensor = UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
@@ -147,7 +183,9 @@ class BgPostProcessingManager {
             ).reversed()
         )
 
-        guard bgReadings.count > 0 else { return false }
+        guard bgReadings.count > 0 else {
+            return BgPostProcessingResult(shouldProcessDownstream: false, rewroteDownstreamHistory: false)
+        }
 
         var statesBeforeProcessing = [NSManagedObjectID: BgReadingStateBeforeProcessing]()
         for bgReading in bgReadings {
@@ -176,6 +214,7 @@ class BgPostProcessingManager {
         recomputeSlopes(bgReadings: bgReadings)
 
         let latestVisibleBgReading = bgReadings.last(where: { !$0.isSuppressedByFiveMinuteCadence })
+        let shouldProcessDownstream = downstreamGate.shouldProcess(currentVisibleReadingTimeStamp: latestVisibleBgReading?.timeStamp)
         let automaticRewriteStartDate = latestVisibleBgReading?.timeStamp.addingTimeInterval(-ConstantsBgSmoothing.automaticDownstreamRewriteLookbackInterval)
 
         // Automatic processing uses the wider fetched segment as calculation context only.
@@ -200,6 +239,15 @@ class BgPostProcessingManager {
 
         coreDataManager.saveChanges()
 
+        // Once suppression has been saved, a suppressed-only live event stops here. Manual
+        // historical processing remains unrestricted so an explicit apply can repair downstream data.
+        guard allowHistoricalDownstreamRewrite && shouldProcessDownstream else {
+            return BgPostProcessingResult(
+                shouldProcessDownstream: shouldProcessDownstream,
+                rewroteDownstreamHistory: false
+            )
+        }
+
         let downstreamChangesByObjectID = Dictionary(uniqueKeysWithValues: bgReadings.map { bgReading in
             let stateBeforeProcessing = statesBeforeProcessing[bgReading.objectID]
 
@@ -216,7 +264,6 @@ class BgPostProcessingManager {
         // Automatic live processing rewrites only the changed visible readings
         // inside the bounded recent processing window.
         let shouldRewriteFullDownstreamWindow = allowHistoricalDownstreamRewrite && (processingStartDateOverride != nil || forceFullDownstreamRewrite)
-        guard allowHistoricalDownstreamRewrite else { return false }
 
         let bgReadingsToReplaceDownstream: [BgReading]
         if shouldRewriteFullDownstreamWindow {
@@ -260,10 +307,60 @@ class BgPostProcessingManager {
             )
             healthKitManager?.deleteBgReadingsFromHealthKit(bgReadingIDs: downstreamReadingsToDelete.map { $0.id })
             healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: downstreamReadingsToReplace)
-            return true
+            return BgPostProcessingResult(shouldProcessDownstream: shouldProcessDownstream, rewroteDownstreamHistory: true)
         }
 
-        return false
+        return BgPostProcessingResult(shouldProcessDownstream: shouldProcessDownstream, rewroteDownstreamHistory: false)
+    }
+
+    /// Correct metadata for the existing session without treating it as a new glucose source.
+    /// Real sensor replacements still use handleSourceContextChanged().
+    @discardableResult
+    func correctSensorStartDate(_ sensor: Sensor, to startDate: Date) -> Bool {
+        guard UserDefaults.standard.isMaster,
+              sensorsAccessor.fetchActiveSensor()?.objectID == sensor.objectID else { return false }
+
+        let oldDate = sensor.startDate
+        let oldIdentifier = Self.masterSourceContextIdentifier(sensorID: sensor.id, startDate: oldDate)
+        let newIdentifier = Self.masterSourceContextIdentifier(sensorID: sensor.id, startDate: startDate)
+        let context = coreDataManager.mainManagedObjectContext
+        let request: NSFetchRequest<BgAdjustment> = BgAdjustment.fetchRequest()
+        request.predicate = NSPredicate(format: "sourceContextIdentifier == %@", oldIdentifier)
+        var adjustments = [BgAdjustment]()
+        var saved = false
+
+        context.performAndWait {
+            do {
+                // Fetch must succeed before changing the date: an empty result on fetch failure
+                // would orphan the saved adjustment. Move the whole history, including disabled rows.
+                adjustments = try context.fetch(request)
+                sensor.startDate = startDate
+                adjustments.forEach { $0.sourceContextIdentifier = newIdentifier }
+                saved = coreDataManager.saveChangesSynchronously()
+                if !saved {
+                    // Restore only this operation's edits; never roll back unrelated pending work.
+                    sensor.startDate = oldDate
+                    adjustments.forEach { $0.sourceContextIdentifier = oldIdentifier }
+                }
+            } catch {
+                trace("in correctSensorStartDate, adjustment fetch failed: %{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)
+            }
+        }
+        guard saved else { return false }
+
+        // A timestamp correction must preserve both the settings and their lookup key. Updating
+        // only the date would make refreshSourceContext reset them on the next reading. A different
+        // cached source must still go through that reset; never adopt another source's settings.
+        if UserDefaults.standard.postProcessingSourceContextIdentifier == oldIdentifier {
+            UserDefaults.standard.postProcessingSourceContextIdentifier = newIdentifier
+        }
+        UserDefaults.standard.activeSensorStartDate = startDate
+        trace("in correctSensorStartDate, preserved BG post processing for existing sensor; start date %{public}@ -> %{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, oldDate.description, startDate.description)
+        return true
+    }
+
+    private static func masterSourceContextIdentifier(sensorID: String, startDate: Date) -> String {
+        return "master|\(sensorID)|\(startDate.toMillisecondsAsDouble())"
     }
 
     /// reset source-specific post processing whenever the active master sensor
@@ -1186,7 +1283,7 @@ class BgPostProcessingManager {
     private func currentSourceContextIdentifier() -> String? {
         if UserDefaults.standard.isMaster {
             guard let activeSensor = sensorsAccessor.fetchActiveSensor() else { return nil }
-            return "master|\(activeSensor.id)|\(activeSensor.startDate.toMillisecondsAsDouble())"
+            return Self.masterSourceContextIdentifier(sensorID: activeSensor.id, startDate: activeSensor.startDate)
         }
 
         switch UserDefaults.standard.followerDataSourceType {
@@ -1228,7 +1325,7 @@ class BgPostProcessingManager {
             return currentMasterLibreUsesNativeAlgorithm() ? nil : .masterLibreUsesCalibration
         case .dexcom:
             return currentMasterSourceIsDexcomG6() ? .masterDexcomG6UsesCalibration : nil
-        case .dexcomG7, .medtrumTouchCareNano:
+        case .dexcomG7, .Libre3, .medtrumTouchCareNano:
             return nil
         }
     }
@@ -1261,6 +1358,8 @@ class BgPostProcessingManager {
             return connectedCGMPeripherals.first { $0.bubble != nil }
         case .miaomiao:
             return connectedCGMPeripherals.first { $0.miaoMiao != nil }
+        case .Libre3:
+            return connectedCGMPeripherals.first { $0.libre3 != nil }
         case .Libre2:
             return connectedCGMPeripherals.first { $0.libre2 != nil }
         case .dexcomG7:

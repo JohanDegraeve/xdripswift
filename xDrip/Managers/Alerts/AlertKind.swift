@@ -38,7 +38,10 @@ struct DexcomBatteryAlertPolicy {
     /// A missing start date is treated as still inside the settling period. In particular, a G6
     /// battery response can arrive before its transmitter-time response during the first message
     /// flow. Allowing the alarm at that point would recreate the false warning this policy prevents.
-    static func shouldSuppress(hardwareStartDate: Date?, now: Date = Date()) -> Bool {
+    static func shouldSuppress(alertKind: AlertKind, hardwareStartDate: Date?, now: Date = Date()) -> Bool {
+        // Only suppress Dexcom battery alerts. Cached battery data can remain after switching to
+        // follower mode, and a missing hardware start date must not suppress unrelated alarms.
+        guard alertKind == .dexcomG5BatteryLow || alertKind == .dexcomG7BatteryLow else { return false }
         guard let hardwareStartDate else { return true }
         let suppressionInterval = TimeInterval(
             ConstantsAlerts.dexcomBatteryAlertSuppressionPeriodInHours * 60 * 60
@@ -72,6 +75,12 @@ public enum AlertKind: Int, CaseIterable {
     case dexcomG5BatteryLow = 12
     /// G7, ONE+ and Stelo use the disposable-sensor Voltage B alarm.
     case dexcomG7BatteryLow = 13
+    case sensorEndingSoon = 14
+    case sensorExpectedExpiry = 15
+
+    var isSensorExpiryReminder: Bool {
+        self == .sensorEndingSoon || self == .sensorExpectedExpiry
+    }
 
     /// Returns the single battery configuration that belongs to a configured CGM type.
     ///
@@ -86,7 +95,7 @@ public enum AlertKind: Int, CaseIterable {
             return .dexcomG7BatteryLow
         case .miaomiao, .Bubble, .Libre2:
             return .batterylow
-        case .medtrumTouchCareNano, nil:
+        case .Libre3, .medtrumTouchCareNano, nil:
             // Medtrum does not currently provide a battery value through TransmitterBatteryInfo.
             // With no configured CGM there is likewise no meaningful battery alarm to edit.
             return nil
@@ -135,6 +144,10 @@ public enum AlertKind: Int, CaseIterable {
             kinds.append(batteryAlertKind)
         }
 
+        if SensorExpirySnapshot.supportsCurrentSource {
+            let index = kinds.firstIndex(of: .sensorTransmitterFailure) ?? kinds.endIndex
+            kinds.insert(contentsOf: [.sensorEndingSoon, .sensorExpectedExpiry], at: index)
+        }
         kinds.append(.phonebatterylow)
         return kinds
     }
@@ -153,18 +166,17 @@ public enum AlertKind: Int, CaseIterable {
     ///
     /// probably only useful in UI - named AlertKind and not AlertType because there's already an AlertType which has a different goal
     func needsAlertValue() -> Bool {
-        return self != .sensorTransmitterFailure
+        return self != .sensorTransmitterFailure && self != .sensorExpectedExpiry
     }
 
-    /// A terminal failure is event-driven and has one all-day configuration.
-    /// It cannot be divided into schedules because there is no value or time window to evaluate.
+    /// Failure and expiry alerts use a single entry with no daily schedule.
     func supportsAlertSchedules() -> Bool {
-        return self != .sensorTransmitterFailure
+        return self != .sensorTransmitterFailure && !isSensorExpiryReminder
     }
 
-    /// A terminal failure is reported once by the active BLE peripheral and is never snoozable.
+    /// Failure and expiry alerts cannot be snoozed.
     func supportsSnooze() -> Bool {
-        return self != .sensorTransmitterFailure
+        return self != .sensorTransmitterFailure && !isSensorExpiryReminder
     }
     
     /// a trigger value used for some alert types that:
@@ -234,7 +246,9 @@ public enum AlertKind: Int, CaseIterable {
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelPhone
         case .notlooping:
             return ConstantsDefaultAlertLevels.notLooping
-        case .sensorTransmitterFailure:
+        case .sensorEndingSoon:
+            return 24
+        case .sensorTransmitterFailure, .sensorExpectedExpiry:
             return 0
         }
     }
@@ -242,7 +256,7 @@ public enum AlertKind: Int, CaseIterable {
     /// default enabled state for newly introduced alert kinds.
     func defaultIsDisabled() -> Bool {
         switch self {
-        case .notlooping:
+        case .notlooping, .sensorEndingSoon, .sensorExpectedExpiry:
             return true
         default:
             return false
@@ -292,6 +306,10 @@ public enum AlertKind: Int, CaseIterable {
             return "notlooping"
         case .sensorTransmitterFailure:
             return "sensorTransmitterFailure"
+        case .sensorEndingSoon:
+            return "sensorEndingSoon"
+        case .sensorExpectedExpiry:
+            return "sensorExpectedExpiry"
         }
     }
     
@@ -530,7 +548,8 @@ public enum AlertKind: Int, CaseIterable {
 
             return (true, "", Texts_Alerts.notLoopingAlertTitle, nil)
 
-        case .sensorTransmitterFailure:
+        case .sensorTransmitterFailure, .sensorEndingSoon, .sensorExpectedExpiry:
+            // Expiry reminders are scheduled independently of glucose checks.
             // Terminal failures are pushed by the active CGM peripheral. They are not found by the
             // normal value and schedule checks. AlertManager reads this kind's enabled state and
             // assigned Alert Type only when SensorHealthIssueManager passes the event across.
@@ -590,6 +609,10 @@ public enum AlertKind: Int, CaseIterable {
             return ConstantsNotifications.NotificationIdentifiersForAlerts.notLoopingAlert
         case .sensorTransmitterFailure:
             return ConstantsNotifications.NotificationIdentifiersForAlerts.sensorTransmitterFailure
+        case .sensorEndingSoon:
+            return "sensorExpiry.endingSoon"
+        case .sensorExpectedExpiry:
+            return "sensorExpiry.expectedExpiry"
         }
     }
     
@@ -622,6 +645,10 @@ public enum AlertKind: Int, CaseIterable {
             return Texts_Alerts.notLoopingAlertTitle
         case .sensorTransmitterFailure:
             return Texts_Alerts.sensorTransmitterFailureAlertTitle
+        case .sensorEndingSoon:
+            return Texts_Alerts.sensorEndingSoon
+        case .sensorExpectedExpiry:
+            return Texts_Alerts.sensorExpectedExpiry
         }
     }
 
@@ -676,7 +703,7 @@ public enum AlertKind: Int, CaseIterable {
             return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol
         case .missedreading, .notlooping:
             return Texts_Common.minutes
-        case .calibration:
+        case .calibration, .sensorEndingSoon:
             return Texts_Common.hours
         case .batterylow:
             if let transmitterType = transmitterType {
@@ -689,7 +716,7 @@ public enum AlertKind: Int, CaseIterable {
             return "mV"
         case .phonebatterylow:
             return "%"
-        case .sensorTransmitterFailure:
+        case .sensorTransmitterFailure, .sensorExpectedExpiry:
             return ""
         }
     }
@@ -722,6 +749,9 @@ public enum AlertKind: Int, CaseIterable {
         guard value.isFinite else { return nil }
 
         switch self {
+        case .sensorEndingSoon:
+            guard value.rounded() == value, (1...48).contains(value) else { return nil }
+            return Int(value)
         case .dexcomG5BatteryLow, .dexcomG7BatteryLow:
             guard value.rounded() == value else { return nil }
             let integerValue = Int(value)
@@ -765,7 +795,7 @@ private func createAlertTitleForBgReadingAlerts(alertKind: AlertKind) -> String 
     case .fastrise:
         return Texts_Alerts.fastRiseTitle
     case .missedreading, .calibration, .batterylow, .dexcomG5BatteryLow, .dexcomG7BatteryLow,
-         .phonebatterylow, .notlooping, .sensorTransmitterFailure:
+         .phonebatterylow, .notlooping, .sensorTransmitterFailure, .sensorEndingSoon, .sensorExpectedExpiry:
         return ""
     }
 }

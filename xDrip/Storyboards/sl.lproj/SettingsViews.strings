@@ -96,7 +96,6 @@
 "sectionTitleTrace" = "Issue Reporting";
 
 /// nightscout settings, where user can enable or disable nightscout
-"settingsviews_nightscoutEnabled" = "Enable Nightscout";
 
 /// user tries to send trace file but there's no native email account configured
 "emailNotConfigured" = "You must configure an e-mail account on your iOS device.";
@@ -209,7 +208,6 @@
 "settingsviews_labelShowReadingInAppBadge" = "Značka aplikacije";
 
 /// healthkit settings, literally 'healthkit'
-"settingsviews_healthkit" = "Piši v Apple Health";
 
 /// general settings, literally master
 "settingsviews_master" = "Master";
@@ -266,7 +264,6 @@
 "volumeTestSoundPlayerExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = On\n\n(Used for all alarms except Missed Reading alerts which always use the iOS volume.)\n\nChange the volume with the volume buttons and press OK when done.";
 
 /// dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no
-"settingsviews_uploadReadingstoDexcomShare" = "Naloži";
 
 /// Apple Watch Settings - text in row where user needs to say if trend should be displayed or not
 "settingsviews_displayTrendInCalendarEvent" = "Trend";
@@ -799,3 +796,33 @@
 "homeScreen.basalTop" = "Zgoraj";
 "homeScreen.basalBottom" = "Spodaj";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Graf glukoze";
+
+"therapy.none" = "Brez";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Pragovi terapij";
+"therapy.smallBolusThreshold" = "Mali bolus";
+"therapy.smallCarbThreshold" = "Malo OH";
+"therapy.treatmentThresholdsExplanation" = "Vrednosti bolusov in OH pod pragovi so na grafu skrite. Prag bolusa določa tudi male boluse na seznamu terapij. «Brez» prikaže vse vrednosti.";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Ocena glukoze";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Merilo terapij";
+"therapy.scaleStandard" = "Običajno";
+"therapy.scaleSmallDoses" = "Mali odm.";
+"therapy.treatmentScaleExplanation" = "Mali odmerki naredijo male oznake bolj vidne. Bolusi: 0.1–2.0U; OH: 1–50g. Večje količine uporabljajo največjo oznako.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimalno";
+"settingsviews_liveActivityTypeNormal" = "Običajno";
+"settingsviews_liveActivityTypeLarge" = "Veliko";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Nalaganje v Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Izgovori uvod";
+"speak.preview" = "Preizkusi izgovor glukoze";

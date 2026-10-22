@@ -22,3 +22,11 @@
 "confirmdeletionalert" = "Ta bort larm?";
 "alerts_fastdrop" = "Snabbt sjunkande";
 "alerts_fastrise" = "Snabbt stigande";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "Sensorn går snart ut";
+"sensorExpiry.expectedExpiry" = "Förväntat sensorslut";
+"sensorExpiry.hoursBefore" = "Timmar före utgång";
+"sensorExpiry.hoursHelp" = "Ange ett helt antal timmar från 1 till 48.";
+"sensorExpiry.endingSoonBody" = "Din sensor förväntas nå slutet av sin livslängd den %@.";
+"sensorExpiry.expectedExpiryBody" = "Din sensor har nått sin förväntade sluttid (%@).";

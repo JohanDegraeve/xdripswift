@@ -22,14 +22,14 @@ struct TreatmentSettingsView: View {
 }
 
 struct TreatmentSettingsViewModel: SettingsNativeSectionProvider {
-    enum Group { case insulin, carbs }
+    enum Group { case insulin, carbs, display, scale }
     let group: Group
     var policyProvider: () -> DataFlowPolicy = { UserDefaults.standard.dataFlowPolicy }
 
     static var screen: SettingsScreen {
         SettingsScreen(title: TherapyTexts.text("treatmentSettings"),
                        introduction: { TreatmentSettingsViewModel(group: .insulin).introduction }, onlineHelpTopic: .treatments,
-                       providers: { [.insulin, .carbs].map { TreatmentSettingsViewModel(group: $0) } })
+                       providers: { [.insulin, .carbs, .display, .scale].map { TreatmentSettingsViewModel(group: $0) } })
     }
 
     private var policy: DataFlowPolicy { policyProvider() }
@@ -44,6 +44,50 @@ struct TreatmentSettingsViewModel: SettingsNativeSectionProvider {
     }
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
+        // Display preferences are always available, independently of the treatment or IOB source.
+        if group == .display {
+            return [SettingsRow(id: "treatments.smallBolusThreshold",
+                title: TherapyTexts.text("smallBolusThreshold"), accessory: .none,
+                control: .menu(options: {
+                    let selected = UserDefaults.standard.smallBolusTreatmentThreshold
+                    // None uses zero so the same strict comparison works in the chart and treatment list.
+                    return zip([0.0, 0.5, 1.0], [TherapyTexts.text("none"), "<0.5U", "<1.0U"]).map {
+                        SettingsMenuOption(title: $0.1, isSelected: $0.0 == selected)
+                    }
+                }, selectOption: { index in
+                    let thresholds = [0.0, 0.5, 1.0]
+                    guard thresholds.indices.contains(index) else { return }
+                    UserDefaults.standard.smallBolusTreatmentThreshold = thresholds[index]
+                })),
+                // Carb label visibility is independent of the treatment list filters.
+                SettingsRow(id: "treatments.smallCarbThreshold",
+                title: TherapyTexts.text("smallCarbThreshold"), accessory: .none,
+                control: .menu(options: {
+                    let selected = UserDefaults.standard.smallCarbTreatmentThreshold
+                    // A zero threshold keeps labels visible for every nonnegative carb amount.
+                    return zip([0.0, 5.0, 10.0], [TherapyTexts.text("none"), "<5g", "<10g"]).map {
+                        SettingsMenuOption(title: $0.1, isSelected: $0.0 == selected)
+                    }
+                }, selectOption: { index in
+                    let thresholds = [0.0, 5.0, 10.0]
+                    guard thresholds.indices.contains(index) else { return }
+                    UserDefaults.standard.smallCarbTreatmentThreshold = thresholds[index]
+                }))]
+        }
+        // Keep marker scaling in its own untitled section, separate from the label thresholds.
+        if group == .scale {
+            return [SettingsRow(id: "treatments.scale", title: TherapyTexts.text("treatmentScale"),
+                accessory: .none, control: .menu(options: {
+                    let usesSmallDoses = UserDefaults.standard.useSmallDoseTreatmentScale
+                    return [
+                        SettingsMenuOption(title: TherapyTexts.text("scaleStandard"), isSelected: !usesSmallDoses),
+                        SettingsMenuOption(title: TherapyTexts.text("scaleSmallDoses"), isSelected: usesSmallDoses)
+                    ]
+                }, selectOption: { index in
+                    guard (0...1).contains(index) else { return }
+                    UserDefaults.standard.useSmallDoseTreatmentScale = index == 1
+                }))]
+        }
         let isInsulin = group == .insulin
         if (isInsulin ? policy.externalIOBSource : policy.externalCOBSource) != nil {
             return [SettingsRow(id: isInsulin ? "treatments.insulinType" : "treatments.carbDuration",
@@ -88,10 +132,16 @@ struct TreatmentSettingsViewModel: SettingsNativeSectionProvider {
         DateComponentsFormatter.localizedString(from: DateComponents(hour: Int(minutes / 60)), unitsStyle: .full) ?? ""
     }
 
-    func sectionTitle() -> String? { nil }
+    func sectionTitle() -> String? {
+        group == .display ? TherapyTexts.text("treatmentThresholds") : nil
+    }
     func sectionFooter() -> String? {
         let settings = TherapyModelSettings(defaults: .standard)
         switch group {
+        case .display:
+            return TherapyTexts.text("treatmentThresholdsExplanation")
+        case .scale:
+            return TherapyTexts.text("treatmentScaleExplanation")
         case .insulin:
             guard policy.externalIOBSource == nil else { return nil }
             return String(format: TherapyTexts.text("insulinModel"),

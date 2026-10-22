@@ -8,3 +8,101 @@
 "requestingData" = "Daten anfordern...";
 "lastReading" = "Letzter Sensor-Wert";
 "noSensorData" = "Keine Sensordaten";
+
+// Direct to Watch status and pairing guidance
+"directWatchTitle" = "Direkt zur Watch";
+"directWatchNoConnection" = "Keine Verbindung hinzugefügt";
+"directWatchSuspended" = "Erfassung ausgesetzt";
+"directWatchWaiting" = "Warte auf Watch-Messwert";
+"directWatchCollecting" = "Erfassung läuft";
+"directWatchOverdue" = "Messwert überfällig";
+"directWatchDiagnosis" = "Diagnose";
+"directWatchAdded" = "Watch-Verbindung hinzugefügt";
+
+// Direct to Watch collection control
+"directWatchPausedShort" = "Pausiert";
+"directWatchPaused" = "Watch-Erfassung pausiert";
+"directWatchPause" = "Erfassung pausieren";
+"directWatchResume" = "Erfassung fortsetzen";
+"directWatchPausedSinceFormat" = "Seit %@";
+"directWatchConnecting" = "Warten…";
+"directWatchCollectedReadings" = "Erfasste Messwerte";
+"directWatchReadingGapFormat" = "(%dm %ds)";
+"directWatchNoCollectedReadings" = "Noch keine Watch-Messwerte erfasst";
+
+"directWatchSessionStarted" = "Gestartet um %@";
+"directWatchSessionResumed" = "Fortgesetzt um %@";
+"directWatchSessionPaused" = "Pausiert um %@";
+"directWatchSessionEnded" = "Beendet um %@";
+
+"directWatchConnectionDetails" = "Verbindungsdetails";
+"directWatchBluetoothSlot" = "Bluetooth-Slot";
+"directWatchSendLogs" = "Protokolle senden";
+"directWatchResetConnection" = "Zurücksetzen";
+"directWatchCancel" = "Abbrechen";
+"directWatchResetConnectionExplanation" = "Löscht gespeicherte Verbindungsdetails und sucht erneut nach dem Sender. Möglicherweise musst du eine Bluetooth-Kopplungsanfrage bestätigen.";
+
+"directWatchCGMType" = "CGM-Typ";
+
+// Direct to Watch setup and diagnosis
+"directWatchAcceptPairing" = "Bluetooth-Kopplung auf der Watch bestätigen";
+"directWatchAddOnPhone" = "Füge auf dem iPhone im Senderbildschirm eine Watch-Verbindung hinzu.";
+"directWatchAuthenticating" = "Sender authentifizieren";
+"directWatchAway" = "Außer Reichweite";
+"directWatchBackgroundLimit" = "watchOS-Bluetooth-Hintergrundlimit erreicht. Zum Zurücksetzen diese App öffnen.";
+"directWatchBlePaused" = "BLE pausiert";
+"directWatchBluetoothErrorFormat" = "Sender-Bluetooth: %@";
+"directWatchBluetoothRejected" = "Bluetooth-Verbindung abgelehnt, %@ verwenden";
+"directWatchBluetoothUnavailableFormat" = "Watch-Bluetooth nicht verfügbar (%d)";
+"directWatchCgm" = "CGM";
+"directWatchCheckConnection" = "Öffne %@ auf der Watch, um die Verbindung zu prüfen.";
+"directWatchCheckSensor" = "Prüfe den aktiven Sensor unter %@ auf dem iPhone.";
+"directWatchChecking" = "Prüfen";
+"directWatchCheckingDiscovery" = "Sendersuche prüfen";
+"directWatchCollectionOff" = "Watch-Erfassung aus";
+"directWatchConnected" = "Verbunden";
+"directWatchConnectingSaved" = "Verbindung mit gespeichertem Sender";
+"directWatchConnectingTransmitter" = "Mit Sender verbinden";
+"directWatchExportFailedFormat" = "Watch-Protokoll nicht exportierbar: %@";
+"directWatchG6AuthRejected" = "G6-Authentifizierung abgelehnt";
+"directWatchG6StateFormat" = "G6-Status %d, Sensor auf iPhone prüfen";
+"directWatchG7AuthFailed" = "G7-Authentifizierung fehlgeschlagen. Protokoll prüfen.";
+"directWatchG7Family" = "G7-Familie";
+"directWatchG7KeyRejected" = "G7 lehnt Watch-Schlüssel ab, Slot-Belegung prüfen";
+"directWatchG7Requesting" = "G7 authentifiziert, Messwert anfordern";
+"directWatchLowGlucose" = "%@: niedrige Glukose";
+"directWatchNoRecentReading" = "%@: kein aktueller Messwert";
+"directWatchOneReadingFormat" = "%d Messwert";
+"directWatchReadingReceived" = "Watch-Messwert empfangen";
+"directWatchReadingsFormat" = "%d Messwerte";
+"directWatchReconnectingSaved" = "Erneut mit gespeichertem Sender verbinden";
+"directWatchRetryingSaved" = "Gespeicherten Sender erneut verbinden";
+"directWatchScanningRetained" = "Suche, gespeicherte Verbindung behalten";
+"directWatchScanningToPair" = "Sender zum erneuten Koppeln suchen";
+"directWatchStorageReadFailed" = "Watch-Daten nicht lesbar. Erfassung gestoppt.";
+"directWatchStorageSaveFailedFormat" = "Watch-Daten nicht speicherbar: %@";
+"directWatchSuspendedCheckPhone" = "Erfassung ausgesetzt, iPhone prüfen";
+"directWatchSuspendedReasonFormat" = "Erfassung ausgesetzt: %@";
+"directWatchToSync" = "Zu senden";
+"directWatchTransmitterTimeout" = "Sender-Zeitlimit, nächsten Zyklus abwarten";
+"directWatchWaitingCycle" = "Warten auf nächsten Sendezyklus";
+"directWatchWaitingDiscovery" = "Warten auf erneute Sendererkennung";
+"directWatchWaitingNextReading" = "Warten auf nächsten Messwert";
+"directWatchWaitingTransmitter" = "Warten auf Sender";
+
+/* Direct to Watch action feedback. */
+"directWatchLogsQueued" = "Protokolle vorgemerkt";
+"directWatchResetStarted" = "Zurücksetzen gestartet";
+"directWatchTryAgain" = "Erneut versuchen";
+
+/* Optional missed-reading notification, configured on this Watch. */
+"directWatchMissedReadings" = "Fehlende Werte";
+"directWatchMissedReadingsExplanation" = "Wenn aktiviert, meldet die Watch, wenn seit über 20 Minuten kein Wert empfangen wurde";
+
+/* Local Watch alerts use the daily alarm schedules supplied by the iPhone. */
+"directWatchAlerts" = "Alarme";
+"directWatchUrgentLow" = "Dringend niedrig";
+"directWatchLow" = "Niedrig";
+"directWatchAlertExplanation" = "Die Grenzwerte folgen den iPhone-Alarmzeiten. Watch-Alarme erfordern eine aktive Erfassung und über 60 Sekunden ohne iPhone-Kontakt.";
+"directWatchScheduleUnavailable" = "Alarme vom iPhone synchronisieren";
+"directWatchUrgentLowGlucose" = "%@: dringend niedrige Glukose";
