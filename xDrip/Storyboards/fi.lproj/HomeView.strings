@@ -47,7 +47,7 @@
 "stopSensorConfirmation" = "Oletko varma, että haluat pysäyttää sensorin?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "Syötä anturin koodi käsin, skannaa anturin etiketti tai valitse kuva.\n\nJos sinulla ei ole koodia tai haluat käyttää lähettimessä jo käynnissä olevaa anturijaksoa, valitse Käytä ilman koodia.";
+"enterSensorCode" = "Skannaa anturin etiketti tai valitse kuva anturin koodin lukemiseksi.";
 
 /// status info : literally 'Sensor End'
 "sensorend" = "Sensori loppuu";
@@ -193,7 +193,9 @@
 "sensorCodeContinue" = "Jatka";
 "useWithoutSensorCode" = "Käytä ilman koodia";
 "noSensorCode" = "Ei koodia (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Syötä nelinumeroinen pariliitoskoodi käsin, skannaa nykyinen asetin tai valitse kuva. Tarkista valittu koodi ja napauta Jatka.";
+"dexcomG7SelectSensorCodeMessage" = "Skannaa nykyinen asetin tai valitse kuva nelinumeroisen pariliitoskoodin lukemiseksi. Tarkista valittu koodi ja napauta Jatka.";
 "noSensorCodeSelectedTitle" = "Jatketaanko ilman anturin koodia?";
 "noSensorCodeSelectedMessage" = "Jos lähettimessä on jo käynnissä anturijakso, sovellus käyttää sitä sen nykyisten kalibrointivaatimusten mukaisesti.\n\nUuden jakson aloittaminen ilman koodia edellyttää kalibrointeja lämpenemisen jälkeen ja myöhemmin säännöllisesti. Sovelluksen kalibrointimuistutuksen poistaminen käytöstä ei poista näitä vaatimuksia.";
 "showHideGlucoseChartTitle" = "Kaavio";
+"manualSensorCodeEntryFooter" = "Jos et voi skannata etikettiä tai käyttää kuvaa, syötä nelinumeroinen koodi käsin.";
+"useWithoutSensorCodeFooter" = "Jos sinulla ei ole koodia tai haluat käyttää lähettimessä jo käynnissä olevaa anturijaksoa, valitse Käytä ilman koodia.";

@@ -46,7 +46,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "Voer de sensorcode handmatig in, scan het sensoretiket of kies een foto.\n\nAls je de code niet hebt of een sensorsessie wilt gebruiken die al op de zender actief is, kies dan Zonder code gebruiken.";
+"enterSensorCode" = "Scan het sensoretiket of kies een foto om de sensorcode te lezen.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -215,7 +215,9 @@
 "sensorCodeContinue" = "Doorgaan";
 "useWithoutSensorCode" = "Zonder code gebruiken";
 "noSensorCode" = "Geen code (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Voer de viercijferige koppelingscode handmatig in, scan de huidige applicator of kies een foto. Controleer de geselecteerde code en tik op Doorgaan.";
+"dexcomG7SelectSensorCodeMessage" = "Scan de huidige applicator of kies een foto om de viercijferige koppelingscode te lezen. Controleer de geselecteerde code en tik op Doorgaan.";
 "noSensorCodeSelectedTitle" = "Doorgaan zonder sensorcode?";
 "noSensorCodeSelectedMessage" = "Als er al een sensorsessie actief is op de zender, gebruikt de app die sessie met de bestaande kalibratievereisten.\n\nEen nieuwe sessie zonder code vereist kalibraties na het opwarmen en daarna periodiek. Het uitschakelen van de kalibratieherinnering van de app neemt deze vereisten niet weg.";
 "showHideGlucoseChartTitle" = "Grafiek";
+"manualSensorCodeEntryFooter" = "Als je het etiket niet kunt scannen of geen foto kunt gebruiken, voer je de viercijferige code handmatig in.";
+"useWithoutSensorCodeFooter" = "Als je de code niet hebt of een sensorsessie wilt gebruiken die al op de zender actief is, kies dan Zonder code gebruiken.";

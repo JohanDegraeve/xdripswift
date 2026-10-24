@@ -44,7 +44,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "Ange sensorkoden manuellt, skanna sensorns etikett eller välj ett foto.\n\nOm du inte har koden eller vill använda en sensorsession som redan är aktiv på sändaren väljer du Använd utan kod.";
+"enterSensorCode" = "Skanna sensorns etikett eller välj ett foto för att läsa sensorkoden.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -190,7 +190,9 @@
 "sensorCodeContinue" = "Fortsätt";
 "useWithoutSensorCode" = "Använd utan kod";
 "noSensorCode" = "Ingen kod (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Ange den fyrsiffriga parkopplingskoden manuellt, skanna den aktuella applikatorn eller välj ett foto. Kontrollera den valda koden och tryck på Fortsätt.";
+"dexcomG7SelectSensorCodeMessage" = "Skanna den aktuella applikatorn eller välj ett foto för att läsa den fyrsiffriga parkopplingskoden. Kontrollera den valda koden och tryck på Fortsätt.";
 "noSensorCodeSelectedTitle" = "Fortsätta utan sensorkod?";
 "noSensorCodeSelectedMessage" = "Om en sensorsession redan är aktiv på sändaren använder appen den sessionen med dess befintliga kalibreringskrav.\n\nEn ny session utan kod kräver kalibreringar efter uppvärmningen och därefter regelbundet. Kraven försvinner inte om appens kalibreringspåminnelse stängs av.";
 "showHideGlucoseChartTitle" = "Diagram";
+"manualSensorCodeEntryFooter" = "Om du inte kan skanna etiketten eller använda ett foto anger du den fyrsiffriga koden manuellt.";
+"useWithoutSensorCodeFooter" = "Om du inte har koden eller vill använda en sensorsession som redan är aktiv på sändaren väljer du Använd utan kod.";

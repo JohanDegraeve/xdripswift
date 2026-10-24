@@ -83,7 +83,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "手动输入传感器代码、扫描传感器标签或选择照片。\n\n如果您没有代码，或想使用发射器上已在运行的传感器会话，请选择“不使用代码”。";
+"enterSensorCode" = "扫描传感器标签或选择照片以读取传感器代码。";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -230,7 +230,9 @@
 "sensorCodeContinue" = "继续";
 "useWithoutSensorCode" = "不使用代码";
 "noSensorCode" = "无代码 (0000)";
-"dexcomG7SelectSensorCodeMessage" = "手动输入四位配对代码、扫描当前的传感器助针器或选择照片。确认所选代码后，轻点“继续”。";
+"dexcomG7SelectSensorCodeMessage" = "扫描当前的传感器助针器或选择照片以读取四位配对代码。确认所选代码后，轻点“继续”。";
 "noSensorCodeSelectedTitle" = "不使用传感器代码继续？";
 "noSensorCodeSelectedMessage" = "如果发射器上已有正在运行的传感器会话，应用将使用该会话并保留其现有校准要求。\n\n不使用代码启动新会话时，需要在预热后进行校准，并在之后定期校准。关闭应用的校准提醒并不会取消这些要求。";
 "showHideGlucoseChartTitle" = "图表";
+"manualSensorCodeEntryFooter" = "如果无法扫描标签或使用照片，请手动输入四位代码。";
+"useWithoutSensorCodeFooter" = "如果您没有代码，或想使用发射器上已在运行的传感器会话，请选择“不使用代码”。";

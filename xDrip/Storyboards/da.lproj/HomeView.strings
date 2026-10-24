@@ -36,7 +36,7 @@
 "success" = "Success";
 "failed" = "Failed";
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
-"enterSensorCode" = "Indtast sensorkoden manuelt, scan sensorens etiket, eller vælg et foto.\n\nHvis du ikke har koden eller vil bruge en sensorsession, der allerede kører på senderen, skal du vælge Brug uden kode.";
+"enterSensorCode" = "Scan sensorens etiket, eller vælg et foto for at læse sensorkoden.";
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,7 +177,9 @@
 "sensorCodeContinue" = "Fortsæt";
 "useWithoutSensorCode" = "Brug uden kode";
 "noSensorCode" = "Ingen kode (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Indtast den firecifrede parringskode manuelt, scan den aktuelle applikator, eller vælg et foto. Kontrollér den valgte kode, og tryk på Fortsæt.";
+"dexcomG7SelectSensorCodeMessage" = "Scan den aktuelle applikator, eller vælg et foto for at læse den firecifrede parringskode. Kontrollér den valgte kode, og tryk på Fortsæt.";
 "noSensorCodeSelectedTitle" = "Fortsæt uden sensorkode?";
 "noSensorCodeSelectedMessage" = "Hvis en sensorsession allerede kører på senderen, bruger appen den session med dens eksisterende kalibreringskrav.\n\nEn ny session uden kode kræver kalibreringer efter opvarmning og derefter med jævne mellemrum. Disse krav forsvinder ikke, når appens kalibreringspåmindelse slås fra.";
 "showHideGlucoseChartTitle" = "Graf";
+"manualSensorCodeEntryFooter" = "Hvis du ikke kan scanne etiketten eller bruge et foto, skal du indtaste den firecifrede kode manuelt.";
+"useWithoutSensorCodeFooter" = "Hvis du ikke har koden eller vil bruge en sensorsession, der allerede kører på senderen, skal du vælge Brug uden kode.";

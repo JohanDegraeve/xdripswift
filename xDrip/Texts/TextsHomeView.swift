@@ -773,13 +773,15 @@ enum Texts_HomeView {
     }()
     
     static let enterSensorCode: String = {
-        return NSLocalizedString("enterSensorCode", tableName: filename, bundle: Bundle.main, value: "Enter the sensor code manually, scan the sensor label, or choose a photo.\n\nIf you don't have the code, or want to use a sensor session already running on the transmitter, choose Use Without Code.", comment: "Instructions on the G6 sensor-code selection screen")
+        return NSLocalizedString("enterSensorCode", tableName: filename, bundle: Bundle.main, value: "Scan the sensor label or choose a photo to read the sensor code.", comment: "Instructions on the G6 sensor-code selection screen")
     }()
 
     static let sensorCodeContinue = NSLocalizedString("sensorCodeContinue", tableName: filename, bundle: .main, value: "Continue", comment: "Common advance action after reviewing a G6 or G7 sensor-code selection")
     static let useWithoutSensorCode = NSLocalizedString("useWithoutSensorCode", tableName: filename, bundle: .main, value: "Use Without Code", comment: "Select the G6 no-code option without advancing")
     static let noSensorCode = NSLocalizedString("noSensorCode", tableName: filename, bundle: .main, value: "No code (0000)", comment: "Selected G6 no-code option before confirmation")
-    static let dexcomG7SelectSensorCodeMessage = NSLocalizedString("dexcomG7SelectSensorCodeMessage", tableName: filename, bundle: .main, value: "Enter the four-digit pairing code manually, scan the current applicator, or choose a photo. Check the selected code, then tap Continue.", comment: "Instructions on the G7 pairing-code selection screen")
+    static let dexcomG7SelectSensorCodeMessage = NSLocalizedString("dexcomG7SelectSensorCodeMessage", tableName: filename, bundle: .main, value: "Scan the current applicator or choose a photo to read the four-digit pairing code. Check the selected code, then tap Continue.", comment: "Instructions on the G7 pairing-code selection screen")
+    static let manualSensorCodeEntryFooter = NSLocalizedString("manualSensorCodeEntryFooter", tableName: filename, bundle: .main, value: "If you can’t scan the label or use a photo, enter the four-digit code manually.", comment: "Footer explaining manual entry as a fallback for G6 and G7 codes")
+    static let useWithoutSensorCodeFooter = NSLocalizedString("useWithoutSensorCodeFooter", tableName: filename, bundle: .main, value: "If you don't have the code, or want to use a sensor session already running on the transmitter, choose Use Without Code.", comment: "Footer explaining the G6 no-code option")
 
     static let scanWithCamera = NSLocalizedString("scanWithCamera", tableName: filename, bundle: .main, value: "Scan with Camera", comment: "button to scan a Dexcom G6 sensor label")
     static let manuallyEnterSensorCode = NSLocalizedString("manuallyEnterSensorCode", tableName: filename, bundle: .main, value: "Manually Enter Code", comment: "label for the manual Dexcom sensor-code entry field")

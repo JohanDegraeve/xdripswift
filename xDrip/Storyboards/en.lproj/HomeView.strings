@@ -38,7 +38,7 @@
 "failed" = "Failed";
 "calibrationNotNecessary" = "When using the native transmitter algorithm, manual calibration is not available.\n\nIf you want to calibrate, you can switch to the xDrip algorithm in the transmitter screen (if available).";
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
-"enterSensorCode" = "Enter the sensor code manually, scan the sensor label, or choose a photo.\n\nIf you don't have the code, or want to use a sensor session already running on the transmitter, choose Use Without Code.";
+"enterSensorCode" = "Scan the sensor label or choose a photo to read the sensor code.";
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 "calibrationNotNecessary" = "When using the native transmitter algorithm, manual calibration is not available.\n\nIf you want to calibrate, you can switch to the xDrip algorithm in the transmitter screen (if available).";
 "noSensorData" = "No sensor data";
@@ -246,5 +246,7 @@
 "sensorCodeContinue" = "Continue";
 "useWithoutSensorCode" = "Use Without Code";
 "noSensorCode" = "No code (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Enter the four-digit pairing code manually, scan the current applicator, or choose a photo. Check the selected code, then tap Continue.";
+"dexcomG7SelectSensorCodeMessage" = "Scan the current applicator or choose a photo to read the four-digit pairing code. Check the selected code, then tap Continue.";
 "noSensorCodeSelectedTitle" = "Continue Without a Sensor Code?";
+"manualSensorCodeEntryFooter" = "If you can’t scan the label or use a photo, enter the four-digit code manually.";
+"useWithoutSensorCodeFooter" = "If you don't have the code, or want to use a sensor session already running on the transmitter, choose Use Without Code.";

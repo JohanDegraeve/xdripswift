@@ -126,7 +126,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "Wpisz kod sensora ręcznie, zeskanuj etykietę sensora lub wybierz zdjęcie.\n\nJeśli nie masz kodu lub chcesz użyć sesji sensora już działającej w nadajniku, wybierz Użyj bez kodu.";
+"enterSensorCode" = "Zeskanuj etykietę sensora lub wybierz zdjęcie, aby odczytać kod sensora.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -273,7 +273,9 @@
 "sensorCodeContinue" = "Kontynuuj";
 "useWithoutSensorCode" = "Użyj bez kodu";
 "noSensorCode" = "Brak kodu (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Wpisz ręcznie czterocyfrowy kod parowania, zeskanuj bieżący aplikator lub wybierz zdjęcie. Sprawdź wybrany kod, a następnie stuknij Kontynuuj.";
+"dexcomG7SelectSensorCodeMessage" = "Zeskanuj bieżący aplikator lub wybierz zdjęcie, aby odczytać czterocyfrowy kod parowania. Sprawdź wybrany kod, a następnie stuknij Kontynuuj.";
 "noSensorCodeSelectedTitle" = "Kontynuować bez kodu sensora?";
 "noSensorCodeSelectedMessage" = "Jeśli w nadajniku działa już sesja sensora, aplikacja użyje jej z dotychczasowymi wymaganiami dotyczącymi kalibracji.\n\nRozpoczęcie nowej sesji bez kodu wymaga kalibracji po rozgrzewaniu, a następnie okresowo. Wyłączenie przypomnienia o kalibracji w aplikacji nie znosi tych wymagań.";
 "showHideGlucoseChartTitle" = "Wykres";
+"manualSensorCodeEntryFooter" = "Jeśli nie możesz zeskanować etykiety ani użyć zdjęcia, wpisz czterocyfrowy kod ręcznie.";
+"useWithoutSensorCodeFooter" = "Jeśli nie masz kodu lub chcesz użyć sesji sensora już działającej w nadajniku, wybierz Użyj bez kodu.";

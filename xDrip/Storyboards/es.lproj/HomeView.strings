@@ -37,7 +37,7 @@
 "calibrationNotNecessary" = "Cuando estás usando el algoritmo nativo del transmisor, no se puede calibrar.\n\n Si quieres calibrar, debes cambiar al algoritmo xDrip en la pantalla del transmisor.";
 "dexcomBatteryTooLow" = "El nivel de batería del Transmisor es demasiado bajo!";
 "stopSensorConfirmation" = "Estás seguro que quieres para el sensor?";
-"enterSensorCode" = "Introduce el código del sensor manualmente, escanea la etiqueta del sensor o elige una foto.\n\nSi no tienes el código o quieres usar una sesión de sensor que ya está activa en el transmisor, selecciona Usar sin código.";
+"enterSensorCode" = "Escanea la etiqueta del sensor o elige una foto para leer el código del sensor.";
 "sensorend" = "Fin del sensor";
 "sensorDuration" = "Duración Sensor";
 "noSensorData" = "Sin datos";
@@ -187,7 +187,9 @@
 "sensorCodeContinue" = "Continuar";
 "useWithoutSensorCode" = "Usar sin código";
 "noSensorCode" = "Sin código (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Introduce manualmente el código de emparejamiento de cuatro dígitos, escanea el aplicador actual o elige una foto. Comprueba el código seleccionado y pulsa Continuar.";
+"dexcomG7SelectSensorCodeMessage" = "Escanea el aplicador actual o elige una foto para leer el código de emparejamiento de cuatro dígitos. Comprueba el código seleccionado y pulsa Continuar.";
 "noSensorCodeSelectedTitle" = "¿Continuar sin código de sensor?";
 "noSensorCodeSelectedMessage" = "Si ya hay una sesión de sensor activa en el transmisor, la app la usará con sus requisitos de calibración existentes.\n\nIniciar una nueva sesión sin código requiere calibraciones después del calentamiento y periódicamente a partir de entonces. Desactivar el recordatorio de calibración de la app no elimina estos requisitos.";
 "showHideGlucoseChartTitle" = "Gráfico";
+"manualSensorCodeEntryFooter" = "Si no puedes escanear la etiqueta ni usar una foto, introduce el código de cuatro dígitos manualmente.";
+"useWithoutSensorCodeFooter" = "Si no tienes el código o quieres usar una sesión de sensor que ya está activa en el transmisor, selecciona Usar sin código.";
