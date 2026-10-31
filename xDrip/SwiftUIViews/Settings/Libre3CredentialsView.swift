@@ -82,6 +82,7 @@ struct Libre3CredentialsView: View {
         .disabled(busy)
         .navigationTitle(TextsLibre3.localized("Libre 3 Credentials"))
         .navigationBarTitleDisplayMode(.inline)
+        .onlineHelp(.libre3Credentials)
         .task { await reload() }
         .alert(TextsLibre3.localized("Libre 3 Credentials"), isPresented: $showsDownloadResult) {
             Button(Texts_Common.Ok, role: .cancel) {}

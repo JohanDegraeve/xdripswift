@@ -606,7 +606,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleHomeScreen,
-                            onlineHelpTopic: .glucoseDisplay,
+                            onlineHelpTopic: .homeScreen,
                             providers: {
                                 [
                                     SettingsViewHomeScreenSettingsViewModel(rowGroup: .layout),
@@ -624,7 +624,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.glucoseRangesSectionTitle,
-                            onlineHelpTopic: .glucoseDisplay,
+                            onlineHelpTopic: .glucoseRanges,
                             providers: { [SettingsViewHomeScreenSettingsViewModel(rowGroup: .glucoseRanges)] }
                         )
                     }
@@ -640,7 +640,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleStatistics,
-                            onlineHelpTopic: .glucoseDisplay,
+                            onlineHelpTopic: .statisticsSettings,
                             providers: { [SettingsViewStatisticsSettingsViewModel()] }
                         )
                     }

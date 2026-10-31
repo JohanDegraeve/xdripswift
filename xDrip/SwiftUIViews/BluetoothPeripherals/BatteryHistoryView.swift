@@ -219,6 +219,7 @@ struct BatteryHistoryView: View {
         }
         .navigationTitle(Texts_BluetoothPeripheralView.batteryHistory)
         .navigationBarTitleDisplayMode(.inline)
+        .onlineHelp(.batteryHistory)
         .scrollContentBackground(.hidden)
         .background(ConstantsUI.listBackGroundColor)
         .colorScheme(.dark)

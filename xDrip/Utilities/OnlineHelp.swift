@@ -63,7 +63,10 @@ import SwiftUI
 enum OnlineHelpTopic: CaseIterable, Hashable {
     // Settings and general app features
     case settings
-    case glucoseDisplay
+    case homeScreen
+    case glucoseRanges
+    case treatmentSettings
+    case statisticsSettings
     case alertsAndNotifications
     case dataManagement
     case issueReporting
@@ -88,12 +91,19 @@ enum OnlineHelpTopic: CaseIterable, Hashable {
     case treatments
     case statistics
     case devices
+    case directToWatch
+    case batteryHistory
+    case signalStrength
+    case sensorNoise
+    case readSuccess
+    case libre3Credentials
 
     // Direct CGM and companion-device setup
     case addDirectCGM
     case dexcomG5G6One
     case dexcomG7OnePlusStelo
     case libre2
+    case libre3
     case libreTransmitters
     case medtrumNano
     case followerHeartbeat
@@ -115,8 +125,14 @@ enum OnlineHelpTopic: CaseIterable, Hashable {
         switch self {
         case .settings:
             return "use/settings/"
-        case .glucoseDisplay:
-            return "use/glucoseDisplay/"
+        case .homeScreen:
+            return "use/homeScreen/"
+        case .glucoseRanges:
+            return "use/glucoseRanges/"
+        case .treatmentSettings:
+            return "use/treatmentSettings/"
+        case .statisticsSettings:
+            return "use/statisticsSettings/"
         case .alertsAndNotifications:
             return "use/alertsAndNotifications/"
         case .dataManagement:
@@ -155,6 +171,14 @@ enum OnlineHelpTopic: CaseIterable, Hashable {
             return "use/statistics/"
         case .devices:
             return "use/devices/"
+        case .directToWatch:
+            return "display/directToWatch/"
+        case .batteryHistory, .signalStrength, .readSuccess:
+            return "use/devices/"
+        case .sensorNoise:
+            return "use/sensor/"
+        case .libre3Credentials, .libre3:
+            return "connect/libre3/"
         case .addDirectCGM:
             return "connect/cgm/"
         case .dexcomG5G6One:
@@ -194,6 +218,16 @@ enum OnlineHelpTopic: CaseIterable, Hashable {
         switch self {
         case .calibration:
             return "when-calibration-is-available"
+        case .batteryHistory:
+            return "battery-history"
+        case .signalStrength:
+            return "signal-strength"
+        case .sensorNoise:
+            return "sensor-noise"
+        case .readSuccess:
+            return "percentage-of-readings-received"
+        case .libre3Credentials:
+            return "libre-3-credentials"
         default:
             return nil
         }
@@ -385,7 +419,7 @@ extension BluetoothPeripheralType {
         case .M5StackType, .M5StickCType:
             return .m5Stack
         case .Libre3Type:
-            return .devices
+            return .libre3
         case .Libre2Type:
             return .libre2
         case .MiaoMiaoType, .BubbleType:

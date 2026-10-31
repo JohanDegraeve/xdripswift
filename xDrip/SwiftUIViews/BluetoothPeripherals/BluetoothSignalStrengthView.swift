@@ -119,6 +119,7 @@ struct BluetoothSignalStrengthView: View {
         }
         .navigationTitle(Texts_BluetoothPeripheralView.signalStrength)
         .navigationBarTitleDisplayMode(.inline)
+        .onlineHelp(.signalStrength)
         .scrollContentBackground(.hidden)
         .background(ConstantsUI.listBackGroundColor)
         .colorScheme(.dark)
