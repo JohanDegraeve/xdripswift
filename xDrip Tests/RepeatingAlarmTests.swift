@@ -75,9 +75,6 @@ final class RepeatingAlarmTests: XCTestCase {
         h.sound.handleInterruption(type: .began, shouldResume: false)
         XCTAssertEqual(h.players[0].pauses, 1)
         XCTAssertTrue(h.sound.isPlaying())
-        h.sound.handleInterruption(type: .ended, shouldResume: false)
-        XCTAssertTrue(h.activations.isEmpty)
-        h.sound.handleInterruption(type: .began, shouldResume: false)
         h.sound.handleInterruption(type: .ended, shouldResume: true)
         h.activate()
         XCTAssertEqual(h.players[0].starts, 2)
@@ -113,33 +110,80 @@ final class RepeatingAlarmTests: XCTestCase {
         h.activate()
         h.sound.handleInterruption(type: .began, shouldResume: false)
         h.sound.playSound(soundFileName: "xdripalert.aif", repeatSound: true)
-        XCTAssertTrue(h.activations.isEmpty)
+        XCTAssertEqual(h.activations.count, 1)
         h.sound.handleInterruption(type: .ended, shouldResume: true)
+        XCTAssertEqual(h.activations.count, 1)
         h.activate()
         XCTAssertEqual(h.players[0].starts, 1)
         XCTAssertEqual(h.players[1].starts, 1)
         h.sound.stopPlaying()
     }
 
-    func testSinglePlaybackArrivingDuringInterruptionCanStartAfterCall() {
+    func testNewAlarmActivatesWithoutInterruptionEnd() {
         let h = AudioHarness()
         h.sound.handleInterruption(type: .began, shouldResume: false)
         h.sound.playSound(soundFileName: "xdripalert.aif")
-        XCTAssertTrue(h.activations.isEmpty)
-        h.sound.handleInterruption(type: .ended, shouldResume: true)
+        XCTAssertEqual(h.activations.count, 1)
         h.activate()
         XCTAssertEqual(h.players[0].starts, 1)
         XCTAssertEqual(h.players[0].numberOfLoops, 0)
         h.sound.stopPlaying()
     }
 
-    func testSinglePlaybackReleasesOwnershipIfResumptionIsNotPermitted() {
+    func testDelayedInterruptionEndDoesNotStopNewAlarm() {
         let h = AudioHarness()
         h.sound.handleInterruption(type: .began, shouldResume: false)
         h.sound.playSound(soundFileName: "xdripalert.aif")
+        h.activate()
+        h.sound.handleInterruption(type: .ended, shouldResume: false)
+        XCTAssertTrue(h.sound.isPlaying())
+        XCTAssertEqual(h.players[0].starts, 1)
+        h.sound.stopPlaying()
+    }
+
+    func testLoopReleasesOwnershipIfResumptionIsNotPermitted() {
+        let h = AudioHarness()
+        h.sound.playSound(soundFileName: "xdripalert.aif", repeatSound: true)
+        h.activate()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
         h.sound.handleInterruption(type: .ended, shouldResume: false)
         XCTAssertFalse(h.sound.isPlaying())
         XCTAssertTrue(h.activations.isEmpty)
+    }
+
+    func testFailedRecoveryDoesNotBlockNextAlarm() {
+        let h = AudioHarness()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        h.sound.playSound(soundFileName: "xdripalert.aif")
+        h.activations.removeFirst()(CocoaError(.fileReadUnknown))
+        XCTAssertFalse(h.sound.isPlaying())
+        XCTAssertEqual(h.players[0].starts, 0)
+        h.sound.playSound(soundFileName: "xdripalert.aif")
+        h.activate()
+        XCTAssertEqual(h.players[1].starts, 1)
+        h.sound.stopPlaying()
+    }
+
+    func testAnotherInterruptionCancelsRecoveryInFlight() {
+        let h = AudioHarness()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        h.sound.playSound(soundFileName: "xdripalert.aif")
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        h.activate()
+        XCTAssertEqual(h.players[0].starts, 0)
+        XCTAssertFalse(h.sound.isPlaying())
+    }
+
+    func testExplicitPreviewResumeActivatesWithoutInterruptionEnd() {
+        let h = AudioHarness()
+        h.sound.playSound(soundFileName: "xdripalert.aif", repeatSound: true)
+        h.activate()
+        h.sound.pausePlaying()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        h.sound.resumePlaying()
+        h.activate()
+        XCTAssertEqual(h.players[0].starts, 2)
+        h.sound.stopPlaying()
     }
 
     func testOldCompletionCannotStopReplacementPlayer() throws {
@@ -210,6 +254,41 @@ final class RepeatingAlarmTests: XCTestCase {
         XCTAssertEqual(h.players.count, 2)
         manager.stopAlarmSound(alertKind: .verylow, content: content)
         XCTAssertTrue(h.sound.isPlaying())
+    }
+
+    func testSameRepeatingAlarmRecoversWithoutInterruptionEnd() {
+        let (core, manager, type, h) = setupAlarm()
+        defer {
+            manager.stopAlarmSound()
+            withExtendedLifetime(core) {}
+        }
+        _ = present(manager, type, .verylow)
+        h.activate()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        manager.validateRepeatingAlarm()
+        manager.validateRepeatingAlarm()
+        _ = present(manager, type, .verylow)
+        _ = present(manager, type, .verylow)
+        XCTAssertEqual(h.players.count, 1)
+        XCTAssertEqual(h.activations.count, 1)
+        h.activate()
+        XCTAssertEqual(h.players[0].starts, 2)
+        XCTAssertEqual(manager.protectedAlarmNotificationIdentifier, AlertKind.verylow.notificationIdentifier())
+    }
+
+    func testAcknowledgementCancelsRepeatingAlarmRecovery() {
+        let (core, manager, type, h) = setupAlarm()
+        defer { withExtendedLifetime(core) {} }
+        _ = present(manager, type, .verylow)
+        h.activate()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        _ = present(manager, type, .verylow)
+        manager.stopAlarmSound()
+        h.activate()
+        h.sound.handleInterruption(type: .ended, shouldResume: true)
+        XCTAssertEqual(h.players[0].starts, 1)
+        XCTAssertFalse(h.sound.isPlaying())
+        XCTAssertNil(manager.protectedAlarmNotificationIdentifier)
     }
 
     func testHigherUrgencyAndSinglePlaybackCanReplaceLoop() {
