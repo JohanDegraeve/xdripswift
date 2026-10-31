@@ -222,6 +222,9 @@ extension LiveActivityManager {
             let existing = Activity<XDripWidgetAttributes>.activities.first
             if let found = existing {
                 eventActivity = found
+                // A recovered activity may already be near expiry. Keep its real age so the
+                // ten-second restart throttle does not mistake it for a newly created activity.
+                eventStartDate = found.content.state.eventStartDate
                 trace("in recoverOrphanedActivityIfNeeded, recovered orphaned live activity: %{public}@", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: found.id))
             }
         }
