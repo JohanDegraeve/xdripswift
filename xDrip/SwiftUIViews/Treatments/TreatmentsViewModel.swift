@@ -30,7 +30,7 @@ import OSLog
     @Published private(set) var showBgCheckTreatments = UserDefaults.standard.showBgCheckTreatmentsInList
     @Published private(set) var showBasalInjectionTreatments = UserDefaults.standard.showBasalInjectionTreatmentsInList
     @Published private(set) var showNoteTreatments = UserDefaults.standard.showNoteTreatmentsInList
-    @Published private(set) var selectedDate = Date().toMidnight()
+    @Published private(set) var selectedDate = Calendar.current.startOfDay(for: Date())
 
     // MARK: - private properties
 
@@ -39,8 +39,9 @@ import OSLog
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataTreatments)
 
     private var allTreatments: [TreatmentSnapshot] = []
-    private var didInitializeView = false
-    private var lastViewedDay = Date().toMidnight()
+    private var lastViewedDay = Calendar.current.startOfDay(for: Date())
+    private var treatmentsUpdateCounter = UserDefaults.standard.nightscoutTreatmentsUpdateCounter
+    private(set) var reloadTask: Task<Void, Never>?
 
     // MARK: - initialization
 
@@ -55,57 +56,106 @@ import OSLog
 
     /// Performs the first load, or refreshes the existing model when the tab becomes visible again.
     func initializeViewIfNeeded() {
-        let today = Date().toMidnight()
+        let today = Calendar.current.startOfDay(for: Date())
         if lastViewedDay != today {
             // Return to today after a day change, but preserve deliberate history browsing
             // when reopening the tab or returning from the background on the same day.
             lastViewedDay = today
             selectedDateChanged(today)
-        }
-
-        if didInitializeView {
-            reloadTreatments()
             return
         }
 
-        didInitializeView = true
         reloadTreatments()
     }
 
-    /// Reloads the treatment history and reapplies the current filters.
+    /// Loads only the selected day's snapshots without making the main thread wait for SQLite.
     func reloadTreatments() {
         syncFilterSettingsFromUserDefaults()
+        treatmentsUpdateCounter = UserDefaults.standard.nightscoutTreatmentsUpdateCounter
+        reloadTask?.cancel()
 
-        let treatments = treatmentEntryAccessor
-            .getLatestTreatments(howOld: nil)
-            .filter { !$0.treatmentdeleted }
-            .sorted(by: { $0.date > $1.date })
+        let fromDate = Calendar.current.startOfDay(for: selectedDate)
+        guard let toDate = Calendar.current.date(byAdding: .day, value: 1, to: fromDate) else { return }
+        let mainContext = coreDataManager.mainManagedObjectContext
+        let context = coreDataManager.privateManagedObjectContext
 
-        // Rows and edit routes retain object IDs rather than managed objects. Make those IDs
-        // permanent before publication, even when the asynchronous parent save is still pending.
-        let temporaryTreatments = treatments.filter { $0.objectID.isTemporaryID }
-        do {
-            if !temporaryTreatments.isEmpty {
-                try coreDataManager.mainManagedObjectContext.obtainPermanentIDs(for: temporaryTreatments)
+        // The parent cannot see unsaved main-context edits. Retain those objects on main until
+        // publication, including edits which are saved while the private fetch is waiting.
+        // Only dates and snapshots cross the context boundary, never these managed objects.
+        let pendingTreatments = mainContext.insertedObjects.union(mainContext.updatedObjects)
+            .union(mainContext.deletedObjects).compactMap { $0 as? TreatmentEntry }
+
+        reloadTask = Task { @MainActor [weak self] in
+            do {
+                try Task.checkCancellation()
+                let snapshots = try await context.perform {
+                    let request: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
+                    // Use calendar midnights rather than 24 hours so clock-change days are complete.
+                    // The old fetch materialised the whole history before applying this day filter.
+                    request.predicate = NSPredicate(format: "date >= %@ AND date < %@ AND (treatmentdeleted == NO OR treatmentdeleted == nil)", fromDate as NSDate, toDate as NSDate)
+                    request.sortDescriptors = [NSSortDescriptor(key: #keyPath(TreatmentEntry.date), ascending: false)]
+                    request.returnsObjectsAsFaults = false
+                    let treatments = try context.fetch(request)
+                    let temporaryTreatments = treatments.filter { $0.objectID.isTemporaryID }
+                    if !temporaryTreatments.isEmpty {
+                        try context.obtainPermanentIDs(for: temporaryTreatments)
+                    }
+                    return treatments.map { TreatmentSnapshot(treatmentEntry: $0) }
+                }
+                // Cancelling a request does not interrupt SQLite. Discard its eventual result so
+                // a slower previous day or refresh cannot overwrite the most recent selection.
+                try Task.checkCancellation()
+                guard let self else { return }
+
+                let pending = Set(pendingTreatments).union(mainContext.insertedObjects.compactMap { $0 as? TreatmentEntry })
+                    .union(mainContext.updatedObjects.compactMap { $0 as? TreatmentEntry })
+                    .union(mainContext.deletedObjects.compactMap { $0 as? TreatmentEntry })
+                let temporaryTreatments = pending.filter { !$0.isDeleted && $0.managedObjectContext != nil && $0.objectID.isTemporaryID }
+                if !temporaryTreatments.isEmpty {
+                    // Editors retain these IDs after the row is published. Keep the existing
+                    // permanent-ID guarantee even for a local entry which has not been saved yet.
+                    try mainContext.obtainPermanentIDs(for: Array(temporaryTreatments))
+                }
+                var treatments = Dictionary(uniqueKeysWithValues: snapshots.map { ($0.objectID, $0) })
+                for treatment in pending {
+                    // Remove the parent's version first. An edit can move a treatment to another
+                    // day, and an unsaved deletion must not reappear from the private snapshot.
+                    treatments.removeValue(forKey: treatment.objectID)
+                    if treatment.managedObjectContext != nil, !treatment.isDeleted, !treatment.treatmentdeleted,
+                       treatment.date >= fromDate, treatment.date < toDate {
+                        treatments[treatment.objectID] = TreatmentSnapshot(treatmentEntry: treatment)
+                    }
+                }
+                self.allTreatments = treatments.values.sorted { $0.date > $1.date }
+                self.applyFilters()
+            } catch is CancellationError {
+                // A newer load owns publication. Keep its data and let the old request finish.
+            } catch {
+                guard !Task.isCancelled, let self else { return }
+                trace("failed to load treatment snapshots: %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error, error.localizedDescription)
             }
-        } catch {
-            trace("failed to obtain permanent treatment IDs", log: log, category: ConstantsLog.categoryApplicationDataTreatments, type: .error)
-            return
         }
-
-        allTreatments = treatments.map { TreatmentSnapshot(treatmentEntry: $0) }
-
-        applyFilters()
     }
 
     func handleUserDefaultsDidChange() {
-        reloadTreatments()
+        // Both Nightscout and CareLink already advance this counter after treatment changes.
+        // Other defaults notifications only affect presentation. Fetching the whole history on
+        // every notification blocked main and caused a scene update watchdog termination.
+        if treatmentsUpdateCounter != UserDefaults.standard.nightscoutTreatmentsUpdateCounter {
+            reloadTreatments()
+        } else {
+            syncFilterSettingsFromUserDefaults()
+            applyFilters()
+        }
     }
 
     func selectedDateChanged(_ newDate: Date) {
-        selectedDate = min(newDate, Date()).toMidnight()
+        selectedDate = Calendar.current.startOfDay(for: min(newDate, Date()))
         updateDayName()
+        // Do not leave the previous day's rows visible while the selected day's query is pending.
+        allTreatments = []
         applyFilters()
+        reloadTreatments()
         datePickerReset = UUID()
     }
 
@@ -200,7 +250,7 @@ import OSLog
     }
 
     private func applyFilters() {
-        let selectedMidnight = selectedDate.toMidnight()
+        let selectedMidnight = Calendar.current.startOfDay(for: selectedDate)
 
         filteredTreatments = allTreatments.filter { treatment in
             Calendar.current.compare(treatment.date, to: selectedMidnight, toGranularity: .day) == .orderedSame

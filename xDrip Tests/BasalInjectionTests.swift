@@ -9,6 +9,7 @@
 import XCTest
 import UIKit
 import SwiftUI
+import CoreData
 @testable import xdrip
 
 final class BasalInjectionTests: XCTestCase {
@@ -349,8 +350,8 @@ final class BasalInjectionTests: XCTestCase {
         }
     }
 
-    @MainActor func testInjectionHasIndependentListFilterAndEditablePresentation() throws {
-        withRestoredDefaults {
+    @MainActor func testInjectionHasIndependentListFilterAndEditablePresentation() async throws {
+        await withRestoredDefaults {
             let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
             let injection = TreatmentEntry(date: Date(), value: 20, treatmentType: .BasalInjection, nightscoutEventType: "Note", enteredBy: "Test", notes: "Tresiba", nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
             _ = TreatmentEntry(date: Date(), value: 0, treatmentType: .Note, nightscoutEventType: "Note", enteredBy: "Test", notes: "Ordinary note", nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
@@ -359,6 +360,7 @@ final class BasalInjectionTests: XCTestCase {
             UserDefaults.standard.showBasalInjectionTreatmentsInList = true
             let model = TreatmentsViewModel(coreDataManager: coreDataManager)
             model.reloadTreatments()
+            await model.reloadTask?.value
             XCTAssertEqual(model.filteredTreatments.map(\.treatmentType), [.BasalInjection])
             let snapshot = TreatmentSnapshot(treatmentEntry: injection)
             XCTAssertTrue(snapshot.isEditable)
@@ -482,12 +484,13 @@ final class BasalInjectionTests: XCTestCase {
         }
     }
 
-    @MainActor func testTreatmentListPublishesPermanentIDsForPendingLocalEntries() throws {
+    @MainActor func testTreatmentListPublishesPermanentIDsForPendingLocalEntries() async throws {
         let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
         let entry = TreatmentEntry(date: Date(), value: 20, treatmentType: .BasalInjection, nightscoutEventType: nil, enteredBy: "Test", notes: "Tresiba", nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
         XCTAssertTrue(entry.objectID.isTemporaryID)
         let model = TreatmentsViewModel(coreDataManager: coreDataManager)
         model.reloadTreatments()
+        await model.reloadTask?.value
         XCTAssertFalse(entry.objectID.isTemporaryID)
         XCTAssertTrue(coreDataManager.saveChangesSynchronously())
         let resolved = TreatmentEntryAccessor(coreDataManager: coreDataManager).getTreatment(objectID: entry.objectID)
@@ -572,12 +575,293 @@ final class BasalInjectionTests: XCTestCase {
         XCTAssertEqual(longNote.count, 25)
     }
 
+    /// A busy SQLite queue must not make unrelated defaults callbacks wait or request a reload.
+    @MainActor func testUnrelatedDefaultsDoNotReloadTreatmentsWhileStoreIsBusy() async {
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let model = TreatmentsViewModel(coreDataManager: coreDataManager)
+        let entered = expectation(description: "Private context held")
+        let release = DispatchSemaphore(value: 0)
+        let context = coreDataManager.privateManagedObjectContext
+        DispatchQueue.global().async {
+            context.performAndWait {
+                entered.fulfill()
+                XCTAssertEqual(release.wait(timeout: .now() + 5), .success, "Main must release the store before its safety timeout")
+            }
+        }
+        await fulfillment(of: [entered], timeout: 2)
+        defer { release.signal() }
+        for _ in 0..<100 {
+            model.handleUserDefaultsDidChange()
+        }
+        XCTAssertNil(model.reloadTask, "Presentation changes must not schedule any database fetch")
+        // This also exercises the real refresh path while the store is blocked. Main must stay
+        // available to release the store rather than waiting synchronously inside reloadTreatments.
+        let requestedAt = Date()
+        model.reloadTreatments()
+        XCTAssertLessThan(Date().timeIntervalSince(requestedAt), 1)
+        let mainResponded = expectation(description: "Main remains responsive")
+        DispatchQueue.main.async { mainResponded.fulfill() }
+        await fulfillment(of: [mainResponded], timeout: 1)
+        release.signal()
+        await model.reloadTask?.value
+    }
+
+    @MainActor func testTreatmentCounterReloadsButFiltersReuseSnapshots() async {
+        await withRestoredDefaults {
+            let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+            let model = TreatmentsViewModel(coreDataManager: coreDataManager)
+            _ = TreatmentEntry(date: Date(), value: 20, treatmentType: .Note, nightscoutEventType: nil, enteredBy: "Test", nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+            UserDefaults.standard.nightscoutTreatmentsUpdateCounter += 1
+            model.handleUserDefaultsDidChange()
+            await model.reloadTask?.value
+            XCTAssertEqual(model.filteredTreatments.count, 1)
+            UserDefaults.standard.showNoteTreatmentsInList = false
+            model.handleUserDefaultsDidChange()
+            XCTAssertTrue(model.filteredTreatments.isEmpty)
+        }
+    }
+
+    /// Checking parent registrations distinguishes a bounded store query from fetching all history
+    /// and filtering afterwards, even when both implementations display the same rows.
+    @MainActor func testTreatmentFetchOnlyMaterialisesSelectedCalendarDay() async throws {
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let main = coreDataManager.mainManagedObjectContext
+        let start = Calendar.current.startOfDay(for: Date())
+        let end = try XCTUnwrap(Calendar.current.date(byAdding: .day, value: 1, to: start))
+        for date in [start.addingTimeInterval(-1), start, end.addingTimeInterval(-1), end] {
+            _ = TreatmentEntry(date: date, value: 20, treatmentType: .Note, nightscoutEventType: nil, enteredBy: "Test", nsManagedObjectContext: main)
+        }
+        XCTAssertTrue(coreDataManager.saveChangesSynchronously())
+        main.reset()
+        let context = coreDataManager.privateManagedObjectContext
+        context.performAndWait {
+            context.reset()
+            context.retainsRegisteredObjects = true
+        }
+        let model = TreatmentsViewModel(coreDataManager: coreDataManager)
+        model.reloadTreatments()
+        await model.reloadTask?.value
+        XCTAssertEqual(model.filteredTreatments.map(\.date), [end.addingTimeInterval(-1), start])
+        XCTAssertTrue(main.registeredObjects.isEmpty, "Private snapshots must not load managed objects on main")
+        let dates = await context.perform {
+            context.registeredObjects.compactMap { ($0 as? TreatmentEntry)?.date }
+        }
+        XCTAssertEqual(dates.count, 2)
+        XCTAssertTrue(dates.allSatisfy { $0 >= start && $0 < end })
+    }
+
+    @MainActor func testNewerDayLoadWinsAndPendingMoveAndDeletionArePreserved() async throws {
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let main = coreDataManager.mainManagedObjectContext
+        let today = Calendar.current.startOfDay(for: Date())
+        let yesterday = try XCTUnwrap(Calendar.current.date(byAdding: .day, value: -1, to: today))
+        let moved = TreatmentEntry(date: today, value: 1, treatmentType: .Note, nightscoutEventType: nil, enteredBy: "Test", nsManagedObjectContext: main)
+        let deleted = TreatmentEntry(date: today, value: 2, treatmentType: .Note, nightscoutEventType: nil, enteredBy: "Test", nsManagedObjectContext: main)
+        XCTAssertTrue(coreDataManager.saveChangesSynchronously())
+        moved.date = yesterday
+        main.delete(deleted)
+        let model = TreatmentsViewModel(coreDataManager: coreDataManager)
+        model.reloadTreatments()
+        let olderLoad = model.reloadTask
+        model.selectedDateChanged(yesterday)
+        await olderLoad?.value
+        await model.reloadTask?.value
+        XCTAssertEqual(model.filteredTreatments.map(\.objectID), [moved.objectID])
+        XCTAssertEqual(model.filteredTreatments.first?.date, yesterday)
+    }
+
+    /// The previous import blocks main on the same queue which this test deliberately holds.
+    /// Releasing it from main proves the real import suspends rather than synchronously waiting.
+    @MainActor func testNightscoutImportWaitsOffMainAndDoesNotDuplicateExistingOrPendingIDs() async throws {
+        try await withRestoredDefaults {
+            UserDefaults.standard.nightscoutEnabled = true
+            UserDefaults.standard.therapyDataSourceType = .nightscout
+            let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+            let main = coreDataManager.mainManagedObjectContext
+            let manager = NightscoutSyncManager(coreDataManager: coreDataManager, messageHandler: nil)
+            let old = TreatmentEntry(id: "old-note", date: Date(timeIntervalSinceNow: -86400 * 20), value: 1, treatmentType: .Note, nightscoutEventType: nil, enteredBy: "Test", nsManagedObjectContext: main)
+            old.treatmentdeleted = true
+            XCTAssertTrue(coreDataManager.saveChangesSynchronously())
+            // This entry is visible only on main. It must still suppress a duplicate import.
+            _ = TreatmentEntry(id: "pending-note", date: Date(), value: 2, treatmentType: .Note, nightscoutEventType: nil, enteredBy: "Test", nsManagedObjectContext: main)
+            let responses = ["old-note", "pending-note", "new-note", "new-note"].map {
+                TreatmentNSResponse(id: $0, createdAt: Date(), eventType: .Note, nightscoutEventType: nil, value: 3, valueSecondary: nil, enteredBy: "Test", notes: "Imported")
+            }
+            let entered = expectation(description: "Import store held")
+            let release = DispatchSemaphore(value: 0)
+            let context = coreDataManager.privateManagedObjectContext
+            DispatchQueue.global().async {
+                context.performAndWait {
+                    entered.fulfill()
+                    XCTAssertEqual(release.wait(timeout: .now() + 5), .success, "Main must release the store before its safety timeout")
+                }
+            }
+            await fulfillment(of: [entered], timeout: 2)
+            defer { release.signal() }
+            let requestedAt = Date()
+            let task = Task { try await manager.newTreatmentsIfRequired(treatmentNSResponses: responses) }
+            await Task.yield()
+            XCTAssertLessThan(Date().timeIntervalSince(requestedAt), 1)
+            let mainResponded = expectation(description: "Main responds during import")
+            DispatchQueue.main.async { mainResponded.fulfill() }
+            await fulfillment(of: [mainResponded], timeout: 1)
+            release.signal()
+            let count = try await task.value
+            XCTAssertEqual(count, 1)
+            let entries = TreatmentEntryAccessor(coreDataManager: coreDataManager).getLatestTreatments(howOld: nil)
+            XCTAssertEqual(entries.count, 3)
+            XCTAssertEqual(Set(entries.map(\.id)), ["old-note", "pending-note", "new-note"])
+            XCTAssertTrue(old.treatmentdeleted)
+        }
+    }
+
+    @MainActor func testNightscoutImportRejectsSourceChangeWhileLookupIsPending() async throws {
+        try await withRestoredDefaults {
+            UserDefaults.standard.nightscoutEnabled = true
+            UserDefaults.standard.therapyDataSourceType = .nightscout
+            let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+            let manager = NightscoutSyncManager(coreDataManager: coreDataManager, messageHandler: nil)
+            let entered = expectation(description: "Lookup held")
+            let release = DispatchSemaphore(value: 0)
+            let context = coreDataManager.privateManagedObjectContext
+            DispatchQueue.global().async {
+                context.performAndWait {
+                    entered.fulfill()
+                    XCTAssertEqual(release.wait(timeout: .now() + 5), .success, "Main must release the store before its safety timeout")
+                }
+            }
+            await fulfillment(of: [entered], timeout: 2)
+            defer { release.signal() }
+            let response = TreatmentNSResponse(id: "new-note", createdAt: Date(), eventType: .Note, nightscoutEventType: nil, value: 1, valueSecondary: nil, enteredBy: "Test", notes: nil)
+            let task = Task { try await manager.newTreatmentsIfRequired(treatmentNSResponses: [response]) }
+            // Allow the import to capture its source and suspend at the private-context lookup.
+            await Task.yield()
+            UserDefaults.standard.therapyDataSourceType = .none
+            release.signal()
+            do {
+                _ = try await task.value
+                XCTFail("A disabled import must not create treatments from an older request")
+            } catch is CancellationError {
+                XCTAssertTrue(coreDataManager.mainManagedObjectContext.insertedObjects.isEmpty)
+            }
+        }
+    }
+
+    /// The server can change before the HTTP response arrives, not only during the ID lookup.
+    @MainActor func testNightscoutImportRejectsResponseFromPreviousSource() async throws {
+        try await withRestoredDefaults {
+            UserDefaults.standard.nightscoutEnabled = true
+            UserDefaults.standard.therapyDataSourceType = .nightscout
+            UserDefaults.standard.nightscoutUrl = "https://current.invalid"
+            UserDefaults.standard.nightscoutPort = 443
+            let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+            let manager = NightscoutSyncManager(coreDataManager: coreDataManager, messageHandler: nil)
+            let response = TreatmentNSResponse(id: "previous-source-note", createdAt: Date(), eventType: .Note, nightscoutEventType: nil, value: 1, valueSecondary: nil, enteredBy: "Test", notes: nil)
+            do {
+                _ = try await manager.newTreatmentsIfRequired(treatmentNSResponses: [response], sourceURL: "https://previous.invalid", sourcePort: 443)
+                XCTFail("A previous server's response must not be imported under the current source")
+            } catch is CancellationError {
+                XCTAssertTrue(coreDataManager.mainManagedObjectContext.insertedObjects.isEmpty)
+            }
+        }
+    }
+
+    @MainActor func testSavedLocalTreatmentKeepsOneEditableSnapshot() async throws {
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let entry = TreatmentEntry(date: Date(), value: 20, treatmentType: .BasalInjection, nightscoutEventType: nil, enteredBy: "Test", nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+        XCTAssertTrue(coreDataManager.saveChanges())
+        let model = TreatmentsViewModel(coreDataManager: coreDataManager)
+        model.reloadTreatments()
+        await model.reloadTask?.value
+        XCTAssertEqual(model.filteredTreatments.count, 1)
+        let snapshot = try XCTUnwrap(model.filteredTreatments.first)
+        XCTAssertFalse(snapshot.objectID.isTemporaryID)
+        XCTAssertNotNil(TreatmentEntryAccessor(coreDataManager: coreDataManager).getTreatment(objectID: snapshot.objectID))
+    }
+
+    /// A second response can finish its lookup before the first response has saved its inserts.
+    /// Exercise the caller's save as well, so clearing main's insertedObjects cannot hide a duplicate.
+    @MainActor func testOverlappingNightscoutImportsDoNotDuplicateSavedInsertions() async throws {
+        try await withRestoredDefaults {
+            UserDefaults.standard.nightscoutEnabled = true
+            UserDefaults.standard.therapyDataSourceType = .nightscout
+            let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+            let manager = NightscoutSyncManager(coreDataManager: coreDataManager, messageHandler: nil)
+            let response = TreatmentNSResponse(id: "same-note", createdAt: Date(), eventType: .Note, nightscoutEventType: nil, value: 1, valueSecondary: nil, enteredBy: "Test", notes: nil)
+            let first = Task { @MainActor in
+                let count = try await manager.newTreatmentsIfRequired(treatmentNSResponses: [response])
+                XCTAssertTrue(coreDataManager.saveChanges())
+                return count
+            }
+            let second = Task { try await manager.newTreatmentsIfRequired(treatmentNSResponses: [response]) }
+            let counts = try await [first.value, second.value]
+            XCTAssertEqual(counts.reduce(0, +), 1)
+            XCTAssertEqual(TreatmentEntryAccessor(coreDataManager: coreDataManager).getLatestTreatments(howOld: nil).count, 1)
+        }
+    }
+
+    /// Use the incident's treatment volume in a real SQLite store, with a small selected day.
+    /// This exercises the app methods rather than a separate approximation of their SQL queries.
+    @MainActor func testLargeSQLiteHistoryLoadsOneDayAndImportsWithoutDuplicates() async throws {
+        try await withRestoredDefaults {
+            UserDefaults.standard.nightscoutEnabled = true
+            UserDefaults.standard.therapyDataSourceType = .nightscout
+            UserDefaults.standard.showNoteTreatmentsInList = true
+            let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            defer { try? FileManager.default.removeItem(at: directory) }
+            let coreDataManager = try CoreDataManager(testModelName: ConstantsCoreData.modelName, persistentStoreURL: directory.appendingPathComponent("treatments.sqlite"))
+            defer { try? coreDataManager.disconnectPersistentStoresForTesting() }
+            let main = coreDataManager.mainManagedObjectContext
+            let context = coreDataManager.privateManagedObjectContext
+            let start = Calendar.current.startOfDay(for: Date())
+            for index in 0..<43_106 {
+                let date = index < 154 ? start.addingTimeInterval(Double(index)) : start.addingTimeInterval(-Double(index))
+                _ = TreatmentEntry(id: "history-\(index)-note", date: date, value: 1, treatmentType: .Note, nightscoutEventType: nil, enteredBy: "Test", nsManagedObjectContext: main)
+            }
+            XCTAssertTrue(coreDataManager.saveChangesSynchronously())
+            main.reset()
+            context.performAndWait { context.reset() }
+            let model = TreatmentsViewModel(coreDataManager: coreDataManager)
+            model.reloadTreatments()
+            await model.reloadTask?.value
+            XCTAssertEqual(model.filteredTreatments.count, 154)
+            XCTAssertTrue(main.registeredObjects.isEmpty)
+
+            let manager = NightscoutSyncManager(coreDataManager: coreDataManager, messageHandler: nil)
+            // Include IDs far outside the latest-50 upload list, plus a duplicated new response.
+            let ids = (1000..<1236).map { "history-\($0)-note" } + ["new-note", "new-note"]
+            let responses = ids.map { TreatmentNSResponse(id: $0, createdAt: Date(), eventType: .Note, nightscoutEventType: nil, value: 1, valueSecondary: nil, enteredBy: "Test", notes: nil) }
+            let added = try await manager.newTreatmentsIfRequired(treatmentNSResponses: responses)
+            XCTAssertEqual(added, 1)
+            XCTAssertEqual(main.insertedObjects.count, 1)
+            XCTAssertTrue(coreDataManager.saveChangesSynchronously())
+            let count = try await context.perform {
+                try context.count(for: TreatmentEntry.fetchRequest())
+            }
+            XCTAssertEqual(count, 43_107)
+        }
+    }
+
     private func envelope(_ json: String) -> String {
         BasalInjectionPayload.prefix + Data(json.utf8).base64EncodedString()
     }
 
     private func document(notes: String) -> NSDictionary {
         ["_id": "basaltest", "created_at": "2026-09-07T20:00:00Z", "eventType": "Note", "notes": notes]
+    }
+
+    @MainActor private func withRestoredDefaults(_ body: () async throws -> Void) async rethrows {
+        let defaults = UserDefaults.standard
+        let keys = ["nightscoutEnabled", "showBasalInjectionTreatmentsInList", "showNoteTreatmentsInList", "nightscoutTreatmentsUpdateCounter", "therapyDataSourceType", "nightscoutUrl", "nightscoutPort"]
+        let previous = keys.map { defaults.object(forKey: $0) }
+        defer {
+            for (key, value) in zip(keys, previous) {
+                if let value { defaults.set(value, forKey: key) }
+                else { defaults.removeObject(forKey: key) }
+            }
+        }
+        try await body()
     }
 
     /// Keep tests isolated from the simulator's saved treatment and sync preferences.
