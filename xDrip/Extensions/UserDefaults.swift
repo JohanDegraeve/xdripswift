@@ -224,7 +224,7 @@ extension UserDefaults {
         case showNoteTreatmentsInList = "showNoteTreatmentsInList"
         /// should basal injections be listed independently of notes and pump basal?
         case showBasalInjectionTreatmentsInList = "showBasalInjectionTreatmentsInList"
-        /// last saved whole-unit dose used to prefill a new basal injection
+        /// last saved dose used to prefill a new basal injection
         case lastBasalInjectionUnits = "lastBasalInjectionUnits"
         /// last saved insulin type used to prefill a new basal injection
         case lastBasalInjectionInsulinDescription = "lastBasalInjectionInsulinDescription"
@@ -1725,8 +1725,8 @@ extension UserDefaults {
     }
 
     /// New injections start with the last explicitly saved dose, never with an automatic submission.
-    var lastBasalInjectionUnits: Int {
-        get { integer(forKey: Key.lastBasalInjectionUnits.rawValue) }
+    var lastBasalInjectionUnits: Double {
+        get { double(forKey: Key.lastBasalInjectionUnits.rawValue) }
         set { set(newValue, forKey: Key.lastBasalInjectionUnits.rawValue) }
     }
 

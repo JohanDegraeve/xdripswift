@@ -16,6 +16,8 @@ import OSLog
     /// Permit a small amount of advance entry without allowing accidental future-day treatments.
     static let maximumFutureTreatmentInterval: TimeInterval = 60 * 60
 
+    static let maximumBasalInjectionUnits: Double = 150
+
     static let supportedTreatmentTypes: [TreatmentType] = [.Insulin, .Carbs, .BgCheck, .Exercise, .BasalInjection, .Note]
 
     // MARK: - @Published properties
@@ -75,7 +77,7 @@ import OSLog
                 self.enteredValue = treatmentToEdit.value.stringWithoutTrailingZeroes
             }
         } else if initialType == .BasalInjection, UserDefaults.standard.lastBasalInjectionUnits > 0 {
-            self.enteredValue = String(UserDefaults.standard.lastBasalInjectionUnits)
+            self.enteredValue = UserDefaults.standard.lastBasalInjectionUnits.stringWithoutTrailingZeroes
         } else {
             self.enteredValue = ""
         }
@@ -129,7 +131,11 @@ import OSLog
             return nil
         }
 
-        return selectedType == .BasalInjection ? Texts_TreatmentsView.invalidBasalInjectionValueMessage : Texts_TreatmentsView.invalidValueMessage
+        return invalidNumericValueMessage
+    }
+
+    private var invalidNumericValueMessage: String {
+        selectedType == .BasalInjection ? Texts_TreatmentsView.invalidBasalInjectionValueMessage : Texts_TreatmentsView.invalidValueMessage
     }
 
     var canSaveTreatment: Bool {
@@ -189,7 +195,7 @@ import OSLog
             guard let value = normalizedValue(), value > 0 else {
                 alertMessage = TreatmentEditorAlertMessage(
                     title: Texts_Common.warning,
-                    message: Texts_TreatmentsView.invalidValueMessage
+                    message: invalidNumericValueMessage
                 )
                 return false
             }
@@ -292,8 +298,8 @@ import OSLog
 
         // Only a successful explicit save updates the next draft. Cancel and failed saves must
         // leave these preferences alone, and editing a bolus must never replace the basal defaults.
-        if selectedType == .BasalInjection, let units = Int(exactly: storedValue) {
-            UserDefaults.standard.lastBasalInjectionUnits = units
+        if selectedType == .BasalInjection {
+            UserDefaults.standard.lastBasalInjectionUnits = storedValue
             UserDefaults.standard.lastBasalInjectionInsulinDescription = storedNotesValue ?? ""
         }
 
@@ -334,8 +340,9 @@ import OSLog
 
     private func normalizedValue() -> Double? {
         guard let value = enteredValue.toDouble(), value.isFinite else { return nil }
-        // A number pad helps entry, but pasted values still need whole-unit validation.
-        if selectedType == .BasalInjection, Int(exactly: value) == nil { return nil }
+        // Validate again when saving because entry can also come from defaults or a direct edit.
+        if selectedType == .BasalInjection,
+           !BasalInjectionPayload.isValidUnits(value) || value > Self.maximumBasalInjectionUnits { return nil }
         return value
     }
 

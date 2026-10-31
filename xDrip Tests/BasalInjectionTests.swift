@@ -8,6 +8,7 @@
 
 import XCTest
 import UIKit
+import SwiftUI
 @testable import xdrip
 
 final class BasalInjectionTests: XCTestCase {
@@ -96,18 +97,161 @@ final class BasalInjectionTests: XCTestCase {
         XCTAssertEqual(BasalInjectionPayload.decode(from: changedSummary), payload)
     }
 
-    func testFractionalNonFiniteAndNonPositiveDosesAreRejected() {
-        for units in [0.0, -1, 20.5, .nan, .infinity, Double.greatestFiniteMagnitude] {
+    /// Regression for https://github.com/JohanDegraeve/xdripswift/issues/783.
+    @MainActor func testFractionalBasalEntrySaveEditPrefillAndNightscoutRoundTrip() throws {
+        try withRestoredDefaults {
+            let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+            // UserDefaults.double must also read whole-unit defaults saved by earlier builds.
+            UserDefaults.standard.set(20, forKey: "lastBasalInjectionUnits")
+            XCTAssertEqual(UserDefaults.standard.lastBasalInjectionUnits, 20)
+            for input in ["20.5", "20,5", "0.5"] {
+                let units = input == "0.5" ? 0.5 : 20.5
+                let draft = TreatmentEditorViewModel(coreDataManager: coreDataManager, treatmentToEdit: nil, initialType: .BasalInjection)
+                draft.enteredValue = input
+                draft.enteredInsulinDescription = "Tresiba"
+                XCTAssertTrue(draft.canSaveTreatment)
+                XCTAssertNil(draft.helperText)
+                XCTAssertTrue(draft.saveTreatment())
+                XCTAssertEqual(UserDefaults.standard.lastBasalInjectionUnits, units)
+                let prefilled = TreatmentEditorViewModel(coreDataManager: coreDataManager, treatmentToEdit: nil, initialType: .BasalInjection)
+                XCTAssertEqual(prefilled.enteredValue, units.stringWithoutTrailingZeroes)
+                XCTAssertTrue(prefilled.didPrefillBasalInjection)
+                let saved = try XCTUnwrap(TreatmentEntryAccessor(coreDataManager: coreDataManager).getLatestTreatments(howOld: nil).first)
+                XCTAssertEqual(saved.value, units)
+                XCTAssertEqual(TreatmentSnapshot(treatmentEntry: saved).valueText, units.stringWithoutTrailingZeroes)
+                var upload = saved.dictionaryRepresentationForNightscoutUpload()
+                for key in ["insulin", "rate", "absolute", "duration"] {
+                    XCTAssertNil(upload[key])
+                }
+                upload["_id"] = "fractional-basal"
+                let response = try XCTUnwrap(TreatmentNSResponse.fromNightscout(dictionary: upload as NSDictionary).first)
+                XCTAssertEqual(response.eventType, .BasalInjection)
+                XCTAssertEqual(response.value, units)
+                let notes = try XCTUnwrap(upload["notes"] as? String)
+                XCTAssertTrue(notes.hasPrefix("Basal injection: Tresiba, \(units.stringWithoutTrailingZeroes) U\n"))
+                XCTAssertEqual(BasalInjectionPayload.decode(from: notes)?.units, units)
+                let editor = TreatmentEditorViewModel(coreDataManager: coreDataManager, treatmentToEdit: saved)
+                XCTAssertEqual(editor.enteredValue, units.stringWithoutTrailingZeroes)
+                XCTAssertFalse(editor.canSaveTreatment)
+                editor.enteredValue = "21.5"
+                XCTAssertTrue(editor.saveTreatment())
+                XCTAssertEqual(saved.value, 21.5)
+                XCTAssertEqual(UserDefaults.standard.lastBasalInjectionUnits, 21.5)
+            }
+        }
+    }
+
+    @MainActor func testBasalFieldRejectsExtraDecimalsBeforeChangingVisibleText() {
+        var boundText = "4.5"
+        let field = UITextField()
+        field.text = boundText
+        let coordinator = BasalDoseTextField.Coordinator(text: Binding(get: { boundText }, set: { boundText = $0 }))
+        field.delegate = coordinator
+        field.addTarget(coordinator, action: #selector(BasalDoseTextField.Coordinator.textDidChange(_:)), for: .editingChanged)
+
+        // UIKit asks the delegate before applying typing, deletion or a selected-range paste.
+        func edit(_ range: NSRange, _ replacement: String) -> Bool {
+            let accepted = field.delegate!.textField!(field, shouldChangeCharactersIn: range, replacementString: replacement)
+            if accepted {
+                field.text = (field.text! as NSString).replacingCharacters(in: range, with: replacement)
+                field.sendActions(for: .editingChanged)
+            }
+            return accepted
+        }
+
+        XCTAssertFalse(edit(NSRange(location: 3, length: 0), "3"))
+        XCTAssertEqual(field.text, "4.5")
+        XCTAssertEqual(boundText, "4.5")
+        for pasted in ["4.23", "6.45", "6,45", "4..5", "4,5.0", "4e2", "abc", "-1", "150.5", "151", "999"] {
+            XCTAssertFalse(edit(NSRange(location: 0, length: 3), pasted))
+            XCTAssertEqual(field.text, "4.5")
+            XCTAssertEqual(boundText, "4.5")
+        }
+        XCTAssertTrue(edit(NSRange(location: 2, length: 1), "0")) // Replace selected digit.
+        XCTAssertEqual(boundText, "4.0")
+        XCTAssertTrue(edit(NSRange(location: 2, length: 1), "")) // Delete fraction.
+        XCTAssertEqual(boundText, "4.")
+        XCTAssertTrue(edit(NSRange(location: 2, length: 0), "5"))
+        XCTAssertEqual(boundText, "4.5")
+        XCTAssertTrue(edit(NSRange(location: 0, length: 3), ""))
+        XCTAssertEqual(boundText, "")
+        XCTAssertTrue(edit(NSRange(location: 0, length: 0), ","))
+        XCTAssertTrue(edit(NSRange(location: 1, length: 0), "5"))
+        XCTAssertEqual(boundText, ",5")
+        XCTAssertFalse(edit(NSRange(location: 2, length: 0), "3"))
+        XCTAssertEqual(field.text, ",5")
+        XCTAssertEqual(boundText, ",5")
+        XCTAssertTrue(edit(NSRange(location: 0, length: 2), "6,5"))
+        XCTAssertEqual(boundText, "6,5")
+        XCTAssertTrue(edit(NSRange(location: 0, length: 3), "150"))
+        XCTAssertFalse(edit(NSRange(location: 3, length: 0), "1"))
+        XCTAssertEqual(field.text, "150")
+        XCTAssertTrue(edit(NSRange(location: 3, length: 0), "."))
+        XCTAssertFalse(edit(NSRange(location: 4, length: 0), "5"))
+        XCTAssertEqual(boundText, "150.")
+        XCTAssertTrue(edit(NSRange(location: 4, length: 0), "0"))
+        XCTAssertEqual(boundText, "150.0")
+        XCTAssertTrue(edit(NSRange(location: 0, length: 5), "0"))
+        XCTAssertEqual(boundText, "0")
+    }
+
+    @MainActor func testBasalRejectsFinerThanHalfUnitsWithoutRoundingOrChangingSavedDose() throws {
+        try withRestoredDefaults {
+            let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+            UserDefaults.standard.lastBasalInjectionUnits = 4.5
+            let draft = TreatmentEditorViewModel(coreDataManager: coreDataManager, treatmentToEdit: nil, initialType: .BasalInjection)
+            draft.enteredInsulinDescription = "Tresiba"
+            for input in ["4.23", "4,23", "6.4", "6,4", "0.25", "4.5001", "150.5", "151", "0", "-0.5"] {
+                draft.enteredValue = input
+                XCTAssertFalse(draft.canSaveTreatment, input)
+                XCTAssertEqual(draft.helperText, Texts_TreatmentsView.invalidBasalInjectionValueMessage)
+                XCTAssertFalse(draft.saveTreatment(), input)
+                XCTAssertTrue(coreDataManager.mainManagedObjectContext.insertedObjects.isEmpty)
+                XCTAssertEqual(UserDefaults.standard.lastBasalInjectionUnits, 4.5)
+            }
+            for input in ["4", "4.0", "4.5", "4,5", "0.5", "149.5", "150", "150.0"] {
+                draft.enteredValue = input
+                XCTAssertTrue(draft.canSaveTreatment, input)
+                XCTAssertNil(draft.helperText)
+            }
+            draft.enteredValue = "4.5"
+            XCTAssertTrue(draft.saveTreatment())
+            let saved = try XCTUnwrap(TreatmentEntryAccessor(coreDataManager: coreDataManager).getLatestTreatments(howOld: nil).first)
+            let editor = TreatmentEditorViewModel(coreDataManager: coreDataManager, treatmentToEdit: saved)
+            editor.enteredValue = "6.4"
+            XCTAssertFalse(editor.canSaveTreatment)
+            XCTAssertFalse(editor.saveTreatment())
+            XCTAssertEqual(saved.value, 4.5)
+            // Bolus retains its existing decimal precision.
+            let bolus = TreatmentEditorViewModel(coreDataManager: coreDataManager, treatmentToEdit: nil, initialType: .Insulin)
+            for input in ["4.23", "6.4"] {
+                bolus.enteredValue = input
+                XCTAssertTrue(bolus.canSaveTreatment)
+                XCTAssertTrue(bolus.saveTreatment())
+            }
+        }
+    }
+
+    func testEntryLimitDoesNotDiscardHistoricalNightscoutDoses() throws {
+        // The 150 U limit applies to manual entry. Existing Notes still need to import unchanged.
+        let notes = envelope(#"{"version":1,"units":200,"insulinDescription":"Tresiba"}"#)
+        XCTAssertEqual(BasalInjectionPayload.decode(from: notes)?.units, 200)
+        XCTAssertEqual(TreatmentNSResponse.fromNightscout(dictionary: document(notes: notes)).first?.value, 200)
+    }
+
+    func testInvalidBasalDosesAreRejected() {
+        for units in [0.0, -1, 4.23, 6.4, 0.25, .nan, .infinity, -.infinity] {
             XCTAssertNil(BasalInjectionPayload(units: units, insulinDescription: "Tresiba"))
         }
     }
 
-    func testMalformedFutureAndFractionalPayloadsRemainNotes() throws {
+    func testMalformedFutureAndInvalidDosePayloadsRemainNotes() throws {
         let invalidNotes = [
             "Basal injection: Tresiba, 20 U",
             BasalInjectionPayload.prefix + "invalid",
             envelope(#"{"version":2,"units":20,"insulinDescription":"Tresiba"}"#),
-            envelope(#"{"version":1,"units":20.5,"insulinDescription":"Tresiba"}"#),
+            envelope(#"{"version":1,"units":4.23,"insulinDescription":"Tresiba"}"#),
+            envelope(#"{"version":1,"units":6.4,"insulinDescription":"Tresiba"}"#),
             envelope(#"{"version":1,"units":0,"insulinDescription":"Tresiba"}"#)
         ]
         for notes in invalidNotes {
@@ -169,16 +313,16 @@ final class BasalInjectionTests: XCTestCase {
         }
     }
 
-    @MainActor func testFractionalDraftAndFailedSaveDoNotReplaceDefaults() throws {
+    @MainActor func testInvalidDraftAndFailedSaveDoNotReplaceDefaults() throws {
         withRestoredDefaults {
             UserDefaults.standard.lastBasalInjectionUnits = 20
             let draft = TreatmentEditorViewModel(coreDataManager: nil, treatmentToEdit: nil, initialType: .BasalInjection)
-            for input in ["20.5", "0", "-1"] {
+            draft.enteredInsulinDescription = "Tresiba"
+            for input in ["0", "-1", "nan", "inf"] {
                 draft.enteredValue = input
                 XCTAssertFalse(draft.canSaveTreatment)
             }
-            draft.enteredValue = "22"
-            draft.enteredInsulinDescription = "Tresiba"
+            draft.enteredValue = "22.5"
             XCTAssertTrue(draft.canSaveTreatment)
             XCTAssertFalse(draft.saveTreatment())
             XCTAssertEqual(UserDefaults.standard.lastBasalInjectionUnits, 20)
@@ -287,7 +431,7 @@ final class BasalInjectionTests: XCTestCase {
         let treatments = TreatmentEntryAccessor(coreDataManager: coreDataManager).getLatestTreatments(howOld: nil)
         XCTAssertEqual(treatments.count, 1)
         XCTAssertEqual(treatments.first?.treatmentType, .BasalInjection)
-        XCTAssertEqual(treatments.first?.value, 20)
+        XCTAssertEqual(treatments.first?.value, 20.5)
         XCTAssertEqual(treatments.first?.notes, "Tresiba")
     }
 
@@ -456,7 +600,7 @@ private final class BasalInjectionTestURLProtocol: URLProtocol {
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
     override func startLoading() {
-        let notes = BasalInjectionPayload(units: 20, insulinDescription: "Tresiba")!.encodedNotes()!
+        let notes = BasalInjectionPayload(units: 20.5, insulinDescription: "Tresiba")!.encodedNotes()!
         let data = try! JSONSerialization.data(withJSONObject: [["_id": "basaltest", "created_at": "2026-09-07T20:00:00Z", "eventType": "Note", "notes": notes, "insulin": 20] as [String: Any]])
         let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: ["Content-Type": "application/json"])!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)

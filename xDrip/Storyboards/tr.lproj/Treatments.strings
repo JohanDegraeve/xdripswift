@@ -25,7 +25,7 @@
 "treatments_basalInjection" = "Bazal (enjeksiyon)";
 "treatments_insulinDescription" = "İnsülin türü";
 "treatments_insulinDescriptionPlaceholder" = "ör. Tresiba";
-"treatments_invalidBasalInjectionValueMessage" = "Lütfen sıfırdan büyük bir tam sayı olarak ünite girin.";
+"treatments_invalidBasalInjectionValueMessage" = "0’dan büyük ve en fazla 150 üniteyi 0,5 adımlarla girin.";
 
 /* Footer shown when a new basal injection is prefilled from the previous entry. */
 "treatments_basalInjectionCopiedFooter" = "Bazal insülin miktarı ve türü önceki kayıttan kopyalandı";

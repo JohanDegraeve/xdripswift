@@ -69,7 +69,7 @@
 "treatments_basalInjection" = "Базальний інсулін (ін’єкція)";
 "treatments_insulinDescription" = "Тип інсуліну";
 "treatments_insulinDescriptionPlaceholder" = "наприклад, Тресіба";
-"treatments_invalidBasalInjectionValueMessage" = "Введіть ціле число одиниць більше нуля.";
+"treatments_invalidBasalInjectionValueMessage" = "Введіть більше 0 і не більше 150 одиниць із кроком 0,5.";
 
 /* Footer shown when a new basal injection is prefilled from the previous entry. */
 "treatments_basalInjectionCopiedFooter" = "Дозу й тип базального інсуліну скопійовано з попереднього запису";
