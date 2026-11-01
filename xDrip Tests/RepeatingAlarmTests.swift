@@ -36,6 +36,16 @@ final class RepeatingAlarmTests: XCTestCase {
             return { [weak self] in self?.vibrationCancellations += 1 }
         })
         func activate() { activations.removeFirst()(nil) }
+        /// Grants the pending activation, failing the test instead of crashing when none was requested.
+        func grant(file: StaticString = #filePath, line: UInt = #line) {
+            guard !activations.isEmpty else { return XCTFail("alarm did not ask iOS for the audio session", file: file, line: line) }
+            activate()
+        }
+        /// iOS refuses activation while a call or other real interruption still has priority.
+        func refuse(code: AVAudioSession.ErrorCode = .insufficientPriority, file: StaticString = #filePath, line: UInt = #line) {
+            guard !activations.isEmpty else { return XCTFail("alarm did not ask iOS for the audio session", file: file, line: line) }
+            activations.removeFirst()(NSError(domain: NSOSStatusErrorDomain, code: code.rawValue))
+        }
     }
 
     func testLoopingIsOptInAndConfiguredBeforePlayback() {
@@ -113,7 +123,9 @@ final class RepeatingAlarmTests: XCTestCase {
         h.activate()
         h.sound.handleInterruption(type: .began, shouldResume: false)
         h.sound.playSound(soundFileName: "xdripalert.aif", repeatSound: true)
-        XCTAssertTrue(h.activations.isEmpty)
+        h.refuse()
+        XCTAssertEqual(h.players[1].starts, 0)
+        XCTAssertTrue(h.sound.isPlaying())
         h.sound.handleInterruption(type: .ended, shouldResume: true)
         h.activate()
         XCTAssertEqual(h.players[0].starts, 1)
@@ -125,7 +137,9 @@ final class RepeatingAlarmTests: XCTestCase {
         let h = AudioHarness()
         h.sound.handleInterruption(type: .began, shouldResume: false)
         h.sound.playSound(soundFileName: "xdripalert.aif")
-        XCTAssertTrue(h.activations.isEmpty)
+        h.refuse()
+        XCTAssertEqual(h.players[0].starts, 0)
+        XCTAssertTrue(h.sound.isPlaying())
         h.sound.handleInterruption(type: .ended, shouldResume: true)
         h.activate()
         XCTAssertEqual(h.players[0].starts, 1)
@@ -137,9 +151,159 @@ final class RepeatingAlarmTests: XCTestCase {
         let h = AudioHarness()
         h.sound.handleInterruption(type: .began, shouldResume: false)
         h.sound.playSound(soundFileName: "xdripalert.aif")
+        h.refuse()
         h.sound.handleInterruption(type: .ended, shouldResume: false)
         XCTAssertFalse(h.sound.isPlaying())
         XCTAssertTrue(h.activations.isEmpty)
+    }
+
+    /// iOS may never post the end of an interruption, e.g. after another app took the audio
+    /// session. Later alarms must still sound once iOS grants the session again.
+    func testInterruptionWithoutEndDoesNotSilenceLaterAlarms() {
+        let h = AudioHarness()
+        h.sound.playSound(soundFileName: "xdripalert.aif")
+        h.activate()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        XCTAssertFalse(h.sound.isPlaying())
+
+        h.sound.playSound(soundFileName: "xdripalert.aif")
+        h.grant()
+        XCTAssertEqual(h.players[1].starts, 1)
+        h.sound.stopPlaying()
+
+        h.sound.playSound(soundFileName: "xdripalert.aif")
+        h.grant()
+        XCTAssertEqual(h.players[2].starts, 1)
+        h.sound.stopPlaying()
+    }
+
+    func testUnrelatedActivationErrorFailsInsteadOfWaitingForStaleInterruption() {
+        let h = AudioHarness()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        h.sound.playSound(soundFileName: "xdripalert.aif")
+        h.refuse(code: .cannotStartPlaying)
+        XCTAssertFalse(h.sound.isPlaying())
+    }
+
+    func testLateInterruptionEndDoesNotStopOrRestartGrantedAlarm() {
+        let h = AudioHarness()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        h.sound.playSound(soundFileName: "xdripalert.aif")
+        h.grant()
+        h.sound.handleInterruption(type: .ended, shouldResume: false)
+        XCTAssertTrue(h.sound.isPlaying())
+        XCTAssertEqual(h.players[0].stops, 0)
+        h.sound.handleInterruption(type: .ended, shouldResume: true)
+        XCTAssertTrue(h.activations.isEmpty)
+        XCTAssertEqual(h.players[0].starts, 1)
+        h.sound.stopPlaying()
+    }
+
+    /// A loop refused during a real interruption must not stay silent forever when the
+    /// end is never posted; each new reading retries through retryIfWaiting().
+    func testRefusedLoopWithoutInterruptionEndRetriesOnLaterReading() {
+        let h = AudioHarness()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        h.sound.playSound(soundFileName: "xdripalert.aif", repeatSound: true, repeatVibration: {})
+        h.refuse(code: .cannotInterruptOthers)
+        XCTAssertEqual(h.players[0].starts, 0)
+        XCTAssertTrue(h.sound.isPlaying())
+
+        h.sound.retryIfWaiting()
+        h.refuse()
+        XCTAssertEqual(h.players[0].starts, 0)
+
+        h.sound.retryIfWaiting()
+        h.grant()
+        XCTAssertEqual(h.players[0].starts, 1)
+        XCTAssertEqual(h.vibrationEvents.count, 1)
+        h.sound.stopPlaying()
+    }
+
+    func testPausedLoopWithoutInterruptionEndResumesOnRetry() {
+        let h = AudioHarness()
+        h.sound.playSound(soundFileName: "xdripalert.aif", repeatSound: true)
+        h.activate()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        XCTAssertEqual(h.players[0].pauses, 1)
+        h.sound.retryIfWaiting()
+        h.grant()
+        XCTAssertEqual(h.players[0].starts, 2)
+        h.sound.stopPlaying()
+    }
+
+    func testLoopNotResumedByIOSRetriesOnNextCheck() {
+        let h = AudioHarness()
+        h.sound.playSound(soundFileName: "xdripalert.aif", repeatSound: true)
+        h.activate()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        h.sound.handleInterruption(type: .ended, shouldResume: false)
+        XCTAssertTrue(h.activations.isEmpty)
+        h.sound.retryIfWaiting()
+        h.grant()
+        XCTAssertEqual(h.players[0].starts, 2)
+        h.sound.stopPlaying()
+    }
+
+    /// The retry must be wired into the alert check, not only exist on the player.
+    func testAlertCheckRetriesLoopWaitingOnInterruptionWithoutEnd() {
+        let (core, manager, type, h) = setupAlarm()
+        let wasMaster = UserDefaults.standard.isMaster
+        let until = UserDefaults.standard.snoozeAllAlertsUntilDate
+        defer {
+            manager.stopAlarmSound()
+            UserDefaults.standard.isMaster = wasMaster
+            UserDefaults.standard.snoozeAllAlertsUntilDate = until
+            withExtendedLifetime(core) {}
+        }
+        UserDefaults.standard.isMaster = true
+        UserDefaults.standard.snoozeAllAlertsUntilDate = nil
+        let entries = AlertEntriesAccessor(coreDataManager: core).getAllEntries(forAlertKind: nil, alertTypesAccessor: AlertTypesAccessor(coreDataManager: core))
+        for entry in entries { entry.isDisabled = true }
+        _ = present(manager, type, .low)
+        h.activate()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        XCTAssertTrue(h.activations.isEmpty)
+        _ = manager.checkAlerts(maxAgeOfLastBgReadingInSeconds: 60)
+        h.grant()
+        XCTAssertEqual(h.players[0].starts, 2)
+    }
+
+    func testPreviewResumesAfterInterruptionEndedWithoutResume() {
+        let h = AudioHarness()
+        h.sound.playSound(soundFileName: "xdripalert.aif", repeatSound: true)
+        h.activate()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        h.sound.handleInterruption(type: .ended, shouldResume: false)
+        h.sound.pausePlaying()
+        h.sound.resumePlaying()
+        h.grant()
+        XCTAssertEqual(h.players[0].starts, 2)
+        h.sound.stopPlaying()
+    }
+
+    func testRetryDoesNothingWhileAlarmPlaysOrActivationIsPending() {
+        let h = AudioHarness()
+        h.sound.playSound(soundFileName: "xdripalert.aif", repeatSound: true)
+        h.sound.retryIfWaiting()
+        XCTAssertEqual(h.activations.count, 1)
+        h.activate()
+        h.sound.retryIfWaiting()
+        XCTAssertTrue(h.activations.isEmpty)
+        XCTAssertEqual(h.players[0].starts, 1)
+        h.sound.stopPlaying()
+        h.sound.retryIfWaiting()
+        XCTAssertTrue(h.activations.isEmpty)
+    }
+
+    func testLoopAfterInterruptionWithoutEndPlaysAndVibrates() {
+        let h = AudioHarness()
+        h.sound.handleInterruption(type: .began, shouldResume: false)
+        h.sound.playSound(soundFileName: "xdripalert.aif", repeatSound: true, repeatVibration: {})
+        h.grant()
+        XCTAssertEqual(h.players[0].starts, 1)
+        XCTAssertEqual(h.vibrationEvents.count, 1)
+        h.sound.stopPlaying()
     }
 
     func testOldCompletionCannotStopReplacementPlayer() throws {

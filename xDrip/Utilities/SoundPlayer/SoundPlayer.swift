@@ -97,7 +97,9 @@ class SoundPlayer: NSObject, AVAudioPlayerDelegate {
             audioPlayer = try makePlayer(url)
             audioPlayer?.delegate = self
             audioPlayer?.numberOfLoops = repeatSound ? -1 : 0
-            if !interrupted { activateAndPlay() }
+            // iOS does not always post the end of an interruption, so a new alarm asks iOS
+            // instead of trusting the cached flag. A refusal keeps it waiting for the end.
+            activateAndPlay()
         } catch {
             playbackFailed(error)
         }
@@ -110,11 +112,20 @@ class SoundPlayer: NSObject, AVAudioPlayerDelegate {
         activateSession { [weak self] error in
             let finish = {
                 guard let self, self.playbackID == playbackID,
-                      self.activationID == activationID, !self.interrupted, !self.paused else { return }
+                      self.activationID == activationID, !self.paused else { return }
                 self.activationID = nil
                 if let error {
-                    self.playbackFailed(error)
-                } else if self.audioPlayer?.play() != true {
+                    if self.interrupted && Self.isRefusedByActiveInterruption(error) {
+                        // iOS confirmed the interruption is still active, so wait for its end.
+                        trace("alarm sound waits for the audio interruption to end: %{public}@", log: self.log, category: ConstantsLog.categoryPlaySound, type: .info, error.localizedDescription)
+                    } else {
+                        self.playbackFailed(error)
+                    }
+                    return
+                }
+                // A granted activation means any interruption we still remember is over.
+                self.interrupted = false
+                if self.audioPlayer?.play() != true {
                     self.playbackFailed(CocoaError(.fileReadUnknown))
                 } else {
                     self.startRepeatedVibration()
@@ -122,6 +133,15 @@ class SoundPlayer: NSObject, AVAudioPlayerDelegate {
             }
             if Thread.isMainThread { finish() } else { DispatchQueue.main.async(execute: finish) }
         }
+    }
+
+    /// Only these errors mean another audio session currently has priority. Any other
+    /// activation error is a real failure and must not leave the alarm waiting.
+    static func isRefusedByActiveInterruption(_ error: Error) -> Bool {
+        let nsError = error as NSError
+        guard nsError.domain == NSOSStatusErrorDomain else { return false }
+        return nsError.code == AVAudioSession.ErrorCode.insufficientPriority.rawValue
+            || nsError.code == AVAudioSession.ErrorCode.cannotInterruptOthers.rawValue
     }
 
     private func startRepeatedVibration() {
@@ -141,6 +161,16 @@ class SoundPlayer: NSObject, AVAudioPlayerDelegate {
         vibrationID = nil
         cancelVibration?()
         cancelVibration = nil
+    }
+
+    /// Ask iOS again for an alarm still waiting on an interruption whose end was never posted.
+    func retryIfWaiting() {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in self?.retryIfWaiting() }
+            return
+        }
+        guard playbackID != nil, activationID == nil, interrupted, !paused else { return }
+        activateAndPlay()
     }
 
     /// Keep Speak Glucose suppressed while playback is pending or interrupted.
@@ -168,7 +198,8 @@ class SoundPlayer: NSObject, AVAudioPlayerDelegate {
         }
         guard playbackID != nil, paused else { return }
         paused = false
-        if !interrupted { activateAndPlay() }
+        // Ask iOS rather than trusting a possibly stale interruption flag.
+        activateAndPlay()
     }
 
     func stopPlaying() {
@@ -200,8 +231,15 @@ class SoundPlayer: NSObject, AVAudioPlayerDelegate {
             audioPlayer?.pause()
             if !repeats { stopPlaying() }
         case .ended:
+            // A granted activation already closed this interruption; a late end must not
+            // stop or restart the alarm that is now playing.
+            guard interrupted else { return }
+            let resume = shouldResume && playbackID != nil
+            // A looping alarm iOS asked not to resume keeps waiting, so the next alert
+            // check retries it instead of leaving it paused until acknowledged.
+            if !resume && repeats && playbackID != nil { return }
             interrupted = false
-            if shouldResume && playbackID != nil {
+            if resume {
                 activateAndPlay()
             } else if !repeats {
                 stopPlaying()

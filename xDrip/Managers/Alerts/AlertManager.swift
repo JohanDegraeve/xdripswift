@@ -150,6 +150,8 @@ public class AlertManager: NSObject {
     public func checkAlerts(maxAgeOfLastBgReadingInSeconds: Double) -> Bool {
         // Keep the repeating alarm available for snoozing from its notification.
         validateRepeatingAlarm()
+        // iOS may never post the end of an interruption, so every check asks again.
+        soundPlayer?.retryIfWaiting()
         uNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers: alertNotificationIdentifers.filter { $0 != protectedAlarmNotificationIdentifier })
         
         // Do not return early for Snooze All. Each enabled alert must still evaluate its condition so
