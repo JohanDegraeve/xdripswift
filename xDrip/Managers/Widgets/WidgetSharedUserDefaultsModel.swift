@@ -39,6 +39,28 @@ struct WidgetSharedUserDefaultsModel: Codable, Equatable {
     var allowStandByHighContrast: Bool
     var forceStandByBigNumbers: Bool
 
+    /// Missing or unreadable collector data must never become demonstration readings.
+    /// Keep values paired with their measurement dates before giving them to the widget.
+    static func decodeForDisplay(_ encodedData: Data?) -> Self {
+        if let encodedData,
+           let data = try? JSONDecoder().decode(Self.self, from: encodedData),
+           data.bgReadingValues.count == data.bgReadingDatesAsDouble.count {
+            return data
+        }
+
+        return Self(
+            bgReadingValues: [], bgReadingDatesAsDouble: [], isMgDl: true,
+            slopeOrdinal: 0, deltaValueInUserUnit: 0,
+            urgentLowLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl,
+            lowLimitInMgDl: ConstantsBGGraphBuilder.defaultLowMarkInMgdl,
+            highLimitInMgDl: ConstantsBGGraphBuilder.defaultHighMarkInMgdl,
+            urgentHighLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl,
+            dataSourceDescription: "", followerPatientName: nil,
+            aidStatus: nil, therapyMetrics: nil,
+            allowStandByHighContrast: true, forceStandByBigNumbers: false
+        )
+    }
+
 }
 
 /// Remember completed publications, not requests which may still be queued or replaced.
