@@ -193,3 +193,22 @@
 "showHideGlucoseChartTitle" = "Gráfico";
 "manualSensorCodeEntryFooter" = "Si no puedes escanear la etiqueta ni usar una foto, introduce el código de cuatro dígitos manualmente.";
 "useWithoutSensorCodeFooter" = "Si no tienes el código o quieres usar una sesión de sensor que ya está activa en el transmisor, selecciona Usar sin código.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "Ajuste de glucosa";
+"postProcessingSmoothing" = "Suavizado de glucosa";
+"postProcessingCurveAdjustment" = "Ajuste de curva";
+"postProcessingEnableGlucoseAdjustment" = "¿Activar el ajuste de glucosa?";
+"postProcessingEnableCurveAdjustment" = "¿Activar el ajuste de curva?";
+"postProcessingEnableGlucoseSmoothing" = "¿Activar el suavizado de glucosa?";
+"postProcessingGlucoseAdjustmentWarning" = "El ajuste de glucosa suma o resta una compensación fija a las lecturas del sensor. Actívalo solo tras confirmar una diferencia constante con mediciones capilares cuando la glucosa esté estable. Las diferencias grandes o persistentes pueden indicar que el sensor no es fiable.";
+"postProcessingCurveAdjustmentWarning" = "El ajuste de curva es una función avanzada que cambia la escala de los valores de glucosa. Actívalo solo si entiendes cómo afectan la escala y el énfasis a las lecturas.";
+"postProcessingGlucoseSmoothingWarning" = "El suavizado de glucosa reduce los saltos, el ruido y las fluctuaciones de las lecturas del sensor, pero puede retrasar o atenuar los cambios rápidos de glucosa. Actívalo solo si entiendes cómo afecta a las lecturas. El suavizado no puede corregir un sensor impreciso.";
+"postProcessingLargeOffsetWarning" = "Compensación de glucosa elevada. Comprueba con una medición capilar cuando la glucosa esté estable. Las diferencias grandes y persistentes pueden indicar que el sensor no es fiable.";
+"postProcessingOffsetLimit" = "La compensación supera el máximo de ±%@. Redúcela para aplicar este ajuste.";
+"postProcessingOffsetAccessibility" = "Compensación de glucosa: %@";
+"postProcessingInvalidAdjustment" = "No se ha podido aplicar el ajuste. Comprueba los valores de compensación y escala.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "El ajuste del desplazamiento y la forma no está disponible porque este MCG usa calibración propia.";
+
+"postProcessingWarningAgreement" = "Pulsa Aceptar solo si entiendes esta función y aceptas activarla.";

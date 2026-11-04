@@ -219,3 +219,22 @@
 "showHideGlucoseChartTitle" = "Gráfico";
 "manualSensorCodeEntryFooter" = "Se não conseguir ler a etiqueta com a câmara nem usar uma fotografia, introduza manualmente o código de quatro dígitos.";
 "useWithoutSensorCodeFooter" = "Se não tiver o código ou quiser usar uma sessão de sensor já ativa no transmissor, escolha Usar sem código.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "Ajuste da glicose";
+"postProcessingSmoothing" = "Suavização da glicose";
+"postProcessingCurveAdjustment" = "Ajuste da curva";
+"postProcessingEnableGlucoseAdjustment" = "Ativar o ajuste da glicose?";
+"postProcessingEnableCurveAdjustment" = "Ativar o ajuste da curva?";
+"postProcessingEnableGlucoseSmoothing" = "Ativar a suavização da glicose?";
+"postProcessingGlucoseAdjustmentWarning" = "O ajuste da glicose soma ou subtrai um desvio fixo às leituras do sensor. Ative-o apenas depois de confirmar uma diferença constante face a medições capilares quando a glicose estiver estável. Diferenças grandes ou persistentes podem indicar um sensor pouco fiável.";
+"postProcessingCurveAdjustmentWarning" = "O ajuste da curva é uma função avançada que altera a escala dos valores de glicose. Ative-o apenas se compreender como a escala e a ênfase afetam as leituras.";
+"postProcessingGlucoseSmoothingWarning" = "A suavização da glicose reduz saltos, ruído e flutuações nas leituras do sensor, mas pode atrasar ou atenuar alterações rápidas da glicose. Ative-a apenas se compreender como afeta as leituras. A suavização não pode corrigir um sensor impreciso.";
+"postProcessingLargeOffsetWarning" = "Desvio de glicose elevado. Confirme com uma medição capilar quando a glicose estiver estável. Diferenças grandes e persistentes podem indicar um sensor pouco fiável.";
+"postProcessingOffsetLimit" = "O desvio ultrapassa o máximo de ±%@. Reduza-o para aplicar este ajuste.";
+"postProcessingOffsetAccessibility" = "Desvio da glicose: %@";
+"postProcessingInvalidAdjustment" = "Não foi possível aplicar o ajuste. Verifique os valores de desvio e escala.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "O ajuste do desvio e da forma não está disponível porque este CGM usa calibração própria.";
+
+"postProcessingWarningAgreement" = "Toque em OK apenas se compreender esta funcionalidade e concordar em ativá-la.";

@@ -221,3 +221,22 @@
 "showHideGlucoseChartTitle" = "Grafiek";
 "manualSensorCodeEntryFooter" = "Als je het etiket niet kunt scannen of geen foto kunt gebruiken, voer je de viercijferige code handmatig in.";
 "useWithoutSensorCodeFooter" = "Als je de code niet hebt of een sensorsessie wilt gebruiken die al op de zender actief is, kies dan Zonder code gebruiken.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "Glucoseaanpassing";
+"postProcessingSmoothing" = "Glucoseafvlakking";
+"postProcessingCurveAdjustment" = "Curveaanpassing";
+"postProcessingEnableGlucoseAdjustment" = "Glucoseaanpassing inschakelen?";
+"postProcessingEnableCurveAdjustment" = "Curveaanpassing inschakelen?";
+"postProcessingEnableGlucoseSmoothing" = "Glucoseafvlakking inschakelen?";
+"postProcessingGlucoseAdjustmentWarning" = "Glucoseaanpassing telt een vaste offset op bij de sensorwaarden of trekt deze ervan af. Schakel dit alleen in nadat je bij stabiele glucose een constant verschil met vingerprikmetingen hebt bevestigd. Grote of aanhoudende verschillen kunnen wijzen op een onbetrouwbare sensor.";
+"postProcessingCurveAdjustmentWarning" = "Curveaanpassing is een geavanceerde functie die de schaal van glucosewaarden wijzigt. Schakel dit alleen in als je begrijpt hoe Schaal en Nadruk je waarden beïnvloeden.";
+"postProcessingGlucoseSmoothingWarning" = "Glucoseafvlakking vermindert sprongen, ruis en schommelingen in sensorwaarden, maar kan snelle glucoseveranderingen vertragen of afzwakken. Schakel dit alleen in als je begrijpt hoe het je waarden beïnvloedt. Afvlakking kan een onnauwkeurige sensor niet corrigeren.";
+"postProcessingLargeOffsetWarning" = "Grote glucose-offset. Controleer met een vingerprik wanneer de glucose stabiel is. Aanhoudende grote verschillen kunnen wijzen op een onbetrouwbare sensor.";
+"postProcessingOffsetLimit" = "De offset overschrijdt het maximum van ±%@. Verlaag de offset om deze aanpassing toe te passen.";
+"postProcessingOffsetAccessibility" = "Glucose-offset: %@";
+"postProcessingInvalidAdjustment" = "De aanpassing kon niet worden toegepast. Controleer de offset en schaal.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "Aanpassing van de offset en vorm is niet beschikbaar omdat deze CGM een eigen kalibratie gebruikt.";
+
+"postProcessingWarningAgreement" = "Tik alleen op OK als je deze functie begrijpt en ermee instemt om deze in te schakelen.";

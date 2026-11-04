@@ -279,3 +279,22 @@
 "showHideGlucoseChartTitle" = "Wykres";
 "manualSensorCodeEntryFooter" = "Jeśli nie możesz zeskanować etykiety ani użyć zdjęcia, wpisz czterocyfrowy kod ręcznie.";
 "useWithoutSensorCodeFooter" = "Jeśli nie masz kodu lub chcesz użyć sesji sensora już działającej w nadajniku, wybierz Użyj bez kodu.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "Korekta glukozy";
+"postProcessingSmoothing" = "Wygładzanie glukozy";
+"postProcessingCurveAdjustment" = "Korekta krzywej";
+"postProcessingEnableGlucoseAdjustment" = "Włączyć korektę glukozy?";
+"postProcessingEnableCurveAdjustment" = "Włączyć korektę krzywej?";
+"postProcessingEnableGlucoseSmoothing" = "Włączyć wygładzanie glukozy?";
+"postProcessingGlucoseAdjustmentWarning" = "Korekta glukozy dodaje lub odejmuje stałe przesunięcie od odczytów sensora. Włącz ją dopiero po potwierdzeniu stałej różnicy względem pomiarów z palca przy stabilnej glukozie. Duże lub utrzymujące się różnice mogą wskazywać na niewiarygodny sensor.";
+"postProcessingCurveAdjustmentWarning" = "Korekta krzywej to zaawansowana funkcja zmieniająca skalowanie wartości glukozy. Włącz ją tylko wtedy, gdy rozumiesz wpływ skali i akcentowania na odczyty.";
+"postProcessingGlucoseSmoothingWarning" = "Wygładzanie glukozy ogranicza skoki, szum i wahania odczytów sensora, ale może opóźniać lub łagodzić szybkie zmiany glukozy. Włącz je tylko wtedy, gdy rozumiesz jego wpływ na odczyty. Wygładzanie nie naprawi niedokładnego sensora.";
+"postProcessingLargeOffsetWarning" = "Duże przesunięcie glukozy. Sprawdź pomiarem z palca przy stabilnej glukozie. Utrzymujące się duże różnice mogą wskazywać na niewiarygodny sensor.";
+"postProcessingOffsetLimit" = "Przesunięcie przekracza maksimum ±%@. Zmniejsz je, aby zastosować korektę.";
+"postProcessingOffsetAccessibility" = "Przesunięcie glukozy: %@";
+"postProcessingInvalidAdjustment" = "Nie można zastosować korekty. Sprawdź przesunięcie i skalę.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "Korekta przesunięcia i kształtu jest niedostępna, ponieważ ten CGM używa własnej kalibracji.";
+
+"postProcessingWarningAgreement" = "Wybierz OK tylko wtedy, gdy rozumiesz tę funkcję i zgadzasz się ją włączyć.";

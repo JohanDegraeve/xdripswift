@@ -279,3 +279,22 @@
 "showHideGlucoseChartTitle" = "Graf";
 "manualSensorCodeEntryFooter" = "Če ne morete optično prebrati nalepke ali uporabiti fotografije, štirimestno kodo vnesite ročno.";
 "useWithoutSensorCodeFooter" = "Če kode nimate ali želite uporabiti sejo senzorja, ki že poteka na oddajniku, izberite Uporabi brez kode.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "Prilagoditev glukoze";
+"postProcessingSmoothing" = "Glajenje glukoze";
+"postProcessingCurveAdjustment" = "Prilagoditev krivulje";
+"postProcessingEnableGlucoseAdjustment" = "Omogočim prilagoditev glukoze?";
+"postProcessingEnableCurveAdjustment" = "Omogočim prilagoditev krivulje?";
+"postProcessingEnableGlucoseSmoothing" = "Omogočim glajenje glukoze?";
+"postProcessingGlucoseAdjustmentWarning" = "Prilagoditev glukoze odčitkom senzorja prišteje ali odšteje stalen odmik. Omogočite jo šele po potrditvi stalne razlike glede na meritve iz prsta, ko je glukoza stabilna. Velike ali trajne razlike lahko pomenijo nezanesljiv senzor.";
+"postProcessingCurveAdjustmentWarning" = "Prilagoditev krivulje je napredna funkcija, ki spremeni skaliranje vrednosti glukoze. Omogočite jo le, če razumete, kako merilo in poudarek vplivata na odčitke.";
+"postProcessingGlucoseSmoothingWarning" = "Glajenje glukoze zmanjša skoke, šum in nihanja v odčitkih senzorja, vendar lahko zakasni ali ublaži hitre spremembe glukoze. Omogočite ga le, če razumete vpliv na odčitke. Glajenje ne more popraviti nenatančnega senzorja.";
+"postProcessingLargeOffsetWarning" = "Velik odmik glukoze. Preverite z meritvijo iz prsta, ko je glukoza stabilna. Trajne velike razlike lahko pomenijo nezanesljiv senzor.";
+"postProcessingOffsetLimit" = "Odmik presega največjo vrednost ±%@. Zmanjšajte odmik, da uporabite prilagoditev.";
+"postProcessingOffsetAccessibility" = "Odmik glukoze: %@";
+"postProcessingInvalidAdjustment" = "Prilagoditve ni bilo mogoče uporabiti. Preverite odmik in merilo.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "Prilagajanje odmika in oblike ni na voljo, ker ta CGM uporablja lastno kalibracijo.";
+
+"postProcessingWarningAgreement" = "Tapnite V redu samo, če razumete to funkcijo in se strinjate, da jo omogočite.";

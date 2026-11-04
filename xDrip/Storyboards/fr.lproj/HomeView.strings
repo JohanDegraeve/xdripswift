@@ -219,3 +219,22 @@
 "showHideGlucoseChartTitle" = "Graphique";
 "manualSensorCodeEntryFooter" = "Si vous ne pouvez pas scanner l’étiquette ni utiliser une photo, saisissez le code à quatre chiffres manuellement.";
 "useWithoutSensorCodeFooter" = "Si vous ne connaissez pas le code ou souhaitez utiliser une session de capteur déjà active sur le transmetteur, choisissez Utiliser sans code.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "Ajustement du glucose";
+"postProcessingSmoothing" = "Lissage du glucose";
+"postProcessingCurveAdjustment" = "Ajustement de la courbe";
+"postProcessingEnableGlucoseAdjustment" = "Activer l’ajustement du glucose ?";
+"postProcessingEnableCurveAdjustment" = "Activer l’ajustement de la courbe ?";
+"postProcessingEnableGlucoseSmoothing" = "Activer le lissage du glucose ?";
+"postProcessingGlucoseAdjustmentWarning" = "L’ajustement du glucose ajoute ou soustrait un décalage fixe aux mesures du capteur. Activez-le uniquement après avoir confirmé un écart constant avec des mesures capillaires lorsque le glucose est stable. Des écarts importants ou persistants peuvent indiquer un capteur peu fiable.";
+"postProcessingCurveAdjustmentWarning" = "L’ajustement de la courbe est une fonction avancée qui modifie l’échelle des valeurs de glucose. Activez-le uniquement si vous comprenez l’effet de l’échelle et de l’accentuation sur vos mesures.";
+"postProcessingGlucoseSmoothingWarning" = "Le lissage du glucose réduit les sauts, le bruit et les fluctuations des mesures du capteur, mais peut retarder ou atténuer les variations rapides du glucose. Activez-le uniquement si vous comprenez son effet sur vos mesures. Le lissage ne peut pas corriger un capteur imprécis.";
+"postProcessingLargeOffsetWarning" = "Décalage de glucose important. Vérifiez avec une mesure capillaire lorsque le glucose est stable. Des écarts importants et persistants peuvent indiquer un capteur peu fiable.";
+"postProcessingOffsetLimit" = "Le décalage dépasse le maximum de ±%@. Réduisez-le pour appliquer cet ajustement.";
+"postProcessingOffsetAccessibility" = "Décalage de glucose : %@";
+"postProcessingInvalidAdjustment" = "L’ajustement n’a pas pu être appliqué. Vérifiez le décalage et l’échelle.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "Le réglage du décalage et de la forme est indisponible, car ce CGM utilise son propre calibrage.";
+
+"postProcessingWarningAgreement" = "Touchez OK uniquement si vous comprenez cette fonctionnalité et acceptez de l’activer.";

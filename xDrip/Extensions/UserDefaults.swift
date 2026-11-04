@@ -136,6 +136,9 @@ extension UserDefaults {
         case liveActivityShowIOBCOB = "liveActivityShowIOBCOB"
         /// should BG adjustment be enabled?
         case enableAdjustment = "enableAdjustment"
+        /// Separate offset and curve controls. enableAdjustment remains the combined processing flag.
+        case enableGlucoseAdjustment = "enableGlucoseAdjustment"
+        case enableCurveAdjustment = "enableCurveAdjustment"
         /// should BG smoothing be enabled?
         case enableSmoothing = "enableSmoothing"
         /// BG smoothing period in minutes
@@ -1099,6 +1102,18 @@ extension UserDefaults {
         set {
             set(newValue, forKey: Key.enableAdjustment.rawValue)
         }
+    }
+
+    /// Fall back to the combined setting for existing offset adjustments.
+    @objc dynamic var enableGlucoseAdjustment: Bool {
+        get { object(forKey: Key.enableGlucoseAdjustment.rawValue) as? Bool ?? enableAdjustment }
+        set { set(newValue, forKey: Key.enableGlucoseAdjustment.rawValue) }
+    }
+
+    /// Curve adjustment is opt-in and defaults to disabled.
+    @objc dynamic var enableCurveAdjustment: Bool {
+        get { bool(forKey: Key.enableCurveAdjustment.rawValue) }
+        set { set(newValue, forKey: Key.enableCurveAdjustment.rawValue) }
     }
 
     /// should smoothing be enabled?

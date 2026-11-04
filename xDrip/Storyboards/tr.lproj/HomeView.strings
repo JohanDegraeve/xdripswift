@@ -183,3 +183,22 @@
 "showHideGlucoseChartTitle" = "Grafik";
 "manualSensorCodeEntryFooter" = "Etiketi tarayamıyor veya fotoğraf kullanamıyorsanız dört haneli kodu elle girin.";
 "useWithoutSensorCodeFooter" = "Kodunuz yoksa veya vericide zaten çalışan bir sensör oturumunu kullanmak istiyorsanız Kodsuz Kullan seçeneğini seçin.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "Glikoz Ayarı";
+"postProcessingSmoothing" = "Glikoz Yumuşatma";
+"postProcessingCurveAdjustment" = "Eğri Ayarı";
+"postProcessingEnableGlucoseAdjustment" = "Glikoz Ayarı etkinleştirilsin mi?";
+"postProcessingEnableCurveAdjustment" = "Eğri Ayarı etkinleştirilsin mi?";
+"postProcessingEnableGlucoseSmoothing" = "Glikoz Yumuşatma etkinleştirilsin mi?";
+"postProcessingGlucoseAdjustmentWarning" = "Glikoz Ayarı, sensör okumalarına sabit bir ofset ekler veya çıkarır. Yalnızca glikoz sabitken parmak ucu ölçümleriyle tutarlı bir fark olduğunu doğruladıktan sonra etkinleştirin. Büyük veya kalıcı farklar güvenilmez bir sensöre işaret edebilir.";
+"postProcessingCurveAdjustmentWarning" = "Eğri Ayarı, glikoz değerlerinin ölçeklenmesini değiştiren gelişmiş bir özelliktir. Yalnızca Ölçek ve Vurgu ayarlarının okumalarınızı nasıl etkilediğini anlıyorsanız etkinleştirin.";
+"postProcessingGlucoseSmoothingWarning" = "Glikoz Yumuşatma, sensör okumalarındaki sıçramaları, gürültüyü ve dalgalanmaları azaltır ancak hızlı glikoz değişimlerini geciktirebilir veya hafifletebilir. Yalnızca okumalarınızı nasıl etkilediğini anlıyorsanız etkinleştirin. Yumuşatma, hatalı ölçen bir sensörü düzeltemez.";
+"postProcessingLargeOffsetWarning" = "Büyük glikoz ofseti. Glikoz sabitken parmak ucu ölçümüyle doğrulayın. Kalıcı büyük farklar güvenilmez bir sensöre işaret edebilir.";
+"postProcessingOffsetLimit" = "Ofset, ±%@ üst sınırını aşıyor. Bu ayarı uygulamak için ofseti azaltın.";
+"postProcessingOffsetAccessibility" = "Glikoz ofseti: %@";
+"postProcessingInvalidAdjustment" = "Ayar uygulanamadı. Ofset ve ölçek değerlerini kontrol edin.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "Bu CGM kendi kalibrasyonunu kullandığından ofset ve şekil ayarı kullanılamaz.";
+
+"postProcessingWarningAgreement" = "Yalnızca bu özelliği anlıyor ve etkinleştirmeyi kabul ediyorsanız Tamam’a dokunun.";
