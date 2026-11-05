@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import SwiftUI
 import UIKit
 @testable import xdrip
 
@@ -426,6 +427,38 @@ final class BasalInjectionTests: XCTestCase {
         XCTAssertEqual(label?.count, GlucoseChartTreatmentStyle.noteLabelCharacterLimit)
         XCTAssertTrue(label?.hasSuffix("…") == true)
         XCTAssertEqual(longNote.count, 25)
+    }
+
+    /// Text fields span the row after their label; a 72-96 pt field made users tap several times before the keyboard appeared.
+    @MainActor func testEditorTextFieldsFillTheirRows() throws {
+        let expectedFieldCounts: [TreatmentType: Int] = [.Insulin: 2, .Carbs: 2, .BgCheck: 2, .Exercise: 2, .BasalInjection: 3, .Note: 1]
+        for type in TreatmentEditorViewModel.supportedTreatmentTypes {
+            let editor = TreatmentEditorViewModel(coreDataManager: nil, treatmentToEdit: nil, initialType: type)
+            let host = UIHostingController(rootView: NavigationStack { TreatmentEditorView(viewModel: editor, onDelete: nil) })
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 402, height: 874))
+            window.rootViewController = host
+            window.makeKeyAndVisible()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.3))
+            host.view.layoutIfNeeded()
+
+            func textFields(in view: UIView) -> [UITextField] {
+                (view as? UITextField).map { [$0] } ?? view.subviews.flatMap { textFields(in: $0) }
+            }
+            let fields = textFields(in: host.view)
+            XCTAssertEqual(fields.count, expectedFieldCounts[type], "\(type)")
+            for field in fields {
+                XCTAssertGreaterThan(field.bounds.width, 150, "\(type) field \(field.placeholder ?? "")")
+            }
+
+            let image = UIGraphicsImageRenderer(size: host.view.bounds.size).image { _ in
+                host.view.drawHierarchy(in: host.view.bounds, afterScreenUpdates: true)
+            }
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "Treatment-editor-\(type.rawValue)"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+            window.isHidden = true
+        }
     }
 
     private func envelope(_ json: String) -> String {

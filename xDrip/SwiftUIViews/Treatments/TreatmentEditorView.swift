@@ -138,6 +138,15 @@ struct TreatmentEditorView: View {
 
     @ObservedObject var viewModel: TreatmentEditorViewModel
 
+    /// Lets a tap on a row's label focus that row's text field.
+    @FocusState private var focusedField: EditorField?
+
+    private enum EditorField {
+        case value
+        case insulinDescription
+        case enteredBy
+    }
+
     let onDelete: (() -> Void)?
 
     // MARK: - SwiftUI views
@@ -163,28 +172,34 @@ struct TreatmentEditorView: View {
                 .foregroundStyle(Color(.colorSecondary))
 
                 if viewModel.showsNumericValueEditor {
-                    LabeledContent(Texts_TreatmentsView.value) {
+                    // The field fills the space after the label, so the whole row is its tap target.
+                    LabeledContent {
                         HStack(spacing: 6) {
                             TextField(viewModel.valuePlaceholder, text: $viewModel.enteredValue)
                                 .keyboardType(viewModel.selectedType == .BasalInjection ? .numberPad : .decimalPad)
                                 .multilineTextAlignment(.trailing)
                                 .textFieldStyle(.plain)
                                 .foregroundStyle(Color(.colorSecondary))
-                                .frame(minWidth: 72, maxWidth: 96, alignment: .trailing)
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                                .focused($focusedField, equals: .value)
 
                             Text(viewModel.unitText)
                                 .foregroundStyle(Color(.colorTertiary))
                         }
-                        .fixedSize(horizontal: true, vertical: false)
+                    } label: {
+                        fieldLabel(Texts_TreatmentsView.value, focusing: .value)
                     }
                 }
 
                 if viewModel.selectedType == .BasalInjection {
-                    LabeledContent(Texts_TreatmentsView.insulinDescription) {
+                    LabeledContent {
                         TextField(Texts_TreatmentsView.insulinDescriptionPlaceholder, text: $viewModel.enteredInsulinDescription)
                             .multilineTextAlignment(.trailing)
                             .textFieldStyle(.plain)
                             .foregroundStyle(Color(.colorSecondary))
+                            .focused($focusedField, equals: .insulinDescription)
+                    } label: {
+                        fieldLabel(Texts_TreatmentsView.insulinDescription, focusing: .insulinDescription)
                     }
                 }
 
@@ -210,12 +225,15 @@ struct TreatmentEditorView: View {
             }
 
             Section {
-                LabeledContent(Texts_TreatmentsView.enteredBy) {
+                LabeledContent {
                     TextField(Texts_Common.unknown, text: $viewModel.enteredByValue)
                         .multilineTextAlignment(.trailing)
                         .textFieldStyle(.plain)
                         .foregroundStyle(Color(.colorSecondary))
-                        .frame(minWidth: 120, maxWidth: 220, alignment: .trailing)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .focused($focusedField, equals: .enteredBy)
+                } label: {
+                    fieldLabel(Texts_TreatmentsView.enteredBy, focusing: .enteredBy)
                 }
             }
 
@@ -246,6 +264,14 @@ struct TreatmentEditorView: View {
         .onChange(of: viewModel.selectedDate) { _ in
             viewModel.validateSelectedDateIfNeeded()
         }
+    }
+
+    /// Row label that focuses its field when tapped; the gesture stays off the field so text selection keeps working.
+    private func fieldLabel(_ title: String, focusing field: EditorField) -> some View {
+        Text(title)
+            .layoutPriority(1)
+            .contentShape(Rectangle())
+            .onTapGesture { focusedField = field }
     }
 
     @ViewBuilder private func editorFooterView() -> some View {
