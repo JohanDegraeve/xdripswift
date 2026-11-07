@@ -26,6 +26,8 @@ import OSLog
     @Published var enteredByValue: String
     @Published var enteredNotesValue: String
     @Published var enteredInsulinDescription: String
+    /// Experimental: the insulin of a bolus, stored in its notes. Nil uses the default bolus insulin.
+    @Published var selectedBolusInsulin: InsulinProfile?
     @Published var alertMessage: TreatmentEditorAlertMessage?
 
     /// Only show the copied-values footer when both fields were prefilled for a new injection.
@@ -63,6 +65,7 @@ import OSLog
         self.enteredNotesValue = treatmentToEdit?.notes ?? ""
         // Editing always uses the saved treatment. Defaults only prefill a new injection draft.
         self.enteredInsulinDescription = treatmentToEdit?.notes ?? (initialType == .BasalInjection ? UserDefaults.standard.lastBasalInjectionInsulinDescription : "")
+        self.selectedBolusInsulin = treatmentToEdit?.treatmentType == .Insulin ? InsulinProfile.matching(notes: treatmentToEdit?.notes) : nil
 
         if let treatmentToEdit = treatmentToEdit {
             if treatmentToEdit.treatmentType == .Note {
@@ -85,6 +88,11 @@ import OSLog
 
     var isAddMode: Bool {
         originalTreatment == nil
+    }
+
+    /// Experimental insulin support lets a bolus name its insulin and a basal injection pick one.
+    var showsExperimentalInsulinChoice: Bool {
+        UserDefaults.standard.experimentalInsulinsEnabled && (selectedType == .Insulin || selectedType == .BasalInjection)
     }
 
     /// BG checks are measurements and retain their existing no-future rule.
@@ -171,7 +179,7 @@ import OSLog
         guard selectedType != .BasalInjection || normalizedInsulinDescription() != nil else { return false }
 
         let normalizedNotesValue = normalizedNotesValue()
-        let storedNotesValue = selectedType == .BasalInjection ? normalizedInsulinDescription() : (selectedType == .Note ? normalizedNotesValue : nil)
+        let storedNotesValue = storedNotes()
         let storedNightscoutEventType = selectedType == .Note || selectedType == .BasalInjection ? ConstantsNightscout.noteEventType : nil
         let storedValue: Double
 
@@ -388,8 +396,19 @@ import OSLog
         return currentStoredState() != initialTreatmentState
     }
 
+    /// The notes saved with the treatment: a basal injection's insulin description, a note's text,
+    /// and with experimental insulin support a bolus's chosen insulin.
+    private func storedNotes() -> String? {
+        switch selectedType {
+        case .BasalInjection: return normalizedInsulinDescription()
+        case .Note: return normalizedNotesValue()
+        case .Insulin where UserDefaults.standard.experimentalInsulinsEnabled: return selectedBolusInsulin?.shortName
+        default: return nil
+        }
+    }
+
     private func currentStoredState() -> TreatmentEditorInitialState? {
-        let storedNotesValue = selectedType == .BasalInjection ? normalizedInsulinDescription() : (selectedType == .Note ? normalizedNotesValue() : nil)
+        let storedNotesValue = storedNotes()
         let storedValue: Double
 
         if selectedType == .Note {

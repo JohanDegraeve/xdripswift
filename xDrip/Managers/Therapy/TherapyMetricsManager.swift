@@ -30,6 +30,8 @@ final class TherapyMetricsManager {
     // Configured during app setup. Snapshot/status providers are read by main-thread consumers.
     // Worker queues use only Core Data queue operations and immutable calculation inputs.
     private var coreDataManager: CoreDataManager?
+    /// Read by the experimental prediction and insulin chart, which fetch their own treatment types.
+    var configuredCoreDataManager: CoreDataManager? { coreDataManager }
     private var externalStatus: (() -> AIDStatus?)?
     private let lock = NSLock()
     private var revision = 0
@@ -223,14 +225,7 @@ final class TherapyMetricsManager {
             let request = TreatmentEntry.fetchRequest()
             request.predicate = NSPredicate(format: "date >= %@ AND date <= %@ AND (treatmentdeleted == NO OR treatmentdeleted == nil) AND treatmentType IN %@", from as NSDate, to as NSDate, [TreatmentType.Insulin.rawValue, TreatmentType.Carbs.rawValue])
             do {
-                result = try context.fetch(request).filter { entry in
-                    let careLink = entry.careLinkSourceIdentifier != nil || (entry.nightscoutEventType != nil && entry.enteredBy == "CareLink")
-                    if careLink { return policy.importsTherapyFromCareLink }
-                    // Local bolus/carb entries keep a nil remote event type through upload and
-                    // reconciliation. enteredBy is editable text, not reliable source identity.
-                    let local = entry.id.isEmpty || entry.nightscoutEventType == nil
-                    return local || policy.importsTreatmentsFromNightscout
-                }.map { TherapyTreatment(date: $0.date, amount: $0.value, isIOB: $0.treatmentType == .Insulin) }
+                result = try context.fetch(request).filter { Self.includesTherapyTreatment($0, policy: policy) }.map { TherapyTreatment(date: $0.date, amount: $0.value, isIOB: $0.treatmentType == .Insulin) }
             } catch { result = nil }
         }
         lock.lock()
@@ -241,6 +236,16 @@ final class TherapyMetricsManager {
         treatmentCache[cacheKey] = result
         if result == nil { failedReads[cacheKey] = Date() }
         return result
+    }
+
+    /// Whether a treatment comes from a source the configured data flow lets into therapy estimates.
+    static func includesTherapyTreatment(_ entry: TreatmentEntry, policy: DataFlowPolicy) -> Bool {
+        let careLink = entry.careLinkSourceIdentifier != nil || (entry.nightscoutEventType != nil && entry.enteredBy == "CareLink")
+        if careLink { return policy.importsTherapyFromCareLink }
+        // Local bolus/carb entries keep a nil remote event type through upload and
+        // reconciliation. enteredBy is editable text, not reliable source identity.
+        let local = entry.id.isEmpty || entry.nightscoutEventType == nil
+        return local || policy.importsTreatmentsFromNightscout
     }
 
     func chart(from start: Date, to end: Date) async -> TherapyChartSeries {

@@ -108,6 +108,7 @@ struct GlucoseChartView: View {
 
     private var therapySeries = TherapyChartSeries()
     private var renderBasalDownwards = false
+    private var experimentalPlotData = GlucoseChartExperimentalPlots()
 
     // MARK: - Input Data
 
@@ -305,6 +306,19 @@ struct GlucoseChartView: View {
         var view = self
         view.therapySeries = series
         return view
+    }
+
+    /// Experimental prediction, insulin activity and line style. Only the app's main chart sets them.
+    func experimentalPlots(_ plots: GlucoseChartExperimentalPlots) -> Self {
+        var view = self
+        view.experimentalPlotData = plots
+        return view
+    }
+
+    /// The forecast is shown only while the chart ends at the present.
+    private var showsPrediction: Bool {
+        usesMainChartYAxisContext && !experimentalPlotData.prediction.isEmpty
+            && visibleEndDate.timeIntervalSinceNow > -ConstantsGlucoseChartSwiftUI.experimentalPredictionPresentTolerance
     }
 
     /// Blood glucose color dependant on the user defined limit values
@@ -518,6 +532,13 @@ struct GlucoseChartView: View {
     /// of the view's rounded corner without creating future glucose values.
     private func renderedXScaleEndDate() -> Date {
         if usesMainChartYAxisContext {
+            // Room for the forecast: a quarter of the visible span, at least half an hour, never
+            // more than the forecast itself.
+            if showsPrediction, let lastPredictionDate = experimentalPlotData.prediction.last?.date, lastPredictionDate > visibleEndDate {
+                let futureSpan = max(visibleEndDate.timeIntervalSince(visibleStartDate) * ConstantsGlucoseChartSwiftUI.experimentalPredictionFutureShare,
+                                     ConstantsGlucoseChartSwiftUI.experimentalPredictionMinimumFutureSpan)
+                return min(lastPredictionDate, visibleEndDate.addingTimeInterval(futureSpan))
+            }
             return visibleEndDate
         }
 
@@ -625,6 +646,72 @@ struct GlucoseChartView: View {
         }
     }
 
+    @ChartContentBuilder
+    private func insulinActivityMarks(layers: [GlucoseChartExperimentalPlots.InsulinLayer], baseline: Double) -> some ChartContent {
+        let maximumRate = max(layers.flatMap { $0.points.map(\.top) }.max() ?? 0, ConstantsGlucoseChartSwiftUI.experimentalInsulinMinimumScaleUnitsPerHour)
+        let height = (ConstantsGlucoseChartSwiftUI.therapyPlotReferenceHeightInMgDl - baseline) * ConstantsGlucoseChartSwiftUI.therapyPlotHeightMultiplier
+        let y: (Double) -> Double = { baseline + height * $0 / (maximumRate * ConstantsGlucoseChartSwiftUI.experimentalInsulinScaleHeadroom) }
+        ForEach(layers) { layer in
+            ForEach(layer.points) { point in
+                AreaMark(x: .value("Time", point.date),
+                         yStart: .value("BG", y(point.bottom)),
+                         yEnd: .value("BG", y(point.top)),
+                         series: .value("Series", "insulin-fill-\(layer.id)"))
+                    .interpolationMethod(.linear)
+                    .foregroundStyle(layer.color.opacity(ConstantsGlucoseChartSwiftUI.experimentalInsulinFillOpacity))
+                    .accessibilityHidden(true)
+            }
+        }
+        ForEach(layers) { layer in
+            ForEach(layer.points) { point in
+                LineMark(x: .value("Time", point.date), y: .value("BG", y(point.top)),
+                         series: .value("Series", "insulin-\(layer.id)"))
+                    .interpolationMethod(.linear)
+                    .foregroundStyle(layer.color.opacity(ConstantsGlucoseChartSwiftUI.experimentalInsulinLineOpacity))
+                    .lineStyle(StrokeStyle(lineWidth: 1.2))
+                    .accessibilityLabel(layer.name)
+                    .accessibilityValue("\((point.top - point.bottom).formatted(.number.precision(.fractionLength(0...2)))) U/h")
+            }
+        }
+    }
+
+    @ChartContentBuilder
+    private func predictionMarks(endDate: Date, domain: ClosedRange<Double>) -> some ChartContent {
+        let points = experimentalPlotData.predictionPoints(until: endDate)
+        ForEach(points) { point in
+            LineMark(x: .value("Time", point.date),
+                     y: .value("BG", min(max(point.mgDl, domain.lowerBound), domain.upperBound)),
+                     series: .value("Series", "experimental-prediction"))
+                .interpolationMethod(.monotone)
+                .foregroundStyle(ConstantsGlucoseChartSwiftUI.experimentalPredictionColor)
+                .lineStyle(StrokeStyle(lineWidth: 2, lineCap: .round, dash: [6, 4]))
+                .accessibilityLabel(ExperimentalChartTexts.prediction)
+        }
+    }
+
+    /// Glucose as a line in the reading's range colour. A run changes colour where the readings do
+    /// and is broken where readings are more than JugglucoNG's 17-minute gap apart.
+    @ChartContentBuilder
+    private func glucoseLineMarks() -> some ChartContent {
+        let runs = GlucoseChartExperimentalPlots.lineRuns(values: bgReadingValues, dates: bgReadingDates, color: bgColor(bgValueInMgDl:))
+        ForEach(runs) { run in
+            if run.points.count == 1, let point = run.points.first {
+                PointMark(x: .value("Time", point.date), y: .value("BG", point.mgDl))
+                    .symbol(Circle())
+                    .symbolSize(glucosePointSymbolSize())
+                    .foregroundStyle(run.color)
+            } else {
+                ForEach(run.points) { point in
+                    LineMark(x: .value("Time", point.date), y: .value("BG", point.mgDl),
+                             series: .value("Series", "glucose-line-\(run.id)"))
+                        .interpolationMethod(.monotone)
+                        .foregroundStyle(run.color)
+                        .lineStyle(StrokeStyle(lineWidth: ConstantsGlucoseChartSwiftUI.experimentalGlucoseLineWidth, lineCap: .round, lineJoin: .round))
+                }
+            }
+        }
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -644,7 +731,10 @@ struct GlucoseChartView: View {
             : ConstantsGlucoseChartSwiftUI.yAxisAbsoluteMinimumChartValueInMgDl
         // Gate curves at rendering too, so cached series cannot bypass treatment visibility.
         let visibleTherapy = showsTreatments && usesMainChartYAxisContext ? therapySeries.clipped(from: visibleStartDate, to: visibleEndDate) : TherapyChartSeries()
-        let hasTherapy = !visibleTherapy.iob.isEmpty || !visibleTherapy.cob.isEmpty
+        let experimentalXScaleEndDate = renderedXScaleEndDate()
+        let visibleInsulinLayers = showsTreatments && usesMainChartYAxisContext
+            ? experimentalPlotData.insulinLayers(from: visibleStartDate, to: experimentalXScaleEndDate) : []
+        let hasTherapy = !visibleTherapy.iob.isEmpty || !visibleTherapy.cob.isEmpty || !visibleInsulinLayers.isEmpty
         let therapyBaseline = ConstantsGlucoseChartSwiftUI.minimumChartValueWithBottomSpace(hours: hoursToShow)
         let therapyScale = TherapyChartScale(series: visibleTherapy, baseline: therapyBaseline)
         let therapyMinimum = (visibleTherapy.iob.map { therapyScale.glucoseValue(amount: $0.amount, isIOB: true) }
@@ -766,6 +856,9 @@ struct GlucoseChartView: View {
                              opacityMultiplier: !basalValues.isEmpty && !downwardBasal
                                 ? ConstantsGlucoseChartSwiftUI.therapyPlotBottomBasalOpacityMultiplier : 1)
 
+            // Experimental: each insulin's activity, stacked along the bottom.
+            insulinActivityMarks(layers: visibleInsulinLayers, baseline: therapyBaseline)
+
             // Basal areas/lines and primary treatments are drawn below glucose points.
             //
             // The state manager has already produced scheduled and temporary basal step/fill points,
@@ -853,13 +946,22 @@ struct GlucoseChartView: View {
                 }
             }
 
-            // Main glucose points.
-            ForEach(bgReadingValues.indices, id: \.self) { index in
-                PointMark(x: .value("Time", bgReadingDates[index]),
-                          y: .value("BG", bgReadingValues[index]))
-                    .symbol(Circle())
-                    .symbolSize(glucosePointSymbolSize())
-                    .foregroundStyle(bgColor(bgValueInMgDl: bgReadingValues[index]))
+            // Main glucose points, or the experimental connected line.
+            if experimentalPlotData.drawsGlucoseAsLine && usesMainChartYAxisContext {
+                glucoseLineMarks()
+            } else {
+                ForEach(bgReadingValues.indices, id: \.self) { index in
+                    PointMark(x: .value("Time", bgReadingDates[index]),
+                              y: .value("BG", bgReadingValues[index]))
+                        .symbol(Circle())
+                        .symbolSize(glucosePointSymbolSize())
+                        .foregroundStyle(bgColor(bgValueInMgDl: bgReadingValues[index]))
+                }
+            }
+
+            // Experimental forecast from the newest reading, kept inside the y-domain.
+            if showsPrediction {
+                predictionMarks(endDate: experimentalXScaleEndDate, domain: domain)
             }
 
             // Calibration and BG check markers sit above glucose points.
@@ -1448,4 +1550,102 @@ private struct ChartBackgroundModifier: ViewModifier {
             content.background(chartType.backgroundColor())
         }
     }
+}
+
+// MARK: - Experimental plots
+
+/// Experimental overlays for the main chart: the glucose forecast, each insulin's activity and
+/// the connected glucose line. Values are prepared by the app; this file is shared with the
+/// extensions, which never set them.
+struct GlucoseChartExperimentalPlots {
+    struct PredictionPoint: Identifiable {
+        let date: Date
+        let mgDl: Double
+        var id: TimeInterval { date.timeIntervalSince1970 }
+    }
+
+    /// One sample of an insulin layer, in units per hour: `top` includes the layers below.
+    struct InsulinPoint: Identifiable {
+        let date: Date
+        let bottom: Double
+        let top: Double
+        var id: TimeInterval { date.timeIntervalSince1970 }
+    }
+
+    struct InsulinLayer: Identifiable {
+        let id: String
+        let name: String
+        let color: Color
+        let points: [InsulinPoint]
+    }
+
+    struct LinePoint: Identifiable {
+        let date: Date
+        let mgDl: Double
+        var id: TimeInterval { date.timeIntervalSince1970 }
+    }
+
+    struct LineRun: Identifiable {
+        let id: Int
+        let color: Color
+        let points: [LinePoint]
+    }
+
+    /// JugglucoNG `GlucoseChartGap.THRESHOLD_MS`: readings further apart are not connected.
+    static let lineGapThreshold: TimeInterval = 17 * 60
+
+    var prediction: [PredictionPoint] = []
+    var insulin: [InsulinLayer] = []
+    var drawsGlucoseAsLine = false
+
+    /// Layers inside the window that carry any insulin.
+    func insulinLayers(from start: Date, to end: Date) -> [InsulinLayer] {
+        insulin.compactMap { layer in
+            let points = layer.points.filter { $0.date >= start && $0.date <= end }
+            guard points.contains(where: { $0.top - $0.bottom > 0.0001 }) else { return nil }
+            return InsulinLayer(id: layer.id, name: layer.name, color: layer.color, points: points)
+        }
+    }
+
+    /// The forecast up to `end`, ending exactly at `end` when it runs past it.
+    func predictionPoints(until end: Date) -> [PredictionPoint] {
+        var points = prediction.filter { $0.date <= end }
+        if let last = points.last, let next = prediction.first(where: { $0.date > end }), last.date < end {
+            let fraction = end.timeIntervalSince(last.date) / next.date.timeIntervalSince(last.date)
+            points.append(PredictionPoint(date: end, mgDl: last.mgDl + (next.mgDl - last.mgDl) * fraction))
+        }
+        return points
+    }
+
+    /// Splits readings into connected runs of one colour. A run that is followed without a gap by
+    /// a reading of another colour also takes that reading, so the line stays continuous.
+    static func lineRuns(values: [Double], dates: [Date], color: (Double) -> Color) -> [LineRun] {
+        let readings = zip(dates, values).filter { $0.1.isFinite }.sorted { $0.0 < $1.0 }
+        var runs: [LineRun] = []
+        var current: [LinePoint] = []
+        var currentColor: Color?
+        func close() {
+            if let currentColor, !current.isEmpty { runs.append(LineRun(id: runs.count, color: currentColor, points: current)) }
+            current = []
+        }
+        for (date, value) in readings {
+            let point = LinePoint(date: date, mgDl: value)
+            let pointColor = color(value)
+            if let last = current.last, date.timeIntervalSince(last.date) > lineGapThreshold {
+                close()
+            } else if !current.isEmpty, pointColor != currentColor {
+                current.append(point)
+                close()
+            }
+            if current.isEmpty { currentColor = pointColor }
+            current.append(point)
+        }
+        close()
+        return runs
+    }
+}
+
+/// Texts for the experimental chart marks; the bundle default is English.
+enum ExperimentalChartTexts {
+    static let prediction = NSLocalizedString("experimental.prediction", tableName: "SettingsViews", bundle: .main, value: "Glucose prediction", comment: "Accessibility label of the forecast line")
 }

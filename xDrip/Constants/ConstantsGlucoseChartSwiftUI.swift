@@ -33,6 +33,20 @@ enum ConstantsGlucoseChartSwiftUI {
     static let therapyPlotHeightMultiplier: Double = 0.7
     static let therapyPlotCarbsPerInsulinUnit: Double = 7
 
+    // Experimental features (Settings > Experimental).
+    /// The forecast is drawn while the chart ends within this of the present.
+    static let experimentalPredictionPresentTolerance: TimeInterval = 5 * 60
+    /// Share of the visible span added to the right of the main chart for the forecast.
+    static let experimentalPredictionFutureShare: Double = 0.25
+    static let experimentalPredictionMinimumFutureSpan: TimeInterval = 30 * 60
+    static let experimentalPredictionColor = Color(red: 0.55, green: 0.65, blue: 0.95).opacity(0.9)
+    static let experimentalGlucoseLineWidth: CGFloat = 2.5
+    /// Smallest top of the insulin activity scale, so a small dose is not drawn full height.
+    static let experimentalInsulinMinimumScaleUnitsPerHour: Double = 2
+    static let experimentalInsulinScaleHeadroom: Double = 1.1
+    static let experimentalInsulinFillOpacity: Double = 0.28
+    static let experimentalInsulinLineOpacity: Double = 0.8
+
     static func xAxisDates(from startDate: Date, to endDate: Date, everyHours: Int) -> [Date] {
         // Keep labels anchored to real clock hours so a small scroll cannot switch between odd and
         // even hour labels.

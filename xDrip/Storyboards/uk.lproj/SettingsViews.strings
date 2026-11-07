@@ -781,3 +781,33 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Промовляти вступ";
 "speak.preview" = "Прослухати приклад озвучення глюкози";
+
+/* Experimental features (prediction, insulins, chart style) */
+"experimental.chartStyle" = "Глюкоза на графіку";
+"experimental.chartStyleLine" = "Лінія";
+"experimental.chartStylePoints" = "Точки";
+"experimental.chooseInsulin" = "Вибрати інсулін";
+"experimental.insulin" = "Інсулін";
+"experimental.insulin.longGeneric" = "Тривалої дії (загальний)";
+"experimental.insulin.rapidGeneric" = "Швидкої дії (загальний)";
+"experimental.insulin.ultraLongGeneric" = "Надтривалої дії (загальний)";
+"experimental.insulinBasal" = "Базальний інсулін";
+"experimental.insulinBolus" = "Болюсний інсулін";
+"experimental.insulinDefault" = "Типовий (%@)";
+"experimental.insulins" = "Інсуліни";
+"experimental.insulinsFooter" = "Графік показує, наскільки швидко діє кожен інсулін, в одиницях на годину: шари свого кольору, складені вздовж нижнього краю. Крива закінчується там, де джерело припинило вимірювання; нічого не екстраполюється.";
+"experimental.insulinsIntroduction" = "Експериментально. Кожен інсулін має власну криву дії з каталогу JugglucoNG. Болюс або базальна ін’єкція використовує інсулін, названий у нотатках; у редакторі лікування його можна вибрати. Інакше застосовуються типові значення нижче.";
+"experimental.insulinsShow" = "Показувати дію інсуліну на графіку";
+"experimental.numberRange" = "Від %@ до %@ %@.";
+"experimental.prediction" = "Прогноз глюкози";
+"experimental.predictionAbsorption" = "Засвоєння вуглеводів (грамів на годину)";
+"experimental.predictionCarbRatio" = "Вуглеводний коефіцієнт (грамів на одиницю)";
+"experimental.predictionHorizon" = "Тривалість прогнозу";
+"experimental.predictionIntroduction" = "Експериментально. Прогноз на найближчі години пунктирною лінією праворуч на головному графіку. Він продовжує поточний тренд і додає дію внесених вуглеводів, болюсів і навантажень. Це лише оцінка: ніколи не розраховуйте дозу інсуліну за нею.";
+"experimental.predictionMainFooter" = "«Враховувати тренд» продовжує недавнє зростання чи падіння, яке не пояснюють ваші внесення, і згасає приблизно за годину. Прогноз будується лише від показника, не старшого за 15 хвилин.";
+"experimental.predictionModel" = "Модель";
+"experimental.predictionModelFooter" = "Чутливість до інсуліну: на скільки одна одиниця знижує глюкозу. Вуглеводний коефіцієнт: скільки грамів покриває одна одиниця. Засвоєння визначає, як довго діють вуглеводи. Базальні та змішані інсуліни, як і в JugglucoNG, у прогноз не входять.";
+"experimental.predictionMomentum" = "Враховувати тренд";
+"experimental.predictionSensitivity" = "Чутливість до інсуліну (на одиницю)";
+"experimental.predictionShow" = "Показувати прогноз";
+"experimental.sectionTitle" = "Експериментальні функції";

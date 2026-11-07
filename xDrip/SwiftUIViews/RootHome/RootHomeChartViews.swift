@@ -29,6 +29,9 @@ struct RootHomeMainChartView: View {
     @AppStorage(UserDefaults.Key.renderBasalDownwards.rawValue) private var renderBasalDownwards = true
     @State private var therapySeries = TherapyChartSeries()
     @State private var therapyRevision = 0
+    @State private var experimentalPlots = GlucoseChartExperimentalPlots()
+    @State private var experimentalRevision = 0
+    @State private var experimentalSettingsSignature = ExperimentalChartInputs.settingsSignature()
     // Hide curves immediately and cancel pending chart work when Treatments is off.
     private var hasIOB: Bool { showsTreatments && allowsTherapyCharts && showIOBCOB && !therapySeries.iob.isEmpty }
     private var hasCOB: Bool { showsTreatments && allowsTherapyCharts && showIOBCOB && !therapySeries.cob.isEmpty }
@@ -37,6 +40,9 @@ struct RootHomeMainChartView: View {
     private var therapyStart: Date { Date(timeIntervalSince1970: floor(chartState.dataStartDate.timeIntervalSince1970 / 3600) * 3600) }
     private var therapyEnd: Date { Date(timeIntervalSince1970: ceil(chartState.dataEndDate.timeIntervalSince1970 / 3600) * 3600) }
     private var seriesKey: String { scenePhase != .active ? "inactive" : "\(therapyStart)-\(therapyEnd)-\(showIOBCOB)-\(showsTreatments)-\(allowsTherapyCharts)-\(therapyRevision)-\(floor(Date().timeIntervalSince1970 / 60))" }
+    private var experimentalKey: String {
+        scenePhase != .active ? "inactive" : "\(therapyStart)-\(therapyEnd)-\(showsTreatments)-\(allowsTherapyCharts)-\(experimentalRevision)-\(experimentalSettingsSignature)-\(chartState.endDate.timeIntervalSinceNow > -ConstantsGlucoseChartSwiftUI.experimentalPredictionPresentTolerance)-\(chartState.bgReadingDates.last?.timeIntervalSince1970 ?? 0)-\(floor(Date().timeIntervalSince1970 / 60))"
+    }
 
     private enum Layout {
         static let rangeOverlayTopInset: CGFloat = 8
@@ -72,6 +78,7 @@ struct RootHomeMainChartView: View {
                     resetRevision: yAxisResetRevision, renderBasalDownwards: renderBasalDownwards
                 )
                 .therapyPlots(TherapyChartSeries(iob: hasIOB ? therapySeries.iob : [], cob: hasCOB ? therapySeries.cob : []))
+                .experimentalPlots(experimentalPlots)
                 .transaction { transaction in
                     transaction.animation = nil
                 }
@@ -140,7 +147,24 @@ struct RootHomeMainChartView: View {
             guard !Task.isCancelled else { return }
             therapySeries = result
         }
-        .onReceive(NotificationCenter.default.publisher(for: TherapyMetricsManager.changed)) { _ in if scenePhase == .active { therapyRevision &+= 1 } }
+        .onReceive(NotificationCenter.default.publisher(for: TherapyMetricsManager.changed)) { _ in
+            if scenePhase == .active { therapyRevision &+= 1; experimentalRevision &+= 1 }
+        }
+        .task(id: experimentalKey) {
+            guard scenePhase == .active else { return }
+            let plots = await ExperimentalChartInputs.plots(
+                chartState: chartState, dataStart: therapyStart, dataEnd: therapyEnd,
+                showsInsulin: showsTreatments && allowsTherapyCharts)
+            guard !Task.isCancelled else { return }
+            experimentalPlots = plots
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in
+            // Defaults can change on any thread; compare on the main queue.
+            DispatchQueue.main.async {
+                let signature = ExperimentalChartInputs.settingsSignature()
+                if signature != experimentalSettingsSignature { experimentalSettingsSignature = signature }
+            }
+        }
         .onDisappear {
             rangeOverlay.cancel()
         }

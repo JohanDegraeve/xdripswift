@@ -504,6 +504,7 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
     case sharingAndServices
     case dataManagement
     case troubleshooting
+    case experimental
     case about
     case advanced
 
@@ -521,6 +522,8 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
             return "externaldrive.badge.timemachine"
         case .troubleshooting:
             return ConstantsSettingsIcons.troubleshootingSettingsIcon
+        case .experimental:
+            return "testtube.2"
         case .about:
             return ConstantsSettingsIcons.infoSettingsIcon
         case .advanced:
@@ -556,6 +559,8 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
             // Consumer troubleshooting remains visible in the root menu. Developer e-mail reports
             // are intentionally exposed only by Show Advanced in the Advanced Settings section.
             return SettingsViewTraceSettingsViewModel(rowGroup: .troubleshooting)
+        case .experimental:
+            return SettingsViewGroupedSettingsViewModel.experimental()
         case .about:
             return SettingsViewInfoViewModel()
         case .advanced:

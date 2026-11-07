@@ -188,6 +188,29 @@ struct TreatmentEditorView: View {
                     }
                 }
 
+                // Experimental insulin support: the insulin is named in the treatment's notes.
+                if viewModel.showsExperimentalInsulinChoice {
+                    if viewModel.selectedType == .Insulin {
+                        Picker(ExperimentalTexts.text("insulin", "Insulin"), selection: $viewModel.selectedBolusInsulin) {
+                            Text(String(format: ExperimentalTexts.text("insulinDefault", "Default (%@)"),
+                                        UserDefaults.standard.experimentalBolusInsulin.shortName))
+                                .tag(InsulinProfile?.none)
+                            ForEach(InsulinProfile.perDoseBolusChoices, id: \.self) { insulin in
+                                Text(insulin.shortName).tag(InsulinProfile?.some(insulin))
+                            }
+                        }
+                        .foregroundStyle(Color(.colorPrimary))
+                    } else {
+                        Menu {
+                            ForEach(InsulinProfile.perDoseBasalChoices, id: \.self) { insulin in
+                                Button(insulin.displayName) { viewModel.enteredInsulinDescription = insulin.shortName }
+                            }
+                        } label: {
+                            Label(ExperimentalTexts.text("chooseInsulin", "Choose an insulin"), systemImage: "list.bullet")
+                        }
+                    }
+                }
+
                 if viewModel.showsNotesEditor {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(Texts_TreatmentsView.notes)

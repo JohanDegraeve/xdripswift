@@ -552,3 +552,33 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Speak Introduction";
 "speak.preview" = "Preview Speak Glucose";
+
+/* Experimental features (prediction, insulins, chart style) */
+"experimental.chartStyle" = "Glucose on the chart";
+"experimental.chartStyleLine" = "Line";
+"experimental.chartStylePoints" = "Points";
+"experimental.chooseInsulin" = "Choose an insulin";
+"experimental.insulin" = "Insulin";
+"experimental.insulin.longGeneric" = "Long acting (generic)";
+"experimental.insulin.rapidGeneric" = "Rapid acting (generic)";
+"experimental.insulin.ultraLongGeneric" = "Ultra-long basal (generic)";
+"experimental.insulinBasal" = "Basal insulin";
+"experimental.insulinBolus" = "Bolus insulin";
+"experimental.insulinDefault" = "Default (%@)";
+"experimental.insulins" = "Insulins";
+"experimental.insulinsFooter" = "The chart shows how fast each insulin is working, in units per hour, stacked in its own colour along the bottom. A curve ends where its source stopped measuring; nothing is extrapolated.";
+"experimental.insulinsIntroduction" = "Experimental. Each insulin has its own action curve, from JugglucoNG's catalogue. A bolus or basal injection uses the insulin named in its notes; the treatment editor offers a choice. Otherwise the defaults below apply.";
+"experimental.insulinsShow" = "Show insulin activity on the chart";
+"experimental.numberRange" = "From %@ to %@ %@.";
+"experimental.prediction" = "Glucose prediction";
+"experimental.predictionAbsorption" = "Carb absorption (grams per hour)";
+"experimental.predictionCarbRatio" = "Carb ratio (grams per unit)";
+"experimental.predictionHorizon" = "Forecast length";
+"experimental.predictionIntroduction" = "Experimental. A forecast of the next hours, drawn as a dashed line to the right of the main chart. It continues the recent trend and adds the effect of the carbs, boluses and exercise you log. It is an estimate only: never dose insulin from it.";
+"experimental.predictionMainFooter" = "Follow the trend continues the recent rise or fall that your treatments do not explain, fading over about an hour. The forecast starts only from a reading at most 15 minutes old.";
+"experimental.predictionModel" = "Model";
+"experimental.predictionModelFooter" = "Insulin sensitivity: how far one unit lowers glucose. Carb ratio: grams covered by one unit. Absorption sets how long carbs take to act. Basal and premixed insulins are not part of the forecast, as in JugglucoNG.";
+"experimental.predictionMomentum" = "Follow the trend";
+"experimental.predictionSensitivity" = "Insulin sensitivity (per unit)";
+"experimental.predictionShow" = "Show prediction";
+"experimental.sectionTitle" = "Experimental features";

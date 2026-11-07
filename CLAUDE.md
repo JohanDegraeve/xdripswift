@@ -69,6 +69,18 @@ and match it rather than inventing. User-facing docs: `docs/sibionics2-troublesh
   Fresh/Balanced/Stable weighting, evaluated in the user's display unit. Mode raw value 1 must stay
   weighted OLS.
 
+## Experimental features (`docs/experimental-features.md`)
+
+Settings → Experimental features (`SettingsRootSection.experimental`,
+`xDrip/SwiftUIViews/Settings/ExperimentalSettingsView.swift`). Models in
+`xDrip/Managers/Therapy/ExperimentalTherapy.swift`: JugglucoNG `GlucosePredictionKernel` +
+treatment model, `JournalInsulinCurveCatalogue` (22 insulins), `InsulinActivityStack`.
+Drawn only on the Home main chart via `GlucoseChartView.experimentalPlots(_:)`; the chart types
+it needs live in `GlucoseChartView.swift` because that file is also compiled into the widget,
+watch and notification extensions. A treatment's insulin is named in its `notes`
+(`InsulinProfile.matching(notes:)`); every per-dose choice must round-trip through its
+`shortName`. All off by default; IOB/COB is untouched.
+
 ## Not ported (yet)
 
 JugglucoNG alternative glucose models (Balanced, Responsive, Adaptive V2), manual sensitivity

@@ -319,6 +319,7 @@
 		4D7A00023014000100000001 /* TroubleshootingLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7A00013014000100000001 /* TroubleshootingLog.swift */; };
 		4D7A00043014000100000001 /* TroubleshootingLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7A00033014000100000001 /* TroubleshootingLogView.swift */; };
 		4D7A00063014000100000001 /* TroubleshootingLogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7A00053014000100000001 /* TroubleshootingLogTests.swift */; };
+		A746A9242623F6B1163BB84B /* ExperimentalFeaturesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C58142BB54891C87BB6CA2C /* ExperimentalFeaturesTests.swift */; };
 		4D7B00023014000200000001 /* CGMG5SensorSessionDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */; };
 		4D7C00023015000100000001 /* CalibrationReadinessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7C00013015000100000001 /* CalibrationReadinessTests.swift */; };
 		4D7D00023016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */; };
@@ -436,6 +437,8 @@
 		BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */; };
 		BA0709260000000000000001 /* BasalInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0709260000000000000002 /* BasalInjectionTests.swift */; };
 		C15D80D0E8DB47A6A9BE68DF /* TherapyMetricsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05272484BD024BDAAA341C1C /* TherapyMetricsSettingsView.swift */; };
+		91A95449E176B7608EA94683 /* ExperimentalSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DC5CC6AB8F0B8B84EB06E1 /* ExperimentalSettingsView.swift */; };
+		2C229BAE87FD2F6384A8D7DD /* ExperimentalTherapy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488707C346AA445BFFCEF57A /* ExperimentalTherapy.swift */; };
 		C2385D0CA6579919114B060A /* AlertTypesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */; };
 		C606CA18273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606CA17273EF9F800BA199E /* DexcomG6InitialCalibrationPolicy.swift */; };
 		C859C6C1B4CE6B335D4C86E6 /* Libre3NFCActivationCommandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D9952479A5C8B9A161631A /* Libre3NFCActivationCommandTests.swift */; };
@@ -1337,6 +1340,9 @@
 		4D7A00013014000100000001 /* TroubleshootingLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TroubleshootingLog.swift; sourceTree = "<group>"; };
 		4D7A00033014000100000001 /* TroubleshootingLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TroubleshootingLogView.swift; sourceTree = "<group>"; };
 		4D7A00053014000100000001 /* TroubleshootingLogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TroubleshootingLogTests.swift; sourceTree = "<group>"; };
+		3C58142BB54891C87BB6CA2C /* ExperimentalFeaturesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperimentalFeaturesTests.swift; sourceTree = "<group>"; };
+		57DC5CC6AB8F0B8B84EB06E1 /* ExperimentalSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperimentalSettingsView.swift; sourceTree = "<group>"; };
+		488707C346AA445BFFCEF57A /* ExperimentalTherapy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperimentalTherapy.swift; sourceTree = "<group>"; };
 		4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG5SensorSessionDetectionTests.swift; sourceTree = "<group>"; };
 		4D7C00013015000100000001 /* CalibrationReadinessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationReadinessTests.swift; sourceTree = "<group>"; };
 		4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDisplayStatusTests.swift; sourceTree = "<group>"; };
@@ -2935,6 +2941,7 @@
 				7E7760013000000100000004 /* SensorExpiryReminderManagerTests.swift */,
 				4F2600113002000200000001 /* SensorNoisePersistenceTests.swift */,
 				4D7A00053014000100000001 /* TroubleshootingLogTests.swift */,
+				3C58142BB54891C87BB6CA2C /* ExperimentalFeaturesTests.swift */,
 				50E2401E5ED94424A2FEC5E8 /* xDrip Tests/TherapyMetricsTests.swift */,
 			);
 			path = "xDrip Tests";
@@ -2979,6 +2986,7 @@
 			isa = PBXGroup;
 			children = (
 				5F219EC5BAAF4D5E924415FA /* TherapyMetricsManager.swift */,
+				488707C346AA445BFFCEF57A /* ExperimentalTherapy.swift */,
 			);
 			path = Therapy;
 			sourceTree = "<group>";
@@ -3402,6 +3410,7 @@
 				E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */,
 				D9C75EA5D78E3497AC44D3C8 /* SettingsView.swift */,
 				05272484BD024BDAAA341C1C /* TherapyMetricsSettingsView.swift */,
+				57DC5CC6AB8F0B8B84EB06E1 /* ExperimentalSettingsView.swift */,
 				CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */,
 				4D7A00033014000100000001 /* TroubleshootingLogView.swift */,
 				A30000000000000000000001 /* Followers */,
@@ -4900,6 +4909,7 @@
 				CC1EA9B85F7A487E86867E63 /* DirectWatchBridgeTests.swift in Sources */,
 				4D7F00023018000100000001 /* DexcomG7CalibrationTests.swift in Sources */,
 				4D7A00063014000100000001 /* TroubleshootingLogTests.swift in Sources */,
+				A746A9242623F6B1163BB84B /* ExperimentalFeaturesTests.swift in Sources */,
 				A50000030000000000000001 /* OnlineHelpTests.swift in Sources */,
 				FBA100040000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift in Sources */,
 				BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */,
@@ -5352,6 +5362,8 @@
 				C8BA6BBA5746888144511D55 /* GlucoseChartStateManager.swift in Sources */,
 				4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */,
 				C15D80D0E8DB47A6A9BE68DF /* TherapyMetricsSettingsView.swift in Sources */,
+				91A95449E176B7608EA94683 /* ExperimentalSettingsView.swift in Sources */,
+				2C229BAE87FD2F6384A8D7DD /* ExperimentalTherapy.swift in Sources */,
 				B3DBAE6F4DF8465BBF554DE4 /* TherapyMetricsManager.swift in Sources */,
 				4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */,
 				4D21B0022FF8000100000001 /* RootHomeChartRange.swift in Sources */,
