@@ -9,6 +9,27 @@ xDrip4iOS is not related to the xDrip+ project for Android.
 > [!IMPORTANT]
 > xDrip4iOS is experimental software. It is not a regulated medical device and is not approved for making treatment decisions. Never rely on it as the only source of glucose information. Use it at your own risk and confirm readings with approved equipment when necessary.
 
+## Sibionics GS1 CN driver preview
+
+This branch adds a Bluetooth driver for the factory 14-day Chinese GS1 using
+AA55 framing and the JugglucoNG V1.1.5G core. It includes device selection,
+optional MAC discovery, ordered history, checkpoint recovery and five-minute
+calibrated readings after a 60-minute warmup. Scanning and saving are read-only.
+Connecting an unused sensor can start its session.
+
+An already active GS1 has been read on hardware in the development integration.
+First activation on a new sensor, sustained reception with the screen locked and
+clinical accuracy have not been verified for this branch. GS1 EU, 7/10-day,
+SIB2, V120, reset and wear extension are outside its supported scope.
+
+Open `xdrip.xcworkspace` in Xcode on Apple Silicon. The branch includes the
+static GS1Native XCFramework for arm64 iPhone and Simulator. The
+[build recipe and source](Vendor/GS1Native/README.md) and
+[license and provenance notices](Vendor/GS1Native/NOTICE.md) are included.
+The test target covers Bluetooth frame parsing, journal replay, freshness
+gates and migration from upstream model v37. Use a separate simulator or
+bundle identifier to compare driver branches with different data models.
+
 ## Current capabilities
 
 ### Glucose data sources

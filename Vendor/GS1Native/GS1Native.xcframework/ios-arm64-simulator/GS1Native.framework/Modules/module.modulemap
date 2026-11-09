@@ -1,0 +1,8 @@
+framework module "GS1Native" {
+    umbrella header "GS1Native.h"
+
+    export *
+    module * { export * }
+
+    use Foundation
+}

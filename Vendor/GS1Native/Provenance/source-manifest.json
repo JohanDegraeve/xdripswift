@@ -1,0 +1,50 @@
+{
+  "repository": "https://github.com/ctqvva/JugglucoNG",
+  "commit": "11e6e29db7d9055c8fd2e96261812e16f2095f3d",
+  "date_read": "2026-10-31",
+  "third_party_scripts_executed": false,
+  "files": [
+    {
+      "path": "LICENSE.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149,
+      "url": "https://github.com/ctqvva/JugglucoNG/blob/11e6e29db7d9055c8fd2e96261812e16f2095f3d/LICENSE.txt"
+    },
+    {
+      "path": "Common/src/main/java/tk/glucodata/drivers/sibionics/SibionicsExactV115GCore.kt",
+      "sha256": "4da19f96ec02bec41ccc6dac8ce34ee78a6107e7d4a9f4e080d242f215f05adb",
+      "bytes": 37174,
+      "url": "https://github.com/ctqvva/JugglucoNG/blob/11e6e29db7d9055c8fd2e96261812e16f2095f3d/Common/src/main/java/tk/glucodata/drivers/sibionics/SibionicsExactV115GCore.kt"
+    },
+    {
+      "path": "Common/src/main/java/tk/glucodata/drivers/sibionics/SibionicsExactV115GClip.kt",
+      "sha256": "1b75664b6cf9ebf566cc005714f9215af947bd64e6e917b3b804e562f0be2a6d",
+      "bytes": 690407,
+      "url": "https://github.com/ctqvva/JugglucoNG/blob/11e6e29db7d9055c8fd2e96261812e16f2095f3d/Common/src/main/java/tk/glucodata/drivers/sibionics/SibionicsExactV115GClip.kt"
+    },
+    {
+      "path": "Common/src/main/java/tk/glucodata/drivers/sibionics/SibionicsAlgorithm.kt",
+      "sha256": "727a2cfe34d94d662fcd6ff8f08ecb8a1503d19309a0009a6bd1ff476de27d63",
+      "bytes": 29352,
+      "url": "https://github.com/ctqvva/JugglucoNG/blob/11e6e29db7d9055c8fd2e96261812e16f2095f3d/Common/src/main/java/tk/glucodata/drivers/sibionics/SibionicsAlgorithm.kt"
+    },
+    {
+      "path": "Common/src/main/java/tk/glucodata/drivers/sibionics/v116a/SibionicsExactV116A.kt",
+      "sha256": "9a04eafa026c6c75fde62657422992654162b693a54188035149b8d639707949",
+      "bytes": 907009,
+      "url": "https://github.com/ctqvva/JugglucoNG/blob/11e6e29db7d9055c8fd2e96261812e16f2095f3d/Common/src/main/java/tk/glucodata/drivers/sibionics/v116a/SibionicsExactV116A.kt"
+    },
+    {
+      "path": "Common/src/test/java/tk/glucodata/drivers/sibionics/SibionicsExactV115GCoreTest.kt",
+      "sha256": "b9d5c6547bdc47031eca5634eb8e071e6a7e2e1c420d40329e5d93abde67d6fb",
+      "bytes": 11364,
+      "url": "https://github.com/ctqvva/JugglucoNG/blob/11e6e29db7d9055c8fd2e96261812e16f2095f3d/Common/src/test/java/tk/glucodata/drivers/sibionics/SibionicsExactV115GCoreTest.kt"
+    },
+    {
+      "path": "Common/src/test/resources/sibionics_exact_v115g_replay.csv",
+      "sha256": "b285ccd760b5b0ac704b975b0ee418e2f171c7404fc0d1d61e19f9638012de05",
+      "bytes": 313814,
+      "url": "https://github.com/ctqvva/JugglucoNG/blob/11e6e29db7d9055c8fd2e96261812e16f2095f3d/Common/src/test/resources/sibionics_exact_v115g_replay.csv"
+    }
+  ]
+}

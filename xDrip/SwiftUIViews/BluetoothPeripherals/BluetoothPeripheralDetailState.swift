@@ -97,6 +97,12 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     private var dexcomG6BluetoothSlot: DexcomG6BluetoothSlot
     private var dexcomG7BluetoothSlot: DexcomG7BluetoothSlot
     private var isScanning = false
+    private var gs1Code = ""
+    private var gs1MAC = ""
+    private var gs1Scanner: GS1PeripheralScanner?
+    private var gs1ChoosingDevice = false
+    private var gs1Selected: GS1PeripheralScanner.Candidate?
+    private var gs1SetupStatus = "Enter the 8-character code from the sensor box"
     private var nfcScanNeeded = false
     private var nfcScanSuccessful = false
     // Takes priority over saved connection history when this screen starts a fresh wait.
@@ -178,6 +184,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     }
 
     deinit {
+        gs1Scanner?.stop()
         stop()
         reassignTransmitterDelegatesToBluetoothPeripheralManager()
     }
@@ -299,6 +306,13 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     }
 
     func stop() {
+        // The selection list is a pushed route: retain its finished, read-only scanner
+        // so an explicit row choice can perform Device Information discovery.
+        if expectedBluetoothPeripheralType == .SibionicsCNType, !gs1ChoosingDevice {
+            gs1Scanner?.stop()
+            gs1Scanner = nil
+            isScanning = false
+        }
         setSignalStrengthVisible(false)
         stopTransmitterReadSuccessTimer()
         removeObserversIfNeeded()
@@ -374,6 +388,9 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         ))
 
         guard bluetoothPeripheral != nil else {
+            if expectedBluetoothPeripheralType == .SibionicsCNType {
+                sections.append(contentsOf: makeGS1Sections())
+            }
             if let dexcomG6BluetoothSlotSection = makeDexcomG6BluetoothSlotSection() {
                 sections.append(dexcomG6BluetoothSlotSection)
             }
@@ -621,6 +638,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     }
 
     private func makePeripheralSpecificSections() -> [BluetoothPeripheralDetailSection] {
+        if expectedBluetoothPeripheralType == .SibionicsCNType { return makeGS1Sections() }
         guard let bluetoothPeripheral = bluetoothPeripheral else { return [] }
 
         switch expectedBluetoothPeripheralType {
@@ -684,7 +702,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             return makeHeartbeatBatterySections() + makeGenericHeartbeatSettingsSections()
         case .DexcomG7HeartBeatType:
             return makeHeartbeatBatterySections()
-        case .OmniPodHeartBeatType:
+        case .OmniPodHeartBeatType, .SibionicsCNType:
             return []
         }
     }
@@ -795,6 +813,12 @@ private extension BluetoothPeripheralDetailState {
             }
 
             return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.connect, isEnabled: true)
+        }
+
+        if expectedBluetoothPeripheralType == .SibionicsCNType {
+            return isScanning
+                ? BluetoothPeripheralConnectButtonState(title: "Stop scanning", isEnabled: true, isStopAction: true, tintColor: .red)
+                : BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scan, isEnabled: true)
         }
 
         if expectedBluetoothPeripheralType.needsTransmitterId(), transmitterIdTempValue == nil {
@@ -1006,6 +1030,27 @@ private extension BluetoothPeripheralDetailState {
         // Block denied/restricted access here too, in case an NFC retry calls this directly.
         guard CBManager.authorization != .denied && CBManager.authorization != .restricted else {
             refresh()
+            return
+        }
+        if expectedBluetoothPeripheralType == .SibionicsCNType, isScanning {
+            gs1Scanner?.stop(); gs1Scanner = nil; isScanning = false; refresh(); return
+        }
+        if let device = bluetoothPeripheral as? SibionicsCN, !device.blePeripheral.shouldconnect, !device.startAuthorized {
+            guard canActivateCurrentPeripheral() else { return }
+            guard (try? GS1CNIdentity(sensorCode: device.sensorCode ?? "", mac: GS1MAC(device.declaredMAC ?? ""))) != nil,
+                  UUID(uuidString: device.blePeripheral.address) != nil else {
+                pendingAlert = BluetoothPeripheralDetailAlert(title: "GS1 setup incomplete", message: "A valid box code, MAC and selected Bluetooth device are required.")
+                return
+            }
+            pendingAlert = BluetoothPeripheralDetailAlert(title: "Connect factory 14-day GS1 CN",
+                message: "Confirm that this is the Chinese factory 14-day GS1. The first connection may start an unused sensor. Warm-up is 60 minutes from the original start. EU, GS1-7, GS1-10, SIB2 and V120 are not supported by this integration. No reset or extension command is sent.",
+                primaryButtonTitle: "Connect", primaryAction: { [weak self, weak device] in
+                    guard let self, let device else { return }
+                    device.startAuthorized = true
+                    self.coreDataManager.saveChanges()
+                    self.connectButtonHandler()
+                    self.refresh()
+                }, secondaryButtonTitle: Texts_Common.Cancel)
             return
         }
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else { return }
@@ -1372,6 +1417,7 @@ private extension DexcomG7BluetoothSlot {
 
 private extension BluetoothPeripheralDetailState {
     func requestScanForBluetoothPeripheral(type: BluetoothPeripheralType) {
+        if type == .SibionicsCNType { scanGS1Candidates(); return }
         guard let notice = type.scanPreparationNotice else {
             scanForBluetoothPeripheral(type: type)
             return
@@ -3569,5 +3615,96 @@ extension BluetoothPeripheralDetailState: CGMBubbleTransmitterDelegate {
     func received(libreSensorType: LibreSensorType, from cGMBubbleTransmitter: CGMBubbleTransmitter) {
         (bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate)?.received(libreSensorType: libreSensorType, from: cGMBubbleTransmitter)
         refreshOnMain()
+    }
+}
+
+// MARK: - Explicit factory GS1 CN setup
+private extension BluetoothPeripheralDetailState {
+    func makeGS1Sections() -> [BluetoothPeripheralDetailSection] {
+        let device = bluetoothPeripheral as? SibionicsCN
+        let transmitter = device.flatMap { bluetoothPeripheralManager?.getBluetoothTransmitter(for: $0, createANewOneIfNecesssary: false) as? CGMSibionicsTransmitter }
+        var rows = [
+            row(id: "gs1-code", title: "Box code (8 characters)", detail: device?.sensorCode ?? gs1Code, isEnabled: device == nil && !isScanning, action: { [weak self] in self?.editGS1Value(isCode: true) }),
+            row(id: "gs1-mac", title: "Sensor MAC", detail: device?.declaredMAC ?? gs1MAC, isEnabled: device == nil && !isScanning, action: { [weak self] in self?.editGS1Value(isCode: false) }),
+            row(id: "gs1-selected", title: "Selected Bluetooth device", detail: device?.blePeripheral.name ?? gs1Selected?.name ?? "Not selected"),
+            row(id: "gs1-status", title: "Status", detail: transmitter?.statusText ?? (device == nil ? gs1SetupStatus : "Saved; tap Connect when ready"), detailLineLimit: 5)
+        ]
+        if device != nil {
+            let detected = transmitter?.readOnlyDetectedMAC
+            let detail = detected.map { $0.string + ($0.string == device?.declaredMAC ? " ✓" : " (differs from saved MAC)") } ?? "Waiting for Device Information"
+            rows.append(row(id: "gs1-hardware-mac", title: "MAC read from sensor", detail: detail))
+        }
+        if device == nil, gs1Selected != nil {
+            rows.append(row(id: "gs1-save", title: "Use selected device", detail: "Save the code, MAC and selected iPhone Bluetooth identity", isEnabled: !isScanning, action: { [weak self] in self?.saveGS1Selection() }))
+        }
+        return [BluetoothPeripheralDetailSection(id: "gs1-cn", title: "Factory 14-day GS1 CN", footer: "Experimental: verify readings and reception with the screen locked before using this test collector. Select the Chinese 14-day model explicitly. Names identify candidates only. iOS normally hides the MAC; enter the actual sensor MAC or use a strict MAC returned by Device Information. Scanning and saving do not start the sensor. Final readings are available after 60 minutes and complete history; V120 revisions stop with an error.", rows: rows)]
+    }
+
+    func editGS1Value(isCode: Bool) {
+        guard bluetoothPeripheral == nil else { return }
+        presentTextEntryView(BluetoothPeripheralTextEntry(title: isCode ? "Box code" : "Sensor MAC",
+            message: isCode ? "Enter the 8-character factory code from the Chinese GS1 box." : "Enter the actual 6-byte sensor MAC (AA:BB:CC:DD:EE:FF). An iPhone Bluetooth UUID is not a MAC.",
+            keyboardType: .asciiCapable, textInputAutocapitalization: .characters,
+            text: isCode ? gs1Code : gs1MAC, placeholder: nil, actionTitle: Texts_Common.save, cancelTitle: Texts_Common.Cancel,
+            actionHandler: { [weak self] value in
+                guard let self else { return }
+                if isCode {
+                    self.gs1Code = GS1Setup.normalizedCode(value) ?? ""
+                    self.gs1Selected = nil; self.gs1Scanner?.stop(); self.gs1Scanner = nil
+                } else { self.gs1MAC = (try? GS1MAC(value).string) ?? "" }
+                self.refresh()
+            }, actionIsEnabled: nil, inputValidator: { value in
+                if isCode { return GS1Setup.normalizedCode(value) == nil ? "A supported 8-character factory GS1 code is required" : nil }
+                return (try? GS1MAC(value)) == nil ? "Enter a valid 6-byte MAC" : nil
+            }))
+    }
+
+    func scanGS1Candidates() {
+        guard bluetoothPeripheral == nil else { return }
+        guard let code = GS1Setup.normalizedCode(gs1Code) else { editGS1Value(isCode: true); return }
+        gs1Scanner?.stop(); gs1ChoosingDevice = false; gs1Selected = nil
+        isScanning = true; explicitlyStartedScanAt = Date(); gs1SetupStatus = "Scanning for matching names (12 seconds)"; refresh()
+        gs1Scanner = GS1PeripheralScanner(code: code) { [weak self] devices, error in
+            guard let self, self.gs1Code == code else { return }
+            self.isScanning = false
+            self.gs1SetupStatus = error ?? (devices.isEmpty ? "No matching sensor found" : "Choose your sensor")
+            self.refresh()
+            guard !devices.isEmpty else {
+                self.pendingAlert = BluetoothPeripheralDetailAlert(title: "GS1 search", message: error ?? "No matching name was found. Check the box code and keep the sensor near the phone.")
+                return
+            }
+            self.gs1ChoosingDevice = true
+            self.presentSelectionListView(BluetoothPeripheralSelectionList(title: "Choose GS1 Bluetooth device", explanation: "Tap your sensor, then OK. Matching names are candidates, not proof of the MAC or regional model.", data: devices.map { "\($0.name) · \($0.rssi) dBm · \($0.id.uuidString.suffix(8))" }, selectedRow: -1) { [weak self] index in
+                guard let self, devices.indices.contains(index), self.gs1Code == code else { return }
+                self.gs1ChoosingDevice = false
+                let candidate = devices[index]
+                self.gs1Selected = candidate; self.gs1SetupStatus = "Reading optional Device Information MAC…"; self.isScanning = true; self.refresh()
+                self.gs1Scanner?.readMAC(from: candidate) { [weak self] mac in
+                    guard let self, self.gs1Code == code, self.gs1Selected?.id == candidate.id else { return }
+                    self.isScanning = false
+                    if let mac {
+                        if self.gs1MAC.isEmpty { self.gs1MAC = mac.string; self.gs1SetupStatus = "MAC read from Device Information. Check the details, then tap Use selected device." }
+                        else if (try? GS1MAC(self.gs1MAC)) == mac { self.gs1SetupStatus = "Device Information MAC matches the entered MAC. Tap Use selected device." }
+                        else { self.gs1Selected = nil; self.gs1SetupStatus = "Device MAC differs from the entered MAC. Check the code and MAC before selecting again." }
+                    } else { self.gs1SetupStatus = "No MAC was provided by Device Information. Enter the actual sensor MAC, then tap Use selected device." }
+                    self.refresh()
+                }
+            })
+        }
+    }
+
+    func saveGS1Selection() {
+        guard bluetoothPeripheral == nil, let selected = gs1Selected, let manager = bluetoothPeripheralManager as? BluetoothPeripheralManager else { return }
+        guard let code = GS1Setup.normalizedCode(gs1Code), let mac = try? GS1MAC(gs1MAC), GS1Setup.matches(name: selected.name, code: code) else {
+            pendingAlert = BluetoothPeripheralDetailAlert(title: "GS1 setup incomplete", message: "Enter the factory code and actual sensor MAC before saving.")
+            return
+        }
+        do {
+            bluetoothPeripheral = try manager.registerSibionicsCN(address: selected.id, name: selected.name, code: code, mac: mac.string)
+            gs1Scanner?.stop(); gs1Scanner = nil; gs1Selected = nil
+            refresh()
+        } catch {
+            pendingAlert = BluetoothPeripheralDetailAlert(title: "Could not save GS1", message: "This Bluetooth device may already be configured. Open its existing card.")
+        }
     }
 }

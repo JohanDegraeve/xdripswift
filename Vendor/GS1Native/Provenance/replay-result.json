@@ -1,0 +1,12 @@
+{
+  "jvm_trace_rows": 9155,
+  "native_trace_rows": 9155,
+  "different_rows": 0,
+  "first_differences": [],
+  "jvm_result": [
+    "RESULT rows=15765 corrections=3153 emitted=3152 oracleMismatches=0 maxError=0.0 restoredRows=8290 finalStateHash=c9087050f750a827"
+  ],
+  "native_result": [
+    "RESULT rows=15765 corrections=3153 emitted=3152 oracleMismatches=0 maxError=0.0 restoredRows=8290 finalStateHash=c9087050f750a827"
+  ]
+}

@@ -912,6 +912,14 @@
 		DE8D7DE65157474CBFCF8FF0 /* TextsDirectWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB7E2A44F504FB1A8940A2F /* TextsDirectWatch.swift */; };
 		D17EC7000000000000000001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D17EC7000000000000000002 /* InfoPlist.strings */; };
 		B4BF525DF92C9A65870E9F3F /* TextsLibre3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5DB745379C8D9E0C71E5AD /* TextsLibre3.swift */; };
+		564F2D69F532E09DAD13A380 /* GS1Protocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48EB93CC06C9079EAF934ECE /* GS1Protocol.swift */; };
+		9BF467A248380AAD9C221FB1 /* GS1Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B88DB12347CF235EBD62412 /* GS1Session.swift */; };
+		1309FD96361439551BDDA44D /* GS1PeripheralScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F66565F704AB2EE54B55A8B1 /* GS1PeripheralScanner.swift */; };
+		C136F05BF45B4B467A8E5B54 /* CGMSibionicsTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEBC075E7A64E6D16DF5791 /* CGMSibionicsTransmitter.swift */; };
+		6400705B22B4504CDBF5715F /* SibionicsCN.swift in Sources */ = {isa = PBXBuildFile; fileRef = D08C3DC84906DDA255CA4EAE /* SibionicsCN.swift */; };
+		AA56321661BD37675D76F33F /* GS1IntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD51698B7E3721C055534587 /* GS1IntegrationTests.swift */; };
+		92C597F0055F666B8126A392 /* GS1Native.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2D3B4339BE23889951D3F3C /* GS1Native.xcframework */; };
+		72E99589C353928D5018A971 /* GS1Native.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2D3B4339BE23889951D3F3C /* GS1Native.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2229,6 +2237,14 @@
 		3479253DE704C6F3868B55AB /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "el"; path = "xDrip/Storyboards/el.lproj/Libre3.strings"; sourceTree = SOURCE_ROOT; };
 		E6A7CA4437EB565EFE31B175 /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "sl"; path = "xDrip/Storyboards/sl.lproj/Libre3.strings"; sourceTree = SOURCE_ROOT; };
 		4F5DB745379C8D9E0C71E5AD /* TextsLibre3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsLibre3.swift; sourceTree = "<group>"; };
+		48EB93CC06C9079EAF934ECE /* GS1Protocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GS1Protocol.swift"; path = "xDrip/BluetoothTransmitter/CGM/Sibionics/GS1Protocol.swift"; sourceTree = SOURCE_ROOT; };
+		6B88DB12347CF235EBD62412 /* GS1Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GS1Session.swift"; path = "xDrip/BluetoothTransmitter/CGM/Sibionics/GS1Session.swift"; sourceTree = SOURCE_ROOT; };
+		F66565F704AB2EE54B55A8B1 /* GS1PeripheralScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GS1PeripheralScanner.swift"; path = "xDrip/BluetoothTransmitter/CGM/Sibionics/GS1PeripheralScanner.swift"; sourceTree = SOURCE_ROOT; };
+		6DEBC075E7A64E6D16DF5791 /* CGMSibionicsTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "CGMSibionicsTransmitter.swift"; path = "xDrip/BluetoothTransmitter/CGM/Sibionics/CGMSibionicsTransmitter.swift"; sourceTree = SOURCE_ROOT; };
+		D08C3DC84906DDA255CA4EAE /* SibionicsCN.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SibionicsCN.swift"; path = "xDrip/Core Data/classes/SibionicsCN.swift"; sourceTree = SOURCE_ROOT; };
+		AD51698B7E3721C055534587 /* GS1IntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GS1IntegrationTests.swift"; path = "xDrip Tests/GS1IntegrationTests.swift"; sourceTree = SOURCE_ROOT; };
+		B2D3B4339BE23889951D3F3C /* GS1Native.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "GS1Native.xcframework"; path = "Vendor/GS1Native/GS1Native.xcframework"; sourceTree = SOURCE_ROOT; };
+		B4AE1208D36D77A82C9F707C /* xdrip v38.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v38.xcdatamodel"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2270,6 +2286,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72E99589C353928D5018A971 /* GS1Native.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2277,6 +2294,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92C597F0055F666B8126A392 /* GS1Native.xcframework in Frameworks */,
 				F81F3C4225D1D91300520946 /* CoreNFC.framework in Frameworks */,
 				F821CF9722AE589E005C1E43 /* HealthKit.framework in Frameworks */,
 				47DE41AA2B860DF00041DA19 /* WatchConnectivity.framework in Frameworks */,
@@ -3360,6 +3378,13 @@
 		F8AC425121ADEBD60078C348 = {
 			isa = PBXGroup;
 			children = (
+				B2D3B4339BE23889951D3F3C /* GS1Native.xcframework */,
+				AD51698B7E3721C055534587 /* GS1IntegrationTests.swift */,
+				D08C3DC84906DDA255CA4EAE /* SibionicsCN.swift */,
+				6DEBC075E7A64E6D16DF5791 /* CGMSibionicsTransmitter.swift */,
+				F66565F704AB2EE54B55A8B1 /* GS1PeripheralScanner.swift */,
+				6B88DB12347CF235EBD62412 /* GS1Session.swift */,
+				48EB93CC06C9079EAF934ECE /* GS1Protocol.swift */,
 				471C9C022B933461005E1326 /* xDrip Widget Extension.entitlements */,
 				471C9C012B9333D5005E1326 /* xDrip Watch Complication Extension.entitlements */,
 				666E283926F7E54C00ACE4DF /* Version.xcconfig */,
@@ -4784,6 +4809,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA56321661BD37675D76F33F /* GS1IntegrationTests.swift in Sources */,
 				4F3200013008000100000001 /* BgReadingTrendTests.swift in Sources */,
 				5A0100043015000100000001 /* GlucoseRangeDistributionTests.swift in Sources */,
 				5A0921023015000100000001 /* GMIStatisticsTests.swift in Sources */,
@@ -4831,6 +4857,11 @@
 			files = (
 				52802DB9CFDCDC0AA4BE8BE4 /* DexcomWatchProtocol.swift in Sources */,
 				AB5E04E6F6CEDAE08F65B316 /* DirectWatchCompatibility.swift in Sources */,
+				6400705B22B4504CDBF5715F /* SibionicsCN.swift in Sources */,
+				C136F05BF45B4B467A8E5B54 /* CGMSibionicsTransmitter.swift in Sources */,
+				1309FD96361439551BDDA44D /* GS1PeripheralScanner.swift in Sources */,
+				9BF467A248380AAD9C221FB1 /* GS1Session.swift in Sources */,
+				564F2D69F532E09DAD13A380 /* GS1Protocol.swift in Sources */,
 				5A0100023015000100000001 /* GlucoseRangeDistribution.swift in Sources */,
 				4D7A00023014000100000001 /* TroubleshootingLog.swift in Sources */,
 				4D7A00043014000100000001 /* TroubleshootingLogView.swift in Sources */,
@@ -6589,6 +6620,7 @@
 		F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				B4AE1208D36D77A82C9F707C /* xdrip v38.xcdatamodel */,
 				D17EC7350000000000000001 /* xdrip v35.xcdatamodel */,
 				D17EC7360000000000000001 /* xdrip v36.xcdatamodel */,
 				D17EC7370000000000000001 /* xdrip v37.xcdatamodel */,
@@ -6617,7 +6649,7 @@
 				F85FF3C3252D0C32004E6FF1 /* xdrip v12.xcdatamodel */,
 				F7936B31E35D82919DCDE294 /* xdrip v33.xcdatamodel */,
 			);
-			currentVersion = D17EC7370000000000000001 /* xdrip v37.xcdatamodel */;
+			currentVersion = B4AE1208D36D77A82C9F707C /* xdrip v38.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
