@@ -529,6 +529,7 @@ final class BackupService: @unchecked Sendable {
         return try context.fetch(request).map {
             BackupTreatment(
                 careLinkSourceIdentifier: $0.careLinkSourceIdentifier,
+                penDoseIdentifier: $0.penDoseIdentifier,
                 date: $0.date,
                 enteredBy: $0.enteredBy,
                 id: $0.id,
@@ -798,6 +799,7 @@ final class BackupService: @unchecked Sendable {
             )
             treatment.treatmentdeleted = record.treatmentDeleted
             treatment.careLinkSourceIdentifier = record.careLinkSourceIdentifier
+            treatment.penDoseIdentifier = record.penDoseIdentifier
             if !record.id.isEmpty {
                 ids.insert(record.id)
             }
@@ -1039,6 +1041,7 @@ final class BackupService: @unchecked Sendable {
     private func treatmentFingerprint(_ treatment: TreatmentEntry) -> String {
         treatmentFingerprint(BackupTreatment(
             careLinkSourceIdentifier: treatment.careLinkSourceIdentifier,
+            penDoseIdentifier: treatment.penDoseIdentifier,
             date: treatment.date,
             enteredBy: treatment.enteredBy,
             id: treatment.id,

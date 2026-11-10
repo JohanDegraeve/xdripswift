@@ -9,18 +9,21 @@
 import Foundation
 import SwiftUI
 import Combine
+import OSLog
 
 /// Owns the treatment list model and presents the add/edit sheet.
 struct TreatmentsView: View {
     // MARK: - private properties
 
     @StateObject private var viewModel: TreatmentsViewModel
+    @StateObject private var novoPenScan: NovoPenScanModel
     @State private var treatmentEditorState: TreatmentEditorState?
 
     // MARK: - initialization
 
     init(coreDataManager: CoreDataManager) {
         _viewModel = StateObject(wrappedValue: TreatmentsViewModel(coreDataManager: coreDataManager))
+        _novoPenScan = StateObject(wrappedValue: NovoPenScanModel(importer: NovoPenDoseImporter(coreDataManager: coreDataManager), read: { try await NovoPenScanModel.nfcRead(isKnown: $0) }))
     }
 
     // MARK: - SwiftUI views
@@ -28,6 +31,9 @@ struct TreatmentsView: View {
     var body: some View {
         TreatmentsListView(
             viewModel: viewModel,
+            onScanNovoPen: {
+                Task { await novoPenScan.scan() }
+            },
             onAddTreatment: {
                 treatmentEditorState = .add
             },
@@ -48,6 +54,19 @@ struct TreatmentsView: View {
                 }
             )
         }
+        .alert(Texts_NovoPen.scanResultTitle, isPresented: $novoPenScan.isShowingResult) {
+            Button(Texts_Common.Ok, role: .cancel) {}
+        } message: {
+            Text(scanResultMessage ?? "")
+        }
+        .onChange(of: novoPenScan.state) { state in
+            if case .done = state { viewModel.reloadTreatments() }
+        }
+    }
+
+    private var scanResultMessage: String? {
+        if case .done(let message) = novoPenScan.state { return message }
+        return nil
     }
 }
 
@@ -59,9 +78,11 @@ struct TreatmentsListView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.scenePhase) private var scenePhase
     @State private var showScrollToTopButton = false
+    @AppStorage(UserDefaults.Key.novoPenEnabled.rawValue) private var novoPenEnabled = false
     private let topScrollAnchorID = "treatmentsTop"
     private let scrollToTopButtonThresholdIndex = 4
 
+    let onScanNovoPen: () -> Void
     let onAddTreatment: () -> Void
     let onSelectTreatment: (TreatmentSnapshot) -> Void
 
@@ -113,6 +134,16 @@ struct TreatmentsListView: View {
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     OnlineHelpButton(topic: .treatments)
+
+                    #if os(iOS) && canImport(CoreNFC)
+                    if novoPenEnabled {
+                        Button(action: onScanNovoPen) {
+                            Image(systemName: "wave.3.right")
+                        }
+                        .accessibilityLabel(Texts_NovoPen.scanPen)
+                        .tint(ConstantsAppColors.toolbarAction)
+                    }
+                    #endif
 
                     Button(action: onAddTreatment) {
                         Image(systemName: "plus")

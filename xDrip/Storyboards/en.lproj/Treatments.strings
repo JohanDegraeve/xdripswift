@@ -29,3 +29,72 @@
 
 /* Footer shown when a new basal injection is prefilled from the previous entry. */
 "treatments_basalInjectionCopiedFooter" = "The basal amount and type have been copied from the previous entry";
+
+/* NFC system sheet prompt while waiting for the NovoPen. */
+"novopen_holdPenNearPhone" = "Hold the cap end of your NovoPen near the top of your iPhone";
+
+/* NFC system sheet message after the NovoPen was read. */
+"novopen_scanComplete" = "NovoPen scan complete";
+
+/* NFC system sheet message when the scanned tag is not a NovoPen. */
+"novopen_notAPen" = "This is not a NovoPen";
+
+/* NFC system sheet message when reading the NovoPen failed. */
+"novopen_scanFailed" = "NovoPen scan failed";
+
+/* Added to the result alert when the NovoPen read was cut short. */
+"novopen_readIncomplete" = "Read interrupted – scan again for the rest";
+
+/* Added to the result alert when the newest small dose was not imported yet because it may be an air shot. */
+"novopen_heldBackAirShot" = "A small dose was held back as a possible air shot – scan again in a few minutes";
+
+/* Settings menu: choose Bolus or Basal, then scan the NovoPen to add it. */
+"novopen_addPen" = "Add pen";
+
+/* Alert after adding a NovoPen in settings; %1$@ is its serial number, %2$@ is Bolus or Basal. */
+"novopen_penAdded" = "Pen %1$@ added as %2$@";
+
+/* Result alert when a scanned NovoPen was never added; %@ is its serial number. */
+"novopen_penNotAdded" = "Pen %@ is not added yet. Add it in Treatment settings, then scan again.";
+
+/* NFC system sheet message when the scanned NovoPen was never added in settings. */
+"novopen_penNotAddedShort" = "Pen not added yet";
+
+/* Button: this NovoPen holds long-acting (basal) insulin. */
+"novopen_penKindBasal" = "Basal";
+
+/* Accessibility label of the Treatments toolbar button that scans a NovoPen. */
+"novopen_scanPen" = "Scan NovoPen";
+
+/* Settings toggle that turns on scanning a NovoPen over NFC. Experimental feature. */
+"novopen_settingEnabled" = "NovoPen NFC scanning (experimental)";
+
+/* Settings toggle: do not save a small dose that is followed shortly by another dose, which is an air shot. */
+"novopen_settingIgnoreAirShots" = "Ignore air shots";
+
+/* Settings footer explaining the air shot filter. */
+"novopen_airShotFooter" = "With Ignore air shots on, a dose of at most the max units that is followed within the window by another dose is not saved. Only the first small dose in each window is ignored. The newest small dose is held back until its window has passed: scan again a few minutes later to import it.";
+
+/* Settings row: the largest dose that can be an air shot. */
+"novopen_settingAirShotMaxUnits" = "Air shot max units";
+
+/* Settings row: how soon after an air shot the next dose must follow. */
+"novopen_settingAirShotWindow" = "Air shot window";
+
+/* Value of the air shot window setting; %d is a number of minutes. */
+"novopen_minutes" = "%d min";
+
+/* Settings row title for a known NovoPen; %@ is its serial number. */
+"novopen_pen" = "Pen %@";
+
+/* Menu item: this pen holds rapid-acting (bolus) insulin. */
+"novopen_penKindBolus" = "Bolus";
+
+/* Menu item: forget this pen; it has to be added again before its doses are read. */
+"novopen_forgetPen" = "Forget";
+
+/* Title of the alert that shows the result of a NovoPen scan. */
+"novopen_scanResultTitle" = "NovoPen";
+
+/* Value of the air shot max units setting; %d is a number of insulin units. */
+"novopen_units" = "%d U";

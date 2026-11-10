@@ -182,6 +182,9 @@ enum ConstantsLog {
     
     /// libre NFC
     static let categoryLibreNFC =                           "categoryLibreNFC              "
+
+    /// NovoPen NFC (experimental)
+    static let categoryNovoPen =                            "categoryNovoPen               "
     
     /// for use in cgm transmitter bubble
     static let categoryLibreSensorType =                    "categoryLibreSensorType       "

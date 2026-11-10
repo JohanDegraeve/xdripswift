@@ -234,6 +234,7 @@ struct BackupBgReading: Codable, Sendable {
 
 struct BackupTreatment: Codable, Sendable {
     let careLinkSourceIdentifier: String?
+    let penDoseIdentifier: String?
     let date: Date
     let enteredBy: String?
     let id: String

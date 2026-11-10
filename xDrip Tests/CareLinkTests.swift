@@ -51,6 +51,7 @@ final class CareLinkTests: XCTestCase {
     func testBackupTreatmentPreservesCareLinkIdentityAndDecodesLegacyRecords() throws {
         let treatment = BackupTreatment(
             careLinkSourceIdentifier: "patient|AUTO_BASAL_DELIVERY|marker-1",
+            penDoseIdentifier: nil,
             date: now,
             enteredBy: "CareLink",
             id: "",

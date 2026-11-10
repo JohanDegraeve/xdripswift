@@ -210,6 +210,16 @@ extension UserDefaults {
         case smallCarbTreatmentThreshold = "smallCarbTreatmentThreshold"
         /// use larger minimum chart markers and narrower dose ranges
         case useSmallDoseTreatmentScale = "useSmallDoseTreatmentScale"
+        /// experimental: read doses from a NovoPen over NFC
+        case novoPenEnabled = "novoPenEnabled"
+        /// NovoPen serial -> NovoPenPenKind raw value
+        case novoPenPenKinds = "novoPenPenKinds"
+        /// leave NovoPen air shots (priming doses) out of imports
+        case novoPenIgnoreAirShots = "novoPenIgnoreAirShots"
+        /// a NovoPen dose of at most this many units can be an air shot
+        case novoPenAirShotMaxUnits = "novoPenAirShotMaxUnits"
+        /// a NovoPen air shot is followed by another dose within this many minutes
+        case novoPenAirShotWindowMinutes = "novoPenAirShotWindowMinutes"
         /// should the micro-boluses be listed in the treatment list/table?
         case showSmallBolusTreatmentsInList = "showSmallBolusTreatmentsInList"
         /// should the normal boluses be listed in the treatment list/table?
@@ -1783,6 +1793,42 @@ extension UserDefaults {
     @objc dynamic var useSmallDoseTreatmentScale: Bool {
         get { bool(forKey: Key.useSmallDoseTreatmentScale.rawValue) }
         set { set(newValue, forKey: Key.useSmallDoseTreatmentScale.rawValue) }
+    }
+
+    /// experimental NovoPen NFC reader, off by default
+    @objc dynamic var novoPenEnabled: Bool {
+        get { bool(forKey: Key.novoPenEnabled.rawValue) }
+        set { set(newValue, forKey: Key.novoPenEnabled.rawValue) }
+    }
+
+    /// NovoPen serial -> NovoPenPenKind raw value ("bolus" or "basal")
+    @objc dynamic var novoPenPenKinds: [String: String] {
+        get { dictionary(forKey: Key.novoPenPenKinds.rawValue) as? [String: String] ?? [:] }
+        set { set(newValue, forKey: Key.novoPenPenKinds.rawValue) }
+    }
+
+    /// leave NovoPen air shots out of imports, off by default
+    @objc dynamic var novoPenIgnoreAirShots: Bool {
+        get { bool(forKey: Key.novoPenIgnoreAirShots.rawValue) }
+        set { set(newValue, forKey: Key.novoPenIgnoreAirShots.rawValue) }
+    }
+
+    /// NovoPen air shot max units. Only an absent value uses the default 2.0.
+    @objc dynamic var novoPenAirShotMaxUnits: Double {
+        get {
+            guard object(forKey: Key.novoPenAirShotMaxUnits.rawValue) != nil else { return 2.0 }
+            return double(forKey: Key.novoPenAirShotMaxUnits.rawValue)
+        }
+        set { set(newValue, forKey: Key.novoPenAirShotMaxUnits.rawValue) }
+    }
+
+    /// NovoPen air shot window in minutes. Only an absent value uses the default 2.0.
+    @objc dynamic var novoPenAirShotWindowMinutes: Double {
+        get {
+            guard object(forKey: Key.novoPenAirShotWindowMinutes.rawValue) != nil else { return 2.0 }
+            return double(forKey: Key.novoPenAirShotWindowMinutes.rawValue)
+        }
+        set { set(newValue, forKey: Key.novoPenAirShotWindowMinutes.rawValue) }
     }
 
     /// max canula age (CAGE) as Int - if nil, return default value
