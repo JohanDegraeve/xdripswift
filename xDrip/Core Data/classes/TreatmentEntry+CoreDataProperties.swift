@@ -53,5 +53,8 @@ extension TreatmentEntry {
 
     /// Stable CareLink marker identity used to prevent duplicate imports across overlapping polls.
     @NSManaged public var careLinkSourceIdentifier: String?
+
+    /// Stable NovoPen dose identity ("<serial>:Open<relativeTime>:<units>") used to prevent duplicate imports across scans.
+    @NSManaged public var penDoseIdentifier: String?
     
 }

@@ -29,7 +29,7 @@ struct TreatmentSettingsViewModel: SettingsNativeSectionProvider {
     static var screen: SettingsScreen {
         SettingsScreen(title: TherapyTexts.text("treatmentSettings"),
                        introduction: { TreatmentSettingsViewModel(group: .insulin).introduction }, onlineHelpTopic: .treatments,
-                       providers: { [.insulin, .carbs, .display, .scale].map { TreatmentSettingsViewModel(group: $0) } })
+                       providers: { [.insulin, .carbs, .display, .scale].map { TreatmentSettingsViewModel(group: $0) as SettingsNativeSectionProvider } + [NovoPenSettingsProvider()] })
     }
 
     private var policy: DataFlowPolicy { policyProvider() }

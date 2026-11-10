@@ -319,6 +319,18 @@
 		4D7A00023014000100000001 /* TroubleshootingLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7A00013014000100000001 /* TroubleshootingLog.swift */; };
 		4D7A00043014000100000001 /* TroubleshootingLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7A00033014000100000001 /* TroubleshootingLogView.swift */; };
 		4D7A00063014000100000001 /* TroubleshootingLogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7A00053014000100000001 /* TroubleshootingLogTests.swift */; };
+		9F0E00010000000000000005 /* NovoPenLinkLayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E00010000000000000004 /* NovoPenLinkLayerTests.swift */; };
+		9F0E00010000000000000003 /* NovoPenLinkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E00010000000000000002 /* NovoPenLinkLayer.swift */; };
+		9F0E0001000000000000000B /* NovoPenMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E0001000000000000000A /* NovoPenMessages.swift */; };
+		9F0E0001000000000000000D /* NovoPenFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E0001000000000000000C /* NovoPenFixtures.swift */; };
+		9F0E0001000000000000000F /* NovoPenMessagesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E0001000000000000000E /* NovoPenMessagesTests.swift */; };
+		9F0E00010000000000000011 /* NovoPenSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E00010000000000000010 /* NovoPenSessionTests.swift */; };
+		9F0E00010000000000000015 /* NovoPenDoseImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E00010000000000000014 /* NovoPenDoseImporterTests.swift */; };
+		9F0E00010000000000000017 /* NovoPenDoseImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E00010000000000000016 /* NovoPenDoseImporter.swift */; };
+		9F0E00010000000000000013 /* NovoPenSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E00010000000000000012 /* NovoPenSession.swift */; };
+		9F0E00010000000000000006 /* NovoPenNFCReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E00010000000000000007 /* NovoPenNFCReader.swift */; };
+		9F0E00010000000000000008 /* TextsNovoPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E00010000000000000009 /* TextsNovoPen.swift */; };
+		9F0E00010000000000000019 /* NovoPenUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E00010000000000000018 /* NovoPenUI.swift */; };
 		4D7B00023014000200000001 /* CGMG5SensorSessionDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7B00013014000200000001 /* CGMG5SensorSessionDetectionTests.swift */; };
 		4D7C00023015000100000001 /* CalibrationReadinessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7C00013015000100000001 /* CalibrationReadinessTests.swift */; };
 		4D7D00023016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */; };
@@ -455,6 +467,7 @@
 		D41F32922827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41F32912827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift */; };
 		D48E8F78278E49B300CCEE08 /* TreatmentNSResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48E8F77278E49B300CCEE08 /* TreatmentNSResponse.swift */; };
 		D4AC54502778C82C0097FF10 /* Treatments.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4AC54412778C82B0097FF10 /* Treatments.strings */; };
+		9F0E00020000000000000003 /* Treatments.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 9F0E00020000000000000001 /* Treatments.stringsdict */; };
 		D4E499AB277B43E3000F8CBA /* TreatmentCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E499AA277B43E3000F8CBA /* TreatmentCollection.swift */; };
 		D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E499AC277B4CE7000F8CBA /* DateOnly.swift */; };
 		D4FD899727772F9100689788 /* TreatmentEntryAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */; };
@@ -1001,6 +1014,18 @@
 
 /* Begin PBXFileReference section */
 		A19A00370000000000000002 /* RepeatingAlarmTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatingAlarmTests.swift; sourceTree = "<group>"; };
+		9F0E00010000000000000004 /* NovoPenLinkLayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NovoPenLinkLayerTests.swift; sourceTree = "<group>"; };
+		9F0E00010000000000000002 /* NovoPenLinkLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NovoPenLinkLayer.swift; sourceTree = "<group>"; };
+		9F0E0001000000000000000A /* NovoPenMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NovoPenMessages.swift; sourceTree = "<group>"; };
+		9F0E0001000000000000000C /* NovoPenFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NovoPenFixtures.swift; sourceTree = "<group>"; };
+		9F0E0001000000000000000E /* NovoPenMessagesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NovoPenMessagesTests.swift; sourceTree = "<group>"; };
+		9F0E00010000000000000010 /* NovoPenSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NovoPenSessionTests.swift; sourceTree = "<group>"; };
+		9F0E00010000000000000014 /* NovoPenDoseImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NovoPenDoseImporterTests.swift; sourceTree = "<group>"; };
+		9F0E00010000000000000016 /* NovoPenDoseImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NovoPenDoseImporter.swift; sourceTree = "<group>"; };
+		9F0E00010000000000000012 /* NovoPenSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NovoPenSession.swift; sourceTree = "<group>"; };
+		9F0E00010000000000000007 /* NovoPenNFCReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NovoPenNFCReader.swift; sourceTree = "<group>"; };
+		9F0E00010000000000000009 /* TextsNovoPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsNovoPen.swift; sourceTree = "<group>"; };
+		9F0E00010000000000000018 /* NovoPenUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NovoPenUI.swift; sourceTree = "<group>"; };
 		7E7760013000000100000002 /* SensorExpiryReminderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorExpiryReminderManager.swift; sourceTree = "<group>"; };
 		7E7760013000000100000004 /* SensorExpiryReminderManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorExpiryReminderManagerTests.swift; sourceTree = "<group>"; };
 		008DD8362C3D359B7EA1B6BD /* Libre3PairingFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Libre3PairingFlow.swift; path = Libre3PairingFlow.swift; sourceTree = "<group>"; };
@@ -1483,6 +1508,7 @@
 		D41F32912827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewHousekeeperSettingsViewModel.swift; sourceTree = "<group>"; };
 		D48E8F77278E49B300CCEE08 /* TreatmentNSResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentNSResponse.swift; sourceTree = "<group>"; };
 		D4AC54422778C82B0097FF10 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Treatments.strings; sourceTree = "<group>"; };
+		9F0E00020000000000000002 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Treatments.stringsdict; sourceTree = "<group>"; };
 		D4AC54432778C82B0097FF10 /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/Treatments.strings; sourceTree = "<group>"; };
 		D4AC54442778C82B0097FF10 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Treatments.strings; sourceTree = "<group>"; };
 		D4AC54452778C82B0097FF10 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Treatments.strings; sourceTree = "<group>"; };
@@ -2217,6 +2243,7 @@
 		D17EC7350000000000000001 /* xdrip v35.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v35.xcdatamodel"; sourceTree = "<group>"; };
 		D17EC7360000000000000001 /* xdrip v36.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v36.xcdatamodel"; sourceTree = "<group>"; };
 		D17EC7370000000000000001 /* xdrip v37.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v37.xcdatamodel"; sourceTree = "<group>"; };
+		D17EC7380000000000000001 /* xdrip v38.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v38.xcdatamodel"; sourceTree = "<group>"; };
 		6DB1082C16EEE89F23F6C2EB /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "da"; path = "xDrip/Storyboards/da.lproj/Libre3.strings"; sourceTree = SOURCE_ROOT; };
 		3B07F0A837B0A705619A1CFE /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "sv"; path = "xDrip/Storyboards/sv.lproj/Libre3.strings"; sourceTree = SOURCE_ROOT; };
 		C62A08C16FD93E899A7709C8 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fi"; path = "xDrip/Storyboards/fi.lproj/Libre3.strings"; sourceTree = SOURCE_ROOT; };
@@ -2302,6 +2329,18 @@
 				A2000000000000000000000D /* CareLinkWebLogin.swift */,
 			);
 			path = CareLink;
+			sourceTree = "<group>";
+		};
+		9F0E00010000000000000001 /* NovoPen */ = {
+			isa = PBXGroup;
+			children = (
+				9F0E00010000000000000016 /* NovoPenDoseImporter.swift */,
+				9F0E00010000000000000002 /* NovoPenLinkLayer.swift */,
+				9F0E0001000000000000000A /* NovoPenMessages.swift */,
+				9F0E00010000000000000007 /* NovoPenNFCReader.swift */,
+				9F0E00010000000000000012 /* NovoPenSession.swift */,
+			);
+			path = NovoPen;
 			sourceTree = "<group>";
 		};
 		4716A4F22B406C3D00419052 /* xDrip Widget */ = {
@@ -2686,6 +2725,7 @@
 		4C1000052F64000100000001 /* Treatments */ = {
 			isa = PBXGroup;
 			children = (
+				9F0E00010000000000000018 /* NovoPenUI.swift */,
 				4C1000042F64000100000001 /* TreatmentEditorView.swift */,
 				4C1000092F64000100000001 /* TreatmentEditorViewModel.swift */,
 				4C1000022F64000100000001 /* TreatmentsView.swift */,
@@ -2858,6 +2898,11 @@
 				AB1900023014000200000001 /* LiveActivityWarmupTests.swift */,
 				A77400023018000100000001 /* MissedReadingSnoozeTests.swift */,
 				BA0000020000000000000012 /* NightscoutFollowerGapFillTests.swift */,
+				9F0E0001000000000000000C /* NovoPenFixtures.swift */,
+				9F0E00010000000000000004 /* NovoPenLinkLayerTests.swift */,
+				9F0E0001000000000000000E /* NovoPenMessagesTests.swift */,
+				9F0E00010000000000000010 /* NovoPenSessionTests.swift */,
+				9F0E00010000000000000014 /* NovoPenDoseImporterTests.swift */,
 				A50000040000000000000001 /* OnlineHelpTests.swift */,
 				A19A00370000000000000002 /* RepeatingAlarmTests.swift */,
 				4F2800113004000100000001 /* RootHomeInteractionTests.swift */,
@@ -3228,6 +3273,7 @@
 				F8E51D5B2448D8A3001C9E5A /* Loop */,
 				47A05CC42EF160A9004DABE7 /* MedtrumEasyView */,
 				F821CF4F229BF43A005C1E43 /* Nightscout */,
+				9F0E00010000000000000001 /* NovoPen */,
 				4A9B10212F0A000100000001 /* PostProcessing */,
 				F64039AE281C3F8D0051EFFE /* QuickActions */,
 				4F2500213002000100000001 /* SensorHealth */,
@@ -3268,6 +3314,7 @@
 				F8E6C79324CEC2E3007C1199 /* Snooze.strings */,
 				F8B48A9A22B2FA66009BCC01 /* SpeakReading.strings */,
 				D4AC54412778C82B0097FF10 /* Treatments.strings */,
+				9F0E00020000000000000001 /* Treatments.stringsdict */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -3614,6 +3661,7 @@
 				F82436FB24BE014000BED341 /* TextsLibreStates.swift */,
 				F869188B23A044340065B607 /* TextsM5StackView.swift */,
 				F84DDF4A279DF03400F7B5A4 /* TextsNightscout.swift */,
+				9F0E00010000000000000009 /* TextsNovoPen.swift */,
 				F64039B4281E91500051EFFE /* TextsQuickActions.swift */,
 				F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */,
 				F8E6C78F24CEC22A007C1199 /* TextsSnooze.swift */,
@@ -4564,6 +4612,7 @@
 				F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.caf in Resources */,
 				F824377A24CB7A9800BED341 /* Sci-Fi_Spaceship_Message.caf in Resources */,
 				D4AC54502778C82C0097FF10 /* Treatments.strings in Resources */,
+				9F0E00020000000000000003 /* Treatments.stringsdict in Resources */,
 				F824377124CB7A9800BED341 /* Indeed.caf in Resources */,
 				F8B3A7CE226CC0B7004BA588 /* shorthigh2.caf in Resources */,
 				F82437D224CB7A9900BED341 /* Remembers_Me_Of_Asia.caf in Resources */,
@@ -4803,6 +4852,11 @@
 				A50000030000000000000001 /* OnlineHelpTests.swift in Sources */,
 				FBA100040000000000000001 /* FollowerBackgroundKeepAliveManagerTests.swift in Sources */,
 				BA0000020000000000000002 /* NightscoutFollowerGapFillTests.swift in Sources */,
+				9F0E00010000000000000005 /* NovoPenLinkLayerTests.swift in Sources */,
+				9F0E0001000000000000000D /* NovoPenFixtures.swift in Sources */,
+				9F0E0001000000000000000F /* NovoPenMessagesTests.swift in Sources */,
+				9F0E00010000000000000011 /* NovoPenSessionTests.swift in Sources */,
+				9F0E00010000000000000015 /* NovoPenDoseImporterTests.swift in Sources */,
 				BA0709260000000000000001 /* BasalInjectionTests.swift in Sources */,
 				4F2600023002000200000001 /* SensorHealthIssueManagerTests.swift in Sources */,
 				A19A00370000000000000001 /* RepeatingAlarmTests.swift in Sources */,
@@ -4830,6 +4884,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				52802DB9CFDCDC0AA4BE8BE4 /* DexcomWatchProtocol.swift in Sources */,
+				9F0E00010000000000000017 /* NovoPenDoseImporter.swift in Sources */,
+				9F0E00010000000000000003 /* NovoPenLinkLayer.swift in Sources */,
+				9F0E0001000000000000000B /* NovoPenMessages.swift in Sources */,
+				9F0E00010000000000000006 /* NovoPenNFCReader.swift in Sources */,
+				9F0E00010000000000000013 /* NovoPenSession.swift in Sources */,
+				9F0E00010000000000000008 /* TextsNovoPen.swift in Sources */,
 				AB5E04E6F6CEDAE08F65B316 /* DirectWatchCompatibility.swift in Sources */,
 				5A0100023015000100000001 /* GlucoseRangeDistribution.swift in Sources */,
 				4D7A00023014000100000001 /* TroubleshootingLog.swift in Sources */,
@@ -5122,6 +5182,7 @@
 				4C1000032F64000100000001 /* TreatmentEditorView.swift in Sources */,
 				4C1000062F64000100000001 /* TreatmentsViewModel.swift in Sources */,
 				4C1000012F64000100000001 /* TreatmentsView.swift in Sources */,
+				9F0E00010000000000000019 /* NovoPenUI.swift in Sources */,
 				4B0C00022F3B000100000001 /* SensorManagementView.swift in Sources */,
 				4B0C00122F3B000100000001 /* CalibrationView.swift in Sources */,
 				4B0C00142F3B000100000001 /* CalibrationHistoryView.swift in Sources */,
@@ -5576,6 +5637,14 @@
 				4166BFBA28C3501500199980 /* el */,
 			);
 			name = Treatments.strings;
+			sourceTree = "<group>";
+		};
+		9F0E00020000000000000001 /* Treatments.stringsdict */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9F0E00020000000000000002 /* en */,
+			);
+			name = Treatments.stringsdict;
 			sourceTree = "<group>";
 		};
 		F81F370A25C1584A00520946 /* LibreStates.strings */ = {
@@ -6592,6 +6661,7 @@
 				D17EC7350000000000000001 /* xdrip v35.xcdatamodel */,
 				D17EC7360000000000000001 /* xdrip v36.xcdatamodel */,
 				D17EC7370000000000000001 /* xdrip v37.xcdatamodel */,
+				D17EC7380000000000000001 /* xdrip v38.xcdatamodel */,
 				D17EC7340000000000000001 /* xdrip v34.xcdatamodel */,
 				4F3300313009000100000001 /* xdrip v33 Watch.xcdatamodel */,
 				4F3200313008000100000001 /* xdrip v32.xcdatamodel */,
@@ -6617,7 +6687,7 @@
 				F85FF3C3252D0C32004E6FF1 /* xdrip v12.xcdatamodel */,
 				F7936B31E35D82919DCDE294 /* xdrip v33.xcdatamodel */,
 			);
-			currentVersion = D17EC7370000000000000001 /* xdrip v37.xcdatamodel */;
+			currentVersion = D17EC7380000000000000001 /* xdrip v38.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
