@@ -65,24 +65,16 @@ enum OttaiParser {
         options: [.caseInsensitive]
     )
 
-    /// Choose the record size for a packet.
-    ///
-    /// The version text is not enough: a Syai sensor and a CN V3 sensor can both
-    /// say E1.1.4(V1.7.S2530.1) but use different layouts. So we only trust the
-    /// version for known families. For the rest we try both sizes and count how
-    /// many records look valid (current >= 1000, temperature <= 45). The wrong size
-    /// gives nonsense like 505 °C, so it loses.
-    ///
-    /// A live packet is 24 bytes: a header, one 9-byte record and 7 bytes of padding.
-    /// The same 24 bytes also fit a header and two 8-byte records. Two records win over
-    /// one, so a live packet is always read as 8-byte. Then the second "record" is only
-    /// padding and gets rejected, and the live path (which uses only the last record)
-    /// never sees the real one. The reading for that minute is lost. So a packet this
-    /// small must not choose the size. Pass `learned` once `decisiveRecordSize` has
-    /// found it for this sensor.
+    /// Trust clear packet data first, then the saved size, then the firmware.
+    /// A small packet cannot prove its size. Its padding can look like a record.
     static func chooseRecordSize(_ payload: [UInt8], deviceVersion: String, learned: Int? = nil) -> Int {
-        if let confirmed = confirmedRecordSize(deviceVersion) { return confirmed }
-        if let learned = learned, learned == bleRecordSize || learned == bleRecordSizeE12 { return learned }
+        if let content = contentRecordSize(payload) { return content }
+        let bodyLength = payload.count - headerSize
+        if let learned = learned,
+           (learned == bleRecordSize || learned == bleRecordSizeE12), bodyLength >= learned {
+            return learned
+        }
+        if let confirmed = confirmedRecordSize(deviceVersion), bodyLength >= confirmed { return confirmed }
         let (nine, eight) = recordSizeEvidence(payload)
         return nine > eight ? bleRecordSizeE12 : bleRecordSize
     }
@@ -105,18 +97,31 @@ enum OttaiParser {
     /// come from padding by chance.
     private static let decisiveMargin = 2
 
-    /// The record size this packet proves, or nil if it proves nothing.
-    ///
-    /// A known device version proves it without reading the packet. Otherwise the
-    /// winner needs at least `minDecisiveRecords` valid records and a lead of
-    /// `decisiveMargin`. A live packet can never do that; a history page or a
-    /// nine-record live read always does.
+    /// Use clear packet data, or a known firmware size if the data is unclear.
     static func decisiveRecordSize(_ payload: [UInt8], deviceVersion: String) -> Int? {
-        if let confirmed = confirmedRecordSize(deviceVersion) { return confirmed }
+        contentRecordSize(payload) ?? confirmedRecordSize(deviceVersion)
+    }
+
+    static func contentRecordSize(_ payload: [UInt8]) -> Int? {
         let (nine, eight) = recordSizeEvidence(payload)
-        if nine >= minDecisiveRecords && nine - eight >= decisiveMargin { return bleRecordSizeE12 }
-        if eight >= minDecisiveRecords && eight - nine >= decisiveMargin { return bleRecordSize }
+        if nine >= minDecisiveRecords && nine - eight >= decisiveMargin,
+           explainsMostRecords(payload, width: bleRecordSizeE12, valid: nine) {
+            return bleRecordSizeE12
+        }
+        if eight >= minDecisiveRecords && eight - nine >= decisiveMargin,
+           explainsMostRecords(payload, width: bleRecordSize, valid: eight) {
+            return bleRecordSize
+        }
         return nil
+    }
+
+    private static func explainsMostRecords(_ payload: [UInt8], width: Int, valid: Int) -> Bool {
+        let count = max(0, (payload.count - headerSize) / width)
+        let framed = (0..<count).reduce(0) { total, index in
+            let start = headerSize + index * width
+            return total + (payload[start..<(start + width)].contains { $0 != 0 } ? 1 : 0)
+        }
+        return valid * 2 > framed
     }
 
     /// Record size for firmware we know; nil if unknown.

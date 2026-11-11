@@ -378,3 +378,17 @@ extension OttaiServerDurationTests {
         XCTAssertNil(failure(key, f.duration, f.activate))
     }
 }
+
+final class OttaiRecordWidthBackportTests: XCTestCase {
+    func testLowCurrentHistoryCannotPoisonLearnedWidth() {
+        let page = OttaiCrypto.hexToBytes("00000000d7140000ce0344e0898a13660cc60344e0798b13740cae0344e0698c137e0c870344e0598d13890c870344e0498e13920c870344e0398f139b0c6f0344e0299013a30c770344e0199113ac0c7f0344e0099213b50c770344e0f99213bd0c770344e0e99313c80c6f0344e0d99413cd0c7f0344e0c99513d60c870344e0b99613d50c9f0344e0a99713c50cbe0344e0999813bd0cdd0344e0899913b50c00000000000000")
+        XCTAssertNil(OttaiParser.contentRecordSize(page))
+        XCTAssertEqual(OttaiParser.chooseRecordSize(page, deviceVersion: "", learned: 9), 9)
+        XCTAssertEqual(OttaiParser.frameRecords(page, deviceVersion: "", learned: 9).count, 17)
+    }
+    func testVersionCannotForceWidthThatDoesNotFit() {
+        let page: [UInt8] = Array(repeating: 0, count: 16)
+        XCTAssertEqual(OttaiParser.chooseRecordSize(page, deviceVersion: "E1.2.3", learned: 9), 8)
+        XCTAssertEqual(OttaiParser.frameRecords(page, deviceVersion: "E1.2.3", learned: 9).count, 1)
+    }
+}

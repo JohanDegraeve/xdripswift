@@ -27,6 +27,21 @@ enum OttaiOutputFilter {
     static let singleSampleDeltaMmol: Float = 1.5
     static let rawExcursionRatio: Float = 0.18
 
+    /// Reject a whole frame only when most temperatures are impossible.
+    /// Low current alone is not a reason to reject it.
+    static func isMisframedFrame(_ readings: [OttaiReading]) -> Bool {
+        guard readings.count >= 8 else { return false }
+        let accepted = readings.reduce(0) { count, reading in
+            count + (hardRejectReason(record: reading.record, mmol: Float(reading.adjustGlucose)) == nil ? 1 : 0)
+        }
+        guard accepted * 4 < readings.count else { return false }
+        let impossible = readings.reduce(0) { count, reading in
+            let temperature = reading.record.temperatureC
+            return count + (!temperature.isFinite || temperature < 0 || temperature > 60 ? 1 : 0)
+        }
+        return impossible * 2 > readings.count
+    }
+
     /// Returns a reason text if the record must be thrown away, or nil if it is fine.
     static func hardRejectReason(record: OttaiRecord, mmol: Float) -> String? {
         if !mmol.isFinite || mmol <= 0 { return "glucose=\(mmol)" }

@@ -584,8 +584,9 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         case OttaiConstants.charGlucoseLive:
             // CoreBluetooth gives notifications and read answers the same way. A live
             // value that comes while no read is running must be a notification.
-            if liveReadInFlight { liveReadInFlight = false } else { lastLiveNotifyAtMs = nowMs() }
-            handleGlucosePayload(value, live: true)
+            let notification = !liveReadInFlight
+            liveReadInFlight = false
+            handleGlucosePayload(value, live: true, notification: notification)
         case OttaiConstants.charGlucoseHistory:
             handleGlucosePayload(value, live: false)
         case OttaiConstants.charCommand:
@@ -1097,7 +1098,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
 
     // MARK: - live and history packets
 
-    private func handleGlucosePayload(_ cipher: [UInt8], live: Bool) {
+    private func handleGlucosePayload(_ cipher: [UInt8], live: Bool, notification: Bool = false) {
         if sessionKeyHex.isEmpty { return }
         if live && commandStatus >= 4 {
             handleEndedLiveBuffer(cipher)
@@ -1109,6 +1110,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
             trace("%{public}@ decrypt failed len=%{public}d", log: log, category: ConstantsLog.categoryCGMOttai, type: .error, kind, cipher.count)
             return
         }
+        let widthBeforeFrame = learnedRecordSize
         learnRecordSize(payload)
         let records = OttaiParser.frameRecords(payload, deviceVersion: materials.deviceVersion, learned: heldRecordSize())
         if records.isEmpty {
@@ -1129,6 +1131,20 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
             readings = [OttaiParser.toReading(records.last!, method: materials.method, coefficients: materials.coefficients, activeTimeMs: activeMs)]
         } else {
             readings = records.map { OttaiParser.toReading($0, method: materials.method, coefficients: materials.coefficients, activeTimeMs: activeMs) }
+        }
+        if live, notification, let reading = readings.last, reading.valid, reading.record.rawCurrent > 0 {
+            lastLiveNotifyAtMs = receivedAtMs
+        }
+        if !live && OttaiOutputFilter.isMisframedFrame(readings) {
+            learnedRecordSize = widthBeforeFrame
+            OttaiRegistry.saveRecordSize(sensorId, widthBeforeFrame)
+            trace("discarding misframed history; restoring record width=%{public}d", log: log, category: ConstantsLog.categoryCGMOttai, type: .error, widthBeforeFrame)
+            if activeHistoryEndExclusive > 0 {
+                cancelHistoryWatchdog()
+                historyRetryCount = 0
+                advanceHistoryChunkChain()
+            }
+            return
         }
         let previousDataNo = lastDataNo
         // A dataNo far past the sensor's real position means a broken packet.
@@ -1228,7 +1244,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     /// would choose a different size, log it once, with the counts for both sizes, so the
     /// log shows why. Only once, so a strange sensor cannot fill the log.
     private func learnRecordSize(_ payload: [UInt8]) {
-        if let decisive = OttaiParser.decisiveRecordSize(payload, deviceVersion: materials.deviceVersion) {
+        if let decisive = OttaiParser.contentRecordSize(payload) ?? (learnedRecordSize == 0 ? OttaiParser.decisiveRecordSize(payload, deviceVersion: materials.deviceVersion) : nil) {
             recordSizeDisagreementLogged = false
             if decisive != learnedRecordSize {
                 let previous = learnedRecordSize
