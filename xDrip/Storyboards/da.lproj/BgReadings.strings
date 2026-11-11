@@ -44,3 +44,10 @@
 "bgRangeUrgent" = "Akut";
 "bgRangeNotUrgent" = "Ikke akut";
 "bgRangeInRange" = "I område";
+
+"alsoCollectedByWatch" = "Også indsamlet af Watch";
+
+// Direct to Watch setup and diagnosis
+"receivedViaWatchAtFooterFormat" = "Modtaget via Watch kl. %@";
+"backfilledViaWatchAtFooterFormat" = "Efterfyldt via Watch kl. %@";
+"receivedViaWatch" = "Modtaget via Watch";

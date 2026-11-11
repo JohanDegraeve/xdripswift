@@ -95,6 +95,84 @@ final class CGMG5SensorSessionDetectionTests: XCTestCase {
         XCTAssertNil(state.textInputRequest?.message)
     }
 
+    func testSessionCounterSurvivesWallClockDriftWithoutReportingNewSensor() throws {
+        let identity = sessionIdentity()
+        for drift in [-3600.0, -16.0, 16.0, 3600.0] {
+            let clock = try sessionClock(now: sensorStartDate.addingTimeInterval(80_000 + drift))
+            let reconstructed = try XCTUnwrap(clock.sensorStartDate)
+            XCTAssertTrue(CGMG5Transmitter.shouldReportDetectedSensor(activeSensorStartDate: sensorStartDate, receivedSensorStartDate: reconstructed))
+            let resolved = try XCTUnwrap(identity.resolvedStartDate(transmitterID: "8ATEST", clock: clock, activeStartDate: sensorStartDate))
+            XCTAssertEqual(resolved, sensorStartDate)
+            XCTAssertFalse(CGMG5Transmitter.shouldReportDetectedSensor(activeSensorStartDate: sensorStartDate, receivedSensorStartDate: resolved))
+        }
+    }
+
+    func testSessionIdentitySurvivesRelaunch() throws {
+        let persisted = try JSONEncoder().encode(sessionIdentity())
+        let restored = try JSONDecoder().decode(DexcomSensorSessionIdentity.self, from: persisted)
+        let clock = try sessionClock(now: sensorStartDate.addingTimeInterval(83_600))
+        XCTAssertEqual(restored.resolvedStartDate(transmitterID: "8ATEST", clock: clock, activeStartDate: sensorStartDate), sensorStartDate)
+    }
+
+    func testDifferentTransmitterOrCounterCannotPreserveSession() throws {
+        let identity = sessionIdentity()
+        let clock = try sessionClock()
+        XCTAssertNil(identity.resolvedStartDate(transmitterID: "8OTHER", clock: clock, activeStartDate: sensorStartDate))
+        let replacement = try sessionClock(startCounter: 90_000)
+        XCTAssertNil(identity.resolvedStartDate(transmitterID: "8ATEST", clock: replacement, activeStartDate: sensorStartDate))
+        XCTAssertTrue(CGMG5Transmitter.shouldReportDetectedSensor(activeSensorStartDate: sensorStartDate, receivedSensorStartDate: try XCTUnwrap(replacement.sensorStartDate)))
+    }
+
+    func testBackwardsTransmitterClockCannotReuseIdentityEvenWithSameCounter() throws {
+        // Covers an observed transmitter reset/Anubis restart and an out-of-order old clock.
+        let restarted = try sessionClock(transmitterTime: 90_000)
+        XCTAssertFalse(sessionIdentity().matches(transmitterID: "8ATEST", clock: restarted))
+        XCTAssertNil(sessionIdentity().resolvedStartDate(transmitterID: "8ATEST", clock: restarted, activeStartDate: sensorStartDate))
+    }
+
+    func testStoppedOrReplacedInternalSessionCannotReuseIdentity() throws {
+        let clock = try sessionClock()
+        XCTAssertNil(sessionIdentity().resolvedStartDate(transmitterID: "8ATEST", clock: clock, activeStartDate: nil))
+        XCTAssertNil(sessionIdentity().resolvedStartDate(transmitterID: "8ATEST", clock: clock, activeStartDate: sensorStartDate.addingTimeInterval(1)))
+    }
+
+    func testIncompleteAndSentinelClockUseLegacyDateFallback() throws {
+        for counter: UInt32 in [0, UInt32.max, 100_001] {
+            let clock = try sessionClock(startCounter: counter)
+            XCTAssertNil(clock.sensorStartCounter)
+            XCTAssertNil(sessionIdentity().resolvedStartDate(transmitterID: "8ATEST", clock: clock, activeStartDate: sensorStartDate))
+        }
+        let shortClock = try XCTUnwrap(DexcomTransmitterTimeRxMessage(data: Data([0x25, 0, 1, 0, 0, 0])))
+        XCTAssertNil(shortClock.sensorStartCounter)
+        XCTAssertNil(shortClock.sensorStartDate)
+    }
+
+    func testStableSessionDatePreservesNoCodeCalibrationProgress() throws {
+        var policy = DexcomG6InitialCalibrationPolicy()
+        _ = policy.update(state: .FirstofTwoBGsNeeded, sensorStartDate: sensorStartDate)
+        policy.calibrationSubmitted(valueInMgDl: 123, enteredAt: sensorStartDate)
+        let clock = try sessionClock(now: sensorStartDate.addingTimeInterval(83_600))
+        let resolved = try XCTUnwrap(sessionIdentity().resolvedStartDate(transmitterID: "8ATEST", clock: clock, activeStartDate: sensorStartDate))
+        _ = policy.update(state: .SecondofTwoBGsNeeded, sensorStartDate: resolved)
+        XCTAssertEqual(policy.secondCalibrationPrefill?.valueInMgDl, 123)
+    }
+
+    func testSessionIdentityIsExcludedFromPortableBackups() {
+        XCTAssertFalse(BackupService.isPortableSetting(UserDefaults.Key.dexcomSensorSessionIdentityData.rawValue))
+    }
+
+    private func sessionIdentity() -> DexcomSensorSessionIdentity {
+        DexcomSensorSessionIdentity(transmitterID: "8ATEST", startCounter: 20_000, lastTransmitterTime: 100_000, activeSensorStartDate: sensorStartDate)
+    }
+
+    private func sessionClock(transmitterTime: UInt32 = 100_000, startCounter: UInt32 = 20_000, now: Date? = nil) throws -> DexcomTransmitterTimeRxMessage {
+        var data = Data([0x25, 0])
+        for value in [transmitterTime, startCounter] {
+            for index in 0..<4 { data.append(UInt8((value >> (8 * index)) & 0xff)) }
+        }
+        return try XCTUnwrap(DexcomTransmitterTimeRxMessage(data: data, receivedAt: now ?? sensorStartDate.addingTimeInterval(80_000)))
+    }
+
     private func shouldReport(activeSensorStartDate: Date?) -> Bool {
         CGMG5Transmitter.shouldReportDetectedSensor(
             activeSensorStartDate: activeSensorStartDate,

@@ -44,16 +44,13 @@ enum ConstantsGlucoseChart {
     
     static let defaultSmallBolusTreatmentThreshold: Double = 1.0
     
-    /// Bolus chart labels are hidden below this dose, independently of dynamic symbol size.
-    static let minimumBolusLabelValue: Double = 0.8
-
     // carb treatment marker color/sizes
     
     /// carbs Treatment marker colour
     static let carbsTreatmentColor = Color.orange
     
-    /// Carb chart labels are hidden below this amount, independently of dynamic symbol size.
-    static let minimumCarbsLabelValue: Double = 5
+    /// Default carb label threshold preserves the existing chart behaviour.
+    static let defaultSmallCarbTreatmentThreshold: Double = 5
 
     // bg check circle fill/border color/sizes
     

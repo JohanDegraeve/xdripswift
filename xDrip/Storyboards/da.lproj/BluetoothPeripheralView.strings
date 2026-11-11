@@ -161,6 +161,8 @@
 "batteryHistoryRange" = "Periode";
 "batteryHistoryRangeAccessibility" = "Periode for batterihistorik";
 "batteryHistoryRangeExplanation" = "Faste perioder går fra nu og tilbage til det valgte antal dage. Huller viser perioder uden en aflæsning.";
+"batteryHistoryInactive" = "Sender inaktiv";
+"batteryHistoryHistoricalRangeExplanation" = "Perioderne slutter ved den senest registrerede aflæsning. Huller viser perioder uden en aflæsning.";
 
 "connectionDiagramOtherApp" = "Anden app";
 
@@ -185,3 +187,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Udløber";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Bluetooth-adgang er ikke aktiveret";
+"bluetoothAccessInstructions" = "For at oprette forbindelse skal du åbne Indstillinger → Anonymitet & sikkerhed → Bluetooth og give %@ adgang.";
+"bluetoothAccessRestrictedInstructions" = "Enhedens begrænsninger forhindrer Bluetooth-adgang. Kontrollér Skærmtid, eller kontakt enhedens administrator for at aktivere adgang.";

@@ -5,7 +5,6 @@
 "alerttypessettingsview_screentitle" = "Alarm Types";
 "alerttypesettingsview_screentitle" = "Edit Alarm Type";
 "alerttypesettingsview_name" = "Name";
-"alerttypesettingsview_enabled" = "Enabled";
 "alerttypesettingsview_vibrate" = "Vibrate";
 "alerttypesettingsview_snoozevianotification" = "Allow Snooze Via Notification";
 "alerttypesettingsview_defaultsnoozeperiod" = "Default Snooze Time";
@@ -19,3 +18,5 @@
 "alerttypenamealreadyexistsmessages" = "An Alarm Type with this name already exists. Use a different name";
 "confirmdeletionalerttype" = "Delete Alarm Type: ";
 
+"alerttypesettingsview_repeatsound" = "Επανάληψη ήχου";
+"alerttypesettingsview_previewalert" = "Προεπισκόπηση ειδοποίησης";

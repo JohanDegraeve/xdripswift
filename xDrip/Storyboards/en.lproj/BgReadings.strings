@@ -8,6 +8,9 @@
 "timestamp" = "Timestamp";
 "backfilled" = "Backfilled";
 "backfilledAtFooterFormat" = "Backfilled %@";
+"receivedViaWatch" = "Received via Watch";
+"receivedViaWatchAtFooterFormat" = "Received via Watch at %@";
+"backfilledViaWatchAtFooterFormat" = "Backfilled via Watch at %@";
 "calculatedValue" = "Calculated value";
 "calibratedValue" = "Calibrated Value";
 "finalGlucose" = "Glucose Value";
@@ -23,3 +26,5 @@
 "bgRangeUrgent" = "Urgent";
 "bgRangeNotUrgent" = "Not Urgent";
 "bgRangeInRange" = "In Range";
+
+"alsoCollectedByWatch" = "Also collected by Watch";

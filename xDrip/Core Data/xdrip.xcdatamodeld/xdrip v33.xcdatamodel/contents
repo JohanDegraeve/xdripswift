@@ -73,12 +73,12 @@
         <relationship name="dexcomG7" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DexcomG7" inverseName="blePeripheral" inverseEntity="DexcomG7"/>
         <relationship name="dexcomG7HeartBeat" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="DexcomG7HeartBeat" inverseName="blePeripheral" inverseEntity="DexcomG7HeartBeat"/>
         <relationship name="libre2" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Libre2" inverseName="blePeripheral" inverseEntity="Libre2"/>
+        <relationship name="libre3" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Libre3" inverseName="blePeripheral" inverseEntity="Libre3"/>
         <relationship name="libre2heartbeat" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Libre2HeartBeat" inverseName="blePeripheral" inverseEntity="Libre2HeartBeat"/>
         <relationship name="m5Stack" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="M5Stack" inverseName="blePeripheral" inverseEntity="M5Stack"/>
         <relationship name="medtrumTouchCareNano" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="MedtrumTouchCareNano" inverseName="blePeripheral" inverseEntity="MedtrumTouchCareNano"/>
         <relationship name="miaoMiao" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="MiaoMiao" inverseName="blePeripheral" inverseEntity="MiaoMiao"/>
         <relationship name="omniPodHeartBeat" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="OmniPodHeartBeat" inverseName="blePeripheral" inverseEntity="OmniPodHeartBeat"/>
-        <relationship name="ottai" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Ottai" inverseName="blePeripheral" inverseEntity="Ottai"/>
     </entity>
     <entity name="BatteryHistorySample" representedClassName=".BatteryHistorySample" syncable="YES">
         <attribute name="batteryStatusRaw" optional="YES" attributeType="Integer 16"/>
@@ -170,6 +170,14 @@
     <entity name="Libre2" representedClassName=".Libre2" syncable="YES">
         <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="libre2" inverseEntity="BLEPeripheral"/>
     </entity>
+    <entity name="Libre3" representedClassName=".Libre3" syncable="YES">
+        <attribute name="firmware" optional="YES" attributeType="String"/>
+        <attribute name="status" optional="YES" attributeType="String"/>
+        <attribute name="warmupMinutes" attributeType="Integer 32" defaultValueString="60" usesScalarValueType="YES"/>
+        <attribute name="wearMinutes" attributeType="Integer 32" defaultValueString="20160" usesScalarValueType="YES"/>
+        <attribute name="startedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="libre3" inverseEntity="BLEPeripheral"/>
+    </entity>
     <entity name="Libre2HeartBeat" representedClassName=".Libre2HeartBeat" syncable="YES">
         <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BLEPeripheral" inverseName="libre2heartbeat" inverseEntity="BLEPeripheral"/>
     </entity>
@@ -185,10 +193,6 @@
     <entity name="MedtrumTouchCareNano" representedClassName=".MedtrumTouchCareNano" syncable="YES">
         <attribute name="firmware" optional="YES" attributeType="String"/>
         <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="medtrumTouchCareNano" inverseEntity="BLEPeripheral"/>
-    </entity>
-    <entity name="Ottai" representedClassName=".Ottai" syncable="YES">
-        <attribute name="ottaiSensorId" optional="YES" attributeType="String"/>
-        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="ottai" inverseEntity="BLEPeripheral"/>
     </entity>
     <entity name="MiaoMiao" representedClassName=".MiaoMiao" syncable="YES">
         <attribute name="firmware" optional="YES" attributeType="String"/>

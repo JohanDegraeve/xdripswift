@@ -1,1 +1,88 @@
 
+
+// Direct to Watch status and pairing guidance
+"directWatchTitle" = "Doğrudan Watch’a";
+"directWatchNoConnection" = "Bağlantı eklenmedi";
+"directWatchSuspended" = "Veri toplama duraklatıldı";
+"directWatchWaiting" = "Watch ölçümü bekleniyor";
+"directWatchCollecting" = "Veri toplanıyor";
+"directWatchOverdue" = "Ölçüm gelmedi";
+"directWatchDiagnosis" = "Tanılama";
+"directWatchAdded" = "Watch bağlantısı eklendi";
+"directWatchPairingGuidance" = "Watch’ta aşağı kaydırarak Doğrudan Watch’a ekranına gidin ve bu vericiyi ilk kez ekliyorsanız Bluetooth eşleştirme isteğini kabul edin.\n\nVericinin bağlanması beş dakika kadar sürebilir.";
+
+// Direct to Watch collection control
+"directWatchPausedShort" = "Duraklatıldı";
+"directWatchPaused" = "Watch veri toplama duraklatıldı";
+"directWatchPause" = "Toplamayı duraklat";
+"directWatchResume" = "Toplamayı sürdür";
+"directWatchPausedSinceFormat" = "%@ tarihinden beri";
+"directWatchConnecting" = "Bekleniyor…";
+"directWatchCollectedReadings" = "Toplanan ölçümler";
+"directWatchReadingGapFormat" = "(%ddk %dsn)";
+"directWatchNoCollectedReadings" = "Henüz Watch ile ölçüm toplanmadı";
+
+"directWatchSessionStarted" = "%@ saatinde başlatıldı";
+"directWatchSessionResumed" = "%@ saatinde sürdürüldü";
+"directWatchSessionPaused" = "%@ saatinde duraklatıldı";
+"directWatchSessionEnded" = "%@ saatinde sonlandırıldı";
+
+// Direct to Watch setup and diagnosis
+"directWatchBluetoothSlot" = "Bluetooth yuvası";
+"directWatchCancel" = "Vazgeç";
+"directWatchTestingLogs" = "Test ve günlükler";
+"directWatchAddConnection" = "Watch bağla";
+"directWatchRemoveConnection" = "Watch bağlantısını kaldır";
+"directWatchMedicalSlot" = "Tıbbi cihaz yuvası";
+"directWatchWatchSlot" = "Watch yuvası";
+"directWatchConfirmUnusedSlot" = "Yuva boş: Watch bağla";
+"directWatchSlotMedical" = "Yuva 1 · Tıbbi cihaz";
+"directWatchSlotMobile" = "Yuva 2 · Mobil uygulama";
+"directWatchSlotWatch" = "Yuva 3 · Watch";
+"directWatchSlotAnubis" = "Yuva 3 · Anubis ek yuva";
+"directWatchUsedWatch" = "Bu Watch kullanıyor";
+"directWatchUsedPhone" = "Bu iPhone kullanıyor";
+"directWatchSlotMedicalDetail" = "Pompa veya alıcı kullanmıyorsa";
+"directWatchSlotMobileDetail" = "Başka telefon uygulaması kullanmıyorsa";
+"directWatchRecommendedWatch" = "Watch için önerilir";
+"directWatchRecommendedTransmitter" = "Bu verici için önerilir";
+"directWatchAnubisOnly" = "Yalnızca Anubis vericiler";
+"directWatchWatchStatus" = "Watch durumu";
+"directWatchTestingDiagnosis" = "Test ve tanılama";
+"directWatchPausePhone" = "iPhone BLE toplamayı duraklat";
+"directWatchForTesting" = "Watch toplamayı test etmek için";
+"directWatchGetLogs" = "Watch günlüklerini al";
+"directWatchShareLogs" = "Watch günlüklerini paylaş";
+"directWatchPending" = "Bekleyen";
+"directWatchReceivedFormat" = "Alındı %@";
+"directWatchSelectedFormat" = "%@, seçili";
+"directWatchIntro" = "Watch, iPhone yakında değilken doğrudan ölçüm toplayabilir. Sensör kontrolleri iPhone’da kalır.";
+"directWatchBackgroundAdvice" = "Arka planda toplama watchOS’e bağlıdır. iPhone olmadan güvenmeden önce Watch’ta test edin.";
+"directWatchSeparateSlots" = "Watch ve iPhone farklı yuvalar kullanmalıdır. Yuva 1, onu kullanan pompa veya alıcının bağlantısını kesebilir.";
+"directWatchNativeRequired" = "Watch toplama için bu iPhone’da yerel hesaplanan glikoz gerekir.";
+"directWatchStartSensor" = "Watch bağlantısını eklemeden önce bu iPhone’da bir sensör başlatın.";
+"directWatchNoSlot" = "Watch için uygun boş yuva yok.";
+"directWatchMedicalWarning" = "Watch, normalde pompa veya alıcının kullandığı yuva 1’i kullanacaktır. Bu yuvayı pompa, alıcı veya başka tıbbi cihaz kullanıyorsa bağlantıyı eklemeyin. Watch, o cihazın glikoz bağlantısını kesebilir.";
+"directWatchWatchSlotWarning" = "Watch yuva 3’ü kullanacaktır. Sensöre başka bir akıllı saat eşlenmişse bu bağlantıyı eklemeyin. Bu Watch, diğer saatin glikoz bağlantısını kesebilir.";
+"directWatchSlotConflict" = "Bu yuva Watch’a atanmış. iPhone’a atamadan önce Watch bağlantısını kaldırın.";
+"directWatchOpenForStatus" = "Durumu almak için Watch’ta %@ ekranını açın.";
+"directWatchCheckInstalled" = "Durum güncellenmezse iPhone’un Watch uygulamasında uygulamanın Apple Watch’a Yüklendi bölümünde olduğunu kontrol edin.";
+"directWatchMasterRequired" = "iPhone ana modda olmalıdır.";
+"directWatchG6Mismatch" = "Yapılandırılan G6, iPhone’un etkin vericisi değil.";
+"directWatchG7Mismatch" = "Yapılandırılan G7 ailesi sensörü, iPhone’un etkin vericisi değil.";
+"directWatchPrimaryRequired" = "Watch toplama için iPhone’da birincil G7 ailesi bağlantısı gerekir.";
+"directWatchNativeG6Required" = "iPhone’da yerel G6 glikozunu etkinleştirin.";
+"directWatchPairingCodeRequired" = "Watch eşleştirme için dört haneli sensör kodu gerekir.";
+"directWatchSlotsConflict" = "Watch ve iPhone aynı Bluetooth yuvasını kullanıyor.";
+"directWatchAnubisRequired" = "Yuva 3 için Anubis verici gerekir.";
+"directWatchNoActiveSensor" = "iPhone’da etkin sensör yok.";
+
+/* Direct to Watch action feedback. */
+"directWatchTryAgain" = "Yeniden dene";
+"directWatchRequestQueued" = "İstek sırada";
+"directWatchLastLogsReceived" = "Son günlük alımı";
+"directWatchWaitingForLogs" = "Yeni günlükler bekleniyor…";
+"directWatchLogsFailed" = "Günlükler alınamadı. Yeniden deneyin.";
+
+/* Watch diagnostic log actions and receipt time. */
+"directWatchLogs" = "Günlükler";

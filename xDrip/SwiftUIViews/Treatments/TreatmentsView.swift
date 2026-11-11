@@ -57,6 +57,7 @@ struct TreatmentsListView: View {
 
     @ObservedObject var viewModel: TreatmentsViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showScrollToTopButton = false
     private let topScrollAnchorID = "treatmentsTop"
     private let scrollToTopButtonThresholdIndex = 4
@@ -120,6 +121,17 @@ struct TreatmentsListView: View {
                 }
             }
             .onAppear {
+                viewModel.initializeViewIfNeeded()
+            }
+            .onChange(of: scenePhase) { phase in
+                if phase == .active {
+                    viewModel.initializeViewIfNeeded()
+                }
+            }
+            // Also advance the date if the Treatments tab stays open across midnight.
+            .onReceive(
+                NotificationCenter.default.publisher(for: .NSCalendarDayChanged).receive(on: RunLoop.main)
+            ) { _ in
                 viewModel.initializeViewIfNeeded()
             }
             .onReceive(
@@ -232,6 +244,9 @@ struct TreatmentsListView: View {
 
 /// Persistent top controls for date selection and treatment filters.
 private struct TreatmentsControlsCard: View {
+    @AppStorage(UserDefaults.Key.smallBolusTreatmentThreshold.rawValue)
+    private var smallBolusTreatmentThreshold = ConstantsGlucoseChart.defaultSmallBolusTreatmentThreshold
+
     @ObservedObject var viewModel: TreatmentsViewModel
 
     var body: some View {
@@ -267,15 +282,18 @@ private struct TreatmentsControlsCard: View {
                         viewModel.toggleBolusFilter()
                     }
 
-                    TreatmentFilterChip(
-                        systemImage: GlucoseChartTreatmentStyle.bolusSymbol,
-                        tintColor: ConstantsGlucoseChart.bolusTreatmentColor,
-                        isSelected: viewModel.showSmallBolusTreatments,
-                        isEnabled: viewModel.showBolusTreatments,
-                        symbolScale: .medium,
-                        symbolFont: .system(size: TreatmentFilterLayout.symbolSize * GlucoseChartTreatmentStyle.smallBolusScale, weight: .regular)
-                    ) {
-                        viewModel.toggleSmallBolusFilter()
+                    // With no threshold there are no small boluses to filter.
+                    if smallBolusTreatmentThreshold > 0 {
+                        TreatmentFilterChip(
+                            systemImage: GlucoseChartTreatmentStyle.bolusSymbol,
+                            tintColor: ConstantsGlucoseChart.bolusTreatmentColor,
+                            isSelected: viewModel.showSmallBolusTreatments,
+                            isEnabled: viewModel.showBolusTreatments,
+                            symbolScale: .medium,
+                            symbolFont: .system(size: TreatmentFilterLayout.symbolSize * GlucoseChartTreatmentStyle.smallBolusScale, weight: .regular)
+                        ) {
+                            viewModel.toggleSmallBolusFilter()
+                        }
                     }
 
                     TreatmentFilterChip(

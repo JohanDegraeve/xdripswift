@@ -14,7 +14,6 @@
 "alerttypesettingsview_sound" = "Ton";
 
 /// when editing an alert type, field title for Enabled
-"alerttypesettingsview_enabled" = "Aktiv";
 
 /// 
 "alertTypeNoSound" = "Kein Ton";
@@ -45,3 +44,6 @@
 
 /// shown on top of the screen that allows user to edit an alert type
 "alerttypesettingsview_screentitle" = "Alarm Typ bearbeiten";
+
+"alerttypesettingsview_repeatsound" = "Ton wiederholen";
+"alerttypesettingsview_previewalert" = "Alarm vorhören";

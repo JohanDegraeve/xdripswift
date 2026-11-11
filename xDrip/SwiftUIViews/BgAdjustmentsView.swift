@@ -210,7 +210,7 @@ struct BgAdjustmentsView: View {
     private func adjustmentSection() -> some View {
         Section(header: Text(Texts_HomeView.postProcessingAdjustment), footer: adjustmentSectionFooter()) {
             VStack(alignment: .leading, spacing: 4) {
-                Toggle(Texts_HomeView.postProcessingEnable, isOn: $enableAdjustment)
+                Toggle(Texts_Common.enable, isOn: $enableAdjustment)
                     .tint(ConstantsAppColors.normal)
                     .disabled(!shouldAllowAdjustmentForCurrentSource())
 
@@ -322,7 +322,7 @@ struct BgAdjustmentsView: View {
 
     private func smoothingSection() -> some View {
         Section(header: Text(Texts_HomeView.postProcessingSmoothing)) {
-            Toggle(Texts_HomeView.postProcessingEnable, isOn: $enableSmoothing)
+            Toggle(Texts_Common.enable, isOn: $enableSmoothing)
                 .tint(ConstantsAppColors.normal)
 
             if enableSmoothing {

@@ -24,3 +24,11 @@
 "alerts_fastrise" = "Snelle Stijging Alarm";
 "alertWhenBelowValue" = "Alleen als onder";
 "alertWhenAboveValue" = "Alleen als boven";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "Sensor Eindigt Binnenkort";
+"sensorExpiry.expectedExpiry" = "Verwacht Sensoreinde";
+"sensorExpiry.hoursBefore" = "Uren vóór afloop";
+"sensorExpiry.hoursHelp" = "Voer een geheel aantal uren in van 1 tot 48.";
+"sensorExpiry.endingSoonBody" = "De verwachte levensduur van je sensor eindigt op %@.";
+"sensorExpiry.expectedExpiryBody" = "Je sensor heeft zijn verwachte eindtijd bereikt (%@).";

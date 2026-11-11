@@ -22,3 +22,11 @@
 "confirmdeletionalert" = "Delete Alarm?";
 "alerts_fastdrop" = "Fast Drop Alarm";
 "alerts_fastrise" = "Fast Rise Alarm";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "Sensoren udløber snart";
+"sensorExpiry.expectedExpiry" = "Forventet sensorudløb";
+"sensorExpiry.hoursBefore" = "Timer før udløb";
+"sensorExpiry.hoursHelp" = "Indtast et helt antal timer fra 1 til 48.";
+"sensorExpiry.endingSoonBody" = "Din sensor forventes at nå slutningen af sin levetid den %@.";
+"sensorExpiry.expectedExpiryBody" = "Din sensor har nået sit forventede udløb (%@).";

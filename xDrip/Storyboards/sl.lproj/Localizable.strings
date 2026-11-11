@@ -1,1 +1,88 @@
 
+
+// Direct to Watch status and pairing guidance
+"directWatchTitle" = "Neposredno na Watch";
+"directWatchNoConnection" = "Povezava ni dodana";
+"directWatchSuspended" = "Zbiranje začasno ustavljeno";
+"directWatchWaiting" = "Čakanje na odčitek z Watch";
+"directWatchCollecting" = "Zbiranje podatkov";
+"directWatchOverdue" = "Odčitek manjka";
+"directWatchDiagnosis" = "Diagnostika";
+"directWatchAdded" = "Povezava z Watch dodana";
+"directWatchPairingGuidance" = "Na uri Watch se pomaknite navzdol do zaslona Neposredno na Watch in sprejmite zahtevo za seznanitev Bluetooth, če ta oddajnik dodajate prvič.\n\nPovezovanje oddajnika lahko traja do pet minut.";
+
+// Direct to Watch collection control
+"directWatchPausedShort" = "Začasno ustavljeno";
+"directWatchPaused" = "Zbiranje na Watch začasno ustavljeno";
+"directWatchPause" = "Začasno ustavi zbiranje";
+"directWatchResume" = "Nadaljuj zbiranje";
+"directWatchPausedSinceFormat" = "Od %@";
+"directWatchConnecting" = "Čakanje…";
+"directWatchCollectedReadings" = "Zbrani odčitki";
+"directWatchReadingGapFormat" = "(%dm %ds)";
+"directWatchNoCollectedReadings" = "Prek Watch še ni zbranih odčitkov";
+
+"directWatchSessionStarted" = "Začeto ob %@";
+"directWatchSessionResumed" = "Nadaljevano ob %@";
+"directWatchSessionPaused" = "Začasno ustavljeno ob %@";
+"directWatchSessionEnded" = "Končano ob %@";
+
+// Direct to Watch setup and diagnosis
+"directWatchBluetoothSlot" = "Reža Bluetooth";
+"directWatchCancel" = "Prekliči";
+"directWatchTestingLogs" = "Testiranje in dnevniki";
+"directWatchAddConnection" = "Poveži Watch";
+"directWatchRemoveConnection" = "Odstrani povezavo Watch";
+"directWatchMedicalSlot" = "Reža medicinske naprave";
+"directWatchWatchSlot" = "Reža Watch";
+"directWatchConfirmUnusedSlot" = "Prosta reža: poveži Watch";
+"directWatchSlotMedical" = "Reža 1 · Medicinska naprava";
+"directWatchSlotMobile" = "Reža 2 · Mobilna aplikacija";
+"directWatchSlotWatch" = "Reža 3 · Watch";
+"directWatchSlotAnubis" = "Reža 3 · Dodatna Anubis";
+"directWatchUsedWatch" = "Uporablja ta Watch";
+"directWatchUsedPhone" = "Uporablja ta iPhone";
+"directWatchSlotMedicalDetail" = "Le če je brez črpalke ali sprejemnika";
+"directWatchSlotMobileDetail" = "Le če ga ne uporablja druga aplikacija";
+"directWatchRecommendedWatch" = "Priporočeno za Watch";
+"directWatchRecommendedTransmitter" = "Priporočeno za ta oddajnik";
+"directWatchAnubisOnly" = "Samo oddajniki Anubis";
+"directWatchWatchStatus" = "Stanje Watch";
+"directWatchTestingDiagnosis" = "Testiranje in diagnostika";
+"directWatchPausePhone" = "Začasno ustavi zbiranje BLE iPhone";
+"directWatchForTesting" = "Za preizkus zbiranja Watch";
+"directWatchGetLogs" = "Pridobi dnevnike Watch";
+"directWatchShareLogs" = "Deli dnevnike Watch";
+"directWatchPending" = "Na čakanju";
+"directWatchReceivedFormat" = "Prejeto %@";
+"directWatchSelectedFormat" = "%@, izbrano";
+"directWatchIntro" = "Watch lahko neposredno zbira odčitke brez iPhona v bližini. Upravljanje senzorja ostane na iPhonu.";
+"directWatchBackgroundAdvice" = "Zbiranje v ozadju je odvisno od watchOS. Preizkusite ga na Watch, preden se nanj zanesete brez iPhona.";
+"directWatchSeparateSlots" = "Watch in iPhone potrebujeta ločeni reži. Reža 1 lahko prekine povezavo črpalke ali sprejemnika, ki jo že uporablja.";
+"directWatchNativeRequired" = "Zbiranje Watch zahteva izvorno izračunano glukozo na tem iPhonu.";
+"directWatchStartSensor" = "Pred povezavo Watch zaženite senzor na tem iPhonu.";
+"directWatchNoSlot" = "Za Watch ni proste združljive reže.";
+"directWatchMedicalWarning" = "Watch bo uporabljal režo 1, običajno za črpalko ali sprejemnik. Ne dodajajte povezave, če režo uporablja črpalka, sprejemnik ali druga medicinska naprava. Watch lahko prekine povezavo te naprave za prejemanje glukoze.";
+"directWatchWatchSlotWarning" = "Watch bo uporabljal režo 3. Ne dodajajte povezave, če je s senzorjem že seznanjena druga pametna ura. Ta Watch lahko prekine njeno povezavo za prejemanje glukoze.";
+"directWatchSlotConflict" = "Ta reža je dodeljena Watch. Preden jo dodelite iPhonu, odstranite povezavo Watch.";
+"directWatchOpenForStatus" = "Za prejem stanja odprite %@ na uri Watch.";
+"directWatchCheckInstalled" = "Če se stanje ne posodablja, preverite, ali je aplikacija med nameščenimi na Apple Watch v aplikaciji Watch na iPhonu.";
+"directWatchMasterRequired" = "iPhone mora biti v glavnem načinu.";
+"directWatchG6Mismatch" = "Nastavljeni G6 ni aktivni oddajnik iPhona.";
+"directWatchG7Mismatch" = "Nastavljeni senzor družine G7 ni aktivni oddajnik iPhona.";
+"directWatchPrimaryRequired" = "Zbiranje Watch zahteva primarno povezavo družine G7 na iPhonu.";
+"directWatchNativeG6Required" = "Omogočite izvorno glukozo G6 na iPhonu.";
+"directWatchPairingCodeRequired" = "Za seznanitev Watch je potrebna štirimestna koda senzorja.";
+"directWatchSlotsConflict" = "Watch in iPhone uporabljata isto režo Bluetooth.";
+"directWatchAnubisRequired" = "Reža 3 zahteva oddajnik Anubis.";
+"directWatchNoActiveSensor" = "Na iPhonu ni aktivnega senzorja.";
+
+/* Direct to Watch action feedback. */
+"directWatchTryAgain" = "Poskusi znova";
+"directWatchRequestQueued" = "Zahteva v čakalni vrsti";
+"directWatchLastLogsReceived" = "Zadnji prejeti dnevniki";
+"directWatchWaitingForLogs" = "Čakanje na nove dnevnike…";
+"directWatchLogsFailed" = "Dnevnikov ni mogoče pridobiti. Poskusite znova.";
+
+/* Watch diagnostic log actions and receipt time. */
+"directWatchLogs" = "Dnevniki";

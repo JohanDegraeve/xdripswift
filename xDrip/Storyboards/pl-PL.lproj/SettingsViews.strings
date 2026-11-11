@@ -96,7 +96,6 @@
 "sectionTitleTrace" = "Issue Reporting";
 
 /// nightscout settings, where user can enable or disable nightscout
-"settingsviews_nightscoutEnabled" = "Enable Nightscout";
 
 /// user tries to send trace file but there's no native email account configured
 "emailNotConfigured" = "You must configure an e-mail account on your iOS device.";
@@ -209,7 +208,6 @@
 "settingsviews_labelShowReadingInAppBadge" = "Plakietka aplikacji";
 
 /// healthkit settings, literally 'healthkit'
-"settingsviews_healthkit" = "Zapisuj w Apple Health";
 
 /// general settings, literally master
 "settingsviews_master" = "Master";
@@ -266,7 +264,6 @@
 "volumeTestSoundPlayerExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = On\n\n(Used for all alarms except Missed Reading alerts which always use the iOS volume.)\n\nChange the volume with the volume buttons and press OK when done.";
 
 /// dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no
-"settingsviews_uploadReadingstoDexcomShare" = "Prześlij";
 
 /// Apple Watch Settings - text in row where user needs to say if trend should be displayed or not
 "settingsviews_displayTrendInCalendarEvent" = "Trend";
@@ -799,3 +796,33 @@
 "homeScreen.basalTop" = "Góra";
 "homeScreen.basalBottom" = "Dół";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Wykres glukozy";
+
+"therapy.none" = "Brak";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Progi terapii";
+"therapy.smallBolusThreshold" = "Mały bolus";
+"therapy.smallCarbThreshold" = "Mało węgl.";
+"therapy.treatmentThresholdsExplanation" = "Wartości bolusów i węglowodanów poniżej progów są ukryte na wykresie. Próg bolusa określa też małe bolusy na liście terapii. «Brak» pokazuje wszystkie wartości.";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Oszacowanie glukozy";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Skala terapii";
+"therapy.scaleStandard" = "Standard";
+"therapy.scaleSmallDoses" = "Małe dawki";
+"therapy.treatmentScaleExplanation" = "Małe dawki ułatwiają dostrzeżenie małych znaczników. Bolusy: 0.1–2.0U; węglowodany: 1–50g. Większe ilości mają największy znacznik.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimalny";
+"settingsviews_liveActivityTypeNormal" = "Normalny";
+"settingsviews_liveActivityTypeLarge" = "Duży";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Przesyłanie do Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Czytaj wprowadzenie";
+"speak.preview" = "Przetestuj odczyt glukozy";

@@ -1,1 +1,88 @@
 
+
+// Direct to Watch status and pairing guidance
+"directWatchTitle" = "Direkte til Watch";
+"directWatchNoConnection" = "Ingen forbindelse tilføjet";
+"directWatchSuspended" = "Indsamling sat på pause";
+"directWatchWaiting" = "Venter på Watch-måling";
+"directWatchCollecting" = "Indsamler";
+"directWatchOverdue" = "Måling mangler";
+"directWatchDiagnosis" = "Diagnose";
+"directWatchAdded" = "Watch-forbindelse tilføjet";
+"directWatchPairingGuidance" = "Rul ned til skærmen Direkte til Watch på Watch, og accepter Bluetooth-parringsanmodningen, hvis du tilføjer denne sender for første gang.\n\nDet kan tage op til fem minutter, før senderen opretter forbindelse.";
+
+// Direct to Watch collection control
+"directWatchPausedShort" = "På pause";
+"directWatchPaused" = "Watch-indsamling sat på pause";
+"directWatchPause" = "Sæt indsamling på pause";
+"directWatchResume" = "Genoptag indsamling";
+"directWatchPausedSinceFormat" = "Siden %@";
+"directWatchConnecting" = "Venter…";
+"directWatchCollectedReadings" = "Indsamlede målinger";
+"directWatchReadingGapFormat" = "(%dm %ds)";
+"directWatchNoCollectedReadings" = "Ingen målinger indsamlet via Watch endnu";
+
+"directWatchSessionStarted" = "Startet kl. %@";
+"directWatchSessionResumed" = "Genoptaget kl. %@";
+"directWatchSessionPaused" = "Sat på pause kl. %@";
+"directWatchSessionEnded" = "Afsluttet kl. %@";
+
+// Direct to Watch setup and diagnosis
+"directWatchBluetoothSlot" = "Bluetooth-plads";
+"directWatchCancel" = "Annuller";
+"directWatchTestingLogs" = "Test og log";
+"directWatchAddConnection" = "Tilføj Watch";
+"directWatchRemoveConnection" = "Fjern Watch-forbindelse";
+"directWatchMedicalSlot" = "Plads til medicinsk udstyr";
+"directWatchWatchSlot" = "Watch-plads";
+"directWatchConfirmUnusedSlot" = "Ledig plads: tilføj Watch";
+"directWatchSlotMedical" = "Plads 1 · Medicinsk udstyr";
+"directWatchSlotMobile" = "Plads 2 · Mobilapp";
+"directWatchSlotWatch" = "Plads 3 · Watch";
+"directWatchSlotAnubis" = "Plads 3 · Ekstra Anubis";
+"directWatchUsedWatch" = "Bruges af dette Watch";
+"directWatchUsedPhone" = "Bruges af denne iPhone";
+"directWatchSlotMedicalDetail" = "Kun uden pumpe eller modtager";
+"directWatchSlotMobileDetail" = "Kun uden anden mobilapp";
+"directWatchRecommendedWatch" = "Anbefalet til Watch";
+"directWatchRecommendedTransmitter" = "Anbefalet til denne sender";
+"directWatchAnubisOnly" = "Kun Anubis-sendere";
+"directWatchWatchStatus" = "Watch-status";
+"directWatchTestingDiagnosis" = "Test og diagnose";
+"directWatchPausePhone" = "Sæt iPhone-BLE-indsamling på pause";
+"directWatchForTesting" = "Til test af Watch-indsamling";
+"directWatchGetLogs" = "Hent Watch-log";
+"directWatchShareLogs" = "Del Watch-log";
+"directWatchPending" = "Afventer";
+"directWatchReceivedFormat" = "Modtaget %@";
+"directWatchSelectedFormat" = "%@, valgt";
+"directWatchIntro" = "Watch kan indsamle målinger direkte uden iPhone i nærheden. Sensoren styres stadig fra iPhone.";
+"directWatchBackgroundAdvice" = "Indsamling i baggrunden afhænger af watchOS. Test den på dit Watch, før du bruger den uden iPhone.";
+"directWatchSeparateSlots" = "Watch og iPhone skal bruge hver sin plads. Plads 1 kan afbryde en pumpe eller modtager, der allerede bruger den.";
+"directWatchNativeRequired" = "Watch-indsamling kræver nativt beregnet glukose på denne iPhone.";
+"directWatchStartSensor" = "Start en sensor på denne iPhone, før du tilføjer Watch.";
+"directWatchNoSlot" = "Ingen kompatibel plads ledig til Watch.";
+"directWatchMedicalWarning" = "Watch bruger plads 1, som normalt bruges af en pumpe eller modtager. Tilføj ikke forbindelsen, hvis en pumpe, modtager eller andet medicinsk udstyr bruger pladsen. Watch kan afbryde enhedens glukoseforbindelse.";
+"directWatchWatchSlotWarning" = "Watch bruger plads 3. Tilføj ikke forbindelsen, hvis et andet smartwatch allerede er parret med sensoren. Dette Watch kan afbryde dets glukoseforbindelse.";
+"directWatchSlotConflict" = "Denne plads er tildelt Watch. Fjern Watch-forbindelsen, før du tildeler den til iPhone.";
+"directWatchOpenForStatus" = "Åbn %@ på Watch for at modtage status.";
+"directWatchCheckInstalled" = "Hvis status ikke opdateres, skal du se, om appen står under Installeret på Apple Watch i iPhones Watch-app.";
+"directWatchMasterRequired" = "iPhone skal være i mastertilstand.";
+"directWatchG6Mismatch" = "Den konfigurerede G6 er ikke iPhones aktive sender.";
+"directWatchG7Mismatch" = "Den konfigurerede G7-familiesensor er ikke iPhones aktive sender.";
+"directWatchPrimaryRequired" = "Watch-indsamling kræver en primær G7-familieforbindelse på iPhone.";
+"directWatchNativeG6Required" = "Aktivér nativ G6-glukose på iPhone.";
+"directWatchPairingCodeRequired" = "En firecifret sensorkode kræves for at parre Watch.";
+"directWatchSlotsConflict" = "Watch og iPhone bruger samme Bluetooth-plads.";
+"directWatchAnubisRequired" = "Plads 3 kræver en Anubis-sender.";
+"directWatchNoActiveSensor" = "Ingen aktiv sensor på iPhone.";
+
+/* Direct to Watch action feedback. */
+"directWatchTryAgain" = "Prøv igen";
+"directWatchRequestQueued" = "Anmodning i kø";
+"directWatchLastLogsReceived" = "Seneste log modtaget";
+"directWatchWaitingForLogs" = "Venter på nye logfiler…";
+"directWatchLogsFailed" = "Logfiler kunne ikke hentes. Prøv igen.";
+
+/* Watch diagnostic log actions and receipt time. */
+"directWatchLogs" = "Logfiler";

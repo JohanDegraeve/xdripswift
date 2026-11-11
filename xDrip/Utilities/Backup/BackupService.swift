@@ -16,12 +16,14 @@ final class BackupService: @unchecked Sendable {
     private static let accountKeys = BackupAccountCategory.allKeys
     // Runtime, sensor-specific and current post-processing values must not move between app instances.
     private static let excludedSettingKeys: Set<String> = [
+        UserDefaults.Key.dexcomSensorSessionIdentityData.rawValue,
         UserDefaults.Key.nightscoutFollowerGapFillLastAuditEndDate.rawValue,
         UserDefaults.Key.nightscoutFollowerGapFillSite.rawValue,
         UserDefaults.Key.nightscoutFollowerGapFillCoverage.rawValue,
         UserDefaults.Key.careLinkTimestampRepairCompleted.rawValue,
         UserDefaults.Key.careLinkHistoryRestoreGeneration.rawValue,
         UserDefaults.Key.careLinkPatientAliases.rawValue,
+        UserDefaults.Key.careLinkDeviceOffsets.rawValue,
         "pendingHealthKitReplacements",
         "healthKitSyncVersion",
         "is15DayDexcomG7",
@@ -645,7 +647,8 @@ final class BackupService: @unchecked Sendable {
                 snoozePeriod: alertType.snoozeperiod,
                 soundName: alertType.soundname,
                 vibrate: alertType.vibrate,
-                entries: entries.sorted { $0.start < $1.start }
+                entries: entries.sorted { $0.start < $1.start },
+                repeatSound: alertType.repeatSound
             )
         }
     }
@@ -926,7 +929,8 @@ final class BackupService: @unchecked Sendable {
                 vibrate: record.vibrate,
                 soundName: record.soundName,
                 alertEntries: nil,
-                nsManagedObjectContext: context
+                nsManagedObjectContext: context,
+                repeatSound: record.repeatSound ?? false
             )
             for entry in record.entries {
                 guard let kind = AlertKind(rawValue: Int(entry.alertKind)) else { continue }

@@ -12,6 +12,48 @@ import XCTest
 @testable import xdrip
 
 final class GMIStatisticsTests: XCTestCase {
+    @MainActor
+    func testEstimatePickerDefaultsToGMIAndPersistsBothOptions() throws {
+        let defaults = UserDefaults.standard
+        let key = UserDefaults.Key.statisticsUseHbA1c.rawValue
+        let saved = defaults.object(forKey: key)
+        let savedShow = defaults.object(forKey: UserDefaults.Key.showStatistics.rawValue)
+        defer {
+            defaults.set(saved, forKey: key)
+            defaults.set(savedShow, forKey: UserDefaults.Key.showStatistics.rawValue)
+        }
+        defaults.removeObject(forKey: key)
+        defaults.showStatistics = false
+        XCTAssertFalse(defaults.statisticsUseHbA1c)
+        let model = SettingsViewStatisticsSettingsViewModel()
+        let rows = model.settingsRows(sectionID: 0)
+        let row = try XCTUnwrap(rows.first { $0.id == "statistics.statisticsUseHbA1c" })
+        XCTAssertTrue(row.isVisible)
+        guard case let .menuWithSelectionTitle(options, title, select)? = row.control else {
+            return XCTFail("Expected the estimate picker")
+        }
+        XCTAssertEqual(title(), Texts_Common.statisticsGMI)
+        XCTAssertTrue(options()[0].isSelected)
+        select(1)
+        XCTAssertTrue(defaults.bool(forKey: key))
+        XCTAssertEqual(title(), Texts_Common.statisticsEstimatedA1c)
+        XCTAssertTrue(options()[1].isSelected)
+        XCTAssertEqual(model.settingsRowText(index: 3), Texts_SettingsView.labelUseIFCCA1C)
+        select(0)
+        XCTAssertFalse(defaults.bool(forKey: key))
+        XCTAssertEqual(model.settingsRowText(index: 3), Texts_SettingsView.labelUseIFCCGMI)
+    }
+
+    func testEstimatedHbA1cUsesADAGAndKeepsEmptyDataEmpty() {
+        XCTAssertEqual(GlucoseReportClinicalMath.statisticsPercentage(forAverageMgDl: 125, useHbA1c: true), 5.9825783972, accuracy: 0.000001)
+        XCTAssertEqual(GlucoseReportClinicalMath.statisticsPercentage(forAverageMgDl: 125, useHbA1c: false), 6.3, accuracy: 0.000001)
+        for useHbA1c in [false, true] {
+            let percentage = GlucoseReportClinicalMath.statisticsPercentage(forAverageMgDl: 0, useHbA1c: useHbA1c)
+            XCTAssertEqual(percentage, 0)
+            XCTAssertEqual(GlucoseReportFormatting.gmi(percentage, usesIFCC: true), "-")
+        }
+    }
+
     func testGMIAndIFCCConversionUseUnroundedValues() {
         let percentage = GlucoseReportClinicalMath.gmiPercentage(forAverageMgDl: 120)
         XCTAssertEqual(percentage, 6.1804, accuracy: 0.000001)
@@ -48,9 +90,11 @@ final class GMIStatisticsTests: XCTestCase {
 
     @MainActor
     func testHomeSummaryAndTrendShareSamplesAcrossUnitsAndCachedResults() async throws {
+        let savedEstimate = UserDefaults.standard.object(forKey: "statisticsUseHbA1c")
         let savedIFCC = UserDefaults.standard.object(forKey: "useIFCCA1C")
         let savedGlucoseUnit = UserDefaults.standard.object(forKey: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue)
         defer {
+            UserDefaults.standard.set(savedEstimate, forKey: "statisticsUseHbA1c")
             UserDefaults.standard.set(savedIFCC, forKey: "useIFCCA1C")
             UserDefaults.standard.set(savedGlucoseUnit, forKey: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue)
         }
@@ -98,11 +142,26 @@ final class GMIStatisticsTests: XCTestCase {
                 XCTAssertEqual(home.gmiPercentage, expected, accuracy: 0.000001)
                 XCTAssertEqual(home.gmiPercentage, analytics.gmiPercentage, accuracy: 0.000001)
                 XCTAssertEqual(try XCTUnwrap(analytics.trendPoints.first).gmiPercentage, expected, accuracy: 0.000001)
+                UserDefaults.standard.statisticsUseHbA1c = false
                 let model = RootHomeStateModel()
                 model.updateStatistics(home)
                 XCTAssertEqual(model.state.statistics.gmi.title, "GMI")
                 XCTAssertEqual(model.state.statistics.gmi.value,
                     GlucoseReportFormatting.gmi(expected, usesIFCC: usesIFCC, compactUnit: true))
+                // Switching the display uses the same samples, including when analytics are cached.
+                for useHbA1c in [true, false] {
+                    UserDefaults.standard.statisticsUseHbA1c = useHbA1c
+                    let cached = await manager.reportAnalytics(for: configuration)
+                    let summaryPercentage = GlucoseReportClinicalMath.statisticsPercentage(forAverageMgDl: cached.averageMgDl, useHbA1c: useHbA1c)
+                    let trendPercentage = GlucoseReportClinicalMath.statisticsPercentage(forAverageMgDl: try XCTUnwrap(cached.trendPoints.first).averageMgDl, useHbA1c: useHbA1c)
+                    let selectedHome = useHbA1c ? home.estimatedHbA1cPercentage : home.gmiPercentage
+                    XCTAssertEqual(selectedHome, summaryPercentage, accuracy: 0.000001)
+                    XCTAssertEqual(selectedHome, trendPercentage, accuracy: 0.000001)
+                    XCTAssertEqual(cached.gmiPercentage, expected, accuracy: 0.000001)
+                    model.updateStatistics(home)
+                    XCTAssertEqual(model.state.statistics.gmi.title, useHbA1c ? Texts_Common.a1cStatistics : Texts_Common.statisticsGMI)
+                    XCTAssertEqual(model.state.statistics.gmi.value, GlucoseReportFormatting.gmi(selectedHome, usesIFCC: usesIFCC, compactUnit: true))
+                }
                 // Home's existing average is intentionally unaffected by GMI sample alignment.
                 XCTAssertEqual(home.averageStatisticValue, usesMgDl ? 100 : 100 * ConstantsBloodGlucose.mgDlToMmoll, accuracy: 0.000001)
             }
@@ -164,8 +223,13 @@ final class GMIStatisticsTests: XCTestCase {
 
     @MainActor
     func testReportSnapshotAndBothPaperSizesRenderInBothUnits() async throws {
+        let savedEstimate = UserDefaults.standard.object(forKey: "statisticsUseHbA1c")
         let savedIFCC = UserDefaults.standard.object(forKey: "useIFCCA1C")
-        defer { UserDefaults.standard.set(savedIFCC, forKey: "useIFCCA1C") }
+        defer {
+            UserDefaults.standard.set(savedIFCC, forKey: "useIFCCA1C")
+            UserDefaults.standard.set(savedEstimate, forKey: "statisticsUseHbA1c")
+        }
+        UserDefaults.standard.statisticsUseHbA1c = true
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let core = try CoreDataManager(testModelName: ConstantsCoreData.modelName,
@@ -197,6 +261,7 @@ final class GMIStatisticsTests: XCTestCase {
                     analytics: analytics, generatedAt: end)
                 let pdf = try XCTUnwrap(PDFDocument(url: url))
                 XCTAssertEqual(pdf.pageCount, 3)
+                XCTAssertEqual(analytics.gmiPercentage, GlucoseReportClinicalMath.gmiPercentage(forAverageMgDl: analytics.averageMgDl), accuracy: 0.000001)
                 XCTAssertEqual(try XCTUnwrap(pdf.page(at: 0)).bounds(for: .mediaBox).size, paperSize.pageSize)
                 // Keep the rendered report in the test results for visual review.
                 let attachment = XCTAttachment(contentsOfFile: url)

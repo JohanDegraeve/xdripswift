@@ -1,1 +1,88 @@
 
+
+// Direct to Watch status and pairing guidance
+"directWatchTitle" = "Direct to Watch";
+"directWatchNoConnection" = "No Connection Added";
+"directWatchSuspended" = "Collection suspended";
+"directWatchWaiting" = "Waiting for Watch reading";
+"directWatchCollecting" = "Collecting";
+"directWatchOverdue" = "Reading overdue";
+"directWatchDiagnosis" = "Diagnosis";
+"directWatchAdded" = "Watch connection added";
+"directWatchPairingGuidance" = "Scroll down to the Direct to Watch screen on the Watch and accept the Bluetooth pairing request if this is the first time you're adding this transmitter.\n\nAllow up to five minutes for the transmitter to connect.";
+
+// Direct to Watch collection control
+"directWatchPausedShort" = "Paused";
+"directWatchPaused" = "Watch collection paused";
+"directWatchPause" = "Pause Collection";
+"directWatchResume" = "Resume Collection";
+"directWatchPausedSinceFormat" = "Since %@";
+"directWatchConnecting" = "Waiting…";
+"directWatchCollectedReadings" = "Collected Readings";
+"directWatchReadingGapFormat" = "(%dm %ds)";
+"directWatchNoCollectedReadings" = "No Watch readings collected yet";
+
+"directWatchSessionStarted" = "Started at %@";
+"directWatchSessionResumed" = "Resumed at %@";
+"directWatchSessionPaused" = "Paused at %@";
+"directWatchSessionEnded" = "Ended at %@";
+
+// Direct to Watch setup and diagnosis
+"directWatchBluetoothSlot" = "Bluetooth slot";
+"directWatchCancel" = "Cancel";
+"directWatchTestingLogs" = "Testing and Logs";
+"directWatchAddConnection" = "Add Watch connection";
+"directWatchRemoveConnection" = "Remove Watch connection";
+"directWatchMedicalSlot" = "Medical device slot";
+"directWatchWatchSlot" = "Watch slot";
+"directWatchConfirmUnusedSlot" = "Slot unused: add Watch";
+"directWatchSlotMedical" = "Slot 1 · Medical device";
+"directWatchSlotMobile" = "Slot 2 · Mobile app";
+"directWatchSlotWatch" = "Slot 3 · Watch";
+"directWatchSlotAnubis" = "Slot 3 · Anubis extra";
+"directWatchUsedWatch" = "Used by this Watch";
+"directWatchUsedPhone" = "Used by this iPhone";
+"directWatchSlotMedicalDetail" = "Only if no pump or receiver uses it";
+"directWatchSlotMobileDetail" = "Only if no other phone app uses it";
+"directWatchRecommendedWatch" = "Recommended for the Watch";
+"directWatchRecommendedTransmitter" = "Recommended for this transmitter";
+"directWatchAnubisOnly" = "Anubis transmitters only";
+"directWatchWatchStatus" = "Watch status";
+"directWatchTestingDiagnosis" = "Testing and diagnosis";
+"directWatchPausePhone" = "Pause iPhone BLE collection";
+"directWatchForTesting" = "For testing Watch collection";
+"directWatchGetLogs" = "Get Watch logs";
+"directWatchShareLogs" = "Share Watch logs";
+"directWatchPending" = "Pending";
+"directWatchReceivedFormat" = "Received %@";
+"directWatchSelectedFormat" = "%@, selected";
+"directWatchIntro" = "Your Watch can collect readings directly when your iPhone is away. Sensor controls stay on your iPhone.";
+"directWatchBackgroundAdvice" = "Background collection depends on watchOS. Test it on your Watch before relying on it away from your iPhone.";
+"directWatchSeparateSlots" = "The Watch and iPhone need separate slots. Slot 1 may interrupt a pump or receiver already using it.";
+"directWatchNativeRequired" = "Direct Watch collection requires native calculated glucose on this iPhone.";
+"directWatchStartSensor" = "Start a sensor on this iPhone before adding the Watch connection.";
+"directWatchNoSlot" = "No compatible slot is available for the Watch.";
+"directWatchMedicalWarning" = "The Watch will use slot 1, normally used by a pump or receiver. Do not add this connection if a pump, receiver or other medical device uses this slot. Adding the Watch could interrupt that device’s glucose connection.";
+"directWatchWatchSlotWarning" = "The Watch will use slot 3. Do not add this connection if another smartwatch is already paired to this sensor. Adding this Watch could interrupt its glucose connection.";
+"directWatchSlotConflict" = "This slot is assigned to the Watch. Remove the Watch connection before assigning it to the iPhone.";
+"directWatchOpenForStatus" = "Open %@ on the Watch to receive its status.";
+"directWatchCheckInstalled" = "If this status stays stale, check that the app appears under Installed on Apple Watch in the iPhone’s Watch app.";
+"directWatchMasterRequired" = "iPhone must be in master mode.";
+"directWatchG6Mismatch" = "Configured G6 is not the active iPhone transmitter.";
+"directWatchG7Mismatch" = "Configured G7-family sensor is not the active iPhone transmitter.";
+"directWatchPrimaryRequired" = "Direct Watch collection requires a primary G7-family iPhone connection.";
+"directWatchNativeG6Required" = "Enable native G6 glucose on the iPhone.";
+"directWatchPairingCodeRequired" = "A four-digit sensor code is required for Watch pairing.";
+"directWatchSlotsConflict" = "Watch and iPhone Bluetooth slots conflict.";
+"directWatchAnubisRequired" = "Slot 3 requires an Anubis transmitter.";
+"directWatchNoActiveSensor" = "No active sensor on the iPhone.";
+
+/* Direct to Watch action feedback. */
+"directWatchTryAgain" = "Try again";
+"directWatchRequestQueued" = "Request queued";
+"directWatchLastLogsReceived" = "Last logs received";
+"directWatchWaitingForLogs" = "Waiting for new logs…";
+"directWatchLogsFailed" = "Could not get logs. Try again.";
+
+/* Watch diagnostic log actions and receipt time. */
+"directWatchLogs" = "Logs";

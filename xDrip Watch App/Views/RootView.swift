@@ -7,9 +7,13 @@
 //
 
 import SwiftUI
+import Combine
 
 struct RootView: View {
+    var onCollectedReadings: () -> Void = {}
+    var onAlerts: () -> Void = {}
     @EnvironmentObject var watchState: WatchStateModel
+    @Environment(\.scenePhase) private var scenePhase
 
     // save the last selected tab on the Watch so re-opening the app returns to the same page
     @AppStorage("watchAppSelectedPage") private var selectedPage = WatchAppPage.main.rawValue
@@ -17,36 +21,66 @@ struct RootView: View {
     // keep both main pages on the same chart range so swiping between them only changes whether
     // the AGP background is visible. The chart content should not jump between pages.
     @State private var hoursToShowIndex = ConstantsAppleWatch.hoursToShowDefaultIndex
+    private let phoneLinkProbeTimer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
     
     var body: some View {
         TabView(selection: $selectedPage) {
             // normal main page
             MainView(hoursToShowIndex: $hoursToShowIndex)
+                .modifier(DirectWatchCollectionGesture())
                 .tag(WatchAppPage.main.rawValue)
 
             // same main page layout, but with the AGP background enabled in the chart
             MainView(showsAGPBackground: true, hoursToShowIndex: $hoursToShowIndex)
+                .modifier(DirectWatchCollectionGesture())
                 .tag(WatchAppPage.agp.rawValue)
 
             // large number page
             BigNumberView()
+                .modifier(DirectWatchCollectionGesture())
                 .tag(WatchAppPage.bigNumber.rawValue)
+
+            DirectWatchCollectionView(collector: watchState.directWatchCollector, onCollectedReadings: onCollectedReadings, onAlerts: onAlerts)
+                .tag(WatchAppPage.directWatch.rawValue)
         }
         .modifier(RootViewTabViewStyleModifier())
         .environmentObject(watchState)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                watchState.directWatchCollector.foreground()
+                if watchState.watchCollectionConfigured && !watchState.directWatchCollector.isPaused {
+                    watchState.beginForegroundPhoneLinkCheck()
+                    watchState.probePhoneLink()
+                }
+            }
+            else { watchState.directWatchCollector.background() }
+        }
+        .onReceive(phoneLinkProbeTimer) { _ in
+            if scenePhase == .active && watchState.watchCollectionConfigured && !watchState.directWatchCollector.isPaused { watchState.probePhoneLink() }
+        }
         .onAppear {
+            if scenePhase == .active {
+                watchState.directWatchCollector.foreground()
+                if watchState.watchCollectionConfigured && !watchState.directWatchCollector.isPaused {
+                    watchState.beginForegroundPhoneLinkCheck()
+                    watchState.probePhoneLink()
+                }
+            }
             // if a saved tab value from an older build is invalid, fall back to the normal main page
             if WatchAppPage(rawValue: selectedPage) == nil {
                 selectedPage = WatchAppPage.main.rawValue
             }
         }
     }
+
+
 }
 
 private enum WatchAppPage: Int {
     case main = 0
     case agp = 1
     case bigNumber = 2
+    case directWatch = 3
 }
 
 #if os(watchOS)

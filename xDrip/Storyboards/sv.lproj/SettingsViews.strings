@@ -57,9 +57,7 @@
 "settingsviews_alert_types_section_footer" = "Larmtyper definierar hur larm beter sig, inklusive ljud, vibration, snooze och åsidosättning av tyst läge.";
 "settingsviews_alerts_section_footer" = "Larm definierar när appen ska meddela dig om glukosnivåer, saknade avläsningar och andra tillstånd.";
 "settingsviews_sectiontitlehealthkit" = "Apple Hälsa";
-"settingsviews_healthkit" = "Skriv till Apple Hälsa";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Ladda upp";
 "settingsviews_dexcomShareUploadSerialNumber" = "Sändarens serienummer";
 "settingsviews_useUSDexcomShareurl" = "US-servrar";
 "settingsviews_dexcomShareAccountName" = "Användarnamn";
@@ -68,7 +66,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Ange Dexcom mottagares serienummer";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Uppladdningsalternativ";
-"settingsviews_nightscoutEnabled" = "Slå på Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Aktivera schema";
@@ -573,3 +570,33 @@
 "homeScreen.basalTop" = "Överst";
 "homeScreen.basalBottom" = "Nederst";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Glukosdiagram";
+
+"therapy.none" = "Av";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Behandlingsgränser";
+"therapy.smallBolusThreshold" = "Liten bolus";
+"therapy.smallCarbThreshold" = "Lite kolh.";
+"therapy.treatmentThresholdsExplanation" = "Bolus- och kolhydratvärden under gränserna döljs i grafen. Bolusgränsen definierar även små bolus i behandlingslistan. «Av» visar alla värden.";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Glukosuppskattning";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Terapiskala";
+"therapy.scaleStandard" = "Standard";
+"therapy.scaleSmallDoses" = "Små doser";
+"therapy.treatmentScaleExplanation" = "Små doser gör små markörer tydligare. Bolusmarkörer skalas från 0.1–2.0U och kolhydratmarkörer från 1–50g. Större mängder använder den största markören.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Minimal";
+"settingsviews_liveActivityTypeNormal" = "Normal";
+"settingsviews_liveActivityTypeLarge" = "Stor";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Uppladdning till Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Läs upp inledning";
+"speak.preview" = "Testa glukosuppläsning";

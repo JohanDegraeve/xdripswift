@@ -63,3 +63,11 @@
 
 /// When high alarm rises, this is the start of the text shown in the title of the alert notification, also in alert settings list, for the name of the alarm
 "alerts_highalerttitle" = "High Alarm";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "Il sensore sta per scadere";
+"sensorExpiry.expectedExpiry" = "Scadenza prevista del sensore";
+"sensorExpiry.hoursBefore" = "Ore prima della scadenza";
+"sensorExpiry.hoursHelp" = "Inserisci un numero intero da 1 a 48 ore.";
+"sensorExpiry.endingSoonBody" = "La durata del sensore dovrebbe terminare il %@.";
+"sensorExpiry.expectedExpiryBody" = "Il sensore ha raggiunto la scadenza prevista (%@).";

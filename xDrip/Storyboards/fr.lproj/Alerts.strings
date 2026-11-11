@@ -24,3 +24,11 @@
 "alerts_fastrise" = "Augmentation rapide";
 "alertWhenBelowValue" = "Que si inf à";
 "alertWhenAboveValue" = "Que si sup à";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "Fin prochaine du capteur";
+"sensorExpiry.expectedExpiry" = "Expiration prévue du capteur";
+"sensorExpiry.hoursBefore" = "Heures avant expiration";
+"sensorExpiry.hoursHelp" = "Saisissez un nombre entier de 1 à 48 heures.";
+"sensorExpiry.endingSoonBody" = "Votre capteur devrait atteindre la fin de sa durée de vie le %@.";
+"sensorExpiry.expectedExpiryBody" = "Votre capteur a atteint son expiration prévue (%@).";

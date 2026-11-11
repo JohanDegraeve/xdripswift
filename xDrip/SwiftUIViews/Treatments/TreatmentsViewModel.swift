@@ -40,6 +40,7 @@ import OSLog
 
     private var allTreatments: [TreatmentSnapshot] = []
     private var didInitializeView = false
+    private var lastViewedDay = Date().toMidnight()
 
     // MARK: - initialization
 
@@ -54,6 +55,14 @@ import OSLog
 
     /// Performs the first load, or refreshes the existing model when the tab becomes visible again.
     func initializeViewIfNeeded() {
+        let today = Date().toMidnight()
+        if lastViewedDay != today {
+            // Return to today after a day change, but preserve deliberate history browsing
+            // when reopening the tab or returning from the background on the same day.
+            lastViewedDay = today
+            selectedDateChanged(today)
+        }
+
         if didInitializeView {
             reloadTreatments()
             return

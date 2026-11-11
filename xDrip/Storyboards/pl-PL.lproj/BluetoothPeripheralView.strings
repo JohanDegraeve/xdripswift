@@ -237,6 +237,8 @@
 "batteryHistoryRange" = "Zakres";
 "batteryHistoryRangeAccessibility" = "Zakres historii baterii";
 "batteryHistoryRangeExplanation" = "Stałe zakresy obejmują czas od teraz do wybranej liczby dni wstecz. Przerwy oznaczają okresy bez odczytu.";
+"batteryHistoryInactive" = "Nadajnik nieaktywny";
+"batteryHistoryHistoricalRangeExplanation" = "Zakresy kończą się na ostatnim zapisanym odczycie. Przerwy oznaczają okresy bez odczytów.";
 
 "connectionDiagramOtherApp" = "Inna aplikacja";
 
@@ -261,3 +263,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Wygasa";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Dostęp do Bluetooth nie jest włączony";
+"bluetoothAccessInstructions" = "Aby się połączyć, otwórz Ustawienia → Prywatność i ochrona → Bluetooth i zezwól na dostęp aplikacji %@.";
+"bluetoothAccessRestrictedInstructions" = "Ograniczenia urządzenia uniemożliwiają dostęp do Bluetooth. Sprawdź ustawienia Czasu przed ekranem lub skontaktuj się z administratorem urządzenia, aby włączyć dostęp.";

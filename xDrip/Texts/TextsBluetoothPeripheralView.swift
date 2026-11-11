@@ -4,6 +4,10 @@ class Texts_BluetoothPeripheralView {
     
     static private let filename = "BluetoothPeripheralView"
 
+    static let bluetoothAccessNotEnabled = NSLocalizedString("bluetoothAccessNotEnabled", tableName: filename, bundle: .main, value: "Bluetooth access is not enabled", comment: "Status banner when Bluetooth permission is denied or restricted")
+    static let bluetoothAccessInstructions = NSLocalizedString("bluetoothAccessInstructions", tableName: filename, bundle: .main, value: "To connect, open Settings → Privacy & Security → Bluetooth and allow access for %@.", comment: "Bluetooth permission instructions. %@ is the installed app name")
+    static let bluetoothAccessRestrictedInstructions = NSLocalizedString("bluetoothAccessRestrictedInstructions", tableName: filename, bundle: .main, value: "Device restrictions prevent Bluetooth access. Check Screen Time or contact your device administrator to enable access.", comment: "Instructions when device restrictions block Bluetooth permission")
+
     static let signalStrengthDisconnected = NSLocalizedString("signalStrengthDisconnected", tableName: filename, bundle: .main, value: "Disconnected", comment: "Signal value replacement while an always-on device is disconnected")
     static let signalStrength = NSLocalizedString("signalStrength", tableName: filename, bundle: .main, value: "Signal Strength", comment: "Bluetooth signal strength row")
     static let signalStrengthLastMeasurement = NSLocalizedString("signalStrengthLastMeasurement", tableName: filename, bundle: .main, value: "Last measurement", comment: "Elapsed time since RSSI measurement for intermittent devices")
@@ -88,6 +92,8 @@ class Texts_BluetoothPeripheralView {
     static let batteryHistoryRange = NSLocalizedString("batteryHistoryRange", tableName: filename, bundle: .main, value: "Range", comment: "Label for the battery history time-range selector")
     static let batteryHistoryRangeAccessibility = NSLocalizedString("batteryHistoryRangeAccessibility", tableName: filename, bundle: .main, value: "Battery history range", comment: "Accessibility label for the battery history time-range selector")
     static let batteryHistoryRangeExplanation = NSLocalizedString("batteryHistoryRangeExplanation", tableName: filename, bundle: .main, value: "Fixed ranges run from now back to the selected number of days. Gaps show periods without a reading.", comment: "Explanation below the battery history chart")
+    static let batteryHistoryInactive = NSLocalizedString("batteryHistoryInactive", tableName: filename, bundle: .main, value: "Transmitter Inactive", comment: "Label identifying battery history for a disabled transmitter")
+    static let batteryHistoryHistoricalRangeExplanation = NSLocalizedString("batteryHistoryHistoricalRangeExplanation", tableName: filename, bundle: .main, value: "Ranges end at the last recorded reading. Gaps show periods without a reading.", comment: "Section footer below an inactive transmitter battery history chart")
 
     static let versionCode: String = {
         return NSLocalizedString("versionCode", tableName: filename, bundle: Bundle.main, value: "Version Code", comment: "Dexcom G7 family firmware compatibility version code")

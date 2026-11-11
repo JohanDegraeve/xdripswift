@@ -97,20 +97,23 @@ struct BigNumberView: View {
                 }
             }
             
-            HStack(alignment: .center, spacing: 3) {
-                Image(systemName: ConstantsAppleWatch.requestingDataIconSFSymbolName)
-                    .font(.system(size: ConstantsAppleWatch.requestingDataIconFontSize, weight: .heavy))
-                    .foregroundStyle(watchState.requestingDataIconColor)
-                    .padding(.top, 4)
-                    .padding(.trailing, 2)
-                
-                Text(watchState.lastUpdatedMinsAgoString())
-                    .font(.system(size: isSmallScreen ? 20 : 22))
-                    .foregroundStyle(minsAgoTextColor)
-                    .animation(.easeOut(duration: 0.3), value: minsAgoTextColor)
-                    .onChange(of: watchState.lastUpdatedMinsAgoString()) { oldState, newState in
-                        animateTextColor()
-                    }
+            UniformlyScaledWatchRow(height: isSmallScreen ? 26 : 28) {
+                HStack(alignment: .center, spacing: 3) {
+                    Image(systemName: ConstantsAppleWatch.requestingDataIconSFSymbolName)
+                        .font(.system(size: ConstantsAppleWatch.requestingDataIconFontSize, weight: .heavy))
+                        .foregroundStyle(watchState.requestingDataIconColor)
+                        .padding(.top, 4)
+                        .padding(.trailing, 2)
+
+                    Text(watchState.lastUpdatedMinsAgoString())
+                        .font(.system(size: isSmallScreen ? 20 : 22))
+                        .foregroundStyle(minsAgoTextColor)
+                        .animation(.easeOut(duration: 0.3), value: minsAgoTextColor)
+                        .onChange(of: watchState.lastUpdatedMinsAgoString()) { oldState, newState in
+                            animateTextColor()
+                        }
+                    DirectWatchCollectionIcon(symbolSize: isSmallScreen ? 20 : 22)
+                }
             }
             .padding(.top, 15)
             .padding(.bottom, -20)

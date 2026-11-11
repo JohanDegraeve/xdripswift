@@ -1,7 +1,6 @@
 "alerttypessettingsview_screentitle" = "أنواع التنبيهات";
 "alerttypesettingsview_screentitle" = "تعديل نوع التنبيه";
 "alerttypesettingsview_name" = "الاسم";
-"alerttypesettingsview_enabled" = "تفعيل؟";
 "alerttypesettingsview_vibrate" = "هزاز؟";
 "alerttypesettingsview_snoozevianotification" = "السماح للغفوة عبر الإشعارات؟";
 "alerttypesettingsview_defaultsnoozeperiod" = "مدة الغفوة الإفتراض";
@@ -15,3 +14,5 @@
 "alerttypenamealreadyexistsmessages" = "يوجد نوع تنبيه بهذا الاسم. استخدم اسمًا مختلفًا";
 "confirmdeletionalerttype" = "حذف نوع التنبيه: ";
 
+"alerttypesettingsview_repeatsound" = "تكرار الصوت";
+"alerttypesettingsview_previewalert" = "معاينة التنبيه";

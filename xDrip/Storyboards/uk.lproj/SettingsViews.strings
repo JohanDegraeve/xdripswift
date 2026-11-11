@@ -95,7 +95,6 @@
 
 
 /// nightscout settings, where user can enable or disable nightscout
-"settingsviews_nightscoutEnabled" = "Enable Nightscout";
 
 /// home screen settings, urgent high value
 "settingsviews_urgentHighValue" = "Urgent High Value";
@@ -116,7 +115,6 @@
 "settingsviews_useUSDexcomShareurl" = "Сервери US";
 
 /// healthkit settings, literally 'healthkit'
-"settingsviews_healthkit" = "Записувати в Apple Health";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
 "volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
@@ -275,7 +273,6 @@
 "settingsviews_transmitterid_text_for_button" = "Transmitter ID";
 
 /// dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no
-"settingsviews_uploadReadingstoDexcomShare" = "Завантажити";
 
 /// nightscout or dexcom share settings, where user can select to edit the schedule
 "schedule" = "Schedule";
@@ -754,3 +751,33 @@
 "homeScreen.basalTop" = "Вгорі";
 "homeScreen.basalBottom" = "Внизу";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Графік глюкози";
+
+"therapy.none" = "Ні";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Пороги терапії";
+"therapy.smallBolusThreshold" = "Мал. бол.";
+"therapy.smallCarbThreshold" = "Мало вугл.";
+"therapy.treatmentThresholdsExplanation" = "Значення болюсів і вуглеводів нижче порогів приховані на графіку. Поріг болюса також визначає малі болюси у списку терапії. «Ні» показує всі значення.";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Оцінка глюкози";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Шкала терапії";
+"therapy.scaleStandard" = "Типова";
+"therapy.scaleSmallDoses" = "Малі дози";
+"therapy.treatmentScaleExplanation" = "Малі дози роблять малі маркери помітнішими. Болюси: 0.1–2.0U; вуглеводи: 1–50g. Більші кількості використовують найбільший маркер.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Мінімальний";
+"settingsviews_liveActivityTypeNormal" = "Звичайний";
+"settingsviews_liveActivityTypeLarge" = "Великий";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Завантаження в Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Промовляти вступ";
+"speak.preview" = "Прослухати приклад озвучення глюкози";

@@ -1,0 +1,4 @@
+/* Direct to Watch */
+
+// Direct to Watch setup and diagnosis
+"NSBluetoothAlwaysUsageDescription" = "Connect directly to your glucose transmitter using Direct to Watch.";

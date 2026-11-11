@@ -181,4 +181,3 @@
 "noSensorCodeSelectedTitle" = "Sensör kodu olmadan devam edilsin mi?";
 "noSensorCodeSelectedMessage" = "Vericide zaten bir sensör oturumu çalışıyorsa uygulama bu oturumu mevcut kalibrasyon gereksinimleriyle kullanır.\n\nKodsuz yeni bir oturum başlatmak, ısınmadan sonra ve ardından düzenli aralıklarla kalibrasyon gerektirir. Uygulamanın kalibrasyon hatırlatıcısını kapatmak bu gereksinimleri ortadan kaldırmaz.";
 "showHideGlucoseChartTitle" = "Grafik";
-"showHideAdditionalItemsTitle" = "Uyarılar ve Sesli Okuma";

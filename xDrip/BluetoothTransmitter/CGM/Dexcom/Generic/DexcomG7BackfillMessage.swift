@@ -11,7 +11,7 @@ public struct DexcomG7BackfillMessage: Equatable {
     private let trend: Double?
     private let glucoseIsDisplayOnly: Bool
 
-    init?(data: Data, sensorAge: TimeInterval) {
+    init?(data: Data, sensorStartDate: Date) {
         //    0 1 2  3  4 5  6  7  8
         //   TTTTTT    BGBG SS    TR
         //   45a100 00 9600 06 0f fc
@@ -22,7 +22,9 @@ public struct DexcomG7BackfillMessage: Equatable {
 
         timeStampSincePairing = data[0..<4].toInt()
         
-        timeStamp = Date().addingTimeInterval(-TimeInterval(sensorAge)).addingTimeInterval(TimeInterval(timeStampSincePairing))
+        // Anchor history to the same fixed session date as live readings. Using Date()
+        // with a previously received age shifts history when backfill arrives later.
+        timeStamp = sensorStartDate.addingTimeInterval(TimeInterval(timeStampSincePairing))
 
         let glucoseBytes = data[4..<6].to(UInt16.self)
 

@@ -96,9 +96,7 @@
 "settingsviews_alert_types_section_footer" = "Los Tipos de Alarma definen cómo se comportan las alarmas, incluyendo sonido, vibración, repetición e ignorar el modo silencio.";
 "settingsviews_alerts_section_footer" = "Las Alarmas definen cuándo la app debe avisarte sobre niveles de glucosa, lecturas perdidas y otras condiciones.";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Escribir en Apple Health";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Subir";
 "settingsviews_dexcomShareUploadSerialNumber" = "Número de Serie del Receptor";
 "settingsviews_useUSDexcomShareurl" = "Servidores US";
 "settingsviews_dexcomShareAccountName" = "Nombre de Cuenta";
@@ -107,7 +105,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Entrar el número de serie del receptor Dexcom";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Opciones de subida";
-"settingsviews_nightscoutEnabled" = "Habilitar Nightscout";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Activar horario";
 "schedule" = "Horario";
@@ -176,7 +173,6 @@
 "settingsviews_sectiontitlehomescreen" = "Inicio";
 "settingsviews_infoContactsAccessRestricted" = "No has podido dar permiso a %@ para accesar a tus contactos. Esto es probablemente debido a restriciones como el control parental o similar.";
 "settingsviews_contactImageSectionTitle" = "Imagen de Contacto";
-"settingsviews_enableContactImage" = "Imagen de contacto";
 "settingsviews_displayTrendInContactImage" = "Tendencia";
 "settingsviews_contactImageCreatedByString" = "Contacto creado automáticamente por";
 
@@ -516,3 +512,33 @@
 "homeScreen.basalPosition" = "Posición de la Basal";
 "homeScreen.basalTop" = "Arriba";
 "homeScreen.basalBottom" = "Abajo";
+
+"therapy.none" = "No";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Umbrales de terapia";
+"therapy.smallBolusThreshold" = "Bolo chico";
+"therapy.smallCarbThreshold" = "Pocos HC";
+"therapy.treatmentThresholdsExplanation" = "El gráfico oculta valores de bolos y HC bajo los umbrales. El umbral de bolo también define los bolos pequeños en tratamientos. «No» muestra todos los valores.";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Estimación de glucosa";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Escala terapia";
+"therapy.scaleStandard" = "Estándar";
+"therapy.scaleSmallDoses" = "Dosis bajas";
+"therapy.treatmentScaleExplanation" = "«Dosis bajas» hace más visibles los marcadores pequeños. Bolos: 0.1–2.0U; HC: 1–50g. Cantidades mayores usan el marcador más grande.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Mínimo";
+"settingsviews_liveActivityTypeNormal" = "Normal";
+"settingsviews_liveActivityTypeLarge" = "Grande";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Subida a Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Decir introducción";
+"speak.preview" = "Probar glucosa hablada";

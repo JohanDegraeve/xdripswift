@@ -161,6 +161,8 @@
 "batteryHistoryRange" = "النطاق";
 "batteryHistoryRangeAccessibility" = "نطاق سجل البطارية";
 "batteryHistoryRangeExplanation" = "تمتد النطاقات الثابتة من الآن إلى عدد الأيام المحدد في الماضي. تشير الفجوات إلى فترات لم تتوفر فيها قراءة.";
+"batteryHistoryInactive" = "جهاز الإرسال غير نشط";
+"batteryHistoryHistoricalRangeExplanation" = "تنتهي النطاقات عند آخر قراءة مسجلة. تشير الفجوات إلى فترات لم تتوفر فيها قراءة.";
 
 "connectionDiagramOtherApp" = "تطبيق آخر";
 
@@ -185,3 +187,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "تنتهي الصلاحية";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "الوصول إلى Bluetooth غير مفعّل";
+"bluetoothAccessInstructions" = "للاتصال، افتح الإعدادات ← الخصوصية والأمان ← Bluetooth واسمح بالوصول لتطبيق %@.";
+"bluetoothAccessRestrictedInstructions" = "تمنع قيود الجهاز الوصول إلى Bluetooth. تحقق من إعدادات مدة استخدام الجهاز أو تواصل مع مسؤول الجهاز لتفعيل الوصول.";

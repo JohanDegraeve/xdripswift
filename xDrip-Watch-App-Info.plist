@@ -6,5 +6,11 @@
 	<string>$(APP_GROUP_IDENTIFIER)</string>
 	<key>MainAppBundleIdentifier</key>
 	<string>$(MAIN_APP_BUNDLE_IDENTIFIER)</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Connect directly to your glucose transmitter using Direct to Watch.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+	</array>
 </dict>
 </plist>

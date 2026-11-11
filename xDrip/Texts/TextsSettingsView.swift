@@ -92,14 +92,6 @@ class Texts_SettingsView {
     
     // MARK: - Notifications
         
-    static let labelLiveActivityType: String = {
-        return NSLocalizedString("settingsviews_labelLiveActivityType", tableName: filename, bundle: Bundle.main, value: "Live Activities", comment: "notification settings, type of live activities that should be enabled")
-    }()
-    
-    static let liveActivityTypeDisabled: String = {
-        return NSLocalizedString("settingsviews_liveActivityTypeDisabled", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "notification settings, disable live activities")
-    }()
-    
     static let liveActivityDisabledInFollowerMode: String = {
         return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerMode", tableName: filename, bundle: Bundle.main, value: "Disabled in follower mode", comment: "notification settings, live activities are not available in follower mode")
     }()
@@ -529,6 +521,14 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_timeInRangeTypeUserDefinedRange", tableName: filename, bundle: Bundle.main, value: "User Range", comment: "statistics settings, prefer user-defined range")
     }()
     
+    static let labelStatisticsEstimate: String = {
+        NSLocalizedString("settingsviews_statisticsEstimate", tableName: filename, bundle: Bundle.main, value: "Glucose Estimate", comment: "picker for GMI or estimated HbA1c")
+    }()
+
+    static let labelUseIFCCA1C: String = {
+        NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "HbA1c in mmols/mol", comment: "statistics settings, display estimated HbA1c in IFCC units")
+    }()
+
     static let labelUseIFCCGMI: String = {
         return NSLocalizedString("settingsviews_useIFCCGMI", tableName: filename, bundle: Bundle.main, value: "GMI in mmols/mol", comment: "statistics settings, display GMI in IFCC units")
     }()
@@ -644,18 +644,15 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_sectiontitlehealthkit", tableName: filename, bundle: Bundle.main, value: "Apple Health", comment: "healthkit settings, section title")
     }()
     
-    static let labelHealthKit: String = {
-        return NSLocalizedString("settingsviews_healthkit", tableName: filename, bundle: Bundle.main, value: "Write to Apple Health", comment: "healthkit settings, literally 'healthkit'")
-    }()
-    
     // MARK: - Section Dexcom Share (including Share Follower)
     
+    // keep the upload section explicit without changing the navigation title
+    static let dexcomShareUploadSectionTitle = {
+        return NSLocalizedString("settingsviews_dexcomShareUploadSectionTitle", tableName: filename, bundle: Bundle.main, value: "Dexcom Share Upload", comment: "section heading for the Dexcom Share upload enable switch; navigation titles remain Dexcom Share")
+    }()
+
     static let sectionTitleDexcomShareUpload: String = {
         return NSLocalizedString("settingsviews_sectiontitledexcomshareupload", tableName: filename, bundle: Bundle.main, value: "Dexcom Share", comment: "dexcom share upload settings, section title")
-    }()
-    
-    static let labelUploadReadingstoDexcomShare = {
-        return NSLocalizedString("settingsviews_uploadReadingstoDexcomShare", tableName: filename, bundle: Bundle.main, value: "Upload", comment: "dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no")
     }()
     
     static let labelUploadReadingstoDexcomShareDisabledMessage = {
@@ -696,10 +693,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_nightscoutUploadOptionsSectionTitle", tableName: filename, bundle: Bundle.main, value: "Upload Options", comment: "nightscout settings, section title for upload options")
     }()
     
-    static let labelNightscoutEnabled = {
-        return NSLocalizedString("settingsviews_nightscoutEnabled", tableName: filename, bundle: Bundle.main, value: "Enable Nightscout", comment: "nightscout settings, where user can enable or disable nightscout")
-    }()
-
     static let labelNightscoutUrl = {
         return NSLocalizedString("settingsviews_nightscoutUrl", tableName: filename, bundle: Bundle.main, value: "URL:", comment: "nightscout settings, where user can set the nightscout url")
     }()
@@ -789,6 +782,9 @@ class Texts_SettingsView {
     }()
 
     // MARK: - Section Speak
+
+    static let labelSpeakIntroduction = NSLocalizedString("speak.introduction", tableName: filename, bundle: .main, value: "Speak Introduction", comment: "Include the opening words before the glucose value.")
+    static let previewSpeakGlucose = NSLocalizedString("speak.preview", tableName: filename, bundle: .main, value: "Preview Speak Glucose", comment: "Play a one-shot preview using the selected speech settings.")
 
     static let speakScheduleActive = NSLocalizedString("speak.schedule.active", tableName: filename, bundle: .main, value: "Active", comment: "Speech is enabled and allowed at the current time; not a promise that audio is currently playing.")
     static let speakScheduleInactive = NSLocalizedString("speak.schedule.inactive", tableName: filename, bundle: .main, value: "Inactive", comment: "Speech is enabled but paused outside its daily schedule.")
@@ -1027,10 +1023,6 @@ class Texts_SettingsView {
     
     static let contactImageSectionTitle: String = {
         return NSLocalizedString("settingsviews_contactImageSectionTitle", tableName: filename, bundle: Bundle.main, value: "Contact Image", comment: "Contact Image - section title")
-    }()
-    
-    static let enableContactImage: String = {
-        return NSLocalizedString("settingsviews_enableContactImage", tableName: filename, bundle: Bundle.main, value: "Contact Image", comment: "Contact Image Settings - text in row where contact image is enabled or disabled ")
     }()
     
     static let displayTrendInContactImage: String = {
@@ -1679,4 +1671,19 @@ class Texts_SettingsView {
         return String(format: NSLocalizedString("settingsviews_nightscoutImportErrorUnexpectedStatus", tableName: filename, bundle: Bundle.main, value: "Nightscout returned an unexpected response (HTTP %d).", comment: "nightscout import, unexpected HTTP status error"), status)
     }
     
+    // Dexcom Share upload connection and activity
+    static let shareUploadAccountVerified = NSLocalizedString("settingsviews_shareUploadAccountVerified", tableName: filename, bundle: Bundle.main, value: "Account verified", comment: "Dexcom Share upload settings")
+    static let shareUploadUnchecked = NSLocalizedString("settingsviews_shareUploadUnchecked", tableName: filename, bundle: Bundle.main, value: "Not checked", comment: "Dexcom Share upload settings")
+    static let shareUploadPaused = NSLocalizedString("settingsviews_shareUploadPaused", tableName: filename, bundle: Bundle.main, value: "Paused by schedule", comment: "Dexcom Share upload settings")
+    static let shareUploadLocalOnly = NSLocalizedString("settingsviews_shareUploadLocalOnly", tableName: filename, bundle: Bundle.main, value: "Uploading to Dexcom Share is only available with a local glucose source.", comment: "Dexcom Share upload settings")
+    static let shareUploadCheckFooter = NSLocalizedString("settingsviews_shareUploadCheckFooter", tableName: filename, bundle: Bundle.main, value: "Test Connection verifies your account. The receiver serial number is verified when readings are uploaded.", comment: "Dexcom Share upload settings")
+    static let shareUploadLastConnection = NSLocalizedString("settingsviews_shareUploadLastConnection", tableName: filename, bundle: Bundle.main, value: "Last successful connection", comment: "Dexcom Share upload settings")
+    static let shareUploadLastUpload = NSLocalizedString("settingsviews_shareUploadLastUpload", tableName: filename, bundle: Bundle.main, value: "Last successful upload", comment: "Dexcom Share upload settings")
+    static let shareUploadFailed = NSLocalizedString("settingsviews_shareUploadFailed", tableName: filename, bundle: Bundle.main, value: "Upload failed", comment: "Dexcom Share upload status")
+    static let shareUploadTooLarge = NSLocalizedString("settingsviews_shareUploadTooLarge", tableName: filename, bundle: Bundle.main, value: "Dexcom Share rejected an oversized upload.", comment: "Dexcom Share HTTP 413 upload error")
+    static let shareUploadError = NSLocalizedString("settingsviews_shareUploadError", tableName: filename, bundle: Bundle.main, value: "Upload error", comment: "Dexcom Share upload settings")
+    static let shareUploadNever = NSLocalizedString("settingsviews_shareUploadNever", tableName: filename, bundle: Bundle.main, value: "Not yet", comment: "Dexcom Share upload settings")
+    static let shareUploadReceiverNotAssigned = NSLocalizedString("settingsviews_shareUploadReceiverNotAssigned", tableName: filename, bundle: Bundle.main, value: "This receiver is not assigned to your Dexcom account. Register it using the official Dexcom app.", comment: "Dexcom Share upload settings")
+    static let shareUploadConfigurationRequired = NSLocalizedString("settingsviews_shareUploadConfigurationRequired", tableName: filename, bundle: Bundle.main, value: "Enter your username, password and receiver serial number.", comment: "Dexcom Share upload settings")
+
 }

@@ -19,24 +19,35 @@ struct BluetoothPeripheralDetailView: View {
             Section {
                 BluetoothPeripheralStatusBannerView(state: state)
                     .listRowInsets(ConstantsUI.bluetoothPeripheralStatusBannerRowInsets)
-                    .listRowBackground(state.connectionStatus.rowBackgroundColor)
+                    .listRowBackground(state.bluetoothAccessIsBlocked ? ConstantsUI.warningSectionBackgroundColor : state.connectionStatus.rowBackgroundColor)
 
-                Button(action: state.connectButtonTapped) {
-                    Text(state.connectButtonTitle)
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
+                if !state.bluetoothAccessIsBlocked {
+                    Button(action: state.connectButtonTapped) {
+                        Text(state.connectButtonTitle)
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(connectButtonTint)
+                    .disabled(!state.connectButtonIsEnabled)
+                    .listRowInsets(ConstantsUI.bluetoothPeripheralStatusButtonRowInsets)
+                    .listRowBackground(state.connectionStatus.rowBackgroundColor)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(connectButtonTint)
-                .disabled(!state.connectButtonIsEnabled)
-                .listRowInsets(ConstantsUI.bluetoothPeripheralStatusButtonRowInsets)
-                .listRowBackground(state.connectionStatus.rowBackgroundColor)
             } footer: {
                 if let statusFooterText = state.statusFooterText {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         if let statusFooterSystemImage = state.statusFooterSystemImage {
                             Image(systemName: statusFooterSystemImage)
                                 .foregroundStyle(state.statusFooterSymbolColor)
+                        }
+
+                        if state.directWatchIsEnabled {
+                            TimelineView(.periodic(from: .now, by: 10)) { timeline in
+                                let watchStatus = state.directWatchStatus(at: timeline.date)
+                                Image(systemName: ConstantsDirectWatch.watchSymbol(for: watchStatus))
+                                    .foregroundStyle(ConstantsDirectWatch.statusColor(for: watchStatus))
+                                    .accessibilityLabel(watchStatus.title)
+                            }
                         }
 
                         Text(statusFooterText)
@@ -50,6 +61,30 @@ struct BluetoothPeripheralDetailView: View {
                 Section {
                     ForEach(section.rows) { row in
                         BluetoothPeripheralDetailRowView(row: row)
+                    }
+                    if section.id == "dexcom-g6-bluetooth-slot" || section.id == "dexcom-g7-bluetooth-slot",
+                       let context = state.directWatchSetupContext {
+                        NavigationLink {
+                            DirectWatchSetupView(context: context)
+                        } label: {
+                            HStack {
+                                Text(TextsDirectWatch.title)
+                                Spacer()
+                                if state.directWatchIsEnabled {
+                                    TimelineView(.periodic(from: .now, by: 10)) { timeline in
+                                        let watchStatus = state.directWatchStatus(at: timeline.date)
+                                        HStack(spacing: 7) {
+                                            Image(systemName: ConstantsDirectWatch.watchSymbol(for: watchStatus))
+                                                .font(.system(size: 16))
+                                                .foregroundStyle(ConstantsDirectWatch.statusColor(for: watchStatus))
+                                            Text(Texts_Common.enabled)
+                                                .foregroundStyle(ConstantsAppColors.rowDetailText)
+                                        }
+                                        .accessibilityLabel("\(Texts_Common.enabled), \(watchStatus.title)")
+                                    }
+                                }
+                            }
+                        }
                     }
                 } header: {
                     BluetoothPeripheralDetailSectionHeaderView(section: section)
@@ -98,7 +133,13 @@ struct BluetoothPeripheralDetailView: View {
             state.setSignalStrengthVisible(true)
         }
         .onDisappear { state.setSignalStrengthVisible(false) }
+        .onReceive(NotificationCenter.default.publisher(for: DirectWatchSettings.changed)) { _ in
+            state.refresh()
+        }
         .onChange(of: scenePhase) { phase in
+            if phase == .active {
+                state.refresh()
+            }
             state.updateSignalStrengthPolling(active: phase == .active)
         }
         .frame(maxWidth: UIDevice.current.userInterfaceIdiom == .pad ? 780 : .infinity)
@@ -205,29 +246,41 @@ private struct BluetoothPeripheralStatusBannerView: View {
     @ObservedObject var state: BluetoothPeripheralDetailState
 
     var body: some View {
-        HStack(alignment: .center, spacing: 10) {
-            Image(systemName: state.connectionStatus.antennaSystemImage)
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(state.connectionStatus.tintColor)
-                .frame(width: 24)
-
-            Text(state.connectionStatus.fullStatusText)
-                .foregroundStyle(Color(.colorPrimary))
-
-            Spacer()
-
-            if let connectionWaitStartedAt = state.connectionWaitStartedAt {
-                HStack(spacing: 4) {
-                    Image(systemName: "clock")
-                        .accessibilityHidden(true)
-
-                    Text(connectionWaitStartedAt, style: .timer)
-                        .monospacedDigit()
-                }
-                    .foregroundStyle(Color(.colorSecondary))
+        if state.bluetoothAccessIsBlocked {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(Color(.systemRed))
+                    .accessibilityHidden(true)
+                Text(Texts_BluetoothPeripheralView.bluetoothAccessNotEnabled)
+                    .font(.headline)
             }
+            .foregroundStyle(Color(.colorPrimary))
+            .padding(.vertical, 3)
+        } else {
+            HStack(alignment: .center, spacing: 10) {
+                Image(systemName: state.connectionStatus.antennaSystemImage)
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(state.connectionStatus.tintColor)
+                    .frame(width: 24)
+
+                Text(state.connectionStatus.fullStatusText)
+                    .foregroundStyle(Color(.colorPrimary))
+
+                Spacer()
+
+                if let connectionWaitStartedAt = state.connectionWaitStartedAt {
+                    HStack(spacing: 4) {
+                        Image(systemName: "clock")
+                            .accessibilityHidden(true)
+
+                        Text(connectionWaitStartedAt, style: .timer)
+                            .monospacedDigit()
+                    }
+                        .foregroundStyle(Color(.colorSecondary))
+                }
+            }
+            .padding(.vertical, 3)
         }
-        .padding(.vertical, 3)
     }
 }
 

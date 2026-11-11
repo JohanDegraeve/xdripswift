@@ -20,10 +20,11 @@ final class BluetoothPeripheralsRouter: ObservableObject {
     func openPeripheral(
         _ bluetoothPeripheral: BluetoothPeripheral?,
         type: BluetoothPeripheralType,
-        dexcomConfiguration: DexcomAddConfiguration? = nil
+        dexcomConfiguration: DexcomAddConfiguration? = nil,
+        startLibre3AfterNFC: Bool = false
     ) {
         // Return directly to the peripheral list when leaving this detail screen.
-        path = [BluetoothPeripheralsRoute(.peripheral(bluetoothPeripheral, type, dexcomConfiguration))]
+        path = [BluetoothPeripheralsRoute(.peripheral(bluetoothPeripheral, type, dexcomConfiguration, startLibre3AfterNFC))]
     }
 
     func showDexcomConnectionMode(type: BluetoothPeripheralType) {
@@ -107,11 +108,12 @@ final class BluetoothPeripheralsRouter: ObservableObject {
 struct BluetoothPeripheralsRoute: Hashable {
     enum Destination {
         case categories
+        case libre3Setup(String?)
         case types(BluetoothPeripheralCategory)
         case dexcomConnectionMode(BluetoothPeripheralType)
         case sensorCodeCapture(DexcomSensorCodeCapture)
         case manualSensorCodeEntry(DexcomManualSensorCodeEntry)
-        case peripheral(BluetoothPeripheral?, BluetoothPeripheralType, DexcomAddConfiguration?)
+        case peripheral(BluetoothPeripheral?, BluetoothPeripheralType, DexcomAddConfiguration?, Bool = false)
         case textEntry(BluetoothPeripheralTextEntry)
         case selectionList(BluetoothPeripheralSelectionList)
         case readSuccess(TransmitterReadSuccessDisplay, String)
@@ -422,6 +424,7 @@ struct BluetoothPeripheralListRow: Identifiable {
     }
 
     var typeTitle: String {
+        if let libre3 = bluetoothPeripheral as? Libre3 { return libre3.productName }
         // Resolve configured Dexcom rows from their own transmitter ID. The global active sensor
         // can belong to another row and must not determine this device's product name.
         if let dexcomG5 = bluetoothPeripheral as? DexcomG5 {
@@ -597,6 +600,7 @@ extension BluetoothPeripheralType {
     static let addFlowPreferredOrder: [BluetoothPeripheralCategory: [BluetoothPeripheralType]] = [
         .CGM: [
             .Libre2Type,
+            .Libre3Type,
             .DexcomType,
             .DexcomG7Type,
             .MiaoMiaoType,

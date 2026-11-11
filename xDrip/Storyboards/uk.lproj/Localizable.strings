@@ -1,0 +1,88 @@
+
+
+// Direct to Watch status and pairing guidance
+"directWatchTitle" = "Безпосередньо на Watch";
+"directWatchNoConnection" = "З’єднання не додано";
+"directWatchSuspended" = "Збирання призупинено";
+"directWatchWaiting" = "Очікування показника з Watch";
+"directWatchCollecting" = "Збирання даних";
+"directWatchOverdue" = "Показник прострочено";
+"directWatchDiagnosis" = "Діагностика";
+"directWatchAdded" = "З’єднання з Watch додано";
+"directWatchPairingGuidance" = "Прокрутіть униз до екрана «Безпосередньо на Watch» на годиннику Watch і прийміть запит на сполучення Bluetooth, якщо додаєте цей передавач уперше.\n\nПідключення передавача може тривати до п’яти хвилин.";
+
+// Direct to Watch collection control
+"directWatchPausedShort" = "Призупинено";
+"directWatchPaused" = "Збирання на Watch призупинено";
+"directWatchPause" = "Призупинити збір";
+"directWatchResume" = "Відновити збір";
+"directWatchPausedSinceFormat" = "З %@";
+"directWatchConnecting" = "Очікування…";
+"directWatchCollectedReadings" = "Зібрані показники";
+"directWatchReadingGapFormat" = "(%dхв %dс)";
+"directWatchNoCollectedReadings" = "Показники через Watch ще не отримано";
+
+"directWatchSessionStarted" = "Розпочато о %@";
+"directWatchSessionResumed" = "Відновлено о %@";
+"directWatchSessionPaused" = "Призупинено о %@";
+"directWatchSessionEnded" = "Завершено о %@";
+
+// Direct to Watch setup and diagnosis
+"directWatchBluetoothSlot" = "Слот Bluetooth";
+"directWatchCancel" = "Скасувати";
+"directWatchTestingLogs" = "Тести й журнали";
+"directWatchAddConnection" = "Підключити Watch";
+"directWatchRemoveConnection" = "Видалити з’єднання Watch";
+"directWatchMedicalSlot" = "Слот медичного пристрою";
+"directWatchWatchSlot" = "Слот Watch";
+"directWatchConfirmUnusedSlot" = "Слот вільний: підключити Watch";
+"directWatchSlotMedical" = "Слот 1 · Медичний пристрій";
+"directWatchSlotMobile" = "Слот 2 · Мобільний застосунок";
+"directWatchSlotWatch" = "Слот 3 · Watch";
+"directWatchSlotAnubis" = "Слот 3 · Додатковий Anubis";
+"directWatchUsedWatch" = "Використовує цей Watch";
+"directWatchUsedPhone" = "Використовує цей iPhone";
+"directWatchSlotMedicalDetail" = "Якщо не зайнятий помпою чи приймачем";
+"directWatchSlotMobileDetail" = "Якщо не зайнятий іншим застосунком";
+"directWatchRecommendedWatch" = "Рекомендовано для Watch";
+"directWatchRecommendedTransmitter" = "Рекомендовано для цього передавача";
+"directWatchAnubisOnly" = "Лише передавачі Anubis";
+"directWatchWatchStatus" = "Стан Watch";
+"directWatchTestingDiagnosis" = "Тести й діагностика";
+"directWatchPausePhone" = "Пауза збору BLE на iPhone";
+"directWatchForTesting" = "Для перевірки збору на Watch";
+"directWatchGetLogs" = "Отримати логи Watch";
+"directWatchShareLogs" = "Поділитися логами Watch";
+"directWatchPending" = "У черзі";
+"directWatchReceivedFormat" = "Отримано %@";
+"directWatchSelectedFormat" = "%@, вибрано";
+"directWatchIntro" = "Watch може збирати показники напряму без iPhone поруч. Керування сенсором залишається на iPhone.";
+"directWatchBackgroundAdvice" = "Збір у фоні залежить від watchOS. Перевірте його на Watch, перш ніж покладатися на нього без iPhone.";
+"directWatchSeparateSlots" = "Watch та iPhone потрібні різні слоти. Слот 1 може перервати зв’язок помпи чи приймача, що вже його використовує.";
+"directWatchNativeRequired" = "Збір на Watch потребує нативного розрахунку глюкози на цьому iPhone.";
+"directWatchStartSensor" = "Запустіть сенсор на цьому iPhone перед підключенням Watch.";
+"directWatchNoSlot" = "Немає вільного сумісного слота для Watch.";
+"directWatchMedicalWarning" = "Watch використовуватиме слот 1, зазвичай призначений для помпи чи приймача. Не додавайте з’єднання, якщо слот використовує помпа, приймач або інший медичний пристрій. Watch може перервати отримання глюкози цим пристроєм.";
+"directWatchWatchSlotWarning" = "Watch використовуватиме слот 3. Не додавайте з’єднання, якщо інший годинник уже сполучено із цим сенсором. Цей Watch може перервати отримання ним глюкози.";
+"directWatchSlotConflict" = "Слот призначено Watch. Видаліть з’єднання Watch перед призначенням слота iPhone.";
+"directWatchOpenForStatus" = "Відкрийте %@ на годиннику, щоб отримати стан.";
+"directWatchCheckInstalled" = "Якщо стан не оновлюється, перевірте наявність застосунку в розділі Встановлено на Apple Watch у застосунку Watch на iPhone.";
+"directWatchMasterRequired" = "iPhone має бути в режимі майстра.";
+"directWatchG6Mismatch" = "Налаштований G6 не є активним передавачем iPhone.";
+"directWatchG7Mismatch" = "Налаштований сенсор сімейства G7 не є активним передавачем iPhone.";
+"directWatchPrimaryRequired" = "Збір на Watch потребує основного з’єднання сімейства G7 на iPhone.";
+"directWatchNativeG6Required" = "Увімкніть нативну глюкозу G6 на iPhone.";
+"directWatchPairingCodeRequired" = "Для сполучення Watch потрібен чотиризначний код сенсора.";
+"directWatchSlotsConflict" = "Watch та iPhone використовують один слот Bluetooth.";
+"directWatchAnubisRequired" = "Слот 3 потребує передавача Anubis.";
+"directWatchNoActiveSensor" = "Немає активного сенсора на iPhone.";
+
+/* Direct to Watch action feedback. */
+"directWatchTryAgain" = "Спробувати знову";
+"directWatchRequestQueued" = "Запит у черзі";
+"directWatchLastLogsReceived" = "Останні логи отримано";
+"directWatchWaitingForLogs" = "Очікування нових логів…";
+"directWatchLogsFailed" = "Не вдалося отримати логи. Спробуйте знову.";
+
+/* Watch diagnostic log actions and receipt time. */
+"directWatchLogs" = "Логи";

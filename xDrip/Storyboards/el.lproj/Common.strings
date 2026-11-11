@@ -1,5 +1,6 @@
 "common_Ok" = "OK";
 "common_cancel" = "Ακύρωση";
+"common_close" = "Κλείσιμο";
 "common_mgdl" = "mg/dL";
 "common_mmol" = "mmol/L";
 "common_bloodglucoseunit" = "Μονάδα μέτρησης γλυκόζης αίματος";
@@ -78,3 +79,13 @@
 "common_sensorWarmupUntilFormat" = "Έως %@";
 "common_sensorWarmupComplete" = "Η προθέρμανση ολοκληρώθηκε";
 "common_sensorWaitingForReading" = "Αναμονή πρώτης μέτρησης…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "Εκτιμώμενη HbA1c";
+
+/* Switch title when the surrounding screen or section identifies the feature */
+"common_enable" = "Ενεργοποίηση";
+
+/* Status label, including Direct to Watch in Advanced Settings. */
+"common_enabled" = "Ενεργό";

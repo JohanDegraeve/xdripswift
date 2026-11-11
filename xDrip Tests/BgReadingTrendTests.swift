@@ -74,3 +74,91 @@ final class BgReadingTrendTests: XCTestCase {
         return bgReading
     }
 }
+
+final class BgReadingDownstreamPolicyTests: XCTestCase {
+    func testFirstAndNewerVisibleReadingsEnterDownstreamProcessing() {
+        let first = Date(timeIntervalSince1970: 2_000_000_000)
+        let next = first.addingTimeInterval(5 * 60)
+
+        XCTAssertTrue(BgReadingDownstreamPolicy.shouldProcess(
+            previousVisibleReadingTimeStamp: nil,
+            currentVisibleReadingTimeStamp: first
+        ))
+        XCTAssertTrue(BgReadingDownstreamPolicy.shouldProcess(
+            previousVisibleReadingTimeStamp: first,
+            currentVisibleReadingTimeStamp: next
+        ))
+    }
+
+    func testUnchangedOrHistoricalVisibleReadingDoesNotEnterDownstreamProcessing() {
+        let current = Date(timeIntervalSince1970: 2_000_000_000)
+
+        XCTAssertFalse(BgReadingDownstreamPolicy.shouldProcess(
+            previousVisibleReadingTimeStamp: current,
+            currentVisibleReadingTimeStamp: current
+        ))
+        XCTAssertFalse(BgReadingDownstreamPolicy.shouldProcess(
+            previousVisibleReadingTimeStamp: current,
+            currentVisibleReadingTimeStamp: current.addingTimeInterval(-5 * 60)
+        ))
+        XCTAssertFalse(BgReadingDownstreamPolicy.shouldProcess(
+            previousVisibleReadingTimeStamp: current,
+            currentVisibleReadingTimeStamp: nil
+        ))
+    }
+
+    func testManualPostProcessingGateRemainsUnrestricted() {
+        XCTAssertTrue(BgPostProcessingDownstreamGate.unrestricted.shouldProcess(currentVisibleReadingTimeStamp: nil))
+    }
+
+    func testSuppressedMinuteReadingsDoNotEnterDownstreamProcessing() {
+        let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let accessor = BgReadingsAccessor(coreDataManager: coreDataManager)
+        let firstTimeStamp = Date().addingTimeInterval(-6 * 60)
+        let first = reading(timeStamp: firstTimeStamp, value: 100, coreDataManager: coreDataManager)
+        coreDataManager.saveChanges()
+
+        let previousVisibleTimeStamp = accessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4).first?.timeStamp
+        XCTAssertEqual(previousVisibleTimeStamp, first.timeStamp)
+
+        for minute in 1..<5 {
+            let suppressed = reading(
+                timeStamp: firstTimeStamp.addingTimeInterval(Double(minute) * 60),
+                value: 100,
+                coreDataManager: coreDataManager
+            )
+            suppressed.isSuppressedByFiveMinuteCadence = true
+        }
+        coreDataManager.saveChanges()
+
+        let visibleTimeStampAfterSuppressedReading = accessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4).first?.timeStamp
+        XCTAssertEqual(visibleTimeStampAfterSuppressedReading, first.timeStamp)
+        XCTAssertFalse(BgReadingDownstreamPolicy.shouldProcess(
+            previousVisibleReadingTimeStamp: previousVisibleTimeStamp,
+            currentVisibleReadingTimeStamp: visibleTimeStampAfterSuppressedReading
+        ))
+
+        let nextVisible = reading(timeStamp: firstTimeStamp.addingTimeInterval(5 * 60), value: 100, coreDataManager: coreDataManager)
+        coreDataManager.saveChanges()
+
+        let visibleTimeStampAfterNextVisibleReading = accessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4).first?.timeStamp
+        XCTAssertEqual(visibleTimeStampAfterNextVisibleReading, nextVisible.timeStamp)
+        XCTAssertTrue(BgReadingDownstreamPolicy.shouldProcess(
+            previousVisibleReadingTimeStamp: previousVisibleTimeStamp,
+            currentVisibleReadingTimeStamp: visibleTimeStampAfterNextVisibleReading
+        ))
+    }
+
+    private func reading(timeStamp: Date, value: Double, coreDataManager: CoreDataManager) -> BgReading {
+        let reading = BgReading(
+            timeStamp: timeStamp,
+            sensor: nil,
+            calibration: nil,
+            rawData: value,
+            deviceName: "downstream policy test",
+            nsManagedObjectContext: coreDataManager.mainManagedObjectContext
+        )
+        reading.calculatedValue = value
+        return reading
+    }
+}

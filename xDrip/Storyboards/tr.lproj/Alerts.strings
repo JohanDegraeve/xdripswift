@@ -22,3 +22,11 @@
 "confirmdeletionalert" = "Uyarıyı Sil?";
 "alerts_fastdrop" = "Hızlı Düşme Uyarısı";
 "alerts_fastrise" = "Hızlı Yükselme Uyarısı";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "Sensör Yakında Sona Erecek";
+"sensorExpiry.expectedExpiry" = "Sensörün Beklenen Bitişi";
+"sensorExpiry.hoursBefore" = "Bitişten önceki saat";
+"sensorExpiry.hoursHelp" = "1 ile 48 arasında bir tam saat sayısı girin.";
+"sensorExpiry.endingSoonBody" = "Sensörünüzün kullanım ömrünün %@ tarihinde sona ermesi bekleniyor.";
+"sensorExpiry.expectedExpiryBody" = "Sensörünüz beklenen bitiş zamanına ulaştı (%@).";

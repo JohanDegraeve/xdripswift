@@ -3,6 +3,18 @@ import Foundation
 /// all texts for Alerts related texts (texts in notifications, etc.) and Alert Settings Views related texts
 class Texts_Alerts {
     static private let filename = "Alerts"
+    static let sensorEndingSoon = NSLocalizedString("sensorExpiry.endingSoon", tableName: filename, bundle: .main, value: "Sensor Ending Soon", comment: "Sensor expiry reminder")
+
+    static let sensorExpectedExpiry = NSLocalizedString("sensorExpiry.expectedExpiry", tableName: filename, bundle: .main, value: "Expected Sensor Expiry", comment: "Sensor expiry reminder")
+
+    static let hoursBeforeExpiry = NSLocalizedString("sensorExpiry.hoursBefore", tableName: filename, bundle: .main, value: "Hours before expiry", comment: "Sensor expiry reminder")
+
+    static let sensorExpiryHoursHelp = NSLocalizedString("sensorExpiry.hoursHelp", tableName: filename, bundle: .main, value: "Enter a whole number from 1 to 48 hours.", comment: "Sensor expiry reminder")
+
+    static let sensorEndingSoonBody = NSLocalizedString("sensorExpiry.endingSoonBody", tableName: filename, bundle: .main, value: "Your sensor is expected to reach the end of its lifetime on %@.", comment: "Sensor expiry reminder")
+
+    static let sensorExpectedExpiryBody = NSLocalizedString("sensorExpiry.expectedExpiryBody", tableName: filename, bundle: .main, value: "Your sensor has reached its expected expiry time (%@).", comment: "Sensor expiry reminder")
+
     
     // MARK:- Body Text in the alerts
     static let highAlertTitle: String = {

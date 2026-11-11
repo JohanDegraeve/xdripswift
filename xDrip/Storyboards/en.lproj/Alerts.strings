@@ -26,3 +26,11 @@
 "alerts_fastrise" = "Fast Rise Alarm";
 "alertWhenBelowValue" = "Only When Below";
 "alertWhenAboveValue" = "Only When Above";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "Sensor Ending Soon";
+"sensorExpiry.expectedExpiry" = "Expected Sensor Expiry";
+"sensorExpiry.hoursBefore" = "Hours before expiry";
+"sensorExpiry.hoursHelp" = "Enter a whole number from 1 to 48 hours.";
+"sensorExpiry.endingSoonBody" = "Your sensor is expected to reach the end of its lifetime on %@.";
+"sensorExpiry.expectedExpiryBody" = "Your sensor has reached its expected expiry time (%@).";

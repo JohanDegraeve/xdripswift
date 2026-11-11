@@ -73,6 +73,9 @@ final class WatchStateModel: NSObject, ObservableObject {
 
     /// the Watch Connectivity session
     var session: WCSession
+    let directWatchCollector = DirectWatchCollector()
+    private var directWatchSubscription: AnyCancellable?
+
 
     // set timer to automatically refresh the view
     // https://www.hackingwithswift.com/quick-start/swiftui/how-to-use-a-timer-with-swiftui
@@ -106,6 +109,17 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var urgentHighLimitInMgDl: Double = 250
     @Published var updatedDate: Date = .now
     @Published var activeSensorDescription: String = ""
+    @Published var watchCollectionConfigured = false
+    @Published var phoneBLECollectionPaused = false
+    // A successful foreground message or probe reply proves a live phone link. When the app
+    // opens after an idle period, show Checking during the first exchange instead of Away.
+    @Published var lastLivePhoneContactAt: Date = .distantPast {
+        didSet { directWatchCollector.recordLivePhoneContact(at: lastLivePhoneContactAt) }
+    }
+    @Published private(set) var phoneLinkCheckStartedAt: Date?
+    private let phoneLinkTimeout = DirectWatchCollectionPolicy.phoneLinkTimeout
+    private var lastPhoneLinkProbeLogAt: Date = .distantPast
+    private var lastPhoneLinkFailureLogAt: Date = .distantPast
     @Published var sensorAgeInMinutes: Double = 0
     @Published var sensorMaxAgeInMinutes: Double = 14400
     @Published var preferSensorCountdown: Bool = false
@@ -139,8 +153,65 @@ final class WatchStateModel: NSObject, ObservableObject {
         self.session = session
         super.init()
 
+        watchCollectionConfigured = directWatchCollector.isConfigured
         session.delegate = self
         session.activate()
+        directWatchSubscription = directWatchCollector.objectWillChange.sink { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.applyDirectWatchReadings()
+            }
+        }
+        applyDirectWatchReadings()
+    }
+
+    /// Phone values win overlapping cycles so normal updates retain their formatting/smoothing.
+    /// Local readings fill missing cycles while away. This display merge does not acknowledge
+    /// or delete the collector's pending queue. Only a saved phone import can do that.
+    @discardableResult private func applyDirectWatchReadings(updateComplication: Bool = true) -> Bool {
+        guard let configuration = directWatchCollector.configuration else { return false }
+        var merged = zip(bgReadingDates, bgReadingValues).map { (date: $0.0, value: $0.1) }
+        for reading in directWatchCollector.readings where reading.belongs(to: configuration) {
+            if !merged.contains(where: { abs($0.date.timeIntervalSince(reading.measuredAt)) <= ConstantsDirectWatch.nativeReadingDuplicateWindow }) {
+                merged.append((reading.measuredAt, reading.mgDl))
+            }
+        }
+        merged = merged.filter { $0.date > Date().addingTimeInterval(-ConstantsDirectWatch.localReadingRetention) }.sorted { $0.date > $1.date }
+        let dates = merged.map(\.date)
+        let values = merged.map(\.value)
+        guard dates != bgReadingDates || values != bgReadingValues || isMgDl != configuration.isMgDl
+                || lowLimitInMgDl != configuration.low || highLimitInMgDl != configuration.high
+                || keepAliveIsDisabled else { return false }
+        isMgDl = configuration.isMgDl
+        lowLimitInMgDl = configuration.low
+        highLimitInMgDl = configuration.high
+        keepAliveIsDisabled = false
+        bgReadingDates = dates
+        bgReadingDatesAsDouble = merged.map { $0.date.timeIntervalSince1970 }
+        bgReadingValues = values
+        sensorAgeInMinutes = max(0, Date().timeIntervalSince(configuration.sensorStartDate) / 60)
+        if merged.count > 1 {
+            let minutes = merged[0].date.timeIntervalSince(merged[1].date) / 60
+            let slope = minutes > 0 ? (merged[0].value - merged[1].value) / minutes : 0
+            // Match the existing Dexcom arrow boundaries, including equality at each limit.
+            // An ordered switch keeps the seven directions readable without a nested ternary.
+            switch slope {
+            case ...(-3.5): slopeOrdinal = 7
+            case ...(-2): slopeOrdinal = 6
+            case ...(-1): slopeOrdinal = 5
+            case ...1: slopeOrdinal = 4
+            case ...2: slopeOrdinal = 3
+            case ...3.5: slopeOrdinal = 2
+            default: slopeOrdinal = 1
+            }
+            deltaValueInUserUnit = (merged[0].value - merged[1].value) / (isMgDl ? 1 : 18)
+        }
+        if let date = bgReadingDates.first {
+            lastUpdatedTextString = Texts_WatchApp.lastReading + " "
+            lastUpdatedTimeString = date.formatted(date: .omitted, time: .shortened)
+            lastUpdatedTimeAgoString = date.daysAndHoursAgo(appendAgo: true)
+        }
+        if updateComplication { updateComplicationData() }
+        return true
     }
 
     // MARK: - Functions to provide context data to populate the views
@@ -494,6 +565,68 @@ final class WatchStateModel: NSObject, ObservableObject {
         }
     }
 
+    func probePhoneLink() {
+        // Normal reading refreshes continue while paused. Omit the extra collector heartbeat.
+        guard !directWatchCollector.isPaused else { return }
+        guard session.activationState == .activated, session.isReachable else {
+            requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorInactive
+            if Date().timeIntervalSince(lastPhoneLinkFailureLogAt) >= 30 {
+                lastPhoneLinkFailureLogAt = .now
+                directWatchCollector.recordPhoneLinkDiagnostic("probe unavailable, activation=\(session.activationState.rawValue), reachable=\(session.isReachable)")
+            }
+            return
+        }
+        if !phoneLinkIsLive() {
+            requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorInactive
+        }
+        let sentAt = Date().timeIntervalSince1970
+        if Date().timeIntervalSince(lastPhoneLinkProbeLogAt) >= 30 {
+            lastPhoneLinkProbeLogAt = .now
+            let age = lastLivePhoneContactAt == .distantPast ? "none" : "\(Int(Date().timeIntervalSince(lastLivePhoneContactAt)))s"
+            directWatchCollector.recordPhoneLinkDiagnostic("probe sent, last live reply age=\(age)")
+        }
+        let payload: [String: Any] = ["directWatchLinkProbe": sentAt]
+            .merging(directWatchCollector.collectionControl?.payload ?? [:], uniquingKeysWith: { _, new in new })
+            .merging(directWatchCollector.connectionEventPayload, uniquingKeysWith: { _, new in new })
+        session.sendMessage(DirectWatchCompatibility.outgoing(payload), replyHandler: { [weak self] response in
+            let response = DirectWatchCompatibility.normalized(response)
+            guard response["directWatchLinkProbe"] as? Double == sentAt else { return }
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if !self.phoneLinkIsLive() { self.directWatchCollector.recordPhoneLinkDiagnostic("probe reply, live link restored") }
+                self.directWatchCollector.receiveCollectionControl(response)
+                self.lastLivePhoneContactAt = .now
+                self.phoneLinkCheckStartedAt = nil
+            }
+        }, errorHandler: { [weak self] error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorInactive
+                if Date().timeIntervalSince(self.lastPhoneLinkFailureLogAt) >= 30 {
+                    self.lastPhoneLinkFailureLogAt = .now
+                    self.directWatchCollector.recordPhoneLinkDiagnostic("probe failed, \(error.localizedDescription)")
+                }
+            }
+        })
+    }
+
+    func phoneLinkIsLive(at date: Date = .now) -> Bool {
+        date.timeIntervalSince(lastLivePhoneContactAt) < phoneLinkTimeout
+    }
+
+    func beginForegroundPhoneLinkCheck() {
+        if !phoneLinkIsLive() {
+            if phoneLinkCheckStartedAt.map({ Date().timeIntervalSince($0) >= phoneLinkTimeout }) ?? true {
+                directWatchCollector.recordPhoneLinkDiagnostic("foreground check started, waiting for live reply")
+            }
+            phoneLinkCheckStartedAt = .now
+        }
+    }
+
+    func phoneLinkIsChecking(at date: Date = .now) -> Bool {
+        !phoneLinkIsLive(at: date) && phoneLinkCheckStartedAt.map { date.timeIntervalSince($0) < phoneLinkTimeout } == true
+    }
+
     /// request the compact AGP profile used by the Watch main chart background
     func requestAGPBackground(startDate: Date, endDate: Date) {
         // always save the latest requested range first
@@ -613,14 +746,33 @@ final class WatchStateModel: NSObject, ObservableObject {
     }
 
     private func requestWatchUpdate(updateType: String) {
-        session.sendMessage(["requestWatchUpdate": updateType], replyHandler: nil) { [log] error in
-            log.error("Error requesting \(updateType, privacy: .public): \(error.localizedDescription, privacy: .public)")
+        session.sendMessage(["requestWatchUpdate": updateType], replyHandler: nil) { [weak self] error in
+            self?.log.error("Error requesting \(updateType, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            DispatchQueue.main.async {
+                self?.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorInactive
+            }
         }
     }
 
     // MARK: - Private functions used to interact with the WCSession and prepare internal data
 
+    private func processDirectWatchConfiguration(_ dictionary: [String: Any]) {
+        let dictionary = DirectWatchCompatibility.normalized(dictionary)
+        guard dictionary["directWatchRevision"] != nil,
+              directWatchCollector.receiveConfiguration(dictionary) else { return }
+        phoneBLECollectionPaused = directWatchCollector.phoneBLECollectionPaused
+        // The collector also understands older payloads without directWatchConfigured.
+        // Derive visibility from its accepted state, rather than duplicating wire defaults here.
+        let configured = directWatchCollector.isConfigured
+        if configured && !watchCollectionConfigured { beginForegroundPhoneLinkCheck() }
+        watchCollectionConfigured = configured
+    }
+
     private func processWatchPayloadFromDictionary(dictionary: [String: Any]) {
+        let dictionary = DirectWatchCompatibility.normalized(dictionary)
+        processDirectWatchConfiguration(dictionary)
+        directWatchCollector.acknowledge(dictionary)
+        if dictionary["directWatchRequestLogs"] as? Bool == true { directWatchCollector.sendLogs() }
         var processedUpdate = false
 
         if let statusDictionary = dictionary["status"] as? [String: Any] {
@@ -635,6 +787,8 @@ final class WatchStateModel: NSObject, ObservableObject {
             processAGPFromDictionary(dictionary: agpDictionary)
             processedUpdate = true
         }
+
+        processedUpdate = applyDirectWatchReadings(updateComplication: false) || processedUpdate
 
         if processedUpdate {
             // now process the shared user defaults to get data for the WidgetKit complications
@@ -691,6 +845,10 @@ final class WatchStateModel: NSObject, ObservableObject {
         urgentHighLimitInMgDl = dictionary["urgentHighLimitInMgDl"] as? Double ?? 250
         updatedDate = Date(timeIntervalSince1970: generatedAt)
         activeSensorDescription = dictionary["activeSensorDescription"] as? String ?? ""
+        // Ordered configuration owns this flag. Older queued status must not override a pause.
+        phoneBLECollectionPaused = directWatchCollector.isConfigured
+            ? directWatchCollector.phoneBLECollectionPaused
+            : (dictionary["phoneBLECollectionPaused"] as? Bool ?? false)
         sensorAgeInMinutes = dictionary["sensorAgeInMinutes"] as? Double ?? 0
         sensorMaxAgeInMinutes = dictionary["sensorMaxAgeInMinutes"] as? Double ?? 0
         preferSensorCountdown = dictionary["preferSensorCountdown"] as? Bool ?? false
@@ -823,6 +981,8 @@ extension WatchStateModel: WCSessionDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self = self, activationState == .activated else { return }
 
+            self.processDirectWatchConfiguration(self.session.receivedApplicationContext)
+            self.directWatchCollector.sync()
             self.requestWatchStateUpdate()
             // if the AGP tab requested data while activation was pending, send it now
             self.sendPendingAGPRequestIfPossible()
@@ -831,8 +991,24 @@ extension WatchStateModel: WCSessionDelegate {
 
     func sessionReachabilityDidChange(_: WCSession) {
         DispatchQueue.main.async {
+            if !self.session.isReachable {
+                self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorInactive
+            } else if self.watchCollectionConfigured {
+                self.probePhoneLink()
+            }
+            self.directWatchCollector.sync()
             // retry AGP requests that were made before the phone became reachable
             self.sendPendingAGPRequestIfPossible()
+        }
+    }
+
+    func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+        DispatchQueue.main.async { self.processWatchPayloadFromDictionary(dictionary: applicationContext) }
+    }
+
+    func session(_: WCSession, didFinish fileTransfer: WCSessionFileTransfer, error: Error?) {
+        if DirectWatchCompatibility.normalized(fileTransfer.file.metadata ?? [:])["directWatchLog"] as? Bool == true, error == nil {
+            try? FileManager.default.removeItem(at: fileTransfer.file.fileURL)
         }
     }
 
@@ -840,6 +1016,9 @@ extension WatchStateModel: WCSessionDelegate {
 
     func session(_: WCSession, didReceiveMessage message: [String: Any]) {
         DispatchQueue.main.async {
+            if !self.phoneLinkIsLive() { self.directWatchCollector.recordPhoneLinkDiagnostic("phone message received, live link restored") }
+            self.lastLivePhoneContactAt = .now
+            self.phoneLinkCheckStartedAt = nil
             self.processWatchPayloadFromDictionary(dictionary: message)
             self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorActive
 

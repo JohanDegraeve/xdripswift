@@ -288,6 +288,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     // MARK: - CGMTransmitter
 
     func cgmTransmitterType() -> CGMTransmitterType { .ottai }
+    func sensorWarmupDurationInMinutes() -> Double? { ConstantsMaster.minimumSensorWarmUpRequiredInMinutesOttai }
     func getCBUUID_Service() -> String { OttaiConstants.serviceCgm }
     func getCBUUID_Receive() -> String { OttaiConstants.charGlucoseLive }
     func maxSensorAgeInDays() -> Double? {

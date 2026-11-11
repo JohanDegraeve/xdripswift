@@ -111,12 +111,38 @@ class BGReadingSpeaker:NSObject {
             return
         }
         
+        say(text: Self.readingText(lastReadings), language: Texts_SpeakReading.languageCode)
+        timeStampLastSpokenReading = bgReadingToSpeak.timeStamp
+    }
+
+    /// Use the same wording for automatic readings and the settings preview.
+    private static func readingText(_ readings: [BgReading]) -> String {
+        let reading = readings[0]
+        return speechText(
+            glucose: reading.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl),
+            trend: reading.slopeName,
+            delta: reading.unitizedDeltaString(previousBgReading: readings.count > 1 ? readings[1] : nil, showUnit: false, highGranularity: true, mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        )
+    }
+
+    /// A manual preview uses readings up to 11 minutes old and does not change the automatic schedule or interval.
+    static func previewText(coreDataManager: CoreDataManager?) -> String {
+        if let coreDataManager {
+            let readings = BgReadingsAccessor(coreDataManager: coreDataManager).get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
+            if let reading = readings.first, Date().timeIntervalSince(reading.timeStamp) <= 11 * 60 {
+                return readingText(readings)
+            }
+        }
+        return speechText(glucose: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? "100" : "5.6", trend: "Flat", delta: "0")
+    }
+
+    static func speechText(glucose: String, trend: String, delta: String) -> String {
         // start creating the text that needs to be spoken
-        var currentBgReadingOutput = Texts_SpeakReading.currentGlucose
+        var currentBgReadingOutput = UserDefaults.standard.speakIntroduction ? Texts_SpeakReading.currentGlucose + " ,, " : ""
         
         //Glucose
         // create reading value
-        var currentBgReadingFormatted = bgReadingToSpeak.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        var currentBgReadingFormatted = glucose
         // copied from Spike
         if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
             currentBgReadingFormatted = assertFractionalDigits(number: currentBgReadingFormatted)
@@ -127,14 +153,14 @@ class BGReadingSpeaker:NSObject {
         } else if (currentBgReadingFormatted == "LOW") {
             currentBgReadingFormatted = ". " + Texts_SpeakReading.low;
         }
-        currentBgReadingOutput = currentBgReadingOutput + " ,, " + currentBgReadingFormatted + ". ";
+        currentBgReadingOutput += currentBgReadingFormatted + ". "
         
         // Trend
         // if trend needs to be spoken, then compose trend text
         if UserDefaults.standard.speakTrend {
 
             //add trend to text (slope)
-            currentBgReadingOutput += Texts_SpeakReading.currentTrend + " " + searchTranslationForCurrentTrend(currentTrend: bgReadingToSpeak.slopeName) + ". ";
+            currentBgReadingOutput += Texts_SpeakReading.currentTrend + " " + searchTranslationForCurrentTrend(currentTrend: trend) + ". ";
             
         }
         
@@ -142,10 +168,8 @@ class BGReadingSpeaker:NSObject {
         // if delta needs to be spoken then compose delta
         if UserDefaults.standard.speakDelta {
             
-            var previousBgReading:BgReading?
-            if lastReadings.count > 1 {previousBgReading = lastReadings[1]}
-            var currentDelta:String = bgReadingToSpeak.unitizedDeltaString(previousBgReading: previousBgReading, showUnit: false, highGranularity: true, mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-            
+            var currentDelta = delta
+
             //Format current delta in case of anomalies
             if currentDelta == "ERR" || currentDelta == "???"{
                 currentDelta = Texts_SpeakReading.deltanoncomputable
@@ -161,16 +185,11 @@ class BGReadingSpeaker:NSObject {
             
         }
         
-        // say the text
-        say(text: currentBgReadingOutput, language: Texts_SpeakReading.languageCode)
-        
-        // set timeStampLastSpokenReading
-        timeStampLastSpokenReading = bgReadingToSpeak.timeStamp
-        
+        return currentBgReadingOutput
     }
-    
+
     // MARK: - private functions
-    
+
     /// will speak the text, using language code for pronunciation
     private func say(text:String, language:String?) {
         
@@ -184,7 +203,7 @@ class BGReadingSpeaker:NSObject {
 
     /// copied from Spike -
     /// if number is a Double value, and if it has no "." then a "." is added - otherwise returns number
-    private func assertFractionalDigits(number:String) -> String {
+    private static func assertFractionalDigits(number:String) -> String {
         
         let newNumber = number.replacingOccurrences(of: " ", with: "")
         
@@ -201,7 +220,7 @@ class BGReadingSpeaker:NSObject {
     /// copied from Spike
     /// - parameters:
     ///     - languageCode : must be format like en-EN
-    private func formatLocaleSpecific(number:String, languageCode:String?) -> String {
+    private static func formatLocaleSpecific(number:String, languageCode:String?) -> String {
         
         let newNumber = number.replacingOccurrences(of: " ", with: "")
         
@@ -217,7 +236,7 @@ class BGReadingSpeaker:NSObject {
     /// translates currentTrend string to local string
     ///
     /// example if currentTrend = trenddoubledown, then for en-EN, return dramatically downward
-    private func searchTranslationForCurrentTrend(currentTrend:String) -> String {
+    private static func searchTranslationForCurrentTrend(currentTrend:String) -> String {
         
         if (currentTrend == "NONE" || currentTrend == "NON COMPUTABLE") {
             return Texts_SpeakReading.trendnoncomputable

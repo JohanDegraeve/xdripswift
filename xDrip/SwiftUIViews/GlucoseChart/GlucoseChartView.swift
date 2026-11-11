@@ -101,6 +101,11 @@ struct GlucoseChartBasalLayout {
 /// The view does not load or mutate chart data. `GlucoseChartState` is the boundary between the
 /// cached state manager and this renderer.
 struct GlucoseChartView: View {
+    // This renderer is shared with extensions that do not include the app's UserDefaults helpers.
+    @AppStorage("smallBolusTreatmentThreshold") private var smallBolusTreatmentThreshold = 1.0
+    @AppStorage("smallCarbTreatmentThreshold") private var smallCarbTreatmentThreshold = 5.0
+    @AppStorage("useSmallDoseTreatmentScale") private var useSmallDoseTreatmentScale = false
+
     private var therapySeries = TherapyChartSeries()
     private var renderBasalDownwards = false
 
@@ -807,8 +812,8 @@ struct GlucoseChartView: View {
 
                 // Draw basal injections first so overlapping carbs and boluses remain in front.
                 treatmentSymbolMarks(points: visibleTreatmentPoints.basalInjections, systemImage: GlucoseChartTreatmentStyle.basalInjectionSymbol, size: { _ in treatmentSymbolSize() * GlucoseChartTreatmentStyle.basalInjectionScale }, color: GlucoseChartTreatmentStyle.basalInjectionColor, labelPosition: .bottom)
-                treatmentSymbolMarks(points: visibleTreatmentPoints.carbs, systemImage: GlucoseChartTreatmentStyle.carbsSymbol, size: GlucoseChartTreatmentStyle.carbsSymbolSizing.size, color: GlucoseChartTreatmentStyle.carbsColor, labelPosition: .top)
-                treatmentSymbolMarks(points: visibleTreatmentPoints.boluses, systemImage: GlucoseChartTreatmentStyle.bolusSymbol, size: GlucoseChartTreatmentStyle.bolusSymbolSizing.size, color: GlucoseChartTreatmentStyle.bolusColor, labelPosition: .bottom)
+                treatmentSymbolMarks(points: visibleTreatmentPoints.carbs, systemImage: GlucoseChartTreatmentStyle.carbsSymbol, size: carbsSymbolSizing.size, color: GlucoseChartTreatmentStyle.carbsColor, labelPosition: .top, minimumLabelValue: smallCarbTreatmentThreshold)
+                treatmentSymbolMarks(points: visibleTreatmentPoints.boluses, systemImage: GlucoseChartTreatmentStyle.bolusSymbol, size: bolusSymbolSizing.size, color: GlucoseChartTreatmentStyle.bolusColor, labelPosition: .bottom, minimumLabelValue: smallBolusTreatmentThreshold)
             }
 
             // Extra glucose-like data sets, such as original/raw glucose values, can provide lines, points or bordered points.
@@ -973,7 +978,9 @@ struct GlucoseChartView: View {
                         AxisValueLabel {
                             let shouldHideLabel = abs(visibleEndDate.distance(to: value)) < ConstantsGlucoseChartSwiftUI.xAxisLabelFirstClippingInMinutes || abs(visibleStartDate.distance(to: value)) < ConstantsGlucoseChartSwiftUI.xAxisLabelLastClippingInMinutes ? true : false
 
-                            Text(value.formatted(.dateTime.hour()))
+                            Text(value.formatted(.dateTime.hour(.defaultDigits(amPM: hoursToShow >= 8 ? .narrow : .abbreviated))))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
                                 .opacity(shouldHideLabel ? 0 : 1)
                                 .foregroundStyle(ConstantsGlucoseChartSwiftUI.xAxisLabelColor)
                                 .font(.footnote)
@@ -1171,7 +1178,8 @@ struct GlucoseChartView: View {
     /// Keep labels in the symbol's coordinate space. With the iOS 27 SDK, Charts annotations
     /// on custom symbols can be displaced from the mark. An overlay preserves the symbol's
     /// size and data position while anchoring the label to its actual top or bottom edge.
-    private func treatmentSymbolMarks(points: [GlucoseChartTreatmentPoint], systemImage: String?, size: @escaping (Double) -> Double, color: Color, labelPosition: VerticalAlignment?, verticalLabel: Bool = false) -> some ChartContent {
+    /// Boluses and carbs pass their own label thresholds; values equal to the threshold remain visible.
+    private func treatmentSymbolMarks(points: [GlucoseChartTreatmentPoint], systemImage: String?, size: @escaping (Double) -> Double, color: Color, labelPosition: VerticalAlignment?, verticalLabel: Bool = false, minimumLabelValue: Double? = nil) -> some ChartContent {
         ForEach(points) { point in
             PointMark(x: .value("Time", point.date), y: .value("BG", point.yValue))
                 .symbol {
@@ -1184,7 +1192,8 @@ struct GlucoseChartView: View {
                         }
                     }
                     .overlay(alignment: labelPosition == .bottom ? .bottom : .top) {
-                        if let labelPosition, let label = point.label {
+                        if let labelPosition, let label = point.label,
+                           minimumLabelValue.map({ !(point.treatmentValue < $0) }) ?? true {
                             Group {
                                 if verticalLabel {
                                     verticalTreatmentLabel(label)
@@ -1200,6 +1209,15 @@ struct GlucoseChartView: View {
                     }
                 }
         }
+    }
+
+    /// Resolve marker ranges at render time so cached treatments respond immediately to scale changes.
+    private var bolusSymbolSizing: GlucoseChartTreatmentSizeRange {
+        useSmallDoseTreatmentScale ? GlucoseChartTreatmentStyle.smallDoseBolusSymbolSizing : GlucoseChartTreatmentStyle.bolusSymbolSizing
+    }
+
+    private var carbsSymbolSizing: GlucoseChartTreatmentSizeRange {
+        useSmallDoseTreatmentScale ? GlucoseChartTreatmentStyle.smallDoseCarbsSymbolSizing : GlucoseChartTreatmentStyle.carbsSymbolSizing
     }
 
     /// Basal injection and BG check symbols follow the visible time range.

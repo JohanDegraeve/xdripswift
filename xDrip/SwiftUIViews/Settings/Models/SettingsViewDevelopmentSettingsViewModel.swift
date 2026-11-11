@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import os
 
 fileprivate enum Setting:Int, CaseIterable {
@@ -122,7 +123,11 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             nativeSettingsRow(id: "developer.OSLogEnabled", index: Setting.OSLogEnabled.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.libreLinkUpVersion", index: Setting.libreLinkUpVersion.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.careLinkVersion", index: Setting.careLinkVersion.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
-            nativeSettingsRow(id: "developer.CAGEMaxHours", index: Setting.CAGEMaxHours.rawValue, sectionID: sectionID, isVisible: developerRowsVisible)
+            nativeSettingsRow(id: "developer.CAGEMaxHours", index: Setting.CAGEMaxHours.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            SettingsRow(id: "advanced.libre3Credentials", title: TextsLibre3.localized("Libre 3 Credentials"),
+                control: .custom(content: {
+                    AnyView(NavigationLink(TextsLibre3.localized("Libre 3 Credentials")) { Libre3CredentialsView() })
+                }), isVisible: developerRowsVisible)
         ]
 
         let osAidLoopShareRows = [

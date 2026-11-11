@@ -69,7 +69,7 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
         case .enabledHealthKit:
-            return Texts_SettingsView.labelHealthKit
+            return Texts_Common.enable
         }
     }
     

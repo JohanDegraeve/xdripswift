@@ -253,6 +253,7 @@ private struct StatisticsCGMStatisticsPage: View {
 
 private struct StatisticsSummaryView: View {
     @AppStorage("useIFCCA1C") private var usesIFCC = false
+    @AppStorage("statisticsUseHbA1c") private var useHbA1c = false
     let analytics: GlucoseReportAnalytics
     var columnCount = 2
 
@@ -264,7 +265,9 @@ private struct StatisticsSummaryView: View {
     var body: some View {
         LazyVGrid(columns: columns, spacing: tileSpacing) {
             tile(Texts_Common.averageStatistics, GlucoseReportFormatting.glucose(analytics.averageMgDl, usesMgDl: analytics.usesMgDl), Texts_Common.statisticsAverageGlucose)
-            tile(Texts_Common.statisticsGMI, GlucoseReportFormatting.gmi(analytics.gmiPercentage, usesIFCC: usesIFCC), Texts_Common.statisticsCGMEstimate)
+            tile(useHbA1c ? Texts_Common.a1cStatistics : Texts_Common.statisticsGMI,
+                GlucoseReportFormatting.gmi(GlucoseReportClinicalMath.statisticsPercentage(forAverageMgDl: analytics.averageMgDl, useHbA1c: useHbA1c), usesIFCC: usesIFCC),
+                useHbA1c ? Texts_Common.statisticsEstimatedA1c : Texts_Common.statisticsCGMEstimate)
             tile(
                 Texts_Common.cvStatistics,
                 GlucoseReportFormatting.percentage(analytics.coefficientOfVariation),
@@ -481,17 +484,18 @@ private struct StatisticsAGPChart: View {
 
 private struct StatisticsTrendCard: View {
     @AppStorage("useIFCCA1C") private var usesIFCC = false
+    @AppStorage("statisticsUseHbA1c") private var useHbA1c = false
     let trendPoints: [GlucoseReportTrendPoint]
 
     var body: some View {
         VStack(spacing: 10) {
-            StatisticsSection(title: Texts_Common.statisticsGMITrend, detail: trendIntervalTitle) {
+            StatisticsSection(title: estimateTrendTitle, detail: trendIntervalTitle) {
                 StatisticsCard {
                     trendChart(
-                        title: Texts_Common.statisticsGMITrend,
+                        title: estimateTrendTitle,
                         yDomain: gmiDomain,
                         decimalPlaces: usesIFCC ? 0 : 1,
-                        value: { GlucoseReportClinicalMath.gmiValue($0.gmiPercentage, usesIFCC: usesIFCC) },
+                        value: { GlucoseReportClinicalMath.gmiValue(estimatePercentage($0), usesIFCC: usesIFCC) },
                         labelText: { GlucoseReportFormatting.number($0, decimalPlaces: usesIFCC ? 0 : 1) + (usesIFCC ? " mmol/mol" : "%") }
                     )
                 }
@@ -631,8 +635,16 @@ private struct StatisticsTrendCard: View {
         }
     }
 
+    private var estimateTrendTitle: String {
+        useHbA1c ? Texts_Common.statisticsEstimatedA1cTrend : Texts_Common.statisticsGMITrend
+    }
+
+    private func estimatePercentage(_ point: GlucoseReportTrendPoint) -> Double {
+        GlucoseReportClinicalMath.statisticsPercentage(forAverageMgDl: point.averageMgDl, useHbA1c: useHbA1c)
+    }
+
     private var gmiDomain: ClosedRange<Double> {
-        GlucoseReportClinicalMath.gmiDomain(percentages: trendPoints.map(\.gmiPercentage), usesIFCC: usesIFCC)
+        GlucoseReportClinicalMath.gmiDomain(percentages: trendPoints.map(estimatePercentage), usesIFCC: usesIFCC)
     }
 
     private func upperDomain(values: [Double], minimum: Double) -> ClosedRange<Double> {

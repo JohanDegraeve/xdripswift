@@ -289,7 +289,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
         }
 
         if !alertKindValue.supportsAlertSchedules() {
-            return [.isDisabled, .alertType]
+            return alertKindValue.needsAlertValue() ? [.isDisabled, .alertType, .value] : [.isDisabled, .alertType]
         }
 
         if alertKindValue.needsAlertValue() || alertType.enabled {
@@ -486,13 +486,13 @@ final class AlertEntryEditorViewModel: ObservableObject {
     func title(for setting: AlertEntryEditorSetting) -> String {
         switch setting {
         case .isDisabled:
-            return Texts_Common.enabled
+            return Texts_Common.enable
         case .start:
             return Texts_Alerts.alertStart
         case .alertType:
             return Texts_Alerts.alerttype
         case .value:
-            return Texts_Alerts.alertValue + alertKindValue.configurationFamilySuffix()
+            return alertKindValue == .sensorEndingSoon ? Texts_Alerts.hoursBeforeExpiry : Texts_Alerts.alertValue + alertKindValue.configurationFamilySuffix()
         case .triggerValue:
             return triggerValueText
         }
@@ -580,7 +580,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
 
         return SettingsTextEntryContent(
             title: title,
-            message: message,
+            message: alertKindValue == .sensorEndingSoon ? Texts_Alerts.sensorExpiryHoursHelp : message,
             keyboardType: keyboardType,
             text: valueIsBg
                 ? Double(currentValue).mgDlToMmolAndToString(mgDl: isMgDl)

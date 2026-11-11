@@ -12,8 +12,10 @@ import SwiftUI
 struct LiveActivitySettingsPreview: View {
     @AppStorage(UserDefaults.Key.liveActivityShowIOBCOB.rawValue) private var showIOBCOB = true
     @ObservedObject private var liveActivityManager = LiveActivityManager.shared
+    // hide the preview when disabled without discarding the selected style
+    @AppStorage(UserDefaults.Key.liveActivitiesEnabled.rawValue) private var liveActivitiesEnabled = false
     @AppStorage(UserDefaults.Key.liveActivityType.rawValue)
-    private var liveActivityTypeRawValue = LiveActivityType.disabled.rawValue
+    private var liveActivityTypeRawValue = LiveActivityType.normal.rawValue
     @AppStorage(UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue) private var isMgDl = true
 
     private var liveActivityType: LiveActivityType {
@@ -47,7 +49,7 @@ struct LiveActivitySettingsPreview: View {
     }
 
     var body: some View {
-        if liveActivityType != .disabled {
+        if liveActivitiesEnabled {
             LiveActivityViewContentState(state: previewState)
                 .frame(maxWidth: .infinity)
                 .frame(height: liveActivityPreviewHeight)
@@ -65,8 +67,10 @@ struct LiveActivitySettingsPreview: View {
 struct CarPlayLiveActivitySettingsPreview: View {
     @AppStorage(UserDefaults.Key.liveActivityShowIOBCOB.rawValue) private var showIOBCOB = true
     @ObservedObject private var liveActivityManager = LiveActivityManager.shared
+    // hide the preview when disabled without discarding the selected style
+    @AppStorage(UserDefaults.Key.liveActivitiesEnabled.rawValue) private var liveActivitiesEnabled = false
     @AppStorage(UserDefaults.Key.liveActivityType.rawValue)
-    private var liveActivityTypeRawValue = LiveActivityType.disabled.rawValue
+    private var liveActivityTypeRawValue = LiveActivityType.normal.rawValue
     @AppStorage(UserDefaults.Key.carPlayLiveActivityType.rawValue)
     private var carPlayLiveActivityTypeRawValue = CarPlayLiveActivityType.chart.rawValue
     @AppStorage(UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue) private var isMgDl = true
@@ -92,7 +96,7 @@ struct CarPlayLiveActivitySettingsPreview: View {
     }
 
     var body: some View {
-        if #available(iOS 26.0, *), liveActivityType != .disabled {
+        if #available(iOS 26.0, *), liveActivitiesEnabled {
             LiveActivityViewContentActivityFamiliesState(state: previewState)
                 // Use a representative CarPlay size instead of the full Settings row width.
                 .frame(width: 240, height: 100)

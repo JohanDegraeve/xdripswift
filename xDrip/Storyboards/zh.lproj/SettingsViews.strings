@@ -30,7 +30,6 @@
 "settingsviews_alerts_section_footer" = "警报定义应用何时针对血糖水平、缺失读数和其他情况通知你。";
 "settingsviews_sectiontitlehealthkit" = "苹果健康";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "上传";
 "settingsviews_dexcomShareUploadSerialNumber" = "序列号";
 "settingsviews_givedexcomShareUploadSerialNumber" = "输入Dexcom Share 序列号";
 "settingsviews_useUSDexcomShareurl" = "使用美国德康服务器";
@@ -39,7 +38,6 @@
 "settingsviews_giveDexcomSharePassword" = "输入Dexcom APP密码";
 "settingsviews_sectiontitlenightscout" = "Nightscout远程监控";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "上传选项";
-"settingsviews_nightscoutEnabled" = "Nightscout 已启用";
 "settingsviews_nightscoutUrl" = "Url(网址)";
 "settingsviews_giveNightscoutUrl" = "输入 Nightscout 网址";
 "settingsviews_nightscoutAPIKey" = "API 密钥";
@@ -174,7 +172,6 @@
 "volumeTestSoundPlayer" = "静音模式开启时";
 
 /// healthkit settings, literally 'healthkit'
-"settingsviews_healthkit" = "写入 Apple Health";
 
 /// bluetooth settings, section title - also used in bluetooth peripheral view, eg when viewing M5Stack details. This is the title of the first section
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
@@ -724,3 +721,33 @@
 "homeScreen.basalTop" = "顶部";
 "homeScreen.basalBottom" = "底部";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "葡萄糖图表";
+
+"therapy.none" = "无";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "治疗阈值";
+"therapy.smallBolusThreshold" = "小剂量推注";
+"therapy.smallCarbThreshold" = "少量碳水";
+"therapy.treatmentThresholdsExplanation" = "图表隐藏低于相应阈值的推注和碳水数值。推注阈值也用于定义治疗列表中的小剂量推注。选择无可显示所有数值。";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "血糖估算";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "治疗缩放";
+"therapy.scaleStandard" = "标准";
+"therapy.scaleSmallDoses" = "小剂量";
+"therapy.treatmentScaleExplanation" = "小剂量使少量治疗的标记更清晰。推注标记在0.1–2.0U之间缩放，碳水标记在1–50g之间缩放。超过范围的量使用最大标记。";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "精简";
+"settingsviews_liveActivityTypeNormal" = "标准";
+"settingsviews_liveActivityTypeLarge" = "大";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Dexcom Share 上传";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "朗读开场语";
+"speak.preview" = "预览血糖播报";

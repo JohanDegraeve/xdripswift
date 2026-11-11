@@ -15,3 +15,10 @@
 "bgRangeUrgent" = "Urgente";
 "bgRangeNotUrgent" = "No urgente";
 "bgRangeInRange" = "En rango";
+
+"alsoCollectedByWatch" = "También recogida por el Watch";
+
+// Direct to Watch setup and diagnosis
+"receivedViaWatchAtFooterFormat" = "Recibido mediante Watch a las %@";
+"backfilledViaWatchAtFooterFormat" = "Recuperado mediante Watch a las %@";
+"receivedViaWatch" = "Recibido mediante Watch";

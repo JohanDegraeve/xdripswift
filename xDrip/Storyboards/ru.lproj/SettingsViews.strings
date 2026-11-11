@@ -59,9 +59,7 @@
 "settingsviews_alert_types_section_footer" = "Типы сигналов определяют поведение сигналов, включая звук, вибрацию, повтор и обход беззвучного режима.";
 "settingsviews_alerts_section_footer" = "Сигналы определяют, когда приложение должно уведомлять о уровнях глюкозы, пропущенных показаниях и других условиях.";
 "settingsviews_sectiontitlehealthkit" = "Apple Здоровье";
-"settingsviews_healthkit" = "Записывать в Здоровье";
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Загружать";
 "settingsviews_dexcomShareUploadSerialNumber" = "Серийный номер приемника";
 "settingsviews_useUSDexcomShareurl" = "Серверы US";
 "settingsviews_dexcomShareAccountName" = "Имя аккаунта";
@@ -70,7 +68,6 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Введите Dexcom приемника серийный номер";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutUploadOptionsSectionTitle" = "Параметры загрузки";
-"settingsviews_nightscoutEnabled" = "Интеграция Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 /* Enable the configured time schedule for uploads or spoken glucose readings. Does not enable the underlying feature; its master switch remains separate. */
 "settingsviews_enableSchedule" = "Включить расписание";
@@ -519,3 +516,33 @@
 "homeScreen.basalTop" = "Сверху";
 "homeScreen.basalBottom" = "Снизу";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "График глюкозы";
+
+"therapy.none" = "Нет";
+
+/* Treatment label thresholds. Only the bolus threshold also affects list classification. None disables label hiding. */
+"therapy.treatmentThresholds" = "Пороги терапии";
+"therapy.smallBolusThreshold" = "Мал. бол.";
+"therapy.smallCarbThreshold" = "Мало угл.";
+"therapy.treatmentThresholdsExplanation" = "Значения болюсов и углеводов ниже порогов скрыты на графике. Порог болюса также определяет малые болюсы в списке терапии. «Нет» показывает все значения.";
+
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
+
+"settingsviews_statisticsEstimate" = "Оценка глюкозы";
+
+/* Treatment marker sizing only. Standard keeps the existing ranges; Small Doses uses larger minimum markers. */
+"therapy.treatmentScale" = "Шкала терапии";
+"therapy.scaleStandard" = "Обыч.";
+"therapy.scaleSmallDoses" = "Мал. дозы";
+"therapy.treatmentScaleExplanation" = "Малые дозы делают малые маркеры заметнее. Болюсы: 0.1–2.0U; углеводы: 1–50g. Большие количества используют самый большой маркер.";
+
+/* Live Activity styles */
+"settingsviews_liveActivityTypeMinimal" = "Минимальный";
+"settingsviews_liveActivityTypeNormal" = "Обычный";
+"settingsviews_liveActivityTypeLarge" = "Большой";
+
+/* Dexcom Share upload enable section heading */
+"settingsviews_dexcomShareUploadSectionTitle" = "Загрузка в Dexcom Share";
+
+/* Speak Glucose wording and preview. */
+"speak.introduction" = "Произносить вступление";
+"speak.preview" = "Прослушать пример озвучивания глюкозы";

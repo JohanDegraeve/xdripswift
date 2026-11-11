@@ -172,6 +172,95 @@ final class BatteryHistoryTests: XCTestCase {
         XCTAssertNil(decoded.profiles)
     }
 
+    func testInactiveHistoryEndsAtLastReadingAndPreservesGaps() throws {
+        let core = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let device = Libre2HeartBeat(address: "inactive-history", name: "History Test", alias: nil,
+                                    nsManagedObjectContext: core.mainManagedObjectContext)
+        device.blePeripheral.shouldconnect = false
+        XCTAssertTrue(core.saveChangesSynchronously())
+        let manager = BatteryHistoryManager(coreDataManager: core)
+        let lastObservation = now.addingTimeInterval(-TimeInterval(days: 60))
+        // Sparse observations leave genuine gaps inside the ten-day recorded lifetime.
+        let dates = [10.0, 6.0, 1.0, 0.0].map { lastObservation.addingTimeInterval(-TimeInterval(days: $0)) }
+        for date in dates {
+            manager.record(peripheralObjectID: device.blePeripheral.objectID, observedAt: date,
+                           observation: .percentage(value: 42, producer: .genericHeartbeat))
+        }
+        let points = manager.history(peripheralObjectID: device.blePeripheral.objectID)
+        let information = try XCTUnwrap(manager.information(
+            peripheralObjectID: device.blePeripheral.objectID, now: now, lastObservation: points.last?.observedAt
+        ))
+        XCTAssertFalse(information.isEnabled)
+        XCTAssertEqual(information.chartEndDate, lastObservation)
+        XCTAssertEqual(points.map(\.observedAt), dates)
+        let first = try XCTUnwrap(points.first?.observedAt)
+        let ranges = BatteryHistoryRange.available(firstObservation: first, endDate: information.chartEndDate)
+        XCTAssertEqual(ranges, [.days(3), .days(7), .lifetime(TimeInterval(days: 10))])
+        XCTAssertEqual(ranges.map { range in
+            points.filter { range.domain(endDate: information.chartEndDate).contains($0.observedAt) }.count
+        }, [2, 3, 4])
+        for range in ranges {
+            let domain = range.domain(endDate: information.chartEndDate)
+            XCTAssertEqual(domain.upperBound, lastObservation)
+            XCTAssertTrue(domain.contains(lastObservation))
+            XCTAssertFalse(domain.contains(now))
+        }
+    }
+
+    func testEnabledStateControlsChartEndAndDexcomAgeOnRefresh() throws {
+        let core = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let g6 = DexcomG5(address: "history-g6", name: "DexcomAB", alias: nil,
+                          nsManagedObjectContext: core.mainManagedObjectContext)
+        let g7 = DexcomG7(address: "history-g7", name: "DXCMAB", alias: nil,
+                          nsManagedObjectContext: core.mainManagedObjectContext)
+        let lastObservation = now.addingTimeInterval(-TimeInterval(days: 60))
+        let start = lastObservation.addingTimeInterval(-TimeInterval(days: 10))
+        g6.transmitterStartDate = start
+        g7.sensorStartDate = start
+        XCTAssertTrue(core.saveChangesSynchronously())
+        let manager = BatteryHistoryManager(coreDataManager: core)
+        for peripheral in [g6.blePeripheral, g7.blePeripheral] {
+            // No live Bluetooth connection is needed to keep an enabled device anchored to now.
+            for isEnabled in [true, false, true] {
+                peripheral.shouldconnect = isEnabled
+                let information = try XCTUnwrap(manager.information(
+                    peripheralObjectID: peripheral.objectID, now: now, lastObservation: lastObservation
+                ))
+                XCTAssertEqual(information.isEnabled, isEnabled)
+                XCTAssertEqual(information.chartEndDate, isEnabled ? now : lastObservation)
+                XCTAssertEqual(try XCTUnwrap(information.transmitterLifetime),
+                               TimeInterval(days: isEnabled ? 70 : 10), accuracy: 0.001)
+            }
+        }
+    }
+
+    func testInactiveEmptyHistoryFallsBackToNowAndSingleReadingHasMinimumWidth() throws {
+        let core = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+        let device = Libre2HeartBeat(address: "empty-history", name: "History Test", alias: nil,
+                                    nsManagedObjectContext: core.mainManagedObjectContext)
+        device.blePeripheral.shouldconnect = false
+        XCTAssertTrue(core.saveChangesSynchronously())
+        let manager = BatteryHistoryManager(coreDataManager: core)
+        XCTAssertTrue(manager.history(peripheralObjectID: device.blePeripheral.objectID).isEmpty)
+        let emptyInformation = try XCTUnwrap(manager.information(peripheralObjectID: device.blePeripheral.objectID, now: now))
+        XCTAssertFalse(emptyInformation.isEnabled)
+        XCTAssertEqual(emptyInformation.chartEndDate, now)
+
+        let observedAt = now.addingTimeInterval(-TimeInterval(days: 60))
+        manager.record(peripheralObjectID: device.blePeripheral.objectID, observedAt: observedAt,
+                       observation: .percentage(value: 42, producer: .genericHeartbeat))
+        let points = manager.history(peripheralObjectID: device.blePeripheral.objectID)
+        XCTAssertEqual(points.count, 1)
+        let information = try XCTUnwrap(manager.information(
+            peripheralObjectID: device.blePeripheral.objectID, now: now, lastObservation: points.last?.observedAt
+        ))
+        let ranges = BatteryHistoryRange.available(firstObservation: observedAt, endDate: information.chartEndDate)
+        XCTAssertEqual(ranges, [.lifetime(0)])
+        let domain = try XCTUnwrap(ranges.last).domain(endDate: information.chartEndDate)
+        XCTAssertEqual(domain.upperBound, observedAt)
+        XCTAssertEqual(domain.upperBound.timeIntervalSince(domain.lowerBound), 6 * 3600, accuracy: 0.001)
+    }
+
     func testAdaptiveRangesReplaceNextUnavailableFixedRangeWithLifetime() {
         XCTAssertEqual(labels(afterDays: 2), ["2d"])
         XCTAssertEqual(labels(afterDays: 3), ["3d"])
@@ -195,7 +284,7 @@ final class BatteryHistoryTests: XCTestCase {
         ] {
             let ranges = BatteryHistoryRange.available(
                 firstObservation: now.addingTimeInterval(-lifetime),
-                now: now
+                endDate: now
             )
 
             XCTAssertEqual(Set(ranges.map(\.id)).count, ranges.count)
@@ -203,7 +292,7 @@ final class BatteryHistoryTests: XCTestCase {
     }
 
     func testLifetimeChartHasSixHourMinimumDomain() {
-        let range = BatteryHistoryRange.lifetime(30 * 60).domain(now: now)
+        let range = BatteryHistoryRange.lifetime(30 * 60).domain(endDate: now)
         XCTAssertEqual(range.upperBound.timeIntervalSince(range.lowerBound), 6 * 3600, accuracy: 0.001)
     }
 
@@ -439,6 +528,6 @@ final class BatteryHistoryTests: XCTestCase {
     }
 
     private func labels(after lifetime: TimeInterval) -> [String] {
-        BatteryHistoryRange.available(firstObservation: now.addingTimeInterval(-lifetime), now: now).map(\.label)
+        BatteryHistoryRange.available(firstObservation: now.addingTimeInterval(-lifetime), endDate: now).map(\.label)
     }
 }

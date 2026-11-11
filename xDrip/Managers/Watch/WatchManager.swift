@@ -7,6 +7,7 @@
 //
 
 import Combine
+import CoreData
 import Foundation
 import OSLog
 import WatchConnectivity
@@ -15,10 +16,31 @@ import WidgetKit
 // WatchConnectivity delegate callbacks can trigger async AGP generation
 // mutable watch payloads are still committed back on the main queue
 final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
+    /// Returns only identities confirmed in the phone's persistent glucose store.
+    var importDirectWatchReadings: (([DirectWatchReading]) -> [String])?
+    private var directWatchObservers: [NSObjectProtocol] = []
+    private var directWatchConfigurationSendScheduled = false
+    private var directWatchConfigurationHasPublished = false
+
     // MARK: - private properties
 
     /// a watch connectivity session instance
-    private var session: WCSession
+    private let session: WCSession
+
+    // Only the configuration sender's serial queue accesses this transfer. Replace obsolete
+    // queued setup snapshots, while leaving reading acknowledgements and log requests alone.
+    private var configurationTransfer: WCSessionUserInfoTransfer?
+    private lazy var configurationSender = DirectWatchConfigurationSender { [weak self] payload, changed in
+        guard let self, self.session.activationState == .activated else { return false }
+        if changed {
+            self.configurationTransfer?.cancel()
+            self.configurationTransfer = self.session.transferUserInfo(payload)
+        }
+        if self.session.isReachable {
+            self.session.sendMessage(payload, replyHandler: nil, errorHandler: nil)
+        }
+        return true
+    }
 
     /// prevents duplicate activate calls while WatchConnectivity is already processing one
     private let sessionActivationLock = NSLock()
@@ -88,8 +110,141 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
                 self?.processWatchUpdate(updateTypes: [.status], forceComplicationUpdate: false)
             }
 
+        // Alarm edits must reach an offline-capable Watch without waiting for a new reading.
+        // Inspect saved objects on their context's queue, then build the value snapshot on main.
+        directWatchObservers.append(NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: nil, queue: nil) { [weak self] notification in
+            let keys = [NSInsertedObjectsKey, NSUpdatedObjectsKey, NSDeletedObjectsKey]
+            let objects = keys.flatMap { notification.userInfo?[$0] as? Set<NSManagedObject> ?? [] }
+            guard objects.contains(where: { $0 is AlertEntry }) else { return }
+            DispatchQueue.main.async { self?.sendDirectWatchConfiguration() }
+        })
         processWatchUpdate(updateTypes: [.status, .bgReadings], forceComplicationUpdate: false)
+        directWatchObservers.append(NotificationCenter.default.addObserver(forName: DirectWatchSettings.changed, object: nil, queue: .main) { [weak self] _ in self?.sendDirectWatchConfiguration() })
+        directWatchObservers.append(NotificationCenter.default.addObserver(forName: DirectWatchSettings.requestLogs, object: nil, queue: .main) { [weak self] _ in
+            guard let self, self.session.activationState == .activated else {
+                DirectWatchSettings.recordLogRequest(queued: false)
+                return
+            }
+            let request = DirectWatchCompatibility.outgoing(["directWatchRequestLogs": true])
+            if self.session.isReachable {
+                self.session.sendMessage(request, replyHandler: nil, errorHandler: { _ in self.session.transferUserInfo(request) })
+            } else { self.session.transferUserInfo(request) }
+            DirectWatchSettings.recordLogRequest(queued: true)
+        })
     }
+
+    private func sendDirectWatchConfiguration() {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { self.sendDirectWatchConfiguration() }
+            return
+        }
+        guard !directWatchConfigurationSendScheduled else { return }
+        directWatchConfigurationSendScheduled = true
+        // Sensor reconciliation can stop and recreate the internal sensor synchronously.
+        // Publish its settled state on the next main-queue turn, not the intermediate nil.
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.directWatchConfigurationSendScheduled = false
+            self.publishDirectWatchConfiguration()
+        }
+    }
+
+    private func publishDirectWatchConfiguration() {
+        guard session.activationState == .activated else { return }
+        if !directWatchConfigurationHasPublished {
+            // Invalidate snapshots still queued from the previous phone process, including
+            // suspension messages emitted by older builds during sensor reconciliation.
+            DirectWatchSettings.advanceRevision()
+            directWatchConfigurationHasPublished = true
+        }
+        var configuration = DirectWatchSettings.configuration
+        var unavailableReason: String?
+        let activeSensorStart = sensorsAccessor.fetchActiveSensor()?.startDate
+        if var current = configuration {
+            let selected = BLEPeripheralAccessor(coreDataManager: coreDataManager).getBLEPeripherals().first { $0.shouldconnect && $0.transmitterId == current.transmitterID }
+            let g6 = selected?.dexcomG5
+            let g7 = selected?.dexcomG7
+            // Suspend collection without deleting the user's setup or testing controls.
+            if !UserDefaults.standard.isMaster { unavailableReason = TextsDirectWatch.masterRequired }
+            else if current.transmitterFamily == .g6 && g6 == nil { unavailableReason = TextsDirectWatch.g6Mismatch }
+            else if current.transmitterFamily == .g7 && g7 == nil { unavailableReason = TextsDirectWatch.g7Mismatch }
+            else if current.transmitterFamily == .g7 && g7?.useOtherApp == true { unavailableReason = TextsDirectWatch.primaryRequired }
+            else if current.transmitterFamily == .g6 && selected?.webOOPEnabled != true { unavailableReason = TextsDirectWatch.nativeG6Required }
+            else if current.transmitterFamily == .g7 && (g7?.sensorCode?.count != 4 || g7?.sensorCode?.allSatisfy(\.isNumber) != true) { unavailableReason = TextsDirectWatch.pairingCodeRequired }
+            else if (g6?.effectiveDexcomG6BluetoothSlot().rawValue ?? g7?.effectiveDexcomG7BluetoothSlot().rawValue) == current.slot { unavailableReason = TextsDirectWatch.slotsConflict }
+            else if current.slot == 3 && current.transmitterFamily == .g6 && g6?.isAnubis != true { unavailableReason = TextsDirectWatch.anubisRequired }
+            else if activeSensorStart == nil { unavailableReason = TextsDirectWatch.noActiveSensor }
+            current.sensorStartDate = activeSensorStart ?? current.sensorStartDate
+            if current.transmitterFamily == .g7 { current.pairingCode = g7?.sensorCode }
+            current.isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+            current.low = UserDefaults.standard.lowMarkValue
+            current.high = UserDefaults.standard.highMarkValue
+            let entries = AlertEntriesAccessor(coreDataManager: coreDataManager)
+            let types = AlertTypesAccessor(coreDataManager: coreDataManager)
+            func schedule(_ kind: AlertKind) -> [DirectWatchAlertEntry] {
+                entries.getAllEntries(forAlertKind: kind, alertTypesAccessor: types).map {
+                    DirectWatchAlertEntry(startMinute: Int($0.start), threshold: Double($0.value))
+                }
+            }
+            current.urgentLowSchedule = schedule(.verylow)
+            current.lowSchedule = schedule(.low)
+            if unavailableReason == nil && current != configuration {
+                DirectWatchSettings.save(current)
+                return
+            }
+            configuration = unavailableReason == nil ? current : nil
+        }
+        if UserDefaults.standard.string(forKey: DirectWatchSettings.unavailableReasonKey) != unavailableReason {
+            trace("Direct to Watch availability: %{public}@", log: log, category: ConstantsLog.categoryWatchManager, type: .info, unavailableReason ?? "ready")
+            // Availability transitions must also be ordered, so a delayed suspension cannot
+            // override a newer ready configuration received through another WCSession channel.
+            DirectWatchSettings.advanceRevision()
+        }
+        UserDefaults.standard.set(unavailableReason, forKey: DirectWatchSettings.unavailableReasonKey)
+        var payload: [String: Any] = ["directWatchEnabled": configuration != nil,
+                                      "directWatchConfigured": DirectWatchSettings.configuration != nil,
+                                      "directWatchRevision": UserDefaults.standard.double(forKey: DirectWatchSettings.revisionKey),
+                                      "directWatchPhonePaused": DirectWatchSettings.configuration.map { DirectWatchSettings.phoneIsPaused($0.transmitterID) } ?? false]
+        payload.merge(DirectWatchSettings.collectionControl?.payload ?? [:], uniquingKeysWith: { _, new in new })
+        if let unavailableReason { payload["directWatchUnavailableReason"] = unavailableReason }
+        if let configuration, let data = try? JSONEncoder().encode(configuration) { payload["directWatchConfiguration"] = data }
+        payload = DirectWatchCompatibility.outgoing(payload)
+        // Device crash reports show updateApplicationContext blocking inside WCSession's
+        // synchronous applicationContext getter until iOS kills the main thread. Use the
+        // existing queued-message receiver instead, with revisions still ordering snapshots.
+        // Build the payload on main, where its Core Data inputs belong, then send only values.
+        configurationSender.enqueue(payload)
+    }
+
+    private func receiveDirectWatchPayload(_ payload: [String: Any], reply: (([String: Any]) -> Void)? = nil) {
+        let payload = DirectWatchCompatibility.normalized(payload)
+        DispatchQueue.main.async {
+            if let control = DirectWatchCollectionControl.decode(payload) {
+                DirectWatchSettings.receiveCollectionControl(control)
+            }
+            if let event = DirectWatchConnectionEvent.decode(payload) { DirectWatchSettings.recordConnection(event) }
+            if let status = payload["directWatchStatus"] as? String {
+                UserDefaults.standard.set(String(status.prefix(500)), forKey: DirectWatchSettings.lastStatusKey)
+                UserDefaults.standard.set(Date(), forKey: DirectWatchSettings.lastStatusDateKey)
+                DirectWatchSettings.recordContact()
+            }
+            guard let data = payload["directWatchReadings"] as? Data, data.count <= 100_000,
+                  let readings = try? JSONDecoder().decode([DirectWatchReading].self, from: data), readings.count <= ConstantsDirectWatch.maximumSyncBatchReadings else {
+                reply?(DirectWatchCompatibility.outgoing(DirectWatchSettings.collectionControl?.payload ?? [:]))
+                return
+            }
+            let acknowledged = self.importDirectWatchReadings?(readings) ?? []
+            if let latest = readings.filter({ acknowledged.contains($0.id) }).map(\.measuredAt).max() {
+                DirectWatchSettings.recordContact(latestReadingAt: latest)
+            }
+            let response = DirectWatchCompatibility.outgoing(["directWatchAcknowledged": acknowledged].merging(DirectWatchSettings.collectionControl?.payload ?? [:], uniquingKeysWith: { _, new in new }))
+            if let reply { reply(response) }
+            else if !acknowledged.isEmpty { self.session.transferUserInfo(response) }
+            trace("Direct to Watch batch received: %{public}@ readings, %{public}@ acknowledged", log: self.log, category: ConstantsLog.categoryWatchManager, type: .info, readings.count.description, acknowledged.count.description)
+            self.processWatchUpdate(updateTypes: [.status, .bgReadings], forceComplicationUpdate: false)
+        }
+    }
+
 
     // MARK: - overriden functions
 
@@ -156,6 +311,7 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
             bgReadings = currentBgReadings()
         }
 
+        sendDirectWatchConfiguration()
         sendUpdateToWatch(updateTypes: updateTypes, forceComplicationUpdate: forceComplicationUpdate)
     }
 
@@ -218,6 +374,15 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
                 if peripheral?.dexcomG5?.isAnubis == true {
                     status.activeSensorDescription = DexcomProductNameResolver.anubisTitle
                 }
+            }
+        }
+        if UserDefaults.standard.isMaster {
+            let peripheral = BLEPeripheralAccessor(coreDataManager: coreDataManager)
+                .getBLEPeripherals()
+                .first { $0.shouldconnect && ($0.dexcomG5 != nil || $0.dexcomG7 != nil) }
+            if let peripheral {
+                status.phoneBLECollectionPaused = DirectWatchSettings.phoneIsPaused(peripheral.transmitterId ?? "")
+
             }
         }
         status.preferSensorCountdown = UserDefaults.standard.preferSensorCountdown
@@ -389,6 +554,7 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
     }
 
     deinit {
+        directWatchObservers.forEach { NotificationCenter.default.removeObserver($0) }
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutDeviceStatusWasUpdated.rawValue)
     }
 }
@@ -399,13 +565,13 @@ extension WatchManager: WCSessionDelegate {
     func sessionDidBecomeInactive(_: WCSession) {}
 
     func sessionDidDeactivate(_: WCSession) {
-        session = WCSession.default
         session.delegate = self
         activateSessionIfNeeded()
     }
 
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         completeSessionActivationRequest()
+        sendDirectWatchConfiguration()
 
         if let error {
             trace("watch session activation failed, error = %{public}@", log: log, category: ConstantsLog.categoryWatchManager, type: .error, troubleshooting: .detailed(.integration(name: .watch, activity: .failed)), error.localizedDescription)
@@ -422,6 +588,8 @@ extension WatchManager: WCSessionDelegate {
 
     // process any received messages from the watch app
     func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        receiveDirectWatchPayload(message)
+        sendDirectWatchConfiguration()
         // check which type of update the Watch is requesting and call the correct sending function as needed
         if let requestWatchUpdate = message["requestWatchUpdate"] as? String {
             switch requestWatchUpdate {
@@ -456,7 +624,44 @@ extension WatchManager: WCSessionDelegate {
         }
     }
 
-    func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {}
+    func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        receiveDirectWatchPayload(userInfo)
+    }
+
+    func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+        let message = DirectWatchCompatibility.normalized(message)
+        if let probe = message["directWatchLinkProbe"] as? Double {
+            DispatchQueue.main.async {
+                if let control = DirectWatchCollectionControl.decode(message) {
+                    DirectWatchSettings.receiveCollectionControl(control)
+                }
+                if let event = DirectWatchConnectionEvent.decode(message) { DirectWatchSettings.recordConnection(event) }
+                DirectWatchSettings.recordContact()
+                let response: [String: Any] = ["directWatchLinkProbe": probe]
+                    .merging(DirectWatchSettings.collectionControl?.payload ?? [:], uniquingKeysWith: { _, new in new })
+                replyHandler(DirectWatchCompatibility.outgoing(response))
+            }
+            return
+        }
+        receiveDirectWatchPayload(message, reply: replyHandler)
+    }
+
+    func session(_: WCSession, didReceive file: WCSessionFile) {
+        guard DirectWatchCompatibility.normalized(file.metadata ?? [:])["directWatchLog"] as? Bool == true else { return }
+        do {
+            let attributes = try FileManager.default.attributesOfItem(atPath: file.fileURL.path)
+            guard let size = (attributes[.size] as? NSNumber)?.intValue, size > 0, size <= 2_000_000 else {
+                throw CocoaError(.fileReadCorruptFile)
+            }
+            try Data(contentsOf: file.fileURL).write(to: DirectWatchSettings.receivedLogURL, options: .atomic)
+            // WCSession owns this temporary URL only during the callback. Save it before
+            // publishing receipt on the main queue so the share action can use it immediately.
+            DispatchQueue.main.async { DirectWatchSettings.recordLogsReceived() }
+        } catch {
+            DispatchQueue.main.async { DirectWatchSettings.recordLogRequest(queued: false) }
+            trace("Direct to Watch log import failed: %{public}@", log: log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
+        }
+    }
 
     func session(_: WCSession, didReceiveMessageData _: Data) {}
 
@@ -465,6 +670,50 @@ extension WatchManager: WCSessionDelegate {
             DispatchQueue.main.async {
                 self.processWatchUpdate(updateTypes: [.status, .bgReadings], forceComplicationUpdate: false)
             }
+        }
+    }
+}
+
+/// Keep framework calls off main and retain at most the latest waiting configuration.
+/// The lock protects the handoff only. A slow framework call never holds it, so UI and
+/// Bluetooth callers can continue replacing the pending snapshot without waiting.
+final class DirectWatchConfigurationSender {
+    private let queue = DispatchQueue(label: "DirectWatchConfigurationSender", qos: .utility)
+    private let lock = NSLock()
+    private var pending: [String: Any]?
+    private var sending = false
+    private var lastSent: [String: Any]?
+    private let send: ([String: Any], Bool) -> Bool
+
+    /// The changed flag requests replacement of the queued configuration. Return false
+    /// when the session is inactive, so the next activation can retry the same snapshot.
+    init(send: @escaping ([String: Any], Bool) -> Bool) { self.send = send }
+
+    func enqueue(_ payload: [String: Any]) {
+        lock.lock()
+        pending = payload
+        let shouldStart = !sending
+        sending = true
+        lock.unlock()
+        if shouldStart { queue.async { self.drain() } }
+    }
+
+    private func drain() {
+        while true {
+            lock.lock()
+            guard let payload = pending else {
+                sending = false
+                lock.unlock()
+                return
+            }
+            pending = nil
+            lock.unlock()
+            // Refresh requests may resend an unchanged live message, but must not keep
+            // cancelling and recreating an identical background configuration transfer.
+            let changed = lastSent.map { !NSDictionary(dictionary: $0).isEqual(to: payload) } ?? true
+            // Activation can disappear between main's snapshot and this queue's send.
+            // Do not suppress the background retry when activation completes again.
+            if send(payload, changed) { lastSent = payload }
         }
     }
 }

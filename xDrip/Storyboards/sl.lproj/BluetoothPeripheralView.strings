@@ -237,6 +237,8 @@
 "batteryHistoryRange" = "Obdobje";
 "batteryHistoryRangeAccessibility" = "Obdobje zgodovine baterije";
 "batteryHistoryRangeExplanation" = "Fiksna obdobja segajo od zdaj nazaj za izbrano število dni. Vrzeli prikazujejo obdobja brez odčitka.";
+"batteryHistoryInactive" = "Oddajnik ni aktiven";
+"batteryHistoryHistoricalRangeExplanation" = "Obdobja se končajo pri zadnjem shranjenem odčitku. Vrzeli prikazujejo obdobja brez odčitka.";
 
 "connectionDiagramOtherApp" = "Druga aplikacija";
 
@@ -261,3 +263,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Poteče";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Dostop do povezave Bluetooth ni omogočen";
+"bluetoothAccessInstructions" = "Za povezavo odprite Nastavitve → Zasebnost in varnost → Bluetooth in omogočite dostop za %@.";
+"bluetoothAccessRestrictedInstructions" = "Omejitve naprave preprečujejo dostop do povezave Bluetooth. Preverite nastavitve časa uporabe ali se obrnite na skrbnika naprave, da omogoči dostop.";

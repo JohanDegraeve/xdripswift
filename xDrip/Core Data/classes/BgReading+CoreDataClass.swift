@@ -3,6 +3,47 @@ import CoreData
 
 public class BgReading: NSManagedObject {
 
+    /// Retain every Watch receipt, including historical collection, for diagnosis.
+    /// Only a live collection contributes to the shared-collector icon. Phone delivery
+    /// can happen much later and must not turn a live Watch collection into backfill.
+    func recordWatchCollection(at receivedAt: Date, collectedAt: Date? = nil, isBackfill: Bool = false) {
+        if watchReceivedAt == nil { watchReceivedAt = receivedAt }
+        // Older stores/payloads have no acquisition time. Do not invent one from sync time.
+        if let collectedAt, watchCollectedAt == nil { watchCollectedAt = collectedAt }
+        if !isBackfill {
+            watchCollectedLive = true
+            // The phone may have recovered this historical value before an offline
+            // Watch delivered its live copy. Arrival order must not change the icon.
+            if phoneCollectedLive?.boolValue == false {
+                valueIsFromWatch = true
+                backfilledAt = nil
+            }
+        } else if watchCollectedLive == nil {
+            watchCollectedLive = false
+        }
+    }
+
+    /// The caller has matched the same sensor cycle. Historical recovery must never
+    /// relabel a run collected using only the Watch as simultaneous phone collection.
+    /// A later live packet can still confirm participation, regardless of buffering.
+    @discardableResult func recordPhoneCollection(isBackfill: Bool = false) -> Bool {
+        guard !isBackfill else { return false }
+        let changed = phoneCollectedLive?.boolValue != true || valueIsFromWatch
+        phoneCollectedLive = true
+        if valueIsFromWatch {
+            valueIsFromWatch = false
+            backfilledAt = nil
+        }
+        return changed
+    }
+
+    var wasAlsoCollectedByWatch: Bool {
+        // Preserve legacy presentation when the old store has no live-path metadata.
+        // New rows always record both flags, so backfill cannot imply live collection.
+        !valueIsFromWatch && (phoneCollectedLive?.boolValue ?? true)
+            && (watchCollectedLive?.boolValue ?? (watchReceivedAt != nil))
+    }
+
     /// creates BgReading with given parameters.
     ///
     /// properties that are not in the parameter list get either value 0 or false (depending on type). id gets new value
@@ -15,6 +56,8 @@ public class BgReading: NSManagedObject {
         self.rawData = rawData
         self.deviceName = deviceName
         self.backfilledAt = nil
+        self.valueIsFromWatch = false
+        self.watchReceivedAt = nil
         
         ageAdjustedRawValue = 0
         calibrationFlag = false
@@ -318,6 +361,9 @@ public struct BgReadingSnapshot: Sendable, Hashable {
     public let adjustedValue: Double?
     public let smoothedValue: Double?
     public let backfilledAt: Date?
+    public let valueIsFromWatch: Bool
+    public let watchReceivedAt: Date?
+    public let wasAlsoCollectedByWatch: Bool
     public let calculatedValueSlope: Double
     public let hideSlope: Bool
     public let id: String

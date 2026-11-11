@@ -44,3 +44,10 @@
 "bgRangeUrgent" = "Επείγον";
 "bgRangeNotUrgent" = "Μη επείγον";
 "bgRangeInRange" = "Εντός εύρους";
+
+"alsoCollectedByWatch" = "Συλλέχθηκε επίσης από το Watch";
+
+// Direct to Watch setup and diagnosis
+"receivedViaWatchAtFooterFormat" = "Ελήφθη μέσω Watch στις %@";
+"backfilledViaWatchAtFooterFormat" = "Συμπληρώθηκε μέσω Watch στις %@";
+"receivedViaWatch" = "Ελήφθη μέσω Watch";

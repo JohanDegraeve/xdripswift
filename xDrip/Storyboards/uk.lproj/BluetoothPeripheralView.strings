@@ -233,6 +233,8 @@
 "batteryHistoryRange" = "Період";
 "batteryHistoryRangeAccessibility" = "Період історії батареї";
 "batteryHistoryRangeExplanation" = "Фіксовані періоди відлічуються від поточного моменту назад на вибрану кількість днів. Проміжки позначають періоди без показань.";
+"batteryHistoryInactive" = "Передавач неактивний";
+"batteryHistoryHistoricalRangeExplanation" = "Періоди закінчуються останнім збереженим показанням. Проміжки позначають періоди без показань.";
 
 "connectionDiagramOtherApp" = "Інший застосунок";
 
@@ -257,3 +259,8 @@
 
 /* Label before the transmitter expiry date. */
 "transmitterExpiresLabel" = "Закінчується";
+
+/* Bluetooth permission status and instructions. %@ is the installed app name. */
+"bluetoothAccessNotEnabled" = "Доступ до Bluetooth не ввімкнено";
+"bluetoothAccessInstructions" = "Щоб підключитися, відкрийте Параметри → Приватність і безпека → Bluetooth і дозвольте доступ для %@.";
+"bluetoothAccessRestrictedInstructions" = "Обмеження пристрою блокують доступ до Bluetooth. Перевірте параметри Екранного часу або зверніться до адміністратора пристрою, щоб увімкнути доступ.";

@@ -28,6 +28,7 @@ struct WatchStatus: WatchPayload {
     var highLimitInMgDl: Double = 170
     var urgentHighLimitInMgDl: Double = 250
     var activeSensorDescription: String?
+    var phoneBLECollectionPaused: Bool = false
     var sensorAgeInMinutes: Double = 0
     var sensorMaxAgeInMinutes: Double = 0
     var preferSensorCountdown: Bool = false

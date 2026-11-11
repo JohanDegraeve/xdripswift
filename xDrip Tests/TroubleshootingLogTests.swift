@@ -7,9 +7,40 @@
 //
 
 import XCTest
+import Combine
+import os
 @testable import xdrip
 
 final class TroubleshootingLogTests: XCTestCase {
+    @MainActor
+    func testConcurrentDeveloperTraceWritesSurviveRotationWithoutLostLines() throws {
+        let defaults = UserDefaults.standard
+        let osLog = defaults.object(forKey: UserDefaults.Key.OSLogEnabled.rawValue)
+        let nsLog = defaults.object(forKey: UserDefaults.Key.NSLogEnabled.rawValue)
+        defaults.OSLogEnabled = false
+        defaults.NSLogEnabled = false
+        defer {
+            defaults.set(osLog, forKey: UserDefaults.Key.OSLogEnabled.rawValue)
+            defaults.set(nsLog, forKey: UserDefaults.Key.NSLogEnabled.rawValue)
+        }
+        let marker = "TraceConcurrency-\(UUID().uuidString)"
+        let padding = String(repeating: "x", count: 1024)
+        let log = OSLog(subsystem: ConstantsLog.subSystem, category: "TraceConcurrencyTest")
+        // More than one complete trace file, written from concurrent BLE/network-style queues.
+        // Retained files must contain each complete message exactly once across rotation.
+        DispatchQueue.concurrentPerform(iterations: 3600) { index in
+            trace("%{public}@", log: log, category: "TraceConcurrencyTest", type: .info, "\(marker)-\(index) \(padding)")
+        }
+        let directory = try XCTUnwrap(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first)
+        let lines = (0..<ConstantsTrace.maximumAmountOfTraceFiles).flatMap { index -> [String] in
+            let path = directory.appendingPathComponent("\(ConstantsTrace.traceFileName).\(index).log")
+            return ((try? String(contentsOf: path, encoding: .utf8)) ?? "").components(separatedBy: "\n")
+        }.filter { $0.contains(marker) }
+        XCTAssertEqual(lines.count, 3600)
+        XCTAssertEqual(Set(lines).count, 3600)
+        XCTAssertTrue(lines.allSatisfy { $0.hasSuffix(padding) })
+    }
+
     private let referenceDate = Date(timeIntervalSince1970: 1_800_000_000)
 
     @MainActor
@@ -339,6 +370,42 @@ final class TroubleshootingLogTests: XCTestCase {
         let storedText = String(decoding: try Data(contentsOf: fixture.fileURL), as: UTF8.self)
         XCTAssertTrue(storedText.contains("0000"))
         XCTAssertTrue(report.reportText.contains("0000"))
+    }
+
+    func testLegacyLibre3ReceiverActivityKeepsStorageCompatibilityAndRedactsReports() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        for confirmed in [false, true] {
+            fixture.store.record(.standard(.sensor(.libre3ReceiverID(
+                sensorSerial: "ABC123456", receiverID: 0x12345678, confirmed: confirmed
+            )), timestamp: referenceDate.addingTimeInterval(confirmed ? 1 : 0)))
+        }
+        let entries = fixture.store.snapshot()
+        XCTAssertEqual(entries.count, 2)
+        let report = makeReport(entries: entries)
+        XCTAssertEqual(entries.map(report.message(for:)), [
+            "Libre 3 NFC confirmed.",
+            "Libre 3 NFC attempt."
+        ])
+        XCTAssertFalse(report.reportText.contains("ABC123456"))
+        XCTAssertFalse(report.reportText.contains("78563412"))
+        let restored = TroubleshootingLogStore(fileURL: fixture.fileURL).snapshot()
+        XCTAssertEqual(restored.map(\.kind), entries.map(\.kind))
+    }
+
+    func testLibre3NFCActivityStoresNoRecoveryIdentifiers() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        fixture.store.record(.standard(.sensor(.libre3NFC(confirmed: true)), timestamp: referenceDate))
+        // Writes are queued. Flush this store before asking a separate reader to reopen its file.
+        _ = fixture.store.snapshot()
+        let restored = TroubleshootingLogStore(fileURL: fixture.fileURL, now: { self.referenceDate }).snapshot()
+        XCTAssertEqual(restored.count, 1)
+        let entry = try XCTUnwrap(restored.first)
+        XCTAssertEqual(makeReport(entries: restored).message(for: entry), "Libre 3 NFC confirmed.")
+        let storedText = String(decoding: try Data(contentsOf: fixture.fileURL), as: UTF8.self)
+        XCTAssertFalse(storedText.contains("receiverID"))
+        XCTAssertFalse(storedText.contains("sensorSerial"))
     }
 
     func testSensorLabelScanActivityRetainsDecodedInformationAndFailures() throws {
@@ -887,6 +954,29 @@ final class TroubleshootingLogTests: XCTestCase {
         ])
     }
 
+    func testDexcomShareUsesHourlyUpdatesAndKeepsUploadFailureAcrossAccountVerification() {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        let kinds: [TroubleshootingLogKind] = [
+            .configuration(.dexcomShareUploadChanged(enabled: true)),
+            .integration(name: .dexcomShareUpload, activity: .succeeded(itemCount: 1)),
+            .integration(name: .dexcomShareUpload, activity: .succeeded(itemCount: 1)),
+            .integration(name: .dexcomShareUpload, activity: .succeeded(itemCount: 1)),
+            .integration(name: .dexcomShareUpload, activity: .failed),
+            .integration(name: .dexcomShareUpload, activity: .failed),
+            .integration(name: .dexcomShareUploadAccount, activity: .succeeded(itemCount: nil)),
+            .integration(name: .dexcomShareUpload, activity: .succeeded(itemCount: 1)),
+            .configuration(.dexcomShareUploadChanged(enabled: false))
+        ]
+        let times: [TimeInterval] = [0, 1, 300, 3601, 3602, 3603, 3604, 3605, 3606]
+        for (kind, offset) in zip(kinds, times) {
+            fixture.store.record(.standard(kind, timestamp: referenceDate.addingTimeInterval(offset)))
+        }
+        XCTAssertEqual(fixture.store.snapshot().map(\.kind), [
+            kinds[8], .integration(name: .dexcomShareUpload, activity: .recovered), kinds[6], kinds[4], kinds[3], kinds[1], kinds[0]
+        ])
+    }
+
     func testRoutineIntegrationSuccessIsLimitedToOnePerHour() {
         let fixture = makeStore()
         defer { removeFixture(fixture.directory) }
@@ -1198,6 +1288,62 @@ final class TroubleshootingLogTests: XCTestCase {
 
         let reloadedStore = TroubleshootingLogStore(fileURL: fileURL, now: { self.referenceDate })
         XCTAssertEqual(reloadedStore.snapshot().map(\.kind), [.app(.terminated), .app(.started)])
+    }
+
+    @MainActor
+    func testActivityLogReloadDoesNotBlockMainWhileStoreIsBusy() async throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        let gate = DispatchGroup()
+        gate.enter()
+        let enteredStore = expectation(description: "Store is busy on its own queue")
+        enteredStore.assertForOverFulfill = false
+        let referenceDate = referenceDate
+        let store = TroubleshootingLogStore(fileURL: fixture.fileURL, now: {
+            enteredStore.fulfill()
+            _ = gate.wait(timeout: .now() + 5)
+            return referenceDate
+        })
+        store.record(.standard(.app(.started), timestamp: referenceDate))
+        await fulfillment(of: [enteredStore], timeout: 2)
+
+        let start = Date()
+        let appInfo = appInfo
+        let model = TroubleshootingLogViewModel(store: store, appInfoProvider: { appInfo })
+        XCTAssertLessThan(Date().timeIntervalSince(start), 1)
+        XCTAssertNil(model.reportText)
+        // Repeated appearances and live updates must coalesce while the snapshot is waiting.
+        model.reload()
+        model.reload()
+        let exported = expectation(description: "Complete report published after store unblocks")
+        let observation = model.$reportText.compactMap { $0 }.first().sink { text in
+            XCTAssertTrue(text.contains("App started."))
+            exported.fulfill()
+        }
+        gate.leave()
+        await fulfillment(of: [exported], timeout: 5)
+        XCTAssertEqual(model.report.entries.map(\.kind), [.app(.started)])
+        XCTAssertEqual(model.reportText, model.report.reportText)
+        observation.cancel()
+    }
+
+    func testMaximumOvernightReportKeepsEveryReadingAndFormatsWithinWatchdogBudget() {
+        let entries = (0..<TroubleshootingLogStore.maximumEntryCount).map { index in
+            let date = referenceDate.addingTimeInterval(-Double(index) * 15)
+            return TroubleshootingLogEntry.standard(
+                .glucoseAccepted(mgDl: 123, source: .libre2EU, measuredAt: date), timestamp: date
+            )
+        }
+        let report = makeReport(entries: entries)
+        let start = Date()
+        let text = report.reportText
+        let elapsed = Date().timeIntervalSince(start)
+        XCTAssertEqual(text.components(separatedBy: "New reading:").count - 1, entries.count)
+        XCTAssertTrue(text.contains("App Name: xDrip4iOS"))
+        // A generous regression guard for a simulator. Export also runs away from main, but it
+        // should not spend the scene watchdog's entire allowance constructing ICU formatters.
+        XCTAssertLessThan(elapsed, 5)
+        print("Maximum Activity Log export: \(entries.count) entries in \(elapsed) seconds")
     }
 
     func testReportAlwaysIncludesEveryRetainedEntryAndCompleteExportHeader() {
@@ -1740,7 +1886,7 @@ final class TroubleshootingLogTests: XCTestCase {
         XCTAssertEqual(report.entries(matching: "HEARTbeat").map(\.kind), [
             .heartbeatReceived
         ])
-        XCTAssertEqual(report.entries(matching: "123 mg/dL").map(\.kind), [
+        XCTAssertEqual(report.entries(matching: "New reading: 123").map(\.kind), [
             entries[2].kind
         ])
         XCTAssertEqual(report.entries(matching: "no match"), [])
@@ -1902,4 +2048,85 @@ private extension JSONDecoder {
 
 private extension Data.SubSequence {
     var data: Data { Data(self) }
+}
+
+extension TroubleshootingLogTests {
+    func testLibre3AuthenticationKeepsFailureAndOneRecoveryAcrossReplay() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        let activities: [TroubleshootingCGMActivity] = [
+            .authenticationSucceeded, .authenticationStarted, .authenticationFailed,
+            .authenticationStarted, .authenticationFailed, .authenticationSucceeded, .authenticationSucceeded
+        ]
+        for (index, activity) in activities.enumerated() {
+            fixture.store.record(.standard(.cgm(source: .libre3, activity: activity), timestamp: referenceDate.addingTimeInterval(Double(index))))
+        }
+        let entries = fixture.store.snapshot()
+        XCTAssertEqual(entries.map(\.kind), [
+            .cgm(source: .libre3, activity: .authenticationRecovered),
+            .cgm(source: .libre3, activity: .authenticationFailed)
+        ])
+        XCTAssertEqual(TroubleshootingLogStore(fileURL: fixture.fileURL).snapshot().map(\.kind), entries.map(\.kind))
+    }
+
+    func testLibre3ProvisioningKeepsOnlyProblemAndRecovery() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        for (index, activity) in [TroubleshootingCGMActivity.credentialsReady, .credentialsUnavailable, .credentialsUnavailable, .credentialsReady, .credentialsReady].enumerated() {
+            fixture.store.record(.standard(.cgm(source: .libre3, activity: activity), timestamp: referenceDate.addingTimeInterval(Double(index))))
+        }
+        XCTAssertEqual(fixture.store.snapshot().map(\.kind), [
+            .cgm(source: .libre3, activity: .credentialsReady),
+            .cgm(source: .libre3, activity: .credentialsUnavailable)
+        ])
+    }
+
+    func testLibre3NFCNextAttemptKeepsItsOwnConnectionOutcome() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        let activities: [TroubleshootingCGMActivity] = [.nfcScanStarted, .nfcScanCancelled, .nfcScanStarted, .nfcScanSucceeded, .connected, .connected]
+        for (index, activity) in activities.enumerated() {
+            fixture.store.record(.standard(.cgm(source: .libre3, activity: activity), timestamp: referenceDate.addingTimeInterval(Double(index))))
+        }
+        XCTAssertEqual(fixture.store.snapshot().count, 5)
+        XCTAssertEqual(fixture.store.snapshot().first?.kind, .cgm(source: .libre3, activity: .connected))
+    }
+
+    func testLibre3SensorExpiryIsNotReportedAsSensorFailure() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        for (index, activity) in [TroubleshootingCGMActivity.sensorOkay, .sensorCheckRequired, .sensorCheckRequired, .sensorOkay, .sensorOkay, .sensorExpired, .sensorExpired].enumerated() {
+            fixture.store.record(.standard(.cgm(source: .libre3, activity: activity), timestamp: referenceDate.addingTimeInterval(Double(index))))
+        }
+        let entries = fixture.store.snapshot()
+        XCTAssertEqual(entries.count, 3)
+        let text = makeReport(entries: entries).reportText
+        XCTAssertTrue(text.contains("sensor session ended"))
+        XCTAssertFalse(text.contains("sensor failure"))
+    }
+
+    func testLibre3LookupEventsContainNoAccountDetails() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        for (index, activity) in [TroubleshootingCGMActivity.accountLookupStarted, .accountLookupFailed, .accountLookupStarted, .accountLookupSucceeded].enumerated() {
+            fixture.store.record(.standard(.cgm(source: .libre3, activity: activity), timestamp: referenceDate.addingTimeInterval(Double(index))))
+        }
+        let entries = fixture.store.snapshot()
+        XCTAssertEqual(entries.count, 4)
+        let text = makeReport(entries: entries).reportText
+        XCTAssertTrue(text.contains("Account ID lookup succeeded"))
+        XCTAssertFalse(text.contains("password"))
+    }
+}
+
+extension TroubleshootingLogTests {
+    func testLibre3ManualReconnectDoesNotLoseAuthenticationRecovery() throws {
+        let fixture = makeStore()
+        defer { removeFixture(fixture.directory) }
+        let activities: [TroubleshootingCGMActivity] = [.authenticationFailed, .disconnected, .connectionRequested, .connected, .authenticationSucceeded]
+        for (index, activity) in activities.enumerated() {
+            fixture.store.record(.standard(.cgm(source: .libre3, activity: activity), timestamp: referenceDate.addingTimeInterval(Double(index))))
+        }
+        XCTAssertEqual(fixture.store.snapshot().first?.kind, .cgm(source: .libre3, activity: .authenticationRecovered))
+    }
 }

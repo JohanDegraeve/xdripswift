@@ -17,6 +17,7 @@
 
 /// literally 'Cancel'
 "common_cancel" = "Cancel";
+"common_close" = "Закрити";
 
 /// literally warning
 "warning" = "Warning!";
@@ -177,3 +178,13 @@
 "common_sensorWarmupUntilFormat" = "До %@";
 "common_sensorWarmupComplete" = "Прогрів завершено";
 "common_sensorWaitingForReading" = "Очікування першого показника…";
+
+"common_statistics_a1c" = "HbA1c";
+
+"common_statistics_estimatedA1c" = "Розрахунковий HbA1c";
+
+/* Switch title when the surrounding screen or section identifies the feature */
+"common_enable" = "Увімкнути";
+
+/* Status label, including Direct to Watch in Advanced Settings. */
+"common_enabled" = "Увімкнено";

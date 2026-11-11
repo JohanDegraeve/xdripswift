@@ -22,3 +22,11 @@
 "confirmdeletionalert" = "Διαγραφή ειδοποίησης;";
 "alerts_fastdrop" = "Η γλυκόζη πέφτει γρήγορα";
 "alerts_fastrise" = "Η γλυκόζη αυξάνεται γρήγορα";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "Ο αισθητήρας λήγει σύντομα";
+"sensorExpiry.expectedExpiry" = "Αναμενόμενη λήξη αισθητήρα";
+"sensorExpiry.hoursBefore" = "Ώρες πριν από τη λήξη";
+"sensorExpiry.hoursHelp" = "Εισαγάγετε ακέραιο αριθμό από 1 έως 48 ώρες.";
+"sensorExpiry.endingSoonBody" = "Η διάρκεια ζωής του αισθητήρα αναμένεται να λήξει στις %@.";
+"sensorExpiry.expectedExpiryBody" = "Ο αισθητήρας έφτασε στην αναμενόμενη λήξη του (%@).";

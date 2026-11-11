@@ -36,10 +36,9 @@ struct SnoozeView: View {
             .navigationTitle(Texts_HomeView.snoozeButton)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(Texts_Common.Cancel) {
+                    SheetCloseButton {
                         presentationMode.wrappedValue.dismiss()
                     }
-                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     OnlineHelpButton(topic: .snooze)

@@ -1,7 +1,6 @@
 "alerttypessettingsview_screentitle" = "Typ av larm";
 "alerttypesettingsview_screentitle" = "Ändra larmtyp";
 "alerttypesettingsview_name" = "Namn";
-"alerttypesettingsview_enabled" = "På";
 "alerttypesettingsview_vibrate" = "Vibrera";
 "alerttypesettingsview_snoozevianotification" = "Tillåt Snoozande via notis";
 "alerttypesettingsview_defaultsnoozeperiod" = "Standard Snooza-tid";
@@ -15,3 +14,5 @@
 "alerttypenamealreadyexistsmessages" = "En larmtyp med detta namn finns redan. Använd ett annat namn.";
 "confirmdeletionalerttype" = "Ta bort larmtyp: ";
 
+"alerttypesettingsview_repeatsound" = "Upprepa ljud";
+"alerttypesettingsview_previewalert" = "Förhandslyssna på larm";

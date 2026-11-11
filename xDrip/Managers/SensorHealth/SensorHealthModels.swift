@@ -64,6 +64,7 @@ enum SensorHealthReason: String, Codable {
     case dexcomSensorFailure
     case dexcomTransmitterFailure
     case libreSensorFailure
+    case libreTemporarySensorIssue
     case dexcomTransmitterBatteryFailure
 }
 
@@ -84,7 +85,7 @@ struct SensorHealthIssue: Codable, Equatable, Identifiable {
             return Texts_HomeView.sensorHealthPersistentNoiseTitle
         case .flatline:
             return Texts_HomeView.sensorHealthFlatlineTitle
-        case .dexcomExcessNoise, .dexcomTemporarySensorIssue, .dexcomQuestionMarks:
+        case .dexcomExcessNoise, .dexcomTemporarySensorIssue, .dexcomQuestionMarks, .libreTemporarySensorIssue:
             return Texts_HomeView.sensorHealthTemporaryIssueTitle
         case .dexcomSensorFailure, .libreSensorFailure:
             return Texts_HomeView.sensorHealthSensorFailedTitle
@@ -99,7 +100,7 @@ struct SensorHealthIssue: Codable, Equatable, Identifiable {
             return Texts_HomeView.sensorHealthPersistentNoiseGuidance
         case .flatline:
             return Texts_HomeView.sensorHealthFlatlineGuidance
-        case .dexcomExcessNoise, .dexcomTemporarySensorIssue, .dexcomQuestionMarks:
+        case .dexcomExcessNoise, .dexcomTemporarySensorIssue, .dexcomQuestionMarks, .libreTemporarySensorIssue:
             return Texts_HomeView.sensorHealthTemporaryIssueGuidance
         case .dexcomSensorFailure, .libreSensorFailure:
             return Texts_HomeView.sensorHealthSensorFailedGuidance

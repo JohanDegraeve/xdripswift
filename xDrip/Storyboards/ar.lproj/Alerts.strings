@@ -22,3 +22,11 @@
 "confirmdeletionalert" = "حذف التنبيه؟";
 "alerts_fastdrop" = "تنبيه الانخفاض السريع";
 "alerts_fastrise" = "تنبيه الارتفاع السريع";
+
+/* Optional one-off sensor expiry reminders. */
+"sensorExpiry.endingSoon" = "سينتهي المستشعر قريبًا";
+"sensorExpiry.expectedExpiry" = "انتهاء المستشعر المتوقع";
+"sensorExpiry.hoursBefore" = "الساعات قبل الانتهاء";
+"sensorExpiry.hoursHelp" = "أدخل عددًا صحيحًا من 1 إلى 48 ساعة.";
+"sensorExpiry.endingSoonBody" = "من المتوقع أن يصل المستشعر إلى نهاية عمره في %@.";
+"sensorExpiry.expectedExpiryBody" = "وصل المستشعر إلى وقت انتهائه المتوقع (%@).";

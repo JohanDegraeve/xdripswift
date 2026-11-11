@@ -44,3 +44,10 @@
 "bgRangeUrgent" = "Срочно";
 "bgRangeNotUrgent" = "Не срочно";
 "bgRangeInRange" = "В диапазоне";
+
+"alsoCollectedByWatch" = "Также получено Watch";
+
+// Direct to Watch setup and diagnosis
+"receivedViaWatchAtFooterFormat" = "Получено через Watch в %@";
+"backfilledViaWatchAtFooterFormat" = "Восстановлено через Watch в %@";
+"receivedViaWatch" = "Получено через Watch";

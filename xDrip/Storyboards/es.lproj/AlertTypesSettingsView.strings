@@ -1,7 +1,6 @@
 "alerttypessettingsview_screentitle" = "Tipos de Alarma";
 "alerttypesettingsview_screentitle" = "Editar Tipo de Alarma";
 "alerttypesettingsview_name" = "Nombre";
-"alerttypesettingsview_enabled" = "Habilitado";
 "alerttypesettingsview_vibrate" = "Vibración";
 "alerttypesettingsview_snoozevianotification" = "Permitir Silenciar Via Notificación";
 "alerttypesettingsview_defaultsnoozeperiod" = "Tiempo de Silencio Por Defecto";
@@ -14,3 +13,6 @@
 "alertTypeNoSound" = "Sin Sonido";
 "alerttypenamealreadyexistsmessages" = "Ya existe un Tipo de Alarma con este nombre. Usar otro nombre";
 "confirmdeletionalerttype" = "Borrar Tipo de Alarma: ";
+
+"alerttypesettingsview_repeatsound" = "Repetir sonido";
+"alerttypesettingsview_previewalert" = "Probar alarma";

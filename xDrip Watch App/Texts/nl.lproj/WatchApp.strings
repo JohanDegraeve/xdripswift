@@ -8,3 +8,101 @@
 "requestingData" = "Gegevens opvragen...";
 "lastReading" = "Laatste meting";
 "noSensorData" = "Geen sensor gegevens";
+
+// Direct to Watch status and pairing guidance
+"directWatchTitle" = "Direct naar Watch";
+"directWatchNoConnection" = "Geen verbinding toegevoegd";
+"directWatchSuspended" = "Verzameling onderbroken";
+"directWatchWaiting" = "Wachten op Watch-meting";
+"directWatchCollecting" = "Metingen verzamelen";
+"directWatchOverdue" = "Meting te laat";
+"directWatchDiagnosis" = "Diagnose";
+"directWatchAdded" = "Watch-verbinding toegevoegd";
+
+// Direct to Watch collection control
+"directWatchPausedShort" = "Gepauzeerd";
+"directWatchPaused" = "Watch-verzameling gepauzeerd";
+"directWatchPause" = "Verzamelen pauzeren";
+"directWatchResume" = "Verzamelen hervatten";
+"directWatchPausedSinceFormat" = "Sinds %@";
+"directWatchConnecting" = "Wachten…";
+"directWatchCollectedReadings" = "Verzamelde metingen";
+"directWatchReadingGapFormat" = "(%dm %ds)";
+"directWatchNoCollectedReadings" = "Nog geen Watch-metingen verzameld";
+
+"directWatchSessionStarted" = "Gestart om %@";
+"directWatchSessionResumed" = "Hervat om %@";
+"directWatchSessionPaused" = "Gepauzeerd om %@";
+"directWatchSessionEnded" = "Beëindigd om %@";
+
+"directWatchConnectionDetails" = "Verbindingsdetails";
+"directWatchBluetoothSlot" = "Bluetooth-slot";
+"directWatchSendLogs" = "Logs versturen";
+"directWatchResetConnection" = "Reset verbinding";
+"directWatchCancel" = "Annuleren";
+"directWatchResetConnectionExplanation" = "Wist opgeslagen verbindingsgegevens en zoekt opnieuw naar de zender. Mogelijk moet je een Bluetooth-koppelingsverzoek accepteren.";
+
+"directWatchCGMType" = "CGM-type";
+
+// Direct to Watch setup and diagnosis
+"directWatchAcceptPairing" = "Accepteer Bluetooth-koppeling op de Watch";
+"directWatchAddOnPhone" = "Voeg een Watch-verbinding toe via het zenderscherm op de iPhone.";
+"directWatchAuthenticating" = "Zender verifiëren";
+"directWatchAway" = "Buiten bereik";
+"directWatchBackgroundLimit" = "watchOS-Bluetooth-achtergrondlimiet bereikt. Open deze app om te herstellen.";
+"directWatchBlePaused" = "BLE gepauzeerd";
+"directWatchBluetoothErrorFormat" = "Zender-Bluetooth: %@";
+"directWatchBluetoothRejected" = "Bluetooth weigert verbinding, gebruik %@";
+"directWatchBluetoothUnavailableFormat" = "Watch-Bluetooth niet beschikbaar (%d)";
+"directWatchCgm" = "CGM";
+"directWatchCheckConnection" = "Open %@ op de Watch om de verbinding te controleren.";
+"directWatchCheckSensor" = "Controleer de actieve sensor in %@ op de iPhone.";
+"directWatchChecking" = "Controleren";
+"directWatchCheckingDiscovery" = "Zenderdetectie controleren";
+"directWatchCollectionOff" = "Watch-collectie uit";
+"directWatchConnected" = "Verbonden";
+"directWatchConnectingSaved" = "Verbinden met opgeslagen zender";
+"directWatchConnectingTransmitter" = "Verbinden met zender";
+"directWatchExportFailedFormat" = "Watch-logboek exporteren mislukt: %@";
+"directWatchG6AuthRejected" = "G6-verificatie geweigerd";
+"directWatchG6StateFormat" = "G6-status %d, controleer sensor op iPhone";
+"directWatchG7AuthFailed" = "G7-verificatie mislukt. Zie logboeken.";
+"directWatchG7Family" = "G7-familie";
+"directWatchG7KeyRejected" = "G7 weigert Watch-sleutel, controleer slotgebruik";
+"directWatchG7Requesting" = "G7 geverifieerd, waarde opvragen";
+"directWatchLowGlucose" = "%@: lage glucose";
+"directWatchNoRecentReading" = "%@: geen recente waarde";
+"directWatchOneReadingFormat" = "%d waarde";
+"directWatchReadingReceived" = "Watch-waarde ontvangen";
+"directWatchReadingsFormat" = "%d waarden";
+"directWatchReconnectingSaved" = "Opnieuw verbinden met opgeslagen zender";
+"directWatchRetryingSaved" = "Opgeslagen zender opnieuw proberen";
+"directWatchScanningRetained" = "Zoeken, opgeslagen verbinding behouden";
+"directWatchScanningToPair" = "Zender zoeken om opnieuw te koppelen";
+"directWatchStorageReadFailed" = "Watch-gegevens onleesbaar. Collectie gestopt.";
+"directWatchStorageSaveFailedFormat" = "Opslaan Watch-gegevens mislukt: %@";
+"directWatchSuspendedCheckPhone" = "Collectie onderbroken, controleer iPhone";
+"directWatchSuspendedReasonFormat" = "Collectie onderbroken: %@";
+"directWatchToSync" = "Te syncen";
+"directWatchTransmitterTimeout" = "Zender reageert niet, wacht op volgende cyclus";
+"directWatchWaitingCycle" = "Wachten op volgende zendcyclus";
+"directWatchWaitingDiscovery" = "Wachten op herdetectie van zender";
+"directWatchWaitingNextReading" = "Wachten op volgende waarde";
+"directWatchWaitingTransmitter" = "Wachten op zender";
+
+/* Direct to Watch action feedback. */
+"directWatchLogsQueued" = "Logs in wachtrij";
+"directWatchResetStarted" = "Reset gestart";
+"directWatchTryAgain" = "Opnieuw proberen";
+
+/* Optional missed-reading notification, configured on this Watch. */
+"directWatchMissedReadings" = "Gemiste metingen";
+"directWatchMissedReadingsExplanation" = "Indien ingeschakeld, meldt het horloge wanneer er meer dan 20 minuten geen meting is ontvangen";
+
+/* Local Watch alerts use the daily alarm schedules supplied by the iPhone. */
+"directWatchAlerts" = "Meldingen";
+"directWatchUrgentLow" = "Dringend laag";
+"directWatchLow" = "Laag";
+"directWatchAlertExplanation" = "De grenzen volgen het alarmschema op de iPhone. Watch-meldingen vereisen actieve verzameling en meer dan 60 seconden zonder iPhone-contact.";
+"directWatchScheduleUnavailable" = "Synchroniseer iPhone-alarmen";
+"directWatchUrgentLowGlucose" = "%@: dringend lage glucose";
