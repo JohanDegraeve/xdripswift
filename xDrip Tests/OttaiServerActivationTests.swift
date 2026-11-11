@@ -392,3 +392,22 @@ final class OttaiRecordWidthBackportTests: XCTestCase {
         XCTAssertEqual(OttaiParser.frameRecords(page, deviceVersion: "E1.2.3", learned: 9).count, 1)
     }
 }
+
+final class OttaiTimeBackportTests: XCTestCase {
+    func testCorrectionRequiresIndependentFramesAndStaysWithinOneMinute() {
+        var correction = OttaiArrivalStartCorrection()
+        correction.seed(start: 1_000_000, arrivalStart: 1_000_000)
+        XCTAssertNil(correction.accept(anchor: 1_000_000, counter: 10, received: 1_585_000))
+        XCTAssertNil(correction.accept(anchor: 1_000_000, counter: 10, received: 1_585_000))
+        XCTAssertEqual(correction.accept(anchor: 1_000_000, counter: 11, received: 1_645_000), 985_000)
+        correction.seed(start: 1_000_000, arrivalStart: 1_000_000)
+        XCTAssertNil(correction.accept(anchor: 1_000_000, counter: 100, received: 1_585_000))
+        XCTAssertNil(correction.accept(anchor: 1_000_000, counter: 101, received: 1_645_000))
+    }
+    func testHistorySeedCannotBeCorrectedFromArrivals() {
+        var correction = OttaiArrivalStartCorrection()
+        correction.seed(start: 1_000_000, arrivalStart: 0)
+        XCTAssertNil(correction.accept(anchor: 1_000_000, counter: 10, received: 1_585_000))
+        XCTAssertNil(correction.accept(anchor: 1_000_000, counter: 11, received: 1_645_000))
+    }
+}

@@ -197,6 +197,10 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     private var streamStartTimeMs: Int64 = 0
     private var streamStartReliable = false
     private var pendingConfirmedStartMs: Int64 = 0
+    private var pendingConfirmedDataNo = -1
+    private var arrivalCorrection = OttaiArrivalStartCorrection()
+    private var acceptedLiveTimes: [Int: Int64] = [:]
+    private var acceptedLiveOrder: [Int] = []
 
     // dataNo limit
     private var consecutiveCeilingFullDrops = 0
@@ -1292,6 +1296,21 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
             noteContinuityRejection(dataNo: r.record.dataNo, sampleMs: sampleMs)
             return rejectReading(r, mmol: mmol, live: live, reason: reason)
         }
+        if live && acceptedLiveTimes[r.record.dataNo] == nil {
+            // Only accepted, new counters can confirm the sensor start time.
+            let monitorMs = r.monitorTimeMs
+            let hintMs = monitorMs > 0 && monitorMs <= receivedAtMs && receivedAtMs - monitorMs <= Self.currentSampleFreshMs
+                ? monitorMs : receivedAtMs
+            offerConfirmedActiveTime(hintMs - Int64(r.record.dataNo) * Self.recordIntervalMs, dataNo: r.record.dataNo)
+            if let corrected = arrivalCorrection.accept(anchor: streamStartTimeMs, counter: r.record.dataNo, received: receivedAtMs) {
+                streamStartTimeMs = corrected
+            }
+            acceptedLiveTimes[r.record.dataNo] = sampleMs
+            acceptedLiveOrder.append(r.record.dataNo)
+            if acceptedLiveOrder.count > 64 {
+                acceptedLiveTimes.removeValue(forKey: acceptedLiveOrder.removeFirst())
+            }
+        }
         let previousGlucoseAtMs = lastGlucoseAtMs
         let freshLiveSample = live && isFreshLiveSample(receivedAtMs: receivedAtMs, sampleMs: sampleMs)
         let newest = sampleMs >= previousGlucoseAtMs
@@ -1519,18 +1538,20 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     }
 
     private func resolveSampleTimeMs(_ r: OttaiReading, live: Bool, receivedAtMs: Int64) -> Int64 {
-        if streamStartTimeMs > 0 && (materials.activeTimeMs > 0 || !live) {
-            return streamStartTimeMs + Int64(r.record.dataNo) * Self.recordIntervalMs
+        if live, let accepted = acceptedLiveTimes[r.record.dataNo] { return accepted }
+        if streamStartTimeMs > 0 && (streamStartReliable || !live) {
+            let anchored = streamStartTimeMs + Int64(r.record.dataNo) * Self.recordIntervalMs
+            return live && receivedAtMs > 0 ? min(anchored, receivedAtMs) : anchored
         }
         if live && receivedAtMs > 0 && r.record.dataNo >= 0 {
             let monitorMs = r.monitorTimeMs
-            if monitorMs > 0 && abs(receivedAtMs - monitorMs) <= Self.currentSampleFreshMs {
-                return seedStreamTimeAnchor(r.record.dataNo, monitorMs, "monitor-live", reliable: true)
+            if monitorMs > 0 && monitorMs <= receivedAtMs && receivedAtMs - monitorMs <= Self.currentSampleFreshMs {
+                return seedStreamTimeAnchor(r.record.dataNo, monitorMs, "monitor-live", reliable: true, receivedAtMs: receivedAtMs)
             }
             if monitorMs > 0 {
                 trace("ignore stale live monitor timestamp dataNo=%{public}d delta=%{public}ds", log: log, category: ConstantsLog.categoryCGMOttai, type: .info, r.record.dataNo, Int(abs(receivedAtMs - monitorMs) / 1000))
             }
-            return seedStreamTimeAnchor(r.record.dataNo, receivedAtMs, "live", reliable: true)
+            return seedStreamTimeAnchor(r.record.dataNo, receivedAtMs, "live", reliable: true, receivedAtMs: receivedAtMs)
         }
         if r.monitorTimeMs > 0 {
             return seedStreamTimeAnchor(r.record.dataNo, r.monitorTimeMs, "monitor")
@@ -1542,9 +1563,9 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         return r.monitorTimeMs
     }
 
-    private func seedStreamTimeAnchor(_ dataNo: Int, _ sampleHintMs: Int64, _ reason: String, reliable: Bool = false) -> Int64 {
+    private func seedStreamTimeAnchor(_ dataNo: Int, _ sampleHintMs: Int64, _ reason: String, reliable: Bool = false, receivedAtMs: Int64 = 0) -> Int64 {
         if dataNo < 0 || sampleHintMs <= 0 { return sampleHintMs }
-        let sampleMs = (sampleHintMs / Self.recordIntervalMs) * Self.recordIntervalMs
+        let sampleMs = sampleHintMs
         let start = sampleMs - Int64(dataNo) * Self.recordIntervalMs
         if start > 0 {
             let old = streamStartTimeMs
@@ -1554,10 +1575,10 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
             }
             streamStartTimeMs = start
             streamStartReliable = reliable
+            arrivalCorrection.seed(start: start, arrivalStart: reliable && receivedAtMs > 0 ? receivedAtMs - Int64(dataNo) * Self.recordIntervalMs : 0)
             if old == 0 || abs(old - start) > Self.recordIntervalMs {
                 trace("stream time anchor dataNo=%{public}d start=%{public}@ source=%{public}@ reliable=%{public}@", log: log, category: ConstantsLog.categoryCGMOttai, type: .info, dataNo, "\(start / 1000)", reason, reliable.description)
             }
-            if reliable { offerConfirmedActiveTime(start) }
         }
         return sampleMs
     }
@@ -1565,7 +1586,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     /// Two start times, found on their own, must agree before we save the
     /// activation time. A broken dataNo gives a time far away; a real pair is
     /// within a minute or two.
-    private func offerConfirmedActiveTime(_ startMs: Int64) {
+    private func offerConfirmedActiveTime(_ startMs: Int64, dataNo: Int) {
         if startMs <= 0 || materials.activeTimeMs > 0 { return }
         let now = nowMs()
         if startMs > now || now - startMs > OttaiConstants.extendedLifetimeMs {
@@ -1575,9 +1596,11 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         let pending = pendingConfirmedStartMs
         if pending <= 0 {
             pendingConfirmedStartMs = startMs
+            pendingConfirmedDataNo = dataNo
             trace("activation start candidate=%{public}@ awaiting corroboration", log: log, category: ConstantsLog.categoryCGMOttai, type: .info, "\(startMs / 1000)")
             return
         }
+        guard pendingConfirmedDataNo != dataNo else { return }
         if abs(pending - startMs) <= Self.confirmedStartAgreementMs {
             materials.activeTimeMs = startMs
             provisionalActiveTimeMs = 0
@@ -1589,6 +1612,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         }
         trace("activation start candidates disagree: %{public}@ vs %{public}@; re-arming corroboration", log: log, category: ConstantsLog.categoryCGMOttai, type: .error, "\(pending / 1000)", "\(startMs / 1000)")
         pendingConfirmedStartMs = startMs
+        pendingConfirmedDataNo = dataNo
     }
 
     private func setProvisionalActiveTime(_ activeTimeMs: Int64, _ reason: String) {

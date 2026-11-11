@@ -109,3 +109,39 @@ struct OttaiServerDurationPlan {
         return index + 1
     }
 }
+
+/// Move the live start time back only when two accepted readings agree.
+struct OttaiArrivalStartCorrection {
+    private var lowest: Int64 = 0
+    private var latestArrival: Int64 = 0
+    private var pending: (start: Int64, counter: Int, received: Int64)?
+
+    mutating func seed(start: Int64, arrivalStart: Int64) {
+        lowest = start - 60_000
+        latestArrival = max(0, arrivalStart)
+        pending = nil
+    }
+
+    mutating func accept(anchor: Int64, counter: Int, received: Int64) -> Int64? {
+        guard anchor > 0, counter >= 0, received > 0 else {
+            pending = nil
+            return nil
+        }
+        let implied = received - Int64(counter) * 60_000
+        if latestArrival > 0 { latestArrival = max(latestArrival, implied) }
+        guard implied < anchor else {
+            pending = nil
+            return nil
+        }
+        guard let previous = pending, counter > previous.counter,
+              received > previous.received, received - previous.received <= 180_000,
+              abs(previous.start - implied) <= 60_000 else {
+            pending = (implied, counter, received)
+            return nil
+        }
+        pending = nil
+        let agreed = max(previous.start, implied)
+        guard lowest > 0, latestArrival > 0, agreed >= max(lowest, latestArrival - 120_000) else { return nil }
+        return agreed
+    }
+}
