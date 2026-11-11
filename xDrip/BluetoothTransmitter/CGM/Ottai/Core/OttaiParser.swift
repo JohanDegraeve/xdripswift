@@ -229,27 +229,6 @@ enum OttaiParser {
         return true
     }
 
-    /// True for an "average" record: runtime >= warmup, dataNo >= 5, dataNo is a multiple of 5.
-    static func isAverageTick(_ rec: OttaiRecord, warmupSec: Int = 3200) -> Bool {
-        rec.runtimeSec >= warmupSec && rec.dataNo >= 5 && rec.dataNo % 5 == 0
-    }
-
-    // MARK: - full parse (decrypt → records → formula)
-
-    /// Live: decrypt, take the last record, run the formula.
-    static func parseLive(cipher: [UInt8], sessionKeyHex: String, method: String, coefficients: [Double], activeTimeMs: Int64) -> OttaiReading? {
-        guard let payload = OttaiCrypto.decryptPayload(cipher, sessionKeyHex: sessionKeyHex) else { return nil }
-        let records = frameRecords(payload)
-        guard let last = records.last else { return nil }
-        return toReading(last, method: method, coefficients: coefficients, activeTimeMs: activeTimeMs)
-    }
-
-    /// History: decrypt, take all records, run the formula on each.
-    static func parseHistory(cipher: [UInt8], sessionKeyHex: String, method: String, coefficients: [Double], activeTimeMs: Int64) -> [OttaiReading] {
-        guard let payload = OttaiCrypto.decryptPayload(cipher, sessionKeyHex: sessionKeyHex) else { return [] }
-        return frameRecords(payload).map { toReading($0, method: method, coefficients: coefficients, activeTimeMs: activeTimeMs) }
-    }
-
     /// Make a reading from one 12-byte record (no decryption here).
     static func toReading(_ rec12: [UInt8], method: String, coefficients: [Double], activeTimeMs: Int64) -> OttaiReading {
         let record = parseRecord(rec12)

@@ -46,8 +46,3 @@ enum OttaiSmsCountry: CaseIterable {
         return regex.firstMatch(in: raw, options: [], range: range) != nil
     }
 }
-
-/// Returns the digits if they are a valid number for the country, else nil.
-func normalizeOttaiPhone(_ raw: String, country: OttaiSmsCountry) -> String? {
-    country.accepts(raw) ? raw : nil
-}

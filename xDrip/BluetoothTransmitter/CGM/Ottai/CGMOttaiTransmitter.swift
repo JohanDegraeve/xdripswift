@@ -93,20 +93,40 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
 
     private enum Phase { case idle, enablingNotify, auth, streaming }
     private enum AuthStep { case none, readDeviceTime, readDeviceParam, readDeviceSign, writeAppParam, writeAppSign, done }
-    // rtc .. command: old sensors, the phone builds the frames. server*: new sensors.
     private enum ActStep {
-        case none, rtc, maxActive, destruction, command, done
-        case serverFirmware, serverCmdGate, serverCoefficient, serverDuration, serverRtc, serverActivate
-        var isServer: Bool {
-            [.serverFirmware, .serverCmdGate, .serverCoefficient, .serverDuration, .serverRtc, .serverActivate].contains(self)
+        case none, serverFirmware, serverCmdGate, preparationBind, preparationFirmware, preparation
+        case rtc, maxActive, destruction, command, done
+
+        var writeCharacteristic: String? {
+            switch self {
+            case .preparation, .destruction: return OttaiConstants.charDestructive
+            case .rtc: return OttaiConstants.charCurrentTime
+            case .maxActive: return OttaiConstants.charMaxActiveTime
+            case .command: return OttaiConstants.charCommand
+            default: return nil
+            }
         }
     }
 
     private var phase: Phase = .idle
     private var authStep: AuthStep = .none
     private var actStep: ActStep = .none
-    private var commandStatus = -1
+    private let commandStatusLock = NSLock()
+    private var storedCommandStatus = -1
+    private var commandStatus: Int {
+        get {
+            commandStatusLock.lock()
+            defer { commandStatusLock.unlock() }
+            return storedCommandStatus
+        }
+        set {
+            commandStatusLock.lock()
+            storedCommandStatus = newValue
+            commandStatusLock.unlock()
+        }
+    }
     private var connectionGeneration = 0
+    private var isReleased = false
 
     private var characteristics: [String: CBCharacteristic] = [:]
     private var discoveredServices = Set<CBUUID>()
@@ -127,12 +147,8 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     private var serverAuthHostBytes: [UInt8]?
     private var serverAuthFlagBytes: [UInt8]?
     private var serverActivating = false
-    private var serverFrames: (coefficient: [UInt8], duration: [UInt8], activate: [UInt8])?
-    private var serverDurationPlan: OttaiServerDurationPlan?
-    private var serverDurationBaselineSeconds: Int64?
-    private var serverDurationIndex = 0
-    private var serverDurationAttempted = false
-
+    private var preparationPackets: [[UInt8]] = []
+    private var preparationFirmware = ""
     private var pendingActivation = false
     private var rediscoveredServices = Set<CBUUID>()
     /// How many services the sensor reported in the re-discovery before activation.
@@ -188,8 +204,6 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     private var maxActiveCandidateIndex = 0
     private var maxActiveAttemptMs: Int64 = 0
     private var serverActivationStarts = 0
-    /// When the activate frame was sent. If the next cmd gate says 3, this is the sensor start.
-    private var serverActivateAttemptedAtMs: Int64 = 0
     private var pendingBindInFlight = false
 
     // stream time anchor (see seedStreamTimeAnchor / offerConfirmedActiveTime)
@@ -314,28 +328,27 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     /// The settings screen uses it to warn before a repeated activation.
     var sensorCommandStatus: Int { commandStatus }
 
-    /// Like `requestForceActivation()` in JugglucoNG, the user's Activate button bypasses the
-    /// "start time already known" guard, so a request that got lost half-way (command sent,
-    /// sensor still says 0..2) can be repeated. Two sensor states are refused no matter what:
-    /// - running (cmd 3): a repeated activation ended two working sensors. The RTC was
-    ///   rewritten, the lifetime write came back "invalid handle", and the sensor reported
-    ///   cmd 4 on the next connection. A running sensor cannot be activated again anyway.
-    /// - ended (cmd 4+): the sensor rejected every restart in the logs we have.
-    /// While the state is not known yet (no connection, or the command byte not read), the
-    /// request is kept and runs after the next status read, and only if that says 0..2.
+    private var activationHasStarted: Bool {
+        OttaiRegistry.activationStarted(sensorId) || OttaiRegistry.loadPendingBind(sensorId) > 0
+            || activationCommandSentAtMs > 0 || provisionalActiveTimeMs > 0
+    }
+
+    /// Remember the user's request until the sensor state is known.
+    /// Never restart a sensor that has already started or ended.
     func startSensor(sensorCode: String?, startDate: Date) {
         workQueue.async { [weak self] in
-            guard let self = self else { return }
-            if self.commandStatus == 3 {
-                trace("activation refused — the sensor is already running (cmd=3); a repeated activation ends a working sensor", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .error)
+            guard let self = self, !self.isReleased else { return }
+            guard self.actStep == .none, !self.pendingActivation else {
+                trace("activation is already in progress", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .info)
+                return
+            }
+            if self.commandStatus == 3 || self.activationHasStarted {
+                trace("activation refused: this sensor has already started", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .error)
                 return
             }
             if self.commandStatus >= 4 {
                 trace("activation refused — the sensor has ended (cmd=%{public}d) and cannot be started again", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .error, self.commandStatus)
                 return
-            }
-            if self.effectiveActiveTimeMs() > 0 || self.activationCommandSentAtMs > 0 {
-                trace("FORCE activation (bypassing already-started guard)", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .info)
             }
             self.activationRequested = true
             OttaiRegistry.setActivationAttempted(self.sensorId, true)
@@ -382,9 +395,8 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         serverAuthHostBytes = nil
         serverAuthFlagBytes = nil
         serverActivating = false
-        serverFrames = nil
-        serverDurationPlan = nil // frames and keys are valid only on this connection
-        serverDurationAttempted = false
+        preparationFirmware = ""
+        preparationPackets = []
         pendingActivation = false
         expectedRediscoveryCount = 0
         liveReadInFlight = false
@@ -405,7 +417,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         workQueue.async { [weak self] in
             guard let self = self else { return }
-            _ = self.stepDownServerDurationIfNeeded()
+            self.connectionGeneration += 1
             self.livePollTimer?.cancel()
             self.livePollTimer = nil
             self.phase = .idle
@@ -499,7 +511,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
                 if self.expectedRediscoveryCount > 0, self.rediscoveredServices.count >= self.expectedRediscoveryCount {
                     self.pendingActivation = false
                     trace("post-auth re-discovery complete — starting activation", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .info)
-                    if self.serverActivating { self.startServerActivationWrites() } else { self.startActivationWrites() }
+                    self.startActivationWrites()
                 }
             }
         }
@@ -562,6 +574,10 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
                 trace("read err %{public}@ %{public}@ phase=%{public}@", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .error, characteristic.uuid.uuidString, error.localizedDescription, "\(self.phase)")
                 // The maxActive read is only for display. Never let it break a stream.
                 if uuid == OttaiConstants.charMaxActiveTime { return }
+                if self.actStep == .preparationFirmware, uuid == OttaiConstants.charSoftwareVersion {
+                    self.recoverAndReconnect("preparation firmware read failed")
+                    return
+                }
                 if self.actStep == .serverFirmware, uuid == OttaiConstants.charSoftwareVersion { self.readServerCmdGate(); return }
                 if self.phase == .auth { self.recoverAndReconnect("auth read failed") }
                 return
@@ -600,7 +616,20 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
                 handleCommandStatus(value.first.map { Int($0) } ?? -1)
             }
         case OttaiConstants.charSoftwareVersion:
-            if actStep == .serverFirmware { handleServerFirmware(value) }
+            let firmware = OttaiCloudClient.softwareRevision(value)
+            trace("BLE firmware sensor=%{public}@ version=%{public}@ step=%{public}@",
+                  log: log, category: ConstantsLog.categoryCGMOttai, type: .info,
+                  sensorId, firmware.isEmpty ? "missing" : firmware, "\(actStep)")
+            if actStep == .preparationFirmware {
+                guard let checkpoint = OttaiRegistry.preparation(sensorId),
+                      checkpoint.version == firmware else {
+                    failActivation("firmware changed during preparation")
+                    return
+                }
+                preparationFirmware = firmware
+                actStep = .none
+                readChar(OttaiConstants.charCommand)
+            } else if actStep == .serverFirmware { handleServerFirmware(firmware) }
         case OttaiConstants.charMaxActiveTime:
             handleMaxActiveRead(value)
         default:
@@ -622,7 +651,11 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
             requestCgmAuthVerify(authDevHex: lastAuthDevHex, authFlagHex: authFlagHex)
             return
         }
-        _ = verifyDeviceSign(value)
+        let verified = verifyDeviceSign(value)
+        if OttaiRegistry.preparation(sensorId) != nil && !verified {
+            rotateAwayFromWrongSensor()
+            return
+        }
         writeAppParam()
     }
 
@@ -667,9 +700,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
             if let error = error {
                 trace("write err %{public}@ %{public}@ authStep=%{public}@ actStep=%{public}@", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .error, characteristic.uuid.uuidString, error.localizedDescription, "\(self.authStep)", "\(self.actStep)")
                 if self.actStep == .maxActive, uuid == OttaiConstants.charMaxActiveTime, self.retryMaxActiveTime() { return }
-                if self.actStep.isServer {
-                    self.failServerActivationWrite(error.localizedDescription)
-                } else if self.actStep != .none {
+                if self.actStep.writeCharacteristic == uuid {
                     self.failActivation("aborted after \(self.actStep) write error")
                 } else if self.authStep == .writeAppParam || self.authStep == .writeAppSign {
                     self.handleAuthWriteFailure()
@@ -729,12 +760,14 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
             OttaiRegistry.ensureSensorRecord(sensorId: sensorId, address: deviceAddress ?? "", displayName: OttaiConstants.defaultDisplayName)
             // The command byte tells the true state: 0..2 = activate, 3 = stream,
             // 4 or more = the sensor has ended.
-            readChar(OttaiConstants.charCommand)
+            if OttaiRegistry.preparation(sensorId) != nil {
+                readPreparationFirmware()
+            } else {
+                readChar(OttaiConstants.charCommand)
+            }
             return
         }
-        if actStep.isServer {
-            advanceServerActivation()
-        } else if actStep != .none {
+        if actStep.writeCharacteristic == uuid {
             if actStep == .maxActive, uuid == OttaiConstants.charMaxActiveTime { markMaxActiveAccepted() }
             advanceActivation()
         }
@@ -748,8 +781,8 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
 
     // MARK: - server-assisted activation (new Syai sensors, as in SyaiKit)
     //
-    // A new sensor has no keyA before activation. The server answers its login and sends
-    // the activation frames. We write them, drop the link, bind (gives keyA) and log in again.
+    // The server checks the sensor identity. BindV3 then returns keyA.
+    // A new local login writes factory settings and sets the sensor lifetime.
 
     private func requestCgmAuthVerify(authDevHex: String, authFlagHex: String) {
         if authFlagHex.allSatisfy({ $0 == "0" }) {
@@ -774,7 +807,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
                         if code == "DEVICE_AUTH_SIGN_ERROR" { self.serverAuthSignatureFailures += 1 }
                         switch ottaiServerAuthRecovery(code: code,
                                                        signatureFailures: self.serverAuthSignatureFailures,
-                                                       activateSent: self.serverActivateAttemptedAtMs > 0) {
+                                                       activateSent: self.activationCommandSentAtMs > 0) {
                         case .retryConnection:
                             self.recoverAndReconnect("cgmAuth/verify rejected the device signature; retrying with a fresh challenge")
                         case .scanNextSensor:
@@ -790,38 +823,6 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
                     return
                 }
                 self.serverAuthSignatureFailures = 0
-                // Check all frames before the first write, so the sensor is never half-written.
-                guard m.hasActivationFrames,
-                      let cf = try? OttaiCrypto.hexToBytesStrict(m.cf),
-                      let d = try? OttaiCrypto.hexToBytesStrict(m.d),
-                      let c = try? OttaiCrypto.hexToBytesStrict(m.c) else {
-                    self.giveUpServerActivation("the server sent no activation frames")
-                    return
-                }
-                let verification = OttaiServerDurationPlan.verification(keyHex: m.keyB, duration: d, activate: c)
-                let plan: OttaiServerDurationPlan?
-                switch verification {
-                case .success(let verified):
-                    plan = verified
-                case .failure(let reason):
-                    plan = nil
-                    trace("server duration: extension unavailable reason=%{public}@ kbChars=%{public}d durationBytes=%{public}d activateBytes=%{public}d; using original server frame", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .info,
-                          reason.rawValue, m.keyB.count, d.count, c.count)
-                }
-                // Candidate positions must refer to the same baseline after reconnect.
-                if let old = self.serverDurationBaselineSeconds, let plan = plan, old != plan.serverSeconds {
-                    self.serverDurationIndex = plan.candidates.count - 1
-                    trace("server duration: baseline changed old=%{public}ds new=%{public}ds; using original server frame", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .info,
-                          Int(old), Int(plan.serverSeconds))
-                }
-                self.serverDurationPlan = plan
-                if let plan = plan {
-                    self.serverDurationBaselineSeconds = plan.serverSeconds
-                    self.serverDurationIndex = min(self.serverDurationIndex, plan.candidates.count - 1)
-                    trace("server duration: verified key; target=%{public}ds server=%{public}ds", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .info,
-                          Int(plan.candidates[self.serverDurationIndex]), Int(plan.serverSeconds))
-                }
-                self.serverFrames = (cf, d, c)
                 self.serverAuthHostBytes = host
                 self.serverAuthFlagBytes = flag
                 self.writeAppParam()
@@ -838,9 +839,8 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         }
     }
 
-    private func handleServerFirmware(_ value: [UInt8]) {
-        let firmware = OttaiCloudClient.softwareRevision(value)
-        trace("server activation: firmware=%{public}@", log: log, category: ConstantsLog.categoryCGMOttai, type: .info, firmware)
+    private func handleServerFirmware(_ firmware: String) {
+        preparationFirmware = firmware
         if OttaiRegistry.loadLastValidatedDeviceVersion(sensorId: sensorId) == nil {
             OttaiRegistry.saveLastValidatedDeviceVersion(sensorId: sensorId, version: OttaiCloudClient.deviceVersion(fromFirmware: firmware))
         }
@@ -855,102 +855,82 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     /// Nothing is written to a sensor with cmd 3 or more.
     private func handleServerCmdGate(_ status: Int) {
         commandStatus = status
+        OttaiRegistry.saveSensorStatus(sensorId, status)
         actStep = .none
         trace("server activation: cmd gate status=%{public}d", log: log, category: ConstantsLog.categoryCGMOttai, type: .info, status)
         switch status {
         case ..<0:
             recoverAndReconnect("server activation: empty cmd read")
         case 3:
-            // An activate write from an earlier link landed, or the sensor was started elsewhere.
-            if serverActivateAttemptedAtMs <= 0 {
-                trace("sensor was already active; binding with the current time as its start", log: log, category: ConstantsLog.categoryCGMOttai, type: .error)
-            }
-            serverActivationLanded(atMs: serverActivateAttemptedAtMs > 0 ? serverActivateAttemptedAtMs : nowMs())
+            // The sensor was already started. Fetch its keys without activation writes.
+            serverActivationLanded(atMs: nowMs())
         case 4...:
             giveUpServerActivation("the sensor has ended (cmd=\(status))")
         default:
-            // The ctl service (for cf) is only found by a new discovery.
-            requestActivationWithRediscovery()
+            bindBeforeActivation()
         }
     }
 
-    private func startServerActivationWrites() {
-        guard let frames = serverFrames else {
-            giveUpServerActivation("the activation frames are gone")
+    private func bindBeforeActivation() {
+        guard let address = deviceAddress, !preparationFirmware.isEmpty,
+              OttaiPreparation.minor(preparationFirmware) != nil else {
+            giveUpServerActivation("cannot prepare without a supported BLE firmware revision")
             return
         }
-        trace("server activation: writing the frames", log: log, category: ConstantsLog.categoryCGMOttai, type: .info)
-        writeServerStep(.serverCoefficient, OttaiConstants.charDestructive, frames.coefficient)
-    }
-
-    /// Order as in the official app: coefficient -> duration -> RTC(0) -> activate.
-    private func advanceServerActivation() {
-        guard let frames = serverFrames else { return }
-        switch actStep {
-        case .serverCoefficient:
-            var duration = frames.duration
-            if let plan = serverDurationPlan {
-                guard let candidate = plan.frame(at: serverDurationIndex, original: frames.duration) else {
-                    giveUpServerActivation("could not build the verified duration frame")
+        let existing = OttaiRegistry.preparation(sensorId)
+        if let existing = existing, existing.address != address || existing.version != preparationFirmware {
+            giveUpServerActivation("pending preparation belongs to a different device or firmware")
+            return
+        }
+        let id = sensorId, version = preparationFirmware, generation = connectionGeneration
+        OttaiRegistry.savePreparation(id, version: version, address: address)
+        actStep = .preparationBind
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let prepared = OttaiCloudClient.prepareMaterials(mac: id, version: version, allowBind: existing == nil)
+            let result = prepared.operation
+            self?.workQueue.async { [weak self] in
+                guard let self = self, self.connectionGeneration == generation, self.actStep == .preparationBind else { return }
+                guard let materials = result.value, OttaiRegistry.saveMaterials(sensorId: id, materials) else {
+                    if prepared.bindRejected { OttaiRegistry.clearPreparation(id) }
+                    self.giveUpServerActivation("preparation bind failed: \(result.errorText)")
                     return
                 }
-                duration = candidate
-                trace("server maxActive attempt=%{public}d/%{public}d target=%{public}ds", log: log, category: ConstantsLog.categoryCGMOttai, type: .info,
-                      serverDurationIndex + 1, plan.candidates.count, Int(plan.candidates[serverDurationIndex]))
-                serverDurationAttempted = true
+                self.materials = OttaiRegistry.loadMaterials(sensorId: id)
+                self.authKeys = self.materials.authKeys
+                self.serverActivating = false
+                self.actStep = .none
+                self.disconnect()
             }
-            writeServerStep(.serverDuration, OttaiConstants.charMaxActiveTime, duration)
-        case .serverDuration:
-            trace("server duration: write acknowledged; actual lifetime will be checked after activation", log: log, category: ConstantsLog.categoryCGMOttai, type: .info)
-            writeServerStep(.serverRtc, OttaiConstants.charCurrentTime, [0, 0, 0, 0])
-        case .serverRtc:
-            serverDurationAttempted = false
-            // Saved before the answer: a dropped link may never report this write.
-            if serverActivateAttemptedAtMs <= 0 { serverActivateAttemptedAtMs = nowMs() }
-            writeServerStep(.serverActivate, OttaiConstants.charCommand, frames.activate)
-        case .serverActivate:
+        }
+    }
+
+    private func writeNextPreparationPacket() {
+        guard !preparationPackets.isEmpty else {
+            OttaiRegistry.clearPreparation(sensorId)
             actStep = .none
-            serverActivationLanded(atMs: nowMs())
-        default:
-            break
+            startActivationWrites()
+            return
+        }
+        actStep = .preparation
+        guard let peripheral = connectedPeripheral,
+              preparationPackets[0].count <= peripheral.maximumWriteValueLength(for: .withResponse),
+              writeChar(OttaiConstants.charDestructive, preparationPackets.removeFirst()) else {
+            failActivation("factory parameter characteristic or write capacity unavailable")
+            return
         }
     }
 
-    private func writeServerStep(_ step: ActStep, _ characteristic: String, _ value: [UInt8]) {
-        actStep = step
-        if !writeChar(characteristic, value) { failServerActivationWrite("characteristic is missing") }
-    }
-
-    /// Usually the link dropped. The cmd gate on the next link tells if the activate landed.
-    private func failServerActivationWrite(_ reason: String) {
-        trace("server activation write failed at %{public}@: %{public}@", log: log, category: ConstantsLog.categoryCGMOttai, type: .error, "\(actStep)", reason)
-        let step = actStep
-        let steppedDown = stepDownServerDurationIfNeeded()
-        actStep = .none
-        pendingActivation = false
-        if steppedDown {
-            recoverAndReconnect("server duration rejected; trying a shorter lifetime")
-        } else if serverActivationStarts >= Self.maxServerActivationStarts {
-            giveUpServerActivation("write failed at \(step) on the last try")
-        } else {
-            recoverAndReconnect("server activation interrupted")
+    private func readPreparationFirmware() {
+        guard char(OttaiConstants.charSoftwareVersion) != nil else {
+            failActivation("preparation firmware characteristic is missing")
+            return
         }
-    }
-
-    /// Called for both write errors and link drops; consuming the attempt once avoids
-    /// skipping two candidates when CoreBluetooth reports both for the same rejection.
-    @discardableResult
-    private func stepDownServerDurationIfNeeded() -> Bool {
-        guard serverActivating, serverDurationAttempted, let plan = serverDurationPlan,
-              let next = plan.nextIndex(after: serverDurationIndex,
-                                        durationOrRTCFailed: actStep == .serverDuration || actStep == .serverRtc,
-                                        activateSent: serverActivateAttemptedAtMs > 0) else { return false }
-        serverDurationAttempted = false
-        serverDurationIndex = next
-        serverActivationStarts = 0 // keep the connection retry budget per candidate
-        trace("server maxActive rejected; reconnecting to try %{public}ds", log: log, category: ConstantsLog.categoryCGMOttai, type: .info,
-              Int(plan.candidates[next]))
-        return true
+        actStep = .preparationFirmware
+        readChar(OttaiConstants.charSoftwareVersion)
+        afterDelay(10) { [weak self] in
+            guard let self = self, self.actStep == .preparationFirmware else { return }
+            self.recoverAndReconnect("preparation firmware read timed out")
+        }
     }
 
     private func serverActivationLanded(atMs startMs: Int64) {
@@ -963,10 +943,6 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
 
     private func giveUpServerActivation(_ reason: String) {
         trace("server-assisted activation failed: %{public}@", log: log, category: ConstantsLog.categoryCGMOttai, type: .error, reason)
-        // An activate write that may have landed: bind, never activate again.
-        if serverActivateAttemptedAtMs > 0 {
-            OttaiRegistry.savePendingBind(sensorId, activatedAtMs: serverActivateAttemptedAtMs)
-        }
         endServerActivation()
     }
 
@@ -974,14 +950,8 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         OttaiRegistry.setActivationAttempted(sensorId, false)
         activationRequested = false
         serverActivating = false
-        serverFrames = nil
-        serverDurationPlan = nil
-        serverDurationBaselineSeconds = nil
-        serverDurationIndex = 0
-        serverDurationAttempted = false
         serverActivationStarts = 0
         serverAuthSignatureFailures = 0
-        serverActivateAttemptedAtMs = 0
         actStep = .none
         pendingActivation = false
         disconnect()
@@ -991,7 +961,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     private func startPendingBind() {
         let id = sensorId
         let activatedAtMs = OttaiRegistry.loadPendingBind(id)
-        guard activatedAtMs > 0, authKeys == nil, !pendingBindInFlight else { return }
+        guard !isReleased, activatedAtMs > 0, authKeys == nil, !pendingBindInFlight else { return }
         pendingBindInFlight = true
         let version = OttaiCloudClient.serverActivationBindVersion(id)
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -1001,7 +971,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
             let mats = result.value
             let failure = result.failure
             self?.workQueue.async { [weak self] in
-                guard let self = self else { return }
+                guard let self = self, !self.isReleased else { return }
                 self.pendingBindInFlight = false
                 guard let mats = mats, OttaiRegistry.saveMaterials(sensorId: id, mats) else {
                     trace("bind after server activation failed: %{public}@", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .error,
@@ -1026,10 +996,15 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     private func handleCommandStatus(_ status: Int) {
         let previous = commandStatus
         commandStatus = status
+        OttaiRegistry.saveSensorStatus(sensorId, status)
         trace("cmd/activation status=%{public}d (official: 3=activated, <3=needs activation)", log: log, category: ConstantsLog.categoryCGMOttai, type: .info, status)
         if status < 0 { return }
         if OttaiConstants.commandNeedsActivation(status) {
             livePollTimer?.cancel(); livePollTimer = nil
+            guard ottaiCanWriteActivation(commandStatus: status, activationStarted: activationHasStarted) else {
+                trace("activation blocked: this sensor was already started", log: log, category: ConstantsLog.categoryCGMOttai, type: .info)
+                return
+            }
             // activationRequested is only in memory. If this object is destroyed and created
             // again during a retry (the app came to the foreground, or a reconnect came in
             // between), the flag is lost while the user's request is not finished. The saved
@@ -1047,6 +1022,11 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
             return
         }
         if status == 3 {
+            actStep = .none
+            pendingActivation = false
+            activationRequested = false
+            preparationPackets.removeAll()
+            OttaiRegistry.clearPreparation(sensorId)
             // activationCommandSentAtMs is kept on purpose (same as the Kotlin): it is the
             // warmup anchor for a sensor we just started, until the real start is confirmed.
             if previous >= 4 { trace("ended-sensor recovery accepted; normal streaming restored", log: log, category: ConstantsLog.categoryCGMOttai, type: .info) }
@@ -1058,6 +1038,9 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         // the live buffer once, to learn the last dataNo, and fetch the history up to it. No
         // glucose is shown from this read. The user needs a new sensor.
         livePollTimer?.cancel(); livePollTimer = nil
+        actStep = .none
+        pendingActivation = false
+        activationRequested = false
         trace("sensor ended cmd=%{public}d; no lifetime write will be attempted automatically", log: log, category: ConstantsLog.categoryCGMOttai, type: .error, status)
         afterDelay(0.5) { [weak self] in
             guard let self = self, self.commandStatus >= 4 else { return }
@@ -1248,7 +1231,10 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     /// would choose a different size, log it once, with the counts for both sizes, so the
     /// log shows why. Only once, so a strange sensor cannot fill the log.
     private func learnRecordSize(_ payload: [UInt8]) {
-        if let decisive = OttaiParser.contentRecordSize(payload) ?? (learnedRecordSize == 0 ? OttaiParser.decisiveRecordSize(payload, deviceVersion: materials.deviceVersion) : nil) {
+        let decisive = learnedRecordSize == 0
+            ? OttaiParser.decisiveRecordSize(payload, deviceVersion: materials.deviceVersion)
+            : OttaiParser.contentRecordSize(payload)
+        if let decisive = decisive {
             recordSizeDisagreementLogged = false
             if decisive != learnedRecordSize {
                 let previous = learnedRecordSize
@@ -1917,6 +1903,8 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     /// handles found before login gave "invalid handle" for b8fd9848 / 6aa799b6.
     /// We do the same and start the writes when all services are back.
     private func requestActivationWithRediscovery() {
+        guard actStep == .none, !pendingActivation else { return }
+        guard ottaiCanWriteActivation(commandStatus: commandStatus, activationStarted: activationHasStarted) else { return }
         guard let peripheral = connectedPeripheral else {
             trace("activation refused — no connected peripheral", log: log, category: ConstantsLog.categoryCGMOttai, type: .error)
             return
@@ -1943,6 +1931,25 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     }
 
     private func startActivationWrites() {
+        guard ottaiCanWriteActivation(commandStatus: commandStatus, activationStarted: activationHasStarted) else {
+            failActivation("sensor is already started or its state is unknown")
+            return
+        }
+        if let checkpoint = OttaiRegistry.preparation(sensorId) {
+            guard commandStatus >= 0 && commandStatus < 3,
+                  checkpoint.address == deviceAddress,
+                  preparationFirmware == checkpoint.version,
+                  OttaiPreparation.versionMatches(checkpoint.version, materials.deviceVersion) else {
+                failActivation("preparation identity or command state mismatch")
+                return
+            }
+            do {
+                preparationPackets = try OttaiPreparation.packets(version: checkpoint.version, coefficients: materials.coefficient,
+                    k: materials.calibrationK, b: materials.calibrationB, session: sessionKeyHex)
+                writeNextPreparationPacket()
+            } catch { failActivation("invalid or missing factory parameters") }
+            return
+        }
         if maxActiveCandidatesMs.isEmpty {
             let cloudExpireMs = materials.activeExpireTimeMs > 0 ? materials.activeExpireTimeMs : OttaiConstants.defaultActiveExpireMs
             maxActiveCandidatesMs = OttaiConstants.activationMaxActiveCandidatesMs(cloudActiveExpireMs: cloudExpireMs)
@@ -1955,6 +1962,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
 
     private func advanceActivation() {
         switch actStep {
+        case .preparation: writeNextPreparationPacket()
         case .rtc: actStep = .maxActive; writeMaxActiveTime()
         case .maxActive: actStep = .destruction; writeDestructionTime()
         case .destruction: actStep = .command; writeActivateCmd()
@@ -2013,6 +2021,10 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     }
 
     private func writeActivateCmd() {
+        guard ottaiCanWriteActivation(commandStatus: commandStatus, activationStarted: activationHasStarted) else {
+            failActivation("sensor state changed before activation")
+            return
+        }
         guard let cmd = OttaiCrypto.encryptActivateCmd([OttaiConstants.activateCmd], sessionKeyHex: sessionKeyHex) else {
             failActivation("activation command encryption failed"); return
         }
@@ -2025,7 +2037,8 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         activationCommandSentAtMs = nowMs()
         maxActiveCandidatesMs = []
         maxActiveCandidateIndex = 0
-        OttaiRegistry.setActivationAttempted(sensorId, true)
+        OttaiRegistry.markActivationStarted(sensorId)
+        activationRequested = false
         if materials.activeTimeMs <= 0 { setProvisionalActiveTime(activationCommandSentAtMs, "activation-command") }
         reportSensorSessionIfNeeded()
         trace("activation command sent; sensor accepted activation writes", log: log, category: ConstantsLog.categoryCGMOttai, type: .info)
@@ -2057,6 +2070,9 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         trace("activation failed: %{public}@", log: log, category: ConstantsLog.categoryCGMOttai, type: .error, reason)
         actStep = .none
         pendingActivation = false
+        activationRequested = false
+        OttaiRegistry.setActivationAttempted(sensorId, false)
+        preparationPackets.removeAll()
         maxActiveCandidatesMs = []
         maxActiveCandidateIndex = 0
     }
@@ -2090,6 +2106,13 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     override func prepareForRelease() {
         workQueue.async { [weak self] in
             guard let self = self else { return }
+            self.isReleased = true
+            self.connectionGeneration += 1
+            self.phase = .idle
+            self.actStep = .none
+            self.pendingActivation = false
+            self.activationRequested = false
+            self.sessionKeyHex = ""
             self.livePollTimer?.cancel()
             self.livePollTimer = nil
             self.clearPendingHistoryRange()

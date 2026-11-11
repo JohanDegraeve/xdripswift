@@ -109,7 +109,15 @@ enum OttaiSyaiClient {
                       headers: ["timestamp": ts], productModel: true)
     }
 
-    /// bindV3, with the "binding in progress" mark around it like the app.
+    /// Fetch keys before activation. This API uses seconds and newBindType=2.
+    static func bindForPreparation(mac: String, firmware: String) -> [String: Any]? {
+        authed("POST", path: "deviceBind/composite/bindV3", body: [
+            "mac": mac, "deviceType": "cgm", "deviceVersion": firmware,
+            "userId": userId, "activeTime": nowMs() / 1000, "newBindType": 2,
+        ])
+    }
+
+    /// Mark the sensor as busy, then bind it after activation.
     static func bindV3(mac: String, deviceVersion: String, activeTimeMs: Int64) -> [String: Any]? {
         _ = authed("POST", path: "deviceBind/markDeviceStatus", body: ["mac": mac, "state": 1, "duration": 5])
         let resp = authed("POST", path: "deviceBind/composite/bindV3", body: [

@@ -64,9 +64,14 @@ enum OttaiRegistry {
         static let continuityBaselinePrefix = "ottai_continuity_baseline_"
         static let deviceIdPrefix = "ottai_device_id_"
         static let activationAttemptedPrefix = "ottai_act_tried_"
+        static let activationStartedPrefix = "ottai_activation_started_"
+        static let sensorStatusPrefix = "ottai_sensor_status_"
         static let v3BootstrapPendingPrefix = "ottai_v3_bootstrap_pending_"
         // xDrip only: start time of a server-activated sensor that is not bound yet
         static let pendingBindPrefix = "ottai_pending_bind_"
+        static let preparationPrefix = "ottai_preparation_"
+        static let calibrationKPrefix = "ottai_preparation_k_"
+        static let calibrationBPrefix = "ottai_preparation_b_"
         static func validatedVersion(_ id: String) -> String { "ottai_v3_validated_version_\(id)" }
     }
 
@@ -88,6 +93,8 @@ enum OttaiRegistry {
         var activeExpireTimeMs: Int64 = 0
         var retainTimeMs: Int64 = 0
         var preheatPeriodMs: Int64 = 0
+        var calibrationK: Double? = nil
+        var calibrationB: Double? = nil
 
         var authKeys: [[UInt8]]? { OttaiCrypto.parseAuthKeys(keyAHex) }
 
@@ -244,6 +251,45 @@ enum OttaiRegistry {
         d.set(v, forKey: K.activationAttemptedPrefix + OttaiConstants.canonicalSensorId(id))
     }
 
+    static func activationStarted(_ id: String) -> Bool {
+        d.bool(forKey: K.activationStartedPrefix + canonical(id))
+    }
+
+    static func markActivationStarted(_ id: String) {
+        d.set(true, forKey: K.activationStartedPrefix + canonical(id))
+        setActivationAttempted(id, false)
+    }
+
+    static func sensorStatus(_ id: String) -> Int {
+        (d.object(forKey: K.sensorStatusPrefix + canonical(id)) as? Int) ?? -1
+    }
+
+    static func saveSensorStatus(_ id: String, _ status: Int) {
+        guard status >= 3 else { return }
+        d.set(status, forKey: K.sensorStatusPrefix + canonical(id))
+        markActivationStarted(id)
+    }
+
+    struct PreparationCheckpoint {
+        let version: String
+        let address: String
+    }
+
+    static func preparation(_ id: String) -> PreparationCheckpoint? {
+        guard let saved = d.dictionary(forKey: K.preparationPrefix + canonical(id)),
+              let version = saved["version"] as? String,
+              let address = saved["address"] as? String else { return nil }
+        return PreparationCheckpoint(version: version, address: address)
+    }
+
+    static func savePreparation(_ id: String, version: String, address: String) {
+        d.set(["version": version, "address": address], forKey: K.preparationPrefix + canonical(id))
+    }
+
+    static func clearPreparation(_ id: String) {
+        d.removeObject(forKey: K.preparationPrefix + canonical(id))
+    }
+
     // MARK: - materials
 
     static func saveMaterials(sensorId: String, _ m: DeviceMaterials) -> Bool {
@@ -266,6 +312,8 @@ enum OttaiRegistry {
         d.set(NSNumber(value: m.preheatPeriodMs), forKey: K.preheatPeriodPrefix + id)
         d.set(m.deviceVersion, forKey: K.deviceVersionPrefix + id)
         d.set(m.deviceId, forKey: K.deviceIdPrefix + id)
+        d.set(m.calibrationK, forKey: K.calibrationKPrefix + id)
+        d.set(m.calibrationB, forKey: K.calibrationBPrefix + id)
         setV3CredentialBootstrapPending(id, false)
         return true
     }
@@ -289,7 +337,9 @@ enum OttaiRegistry {
             deviceId: d.integer(forKey: K.deviceIdPrefix + id),
             activeExpireTimeMs: activeExpireTimeMs,
             retainTimeMs: int64(K.retainTimePrefix + id),
-            preheatPeriodMs: int64(K.preheatPeriodPrefix + id)
+            preheatPeriodMs: int64(K.preheatPeriodPrefix + id),
+            calibrationK: d.object(forKey: K.calibrationKPrefix + id) as? Double,
+            calibrationB: d.object(forKey: K.calibrationBPrefix + id) as? Double
         )
     }
 
@@ -386,7 +436,9 @@ enum OttaiRegistry {
         for prefix in [K.keyAPrefix, K.methodPrefix, K.coeffPrefix, K.activeTimePrefix,
                        K.provisionalActiveTimePrefix, K.activeExpirePrefix, K.retainTimePrefix,
                        K.preheatPeriodPrefix, K.deviceVersionPrefix, K.lastDataNoPrefix, K.deliveredDataNoPrefix, K.recordSizePrefix,
-                       K.deviceIdPrefix, K.activationAttemptedPrefix, K.v3BootstrapPendingPrefix, K.pendingBindPrefix] {
+                       K.deviceIdPrefix, K.activationAttemptedPrefix, K.activationStartedPrefix, K.sensorStatusPrefix,
+                       K.v3BootstrapPendingPrefix, K.pendingBindPrefix,
+                       K.preparationPrefix, K.calibrationKPrefix, K.calibrationBPrefix] {
             d.removeObject(forKey: prefix + id)
         }
         d.removeObject(forKey: K.validatedVersion(id))

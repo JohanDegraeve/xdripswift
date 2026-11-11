@@ -39,16 +39,6 @@ enum OttaiBleAuth {
 
     // MARK: - little-endian helpers
 
-    /// Read a 32-bit number from the first 4 bytes, little-endian.
-    static func bytesToIntLE(_ b: [UInt8]) -> Int32 {
-        precondition(b.count >= 4, "need >=4 bytes")
-        return Int32(bitPattern:
-            UInt32(b[0]) |
-            (UInt32(b[1]) << 8) |
-            (UInt32(b[2]) << 16) |
-            (UInt32(b[3]) << 24))
-    }
-
     /// Write a 32-bit number as 4 bytes, little-endian.
     static func intToBytesLE(_ i: Int32) -> [UInt8] {
         let u = UInt32(bitPattern: i)

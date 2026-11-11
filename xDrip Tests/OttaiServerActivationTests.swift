@@ -309,91 +309,6 @@ final class OttaiCloudOperationTests: XCTestCase {
     }
 }
 
-final class OttaiServerDurationTests: XCTestCase {
-    private let key = "00112233445566778899aabbccddeeff"
-
-    private func frames(seconds: Int64 = 14 * 86_400) throws -> (duration: [UInt8], activate: [UInt8]) {
-        let plain = (0..<4).map { UInt8(truncatingIfNeeded: seconds >> ($0 * 8)) }
-        return (try XCTUnwrap(OttaiCrypto.encryptPayload(plain, sessionKeyHex: key)),
-                try XCTUnwrap(OttaiCrypto.encryptActivateCmd([3], sessionKeyHex: key)))
-    }
-
-    func testVerifiedSessionTriesThirtyDownToFifteenThenServerDuration() throws {
-        let f = try frames()
-        let plan = try XCTUnwrap(OttaiServerDurationPlan.verified(keyHex: key, duration: f.duration, activate: f.activate))
-        XCTAssertEqual(plan.candidates, Array(stride(from: Int64(30), through: 15, by: -1)).map { $0 * 86_400 } + [14 * 86_400])
-        let frame = try XCTUnwrap(plan.frame(at: 0, original: f.duration))
-        let plain = try XCTUnwrap(OttaiCrypto.aesECB(.decrypt, key: OttaiCrypto.hexToBytes(key), data: frame, pkcs7Padded: false))
-        XCTAssertEqual(Array(plain.prefix(4)), [0x00, 0x8D, 0x27, 0x00])
-        XCTAssertTrue(plain.dropFirst(4).allSatisfy { $0 == 0 })
-        XCTAssertEqual(plan.frame(at: plan.candidates.count - 1, original: f.duration), f.duration)
-    }
-
-    func testUnknownKeyOrWrongSessionNeverOverridesServerFrame() throws {
-        let f = try frames()
-        for candidate in ["", "bad", String(repeating: "ff", count: 16)] {
-            XCTAssertNil(OttaiServerDurationPlan.verified(keyHex: candidate, duration: f.duration, activate: f.activate))
-        }
-        let wrongCommand = try XCTUnwrap(OttaiCrypto.encryptActivateCmd([4], sessionKeyHex: key))
-        XCTAssertNil(OttaiServerDurationPlan.verified(keyHex: key, duration: f.duration, activate: wrongCommand))
-    }
-
-    func testInvalidDurationOrPaddingCannotAuthorizeOverride() throws {
-        let invalid = try frames(seconds: 1)
-        XCTAssertNil(OttaiServerDurationPlan.verified(keyHex: key, duration: invalid.duration, activate: invalid.activate))
-        let valid = try frames()
-        var plain: [UInt8] = [0, 0x75, 0x12, 0]
-        plain += [1] // Unknown frame fields must not be discarded.
-        let frame = try XCTUnwrap(OttaiCrypto.encryptPayload(plain, sessionKeyHex: key))
-        XCTAssertNil(OttaiServerDurationPlan.verified(keyHex: key, duration: frame, activate: valid.activate))
-    }
-
-    func testOnlyDurationOrRTCFailureBeforeActivateStepsDown() throws {
-        let f = try frames()
-        let plan = try XCTUnwrap(OttaiServerDurationPlan.verified(keyHex: key, duration: f.duration, activate: f.activate))
-        XCTAssertEqual(plan.nextIndex(after: 0, durationOrRTCFailed: true, activateSent: false), 1)
-        XCTAssertNil(plan.nextIndex(after: 0, durationOrRTCFailed: false, activateSent: false))
-        XCTAssertNil(plan.nextIndex(after: 0, durationOrRTCFailed: true, activateSent: true))
-        XCTAssertNil(plan.nextIndex(after: plan.candidates.count - 1, durationOrRTCFailed: true, activateSent: false))
-        XCTAssertNil(plan.frame(at: -1, original: f.duration))
-    }
-
-    func testNeverShortensLongerServerLifetime() throws {
-        let f = try frames(seconds: 35 * 86_400)
-        let plan = try XCTUnwrap(OttaiServerDurationPlan.verified(keyHex: key, duration: f.duration, activate: f.activate))
-        XCTAssertEqual(plan.candidates, [35 * 86_400])
-        XCTAssertEqual(plan.frame(at: 0, original: f.duration), f.duration)
-    }
-}
-
-extension OttaiServerDurationTests {
-    func testVerificationReportsSpecificReasonsWithoutSecrets() throws {
-        let f = try frames()
-        func failure(_ kb: String, _ d: [UInt8], _ c: [UInt8]) -> OttaiServerDurationPlan.VerificationFailure? {
-            switch OttaiServerDurationPlan.verification(keyHex: kb, duration: d, activate: c) {
-            case .success: return nil
-            case .failure(let reason): return reason
-            }
-        }
-        XCTAssertEqual(failure("", f.duration, f.activate), .missingKey)
-        XCTAssertEqual(failure(" \n", f.duration, f.activate), .missingKey)
-        XCTAssertEqual(failure("zz", f.duration, f.activate), .invalidKeyHex)
-        XCTAssertEqual(failure("00", f.duration, f.activate), .invalidKeyLength)
-        XCTAssertEqual(failure(key, [], f.activate), .invalidDurationLength)
-        XCTAssertEqual(failure(key, f.duration, []), .invalidActivateLength)
-        let wrongKey = String(repeating: "ff", count: 16)
-        let mismatch = try XCTUnwrap(failure(wrongKey, f.duration, f.activate))
-        XCTAssertEqual(mismatch, .activateMismatch)
-        XCTAssertFalse(mismatch.rawValue.contains(wrongKey))
-        XCTAssertFalse(mismatch.rawValue.contains(key))
-        let badPadding = try XCTUnwrap(OttaiCrypto.encryptPayload([0, 0x75, 0x12, 0, 1], sessionKeyHex: key))
-        XCTAssertEqual(failure(key, badPadding, f.activate), .invalidDurationPadding)
-        let invalid = try frames(seconds: 1)
-        XCTAssertEqual(failure(key, invalid.duration, invalid.activate), .invalidDurationRange)
-        XCTAssertNil(failure(key, f.duration, f.activate))
-    }
-}
-
 final class OttaiRecordWidthBackportTests: XCTestCase {
     func testLowCurrentHistoryCannotPoisonLearnedWidth() {
         let page = OttaiCrypto.hexToBytes("00000000d7140000ce0344e0898a13660cc60344e0798b13740cae0344e0698c137e0c870344e0598d13890c870344e0498e13920c870344e0398f139b0c6f0344e0299013a30c770344e0199113ac0c7f0344e0099213b50c770344e0f99213bd0c770344e0e99313c80c6f0344e0d99413cd0c7f0344e0c99513d60c870344e0b99613d50c9f0344e0a99713c50cbe0344e0999813bd0cdd0344e0899913b50c00000000000000")
@@ -502,5 +417,215 @@ final class OttaiRegionalTransportTests: XCTestCase {
         }
         XCTAssertEqual(calls,2)
         return result
+    }
+}
+
+final class OttaiPreparationTests: XCTestCase {
+    private typealias MaterialsResult = OttaiCloudClient.OperationResult<OttaiRegistry.DeviceMaterials?>
+
+    private func materials(version: String = "V1.7") -> OttaiRegistry.DeviceMaterials {
+        var materials = OttaiRegistry.DeviceMaterials()
+        materials.keyAHex = String(repeating: "01", count: 96)
+        materials.deviceVersion = version
+        materials.activeTimeMs = 1_800_000_000_000
+        return materials
+    }
+
+    func testLostBindAndFailedLookupDoNotAllowAnotherBind() {
+        let result = OttaiCloudClient.recoverPreparation(version: "V1.7", bind: {
+            MaterialsResult(value: nil, failure: .init(text: "connection lost"))
+        }, lookup: {
+            MaterialsResult(value: nil, failure: .init(text: "session expired", code: "TOKEN_EXPIRED"))
+        })
+        XCTAssertNil(result.operation.value)
+        XCTAssertFalse(result.bindRejected)
+    }
+
+    func testLookupOnlyFailureCannotProveThatBindWasRefused() {
+        let result = OttaiCloudClient.recoverPreparation(version: "V1.7", bind: nil, lookup: {
+            MaterialsResult(value: nil, failure: .init(text: "session expired", code: "TOKEN_EXPIRED"))
+        })
+        XCTAssertFalse(result.bindRejected)
+    }
+
+    func testExplicitBindRefusalAllowsAnotherBind() {
+        let result = OttaiCloudClient.recoverPreparation(version: "V1.7", bind: {
+            MaterialsResult(value: nil, failure: .init(text: "bind refused", code: "DEVICE_ALREADY_USED"))
+        }, lookup: {
+            MaterialsResult(value: nil, failure: nil)
+        })
+        XCTAssertTrue(result.bindRejected)
+        XCTAssertEqual(result.operation.failure?.code, "DEVICE_ALREADY_USED")
+    }
+
+    func testIncompleteBindFallsBackToMatchingSavedMaterials() {
+        var lookups = 0
+        let result = OttaiCloudClient.recoverPreparation(version: "V1.7", bind: {
+            MaterialsResult(value: self.materials(version: "V1.6"), failure: nil)
+        }, lookup: {
+            lookups += 1
+            return MaterialsResult(value: self.materials(), failure: nil)
+        })
+        XCTAssertEqual(lookups, 1)
+        XCTAssertNotNil(result.operation.value?.authKeys)
+        XCTAssertEqual(result.operation.value?.activeTimeMs, 0)
+        XCTAssertNil(result.operation.failure)
+    }
+
+    func testMatchingBindDoesNotNeedAnotherRequest() {
+        let result = OttaiCloudClient.recoverPreparation(version: "V1.7", bind: {
+            MaterialsResult(value: self.materials(), failure: nil)
+        }, lookup: {
+            XCTFail("A valid bind must not trigger a lookup")
+            return MaterialsResult(value: nil, failure: nil)
+        })
+        XCTAssertNotNil(result.operation.value)
+        XCTAssertEqual(result.operation.value?.activeTimeMs, 0)
+    }
+
+    func testWrongVersionFromLookupDoesNotAllowPreparation() {
+        let result = OttaiCloudClient.recoverPreparation(version: "V1.7", bind: nil, lookup: {
+            MaterialsResult(value: self.materials(version: "V1.8"), failure: nil)
+        })
+        XCTAssertNil(result.operation.value)
+        XCTAssertFalse(result.bindRejected)
+    }
+
+    func testSavedKeysDoNotErasePendingPreparationAndRemovalClearsIt() {
+        let id = "0000000000AB"
+        OttaiRegistry.removeSensor(id)
+        defer { OttaiRegistry.removeSensor(id) }
+        OttaiRegistry.savePreparation(id, version: "V1.8", address: "test-ble")
+        var materials = OttaiRegistry.DeviceMaterials()
+        materials.calibrationK = 1
+        materials.calibrationB = -2
+        XCTAssertTrue(OttaiRegistry.saveMaterials(sensorId: id, materials))
+        XCTAssertEqual(OttaiRegistry.preparation(id)?.version, "V1.8")
+        XCTAssertEqual(OttaiRegistry.loadMaterials(sensorId: id).calibrationB, -2)
+        OttaiRegistry.removeSensor(id)
+        XCTAssertNil(OttaiRegistry.preparation(id))
+        XCTAssertNil(OttaiRegistry.loadMaterials(sensorId: id).calibrationK)
+    }
+
+    func testFactoryCoefficientVectorAndCRC() throws {
+        let packets = try OttaiPreparation.packets(version: "E1.2.6(V1.7.SH2616.1),STDRD", coefficients: "1,2", k: nil, b: nil, session: "")
+        XCTAssertEqual(packets.count, 1)
+        XCTAssertEqual(Array(packets[0].prefix(10)), [9,2,0,0,128,63,0,0,0,64])
+        var crc = 0xffff
+        for byte in packets[0] {
+            for bit in 0..<8 {
+                let low = (crc ^ (Int(byte) >> bit)) & 1
+                crc >>= 1
+                if low != 0 { crc ^= 0xa001 }
+            }
+        }
+        XCTAssertEqual(crc, 0)
+    }
+    func testInvalidParametersFailBeforeAnyPacketIsReturned() {
+        for coefficients in ["", "1,,2", "NaN", "Infinity"] {
+            XCTAssertThrowsError(try OttaiPreparation.packets(version: "V1.7", coefficients: coefficients, k: nil, b: nil, session: ""))
+        }
+        XCTAssertThrowsError(try OttaiPreparation.packets(version: "V1.8", coefficients: "1,2", k: nil, b: nil, session: ""))
+        XCTAssertThrowsError(try OttaiPreparation.packets(version: "unknown", coefficients: "1,2", k: nil, b: nil, session: ""))
+    }
+    func testCalibrationUsesLocalSession() throws {
+        let key = "00112233445566778899aabbccddeeff"
+        let packets = try OttaiPreparation.packets(version: "V1.8", coefficients: "1", k: 1, b: -2, session: key)
+        XCTAssertEqual(packets.count, 2)
+        XCTAssertEqual(packets[1].first, 11)
+        let plain = try XCTUnwrap(OttaiCrypto.aesECB(.decrypt, key: OttaiCrypto.hexToBytes(key), data: Array(packets[1].dropFirst()), pkcs7Padded: false))
+        XCTAssertEqual(plain, [0,0,0,0,0,0,240,63,0,0,0,0,0,0,0,192])
+    }
+    func testVersionIdentityRejectsDifferentBuildOrVariant() {
+        XCTAssertTrue(OttaiPreparation.versionMatches("E1.2.6(V1.7.SH2616.1),STDRD", "E1.2.6(V1.7.SH2616.1)"))
+        XCTAssertTrue(OttaiPreparation.versionMatches("E1.2.6(V1.7.SH2616.1),STDRD", "V1.7.SH2616.1"))
+        XCTAssertFalse(OttaiPreparation.versionMatches("E1.2.6(V1.7.SH2616.1),STDRD", "E1.2.6(V1.7.SH2616.1),OTHER"))
+        XCTAssertFalse(OttaiPreparation.versionMatches("V1.7.SH2616.1", "V1.7.SH2616.2"))
+    }
+}
+
+final class OttaiSetupSafetyTests: XCTestCase {
+    private let id = "0000000000AC"
+    private let now: Int64 = 1_800_000_000_000
+
+    func testOttaiUsesItsOwnSetupInsteadOfGenericStartAndStopActions() {
+        XCTAssertFalse(CGMTransmitterType.ottai.allowManualSensorStart())
+        XCTAssertTrue(CGMTransmitterType.dexcom.allowManualSensorStart())
+    }
+
+    private func step(sensorID: String = "0000000000AC", signedIn: Bool = true, keys: Bool = true,
+                      bootstrap: Bool = false, pendingBind: Bool = false, requested: Bool = false,
+                      started: Bool = false, command: Int = -1, savedCommand: Int = -1,
+                      startMs: Int64 = 0) -> OttaiSetupStep {
+        OttaiSetupStep.resolve(sensorID: sensorID, signedIn: signedIn, hasKeys: keys,
+            bootstrapPending: bootstrap, pendingBind: pendingBind, activationRequested: requested,
+            activationStarted: started, commandStatus: command, savedCommandStatus: savedCommand,
+            startMs: startMs, nowMs: now)
+    }
+
+    func testSetupOffersOnlyTheNextRequiredStep() {
+        XCTAssertEqual(step(sensorID: "", signedIn: false, keys: false), .enterID)
+        XCTAssertEqual(step(signedIn: false, keys: false), .signIn)
+        XCTAssertEqual(step(keys: false), .fetch)
+        XCTAssertEqual(step(keys: false, bootstrap: true), .activate)
+        XCTAssertEqual(step(keys: true), .connect)
+        XCTAssertEqual(step(command: 2), .activate)
+    }
+
+    func testStartingAndWarmupDoNotOfferAnotherAction() {
+        XCTAssertEqual(step(requested: true, command: 2), .starting)
+        XCTAssertFalse(step(requested: true, command: 2).hasAction)
+        let warming = step(started: true, startMs: now - 5 * 60_000)
+        XCTAssertEqual(warming, .warmup(minutes: 25))
+        XCTAssertFalse(warming.hasAction)
+        XCTAssertEqual(step(started: true, startMs: now - 30 * 60_000), .active)
+    }
+
+    func testActiveOrEndedSensorWinsOverOldActivationRequest() {
+        XCTAssertEqual(step(requested: true, command: 3), .active)
+        XCTAssertEqual(step(requested: true, command: 4), .ended)
+        XCTAssertEqual(step(requested: true, savedCommand: 3), .active)
+        XCTAssertEqual(step(requested: true, savedCommand: 4), .ended)
+    }
+
+    func testSavedKeysWorkWithoutCloudSignIn() {
+        XCTAssertEqual(step(signedIn: false), .connect)
+        XCTAssertEqual(step(signedIn: false, command: 3), .active)
+        XCTAssertEqual(step(signedIn: false, command: 1), .activate)
+    }
+
+    func testPendingBindCannotRestartSensor() {
+        XCTAssertEqual(step(keys: false, pendingBind: true, started: true), .finishingSetup)
+        XCTAssertEqual(step(signedIn: false, keys: false, pendingBind: true, started: true), .signIn)
+    }
+
+    func testCloudStartDateAloneDoesNotBlockAConfirmedNewSensor() {
+        XCTAssertEqual(step(command: 2, startMs: now - 60_000), .activate)
+        XCTAssertEqual(step(startMs: now - 60_000), .connect)
+    }
+
+    func testActivationWritesRequireFreshUnstartedStatus() {
+        for status in [-1, 0, 1, 2, 3, 4, 5] {
+            XCTAssertFalse(ottaiCanWriteActivation(commandStatus: status, activationStarted: true))
+            XCTAssertEqual(ottaiCanWriteActivation(commandStatus: status, activationStarted: false), (0...2).contains(status))
+        }
+    }
+
+    func testStartedStateSurvivesMaterialsRefreshAndReconnect() {
+        OttaiRegistry.removeSensor(id)
+        defer { OttaiRegistry.removeSensor(id) }
+        OttaiRegistry.setActivationAttempted(id, true)
+        OttaiRegistry.markActivationStarted(id)
+        XCTAssertFalse(OttaiRegistry.loadActivationAttempted(id))
+        XCTAssertTrue(OttaiRegistry.saveMaterials(sensorId: id, OttaiRegistry.DeviceMaterials()))
+        XCTAssertTrue(OttaiRegistry.activationStarted(id))
+        XCTAssertFalse(ottaiCanWriteActivation(commandStatus: -1, activationStarted: OttaiRegistry.activationStarted(id)))
+        OttaiRegistry.saveSensorStatus(id, 3)
+        OttaiRegistry.saveSensorStatus(id, -1)
+        OttaiRegistry.saveSensorStatus(id, 2)
+        XCTAssertEqual(OttaiRegistry.sensorStatus(id), 3)
+        OttaiRegistry.removeSensor(id)
+        XCTAssertFalse(OttaiRegistry.activationStarted(id))
+        XCTAssertEqual(OttaiRegistry.sensorStatus(id), -1)
     }
 }
