@@ -6,6 +6,7 @@
 //
 
 import XCTest
+import CryptoKit
 @testable import xdrip
 
 final class OttaiServerActivationTests: XCTestCase {
@@ -409,5 +410,83 @@ final class OttaiTimeBackportTests: XCTestCase {
         correction.seed(start: 1_000_000, arrivalStart: 0)
         XCTAssertNil(correction.accept(anchor: 1_000_000, counter: 10, received: 1_585_000))
         XCTAssertNil(correction.accept(anchor: 1_000_000, counter: 11, received: 1_645_000))
+    }
+}
+
+final class OttaiRegionalTransportTests: XCTestCase {
+    func testBothMobileTokenShapes() {
+        XCTAssertEqual(OttaiCloudClient.mobileAccessToken(["accessToken":"legacy"]), "legacy")
+        XCTAssertEqual(OttaiCloudClient.mobileAccessToken(["jwtToken":["accessToken":"secure"]]), "secure")
+    }
+
+    func testRegionsAndLegacyWatchIsolation() {
+        let path = "/cgm/app/server/user/apiToken"
+        XCTAssertNotNil(OttaiRegionalTransport.route("https://seas.ottai.com" + path, headers: [:]))
+        XCTAssertNil(OttaiRegionalTransport.route("https://api.syai.com" + path, headers: [:]))
+        XCTAssertNil(OttaiRegionalTransport.route("https://api.ottai.com" + path, headers: ["appName":"watch"]))
+        XCTAssertNotNil(OttaiRegionalTransport.route("https://api.ottai.com" + path, headers: ["appName":"ottai", "packageName":"com.ottai.tag"]))
+        XCTAssertNil(OttaiRegionalTransport.route("http://seas.ottai.com" + path, headers: [:]))
+    }
+
+    func testEncryptedExchangeRequestAndBusinessFailure() throws {
+        let result = try encryptedRequest()
+        XCTAssertEqual(result.json["code"] as? String, "DEVICE_AUTH_SIGN_ERROR")
+    }
+
+    func testChangedReplyCannotPassAuthentication() {
+        XCTAssertThrowsError(try encryptedRequest(tamperReply: true))
+    }
+
+    func testInvalidExchangeStopsBeforeSendingBusinessRequest() throws {
+        let route = try XCTUnwrap(OttaiRegionalTransport.route("https://seas.ottai.com/cgm/app/server/test", headers: [:]))
+        var calls = 0
+        XCTAssertThrowsError(try OttaiRegionalTransport.request("GET", route: route, body: nil, headers: ["deviceId": "test"]) { _, _, _, _ in
+            calls += 1
+            return (200, ["data": ["serverSignature": "wrong"]])
+        })
+        XCTAssertEqual(calls, 1)
+    }
+
+    private func encryptedRequest(tamperReply: Bool = false) throws -> OttaiRegionalTransport.Reply {
+        let identity = "test-install", secret = "test-secret"
+        let route = try XCTUnwrap(OttaiRegionalTransport.route("https://seas.ottai.com/cgm/app/server/test?q=a%2Bb", headers: [:]))
+        var aes: SymmetricKey?
+        var signing: SymmetricKey?
+        var calls = 0
+        let aad = Data((identity + "|" + secret).utf8)
+        func seal(_ data: Data, key: SymmetricKey) throws -> AES.GCM.SealedBox { try AES.GCM.seal(data, using: key, authenticating: aad) }
+        let result = try OttaiRegionalTransport.request("POST", route: route, body: "{\"test\":true}", headers: ["deviceId":identity]) { method, url, body, headers in
+            calls += 1
+            let obj = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(try XCTUnwrap(body).utf8)) as? [String: Any])
+            if calls == 1 {
+                XCTAssertTrue(url.hasSuffix("/security/exchangeKey"))
+                let client = try P256.KeyAgreement.PublicKey(rawRepresentation: Data(base64Encoded: obj["clientPubKeyX"] as! String)! + Data(base64Encoded: obj["clientPubKeyY"] as! String)!)
+                let server = P256.KeyAgreement.PrivateKey()
+                let shared = try server.sharedSecretFromKeyAgreement(with: client)
+                let x = server.publicKey.rawRepresentation.prefix(32).base64EncodedString()
+                let y = server.publicKey.rawRepresentation.suffix(32).base64EncodedString()
+                let time = Int64(Date().timeIntervalSince1970 * 1000), expiry = time + 60_000
+                let derived = HKDF<SHA256>.deriveKey(inputKeyMaterial: SymmetricKey(data: shared.withUnsafeBytes { Data($0) }), salt: Data(secret.utf8), info: Data("\(identity)#\(expiry)#\(secret)".utf8), outputByteCount: 64).withUnsafeBytes { Data($0) }
+                aes = SymmetricKey(data: derived.prefix(32))
+                signing = SymmetricKey(data: derived.suffix(32))
+                let proof = try seal(Data((x+y).utf8), key: aes!)
+                return (200,["code":"200", "data":["serverPubKeyX":x,"serverPubKeyY":y,"serverTimestamp":time,"serverSignature":SHA256.hash(data: Data((identity+x+y+String(time)).utf8)).map { String(format:"%02x",$0) }.joined(),"secretId":secret,"expireTime":expiry,"iv":Data(proof.nonce).base64EncodedString(),"authTag":proof.tag.base64EncodedString(),"ciphertext":proof.ciphertext.base64EncodedString()]])
+            }
+            XCTAssertEqual(headers["webDeviceId"],identity)
+            XCTAssertEqual(headers["cipherSeq"],"1")
+            XCTAssertTrue(url.contains("cipherParamText="))
+            XCTAssertNil(obj["test"])
+            let signed = try XCTUnwrap(headers["cipherNonceId"]) + "1" + XCTUnwrap(headers["cipherTimeNow"]) + XCTUnwrap(obj["cipherBodyText"] as? String)
+            let signature = try XCTUnwrap(Data(base64Encoded: XCTUnwrap(obj["cipherBodySignature"] as? String)))
+            XCTAssertTrue(HMAC<SHA256>.isValidAuthenticationCode(signature, authenticating: Data(signed.utf8), using: try XCTUnwrap(signing)))
+            let box = try AES.GCM.SealedBox(nonce: AES.GCM.Nonce(data: Data(base64Encoded: obj["cipherBodyNonce"] as! String)!), ciphertext: Data(base64Encoded: obj["cipherBodyText"] as! String)!, tag: Data(base64Encoded: obj["cipherBodyMac"] as! String)!)
+            XCTAssertEqual(String(decoding: try AES.GCM.open(box, using: aes!, authenticating: aad), as: UTF8.self), "{\"test\":true}")
+            let reply = try seal(Data("{\"code\":\"DEVICE_AUTH_SIGN_ERROR\"}".utf8), key: aes!)
+            var ciphertext = reply.ciphertext
+            if tamperReply { ciphertext[ciphertext.startIndex] ^= 1 }
+            return (200,["cipherSecretId":secret,"cipherText":ciphertext.base64EncodedString(),"cipherMac":reply.tag.base64EncodedString(),"cipherNonce":Data(reply.nonce).base64EncodedString()])
+        }
+        XCTAssertEqual(calls,2)
+        return result
     }
 }

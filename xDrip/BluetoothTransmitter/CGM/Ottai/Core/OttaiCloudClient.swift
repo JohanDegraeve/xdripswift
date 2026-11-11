@@ -62,6 +62,10 @@ enum OttaiCloudClient {
         return OperationResult(value: value, failure: lastFailure)
     }
 
+    static func mobileAccessToken(_ data: [String: Any]) -> String {
+        str((data["jwtToken"] as? [String: Any]) ?? data, "accessToken")
+    }
+
     struct LoginResult {
         let userId: String
         let accessToken: String
@@ -278,7 +282,7 @@ enum OttaiCloudClient {
         ]
         guard let resp = httpPostJson(OttaiConstants.apiBase + OttaiConstants.epSmsLogin, json(body), headers(ts: ts, apiBase: OttaiConstants.apiBase, authorizationOverride: "", profileOverride: profile)),
               let data = dataObject(resp) else { return nil }
-        let result = LoginResult(userId: str(data, "userId"), accessToken: str(data, "accessToken"), glucoseSecretKey: str(data, "glucoseSecretKey"))
+        let result = LoginResult(userId: str(data, "userId"), accessToken: mobileAccessToken(data), glucoseSecretKey: str(data, "glucoseSecretKey"))
         if result.ok {
             OttaiRegistry.saveApiBase(OttaiConstants.apiBase)
             OttaiRegistry.saveSessionProfile(profile)
@@ -304,7 +308,7 @@ enum OttaiCloudClient {
         ]
         guard let resp = httpPostJson(baseUrl + OttaiConstants.epAccountLogin, json(body), headers(ts: ts, apiBase: baseUrl, authorizationOverride: authorizationOverride)),
               let data = dataObject(resp) else { return nil }
-        let result = LoginResult(userId: str(data, "userId"), accessToken: str(data, "accessToken"), glucoseSecretKey: str(data, "glucoseSecretKey"))
+        let result = LoginResult(userId: str(data, "userId"), accessToken: mobileAccessToken(data), glucoseSecretKey: str(data, "glucoseSecretKey"))
         if result.ok {
             OttaiRegistry.saveApiBase(baseUrl)
             OttaiRegistry.saveSessionProfile(.watch)
@@ -853,6 +857,40 @@ enum OttaiCloudClient {
     }
 
     private static func request(_ method: String, url: String, body: String?, headers: [String: String], timeoutMs: Int = timeoutMs) -> [String: Any]? {
+        if let route = OttaiRegionalTransport.route(url, headers: headers) {
+            do {
+                let reply = try OttaiRegionalTransport.request(method, route: route, body: body, headers: headers) { verb, target, payload, common in
+                    guard let url = URL(string: target) else { throw OttaiRegionalTransport.Failure.protocolError }
+                    var request = URLRequest(url: url)
+                    request.httpMethod = verb
+                    request.timeoutInterval = TimeInterval(timeoutMs) / 1000
+                    common.forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
+                    request.httpBody = payload?.data(using: .utf8)
+                    let semaphore = DispatchSemaphore(value: 0)
+                    var result: Result<OttaiRegionalTransport.Reply, Error> = .failure(OttaiRegionalTransport.Failure.protocolError)
+                    let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                        defer { semaphore.signal() }
+                        if let error = error { result = .failure(error); return }
+                        guard let data = data, let http = response as? HTTPURLResponse,
+                              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
+                        result = .success((http.statusCode, json))
+                    }
+                    task.resume()
+                    guard semaphore.wait(timeout: .now() + .milliseconds(timeoutMs + 5_000)) == .success else {
+                        task.cancel()
+                        throw URLError(.timedOut)
+                    }
+                    return try result.get()
+                }
+                let code = anyToString(reply.json["code"])
+                let ok = code.isEmpty || code == "200" || code.caseInsensitiveEquals("OK")
+                lastFailure = (200...299).contains(reply.status) && ok ? nil : CloudFailure(text: "secure request http=\(reply.status) biz=\(code)", code: code)
+                return reply.json
+            } catch {
+                lastFailure = CloudFailure(text: "regional secure transport failed")
+                return nil
+            }
+        }
         guard let u = URL(string: url) else { lastFailure = CloudFailure(text: "bad url"); return nil }
         var req = URLRequest(url: u)
         req.httpMethod = method

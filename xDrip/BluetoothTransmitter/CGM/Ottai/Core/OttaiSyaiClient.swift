@@ -458,3 +458,136 @@ enum OttaiSyaiClient {
         }
     }
 }
+
+/// Encrypt mobile requests for China and Global accounts.
+/// Each request gets its own keys.
+enum OttaiRegionalTransport {
+    struct Route {
+        let base: String
+        let path: String
+        let query: [String: String]
+        let china: Bool
+    }
+    static func route(_ url: String, headers: [String: String]) -> Route? {
+        guard let u = URLComponents(string: url), let host = u.host, u.scheme == "https", u.port == nil,
+              u.user == nil, u.password == nil, u.fragment == nil,
+              u.path.hasPrefix("/cgm/app/server/"), !u.path.contains("..") else { return nil }
+        let china = host == "api.ottai.com" && headers["appName"] == "ottai" && headers["packageName"] == "com.ottai.tag"
+        guard china || host == "seas.ottai.com" else { return nil }
+        let query = Dictionary((u.queryItems ?? []).map { ($0.name, $0.value ?? "") }, uniquingKeysWith: { _, last in last })
+        return Route(base: "https://\(host)/cgm/security/app/server",
+                     path: String(u.path.dropFirst("/cgm/app/server".count)), query: query, china: china)
+    }
+    enum Failure: Error { case protocolError }
+    typealias Reply = (status: Int, json: [String: Any])
+    typealias Send = (String, String, String?, [String: String]) throws -> Reply
+    static func request(_ method: String, route: Route, body: String?, headers: [String: String], send: Send) throws -> Reply {
+        guard let identity = headers["deviceId"], !identity.isEmpty else { throw Failure.protocolError }
+        var common = headers
+        if route.china {
+            common["versionName"] = "1.63.0"
+            common["versionCode"] = "264122"
+        } else {
+            common["versionCode"] = "10000000"
+            common["webDeviceId"] = identity
+        }
+        common["Content-Type"] = "application/json;charset=UTF-8"
+        let privateKey = P256.KeyAgreement.PrivateKey()
+        let raw = privateKey.publicKey.rawRepresentation
+        let x = raw.prefix(32).base64EncodedString()
+        let y = raw.suffix(32).base64EncodedString()
+        var offset: Int64 = 0
+        func now() -> Int64 { Int64(Date().timeIntervalSince1970 * 1000) + offset }
+        var exchange: Reply = (-1, [:])
+        for attempt in 0..<2 {
+            let ts = now()
+            let payload: [String: Any] = [
+                "clientPubKeyX": x, "clientPubKeyY": y, "clientTimestamp": ts,
+                "clientSignature": sha(identity + x + y + String(ts)),
+            ]
+            exchange = try send("POST", route.base + "/security/exchangeKey", json(payload), common)
+            if attempt == 0, string(exchange.json, "code") == "CLIENT_CLOCK_OFFSET",
+               let serverNow = Int64(string(exchange.json, "currentTime")), serverNow > 0 {
+                offset = serverNow - now()
+            } else {
+                break
+            }
+        }
+        guard success(exchange) else { return exchange }
+        guard let data = exchange.json["data"] as? [String: Any] else { throw Failure.protocolError }
+        let sx = string(data, "serverPubKeyX")
+        let sy = string(data, "serverPubKeyY")
+        let timestamp = string(data, "serverTimestamp")
+        guard sha(identity + sx + sy + timestamp) == string(data, "serverSignature").lowercased() else {
+            throw Failure.protocolError
+        }
+        let id = string(data, "secretId")
+        let expiry = string(data, "expireTime")
+        guard !id.isEmpty, id.count <= 256, let expires = Int64(expiry), expires > now() else { throw Failure.protocolError }
+        let publicKey = try P256.KeyAgreement.PublicKey(rawRepresentation: bytes(data, "serverPubKeyX") + bytes(data, "serverPubKeyY"))
+        let shared = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)
+        let derived = HKDF<SHA256>.deriveKey(
+            inputKeyMaterial: SymmetricKey(data: shared.withUnsafeBytes { Data($0) }),
+            salt: Data(id.utf8), info: Data("\(identity)#\(expiry)#\(id)".utf8), outputByteCount: 64
+        ).withUnsafeBytes { Data($0) }
+        let aes = SymmetricKey(data: derived.prefix(32))
+        let signing = SymmetricKey(data: derived.suffix(32))
+        let aad = Data("\(identity)|\(id)".utf8)
+        func open(_ object: [String: Any], text: String, nonce: String, tag: String) throws -> Data {
+            let box = try AES.GCM.SealedBox(nonce: AES.GCM.Nonce(data: bytes(object, nonce)),
+                                           ciphertext: bytes(object, text), tag: bytes(object, tag))
+            return try AES.GCM.open(box, using: aes, authenticating: aad)
+        }
+        guard try open(data, text: "ciphertext", nonce: "iv", tag: "authTag") == Data((sx + sy).utf8) else { throw Failure.protocolError }
+        let time = now()
+        let nonceID = String(((time - 1_288_834_974_657) << 22) | 4096)
+        common["cipherSecretId"] = id
+        common["cipherSeq"] = "1"
+        common["cipherTimeNow"] = String(time)
+        common["cipherNonceId"] = nonceID
+        common[route.china ? "cipherUserId" : "webDeviceId"] = identity
+        func envelope(_ plain: String, kind: String) throws -> [String: String] {
+            let sealed = try AES.GCM.seal(Data(plain.utf8), using: aes, authenticating: aad)
+            let text = sealed.ciphertext.base64EncodedString()
+            let signedData = Data((nonceID + "1" + String(time) + text).utf8)
+            let signature = Data(HMAC<SHA256>.authenticationCode(for: signedData, using: signing)).base64EncodedString()
+            return ["cipher\(kind)Text": text, "cipher\(kind)Mac": sealed.tag.base64EncodedString(),
+                    "cipher\(kind)Nonce": Data(sealed.nonce).base64EncodedString(), "cipher\(kind)Signature": signature]
+        }
+        guard var url = URLComponents(string: route.base + route.path) else { throw Failure.protocolError }
+        if !route.query.isEmpty {
+            url.queryItems = try envelope(json(route.query), kind: "Param").map { URLQueryItem(name: $0.key, value: $0.value) }
+        }
+        // Keep Base64 '+' characters intact in the query.
+        guard let target = url.string?.replacingOccurrences(of: "+", with: "%2B") else { throw Failure.protocolError }
+        let encryptedBody = try body.map { try json(envelope($0, kind: "Body")) }
+        let reply = try send(method, target, encryptedBody, common)
+        guard success(reply) else { return reply }
+        guard string(reply.json, "cipherSecretId") == id else { throw Failure.protocolError }
+        let plain = try open(reply.json, text: "cipherText", nonce: "cipherNonce", tag: "cipherMac")
+        guard let result = try JSONSerialization.jsonObject(with: plain) as? [String: Any] else { throw Failure.protocolError }
+        return (reply.status, result)
+    }
+
+    private static func sha(_ value: String) -> String {
+        SHA256.hash(data: Data(value.utf8)).map { String(format: "%02x", $0) }.joined()
+    }
+
+    private static func json(_ value: [String: Any]) throws -> String {
+        String(decoding: try JSONSerialization.data(withJSONObject: value), as: UTF8.self)
+    }
+
+    private static func string(_ object: [String: Any], _ key: String) -> String {
+        object[key].map { String(describing: $0) } ?? ""
+    }
+
+    private static func bytes(_ object: [String: Any], _ key: String) throws -> Data {
+        guard let data = Data(base64Encoded: string(object, key)) else { throw Failure.protocolError }
+        return data
+    }
+
+    private static func success(_ reply: Reply) -> Bool {
+        let code = string(reply.json, "code")
+        return (200...299).contains(reply.status) && (code.isEmpty || code == "200" || code.uppercased() == "OK")
+    }
+}
