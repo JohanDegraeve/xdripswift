@@ -839,7 +839,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     }
 
     private func handleServerFirmware(_ value: [UInt8]) {
-        let firmware = String(bytes: value, encoding: .utf8)?.trimmingCharacters(in: .controlCharacters.union(.whitespaces)) ?? ""
+        let firmware = OttaiCloudClient.softwareRevision(value)
         trace("server activation: firmware=%{public}@", log: log, category: ConstantsLog.categoryCGMOttai, type: .info, firmware)
         if OttaiRegistry.loadLastValidatedDeviceVersion(sensorId: sensorId) == nil {
             OttaiRegistry.saveLastValidatedDeviceVersion(sensorId: sensorId, version: OttaiCloudClient.deviceVersion(fromFirmware: firmware))

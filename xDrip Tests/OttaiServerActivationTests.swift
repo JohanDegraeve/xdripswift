@@ -110,6 +110,20 @@ final class OttaiServerActivationTests: XCTestCase {
 
     // MARK: - firmware -> deviceVersion
 
+    func testSoftwareRevisionStopsBeforeTrailingGarbage() {
+        let version = "E2.0.3(V1.7.SH22601.3),STDRD"
+        XCTAssertEqual(OttaiCloudClient.softwareRevision(Array(version.utf8) + [0, 255, 254]), version)
+        XCTAssertEqual(OttaiCloudClient.softwareRevision([0, 255]), "")
+        XCTAssertEqual(OttaiCloudClient.softwareRevision(Array(" V1.7 ".utf8)), "V1.7")
+    }
+
+    func testRequiredFirmwareUpgradeKeepsItsBusinessCode() {
+        let failure = OttaiCloudClient.CloudFailure(text: "server failure", code: "OTA_UPGRADE_REQUIRED")
+        XCTAssertEqual(failure.code, "OTA_UPGRADE_REQUIRED")
+        XCTAssertTrue(failure.text.contains("firmware update"))
+        XCTAssertEqual(OttaiCloudClient.CloudFailure(text: "other", code: "OTHER").text, "other")
+    }
+
     func testDeviceVersionFromFirmware() {
         XCTAssertEqual(OttaiCloudClient.deviceVersion(fromFirmware: "E2.0.3(V1.7.SH22601.3),STDRD"), "V1.7.SH22601.3")
         XCTAssertEqual(OttaiCloudClient.deviceVersion(fromFirmware: " V1.7.S2530.1 "), "V1.7.S2530.1")

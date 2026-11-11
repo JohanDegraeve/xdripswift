@@ -32,7 +32,16 @@ enum OttaiCloudClient {
     static let bizUpgradeVersion = "AppDevice_Upgrade_Version"
     static let bizEndUsing = "AppDevice_EndUsing"
 
-    struct CloudFailure { let text: String; var code: String = "" }
+    struct CloudFailure {
+        let text: String
+        var code: String
+        init(text: String, code: String = "") {
+            self.code = code
+            self.text = code.caseInsensitiveCompare("OTA_UPGRADE_REQUIRED") == .orderedSame
+                ? "The server has not finished sensor setup. Check the sensor in the official app. If it offers a firmware update, install it, then fetch the sensor again. (OTA_UPGRADE_REQUIRED)"
+                : text
+        }
+    }
 
     // The legacy synchronous helpers exchange errors through the calling thread.
     // Never share this slot between concurrent upload, activation and UI operations.
@@ -516,6 +525,11 @@ enum OttaiCloudClient {
     private static func bindDeviceResponse() -> [String: Any]? {
         if isSyai { return OttaiSyaiClient.getBindDevice() }
         return httpGet(base() + OttaiConstants.epGetBindDevice, [:], headers(ts: now(), apiBase: base()))
+    }
+
+    /// The firmware text ends at the first zero byte.
+    static func softwareRevision(_ bytes: [UInt8]) -> String {
+        String(bytes: bytes.prefix { $0 != 0 }, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
     }
 
     /// "E2.0.3(V1.7.SH22601.3),STDRD" -> "V1.7.SH22601.3".
