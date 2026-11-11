@@ -31,6 +31,20 @@ func ottaiAuthEntryMode(
     return .blocked
 }
 
+enum OttaiServerAuthRecovery: Equatable {
+    case stop
+    case retryConnection
+    case scanNextSensor
+}
+
+/// An old sensor can advertise the same name as the replacement. Its challenge
+/// cannot be verified against the replacement's Cloud ID. Retry with a fresh
+/// challenge once before excluding that Bluetooth device for this transmitter.
+func ottaiServerAuthRecovery(code: String, signatureFailures: Int, activateSent: Bool) -> OttaiServerAuthRecovery {
+    guard !activateSent, code == "DEVICE_AUTH_SIGN_ERROR" else { return .stop }
+    return signatureFailures >= 2 ? .scanNextSensor : .retryConnection
+}
+
 /// A server session can only override duration if `kb` actually reproduces the
 /// server's encrypted activate command and decrypts its duration with zero padding.
 /// SyaiKit documents these as AES-128 ECB frames; it does not define `kb` as a key.

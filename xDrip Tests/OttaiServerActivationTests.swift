@@ -10,6 +10,26 @@ import XCTest
 
 final class OttaiServerActivationTests: XCTestCase {
 
+    func testServerSignatureRejectionRetriesThenScansForAnotherSensor() {
+        let code = "DEVICE_AUTH_SIGN_ERROR"
+        XCTAssertEqual(ottaiServerAuthRecovery(code: code, signatureFailures: 1, activateSent: false), .retryConnection)
+        XCTAssertEqual(ottaiServerAuthRecovery(code: code, signatureFailures: 2, activateSent: false), .scanNextSensor)
+        // A different device gets its own fresh-challenge retry.
+        XCTAssertEqual(ottaiServerAuthRecovery(code: code, signatureFailures: 1, activateSent: false), .retryConnection)
+    }
+
+    func testServerAuthRecoveryNeverRetriesAfterActivationWasSent() {
+        for failures in [1, 2, 3] {
+            XCTAssertEqual(ottaiServerAuthRecovery(code: "DEVICE_AUTH_SIGN_ERROR", signatureFailures: failures, activateSent: true), .stop)
+        }
+    }
+
+    func testOtherServerErrorsDoNotExcludeBluetoothSensors() {
+        for code in ["", "AuthFailed_LoginElsewhere", "DEVICE_ALREADY_USED", "DEVICE_AUTH_SIGN_ERROR_OTHER"] {
+            XCTAssertEqual(ottaiServerAuthRecovery(code: code, signatureFailures: 2, activateSent: false), .stop)
+        }
+    }
+
     // MARK: - entry mode
 
     private func mode(keys: Bool = false, pendingBind: Bool = false, bootstrap: Bool = true,

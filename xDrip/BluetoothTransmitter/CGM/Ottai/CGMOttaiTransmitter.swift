@@ -122,6 +122,8 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     private var appTime3: [UInt8] = []
     private var sessionKeyHex = ""
     private var lastAuthDevHex = ""
+    // Survives reconnects so two fresh challenges can identify a wrong sensor.
+    private var serverAuthSignatureFailures = 0
     private var serverAuthHostBytes: [UInt8]?
     private var serverAuthFlagBytes: [UInt8]?
     private var serverActivating = false
@@ -434,6 +436,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
 
     private func rotateAwayFromWrongSensor() {
         wrongSensorStrikes = 0
+        serverAuthSignatureFailures = 0
         if let address = deviceAddress {
             rejectedIdentifiersLock.lock()
             rejectedPeripheralIdentifiers.insert(address)
@@ -763,12 +766,25 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
                       let flag = try? OttaiCrypto.hexToBytesStrict(m.authFlag),
                       !host.isEmpty, !flag.isEmpty else {
                     if let code = failure?.code, !code.isEmpty {
-                        self.giveUpServerActivation("cgmAuth/verify refused: \(failure?.text ?? code)")
+                        if code == "DEVICE_AUTH_SIGN_ERROR" { self.serverAuthSignatureFailures += 1 }
+                        switch ottaiServerAuthRecovery(code: code,
+                                                       signatureFailures: self.serverAuthSignatureFailures,
+                                                       activateSent: self.serverActivateAttemptedAtMs > 0) {
+                        case .retryConnection:
+                            self.recoverAndReconnect("cgmAuth/verify rejected the device signature; retrying with a fresh challenge")
+                        case .scanNextSensor:
+                            // Keep the user's activation request. The next discovered
+                            // device must pass server verification before any writes.
+                            self.rotateAwayFromWrongSensor()
+                        case .stop:
+                            self.giveUpServerActivation("cgmAuth/verify refused: \(failure?.text ?? code)")
+                        }
                     } else {
                         self.recoverAndReconnect("cgmAuth/verify gave no answer: \(failure?.text ?? "unknown")")
                     }
                     return
                 }
+                self.serverAuthSignatureFailures = 0
                 // Check all frames before the first write, so the sensor is never half-written.
                 guard m.hasActivationFrames,
                       let cf = try? OttaiCrypto.hexToBytesStrict(m.cf),
@@ -959,6 +975,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         serverDurationIndex = 0
         serverDurationAttempted = false
         serverActivationStarts = 0
+        serverAuthSignatureFailures = 0
         serverActivateAttemptedAtMs = 0
         actStep = .none
         pendingActivation = false
