@@ -524,6 +524,20 @@ enum TroubleshootingPostProcessingApplyRange: Codable, Equatable {
     case hoursAgo(Int)
 }
 
+enum TroubleshootingPostProcessingWarning: String, Codable {
+    case glucoseAdjustment
+    case curveAdjustment
+    case glucoseSmoothing
+
+    var name: String {
+        switch self {
+        case .glucoseAdjustment: return "Glucose Adjustment"
+        case .curveAdjustment: return "Curve Adjustment"
+        case .glucoseSmoothing: return "Glucose Smoothing"
+        }
+    }
+}
+
 /// A complete snapshot of the resulting post-processing configuration.
 ///
 /// Logging the complete state as one typed value avoids falsely claiming that BG adjustment was
@@ -561,6 +575,7 @@ enum TroubleshootingConfigurationActivity: Codable, Equatable {
     case patientAliasChanged(isSet: Bool)
     case credentialChanged(source: TroubleshootingLogSource, field: TroubleshootingCredentialField, isSet: Bool)
     case followerVersionChanged(source: TroubleshootingLogSource, previousVersion: String, newVersion: String)
+    case postProcessingWarningAcknowledged(TroubleshootingPostProcessingWarning)
     case postProcessingSettings(TroubleshootingPostProcessingSettings)
     case heartbeatSubscriptionsChanged(previous: String, updated: String)
 }
@@ -2305,6 +2320,8 @@ struct TroubleshootingLogReportBuilder {
                 return "\(source.name) \(fieldName) was \(isSet ? "changed" : "removed")."
             case let .followerVersionChanged(source, previousVersion, newVersion):
                 return "\(source.name) versions changed by user from \(previousVersion) to \(newVersion)."
+            case let .postProcessingWarningAcknowledged(feature):
+                return "User acknowledged the \(feature.name) warning."
             case let .heartbeatSubscriptionsChanged(previous, updated):
                 return "Generic heartbeat subscriptions changed by user from \(previous) to \(updated)."
             case let .postProcessingSettings(settings):

@@ -55,7 +55,7 @@ struct SensorStartDateView: View {
     }
 }
 
-/// Collects and validates a Dexcom G6 sensor code before starting the session.
+/// Collects and validates a Dexcom G6 sensor code or G7 pairing code.
 struct SensorStartCodeView: View {
     struct Configuration {
         let title: String
@@ -120,21 +120,8 @@ struct SensorStartCodeView: View {
                     .foregroundStyle(Color(.colorSecondary))
             }
 
+            // Prefer scanning or a saved photo. Keep manual entry in its own section as a fallback.
             Section(header: Text(configuration.codeSectionTitle)) {
-                Button {
-                    if let onManualEntry {
-                        onManualEntry(selectManualCode)
-                    } else {
-                        showingManualEntry = true
-                    }
-                } label: {
-                    codeEntryActionRow(
-                        title: Texts_HomeView.manuallyEnterSensorCode,
-                        systemImage: "keyboard"
-                    )
-                }
-                .buttonStyle(.plain)
-
                 Button {
                     DexcomG6SensorLabelScanLogger.requested(source: .camera)
                     showingCameraScanner = true
@@ -153,8 +140,30 @@ struct SensorStartCodeView: View {
                     )
                 }
                 .buttonStyle(.plain)
+            }
+            .disabled(isDecodingPhoto)
 
-                if configuration.allowsNoCode {
+            Section {
+                Button {
+                    if let onManualEntry {
+                        onManualEntry(selectManualCode)
+                    } else {
+                        showingManualEntry = true
+                    }
+                } label: {
+                    codeEntryActionRow(
+                        title: Texts_HomeView.manuallyEnterSensorCode,
+                        systemImage: "keyboard"
+                    )
+                }
+                .buttonStyle(.plain)
+            } footer: {
+                Text(Texts_HomeView.manualSensorCodeEntryFooter)
+            }
+            .disabled(isDecodingPhoto)
+
+            if configuration.allowsNoCode {
+                Section {
                     Button {
                         selectManualCode("0000")
                     } label: {
@@ -164,10 +173,11 @@ struct SensorStartCodeView: View {
                         )
                     }
                     .buttonStyle(.plain)
+                } footer: {
+                    Text(Texts_HomeView.useWithoutSensorCodeFooter)
                 }
-
+                .disabled(isDecodingPhoto)
             }
-            .disabled(isDecodingPhoto)
 
             if isDecodingPhoto {
                 Section(header: Text(Texts_HomeView.sensorInformationTitle)) {

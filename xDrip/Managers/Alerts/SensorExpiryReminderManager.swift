@@ -152,8 +152,7 @@ final class SensorExpiryReminderManager {
         let referenceDate = now()
         needsRetry = false
 
-        // Mark reminders as used once their scheduled time has passed.
-        // Extending the sensor lifetime must not schedule them again.
+        // Mark the saved deadline as used once its scheduled time has passed.
         for index in state.records.indices {
             if let date = state.records[index].scheduledDate, date <= referenceDate {
                 state.records[index].consumed = true
@@ -199,7 +198,6 @@ final class SensorExpiryReminderManager {
                 persist()
                 continue
             }
-            guard !record.consumed else { continue }
             guard deadline > referenceDate else {
                 // Cancel the old warning if the new warning time has already passed.
                 if let oldDate = record.scheduledDate, oldDate > referenceDate {
@@ -207,7 +205,18 @@ final class SensorExpiryReminderManager {
                     state.records[index].scheduledDate = nil
                 }
                 persist()
+                trace("skipped sensor expiry reminder '%{public}@': deadline %{public}@ has passed", log: log, category: ConstantsLog.categoryAlertManager, type: .info, kind.descriptionForLogging(), deadline.description)
                 continue
+            }
+            guard !record.consumed || record.scheduledDate != deadline else {
+                trace("skipped sensor expiry reminder '%{public}@': deadline already used", log: log, category: ConstantsLog.categoryAlertManager, type: .info, kind.descriptionForLogging())
+                continue
+            }
+            if record.consumed {
+                // A lifetime or reminder value change can move a used warning into the future.
+                state.records[index].consumed = false
+                persist()
+                trace("rearmed sensor expiry reminder '%{public}@' for %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .info, kind.descriptionForLogging(), deadline.description)
             }
 
             let content = UNMutableNotificationContent()

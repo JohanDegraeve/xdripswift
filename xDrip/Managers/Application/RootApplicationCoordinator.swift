@@ -579,6 +579,10 @@ import AppIntents
             trace("*******************************************************************", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
         })
         
+        // Renew as soon as the app is active. Waiting for the delayed screen refresh can miss
+        // a short visit to the app, leaving the old activity and its expiry warning in place.
+        NotificationCenter.default.addObserver(self, selector: #selector(restartLiveActivityWhenActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+
         // update the home screen when returning to the foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
             // if view is appeared, view did appear will not get called when app moves to the foreground
@@ -598,10 +602,7 @@ import AppIntents
                 self.updateDataSourceInfo()
                 // update statistics related outlets
                 self.updateStatistics(animate: true)
-                // Restart only if the app is still active after this delayed foreground refresh.
-                // A quick return to the background must keep the existing Live Activity alive:
-                // ActivityKit permits updating it there, but rejects creation of its replacement.
-                self.updateLiveActivityAndWidgets(forceRestart: UIApplication.shared.applicationState == .active)
+                self.updateLiveActivityAndWidgets(forceRestart: false)
                 self.updatePumpAndAIDStatusViews()
             }
         })
@@ -2811,6 +2812,10 @@ import AppIntents
         let endDate = startDate.addingTimeInterval(duration * 60)
         let confirmationUntil = (transmitter as? CGMG5Transmitter)?.sensorWarmupConfirmationUntil(for: startDate, now: now)
         return endDate > now || confirmationUntil != nil ? endDate : nil
+    }
+
+    @objc private func restartLiveActivityWhenActive() {
+        updateLiveActivityAndWidgets(forceRestart: true)
     }
 
     /// check if the conditions are correct to start a live activity, update it, or end it

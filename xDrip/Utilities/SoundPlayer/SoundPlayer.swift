@@ -97,14 +97,16 @@ class SoundPlayer: NSObject, AVAudioPlayerDelegate {
             audioPlayer = try makePlayer(url)
             audioPlayer?.delegate = self
             audioPlayer?.numberOfLoops = repeatSound ? -1 : 0
-            if !interrupted { activateAndPlay() }
+            activateAndPlay()
         } catch {
             playbackFailed(error)
         }
     }
 
     private func activateAndPlay() {
-        guard let playbackID, !paused else { return }
+        guard let playbackID, !paused, activationID == nil else { return }
+        // iOS does not always send an interruption end. Let a new attempt activate the session.
+        interrupted = false
         let activationID = UUID()
         self.activationID = activationID
         activateSession { [weak self] error in
@@ -168,7 +170,13 @@ class SoundPlayer: NSObject, AVAudioPlayerDelegate {
         }
         guard playbackID != nil, paused else { return }
         paused = false
-        if !interrupted { activateAndPlay() }
+        activateAndPlay()
+    }
+
+    /// Retry an interrupted repeating alarm during the next alert check.
+    func retryInterruptedPlayback() {
+        guard repeats, interrupted else { return }
+        activateAndPlay()
     }
 
     func stopPlaying() {
@@ -200,10 +208,13 @@ class SoundPlayer: NSObject, AVAudioPlayerDelegate {
             audioPlayer?.pause()
             if !repeats { stopPlaying() }
         case .ended:
+            let wasInterrupted = interrupted
             interrupted = false
+            // A new alarm or preview may have already recovered the audio session.
+            guard wasInterrupted else { return }
             if shouldResume && playbackID != nil {
                 activateAndPlay()
-            } else if !repeats {
+            } else {
                 stopPlaying()
             }
         @unknown default:

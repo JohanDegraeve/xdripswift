@@ -1397,7 +1397,7 @@ final class NightscoutImportService: @unchecked Sendable {
         // Return here so the encoded Note cannot also create a bolus or a general Note row.
         if eventType?.caseInsensitiveCompare(ConstantsNightscout.noteEventType) == .orderedSame,
            let payload = BasalInjectionPayload.decode(from: document.notes) {
-            append(type: .BasalInjection, value: Double(payload.units), notes: payload.insulinDescription.toNilIfLength0())
+            append(type: .BasalInjection, value: payload.units, notes: payload.insulinDescription.toNilIfLength0())
             return records
         }
 

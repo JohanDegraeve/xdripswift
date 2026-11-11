@@ -741,7 +741,10 @@ public class AlertManager: NSObject {
     func presentImmediateSound(alertKind: AlertKind, alertType: AlertType, entry: AlertEntry?, soundFileName: String?, content: UNMutableNotificationContent) {
         guard soundFileName != "" else { return }
         if let active = activeAlarm, active.repeats {
-            guard active.kind != alertKind else { return }
+            if active.kind == alertKind {
+                soundPlayer?.retryInterruptedPlayback()
+                return
+            }
             guard alertKind.alertUrgencyType().rawValue <= active.kind.alertUrgencyType().rawValue else { return }
         }
 
@@ -777,7 +780,7 @@ public class AlertManager: NSObject {
         soundPlayer?.stopPlaying()
     }
 
-    /// Check saved settings without treating the repeat throttle as a user snooze.
+    /// Check saved settings and retry interrupted playback without changing the snooze.
     func validateRepeatingAlarm() {
         guard let active = activeAlarm, active.repeats else { return }
         let type = active.alertType
@@ -785,6 +788,8 @@ public class AlertManager: NSObject {
             || active.entry?.isDeleted == true || active.entry?.isDisabled == true
             || (active.entry != nil && active.entry?.alertType !== type) {
             stopAlarmSound(alertKind: active.kind, cycleID: active.cycleID)
+        } else {
+            soundPlayer?.retryInterruptedPlayback()
         }
     }
 

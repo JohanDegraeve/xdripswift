@@ -71,7 +71,7 @@ public struct TreatmentNSResponse {
             // must become exactly one injection, with no duplicate Note or active-insulin record.
             if nightscoutEventType?.caseInsensitiveCompare(ConstantsNightscout.noteEventType) == .orderedSame,
                let payload = BasalInjectionPayload.decode(from: dictionary["notes"] as? String) {
-                return [TreatmentNSResponse(id: id + TreatmentType.BasalInjection.idExtension(), createdAt: date, eventType: .BasalInjection, nightscoutEventType: ConstantsNightscout.noteEventType, value: Double(payload.units), valueSecondary: nil, enteredBy: enteredBy, notes: payload.insulinDescription.toNilIfLength0())]
+                return [TreatmentNSResponse(id: id + TreatmentType.BasalInjection.idExtension(), createdAt: date, eventType: .BasalInjection, nightscoutEventType: ConstantsNightscout.noteEventType, value: payload.units, valueSecondary: nil, enteredBy: enteredBy, notes: payload.insulinDescription.toNilIfLength0())]
             }
 
             if let carbs = dictionary["carbs"] as? Double {

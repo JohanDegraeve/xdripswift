@@ -111,6 +111,7 @@ struct SensorNoiseHistoryView: View {
         }
         .navigationTitle(Texts_HomeView.sensorNoiseHistoryTitle)
         .navigationBarTitleDisplayMode(.inline)
+        .onlineHelp(.sensorNoise)
         .onAppear {
             viewModel.load()
             refreshSensorNoiseSensitivity()

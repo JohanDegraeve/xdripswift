@@ -1,5 +1,6 @@
 import Foundation
 import os
+import WatchConnectivity
 
 /// application version
 fileprivate var applicationVersion:String = {
@@ -638,6 +639,11 @@ class Trace {
                                     + ")"
                             )
                             
+                            for line in DirectWatchSettings.diagnosticLines(transmitterID: blePeripheral.transmitterId, family: .g6,
+                                                                           reachable: WCSession.isSupported() && WCSession.default.isReachable) {
+                                traceInfo.appendStringAndNewLine("        " + line)
+                            }
+
                             traceInfo.appendStringAndNewLine("        Is Anubis?: " + dexcomG5.isAnubis.description)
                             
                             traceInfo.appendStringAndNewLine("        Last reset: " + (dexcomG5.lastResetTimeStamp?.toStringForTrace(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (dexcomG5.lastResetTimeStamp?.daysAndHoursAgo(appendAgo: true, forTrace: true) ?? "nil") + ")")
@@ -746,6 +752,10 @@ class Trace {
                                     + String(format: "%02X", bluetoothSlot.rawValue)
                                     + ")"
                             )
+                            for line in DirectWatchSettings.diagnosticLines(transmitterID: blePeripheral.transmitterId, family: .g7,
+                                                                           reachable: WCSession.isSupported() && WCSession.default.isReachable) {
+                                traceInfo.appendStringAndNewLine("        " + line)
+                            }
                         }
 
                     case .MedtrumTouchCareNanoType:

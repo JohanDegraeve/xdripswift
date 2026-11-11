@@ -130,7 +130,7 @@
 "infoCalendarAccessRestricted" = "Richtlinien auf ihrem Gerät verhindern das Sie %@ Zugang zu ihrem Kalender geben.";
 
 /// in Settings, to enable debug level in trace file
-"debugLevel" = "Debug Level hinzufügen";
+"debugLevel" = "Debug-Level verwenden";
 
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
 "warningChangeFromMasterToFollower" = " Der Wechsel von Master zu Follower beendet die aktuelle Verbindung zu ihrem Sensor. Möchten Sie dennoch wechseln?";
@@ -164,8 +164,6 @@
 /// Apple Watch Settings - text in row where user needs to say if unit should be displayed or not
 "displayUnitInCalendarEvent" = "Einheit";
 
-/// Text in pop up shown when user wants to send the trace file
-"describeProblem" = "Helfen Sie uns in dem sie uns so viele Innformationen als möglich mitteilen. Sollten Sie das Problem schon in unsere Facebook Gruppe gemeldet haben, teilen Sie uns bitte ihren Facebook Namen per E-Mail mit.";
 
 /// dexcom share settings, pop up that asks user to enter dexcom share password
 "settingsviews_giveDexcomSharePassword" = "Eingabe Dexcom Share Passwort";
@@ -240,7 +238,7 @@
 "calenderId" = "Kalender auswählen";
 
 /// in Settings, row title to send settings
-"sendTraceFile" = "Fehlerbericht senden";
+"sendTraceFile" = "Per E-Mail senden";
 "settingsviews_issueReportTitle" = "Fehlerbericht";
 
 /// speak settings, where user can select the language
@@ -799,3 +797,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Einleitung sprechen";
 "speak.preview" = "Glukoseansage testen";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Watch-Protokolle einschließen";
+"settingsviews_reportWatchFooter" = "Direct to Watch-Protokolle von der verbundenen Watch abrufen.";
+"settingsviews_reportSendFooter" = "Eine E-Mail an die Entwickler von xDrip4iOS vorbereiten.";
+"settingsviews_requestingWatchLogs" = "Anfordern...";
+"settingsviews_watchLogsNotReceived" = "Watch-Protokolle nicht empfangen";
+"settingsviews_watchLogsTimeout" = "Die Watch-Protokolle wurden nicht innerhalb von 8 Sekunden empfangen. Erneut versuchen oder den Bericht ohne sie senden.";
+"settingsviews_watchLogsFailure" = "Die Watch-Protokolle konnten nicht empfangen werden. Erneut versuchen oder den Bericht ohne sie senden.";
+"settingsviews_openWatchApp" = "Watch-App öffnen";
+"settingsviews_confirmWatchAppOpen" = "Öffnen Sie %@ auf Ihrer Watch und lassen Sie die App geöffnet, bis die Protokolle eintreffen.\n\nIst sie jetzt geöffnet?";
+"settingsviews_reportShareFooter" = "Protokolldateien teilen.";
+"settingsviews_shareReport" = "Bericht teilen";
+"settingsviews_shareIssueReport" = "Problembericht teilen";
+"settingsviews_reportShareFailed" = "Die Protokolldateien konnten nicht vorbereitet werden. Bitte erneut versuchen.";

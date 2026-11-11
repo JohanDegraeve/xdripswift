@@ -96,9 +96,8 @@
 "displayUnitInCalendarEvent" = "Enhed";
 "displayDeltaInCalendarEvent" = "Delta";
 "sectionTitleTrace" = "Issue Reporting";
-"sendTraceFile" = "Send problemrapport";
+"sendTraceFile" = "Send via e-mail";
 "settingsviews_issueReportTitle" = "Problemrapport";
-"describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
 "emailNotConfigured" = "You must configure an e-mail account on your iOS device.";
 "emailbodyText" = "Problem Description: ";
 "failedToSendEmail" = "Failed to Send Email";
@@ -106,7 +105,7 @@
 "volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
 "volumeTestSoundPlayer" = "Når lydløs tilstand er slået til";
 "volumeTestiOSSound" = "Når lydløs tilstand er slået fra";
-"debugLevel" = "Include Debug Level";
+"debugLevel" = "Brug fejlfindingsniveau";
 "warningChangeFromMasterToFollower" = "Switching from Master to Follower will stop your current sensor. Do you want to continue?";
 "nightscoutPort" = "Port";
 "developerSettings" = "Avancerede indstillinger";
@@ -570,3 +569,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Sig indledning";
 "speak.preview" = "Prøv glukoseoplæsning";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Medtag Watch-logfiler";
+"settingsviews_reportWatchFooter" = "Hent Direct to Watch-logfiler fra dit tilsluttede Watch.";
+"settingsviews_reportSendFooter" = "Forbered en e-mail til udviklerne af xDrip4iOS.";
+"settingsviews_requestingWatchLogs" = "Anmoder...";
+"settingsviews_watchLogsNotReceived" = "Watch-logfiler ikke modtaget";
+"settingsviews_watchLogsTimeout" = "Watch-logfilerne blev ikke modtaget inden for 8 sekunder. Prøv igen, eller send rapporten uden dem.";
+"settingsviews_watchLogsFailure" = "Watch-logfilerne kunne ikke modtages. Prøv igen, eller send rapporten uden dem.";
+"settingsviews_openWatchApp" = "Åbn Watch-appen";
+"settingsviews_confirmWatchAppOpen" = "Åbn %@ på dit Watch, og hold appen åben, indtil logfilerne er modtaget.\n\nEr den åben nu?";
+"settingsviews_reportShareFooter" = "Del logfilerne.";
+"settingsviews_shareReport" = "Del rapport";
+"settingsviews_shareIssueReport" = "Del fejlrapport";
+"settingsviews_reportShareFailed" = "Logfilerne kunne ikke klargøres. Prøv igen.";

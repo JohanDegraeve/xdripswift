@@ -868,3 +868,99 @@ final class DirectWatchBridgeTests: XCTestCase {
     }
 
 }
+
+
+extension DirectWatchBridgeTests {
+    func testWatchLogRequestIdentifierSurvivesCompatibilityAliases() {
+        let id = UUID().uuidString
+        let request = DirectWatchCompatibility.outgoing(["directWatchRequestLogs": true, "directWatchLogRequestID": id])
+        XCTAssertEqual(request["g6WatchLogRequestID"] as? String, id)
+        let legacyResponse = DirectWatchCompatibility.normalized(["g6WatchLog": true, "g6WatchLogRequestID": id])
+        XCTAssertEqual(legacyResponse["directWatchLog"] as? Bool, true)
+        XCTAssertEqual(legacyResponse["directWatchLogRequestID"] as? String, id)
+        let manualResponse = DirectWatchCompatibility.normalized(["g6WatchLog": true])
+        XCTAssertEqual(manualResponse["directWatchLog"] as? Bool, true)
+        XCTAssertNil(manualResponse["directWatchLogRequestID"])
+    }
+}
+
+
+extension DirectWatchBridgeTests {
+    func testLiveWatchLogRepliesReassembleCompleteLargeLogWithinMessageLimit() throws {
+        let original = Data((0..<100_003).map { UInt8($0 % 251) })
+        let id = UUID().uuidString
+        var received = Data()
+        var total: Int?
+        var replies = 0
+        while received.count < original.count {
+            let reply = try XCTUnwrap(DirectWatchLogReply.payload(data: original, requestID: id, offset: received.count))
+            let wire = DirectWatchCompatibility.outgoing(reply)
+            let encoded = try PropertyListSerialization.data(fromPropertyList: wire, format: .binary, options: 0)
+            XCTAssertLessThan(encoded.count, 65_536)
+            let assembled = try XCTUnwrap(DirectWatchLogReply.append(wire, requestID: id, to: received, totalBytes: total))
+            received = assembled.data
+            total = assembled.totalBytes
+            replies += 1
+        }
+        XCTAssertGreaterThan(replies, 1)
+        XCTAssertEqual(received, original)
+        XCTAssertEqual(total, original.count)
+    }
+
+    func testLiveWatchLogRejectsMissingMismatchedAndMalformedChunks() throws {
+        let id = UUID().uuidString
+        let data = Data(repeating: 42, count: 40_000)
+        let first = try XCTUnwrap(DirectWatchLogReply.payload(data: data, requestID: id, offset: 0))
+        XCTAssertNil(DirectWatchLogReply.append(first, requestID: "other-request", to: Data(), totalBytes: nil))
+        XCTAssertNil(DirectWatchLogReply.append([:], requestID: id, to: Data(), totalBytes: nil))
+        XCTAssertNil(DirectWatchLogReply.append(first, requestID: id, to: Data([42]), totalBytes: nil))
+        XCTAssertNil(DirectWatchLogReply.append(first, requestID: id, to: Data(), totalBytes: data.count + 1))
+        var invalid = first
+        invalid[DirectWatchLogReply.totalBytesKey] = DirectWatchLogReply.maximumBytes + 1
+        XCTAssertNil(DirectWatchLogReply.append(invalid, requestID: id, to: Data(), totalBytes: nil))
+        invalid = first
+        invalid[DirectWatchLogReply.dataKey] = Data()
+        XCTAssertNil(DirectWatchLogReply.append(invalid, requestID: id, to: Data(), totalBytes: nil))
+        XCTAssertNil(DirectWatchLogReply.payload(data: data, requestID: id, offset: -1))
+        XCTAssertNil(DirectWatchLogReply.payload(data: data, requestID: id, offset: data.count))
+        XCTAssertNil(DirectWatchLogReply.payload(data: Data(), requestID: id, offset: 0))
+    }
+
+    func testWatchDiagnosticsBelongToMatchingPeripheralAndIncludeTimestampedStatus() throws {
+        let suite = "WatchDiagnostics.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        XCTAssertEqual(DirectWatchSettings.diagnosticLines(transmitterID: "8ABCDE", family: .g6, reachable: false, in: defaults),
+                       ["Direct to Watch: not configured"])
+        let configured = configuration(slot: 3)
+        defaults.set(try JSONEncoder().encode(configured), forKey: DirectWatchSettings.configurationKey)
+        defaults.set(try JSONEncoder().encode(DirectWatchCollectionControl(connection: configured.connectionIdentity, isPaused: true)),
+                     forKey: DirectWatchSettings.collectionControlKey)
+        defaults.set("Waiting for transmitter", forKey: DirectWatchSettings.lastStatusKey)
+        defaults.set(start, forKey: DirectWatchSettings.lastStatusDateKey)
+        defaults.set(start, forKey: DirectWatchSettings.lastContactDateKey)
+        defaults.set("Test suspension", forKey: DirectWatchSettings.unavailableReasonKey)
+        defaults.set(configured.transmitterID, forKey: DirectWatchSettings.pausedKey)
+        let lines = DirectWatchSettings.diagnosticLines(transmitterID: configured.transmitterID, family: .g6, reachable: true, in: defaults)
+        XCTAssertTrue(lines.contains("Watch Bluetooth slot: 3 (0x03)"))
+        XCTAssertTrue(lines.contains("Watch collection paused: true"))
+        XCTAssertTrue(lines.contains("Watch collection suspended: true"))
+        XCTAssertTrue(lines.contains("Watch suspension reason: Test suspension"))
+        XCTAssertTrue(lines.contains("Watch reachable now: true"))
+        XCTAssertTrue(lines.contains("Watch last reported status: Waiting for transmitter"))
+        XCTAssertTrue(lines.contains("Watch status received: \(ISO8601DateFormatter().string(from: start))"))
+        XCTAssertTrue(lines.contains("Watch last reading: nil"))
+        XCTAssertTrue(lines.contains("iPhone BLE collection paused for Watch testing: true"))
+        XCTAssertEqual(DirectWatchSettings.diagnosticLines(transmitterID: configured.transmitterID, family: .g7, reachable: true, in: defaults),
+                       ["Direct to Watch: not configured for this peripheral"])
+        XCTAssertEqual(DirectWatchSettings.diagnosticLines(transmitterID: "other-sensor", family: .g6, reachable: true, in: defaults),
+                       ["Direct to Watch: not configured for this peripheral"])
+        var g7 = configured
+        g7.family = .g7
+        defaults.set(try JSONEncoder().encode(g7), forKey: DirectWatchSettings.configurationKey)
+        let g7Lines = DirectWatchSettings.diagnosticLines(transmitterID: g7.transmitterID, family: .g7, reachable: false, in: defaults)
+        XCTAssertEqual(g7Lines.first, "Direct to Watch: configured")
+        XCTAssertTrue(g7Lines.contains("Watch collection paused: false"))
+        XCTAssertTrue(g7Lines.contains("Watch reachable now: false"))
+    }
+}

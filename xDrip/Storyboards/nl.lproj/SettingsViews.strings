@@ -97,9 +97,8 @@
 "infoCalendarAccessWriteOnly" = "Je kunt Agenda Activiteiten niet gebruiken totdat je de Agenda-toegang hebt gewijzigd van 'Voeg alleen activiteiten toe' naar 'Volledige toegang'.\n\nGa naar iPhone-instellingen > Apps > %@ > Agenda's en kies 'Volledige toegang'.";
 "infoCalendarAccessRestricted" = "Geen toegang voor %@ tot je agenda. Dit komt waarschijnlijk door actieve beperkingen zoals Ouderlijk Toezicht.";
 "sectionTitleTrace" = "Probleemrapportage";
-"sendTraceFile" = "Verstuur Probleemrapportage";
+"sendTraceFile" = "Verstuur per e-mail";
 "settingsviews_issueReportTitle" = "Probleemrapportage";
-"describeProblem" = "Leg uit waarom je de log bestanden verstuurd met zoveel mogelijk details als mogelijk (in het Engels). Als je het probleem ook in de Facebook support groep '%@' hebt gerapporteerd, benoem dan ook je facebook naam in de e-mail.";
 "emailNotConfigured" = "Je moet een e-mail account configureren op je iOS apparaat.";
 "emailbodyText" = "Probleembeschrijving: ";
 "failedToSendEmail" = "Email versturen mislukt";
@@ -107,7 +106,7 @@
 "volumeTestiOSSoundExplanation" = "Een alarm geluid wordt nu afgespeeld met hetzelfde volume als wordt gebruikt voor een Alarm Type met 'Dempen Negeren' uit.\n\n(Ook gebruikt voor Gemiste Meting alarmen welke het iOS volume gebruiken.)\n\nVStop het geluid met een van de volumeknoppen, pas het volume aan en test opnieuw.";
 "volumeTestSoundPlayer" = "Wanneer stille modus is ingeschakeld";
 "volumeTestiOSSound" = "Wanneer stille modus is uitgeschakeld";
-"debugLevel" = "Inclusief Debug Niveau";
+"debugLevel" = "Debugniveau gebruiken";
 "warningChangeFromMasterToFollower" = "Wisselen van Master naar Volger stopt de huidige sensor. Wil je doorgaan ?";
 "nightscoutPort" = "Port";
 
@@ -626,3 +625,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Inleiding uitspreken";
 "speak.preview" = "Glucose-uitspraak testen";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Watch-logboeken toevoegen";
+"settingsviews_reportWatchFooter" = "Direct to Watch-logboeken van de verbonden Watch ophalen.";
+"settingsviews_reportSendFooter" = "Een e-mail voorbereiden voor de ontwikkelaars van xDrip4iOS.";
+"settingsviews_requestingWatchLogs" = "Aanvragen...";
+"settingsviews_watchLogsNotReceived" = "Watch-logboeken niet ontvangen";
+"settingsviews_watchLogsTimeout" = "De Watch-logboeken zijn niet binnen 8 seconden ontvangen. Probeer opnieuw of verstuur het rapport zonder deze logboeken.";
+"settingsviews_watchLogsFailure" = "De Watch-logboeken konden niet worden ontvangen. Probeer opnieuw of verstuur het rapport zonder deze logboeken.";
+"settingsviews_openWatchApp" = "Open de Watch-app";
+"settingsviews_confirmWatchAppOpen" = "Open %@ op je Watch en houd de app open tot de logboeken binnen zijn.\n\nIs de app nu open?";
+"settingsviews_reportShareFooter" = "De logbestanden delen.";
+"settingsviews_shareReport" = "Rapport delen";
+"settingsviews_shareIssueReport" = "Probleemrapport delen";
+"settingsviews_reportShareFailed" = "De logbestanden konden niet worden voorbereid. Probeer het opnieuw.";

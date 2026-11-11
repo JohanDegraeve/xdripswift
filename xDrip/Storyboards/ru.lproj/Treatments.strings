@@ -25,7 +25,7 @@
 "treatments_basalInjection" = "Базальный инсулин (инъекция)";
 "treatments_insulinDescription" = "Тип инсулина";
 "treatments_insulinDescriptionPlaceholder" = "например, Тресиба";
-"treatments_invalidBasalInjectionValueMessage" = "Введите целое число единиц больше нуля.";
+"treatments_invalidBasalInjectionValueMessage" = "Введите больше 0 и не более 150 единиц с шагом 0,5.";
 
 /* Footer shown when a new basal injection is prefilled from the previous entry. */
 "treatments_basalInjectionCopiedFooter" = "Доза и тип базального инсулина скопированы из предыдущей записи";

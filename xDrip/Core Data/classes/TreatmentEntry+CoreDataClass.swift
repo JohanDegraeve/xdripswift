@@ -28,7 +28,7 @@ import CoreData
     /// One automatic basal insulin delivery stored natively in units.
     /// `TreatmentEntry.valueSecondary` retains the observed interval to the next delivery in minutes.
     case AutomaticBasal = 9
-    /// A long-acting injection stored in whole units, separately from bolus and pump basal delivery.
+    /// A long-acting injection stored in units, separately from bolus and pump basal delivery.
     /// Append new raw values because existing treatment types are persisted in Core Data.
     case BasalInjection = 10
 	
@@ -264,21 +264,26 @@ public func < (lhs: TreatmentEntry, rhs: TreatmentEntry) -> Bool {
 
 /// Structured long-acting injection data carried by a Nightscout Note.
 ///
-/// Locally, TreatmentEntry.value holds whole units and notes holds only the insulin description.
+/// Locally, TreatmentEntry.value holds units and notes holds only the insulin description.
 /// The readable first line is for humans. Only the marked, versioned payload identifies an injection
 /// on download, so translating or editing the first line does not change the stored dose.
 struct BasalInjectionPayload: Codable, Equatable {
     static let prefix = "xDrip4iOS:BasalInjection:"
     let version: Int
-    let units: Int
+    let units: Double
     let insulinDescription: String
 
     init?(units: Double, insulinDescription: String) {
-        // Do not round a fractional dose or allow an integer conversion to overflow.
-        guard units.isFinite, units > 0, let wholeUnits = Int(exactly: units) else { return nil }
+        // Double preserves half units and still reads whole units from existing version 1 Notes.
+        guard Self.isValidUnits(units) else { return nil }
         version = 1
-        self.units = wholeUnits
+        self.units = units
         self.insulinDescription = insulinDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// Use the same positive half-unit steps for entry, upload and download.
+    static func isValidUnits(_ units: Double) -> Bool {
+        units.isFinite && units > 0 && units.truncatingRemainder(dividingBy: 0.5) == 0
     }
 
     /// Uses the same JSON/base64 envelope as Calendar Share, below a readable summary.
@@ -289,7 +294,7 @@ struct BasalInjectionPayload: Codable, Equatable {
         let description = insulinDescription.components(separatedBy: .newlines).joined(separator: " ")
         let detail = description.isEmpty ? "" : description + ", "
         // Leave a blank line after the summary, then keep the separator and payload on their own lines.
-        return "Basal injection: \(detail)\(units) U\n\n---------\n" + Self.prefix + data.base64EncodedString()
+        return "Basal injection: \(detail)\(units.stringWithoutTrailingZeroes) U\n\n---------\n" + Self.prefix + data.base64EncodedString()
     }
 
     /// Invalid or future payloads remain ordinary Notes. Never infer a dose from the readable text.
@@ -300,8 +305,7 @@ struct BasalInjectionPayload: Codable, Equatable {
               let line = payloadLines.first,
               let data = Data(base64Encoded: String(line.dropFirst(prefix.count))),
               let payload = try? JSONDecoder().decode(Self.self, from: data),
-              payload.version == 1, payload.units > 0,
-              Int(exactly: Double(payload.units)) == payload.units else { return nil }
+              payload.version == 1, isValidUnits(payload.units) else { return nil }
         return payload
     }
 }

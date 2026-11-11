@@ -68,3 +68,36 @@ enum DirectWatchCompatibility {
         }
     }
 }
+
+
+/// Live replies stay below WatchConnectivity's message limit while retaining the complete log.
+enum DirectWatchLogReply {
+    static let requestTimeout: TimeInterval = 8
+    static let maximumBytes = 2_000_000
+    // Outgoing replies also carry legacy aliases, so leave room for both copies.
+    static let chunkBytes = 24_000
+    static let requestIDKey = "directWatchLogRequestID"
+    static let offsetKey = "directWatchLogOffset"
+    static let totalBytesKey = "directWatchLogTotalBytes"
+    static let dataKey = "directWatchLogData"
+
+    static func payload(data: Data, requestID: String, offset: Int) -> [String: Any]? {
+        guard !data.isEmpty, data.count <= maximumBytes, offset >= 0, offset < data.count else { return nil }
+        let end = min(offset + chunkBytes, data.count)
+        return [requestIDKey: requestID, offsetKey: offset, totalBytesKey: data.count,
+                dataKey: data.subdata(in: offset..<end)]
+    }
+
+    static func append(_ payload: [String: Any], requestID: String, to data: Data, totalBytes: Int?) -> (data: Data, totalBytes: Int)? {
+        let payload = DirectWatchCompatibility.normalized(payload)
+        guard payload[requestIDKey] as? String == requestID,
+              let offset = payload[offsetKey] as? Int, offset == data.count,
+              let total = payload[totalBytesKey] as? Int, total > 0, total <= maximumBytes,
+              totalBytes == nil || totalBytes == total,
+              let chunk = payload[dataKey] as? Data, !chunk.isEmpty, chunk.count <= chunkBytes,
+              data.count + chunk.count <= total else { return nil }
+        var combined = data
+        combined.append(chunk)
+        return (combined, total)
+    }
+}

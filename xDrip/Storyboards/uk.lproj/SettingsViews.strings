@@ -129,7 +129,7 @@
 "settingsviews_alerts_section_footer" = "Сигнали визначають, коли застосунок має повідомляти про рівні глюкози, пропущені показники та інші умови.";
 
 /// in Settings, row title to send settings
-"sendTraceFile" = "Надіслати звіт про проблему";
+"sendTraceFile" = "Надіслати поштою";
 "settingsviews_issueReportTitle" = "Звіт про проблему";
 
 /// M5 stack bluetooth  settings, pop up that asks user to enter the password
@@ -221,7 +221,7 @@
 "testUrlAndAPIKey" = "Перевірити з’єднання";
 
 /// in Settings, to enable debug level in trace file
-"debugLevel" = "Include Debug Level";
+"debugLevel" = "Використовувати рівень налагодження";
 
 /// help settings, restart needed
 
@@ -297,8 +297,6 @@
 /// about settings, section title
 "settingsviews_sectiontitleAbout" = "About %@";
 
-/// Text in pop up shown when user wants to send the trace file
-"describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
 
 /// help settings, open the online help
 "settingsviews_showOnlineHelp" = "Open Online Help";
@@ -781,3 +779,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Промовляти вступ";
 "speak.preview" = "Прослухати приклад озвучення глюкози";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Додати журнали Watch";
+"settingsviews_reportWatchFooter" = "Отримати журнали Direct to Watch із підключеного Watch.";
+"settingsviews_reportSendFooter" = "Підготувати лист розробникам xDrip4iOS.";
+"settingsviews_requestingWatchLogs" = "Запит...";
+"settingsviews_watchLogsNotReceived" = "Журнали Watch не отримано";
+"settingsviews_watchLogsTimeout" = "Журнали Watch не отримано протягом 8 секунд. Спробуйте ще раз або надішліть звіт без них.";
+"settingsviews_watchLogsFailure" = "Не вдалося отримати журнали Watch. Спробуйте ще раз або надішліть звіт без них.";
+"settingsviews_openWatchApp" = "Відкрийте застосунок Watch";
+"settingsviews_confirmWatchAppOpen" = "Відкрийте %@ на Watch і не закривайте застосунок до отримання журналів.\n\nВін зараз відкритий?";
+"settingsviews_reportShareFooter" = "Поділитися файлами журналів.";
+"settingsviews_shareReport" = "Поділитися звітом";
+"settingsviews_shareIssueReport" = "Поділитися звітом про проблему";
+"settingsviews_reportShareFailed" = "Не вдалося підготувати файли журналів. Спробуйте ще раз.";

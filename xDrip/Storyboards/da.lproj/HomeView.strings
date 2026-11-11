@@ -36,7 +36,7 @@
 "success" = "Success";
 "failed" = "Failed";
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
-"enterSensorCode" = "Indtast sensorkoden manuelt, scan sensorens etiket, eller vælg et foto.\n\nHvis du ikke har koden eller vil bruge en sensorsession, der allerede kører på senderen, skal du vælge Brug uden kode.";
+"enterSensorCode" = "Scan sensorens etiket, eller vælg et foto for at læse sensorkoden.";
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,7 +177,28 @@
 "sensorCodeContinue" = "Fortsæt";
 "useWithoutSensorCode" = "Brug uden kode";
 "noSensorCode" = "Ingen kode (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Indtast den firecifrede parringskode manuelt, scan den aktuelle applikator, eller vælg et foto. Kontrollér den valgte kode, og tryk på Fortsæt.";
+"dexcomG7SelectSensorCodeMessage" = "Scan den aktuelle applikator, eller vælg et foto for at læse den firecifrede parringskode. Kontrollér den valgte kode, og tryk på Fortsæt.";
 "noSensorCodeSelectedTitle" = "Fortsæt uden sensorkode?";
 "noSensorCodeSelectedMessage" = "Hvis en sensorsession allerede kører på senderen, bruger appen den session med dens eksisterende kalibreringskrav.\n\nEn ny session uden kode kræver kalibreringer efter opvarmning og derefter med jævne mellemrum. Disse krav forsvinder ikke, når appens kalibreringspåmindelse slås fra.";
 "showHideGlucoseChartTitle" = "Graf";
+"manualSensorCodeEntryFooter" = "Hvis du ikke kan scanne etiketten eller bruge et foto, skal du indtaste den firecifrede kode manuelt.";
+"useWithoutSensorCodeFooter" = "Hvis du ikke har koden eller vil bruge en sensorsession, der allerede kører på senderen, skal du vælge Brug uden kode.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "Glukosejustering";
+"postProcessingSmoothing" = "Glukoseudjævning";
+"postProcessingCurveAdjustment" = "Kurvejustering";
+"postProcessingEnableGlucoseAdjustment" = "Aktivér glukosejustering?";
+"postProcessingEnableCurveAdjustment" = "Aktivér kurvejustering?";
+"postProcessingEnableGlucoseSmoothing" = "Aktivér glukoseudjævning?";
+"postProcessingGlucoseAdjustmentWarning" = "Glukosejustering lægger en fast forskydning til eller trækker den fra sensorværdierne. Aktivér kun efter at have bekræftet en ensartet forskel i forhold til fingerprikmålinger, når glukosen er stabil. Store eller vedvarende forskelle kan tyde på en upålidelig sensor.";
+"postProcessingCurveAdjustmentWarning" = "Kurvejustering er en avanceret funktion, som ændrer skaleringen af glukoseværdier. Aktivér kun, hvis du forstår, hvordan skala og vægtning påvirker dine værdier.";
+"postProcessingGlucoseSmoothingWarning" = "Glukoseudjævning reducerer spring, støj og udsving i sensorværdierne, men kan forsinke eller dæmpe hurtige glukoseændringer. Aktivér kun, hvis du forstår, hvordan det påvirker dine værdier. Udjævning kan ikke korrigere en unøjagtig sensor.";
+"postProcessingLargeOffsetWarning" = "Stor glukoseforskydning. Kontrollér med et fingerprik, når glukosen er stabil. Vedvarende store forskelle kan tyde på en upålidelig sensor.";
+"postProcessingOffsetLimit" = "Forskydningen overstiger maksimum på ±%@. Reducer forskydningen for at anvende justeringen.";
+"postProcessingOffsetAccessibility" = "Glukoseforskydning: %@";
+"postProcessingInvalidAdjustment" = "Justeringen kunne ikke anvendes. Kontrollér forskydning og skala.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "Justering af forskydning og form er ikke tilgængelig, fordi denne CGM bruger sin egen kalibrering.";
+
+"postProcessingWarningAgreement" = "Tryk kun på OK, hvis du forstår denne funktion og accepterer at aktivere den.";

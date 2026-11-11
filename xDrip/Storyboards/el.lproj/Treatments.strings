@@ -29,7 +29,7 @@
 "treatments_basalInjection" = "Βασική ινσουλίνη (ένεση)";
 "treatments_insulinDescription" = "Τύπος ινσουλίνης";
 "treatments_insulinDescriptionPlaceholder" = "π.χ. Tresiba";
-"treatments_invalidBasalInjectionValueMessage" = "Εισαγάγετε ακέραιο αριθμό μονάδων μεγαλύτερο από το μηδέν.";
+"treatments_invalidBasalInjectionValueMessage" = "Εισαγάγετε περισσότερες από 0 και έως 150 μονάδες, σε βήματα των 0,5.";
 
 /* Footer shown when a new basal injection is prefilled from the previous entry. */
 "treatments_basalInjectionCopiedFooter" = "Η ποσότητα και ο τύπος βασικής ινσουλίνης αντιγράφηκαν από την προηγούμενη καταχώριση";

@@ -44,7 +44,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "Saisissez le code du capteur manuellement, scannez son étiquette ou choisissez une photo.\n\nSi vous ne connaissez pas le code ou souhaitez utiliser une session de capteur déjà active sur le transmetteur, choisissez Utiliser sans code.";
+"enterSensorCode" = "Scannez l’étiquette du capteur ou choisissez une photo pour lire le code du capteur.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -213,7 +213,28 @@
 "sensorCodeContinue" = "Continuer";
 "useWithoutSensorCode" = "Utiliser sans code";
 "noSensorCode" = "Sans code (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Saisissez manuellement le code d’appairage à quatre chiffres, scannez l’applicateur actuel ou choisissez une photo. Vérifiez le code sélectionné, puis touchez Continuer.";
+"dexcomG7SelectSensorCodeMessage" = "Scannez l’applicateur actuel ou choisissez une photo pour lire le code d’appairage à quatre chiffres. Vérifiez le code sélectionné, puis touchez Continuer.";
 "noSensorCodeSelectedTitle" = "Continuer sans code de capteur ?";
 "noSensorCodeSelectedMessage" = "Si une session de capteur est déjà active sur le transmetteur, l’app l’utilisera avec ses exigences de calibration existantes.\n\nLe démarrage d’une nouvelle session sans code nécessite des calibrations après le préchauffage, puis régulièrement. Désactiver le rappel de calibration de l’app ne supprime pas ces exigences.";
 "showHideGlucoseChartTitle" = "Graphique";
+"manualSensorCodeEntryFooter" = "Si vous ne pouvez pas scanner l’étiquette ni utiliser une photo, saisissez le code à quatre chiffres manuellement.";
+"useWithoutSensorCodeFooter" = "Si vous ne connaissez pas le code ou souhaitez utiliser une session de capteur déjà active sur le transmetteur, choisissez Utiliser sans code.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "Ajustement du glucose";
+"postProcessingSmoothing" = "Lissage du glucose";
+"postProcessingCurveAdjustment" = "Ajustement de la courbe";
+"postProcessingEnableGlucoseAdjustment" = "Activer l’ajustement du glucose ?";
+"postProcessingEnableCurveAdjustment" = "Activer l’ajustement de la courbe ?";
+"postProcessingEnableGlucoseSmoothing" = "Activer le lissage du glucose ?";
+"postProcessingGlucoseAdjustmentWarning" = "L’ajustement du glucose ajoute ou soustrait un décalage fixe aux mesures du capteur. Activez-le uniquement après avoir confirmé un écart constant avec des mesures capillaires lorsque le glucose est stable. Des écarts importants ou persistants peuvent indiquer un capteur peu fiable.";
+"postProcessingCurveAdjustmentWarning" = "L’ajustement de la courbe est une fonction avancée qui modifie l’échelle des valeurs de glucose. Activez-le uniquement si vous comprenez l’effet de l’échelle et de l’accentuation sur vos mesures.";
+"postProcessingGlucoseSmoothingWarning" = "Le lissage du glucose réduit les sauts, le bruit et les fluctuations des mesures du capteur, mais peut retarder ou atténuer les variations rapides du glucose. Activez-le uniquement si vous comprenez son effet sur vos mesures. Le lissage ne peut pas corriger un capteur imprécis.";
+"postProcessingLargeOffsetWarning" = "Décalage de glucose important. Vérifiez avec une mesure capillaire lorsque le glucose est stable. Des écarts importants et persistants peuvent indiquer un capteur peu fiable.";
+"postProcessingOffsetLimit" = "Le décalage dépasse le maximum de ±%@. Réduisez-le pour appliquer cet ajustement.";
+"postProcessingOffsetAccessibility" = "Décalage de glucose : %@";
+"postProcessingInvalidAdjustment" = "L’ajustement n’a pas pu être appliqué. Vérifiez le décalage et l’échelle.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "Le réglage du décalage et de la forme est indisponible, car ce CGM utilise son propre calibrage.";
+
+"postProcessingWarningAgreement" = "Touchez OK uniquement si vous comprenez cette fonctionnalité et acceptez de l’activer.";

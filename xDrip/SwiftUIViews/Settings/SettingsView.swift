@@ -43,6 +43,7 @@ import MessageUI
 
 /// Owns the Settings navigation path and the system sheets requested by settings actions.
 struct SettingsNavigationView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var router: SettingsRouter
     @StateObject private var presenter: SettingsActionPresenter
     @StateObject private var listModel: SettingsListModel
@@ -81,10 +82,13 @@ struct SettingsNavigationView: View {
     var body: some View {
         navigationContent
         .environment(\.settingsNavigationActions, navigationActions)
-        .sheet(isPresented: $router.showsTraceEmail) {
-            SettingsTraceMailView(isPresented: $router.showsTraceEmail) {
+        .sheet(isPresented: $router.showsTraceEmail, onDismiss: presenter.cancelTraceEmailPreparation) {
+            SettingsTraceMailView(isPresented: $router.showsTraceEmail, watchLogData: presenter.traceWatchLogData) {
                 presenter.showMessage(title: Texts_Common.warning, message: Texts_SettingsView.failedToSendEmail)
             }
+        }
+        .sheet(item: $presenter.traceShare, onDismiss: presenter.clearTraceShare) { share in
+            SettingsTraceShareView(files: share.files)
         }
         .tint(ConstantsAppColors.navigationTint)
         .colorScheme(.dark)
@@ -96,7 +100,12 @@ struct SettingsNavigationView: View {
         .onChange(of: incomingBackupRequest?.id) { _ in
             openIncomingBackupIfNeeded()
         }
+        .onDisappear { presenter.cancelTraceEmailPreparation() }
+        .onChange(of: scenePhase) { phase in
+            if phase == .background { presenter.cancelTraceEmailPreparation() }
+        }
         .onChange(of: router.path) { path in
+            presenter.traceReportNavigationChanged()
             if path.isEmpty {
                 listModel.reload(.all)
             }
@@ -375,9 +384,21 @@ private struct NativeAlertsSettingsView: View {
 
 // MARK: - System Presentation
 
-/// SwiftUI adapter for the system mail composer used to send trace files.
+/// Presents the report files in the system share sheet.
+private struct SettingsTraceShareView: UIViewControllerRepresentable {
+    let files: [URL]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: files, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
+}
+
+/// Presents the mail composer with the report files attached.
 private struct SettingsTraceMailView: UIViewControllerRepresentable {
     @Binding var isPresented: Bool
+    let watchLogData: Data?
     let onFailure: () -> Void
 
     func makeCoordinator() -> Coordinator {
@@ -390,22 +411,8 @@ private struct SettingsTraceMailView: UIViewControllerRepresentable {
         mailViewController.setToRecipients([ConstantsTrace.traceFileDestinationAddress])
         mailViewController.setMessageBody(Texts_SettingsView.emailbodyText, isHTML: true)
 
-        let traceFiles = Trace.getTraceFilesInData()
-        for (index, traceFile) in traceFiles.0.enumerated() {
-            mailViewController.addAttachmentData(
-                traceFile as Data,
-                mimeType: "text/txt",
-                fileName: traceFiles.1[index]
-            )
-        }
-
-        let appInfo = Trace.getAppInfoFileAsData()
-        if let appInfoData = appInfo.0 {
-            mailViewController.addAttachmentData(
-                appInfoData as Data,
-                mimeType: "text/txt",
-                fileName: appInfo.1
-            )
+        for file in SettingsIssueReportFiles.attachments(watchLogData: watchLogData) {
+            mailViewController.addAttachmentData(file.data, mimeType: "text/plain", fileName: file.name)
         }
 
         return mailViewController
@@ -555,7 +562,7 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
         case .troubleshooting:
             // Consumer troubleshooting remains visible in the root menu. Developer e-mail reports
             // are intentionally exposed only by Show Advanced in the Advanced Settings section.
-            return SettingsViewTraceSettingsViewModel(rowGroup: .troubleshooting)
+            return SettingsViewTraceSettingsViewModel()
         case .about:
             return SettingsViewInfoViewModel()
         case .advanced:
@@ -599,7 +606,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleHomeScreen,
-                            onlineHelpTopic: .glucoseDisplay,
+                            onlineHelpTopic: .homeScreen,
                             providers: {
                                 [
                                     SettingsViewHomeScreenSettingsViewModel(rowGroup: .layout),
@@ -617,7 +624,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.glucoseRangesSectionTitle,
-                            onlineHelpTopic: .glucoseDisplay,
+                            onlineHelpTopic: .glucoseRanges,
                             providers: { [SettingsViewHomeScreenSettingsViewModel(rowGroup: .glucoseRanges)] }
                         )
                     }
@@ -633,7 +640,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleStatistics,
-                            onlineHelpTopic: .glucoseDisplay,
+                            onlineHelpTopic: .statisticsSettings,
                             providers: { [SettingsViewStatisticsSettingsViewModel()] }
                         )
                     }
@@ -1006,6 +1013,21 @@ enum SettingsListFactory {
             )
 
             configure(viewModel: viewModel, presenter: presenter)
+
+            if section == .advanced, let advanced = viewModel as? SettingsViewDevelopmentSettingsViewModel {
+                let groups: [SettingsViewDevelopmentSettingsRowGroup] = [.advanced, .issueReporting, .advancedOptions]
+                return groups.enumerated().map { offset, group in
+                    let provider = offset == 0 ? advanced
+                        : SettingsViewDevelopmentSettingsViewModel(rowGroup: group)
+                    configure(viewModel: provider, presenter: presenter)
+                    let id = section.rawValue * 10 + offset
+                    return SettingsSectionModel(id: id) {
+                        SettingsSection(title: offset == 0 ? provider.sectionTitle() : nil,
+                                        iconSymbolName: offset == 0 ? section.iconSymbolName : nil,
+                                        rows: provider.settingsRows(sectionID: id))
+                    }
+                }
+            }
 
             if let dataSourceViewModel = viewModel as? SettingsViewDataSourceSettingsViewModel {
                 let sectionIDBase = section.rawValue * 10

@@ -90,9 +90,8 @@
 "infoCalendarAccessDeniedByUser" = "لقد رفضت الوصول إلى التقويم الخاص بك مسبقًا.\n\nلتمكينه ، انتقل إلى إعدادات جهازك ثم الخصوصية ثم التقويم ثم قم بتمكينه.";
 "infoCalendarAccessRestricted" = "لا يمكنك منح إذن لـ %@ للوصول إلى التقويم الخاص بك. قد يكون هذا بسبب القيود النشطة مثل وجود أدوات الرقابة الأبوية.";
 "sectionTitleTrace" = "الإبلاغ عن المشاكل";
-"sendTraceFile" = "إرسال تقرير المشكلة";
+"sendTraceFile" = "إرسال بالبريد الإلكتروني";
 "settingsviews_issueReportTitle" = "تقرير المشكلة";
-"describeProblem" = "اشرح سبب حاجتك لإرسال ملف التتبع بأكبر قدر ممكن من التفاصيل. إذا كنت قد ذكرت بالفعل مشكلتك في مجموعة دعم الفيسبوك %@، اذكر اسم الفيسبوك الخاص بك في البريد الإلكتروني";
 "emailNotConfigured" = "يجب عليك تفعيل حساب البريد الإلكتروني على جهازك.";
 "emailbodyText" = "وصف المشكلة: ";
 "failedToSendEmail" = "فشل في إرسال البريد الإلكتروني";
@@ -100,7 +99,7 @@
 "volumeTestiOSSoundExplanation" = "يتم الآن تشغيل صوت التنبيه بنفس الحجم الذي سيتم استخدامه لنوع التنبيه مع عدم تفعيل 'تجاوزوضع الصامت' \ n \ n (يستخدم أيضًا دائمًا لإنذارات القراءات المفقودة والتي تستخدم مستوى صوت الجهاز.) \ n \ n اضغط على واحد من أزرار الصوت لإيقاف الصوت ، ثم قم بتغيير مستوى الصوت باستخدام أزرار الصوت إلى مستوى الصوت المطلوب واختبره مرة أخرى.";
 "volumeTestSoundPlayer" = "عند تفعيل الوضع الصامت";
 "volumeTestiOSSound" = "عند تعطيل الوضع الصامت";
-"debugLevel" = "تضمين مستوى التصحيح";
+"debugLevel" = "استخدام مستوى تصحيح الأخطاء";
 "warningChangeFromMasterToFollower" = "سيؤدي التبديل من رئيسي إلى متابعة، إلى إيقاف الحساس الحالي. هل تريد الاستمرار ?";
 "nightscoutPort" = "المنفذ (اختياري)";
 "developerSettings" = "الإعدادات المتقدمة";
@@ -582,3 +581,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "نطق المقدمة";
 "speak.preview" = "معاينة نطق الجلوكوز";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "تضمين سجلات Watch";
+"settingsviews_reportWatchFooter" = "جلب سجلات Direct to Watch من ساعة Watch المتصلة.";
+"settingsviews_reportSendFooter" = "إعداد رسالة بريد إلكتروني لإرسالها إلى مطوري xDrip4iOS.";
+"settingsviews_requestingWatchLogs" = "جارٍ الطلب...";
+"settingsviews_watchLogsNotReceived" = "لم يتم استلام سجلات Watch";
+"settingsviews_watchLogsTimeout" = "لم يتم استلام سجلات Watch خلال 8 ثوانٍ. حاول مجددًا أو أرسل التقرير بدونها.";
+"settingsviews_watchLogsFailure" = "تعذر استلام سجلات Watch. حاول مجددًا أو أرسل التقرير بدونها.";
+"settingsviews_openWatchApp" = "افتح تطبيق Watch";
+"settingsviews_confirmWatchAppOpen" = "افتح %@ على ساعة Watch وأبقِ التطبيق مفتوحًا حتى تصل السجلات.\n\nهل هو مفتوح الآن؟";
+"settingsviews_reportShareFooter" = "مشاركة ملفات السجل.";
+"settingsviews_shareReport" = "مشاركة التقرير";
+"settingsviews_shareIssueReport" = "مشاركة تقرير المشكلة";
+"settingsviews_reportShareFailed" = "تعذر إعداد ملفات السجل. يرجى المحاولة مرة أخرى.";

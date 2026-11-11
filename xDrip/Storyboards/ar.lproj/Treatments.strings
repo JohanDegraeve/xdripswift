@@ -37,7 +37,7 @@
 "treatments_basalInjection" = "الأنسولين القاعدي (حقن)";
 "treatments_insulinDescription" = "نوع الأنسولين";
 "treatments_insulinDescriptionPlaceholder" = "مثل تريسيبا";
-"treatments_invalidBasalInjectionValueMessage" = "يرجى إدخال عدد صحيح من الوحدات أكبر من الصفر.";
+"treatments_invalidBasalInjectionValueMessage" = "يرجى إدخال أكثر من 0 وحتى 150 وحدة بزيادات قدرها 0.5.";
 
 /* Footer shown when a new basal injection is prefilled from the previous entry. */
 "treatments_basalInjectionCopiedFooter" = "تم نسخ كمية الأنسولين القاعدي ونوعه من الإدخال السابق";

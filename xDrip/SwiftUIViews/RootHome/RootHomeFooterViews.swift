@@ -279,6 +279,24 @@ struct RootHomeDataSourceView: View {
             Spacer(minLength: 8)
 
             HStack(spacing: 4) {
+                if let offset = state.adjustmentOffsetText {
+                    HStack(spacing: 1) {
+                        Text("(")
+                        Image(systemName: state.adjustmentSystemImage)
+                            .font(.system(size: 12))
+                        Text(offset)
+                        Text(")")
+                    }
+                    .font(.system(size: 14))
+                    .foregroundStyle(state.adjustmentOffsetColor)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(state.adjustmentOffsetAccessibilityLabel)
+                    .padding(.trailing, 3)
+                }
+
                 Text(dataSourceDetailText)
                     .font(.system(size: 14))
                     .foregroundStyle(dataSourceDetailColor)

@@ -48,7 +48,7 @@ enum Texts_TreatmentsView {
     static let basalInjectionCopiedFooter = NSLocalizedString("treatments_basalInjectionCopiedFooter", tableName: filename, bundle: .main, value: "The basal amount and type have been copied from the previous entry", comment: "Footer for a new basal injection prefilled from the previous entry")
     static let insulinDescription = NSLocalizedString("treatments_insulinDescription", tableName: filename, bundle: .main, value: "Insulin Type", comment: "Name of the long-acting insulin")
     static let insulinDescriptionPlaceholder = NSLocalizedString("treatments_insulinDescriptionPlaceholder", tableName: filename, bundle: .main, value: "e.g. Tresiba", comment: "Example long-acting insulin name")
-    static let invalidBasalInjectionValueMessage = NSLocalizedString("treatments_invalidBasalInjectionValueMessage", tableName: filename, bundle: .main, value: "Please enter a whole number of units greater than zero.", comment: "Basal injections require positive integer units")
+    static let invalidBasalInjectionValueMessage = NSLocalizedString("treatments_invalidBasalInjectionValueMessage", tableName: filename, bundle: .main, value: "Please enter more than 0 and up to 150 units, in steps of 0.5.", comment: "Basal injections require 0.5-unit steps greater than zero and no more than 150 units")
 
     static let automaticBasal: String = {
         return NSLocalizedString("treatments_automaticBasal", tableName: filename, bundle: Bundle.main, value: "Automatic Basal", comment: "One automatic basal insulin delivery")
