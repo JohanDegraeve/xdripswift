@@ -126,6 +126,10 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     private var serverAuthFlagBytes: [UInt8]?
     private var serverActivating = false
     private var serverFrames: (coefficient: [UInt8], duration: [UInt8], activate: [UInt8])?
+    private var serverDurationPlan: OttaiServerDurationPlan?
+    private var serverDurationBaselineSeconds: Int64?
+    private var serverDurationIndex = 0
+    private var serverDurationAttempted = false
 
     private var pendingActivation = false
     private var rediscoveredServices = Set<CBUUID>()
@@ -372,6 +376,8 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         serverAuthFlagBytes = nil
         serverActivating = false
         serverFrames = nil
+        serverDurationPlan = nil // frames and keys are valid only on this connection
+        serverDurationAttempted = false
         pendingActivation = false
         expectedRediscoveryCount = 0
         liveReadInFlight = false
@@ -392,6 +398,7 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         workQueue.async { [weak self] in
             guard let self = self else { return }
+            _ = self.stepDownServerDurationIfNeeded()
             self.livePollTimer?.cancel()
             self.livePollTimer = nil
             self.phase = .idle
@@ -769,6 +776,29 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
                     self.giveUpServerActivation("the server sent no activation frames")
                     return
                 }
+                let verification = OttaiServerDurationPlan.verification(keyHex: m.keyB, duration: d, activate: c)
+                let plan: OttaiServerDurationPlan?
+                switch verification {
+                case .success(let verified):
+                    plan = verified
+                case .failure(let reason):
+                    plan = nil
+                    trace("server duration: extension unavailable reason=%{public}@ kbChars=%{public}d durationBytes=%{public}d activateBytes=%{public}d; using original server frame", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .info,
+                          reason.rawValue, m.keyB.count, d.count, c.count)
+                }
+                // Candidate positions must refer to the same baseline after reconnect.
+                if let old = self.serverDurationBaselineSeconds, let plan = plan, old != plan.serverSeconds {
+                    self.serverDurationIndex = plan.candidates.count - 1
+                    trace("server duration: baseline changed old=%{public}ds new=%{public}ds; using original server frame", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .info,
+                          Int(old), Int(plan.serverSeconds))
+                }
+                self.serverDurationPlan = plan
+                if let plan = plan {
+                    self.serverDurationBaselineSeconds = plan.serverSeconds
+                    self.serverDurationIndex = min(self.serverDurationIndex, plan.candidates.count - 1)
+                    trace("server duration: verified key; target=%{public}ds server=%{public}ds", log: self.log, category: ConstantsLog.categoryCGMOttai, type: .info,
+                          Int(plan.candidates[self.serverDurationIndex]), Int(plan.serverSeconds))
+                }
                 self.serverFrames = (cf, d, c)
                 self.serverAuthHostBytes = host
                 self.serverAuthFlagBytes = flag
@@ -836,10 +866,23 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         guard let frames = serverFrames else { return }
         switch actStep {
         case .serverCoefficient:
-            writeServerStep(.serverDuration, OttaiConstants.charMaxActiveTime, frames.duration)
+            var duration = frames.duration
+            if let plan = serverDurationPlan {
+                guard let candidate = plan.frame(at: serverDurationIndex, original: frames.duration) else {
+                    giveUpServerActivation("could not build the verified duration frame")
+                    return
+                }
+                duration = candidate
+                trace("server maxActive attempt=%{public}d/%{public}d target=%{public}ds", log: log, category: ConstantsLog.categoryCGMOttai, type: .info,
+                      serverDurationIndex + 1, plan.candidates.count, Int(plan.candidates[serverDurationIndex]))
+                serverDurationAttempted = true
+            }
+            writeServerStep(.serverDuration, OttaiConstants.charMaxActiveTime, duration)
         case .serverDuration:
+            trace("server duration: write acknowledged; actual lifetime will be checked after activation", log: log, category: ConstantsLog.categoryCGMOttai, type: .info)
             writeServerStep(.serverRtc, OttaiConstants.charCurrentTime, [0, 0, 0, 0])
         case .serverRtc:
+            serverDurationAttempted = false
             // Saved before the answer: a dropped link may never report this write.
             if serverActivateAttemptedAtMs <= 0 { serverActivateAttemptedAtMs = nowMs() }
             writeServerStep(.serverActivate, OttaiConstants.charCommand, frames.activate)
@@ -860,13 +903,32 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
     private func failServerActivationWrite(_ reason: String) {
         trace("server activation write failed at %{public}@: %{public}@", log: log, category: ConstantsLog.categoryCGMOttai, type: .error, "\(actStep)", reason)
         let step = actStep
+        let steppedDown = stepDownServerDurationIfNeeded()
         actStep = .none
         pendingActivation = false
-        if serverActivationStarts >= Self.maxServerActivationStarts {
+        if steppedDown {
+            recoverAndReconnect("server duration rejected; trying a shorter lifetime")
+        } else if serverActivationStarts >= Self.maxServerActivationStarts {
             giveUpServerActivation("write failed at \(step) on the last try")
         } else {
             recoverAndReconnect("server activation interrupted")
         }
+    }
+
+    /// Called for both write errors and link drops; consuming the attempt once avoids
+    /// skipping two candidates when CoreBluetooth reports both for the same rejection.
+    @discardableResult
+    private func stepDownServerDurationIfNeeded() -> Bool {
+        guard serverActivating, serverDurationAttempted, let plan = serverDurationPlan,
+              let next = plan.nextIndex(after: serverDurationIndex,
+                                        durationOrRTCFailed: actStep == .serverDuration || actStep == .serverRtc,
+                                        activateSent: serverActivateAttemptedAtMs > 0) else { return false }
+        serverDurationAttempted = false
+        serverDurationIndex = next
+        serverActivationStarts = 0 // keep the connection retry budget per candidate
+        trace("server maxActive rejected; reconnecting to try %{public}ds", log: log, category: ConstantsLog.categoryCGMOttai, type: .info,
+              Int(plan.candidates[next]))
+        return true
     }
 
     private func serverActivationLanded(atMs startMs: Int64) {
@@ -891,6 +953,10 @@ final class CGMOttaiTransmitter: BluetoothTransmitter, CGMTransmitter {
         activationRequested = false
         serverActivating = false
         serverFrames = nil
+        serverDurationPlan = nil
+        serverDurationBaselineSeconds = nil
+        serverDurationIndex = 0
+        serverDurationAttempted = false
         serverActivationStarts = 0
         serverActivateAttemptedAtMs = 0
         actStep = .none

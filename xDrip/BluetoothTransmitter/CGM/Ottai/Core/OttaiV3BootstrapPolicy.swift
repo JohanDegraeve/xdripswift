@@ -30,3 +30,68 @@ func ottaiAuthEntryMode(
     if bootstrapPending, sessionAvailable, activationRequested { return .serverAssistedActivation }
     return .blocked
 }
+
+/// A server session can only override duration if `kb` actually reproduces the
+/// server's encrypted activate command and decrypts its duration with zero padding.
+/// SyaiKit documents these as AES-128 ECB frames; it does not define `kb` as a key.
+/// Never assume that meaning without checking both frames for this connection.
+struct OttaiServerDurationPlan {
+    let keyHex: String
+    let serverSeconds: Int64
+    let candidates: [Int64]
+
+    /// Stable diagnostic codes only: never include keys, ciphertext or decrypted bytes.
+    enum VerificationFailure: String, Error {
+        case missingKey = "kb-missing"
+        case invalidKeyHex = "kb-invalid-hex"
+        case invalidKeyLength = "kb-not-16-bytes"
+        case invalidDurationLength = "duration-not-16-bytes"
+        case invalidActivateLength = "activate-not-16-bytes"
+        case activateEncryptionFailed = "activate-encryption-failed"
+        case activateMismatch = "activate-frame-mismatch"
+        case durationDecryptionFailed = "duration-decryption-failed"
+        case invalidDurationPadding = "duration-padding-mismatch"
+        case invalidDurationRange = "duration-outside-10-to-45-days"
+    }
+
+    static func verified(keyHex: String, duration: [UInt8], activate: [UInt8]) -> Self? {
+        try? verification(keyHex: keyHex, duration: duration, activate: activate).get()
+    }
+
+    static func verification(keyHex: String, duration: [UInt8], activate: [UInt8]) -> Result<Self, VerificationFailure> {
+        guard !keyHex.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return .failure(.missingKey) }
+        guard let key = try? OttaiCrypto.hexToBytesStrict(keyHex) else { return .failure(.invalidKeyHex) }
+        guard key.count == 16 else { return .failure(.invalidKeyLength) }
+        guard duration.count == 16 else { return .failure(.invalidDurationLength) }
+        guard activate.count == 16 else { return .failure(.invalidActivateLength) }
+        guard let encryptedActivate = OttaiCrypto.encryptActivateCmd([3], sessionKeyHex: keyHex) else {
+            return .failure(.activateEncryptionFailed)
+        }
+        guard encryptedActivate == activate else { return .failure(.activateMismatch) }
+        guard let plain = OttaiCrypto.aesECB(.decrypt, key: key, data: duration, pkcs7Padded: false), plain.count == 16 else {
+            return .failure(.durationDecryptionFailed)
+        }
+        guard plain.dropFirst(4).allSatisfy({ $0 == 0 }) else { return .failure(.invalidDurationPadding) }
+        let seconds = (0..<4).reduce(Int64(0)) { $0 | (Int64(plain[$1]) << ($1 * 8)) }
+        guard OttaiConstants.sanitizeActiveExpireMs(seconds * 1000) > 0 else { return .failure(.invalidDurationRange) }
+        let candidates = OttaiConstants.activationMaxActiveCandidatesMs(cloudActiveExpireMs: seconds * 1000)
+            .map { $0 / 1000 }.filter { $0 > seconds && $0 <= 30 * 86_400 }
+        return .success(Self(keyHex: keyHex, serverSeconds: seconds, candidates: candidates + [seconds]))
+    }
+
+    func frame(at index: Int, original: [UInt8]) -> [UInt8]? {
+        guard candidates.indices.contains(index) else { return nil }
+        let seconds = candidates[index]
+        if seconds == serverSeconds { return original }
+        let payload = (0..<4).map { UInt8(truncatingIfNeeded: seconds >> ($0 * 8)) }
+        return OttaiCrypto.encryptPayload(payload, sessionKeyHex: keyHex)
+    }
+
+    /// Only duration rejection (including a drop before the RTC acknowledgement)
+    /// steps down. Never retry activation after the activate command was sent.
+    func nextIndex(after index: Int, durationOrRTCFailed: Bool, activateSent: Bool) -> Int? {
+        guard durationOrRTCFailed, !activateSent, candidates.indices.contains(index),
+              candidates[index] > serverSeconds, candidates.indices.contains(index + 1) else { return nil }
+        return index + 1
+    }
+}

@@ -273,3 +273,88 @@ final class OttaiCloudOperationTests: XCTestCase {
         }
     }
 }
+
+final class OttaiServerDurationTests: XCTestCase {
+    private let key = "00112233445566778899aabbccddeeff"
+
+    private func frames(seconds: Int64 = 14 * 86_400) throws -> (duration: [UInt8], activate: [UInt8]) {
+        let plain = (0..<4).map { UInt8(truncatingIfNeeded: seconds >> ($0 * 8)) }
+        return (try XCTUnwrap(OttaiCrypto.encryptPayload(plain, sessionKeyHex: key)),
+                try XCTUnwrap(OttaiCrypto.encryptActivateCmd([3], sessionKeyHex: key)))
+    }
+
+    func testVerifiedSessionTriesThirtyDownToFifteenThenServerDuration() throws {
+        let f = try frames()
+        let plan = try XCTUnwrap(OttaiServerDurationPlan.verified(keyHex: key, duration: f.duration, activate: f.activate))
+        XCTAssertEqual(plan.candidates, Array(stride(from: Int64(30), through: 15, by: -1)).map { $0 * 86_400 } + [14 * 86_400])
+        let frame = try XCTUnwrap(plan.frame(at: 0, original: f.duration))
+        let plain = try XCTUnwrap(OttaiCrypto.aesECB(.decrypt, key: OttaiCrypto.hexToBytes(key), data: frame, pkcs7Padded: false))
+        XCTAssertEqual(Array(plain.prefix(4)), [0x00, 0x8D, 0x27, 0x00])
+        XCTAssertTrue(plain.dropFirst(4).allSatisfy { $0 == 0 })
+        XCTAssertEqual(plan.frame(at: plan.candidates.count - 1, original: f.duration), f.duration)
+    }
+
+    func testUnknownKeyOrWrongSessionNeverOverridesServerFrame() throws {
+        let f = try frames()
+        for candidate in ["", "bad", String(repeating: "ff", count: 16)] {
+            XCTAssertNil(OttaiServerDurationPlan.verified(keyHex: candidate, duration: f.duration, activate: f.activate))
+        }
+        let wrongCommand = try XCTUnwrap(OttaiCrypto.encryptActivateCmd([4], sessionKeyHex: key))
+        XCTAssertNil(OttaiServerDurationPlan.verified(keyHex: key, duration: f.duration, activate: wrongCommand))
+    }
+
+    func testInvalidDurationOrPaddingCannotAuthorizeOverride() throws {
+        let invalid = try frames(seconds: 1)
+        XCTAssertNil(OttaiServerDurationPlan.verified(keyHex: key, duration: invalid.duration, activate: invalid.activate))
+        let valid = try frames()
+        var plain: [UInt8] = [0, 0x75, 0x12, 0]
+        plain += [1] // Unknown frame fields must not be discarded.
+        let frame = try XCTUnwrap(OttaiCrypto.encryptPayload(plain, sessionKeyHex: key))
+        XCTAssertNil(OttaiServerDurationPlan.verified(keyHex: key, duration: frame, activate: valid.activate))
+    }
+
+    func testOnlyDurationOrRTCFailureBeforeActivateStepsDown() throws {
+        let f = try frames()
+        let plan = try XCTUnwrap(OttaiServerDurationPlan.verified(keyHex: key, duration: f.duration, activate: f.activate))
+        XCTAssertEqual(plan.nextIndex(after: 0, durationOrRTCFailed: true, activateSent: false), 1)
+        XCTAssertNil(plan.nextIndex(after: 0, durationOrRTCFailed: false, activateSent: false))
+        XCTAssertNil(plan.nextIndex(after: 0, durationOrRTCFailed: true, activateSent: true))
+        XCTAssertNil(plan.nextIndex(after: plan.candidates.count - 1, durationOrRTCFailed: true, activateSent: false))
+        XCTAssertNil(plan.frame(at: -1, original: f.duration))
+    }
+
+    func testNeverShortensLongerServerLifetime() throws {
+        let f = try frames(seconds: 35 * 86_400)
+        let plan = try XCTUnwrap(OttaiServerDurationPlan.verified(keyHex: key, duration: f.duration, activate: f.activate))
+        XCTAssertEqual(plan.candidates, [35 * 86_400])
+        XCTAssertEqual(plan.frame(at: 0, original: f.duration), f.duration)
+    }
+}
+
+extension OttaiServerDurationTests {
+    func testVerificationReportsSpecificReasonsWithoutSecrets() throws {
+        let f = try frames()
+        func failure(_ kb: String, _ d: [UInt8], _ c: [UInt8]) -> OttaiServerDurationPlan.VerificationFailure? {
+            switch OttaiServerDurationPlan.verification(keyHex: kb, duration: d, activate: c) {
+            case .success: return nil
+            case .failure(let reason): return reason
+            }
+        }
+        XCTAssertEqual(failure("", f.duration, f.activate), .missingKey)
+        XCTAssertEqual(failure(" \n", f.duration, f.activate), .missingKey)
+        XCTAssertEqual(failure("zz", f.duration, f.activate), .invalidKeyHex)
+        XCTAssertEqual(failure("00", f.duration, f.activate), .invalidKeyLength)
+        XCTAssertEqual(failure(key, [], f.activate), .invalidDurationLength)
+        XCTAssertEqual(failure(key, f.duration, []), .invalidActivateLength)
+        let wrongKey = String(repeating: "ff", count: 16)
+        let mismatch = try XCTUnwrap(failure(wrongKey, f.duration, f.activate))
+        XCTAssertEqual(mismatch, .activateMismatch)
+        XCTAssertFalse(mismatch.rawValue.contains(wrongKey))
+        XCTAssertFalse(mismatch.rawValue.contains(key))
+        let badPadding = try XCTUnwrap(OttaiCrypto.encryptPayload([0, 0x75, 0x12, 0, 1], sessionKeyHex: key))
+        XCTAssertEqual(failure(key, badPadding, f.activate), .invalidDurationPadding)
+        let invalid = try frames(seconds: 1)
+        XCTAssertEqual(failure(key, invalid.duration, invalid.activate), .invalidDurationRange)
+        XCTAssertNil(failure(key, f.duration, f.activate))
+    }
+}
