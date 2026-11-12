@@ -675,11 +675,20 @@ class Trace {
                         traceInfo.appendStringAndNewLine("        Type: " + (blePeripheral.libre3?.productName ?? "Libre 3/3 Plus"))
                     case .Libre2Type:
                         if blePeripheral.libre2 != nil {
-                            
+
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
                             
                         }
-                        
+
+                    case .OttaiType:
+                        if blePeripheral.ottai != nil {
+
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("    Upload to Syai cloud: " + OttaiRegistry.loadCloudUploadEnabled().description)
+                            traceInfo.appendStringAndNewLine("    Last Syai upload: " + OttaiRegistry.loadCloudUploadStatus())
+
+                        }
+
                     case .Libre3HeartBeatType:
                         if blePeripheral.libre2heartbeat != nil {
                             

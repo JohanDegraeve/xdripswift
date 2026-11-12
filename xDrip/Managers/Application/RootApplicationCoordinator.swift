@@ -1106,7 +1106,7 @@ import AppIntents
         sensorNoiseManager?.update(activeSensor: activeSensor)
         reconcileSensorExpiryReminders()
     }
-    
+
     /// Imports readings through the normal glucose path and acknowledges only saved samples.
     private func importDirectWatchReadings(_ readings: [DirectWatchReading]) -> [String] {
         guard UserDefaults.standard.isMaster, calibrator is NoCalibrator,
@@ -1983,7 +1983,7 @@ import AppIntents
         // initialize return value
         var calibrator: Calibrator = NoCalibrator()
         
-        switch cgmTransmitterType {            
+        switch cgmTransmitterType {
         case .dexcom:
             if cgmTransmitter.isWebOOPEnabled() {
                 // received values are already calibrated
@@ -2013,6 +2013,10 @@ import AppIntents
                 // no oop web, fixed slope
                 calibrator = Libre1Calibrator()
             }
+
+        case .ottai:
+            // Ottai / Syai send glucose that is already calibrated
+            calibrator = NoCalibrator()
 
         case .medtrumTouchCareNano:
             // Values arrive already calibrated to mg/dL. The transmitter applies the Medtrum per-sensor

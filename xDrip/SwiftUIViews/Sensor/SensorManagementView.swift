@@ -718,6 +718,8 @@ struct SensorManagementView: View {
             sensorActionNote = Texts_HomeView.sensorManagementNotAvailableInFollower
         } else if transmitter == nil {
             sensorActionNote = Texts_HomeView.sensorManagementNoTransmitterNote
+        } else if transmitter?.cgmTransmitterType() == .ottai {
+            sensorActionNote = "Start or change this sensor in Bluetooth > Ottai/Syai. Warmup continues automatically."
         } else if !(transmitter?.cgmTransmitterType().allowManualSensorStart() ?? false) {
             sensorActionNote = Texts_HomeView.sensorManagementAutomaticSessionNote
         } else {
