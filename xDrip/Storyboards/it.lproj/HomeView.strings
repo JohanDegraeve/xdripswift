@@ -233,7 +233,7 @@
 "sensorHealthPersistentNoiseTitle" = "Rumore del sensore molto alto";
 "sensorHealthPersistentNoiseGuidance" = "Rumore molto alto da 12 ore. Valuta di sostituire il sensore se continua.";
 "sensorHealthFlatlineTitle" = "Il segnale del sensore è piatto";
-"sensorHealthFlatlineGuidance" = "Letture invariate da 30 minuti. Di solito indica che il sensore è guasto/scaduto.";
+"sensorHealthFlatlineGuidance" = "Letture invariate da 30 min. Sensore forse guasto o scaduto.";
 "sensorHealthTemporaryIssueTitle" = "Problema temporaneo del sensore";
 "sensorHealthTemporaryIssueGuidance" = "Problema temporaneo del sensore da 3 ore. Controlla con un glucometro e segui le indicazioni del produttore.";
 "sensorHealthSensorFailedTitle" = "Sensore guasto";

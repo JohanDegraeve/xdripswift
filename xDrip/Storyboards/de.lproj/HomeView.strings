@@ -216,7 +216,7 @@
 "sensorHealthPersistentNoiseTitle" = "Sehr starkes Sensorrauschen";
 "sensorHealthPersistentNoiseGuidance" = "Seit 12 Stunden sehr starkes Rauschen. Bei Fortbestehen Sensorwechsel erwägen.";
 "sensorHealthFlatlineTitle" = "Sensorsignal ist unverändert";
-"sensorHealthFlatlineGuidance" = "Messwerte seit 30 Minuten unverändert. Dies deutet meist auf einen ausgefallenen/abgelaufenen Sensor hin.";
+"sensorHealthFlatlineGuidance" = "Seit 30 Min. unverändert. Sensor möglicherweise defekt oder abgelaufen.";
 "sensorHealthTemporaryIssueTitle" = "Vorübergehendes Sensorproblem";
 "sensorHealthTemporaryIssueGuidance" = "Vorübergehendes Sensorproblem seit 3 Stunden. Mit Blutzuckermessgerät prüfen und Herstellerhinweise beachten.";
 "sensorHealthSensorFailedTitle" = "Sensor ausgefallen";

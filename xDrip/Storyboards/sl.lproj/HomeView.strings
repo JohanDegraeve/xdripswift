@@ -210,7 +210,7 @@
 "sensorHealthPersistentNoiseTitle" = "Zelo visok šum senzorja";
 "sensorHealthPersistentNoiseGuidance" = "Zelo visok šum že 12 ur. Če se nadaljuje, razmislite o zamenjavi senzorja.";
 "sensorHealthFlatlineTitle" = "Signal senzorja je raven";
-"sensorHealthFlatlineGuidance" = "Odčitki se 30 minut niso spremenili. To običajno pomeni, da je senzor odpovedal/potekel.";
+"sensorHealthFlatlineGuidance" = "Odčitki nespremenjeni 30 min. Senzor je morda odpovedal ali potekel.";
 "sensorHealthTemporaryIssueTitle" = "Začasna težava s senzorjem";
 "sensorHealthTemporaryIssueGuidance" = "Začasna težava s senzorjem že 3 ure. Preverite z merilnikom in upoštevajte navodila proizvajalca.";
 "sensorHealthSensorFailedTitle" = "Senzor je odpovedal";

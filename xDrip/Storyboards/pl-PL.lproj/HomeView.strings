@@ -210,7 +210,7 @@
 "sensorHealthPersistentNoiseTitle" = "Bardzo wysoki szum sensora";
 "sensorHealthPersistentNoiseGuidance" = "Bardzo wysoki szum od 12 godzin. Rozważ wymianę sensora, jeśli problem nie ustąpi.";
 "sensorHealthFlatlineTitle" = "Sygnał sensora jest płaski";
-"sensorHealthFlatlineGuidance" = "Odczyty nie zmieniły się od 30 minut. Zwykle oznacza to awarię/wygaśnięcie sensora.";
+"sensorHealthFlatlineGuidance" = "Brak zmian od 30 min. Możliwa awaria lub wygaśnięcie sensora.";
 "sensorHealthTemporaryIssueTitle" = "Tymczasowy problem z sensorem";
 "sensorHealthTemporaryIssueGuidance" = "Tymczasowy problem z sensorem od 3 godzin. Sprawdź glukometrem i postępuj zgodnie z zaleceniami producenta.";
 "sensorHealthSensorFailedTitle" = "Awaria sensora";

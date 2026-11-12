@@ -124,7 +124,7 @@
 "sensorHealthPersistentNoiseTitle" = "Ruido del sensor muy alto";
 "sensorHealthPersistentNoiseGuidance" = "Ruido muy alto durante 12 horas. Considera reemplazar el sensor si continúa.";
 "sensorHealthFlatlineTitle" = "La señal del sensor es plana";
-"sensorHealthFlatlineGuidance" = "Lecturas sin cambios durante 30 minutos. Esto suele indicar que el sensor ha fallado/caducado.";
+"sensorHealthFlatlineGuidance" = "Lecturas sin cambios en 30 min. El sensor puede haber fallado o caducado.";
 "sensorHealthTemporaryIssueTitle" = "Problema temporal del sensor";
 "sensorHealthTemporaryIssueGuidance" = "Problema temporal del sensor durante 3 horas. Comprueba con un glucómetro y sigue las indicaciones del fabricante.";
 "sensorHealthSensorFailedTitle" = "El sensor ha fallado";

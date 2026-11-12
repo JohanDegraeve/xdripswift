@@ -167,7 +167,7 @@
 "sensorHealthPersistentNoiseTitle" = "传感器噪声非常高";
 "sensorHealthPersistentNoiseGuidance" = "噪声已持续非常高 12 小时。如果继续，请考虑更换传感器。";
 "sensorHealthFlatlineTitle" = "传感器信号无变化";
-"sensorHealthFlatlineGuidance" = "读数已 30 分钟无变化。这通常表示传感器已失效/到期。";
+"sensorHealthFlatlineGuidance" = "读数 30 分钟无变化。传感器可能已失效或到期。";
 "sensorHealthTemporaryIssueTitle" = "临时传感器问题";
 "sensorHealthTemporaryIssueGuidance" = "临时传感器问题已持续 3 小时。请用血糖仪检查并遵循制造商指导。";
 "sensorHealthSensorFailedTitle" = "传感器失效";

@@ -130,7 +130,7 @@
 "sensorHealthPersistentNoiseTitle" = "Erittäin voimakas anturikohina";
 "sensorHealthPersistentNoiseGuidance" = "Erittäin voimakasta kohinaa 12 tunnin ajan. Harkitse anturin vaihtamista, jos se jatkuu.";
 "sensorHealthFlatlineTitle" = "Anturin signaali on tasainen";
-"sensorHealthFlatlineGuidance" = "Lukemat eivät ole muuttuneet 30 minuuttiin. Tämä tarkoittaa yleensä, että anturi on vioittunut/vanhentunut.";
+"sensorHealthFlatlineGuidance" = "Lukemat ennallaan 30 min. Anturi voi olla viallinen tai vanhentunut.";
 "sensorHealthTemporaryIssueTitle" = "Tilapäinen anturiongelma";
 "sensorHealthTemporaryIssueGuidance" = "Tilapäinen anturiongelma 3 tunnin ajan. Tarkista verensokerimittarilla ja noudata valmistajan ohjeita.";
 "sensorHealthSensorFailedTitle" = "Anturi vioittunut";

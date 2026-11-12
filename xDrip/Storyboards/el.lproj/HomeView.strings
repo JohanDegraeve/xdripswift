@@ -114,7 +114,7 @@
 "sensorHealthPersistentNoiseTitle" = "Πολύ υψηλός θόρυβος αισθητήρα";
 "sensorHealthPersistentNoiseGuidance" = "Πολύ υψηλός θόρυβος για 12 ώρες. Εξετάστε την αντικατάσταση του αισθητήρα αν συνεχιστεί.";
 "sensorHealthFlatlineTitle" = "Το σήμα του αισθητήρα είναι επίπεδο";
-"sensorHealthFlatlineGuidance" = "Οι μετρήσεις δεν άλλαξαν για 30 λεπτά. Αυτό συνήθως σημαίνει ότι ο αισθητήρας απέτυχε/έληξε.";
+"sensorHealthFlatlineGuidance" = "Σταθερές μετρήσεις για 30 λεπτά. Πιθανή βλάβη ή λήξη αισθητήρα.";
 "sensorHealthTemporaryIssueTitle" = "Προσωρινό πρόβλημα αισθητήρα";
 "sensorHealthTemporaryIssueGuidance" = "Προσωρινό πρόβλημα αισθητήρα για 3 ώρες. Ελέγξτε με μετρητή και ακολουθήστε τις οδηγίες του κατασκευαστή.";
 "sensorHealthSensorFailedTitle" = "Αποτυχία αισθητήρα";

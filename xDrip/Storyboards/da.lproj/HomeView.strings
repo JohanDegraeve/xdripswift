@@ -114,7 +114,7 @@
 "sensorHealthPersistentNoiseTitle" = "Meget høj sensorstøj";
 "sensorHealthPersistentNoiseGuidance" = "Meget høj støj i 12 timer. Overvej at udskifte sensoren, hvis det fortsætter.";
 "sensorHealthFlatlineTitle" = "Sensorsignalet er fladt";
-"sensorHealthFlatlineGuidance" = "Målingerne har været uændrede i 30 minutter. Det betyder normalt, at sensoren er defekt/udløbet.";
+"sensorHealthFlatlineGuidance" = "Uændrede målinger i 30 min. Sensoren kan være defekt eller udløbet.";
 "sensorHealthTemporaryIssueTitle" = "Midlertidigt sensorproblem";
 "sensorHealthTemporaryIssueGuidance" = "Midlertidigt sensorproblem i 3 timer. Kontrollér med et blodsukkerapparat, og følg producentens vejledning.";
 "sensorHealthSensorFailedTitle" = "Sensorfejl";

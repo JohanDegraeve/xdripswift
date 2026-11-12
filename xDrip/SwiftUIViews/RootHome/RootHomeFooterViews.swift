@@ -31,14 +31,11 @@ struct SensorHealthBannerView: View {
                         Text(issue.title)
                             .font(.headline.weight(.bold))
                             .foregroundStyle(.white)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.85)
                         Text(issue.guidance)
                             .font(.subheadline)
                             .foregroundStyle(.white)
-                            .lineLimit(3)
-                            .minimumScaleFactor(0.9)
                     }
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                     Spacer(minLength: 4)

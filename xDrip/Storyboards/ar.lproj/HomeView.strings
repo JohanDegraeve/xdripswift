@@ -116,7 +116,7 @@
 "sensorHealthPersistentNoiseTitle" = "تشويش المستشعر مرتفع جدًا";
 "sensorHealthPersistentNoiseGuidance" = "تشويش مرتفع جدًا لمدة 12 ساعة. فكّر في استبدال المستشعر إذا استمر.";
 "sensorHealthFlatlineTitle" = "إشارة المستشعر ثابتة";
-"sensorHealthFlatlineGuidance" = "لم تتغير القراءات منذ 30 دقيقة. يشير هذا عادةً إلى تعطل/انتهاء صلاحية المستشعر.";
+"sensorHealthFlatlineGuidance" = "القراءات ثابتة منذ 30 دقيقة. ربما تعطل المستشعر أو انتهت صلاحيته.";
 "sensorHealthTemporaryIssueTitle" = "مشكلة مؤقتة في المستشعر";
 "sensorHealthTemporaryIssueGuidance" = "مشكلة مؤقتة في المستشعر منذ 3 ساعات. تحقق بجهاز قياس السكر واتبع إرشادات الشركة المصنّعة.";
 "sensorHealthSensorFailedTitle" = "فشل المستشعر";

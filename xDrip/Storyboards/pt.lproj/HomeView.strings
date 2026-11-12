@@ -150,7 +150,7 @@
 "sensorHealthPersistentNoiseTitle" = "Ruído do sensor muito elevado";
 "sensorHealthPersistentNoiseGuidance" = "Ruído muito elevado há 12 horas. Considere substituir o sensor se continuar.";
 "sensorHealthFlatlineTitle" = "O sinal do sensor está plano";
-"sensorHealthFlatlineGuidance" = "Leituras sem alteração há 30 minutos. Geralmente indica que o sensor falhou/expirou.";
+"sensorHealthFlatlineGuidance" = "Leituras sem alterações há 30 min. O sensor pode ter falhado ou expirado.";
 "sensorHealthTemporaryIssueTitle" = "Problema temporário do sensor";
 "sensorHealthTemporaryIssueGuidance" = "Problema temporário do sensor há 3 horas. Confirme com um medidor e siga as orientações do fabricante.";
 "sensorHealthSensorFailedTitle" = "Falha do sensor";

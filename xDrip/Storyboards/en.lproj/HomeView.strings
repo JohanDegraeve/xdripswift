@@ -177,7 +177,7 @@
 "sensorHealthPersistentNoiseTitle" = "Very High Sensor Noise";
 "sensorHealthPersistentNoiseGuidance" = "Very high noise for 12 hours. Consider replacing the sensor if it continues.";
 "sensorHealthFlatlineTitle" = "Sensor Signal Is Flat";
-"sensorHealthFlatlineGuidance" = "Readings unchanged for 30 minutes. This usually indicates that the sensor has failed/expired.";
+"sensorHealthFlatlineGuidance" = "No change for 30 min. Sensor may have failed or expired.";
 "sensorHealthTemporaryIssueTitle" = "Temporary Sensor Issue";
 "sensorHealthTemporaryIssueGuidance" = "Temporary sensor issue for 3 hours. Check with a meter and follow manufacturer guidance.";
 "sensorHealthSensorFailedTitle" = "Sensor Failed";

@@ -152,7 +152,7 @@
 "sensorHealthPersistentNoiseTitle" = "Zeer hoge sensorruis";
 "sensorHealthPersistentNoiseGuidance" = "Zeer hoge ruis gedurende 12 uur. Overweeg de sensor te vervangen als dit aanhoudt.";
 "sensorHealthFlatlineTitle" = "Het sensorsignaal is vlak";
-"sensorHealthFlatlineGuidance" = "Metingen 30 minuten onveranderd. Dit wijst meestal op een defecte/verlopen sensor.";
+"sensorHealthFlatlineGuidance" = "Metingen 30 min. onveranderd. Sensor mogelijk defect of verlopen.";
 "sensorHealthTemporaryIssueTitle" = "Tijdelijk sensorprobleem";
 "sensorHealthTemporaryIssueGuidance" = "Tijdelijk sensorprobleem sinds 3 uur. Controleer met een bloedglucosemeter en volg de aanwijzingen van de fabrikant.";
 "sensorHealthSensorFailedTitle" = "Sensor defect";

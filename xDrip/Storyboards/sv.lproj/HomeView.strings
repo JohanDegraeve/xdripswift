@@ -127,7 +127,7 @@
 "sensorHealthPersistentNoiseTitle" = "Mycket högt sensorbrus";
 "sensorHealthPersistentNoiseGuidance" = "Mycket högt brus i 12 timmar. Överväg att byta sensorn om det fortsätter.";
 "sensorHealthFlatlineTitle" = "Sensorsignalen är platt";
-"sensorHealthFlatlineGuidance" = "Värdena har varit oförändrade i 30 minuter. Det betyder oftast att sensorn har slutat fungera/gått ut.";
+"sensorHealthFlatlineGuidance" = "Oförändrade värden i 30 min. Sensorn kan ha slutat fungera eller gått ut.";
 "sensorHealthTemporaryIssueTitle" = "Tillfälligt sensorproblem";
 "sensorHealthTemporaryIssueGuidance" = "Tillfälligt sensorproblem i 3 timmar. Kontrollera med en blodsockermätare och följ tillverkarens anvisningar.";
 "sensorHealthSensorFailedTitle" = "Sensorfel";

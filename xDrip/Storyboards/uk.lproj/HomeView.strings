@@ -198,7 +198,7 @@
 "sensorHealthPersistentNoiseTitle" = "Дуже високий шум сенсора";
 "sensorHealthPersistentNoiseGuidance" = "Дуже високий шум протягом 12 годин. Якщо він триває, розгляньте заміну сенсора.";
 "sensorHealthFlatlineTitle" = "Сигнал сенсора не змінюється";
-"sensorHealthFlatlineGuidance" = "Показники не змінювалися 30 хвилин. Зазвичай це означає, що сенсор несправний/прострочений.";
+"sensorHealthFlatlineGuidance" = "Показники незмінні 30 хв. Можливі збій або завершення строку роботи сенсора.";
 "sensorHealthTemporaryIssueTitle" = "Тимчасова проблема із сенсором";
 "sensorHealthTemporaryIssueGuidance" = "Тимчасова проблема із сенсором протягом 3 годин. Перевірте глюкометром і дотримуйтеся рекомендацій виробника.";
 "sensorHealthSensorFailedTitle" = "Відмова сенсора";

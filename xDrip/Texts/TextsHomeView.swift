@@ -218,7 +218,7 @@ enum Texts_HomeView {
             "sensorHealthFlatlineGuidance",
             tableName: filename,
             bundle: Bundle.main,
-            value: "Readings unchanged for 30 minutes. This usually indicates that the sensor has failed/expired.",
+            value: "No change for 30 min. Sensor may have failed or expired.",
             comment: "compact sensor health guidance for suspected flatline readings"
         )
     }()

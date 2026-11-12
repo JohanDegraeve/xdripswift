@@ -114,7 +114,7 @@
 "sensorHealthPersistentNoiseTitle" = "Çok Yüksek Sensör Gürültüsü";
 "sensorHealthPersistentNoiseGuidance" = "12 saattir çok yüksek gürültü. Devam ederse sensörü değiştirmeyi düşünün.";
 "sensorHealthFlatlineTitle" = "Sensör Sinyali Sabit";
-"sensorHealthFlatlineGuidance" = "Okumalar 30 dakikadır değişmedi. Bu genellikle sensörün arızalandığını/süresinin dolduğunu gösterir.";
+"sensorHealthFlatlineGuidance" = "Ölçümler 30 dk. değişmedi. Sensör arızalanmış veya süresi dolmuş olabilir.";
 "sensorHealthTemporaryIssueTitle" = "Geçici Sensör Sorunu";
 "sensorHealthTemporaryIssueGuidance" = "3 saattir geçici sensör sorunu. Ölçüm cihazıyla kontrol edin ve üreticinin talimatlarını izleyin.";
 "sensorHealthSensorFailedTitle" = "Sensör Arızası";
