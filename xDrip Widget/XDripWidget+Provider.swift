@@ -18,11 +18,11 @@ extension XDripWidget {
         }
         
         func getSnapshot(in context: Context, completion: @escaping (Entry) -> ()) {
-            completion(.placeholder)
+            completion(context.isPreview ? .placeholder : Entry(date: .now, widgetState: getWidgetStateFromSharedUserDefaults()))
         }
         
         func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-            let entry = Entry(date: .now, widgetState: getWidgetStateFromSharedUserDefaults() ?? sampleWidgetStateFromProvider)
+            let entry = Entry(date: .now, widgetState: getWidgetStateFromSharedUserDefaults())
                 
             var entries = [entry]
             if let metrics = entry.widgetState.therapyMetrics {
@@ -40,85 +40,24 @@ extension XDripWidget {
 // MARK: - Helpers
 
 extension XDripWidget.Provider {
-    func getWidgetStateFromSharedUserDefaults() -> XDripWidget.Entry.WidgetState? {
+    func getWidgetStateFromSharedUserDefaults() -> XDripWidget.Entry.WidgetState {
         
-        guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else {return nil}
+        let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName)
         
-        let keepAliveDisabledMessage = sharedUserDefaults.string(
+        let keepAliveDisabledMessage = sharedUserDefaults?.string(
             forKey: WidgetSharedUserDefaultsModel.keepAliveDisabledMessageKey(
                 for: Bundle.main.mainAppBundleIdentifier
             )
         ).flatMap { $0.isEmpty ? nil : $0 }
 
-        guard let encodedLatestReadings = sharedUserDefaults.data(
+        let encodedLatestReadings = sharedUserDefaults?.data(
             forKey: WidgetSharedUserDefaultsModel.widgetDataKey(
                 for: Bundle.main.mainAppBundleIdentifier
             )
-        ) else {
-            var sampleState = sampleWidgetStateFromProvider
-            sampleState.keepAliveDisabledMessage = keepAliveDisabledMessage
-            return sampleState
-        }
-        
-        let decoder = JSONDecoder()
+        )
+        let data = WidgetSharedUserDefaultsModel.decodeForDisplay(encodedLatestReadings)
+        let bgReadingDates = data.bgReadingDatesAsDouble.map { Date(timeIntervalSince1970: $0) }
 
-        do {
-            let data = try decoder.decode(WidgetSharedUserDefaultsModel.self, from: encodedLatestReadings)
-            
-            // because dates aren't Codable we stored them as doubles
-            // we need to convert the bgReadingDatesAsDouble key values to an array of real dates
-            let bgReadingDates: [Date] = data.bgReadingDatesAsDouble.map { date in
-                Date(timeIntervalSince1970: date)
-            }
-            
-            return Entry.WidgetState(bgReadingValues: data.bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: data.isMgDl, slopeOrdinal: data.slopeOrdinal, deltaValueInUserUnit: data.deltaValueInUserUnit, urgentLowLimitInMgDl: data.urgentLowLimitInMgDl, lowLimitInMgDl: data.lowLimitInMgDl, highLimitInMgDl: data.highLimitInMgDl, urgentHighLimitInMgDl: data.urgentHighLimitInMgDl, dataSourceDescription: data.dataSourceDescription, followerPatientName: data.followerPatientName, keepAliveDisabledMessage: keepAliveDisabledMessage, aidStatus: data.aidStatus, therapyMetrics: data.therapyMetrics, allowStandByHighContrast: data.allowStandByHighContrast, forceStandByBigNumbers: data.forceStandByBigNumbers)
-        } catch {
-            print(error.localizedDescription)
-        }
-              
-        var sampleState = sampleWidgetStateFromProvider
-        sampleState.keepAliveDisabledMessage = keepAliveDisabledMessage
-        return sampleState
-    }
-    
-    private var sampleWidgetStateFromProvider: XDripWidget.Entry.WidgetState {        
-        func bgDateArray() -> [Date] {
-            let endDate = Date()
-            let startDate = endDate.addingTimeInterval(-3600 * 12)
-            var currentDate = startDate
-            
-            var dateArray: [Date] = []
-            
-            while currentDate < endDate {
-                dateArray.append(currentDate)
-                currentDate = currentDate.addingTimeInterval(60 * 5)
-            }
-            return dateArray
-        }
-        
-        func bgValueArray() -> [Double] {
-            
-            var bgValueArray:[Double] = Array(repeating: 0, count: 144)
-            var currentValue: Double = 100
-            var increaseValues: Bool = true
-            
-            for index in bgValueArray.indices {
-                let randomValue = Double(Int.random(in: -10..<10))
-                
-                if currentValue < 75 {
-                    increaseValues = true
-                    bgValueArray[index] = currentValue + abs(randomValue)
-                } else if currentValue > 150 {
-                    increaseValues = false
-                    bgValueArray[index] = currentValue - abs(randomValue)
-                } else {
-                    bgValueArray[index] = currentValue + (increaseValues ? randomValue : -randomValue)
-                }
-                currentValue = bgValueArray[index]
-            }
-            return bgValueArray
-        }
-        
-        return Entry.WidgetState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 1, deltaValueInUserUnit: 0, urgentLowLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl, lowLimitInMgDl: ConstantsBGGraphBuilder.defaultLowMarkInMgdl, highLimitInMgDl: ConstantsBGGraphBuilder.defaultHighMarkInMgdl, urgentHighLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl, dataSourceDescription: "Dexcom G6", followerPatientName: nil)
+        return Entry.WidgetState(bgReadingValues: data.bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: data.isMgDl, slopeOrdinal: data.slopeOrdinal, deltaValueInUserUnit: data.deltaValueInUserUnit, urgentLowLimitInMgDl: data.urgentLowLimitInMgDl, lowLimitInMgDl: data.lowLimitInMgDl, highLimitInMgDl: data.highLimitInMgDl, urgentHighLimitInMgDl: data.urgentHighLimitInMgDl, dataSourceDescription: data.dataSourceDescription, followerPatientName: data.followerPatientName, keepAliveDisabledMessage: keepAliveDisabledMessage, aidStatus: data.aidStatus, therapyMetrics: data.therapyMetrics, allowStandByHighContrast: data.allowStandByHighContrast, forceStandByBigNumbers: data.forceStandByBigNumbers)
     }
 }

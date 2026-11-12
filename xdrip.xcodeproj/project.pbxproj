@@ -356,6 +356,7 @@
 		4F3100043007000100000001 /* BatteryHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3100143007000100000001 /* BatteryHistoryView.swift */; };
 		4F3100053007000100000001 /* BatteryHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3100153007000100000001 /* BatteryHistoryTests.swift */; };
 		4F3200013008000100000001 /* BgReadingTrendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3200023008000100000001 /* BgReadingTrendTests.swift */; };
+		D88F6C113020000100000001 /* WidgetRuntimeDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88F6C113020000100000002 /* WidgetRuntimeDataTests.swift */; };
 		4F67A33C4EC32A86ABC85882 /* CareLinkFollowerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBC8BB898BFD4C30858ED5D /* CareLinkFollowerSettings.swift */; };
 		51D7CB065BD7CB6982719FE1 /* CareLinkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40AD096DBCD9BD7C4BA770E /* CareLinkClient.swift */; };
 		52A6C5F6D047486870D35FA2 /* Libre3AuthTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B34AFE2709EB70DFFEA520 /* Libre3AuthTransport.swift */; };
@@ -1375,6 +1376,7 @@
 		4F3100153007000100000001 /* BatteryHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryHistoryTests.swift; sourceTree = "<group>"; };
 		4F3100313007000100000001 /* xdrip v31.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v31.xcdatamodel"; sourceTree = "<group>"; };
 		4F3200023008000100000001 /* BgReadingTrendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingTrendTests.swift; sourceTree = "<group>"; };
+		D88F6C113020000100000002 /* WidgetRuntimeDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetRuntimeDataTests.swift; sourceTree = "<group>"; };
 		4F3200313008000100000001 /* xdrip v32.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v32.xcdatamodel"; sourceTree = "<group>"; };
 		4F3300313009000100000001 /* xdrip v33 Watch.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v33 Watch.xcdatamodel"; sourceTree = "<group>"; };
 		50E2401E5ED94424A2FEC5E8 /* xDrip Tests/TherapyMetricsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "xDrip Tests/TherapyMetricsTests.swift"; sourceTree = SOURCE_ROOT; };
@@ -2841,6 +2843,7 @@
 				BA0709260000000000000002 /* BasalInjectionTests.swift */,
 				4F3100153007000100000001 /* BatteryHistoryTests.swift */,
 				4F3200023008000100000001 /* BgReadingTrendTests.swift */,
+				D88F6C113020000100000002 /* WidgetRuntimeDataTests.swift */,
 				4D7D00013016000200000001 /* BluetoothPeripheralDisplayStatusTests.swift */,
 				B1E511012026091100000001 /* BluetoothSignalStrengthTests.swift */,
 				4D7C00013015000100000001 /* CalibrationReadinessTests.swift */,
@@ -4788,6 +4791,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4F3200013008000100000001 /* BgReadingTrendTests.swift in Sources */,
+				D88F6C113020000100000001 /* WidgetRuntimeDataTests.swift in Sources */,
 				5A0100043015000100000001 /* GlucoseRangeDistributionTests.swift in Sources */,
 				5A0921023015000100000001 /* GMIStatisticsTests.swift in Sources */,
 				4F3100053007000100000001 /* BatteryHistoryTests.swift in Sources */,
