@@ -576,8 +576,10 @@ struct SensorManagementView: View {
             dexcomConnectionMode = nil
         }
         let isAnubis = transmitter?.isAnubisG6() ?? false
-        let warmupMinutes: Double?
 
+        let elapsedMinutes = startDate.map { Double(Calendar.current.dateComponents([.minute], from: $0, to: Date()).minute ?? 0) }
+
+        let warmupMinutes: Double?
         switch sensorType {
         case .Libre:
             warmupMinutes = transmitter?.sensorWarmupDurationInMinutes() ?? ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
@@ -589,17 +591,18 @@ struct SensorManagementView: View {
             }
         case .Medtrum:
             warmupMinutes = nil
+        case .SibionicsCN:
+            warmupMinutes = (elapsedMinutes ?? 0) < 60 ? 60 : nil
         case .none:
             warmupMinutes = nil
         }
 
-        let elapsedMinutes = startDate.map { Double(Calendar.current.dateComponents([.minute], from: $0, to: Date()).minute ?? 0) }
         let remainingMinutes = (elapsedMinutes != nil && maxSensorAgeInDays > 0) ? ((maxSensorAgeInDays * 24 * 60) - (elapsedMinutes ?? 0)) : nil
         let expiryDate = SensorExpirySnapshot.expiryDate(startDate: startDate, lifetimeDays: maxSensorAgeInDays)
 
         let warmupReadyTimeString: String?
-        if let startDate = startDate, let warmupMinutes = warmupMinutes, let elapsedMinutes = elapsedMinutes, elapsedMinutes < warmupMinutes {
-            let readyDate = startDate.addingTimeInterval(TimeInterval(minutes: warmupMinutes))
+        if let startDate = startDate, let wm = warmupMinutes, let elapsedMinutes = elapsedMinutes, elapsedMinutes < wm {
+            let readyDate = startDate.addingTimeInterval(TimeInterval(minutes: wm))
             warmupReadyTimeString = readyDate.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
         } else {
             warmupReadyTimeString = nil

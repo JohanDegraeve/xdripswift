@@ -174,18 +174,18 @@ class BluetoothPeripheralManager: NSObject {
                         _ = m5StackBluetoothTransmitter.writeBgReadingInfo(bgReading: bgReadingToSend[0])
                     }
                     
-                case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .Libre3Type, .DexcomG7Type, .MedtrumTouchCareNanoType:
+                case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .Libre3Type, .DexcomG7Type, .MedtrumTouchCareNanoType, .SibionicsCNType:
                     // cgm's don't receive reading, they send it
                     break
-                    
+
                 case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
                     // heartbeat transmitters are just there to wake up the app
                     break
-                    
+
                 }
 
             }
-   
+
         }
     }
 
@@ -416,6 +416,11 @@ class BluetoothPeripheralManager: NSObject {
                         }
                     }
 
+                case .SibionicsCNType:
+                    if let device = bluetoothPeripheral as? SibionicsCN, let cgmTransmitterDelegate {
+                        newTransmitter = CGMSibionicsTransmitter(address: device.blePeripheral.address, name: device.blePeripheral.name, code: device.sensorCode, mac: device.declaredMAC, authorized: device.startAuthorized && device.blePeripheral.shouldconnect, bluetoothTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+                    }
+
                 }
                 
                 
@@ -499,6 +504,10 @@ class BluetoothPeripheralManager: NSObject {
                 if bluetoothTransmitter is CGMMedtrumTouchCareNanoTransmitter {
                     return .MedtrumTouchCareNanoType
                 }
+
+            case .SibionicsCNType:
+                if bluetoothTransmitter is CGMSibionicsTransmitter { return .SibionicsCNType }
+
                 
             }
             
@@ -593,6 +602,12 @@ class BluetoothPeripheralManager: NSObject {
             }
 
             return CGMMedtrumTouchCareNanoTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+
+        case .SibionicsCNType:
+            guard let cgmTransmitterDelegate else { fatalError("Missing CGM delegate") }
+            // Initial pairing uses the passive, explicit UI picker. This placeholder cannot write.
+            return CGMSibionicsTransmitter(address: nil, name: nil, code: nil, mac: nil, authorized: false, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+
             
         }
         
@@ -602,8 +617,23 @@ class BluetoothPeripheralManager: NSObject {
         return bluetoothPeripherals.firstIndex(where: {$0.blePeripheral.address == bluetoothPeripheral.blePeripheral.address})
     }
 
-    /// - will insert bluetoothPeripheral in the array bluetoothPeripherals, and returns the index where it's been inserted.
-    /// - it will be inserted in the correct location, ie depending on the BluetoothPeripheralType
+    /// Persist an explicitly selected UUID without creating a transmitter or writing to a sensor.
+    func registerSibionicsCN(address: UUID, name: String, code: String, mac: String) throws -> SibionicsCN {
+        let identity = try GS1CNIdentity(sensorCode: code, mac: GS1MAC(mac))
+        guard !bluetoothPeripherals.contains(where: { $0.blePeripheral.address == address.uuidString }) else {
+            throw GS1SetupError.alreadyConfigured
+        }
+        let device = SibionicsCN(address: address.uuidString, name: name, alias: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+        device.sensorCode = identity.sensorCode
+        device.declaredMAC = identity.mac.string
+        device.startAuthorized = false
+        let index = insertInBluetoothPeripherals(bluetoothPeripheral: device)
+        bluetoothTransmitters.insert(nil, at: index)
+        coreDataManager.saveChanges()
+        return device
+    }
+
+    /// Insert a peripheral in the correct location for its type and return its index.
     public func insertInBluetoothPeripherals(bluetoothPeripheral: BluetoothPeripheral) -> Int {
         
         /// start with assuming we'll insert at location 0
@@ -1068,6 +1098,18 @@ class BluetoothPeripheralManager: NSObject {
 
                     }
 
+                case .SibionicsCNType:
+                    if let device = blePeripheral.sibionicsCN {
+                        blePeripheralFound = true
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: device)
+                        if device.blePeripheral.shouldconnect && device.startAuthorized {
+                            bluetoothTransmitters.insert(CGMSibionicsTransmitter(address: device.blePeripheral.address, name: device.blePeripheral.name, code: device.sensorCode, mac: device.declaredMAC, authorized: true, bluetoothTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
+                            currentCgmTransmitterAddress = blePeripheral.address
+                        } else {
+                            bluetoothTransmitters.insert(nil, at: index)
+                        }
+                    }
+
                 }
 
             }
@@ -1187,7 +1229,7 @@ class BluetoothPeripheralManager: NSObject {
                     bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .Libre3Type, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .DexcomG7Type, .MedtrumTouchCareNanoType:
+            case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .Libre3Type, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .DexcomG7Type, .MedtrumTouchCareNanoType, .SibionicsCNType:
 
                 // nothing to check
                 break

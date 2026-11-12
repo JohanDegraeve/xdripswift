@@ -1,0 +1,53 @@
+--- upstream/SibionicsExactV115GCore.kt
++++ src/SibionicsExactV115GCore.kt
+@@ -1,9 +1,9 @@
+ package tk.glucodata.drivers.sibionics
+ 
+-import java.io.ByteArrayInputStream
+-import java.io.ByteArrayOutputStream
+-import java.io.DataInputStream
+-import java.io.DataOutputStream
++import gs1.compat.ByteArrayInputStream
++import gs1.compat.ByteArrayOutputStream
++import gs1.compat.DataInputStream
++import gs1.compat.DataOutputStream
+ import kotlin.math.abs
+ import kotlin.math.max
+ import kotlin.math.pow
+@@ -173,7 +173,7 @@
+         val current = CurrentJudgment()
+ 
+         fun evaluate(raw: Float, temperatureC: Float, index: Int): Int {
+-            System.arraycopy(flags, 1, flags, 0, flags.lastIndex)
++            gs1.compat.arrayCopy(flags, 1, flags, 0, flags.lastIndex)
+             flags[flags.lastIndex] = current.evaluate(raw, index).toFloat()
+             var count = 0f
+             if (index > 14) flags.forEach { if (it == 1f) count += 1f }
+@@ -363,7 +363,7 @@
+ 
+         fun update(value: Float): Float {
+             val input = f32(value)
+-            System.arraycopy(buffer, 1, buffer, 0, buffer.lastIndex)
++            gs1.compat.arrayCopy(buffer, 1, buffer, 0, buffer.lastIndex)
+             buffer[buffer.lastIndex] = input
+             if (input > 15f || input < 3.5f) return input
+             var accumulator = 0f
+--- upstream/SibionicsExactV115GClip.kt
++++ src/SibionicsExactV115GClip.kt
+@@ -8,11 +8,11 @@
+ private fun b(value: Boolean): Int = if (value) 1 else 0
+ private const val C_DONE = -1
+ private fun f32(value: Double): Double = value.toFloat().toDouble()
+-private fun uLt(a: Int, b: Int): Boolean = Integer.compareUnsigned(a, b) < 0
+-private fun uLe(a: Int, b: Int): Boolean = Integer.compareUnsigned(a, b) <= 0
+-private fun uGt(a: Int, b: Int): Boolean = Integer.compareUnsigned(a, b) > 0
+-private fun uGe(a: Int, b: Int): Boolean = Integer.compareUnsigned(a, b) >= 0
+-private fun u64ToDouble(value: Long): Double = java.lang.Long.toUnsignedString(value).toDouble()
++private fun uLt(a: Int, b: Int): Boolean = gs1.compat.compareUnsigned(a, b) < 0
++private fun uLe(a: Int, b: Int): Boolean = gs1.compat.compareUnsigned(a, b) <= 0
++private fun uGt(a: Int, b: Int): Boolean = gs1.compat.compareUnsigned(a, b) > 0
++private fun uGe(a: Int, b: Int): Boolean = gs1.compat.compareUnsigned(a, b) >= 0
++private fun u64ToDouble(value: Long): Double = value.toULong().toString().toDouble()
+ private fun sBorrow4(a: Int, b: Int): Boolean { val r = a - b; return ((a xor b) and (a xor r)) < 0 }
+ private fun readI32(p: Ptr): Int =
+     (p.bytes[p.off].toInt() and 0xff) or ((p.bytes[p.off + 1].toInt() and 0xff) shl 8) or

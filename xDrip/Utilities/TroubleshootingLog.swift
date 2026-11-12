@@ -42,6 +42,7 @@ enum TroubleshootingLogSource: String, Codable {
     case libre2EU
     case libre2PlusEU
     case medtrumNano
+    case sibionicsCN
     case nightscout
     case libreLinkUp
     case libreLinkUpRussia
@@ -97,6 +98,8 @@ enum TroubleshootingLogSource: String, Codable {
             self = description == "Libre 2 Plus EU" ? .libre2PlusEU : .libre2EU
         case .medtrumTouchCareNano:
             self = .medtrumNano
+        case .sibionicsCN:
+            self = .sibionicsCN
         }
     }
 
@@ -133,6 +136,8 @@ enum TroubleshootingLogSource: String, Codable {
             self = .libre2
         case .MedtrumTouchCareNanoType:
             self = .medtrumNano
+        case .SibionicsCNType:
+            self = .sibionicsCN
         case .M5StackType, .M5StickCType, .Libre3HeartBeatType,
              .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
             return nil
@@ -156,6 +161,7 @@ enum TroubleshootingLogSource: String, Codable {
         case .libre2EU: return "Libre 2 EU"
         case .libre2PlusEU: return "Libre 2 Plus EU"
         case .medtrumNano: return "Medtrum Nano Pump CGM"
+        case .sibionicsCN: return "Sibionics GS1 CN"
         case .nightscout: return "Nightscout"
         case .libreLinkUp: return "LibreLinkUp"
         case .libreLinkUpRussia: return "LibreLinkUp Russia"
@@ -175,7 +181,7 @@ enum TroubleshootingLogSource: String, Codable {
             return true
         case .dexcom, .dexcomG5, .dexcomG6, .dexcomOne, .dexcomG7, .dexcomOnePlus,
              .dexcomStelo, .miaoMiao, .bubble, .libre3, .libre2, .libre2EU, .libre2PlusEU,
-             .medtrumNano:
+             .medtrumNano, .sibionicsCN:
             return false
         }
     }

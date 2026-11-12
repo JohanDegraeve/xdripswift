@@ -582,10 +582,14 @@ class Trace {
                 // active CGM device immediately visible when an issue report contains several old
                 // or temporarily disconnected transmitters.
                 let activeDeviceSuffix = blePeripheral.shouldconnect ? " <--- (active CGM device)" : ""
-                traceInfo.appendStringAndNewLine("\n    Name: " + blePeripheral.name + activeDeviceSuffix)
-                traceInfo.appendStringAndNewLine("        Address: " + blePeripheral.address)
-                if let alias = blePeripheral.alias {
-                    traceInfo.appendStringAndNewLine("        Alias: " + alias)
+                if blePeripheral.sibionicsCN != nil {
+                    traceInfo.appendStringAndNewLine("\n    Name: <redacted>" + activeDeviceSuffix)
+                } else {
+                    traceInfo.appendStringAndNewLine("\n    Name: " + blePeripheral.name + activeDeviceSuffix)
+                    traceInfo.appendStringAndNewLine("        Address: " + blePeripheral.address)
+                    if let alias = blePeripheral.alias {
+                        traceInfo.appendStringAndNewLine("        Alias: " + alias)
+                    }
                 }
                 traceInfo.appendStringAndNewLine("        " + ConstantsHomeView.applicationName + (blePeripheral.shouldconnect ? " is set" : " is *not* set") + " to try and connect to this peripheral")
                 
@@ -766,6 +770,12 @@ class Trace {
                                 traceInfo.appendStringAndNewLine("        Firmware: " + firmware)
                             }
                         }
+
+                    case .SibionicsCNType:
+                        if blePeripheral.sibionicsCN != nil {
+                            traceInfo.appendStringAndNewLine("        Type: Sibionics GS1 CN (14-day)")
+                        }
+
                     }
                 }
                 

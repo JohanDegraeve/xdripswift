@@ -8,4 +8,6 @@ enum CGMSensorType:String, CaseIterable {
 
     case Medtrum = "Medtrum"
 
+    case SibionicsCN = "Sibionics GS1 CN"
+
 }
