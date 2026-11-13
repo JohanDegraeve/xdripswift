@@ -145,15 +145,14 @@
 "infoCalendarAccessWriteOnly" = "No puedes usar Eventos de Calendario hasta que actualices los permisos de 'Sólo agregar eventos' a 'Acceso completo'.\n\nIr a Configuración iPhone > > Apps %@ > Calendarios y seleccionar 'Acceso completo'.";
 "infoCalendarAccessRestricted" = "No se puede autorizar a que %@ tenga acceso a tu calendario. Podría ser debido a que restricciones tipo Controles Parentales o similares lo están impidiendo.";
 "sectionTitleTrace" = "Rastrear/Issue Reporting";
-"sendTraceFile" = "Enviar informe de problema";
+"sendTraceFile" = "Enviar por correo";
 "settingsviews_issueReportTitle" = "Informe de problema";
-"describeProblem" = "Explicar en detalle porqué es necesario enviar este archivo de rastreo. Si ya has reportando previamente este problema en el grupo de Facebook '%@', confirmar tu Nombre en Facebook dentro del cuerpo del correo";
 "emailNotConfigured" = "Deberías tener configurado una cuenta de correo antes de enviar el archivo.";
 "emailbodyText" = "Problem Description: ";
 "failedToSendEmail" = "Error al Enviar Correo";
 "volumeTestSoundPlayer" = "Con Modo Silencio activado";
 "volumeTestiOSSound" = "Con Modo Silencio desactivado";
-"debugLevel" = "Incluir Datos Nivel Debug";
+"debugLevel" = "Usar nivel de depuración";
 "warningChangeFromMasterToFollower" = "Si cambias el modo de Master a Seguidor se parará la sesión del sensor actual. Quieres continuar?";
 "warningChangeFromMasterToFollowerDexcomShare" = "Cambiando de modo Master a Seguidor de Dexcom Share parará la sesión del sensor actual y deshabilitará 'Subir datos a Dexcom Share'. Quieres continuar?";
 "warningChangeToFollowerDexcomShare" = "Cambiando Seguidor de Dexcom Share deshabilitará 'Subir datos a Dexcom Share'.";
@@ -542,3 +541,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Decir introducción";
 "speak.preview" = "Probar glucosa hablada";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Incluir registros del Watch";
+"settingsviews_reportWatchFooter" = "Obtener registros de Direct to Watch del Watch conectado.";
+"settingsviews_reportSendFooter" = "Prepara un correo para enviar a los desarrolladores de xDrip4iOS.";
+"settingsviews_requestingWatchLogs" = "Solicitando...";
+"settingsviews_watchLogsNotReceived" = "Registros del Watch no recibidos";
+"settingsviews_watchLogsTimeout" = "No se recibieron los registros del Watch en 8 segundos. Inténtalo de nuevo o envía el informe sin ellos.";
+"settingsviews_watchLogsFailure" = "No se pudieron recibir los registros del Watch. Inténtalo de nuevo o envía el informe sin ellos.";
+"settingsviews_openWatchApp" = "Abre la app del Watch";
+"settingsviews_confirmWatchAppOpen" = "Abre %@ en tu Watch y mantenla abierta hasta que lleguen los registros.\n\n¿Está abierta ahora?";
+"settingsviews_reportShareFooter" = "Compartir los archivos de registro.";
+"settingsviews_shareReport" = "Compartir informe";
+"settingsviews_shareIssueReport" = "Compartir informe de incidencias";
+"settingsviews_reportShareFailed" = "No se pudieron preparar los archivos de registro. Inténtalo de nuevo.";

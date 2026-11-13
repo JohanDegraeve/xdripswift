@@ -28,7 +28,7 @@ struct TreatmentSettingsViewModel: SettingsNativeSectionProvider {
 
     static var screen: SettingsScreen {
         SettingsScreen(title: TherapyTexts.text("treatmentSettings"),
-                       introduction: { TreatmentSettingsViewModel(group: .insulin).introduction }, onlineHelpTopic: .treatments,
+                       introduction: { TreatmentSettingsViewModel(group: .insulin).introduction }, onlineHelpTopic: .treatmentSettings,
                        providers: { [.insulin, .carbs, .display, .scale].map { TreatmentSettingsViewModel(group: $0) } })
     }
 

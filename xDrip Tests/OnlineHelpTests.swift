@@ -13,7 +13,10 @@ final class OnlineHelpTests: XCTestCase {
     func testEveryTopicBuildsItsExactFutureDocumentationURL() {
         let expectations: [(OnlineHelpTopic, String)] = [
             (.settings, "use/settings/"),
-            (.glucoseDisplay, "use/glucoseDisplay/"),
+            (.homeScreen, "use/homeScreen/"),
+            (.glucoseRanges, "use/glucoseRanges/"),
+            (.treatmentSettings, "use/treatmentSettings/"),
+            (.statisticsSettings, "use/statisticsSettings/"),
             (.alertsAndNotifications, "use/alertsAndNotifications/"),
             (.dataManagement, "use/dataManagement/"),
             (.issueReporting, "troubleshoot/reportingIssues/"),
@@ -34,10 +37,17 @@ final class OnlineHelpTests: XCTestCase {
             (.treatments, "use/treatments/"),
             (.statistics, "use/statistics/"),
             (.devices, "use/devices/"),
+            (.directToWatch, "display/directToWatch/"),
+            (.batteryHistory, "use/devices/#battery-history"),
+            (.signalStrength, "use/devices/#signal-strength"),
+            (.sensorNoise, "use/sensor/#sensor-noise"),
+            (.readSuccess, "use/devices/#percentage-of-readings-received"),
+            (.libre3Credentials, "connect/libre3/#libre-3-credentials"),
             (.addDirectCGM, "connect/cgm/"),
             (.dexcomG5G6One, "connect/dexcomG5G6One/"),
             (.dexcomG7OnePlusStelo, "connect/dexcomG7OnePlusStelo/"),
             (.libre2, "connect/libre2/"),
+            (.libre3, "connect/libre3/"),
             (.libreTransmitters, "connect/libreTransmitters/"),
             (.medtrumNano, "connect/medtrum/"),
             (.followerHeartbeat, "connect/followerHeartbeat/"),
@@ -78,6 +88,13 @@ final class OnlineHelpTests: XCTestCase {
         XCTAssertEqual(items?.first(where: { $0.name == "_x_tr_tl" })?.value, "fr")
         XCTAssertEqual(items?.first(where: { $0.name == "_x_tr_hl" })?.value, "fr")
         XCTAssertEqual(items?.first(where: { $0.name == "_x_tr_pto" })?.value, "nui")
+    }
+
+    func testTranslatedDiagnosticTopicKeepsItsHeading() {
+        let url = OnlineHelp.url(for: .batteryHistory, languageIdentifier: "es-ES", translate: true)
+        XCTAssertEqual(url?.host, "xdrip4ios-readthedocs-io.translate.goog")
+        XCTAssertEqual(url?.path, "/en/latest/use/devices")
+        XCTAssertEqual(url?.fragment, "battery-history")
     }
 
     func testTranslationDisabledAlwaysUsesDirectURL() {

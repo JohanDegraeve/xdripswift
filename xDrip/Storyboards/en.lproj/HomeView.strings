@@ -38,7 +38,7 @@
 "failed" = "Failed";
 "calibrationNotNecessary" = "When using the native transmitter algorithm, manual calibration is not available.\n\nIf you want to calibrate, you can switch to the xDrip algorithm in the transmitter screen (if available).";
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
-"enterSensorCode" = "Enter the sensor code manually, scan the sensor label, or choose a photo.\n\nIf you don't have the code, or want to use a sensor session already running on the transmitter, choose Use Without Code.";
+"enterSensorCode" = "Scan the sensor label or choose a photo to read the sensor code.";
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 "calibrationNotNecessary" = "When using the native transmitter algorithm, manual calibration is not available.\n\nIf you want to calibrate, you can switch to the xDrip algorithm in the transmitter screen (if available).";
 "noSensorData" = "No sensor data";
@@ -59,7 +59,7 @@
 "showHideStandByModeFooter" = "Changes how the StandBy mode will be displayed if activated in the iPhone settings";
 "postProcessingTitle" = "Glucose Adjustments";
 "postProcessingPreviewHours" = "Preview Hours";
-"postProcessingAdjustment" = "Adjustment";
+"postProcessingAdjustment" = "Glucose Adjustment";
 "postProcessingOffset" = "Offset";
 "postProcessingScale" = "Scale";
 "postProcessingShape" = "Emphasis";
@@ -70,7 +70,7 @@
 "postProcessingNeutralDescription" = "Applies the scale effect evenly through the glucose range.";
 "postProcessingSofterLows" = "Lows";
 "postProcessingSofterLowsDescription" = "Applies more of the scale effect at lower glucose values and less at higher values.";
-"postProcessingSmoothing" = "Smoothing";
+"postProcessingSmoothing" = "Glucose Smoothing";
 "postProcessingStrength" = "Strength";
 "postProcessingLight" = "Light";
 "postProcessingMedium" = "Medium";
@@ -246,5 +246,24 @@
 "sensorCodeContinue" = "Continue";
 "useWithoutSensorCode" = "Use Without Code";
 "noSensorCode" = "No code (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Enter the four-digit pairing code manually, scan the current applicator, or choose a photo. Check the selected code, then tap Continue.";
+"dexcomG7SelectSensorCodeMessage" = "Scan the current applicator or choose a photo to read the four-digit pairing code. Check the selected code, then tap Continue.";
 "noSensorCodeSelectedTitle" = "Continue Without a Sensor Code?";
+"manualSensorCodeEntryFooter" = "If you can’t scan the label or use a photo, enter the four-digit code manually.";
+"useWithoutSensorCodeFooter" = "If you don't have the code, or want to use a sensor session already running on the transmitter, choose Use Without Code.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingCurveAdjustment" = "Curve Adjustment";
+"postProcessingEnableGlucoseAdjustment" = "Enable Glucose Adjustment?";
+"postProcessingEnableCurveAdjustment" = "Enable Curve Adjustment?";
+"postProcessingEnableGlucoseSmoothing" = "Enable Glucose Smoothing?";
+"postProcessingGlucoseAdjustmentWarning" = "Glucose Adjustment adds or subtracts a fixed offset from your sensor readings. Only enable it after confirming a consistent difference against fingerstick readings when glucose is stable. Large or persistent differences may indicate an unreliable sensor.";
+"postProcessingCurveAdjustmentWarning" = "Curve Adjustment is an advanced feature that changes how glucose values are scaled. Only enable it if you understand how Scale and Emphasis affect your readings.";
+"postProcessingGlucoseSmoothingWarning" = "Glucose Smoothing reduces jumps, noise and fluctuations in sensor readings, but may delay or soften rapid glucose changes. Only enable it if you understand how it affects your readings. Smoothing cannot correct an inaccurate sensor.";
+"postProcessingLargeOffsetWarning" = "Large glucose offset. Confirm against a fingerstick when glucose is stable. Persistent large differences may indicate an unreliable sensor.";
+"postProcessingOffsetLimit" = "Offset exceeds the maximum of ±%@. Reduce the offset to apply this adjustment.";
+"postProcessingOffsetAccessibility" = "Glucose offset: %@";
+"postProcessingInvalidAdjustment" = "The adjustment could not be applied. Check the offset and scale values.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "Offset and shape adjustment are unavailable because this CGM uses native calibration.";
+
+"postProcessingWarningAgreement" = "Tap OK only if you understand and agree to enable this feature.";

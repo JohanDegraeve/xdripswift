@@ -39,6 +39,17 @@ enum BgAdjustmentShapeType: Int16, CaseIterable {
 }
 
 enum ConstantsBgAdjustment {
+    static let offsetWarningInMgDl = 30.0
+    static let maximumOffsetInMgDl = 50.0
+
+    static func isValidOffset(_ offsetInMgDl: Double) -> Bool {
+        return offsetInMgDl.isFinite && abs(offsetInMgDl) <= maximumOffsetInMgDl
+    }
+
+    static func offsetNeedsWarning(_ offsetInMgDl: Double) -> Bool {
+        return abs(offsetInMgDl) > offsetWarningInMgDl
+    }
+
     static let minimumSlopeValue: Double = 0.25
     static let maximumSlopeValue: Double = 1.75
     static let slopeNudgeValue: Double = 0.05

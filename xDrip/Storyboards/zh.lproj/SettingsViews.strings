@@ -87,7 +87,7 @@
 "emailNotConfigured" = "You must configure an e-mail account on your iOS device.";
 
 /// in Settings, to enable debug level in trace file
-"debugLevel" = "Include Debug Level";
+"debugLevel" = "使用调试级别";
 
 /// Apple Watch Settings - text in row where user needs to say if delta should be displayed or not
 "displayDeltaInCalendarEvent" = "变化量";
@@ -134,7 +134,7 @@
 "m5stack_settingsviews_brightness" = "Screen Brightness";
 
 /// in Settings, row title to send settings
-"sendTraceFile" = "发送问题报告";
+"sendTraceFile" = "通过邮件发送";
 "settingsviews_issueReportTitle" = "问题报告";
 
 /// nightscout settings, title of row
@@ -177,8 +177,6 @@
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 
 
-/// Text in pop up shown when user wants to send the trace file
-"describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
 
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
 "warningChangeFromMasterToFollower" = "Switching from Master to Follower will stop your current sensor. Do you want to continue?";
@@ -751,3 +749,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "朗读开场语";
 "speak.preview" = "预览血糖播报";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "包含 Watch 日志";
+"settingsviews_reportWatchFooter" = "从已连接的 Watch 获取 Direct to Watch 日志。";
+"settingsviews_reportSendFooter" = "准备发送给 xDrip4iOS 开发者的电子邮件。";
+"settingsviews_requestingWatchLogs" = "正在请求...";
+"settingsviews_watchLogsNotReceived" = "未收到 Watch 日志";
+"settingsviews_watchLogsTimeout" = "8 秒内未收到 Watch 日志。请重试或发送不含这些日志的报告。";
+"settingsviews_watchLogsFailure" = "无法接收 Watch 日志。请重试或发送不含这些日志的报告。";
+"settingsviews_openWatchApp" = "打开 Watch 应用";
+"settingsviews_confirmWatchAppOpen" = "请在 Watch 上打开 %@，并保持打开直到日志传输完成。\n\n现在已打开吗？";
+"settingsviews_reportShareFooter" = "共享日志文件。";
+"settingsviews_shareReport" = "分享报告";
+"settingsviews_shareIssueReport" = "分享问题报告";
+"settingsviews_reportShareFailed" = "无法准备日志文件。请重试。";

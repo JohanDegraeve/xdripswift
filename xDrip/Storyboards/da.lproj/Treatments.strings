@@ -33,7 +33,7 @@
 "treatments_basalInjection" = "Basal (injektion)";
 "treatments_insulinDescription" = "Insulintype";
 "treatments_insulinDescriptionPlaceholder" = "f.eks. Tresiba";
-"treatments_invalidBasalInjectionValueMessage" = "Indtast et helt antal enheder større end nul.";
+"treatments_invalidBasalInjectionValueMessage" = "Indtast mere end 0 og højst 150 enheder i trin på 0,5.";
 
 /* Footer shown when a new basal injection is prefilled from the previous entry. */
 "treatments_basalInjectionCopiedFooter" = "Mængden og typen af basalinsulin er kopieret fra den forrige registrering";

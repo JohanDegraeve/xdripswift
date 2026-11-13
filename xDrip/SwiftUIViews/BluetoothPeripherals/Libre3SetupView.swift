@@ -166,6 +166,7 @@ struct Libre3SetupView: View {
         .disabled(busy)
         .navigationTitle(TextsLibre3.localized("Libre 3 / 3 Plus"))
         .navigationBarTitleDisplayMode(.inline)
+        .onlineHelp(.libre3)
         .onAppear {
             prepareCredentials()
             savedReceiverHex = (try? Libre3CredentialStore().pending()).map {

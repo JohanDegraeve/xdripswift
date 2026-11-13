@@ -191,6 +191,10 @@ struct RootHomeSensorNoiseState {
 
 /// Current data-source description and connection indicators.
 struct RootHomeDataSourceState {
+    var adjustmentOffsetText: String?
+    var adjustmentOffsetColor = Color(.colorTertiary)
+    var adjustmentSystemImage = "dial.medium"
+    var adjustmentOffsetAccessibilityLabel = ""
     var title = ""
     var showsWatchCollectorIcon = false
     var watchCollectorHealth: DirectWatchReadingStatus = .off
@@ -919,7 +923,7 @@ final class RootHomeStateModel: ObservableObject {
             }
         }
 
-        return RootHomeDataSourceState(
+        var dataSource = RootHomeDataSourceState(
             title: title,
             showsWatchCollectorIcon: isMaster && activeSensor != nil && watchCollectorIsEnabled(),
             watchCollectorHealth: DirectWatchSettings.readingStatus(),
@@ -935,6 +939,21 @@ final class RootHomeStateModel: ObservableObject {
             keepAliveSystemImage: UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString,
             keepAliveColor: followerKeepAliveColor
         )
+
+        if UserDefaults.standard.enableAdjustment,
+           let manager = bgPostProcessingManager,
+           manager.shouldAllowBgAdjustmentForCurrentSource(),
+           let adjustment = manager.latestActiveBgAdjustment(),
+           adjustment.intercept.isFinite, abs(adjustment.intercept) > 0.0001 {
+            let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+            let signedOffset = (adjustment.intercept < 0 ? "-" : "+") + abs(adjustment.intercept).mgDlToMmolAndToString(mgDl: isMgDl)
+            dataSource.adjustmentOffsetText = signedOffset
+            dataSource.adjustmentSystemImage = postProcessingSystemImage(bgPostProcessingManager: manager)
+            dataSource.adjustmentOffsetColor = ConstantsBgAdjustment.offsetNeedsWarning(adjustment.intercept) ? Color(.systemYellow) : Color(.colorTertiary)
+            dataSource.adjustmentOffsetAccessibilityLabel = String(format: Texts_HomeView.postProcessingOffsetAccessibility, signedOffset + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
+        }
+
+        return dataSource
     }
 
     private func watchCollectorIsEnabled() -> Bool {

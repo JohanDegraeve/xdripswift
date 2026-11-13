@@ -133,6 +133,7 @@ struct DirectWatchSetupView: View {
         .colorScheme(.dark)
         .navigationTitle(TextsDirectWatch.title)
         .navigationBarTitleDisplayMode(.large)
+        .onlineHelp(.directToWatch)
         .onAppear {
             reload()
             selectedSlot = enabled ? Int(configuration?.slot ?? 1)

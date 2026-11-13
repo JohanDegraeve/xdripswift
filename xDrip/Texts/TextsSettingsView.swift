@@ -52,6 +52,21 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_issueReportSectionFooter", tableName: filename, bundle: Bundle.main, value: "Do not send an Issue Report unless requested by an xDrip4iOS developer or your report will be automatically deleted.", comment: "settings footer warning users not to send issue reports unless requested")
     }()
 
+    static let openWatchApp = NSLocalizedString("settingsviews_openWatchApp", tableName: filename, bundle: .main, value: "Open the Watch App", comment: "Issue Report")
+    static let confirmWatchAppOpen = String(format: NSLocalizedString("settingsviews_confirmWatchAppOpen", tableName: filename, bundle: .main, value: "Open %@ on your Watch and keep it open until the logs arrive.\n\nIs it open now?", comment: "Issue Report, app name and a separate confirmation question"), ConstantsHomeView.applicationName)
+
+    static let includeWatchLogs = NSLocalizedString("settingsviews_includeWatchLogs", tableName: filename, bundle: .main, value: "Include Watch Logs", comment: "Issue Report")
+    static let reportWatchFooter = NSLocalizedString("settingsviews_reportWatchFooter", tableName: filename, bundle: .main, value: "Fetch Direct to Watch logs from your connected Watch.", comment: "Issue Report")
+    static let reportSendFooter = NSLocalizedString("settingsviews_reportSendFooter", tableName: filename, bundle: .main, value: "Prepare an email to send to the xDrip4iOS developers.", comment: "Issue Report")
+    static let shareReport = NSLocalizedString("settingsviews_shareReport", tableName: filename, bundle: .main, value: "Share Report", comment: "Issue Report")
+    static let shareIssueReport = NSLocalizedString("settingsviews_shareIssueReport", tableName: filename, bundle: .main, value: "Share Issue Report", comment: "Issue Report")
+    static let reportShareFailed = NSLocalizedString("settingsviews_reportShareFailed", tableName: filename, bundle: .main, value: "Unable to prepare the log files. Please try again.", comment: "Issue Report")
+    static let reportShareFooter = NSLocalizedString("settingsviews_reportShareFooter", tableName: filename, bundle: .main, value: "Share the log files.", comment: "Issue Report")
+    static let requestingWatchLogs = NSLocalizedString("settingsviews_requestingWatchLogs", tableName: filename, bundle: .main, value: "Requesting...", comment: "Issue Report")
+    static let watchLogsNotReceived = NSLocalizedString("settingsviews_watchLogsNotReceived", tableName: filename, bundle: .main, value: "Watch Logs Not Received", comment: "Issue Report")
+    static let watchLogsTimeout = NSLocalizedString("settingsviews_watchLogsTimeout", tableName: filename, bundle: .main, value: "Watch logs were not received within 8 seconds. Try again or send the report without them.", comment: "Issue Report")
+    static let watchLogsFailure = NSLocalizedString("settingsviews_watchLogsFailure", tableName: filename, bundle: .main, value: "Watch logs could not be received. Try again or send the report without them.", comment: "Issue Report")
+
     static let issueReportTitle: String = {
         return NSLocalizedString("settingsviews_issueReportTitle", tableName: filename, bundle: Bundle.main, value: "Issue Report", comment: "advanced settings row and child screen title for developer issue reports")
     }()
@@ -1044,15 +1059,11 @@ class Texts_SettingsView {
     }()
     
     static let sendTraceFile: String = {
-        return NSLocalizedString("sendTraceFile", tableName: filename, bundle: Bundle.main, value: "Send Issue Report", comment: "in Settings, row title to send settings")
+        return NSLocalizedString("sendTraceFile", tableName: filename, bundle: Bundle.main, value: "Send by Email", comment: "in Settings, row title to send settings")
     }()
     
     static let debugLevel: String = {
-        return NSLocalizedString("debugLevel", tableName: filename, bundle: Bundle.main, value: "Include Debug Level", comment: "in Settings, to enable debug level in trace file")
-    }()
-    
-    static let describeProblem: String = {
-        return String(format: NSLocalizedString("describeProblem", tableName: filename, bundle: Bundle.main, value: "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail", comment: "Text in pop up shown when user wants to send the trace file"), ConstantsHomeView.applicationName)
+        return NSLocalizedString("debugLevel", tableName: filename, bundle: Bundle.main, value: "Use Debug Level", comment: "in Settings, to enable debug level in trace file")
     }()
     
     static let emailNotConfigured: String = {

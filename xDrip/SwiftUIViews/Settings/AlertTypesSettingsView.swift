@@ -141,13 +141,13 @@ final class AlertTypeEditorViewModel: ObservableObject {
     init(
         alertType: AlertType?,
         coreDataManager: CoreDataManager,
-        soundPlayer: SoundPlayer = SoundPlayer(),
+        soundPlayer: SoundPlayer? = nil,
         close: @escaping () -> Void
     ) {
         // Keep edits in the draft until Save is tapped.
         self.alertType = alertType
         self.coreDataManager = coreDataManager
-        self.soundPlayer = soundPlayer
+        self.soundPlayer = soundPlayer ?? SoundPlayer()
         self.close = close
 
         if let alertType {

@@ -334,6 +334,8 @@ enum DirectWatchSettings {
     static let statusChanged = Notification.Name("DirectWatchStatusChanged")
     static let requestLogs = Notification.Name("DirectWatchRequestLogs")
     static let logsChanged = Notification.Name("DirectWatchLogsChanged")
+    static let logRequestIDKey = "directWatchLogRequestID"
+    static let logDataKey = "directWatchLogData"
     static let logsRequestedDateKey = "directWatch.logsRequestedDate"
     static let logsReceivedDateKey = "directWatch.logsReceivedDate"
     static let logsFailedKey = "directWatch.logsFailed"
@@ -460,23 +462,65 @@ enum DirectWatchSettings {
         NotificationCenter.default.post(name: changed, object: nil)
     }
 
+    /// Saved Watch telemetry belongs only to the matching sensor and Bluetooth family.
+    static func diagnosticLines(transmitterID: String?, family: DirectWatchTransmitterFamily,
+                                reachable: Bool, in defaults: UserDefaults = .standard) -> [String] {
+        DirectWatchCompatibility.migrateSettings(in: defaults)
+        let configuration = defaults.data(forKey: configurationKey)
+            .flatMap { try? JSONDecoder().decode(DirectWatchConfiguration.self, from: $0) }
+        guard let configuration else { return ["Direct to Watch: not configured"] }
+        guard configuration.transmitterID.uppercased() == transmitterID?.uppercased(), configuration.transmitterFamily == family else {
+            return ["Direct to Watch: not configured for this peripheral"]
+        }
+        let control = defaults.data(forKey: collectionControlKey)
+            .flatMap { try? JSONDecoder().decode(DirectWatchCollectionControl.self, from: $0) }
+        let paused = control?.connection == configuration.connectionIdentity && control?.isPaused == true
+        let reason = defaults.string(forKey: unavailableReasonKey)
+        let formatter = ISO8601DateFormatter()
+        func date(_ key: String) -> String {
+            (defaults.object(forKey: key) as? Date).map { formatter.string(from: $0) } ?? "nil"
+        }
+        return [
+            "Direct to Watch: configured",
+            "Watch Bluetooth slot: \(configuration.slot) (0x\(String(format: "%02X", configuration.slot)))",
+            "Watch collection paused: \(paused)",
+            "Watch collection suspended: \(reason != nil)",
+            "Watch suspension reason: \(reason ?? "nil")",
+            "Watch reachable now: \(reachable)",
+            "Watch last reported status: \(defaults.string(forKey: lastStatusKey) ?? "nil")",
+            "Watch status received: \(date(lastStatusDateKey))",
+            "Watch last contact: \(date(lastContactDateKey))",
+            "Watch last connected: \(date(lastConnectedDateKey))",
+            "Watch last reading: \(date(lastCollectedDateKey))",
+            "iPhone BLE collection paused for Watch testing: \(defaults.string(forKey: pausedKey) == configuration.transmitterID)",
+            "Watch logs requested: \(date(logsRequestedDateKey))",
+            "Watch logs received: \(date(logsReceivedDateKey))",
+            "Watch log request failed: \(defaults.bool(forKey: logsFailedKey))"
+        ]
+    }
+
     static var receivedLogURL: URL {
         DirectWatchCompatibility.logURL(in: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0])
     }
 
     /// Requesting another export must not erase the last successful receipt or its file.
-    static func recordLogRequest(queued: Bool, now: Date = .now, in defaults: UserDefaults = .standard) {
+    static func recordLogRequest(queued: Bool, requestID: String? = nil, now: Date = .now, in defaults: UserDefaults = .standard) {
         defaults.set(queued ? now : nil, forKey: logsRequestedDateKey)
         defaults.set(!queued, forKey: logsFailedKey)
-        NotificationCenter.default.post(name: logsChanged, object: nil)
+        var receipt: [String: Any] = [logsFailedKey: !queued]
+        receipt[logRequestIDKey] = requestID
+        NotificationCenter.default.post(name: logsChanged, object: nil, userInfo: receipt)
     }
 
     /// Call only after the incoming file has been saved. Transfer submission is not receipt.
-    static func recordLogsReceived(now: Date = .now, in defaults: UserDefaults = .standard) {
+    static func recordLogsReceived(requestID: String? = nil, data: Data? = nil, now: Date = .now, in defaults: UserDefaults = .standard) {
         defaults.set(now, forKey: logsReceivedDateKey)
         defaults.removeObject(forKey: logsRequestedDateKey)
         defaults.set(false, forKey: logsFailedKey)
-        NotificationCenter.default.post(name: logsChanged, object: nil)
+        var receipt: [String: Any] = [:]
+        receipt[logRequestIDKey] = requestID
+        receipt[logDataKey] = data
+        NotificationCenter.default.post(name: logsChanged, object: nil, userInfo: receipt)
     }
 }
 

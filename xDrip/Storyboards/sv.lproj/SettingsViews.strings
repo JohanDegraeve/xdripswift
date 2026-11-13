@@ -100,9 +100,8 @@
 "infoCalendarAccessDeniedByUser" = "Du har tidigare nekat tillgång till din kalender.\n\nFör att tillåta tillgång gå till 'Inställningar', 'Integritet', 'Kalendrar' och sätt på";
 "infoCalendarAccessRestricted" = "Du kan inte ge auktorisation till %@ att få tillgång till din kalender. Detta beror möjligtvis på inställda begränsningar i Skärmtidsinställningar.";
 "sectionTitleTrace" = "Problemrapportering";
-"sendTraceFile" = "Skicka problemrapport";
+"sendTraceFile" = "Skicka via e-post";
 "settingsviews_issueReportTitle" = "Problemrapport";
-"describeProblem" = "Förklara varför du behöver skicka rapporten så detaljerat som möjligt. Om du redan har rapporterat problemet på Facebook-gruppen '%@', så skriv även ned ditt Facebook-namn i mejlet";
 "emailNotConfigured" = "Du måste ställa in ett e-postkonto på din iOS-enhet.";
 "emailbodyText" = "Problembeskrivning: ";
 "failedToSendEmail" = "Misslyckades att skicka mejl";
@@ -110,7 +109,7 @@
 "volumeTestiOSSoundExplanation" = "Ett larmljud spelas nu upp med samma volym som kommer att användas för larm med 'Förbigå tyst läge' = På\n\n(Används för alla larm förutom 'Saknad avläsning' som alltid använder inställd iOS-volym.)\n\nTryck på en av volymknapparna för att stänga av ljudet, ändra sedan volymen med volymknapparna till önskad volym och försök igen.";
 "volumeTestSoundPlayer" = "När tyst läge är aktiverat";
 "volumeTestiOSSound" = "När tyst läge är avaktiverat";
-"debugLevel" = "Inkludera felsökningsnivå";
+"debugLevel" = "Använd felsökningsnivå";
 "warningChangeFromMasterToFollower" = "Byte från användare till följare kommer att stoppa nuvarande sensor. Vill du fortsätta?";
 "nightscoutPort" = "Port";
 "developerSettings" = "Avancerade inställningar";
@@ -600,3 +599,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Läs upp inledning";
 "speak.preview" = "Testa glukosuppläsning";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Inkludera Watch-loggar";
+"settingsviews_reportWatchFooter" = "Hämta Direct to Watch-loggar från ansluten Watch.";
+"settingsviews_reportSendFooter" = "Förbered ett e-postmeddelande till utvecklarna av xDrip4iOS.";
+"settingsviews_requestingWatchLogs" = "Begär...";
+"settingsviews_watchLogsNotReceived" = "Watch-loggar inte mottagna";
+"settingsviews_watchLogsTimeout" = "Watch-loggarna togs inte emot inom 8 sekunder. Försök igen eller skicka rapporten utan dem.";
+"settingsviews_watchLogsFailure" = "Watch-loggarna kunde inte tas emot. Försök igen eller skicka rapporten utan dem.";
+"settingsviews_openWatchApp" = "Öppna Watch-appen";
+"settingsviews_confirmWatchAppOpen" = "Öppna %@ på din Watch och håll appen öppen tills loggarna har kommit.\n\nÄr den öppen nu?";
+"settingsviews_reportShareFooter" = "Dela loggfilerna.";
+"settingsviews_shareReport" = "Dela rapport";
+"settingsviews_shareIssueReport" = "Dela felrapport";
+"settingsviews_reportShareFailed" = "Det gick inte att förbereda loggfilerna. Försök igen.";

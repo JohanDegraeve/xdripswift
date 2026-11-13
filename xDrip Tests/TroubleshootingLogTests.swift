@@ -79,16 +79,35 @@ final class TroubleshootingLogTests: XCTestCase {
             ["developer.showDeveloperSettings"]
         )
 
-        UserDefaults.standard.showDeveloperSettings = true
-        let revealedAdvancedSection = advancedSectionModel.section()
-        let visibleRows = revealedAdvancedSection.rows.filter(\.isVisible)
-        XCTAssertEqual(visibleRows.prefix(2).map(\.id), [
-            "developer.showDeveloperSettings",
-            "developer.issueReport"
-        ])
+        let reportingModel = try XCTUnwrap(sections.first { $0.id == advancedID + 1 })
+        let optionsModel = try XCTUnwrap(sections.first { $0.id == advancedID + 2 })
+        XCTAssertTrue(reportingModel.section().rows.filter(\.isVisible).isEmpty)
+        XCTAssertTrue(optionsModel.section().rows.filter(\.isVisible).isEmpty)
+        XCTAssertNotNil(advancedSection.title)
+        XCTAssertNotNil(advancedSection.iconSymbolName)
+        XCTAssertNil(reportingModel.section().title)
+        XCTAssertNil(reportingModel.section().iconSymbolName)
+        XCTAssertNil(optionsModel.section().title)
+        XCTAssertNil(optionsModel.section().iconSymbolName)
 
-        let issueReportRow = try XCTUnwrap(visibleRows.first { $0.id == "developer.issueReport" })
-        XCTAssertEqual(issueReportRow.title, Texts_SettingsView.issueReportTitle)
+        UserDefaults.standard.showDeveloperSettings = true
+        XCTAssertEqual(advancedSectionModel.section().rows.map(\.id), ["developer.showDeveloperSettings"])
+        let reportRows = reportingModel.section().rows.filter(\.isVisible)
+        XCTAssertEqual(reportRows.map(\.id), ["trace.debugLevel", "developer.issueReport"])
+        let previousDebugLevel = UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog
+        defer { UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog = previousDebugLevel }
+        guard case let .toggle(isOn, setIsOn, _) = reportRows[0].control else {
+            return XCTFail("Use Debug Level must retain its existing setting")
+        }
+        setIsOn(!previousDebugLevel)
+        XCTAssertEqual(isOn(), !previousDebugLevel)
+        XCTAssertEqual(UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog, !previousDebugLevel)
+        let options = optionsModel.section().rows.filter(\.isVisible).map(\.id)
+        XCTAssertTrue(options.contains("developer.translateOnlineHelp"))
+        XCTAssertFalse(options.contains("developer.issueReport"))
+        XCTAssertFalse(options.contains("trace.debugLevel"))
+        let issueReportRow = try XCTUnwrap(reportRows.last)
+        XCTAssertEqual(issueReportRow.title, Texts_SettingsView.shareIssueReport)
         guard case let .settingsScreen(makeScreen)? = issueReportRow.action else {
             return XCTFail("Issue Report must open a child Settings screen")
         }
@@ -96,11 +115,12 @@ final class TroubleshootingLogTests: XCTestCase {
         let issueReportScreen = makeScreen()
         XCTAssertEqual(issueReportScreen.title, Texts_SettingsView.issueReportTitle)
         let reportSections = issueReportScreen.makeSections(SettingsActionPresenter(router: SettingsRouter()))
-        XCTAssertEqual(reportSections.count, 1)
-        let reportSection = try XCTUnwrap(reportSections.first?.section())
-        XCTAssertNil(reportSection.title)
-        XCTAssertEqual(reportSection.rows.map(\.id), ["trace.debugLevel", "trace.sendTraceFile"])
-        XCTAssertEqual(reportSection.footer, Texts_SettingsView.issueReportSectionFooter)
+        XCTAssertEqual(reportSections.count, 4)
+        XCTAssertEqual(reportSections.flatMap { $0.section().rows.map(\.id) },
+                       ["trace.warning", "trace.includeWatchLogs", "trace.sendTraceFile", "trace.shareReport"])
+        XCTAssertEqual(reportSections[1].section().footer, Texts_SettingsView.reportWatchFooter)
+        XCTAssertEqual(reportSections[2].section().footer, Texts_SettingsView.reportSendFooter)
+        XCTAssertEqual(reportSections[3].section().footer, Texts_SettingsView.reportShareFooter)
     }
 
     func testTwentyFourHourRetentionRemovesOnlyOlderEntries() {
@@ -2128,5 +2148,354 @@ extension TroubleshootingLogTests {
             fixture.store.record(.standard(.cgm(source: .libre3, activity: activity), timestamp: referenceDate.addingTimeInterval(Double(index))))
         }
         XCTAssertEqual(fixture.store.snapshot().first?.kind, .cgm(source: .libre3, activity: .authenticationRecovered))
+    }
+}
+
+
+extension TroubleshootingLogTests {
+    @MainActor func testIssueReportShareWorksWithoutMailAndCleansUpAfterDismissal() throws {
+        let report = TraceReportFixture()
+        report.mailConfigured = false
+        report.presenter.requestTraceShare()
+        let share = try XCTUnwrap(report.presenter.traceShare)
+        XCTAssertEqual(share.files.map(\.lastPathComponent), ["phone.log", "appinfo.txt"])
+        XCTAssertEqual(try Data(contentsOf: share.files[0]), Data("Phone logs".utf8))
+        XCTAssertFalse(report.router.showsTraceEmail)
+        XCTAssertNil(report.presenter.alert)
+        report.presenter.requestTraceShare()
+        report.presenter.requestTraceEmail()
+        XCTAssertEqual(report.presenter.traceShare?.id, share.id)
+        XCTAssertFalse(report.router.showsTraceEmail)
+        report.presenter.cancelTraceEmailPreparation()
+        XCTAssertTrue(FileManager.default.fileExists(atPath: share.directory.path))
+        report.presenter.clearTraceShare()
+        XCTAssertFalse(FileManager.default.fileExists(atPath: share.directory.path))
+        XCTAssertNil(report.presenter.traceShare)
+    }
+
+    @MainActor func testIssueReportShareWaitsForWatchSnapshot() throws {
+        let report = TraceReportFixture()
+        report.presenter.setIncludeTraceWatchLogs(true)
+        report.presenter.requestTraceShare()
+        report.presenter.requestTraceEmail()
+        XCTAssertNil(report.presenter.traceShare)
+        XCTAssertFalse(report.router.showsTraceEmail)
+        let logs = Data("Requested Watch logs".utf8)
+        report.presenter.receiveTraceWatchLog(requestID: try XCTUnwrap(report.requestID), data: logs, failed: false)
+        XCTAssertNil(report.presenter.traceShare)
+        report.presenter.requestTraceShare()
+        let share = try XCTUnwrap(report.presenter.traceShare)
+        XCTAssertEqual(share.files.count, 3)
+        XCTAssertEqual(share.files.last?.lastPathComponent, SettingsActionPresenter.traceWatchLogFilename)
+        XCTAssertEqual(try Data(contentsOf: XCTUnwrap(share.files.last)), logs)
+        report.presenter.clearTraceShare()
+        XCTAssertFalse(report.presenter.includeTraceWatchLogs)
+        XCTAssertNil(report.presenter.traceWatchLogData)
+    }
+
+    @MainActor func testIssueReportEmptyShareShowsPreparationError() {
+        let report = TraceReportFixture()
+        report.attachments = []
+        report.presenter.requestTraceShare()
+        XCTAssertNil(report.presenter.traceShare)
+        XCTAssertNotNil(report.presenter.alert)
+        XCTAssertFalse(report.router.showsTraceEmail)
+    }
+
+    @MainActor func testIssueReportEmailOpensWithoutGuidanceConfirmation() {
+        let report = TraceReportFixture()
+        report.presenter.requestTraceEmail()
+        XCTAssertTrue(report.router.showsTraceEmail)
+        XCTAssertNil(report.presenter.confirmation)
+        XCTAssertNil(report.presenter.alert)
+    }
+
+    @MainActor func testIssueReportEmailStillRequiresConfiguredMail() {
+        let report = TraceReportFixture()
+        report.mailConfigured = false
+        report.presenter.requestTraceEmail()
+        XCTAssertFalse(report.router.showsTraceEmail)
+        XCTAssertNil(report.presenter.confirmation)
+        XCTAssertNotNil(report.presenter.alert)
+    }
+
+    @MainActor func testIssueReportEmailWaitsForRequestedWatchLogs() throws {
+        let report = TraceReportFixture()
+        report.presenter.setIncludeTraceWatchLogs(true)
+        report.presenter.requestTraceEmail()
+        XCTAssertFalse(report.router.showsTraceEmail)
+        XCTAssertNil(report.presenter.confirmation)
+        report.presenter.receiveTraceWatchLog(requestID: try XCTUnwrap(report.requestID), data: Data("Watch logs".utf8), failed: false)
+        report.presenter.requestTraceEmail()
+        XCTAssertTrue(report.router.showsTraceEmail)
+        XCTAssertNil(report.presenter.confirmation)
+        XCTAssertNil(report.presenter.alert)
+    }
+
+    @MainActor func testIssueReportWithoutWatchSelectionOpensImmediately() {
+        let report = TraceReportFixture()
+        report.presenter.requestTraceEmail()
+        XCTAssertTrue(report.router.showsTraceEmail)
+        XCTAssertFalse(report.presenter.includeTraceWatchLogs)
+        XCTAssertNil(report.requestID)
+    }
+
+    @MainActor func testIssueReportWatchConfirmationStartsOnlyAfterYes() throws {
+        let report = TraceReportFixture()
+        report.presenter.confirmTraceWatchLogs(true)
+        let confirmation = try XCTUnwrap(report.presenter.confirmation)
+        XCTAssertEqual(confirmation.actionTitle, Texts_Common.yes)
+        XCTAssertEqual(confirmation.cancelTitle, Texts_Common.Cancel)
+        let message = try XCTUnwrap(confirmation.message)
+        XCTAssertTrue(message.contains(ConstantsHomeView.applicationName))
+        XCTAssertEqual(message.components(separatedBy: "\n\n").count, 2)
+        XCTAssertNil(report.requestID)
+        XCTAssertFalse(report.presenter.includeTraceWatchLogs)
+        report.now += 20
+        confirmation.action()
+        XCTAssertNotNil(report.requestID)
+        XCTAssertTrue(report.presenter.preparingTraceEmail)
+        report.now += 7
+        report.presenter.receiveTraceWatchLog(requestID: report.requestID, data: Data("fresh".utf8), failed: false)
+        XCTAssertNotNil(report.presenter.traceWatchLogData)
+    }
+
+    @MainActor func testIssueReportWatchConfirmationCancelDoesNotRequestLogs() throws {
+        let report = TraceReportFixture()
+        report.presenter.confirmTraceWatchLogs(true)
+        let confirmation = try XCTUnwrap(report.presenter.confirmation)
+        confirmation.cancel?()
+        XCTAssertNil(report.presenter.confirmation)
+        XCTAssertNil(report.requestID)
+        XCTAssertFalse(report.presenter.includeTraceWatchLogs)
+        XCTAssertFalse(report.presenter.preparingTraceEmail)
+    }
+
+    @MainActor func testIssueReportWatchConfirmationRechecksConnection() throws {
+        let report = TraceReportFixture()
+        report.presenter.confirmTraceWatchLogs(true)
+        let confirmation = try XCTUnwrap(report.presenter.confirmation)
+        report.connectionAvailable = false
+        confirmation.action()
+        XCTAssertNil(report.requestID)
+        XCTAssertFalse(report.presenter.includeTraceWatchLogs)
+    }
+
+    @MainActor func testIssueReportWatchLogsRemainAvailableWhileCollectionIsPaused() throws {
+        let defaults = UserDefaults.standard
+        let keys = [DirectWatchSettings.configurationKey, DirectWatchSettings.collectionControlKey,
+                    DirectWatchSettings.unavailableReasonKey]
+        let previous = keys.map { defaults.object(forKey: $0) }
+        defer {
+            for (key, value) in zip(keys, previous) { defaults.set(value, forKey: key) }
+        }
+        let report = TraceReportFixture()
+        let configuration = try XCTUnwrap(report.configuration)
+        defaults.set(try JSONEncoder().encode(configuration), forKey: DirectWatchSettings.configurationKey)
+        defaults.removeObject(forKey: DirectWatchSettings.collectionControlKey)
+        defaults.removeObject(forKey: DirectWatchSettings.unavailableReasonKey)
+        let presenter = SettingsActionPresenter(router: report.router, traceNotifications: report.notifications,
+                                               traceUptime: { report.now }, traceConfiguration: { report.configuration })
+        XCTAssertTrue(presenter.traceWatchLogsAvailable)
+        presenter.setIncludeTraceWatchLogs(true)
+        let requestID = try XCTUnwrap(report.requestID)
+
+        let pause = DirectWatchCollectionControl(connection: configuration.connectionIdentity, isPaused: true)
+        defaults.set(try JSONEncoder().encode(pause), forKey: DirectWatchSettings.collectionControlKey)
+        XCTAssertTrue(DirectWatchSettings.watchIsPaused)
+        presenter.traceReportConfigurationChanged()
+        XCTAssertTrue(presenter.traceWatchLogsAvailable)
+        XCTAssertTrue(presenter.includeTraceWatchLogs)
+        XCTAssertTrue(presenter.preparingTraceEmail)
+        let data = Data("Paused Watch logs".utf8)
+        presenter.receiveTraceWatchLog(requestID: requestID, data: data, failed: false)
+        XCTAssertEqual(presenter.traceWatchLogData, data)
+        XCTAssertFalse(presenter.preparingTraceEmail)
+
+        presenter.setIncludeTraceWatchLogs(false)
+        presenter.setIncludeTraceWatchLogs(true)
+        XCTAssertEqual(report.requestCount, 2)
+        XCTAssertTrue(presenter.preparingTraceEmail)
+        presenter.cancelTraceEmailPreparation()
+    }
+
+    @MainActor func testIssueReportWatchSelectionRequiresAvailableConnection() {
+        let report = TraceReportFixture()
+        report.connectionAvailable = false
+        XCTAssertFalse(report.presenter.traceWatchLogsAvailable)
+        report.presenter.setIncludeTraceWatchLogs(true)
+        XCTAssertFalse(report.presenter.includeTraceWatchLogs)
+        XCTAssertNil(report.requestID)
+        report.connectionAvailable = true
+        report.configuration = nil
+        report.presenter.setIncludeTraceWatchLogs(true)
+        XCTAssertFalse(report.presenter.traceWatchLogsAvailable)
+        XCTAssertNil(report.requestID)
+    }
+
+    @MainActor func testIssueReportWaitsForMatchingLogsAndAnExplicitSend() throws {
+        let report = TraceReportFixture()
+        report.presenter.setIncludeTraceWatchLogs(true)
+        let id = try XCTUnwrap(report.requestID)
+        XCTAssertTrue(report.presenter.preparingTraceEmail)
+        report.presenter.requestTraceEmail()
+        XCTAssertFalse(report.router.showsTraceEmail)
+        let data = Data("fresh Watch log".utf8)
+        report.presenter.receiveTraceWatchLog(requestID: nil, data: data, failed: false)
+        report.presenter.receiveTraceWatchLog(requestID: "old", data: data, failed: false)
+        report.presenter.receiveTraceWatchLog(requestID: id, data: nil, failed: false)
+        XCTAssertTrue(report.presenter.preparingTraceEmail)
+        report.now += 7
+        report.presenter.receiveTraceWatchLog(requestID: id, data: data, failed: false)
+        XCTAssertEqual(report.presenter.traceWatchLogData, data)
+        XCTAssertFalse(report.presenter.preparingTraceEmail)
+        XCTAssertTrue(report.presenter.includeTraceWatchLogs)
+        XCTAssertFalse(report.router.showsTraceEmail)
+        report.presenter.traceReportDeadlineReached(requestID: id)
+        XCTAssertNil(report.presenter.alert)
+        report.presenter.requestTraceEmail()
+        XCTAssertTrue(report.router.showsTraceEmail)
+        report.presenter.cancelTraceEmailPreparation()
+        XCTAssertFalse(report.presenter.includeTraceWatchLogs)
+        XCTAssertNil(report.presenter.traceWatchLogData)
+    }
+
+    @MainActor func testIssueReportTimeoutAndFailureResetSelectionWithoutOpeningMail() throws {
+        for failure in [false, true] {
+            let report = TraceReportFixture()
+            report.presenter.setIncludeTraceWatchLogs(true)
+            let id = try XCTUnwrap(report.requestID)
+            if failure {
+                report.presenter.receiveTraceWatchLog(requestID: id, data: nil, failed: true)
+            } else {
+                report.now += 8
+                report.presenter.traceReportDeadlineReached(requestID: id)
+            }
+            XCTAssertFalse(report.router.showsTraceEmail)
+            XCTAssertFalse(report.presenter.preparingTraceEmail)
+            XCTAssertFalse(report.presenter.includeTraceWatchLogs)
+            XCTAssertNil(report.presenter.traceWatchLogData)
+            XCTAssertNotNil(report.presenter.alert)
+            report.presenter.receiveTraceWatchLog(requestID: id, data: Data("late".utf8), failed: false)
+            XCTAssertNil(report.presenter.traceWatchLogData)
+            report.presenter.requestTraceEmail()
+            XCTAssertTrue(report.router.showsTraceEmail)
+        }
+    }
+
+    @MainActor func testIssueReportRejectsReceiptAtEightSecondDeadline() throws {
+        let report = TraceReportFixture()
+        report.presenter.setIncludeTraceWatchLogs(true)
+        report.now += 8
+        report.presenter.receiveTraceWatchLog(requestID: try XCTUnwrap(report.requestID), data: Data("late".utf8), failed: false)
+        XCTAssertFalse(report.router.showsTraceEmail)
+        XCTAssertFalse(report.presenter.includeTraceWatchLogs)
+        XCTAssertNil(report.presenter.traceWatchLogData)
+        XCTAssertNotNil(report.presenter.alert)
+    }
+
+    @MainActor func testIssueReportCancelledRequestCannotFinishNewRequest() throws {
+        let report = TraceReportFixture()
+        report.presenter.setIncludeTraceWatchLogs(true)
+        let oldID = try XCTUnwrap(report.requestID)
+        report.presenter.setIncludeTraceWatchLogs(true)
+        XCTAssertEqual(report.requestCount, 1)
+        report.presenter.setIncludeTraceWatchLogs(false)
+        XCTAssertFalse(report.presenter.preparingTraceEmail)
+        report.presenter.setIncludeTraceWatchLogs(true)
+        let newID = try XCTUnwrap(report.requestID)
+        XCTAssertNotEqual(oldID, newID)
+        report.presenter.traceReportDeadlineReached(requestID: oldID)
+        report.presenter.receiveTraceWatchLog(requestID: oldID, data: Data("old".utf8), failed: false)
+        XCTAssertTrue(report.presenter.preparingTraceEmail)
+        report.presenter.receiveTraceWatchLog(requestID: newID, data: Data("new".utf8), failed: false)
+        XCTAssertEqual(report.presenter.traceWatchLogData, Data("new".utf8))
+        XCTAssertFalse(report.router.showsTraceEmail)
+    }
+
+    @MainActor func testIssueReportNavigationAndConnectionChangesCancelSelection() throws {
+        let report = TraceReportFixture()
+        report.router.path = [SettingsRoute(.troubleshootingLog)]
+        report.presenter.setIncludeTraceWatchLogs(true)
+        let id = try XCTUnwrap(report.requestID)
+        report.router.path.removeAll()
+        report.presenter.traceReportNavigationChanged()
+        report.presenter.receiveTraceWatchLog(requestID: id, data: Data("late".utf8), failed: false)
+        XCTAssertFalse(report.presenter.includeTraceWatchLogs)
+        XCTAssertFalse(report.router.showsTraceEmail)
+        report.presenter.setIncludeTraceWatchLogs(true)
+        report.configuration?.sensorStartDate += 300
+        report.presenter.traceReportConfigurationChanged()
+        XCTAssertFalse(report.presenter.includeTraceWatchLogs)
+        XCTAssertFalse(report.router.showsTraceEmail)
+        report.presenter.setIncludeTraceWatchLogs(true)
+        report.connectionAvailable = false
+        report.presenter.traceReportConfigurationChanged()
+        XCTAssertFalse(report.presenter.includeTraceWatchLogs)
+        XCTAssertFalse(report.presenter.traceWatchLogsAvailable)
+    }
+
+    @MainActor func testIssueReportReadyLogsAreInvalidatedWhenConnectionChanges() throws {
+        let report = TraceReportFixture()
+        report.presenter.setIncludeTraceWatchLogs(true)
+        report.presenter.receiveTraceWatchLog(requestID: try XCTUnwrap(report.requestID), data: Data("original".utf8), failed: false)
+        report.configuration = DirectWatchConfiguration(
+            transmitterID: "DX0112", slot: 2, isAnubis: false, sensorStartDate: Date(timeIntervalSince1970: 1_800_000_000),
+            isMgDl: true, low: 70, high: 180, family: .g7, pairingCode: "1234")
+        report.presenter.traceReportConfigurationChanged()
+        XCTAssertFalse(report.presenter.includeTraceWatchLogs)
+        XCTAssertNil(report.presenter.traceWatchLogData)
+        XCTAssertFalse(report.router.showsTraceEmail)
+    }
+
+    @MainActor func testIssueReportUsesReceiptObserverWithoutOpeningMail() async throws {
+        let report = TraceReportFixture()
+        report.presenter.setIncludeTraceWatchLogs(true)
+        let id = try XCTUnwrap(report.requestID)
+        let received = expectation(description: "Matching Watch logs received")
+        let observation = report.presenter.$preparingTraceEmail.filter { !$0 }.prefix(1).sink { _ in received.fulfill() }
+        defer { observation.cancel() }
+        report.notifications.post(name: DirectWatchSettings.logsChanged, object: nil,
+                                  userInfo: [DirectWatchSettings.logRequestIDKey: id, DirectWatchSettings.logDataKey: Data("original".utf8)])
+        await fulfillment(of: [received], timeout: 2)
+        XCTAssertEqual(report.presenter.traceWatchLogData, Data("original".utf8))
+        XCTAssertFalse(report.router.showsTraceEmail)
+    }
+}
+
+@MainActor private final class TraceReportFixture {
+    let router = SettingsRouter()
+    let notifications = NotificationCenter()
+    var now: TimeInterval = 100
+    var connectionAvailable = true
+    var mailConfigured = true
+    var attachments = [SettingsReportAttachment(name: "phone.log", data: Data("Phone logs".utf8)),
+                       SettingsReportAttachment(name: "appinfo.txt", data: Data("App info".utf8))]
+    var configuration: DirectWatchConfiguration? = DirectWatchConfiguration(
+        transmitterID: "DX0112", slot: 3, isAnubis: false, sensorStartDate: Date(timeIntervalSince1970: 1_800_000_000),
+        isMgDl: true, low: 70, high: 180, family: .g7, pairingCode: "1234")
+    var requestID: String?
+    var requestCount = 0
+    private var observer: NSObjectProtocol?
+    lazy var presenter = SettingsActionPresenter(router: router, traceNotifications: notifications,
+                                                 traceUptime: { [unowned self] in now },
+                                                 traceConfiguration: { [unowned self] in configuration },
+                                                 traceConnectionAvailable: { [unowned self] in connectionAvailable },
+                                                 traceCanSendMail: { [unowned self] in mailConfigured },
+                                                 traceAttachments: { [unowned self] watchLogs in
+                                                     attachments + (watchLogs.map { [SettingsReportAttachment(name: SettingsActionPresenter.traceWatchLogFilename, data: $0)] } ?? [])
+                                                 })
+
+    init() {
+        observer = notifications.addObserver(forName: DirectWatchSettings.requestLogs, object: nil, queue: .main) { [weak self] notification in
+            MainActor.assumeIsolated {
+                self?.requestID = notification.userInfo?[DirectWatchSettings.logRequestIDKey] as? String
+                self?.requestCount += 1
+            }
+        }
+    }
+
+    deinit {
+        if let observer { notifications.removeObserver(observer) }
     }
 }

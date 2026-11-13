@@ -136,6 +136,9 @@ extension UserDefaults {
         case liveActivityShowIOBCOB = "liveActivityShowIOBCOB"
         /// should BG adjustment be enabled?
         case enableAdjustment = "enableAdjustment"
+        /// Separate offset and curve controls. enableAdjustment remains the combined processing flag.
+        case enableGlucoseAdjustment = "enableGlucoseAdjustment"
+        case enableCurveAdjustment = "enableCurveAdjustment"
         /// should BG smoothing be enabled?
         case enableSmoothing = "enableSmoothing"
         /// BG smoothing period in minutes
@@ -224,7 +227,7 @@ extension UserDefaults {
         case showNoteTreatmentsInList = "showNoteTreatmentsInList"
         /// should basal injections be listed independently of notes and pump basal?
         case showBasalInjectionTreatmentsInList = "showBasalInjectionTreatmentsInList"
-        /// last saved whole-unit dose used to prefill a new basal injection
+        /// last saved dose used to prefill a new basal injection
         case lastBasalInjectionUnits = "lastBasalInjectionUnits"
         /// last saved insulin type used to prefill a new basal injection
         case lastBasalInjectionInsulinDescription = "lastBasalInjectionInsulinDescription"
@@ -1101,6 +1104,18 @@ extension UserDefaults {
         }
     }
 
+    /// Fall back to the combined setting for existing offset adjustments.
+    @objc dynamic var enableGlucoseAdjustment: Bool {
+        get { object(forKey: Key.enableGlucoseAdjustment.rawValue) as? Bool ?? enableAdjustment }
+        set { set(newValue, forKey: Key.enableGlucoseAdjustment.rawValue) }
+    }
+
+    /// Curve adjustment is opt-in and defaults to disabled.
+    @objc dynamic var enableCurveAdjustment: Bool {
+        get { bool(forKey: Key.enableCurveAdjustment.rawValue) }
+        set { set(newValue, forKey: Key.enableCurveAdjustment.rawValue) }
+    }
+
     /// should smoothing be enabled?
     @objc dynamic var enableSmoothing: Bool {
         get {
@@ -1725,8 +1740,8 @@ extension UserDefaults {
     }
 
     /// New injections start with the last explicitly saved dose, never with an automatic submission.
-    var lastBasalInjectionUnits: Int {
-        get { integer(forKey: Key.lastBasalInjectionUnits.rawValue) }
+    var lastBasalInjectionUnits: Double {
+        get { double(forKey: Key.lastBasalInjectionUnits.rawValue) }
         set { set(newValue, forKey: Key.lastBasalInjectionUnits.rawValue) }
     }
 

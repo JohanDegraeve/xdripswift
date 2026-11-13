@@ -773,13 +773,15 @@ enum Texts_HomeView {
     }()
     
     static let enterSensorCode: String = {
-        return NSLocalizedString("enterSensorCode", tableName: filename, bundle: Bundle.main, value: "Enter the sensor code manually, scan the sensor label, or choose a photo.\n\nIf you don't have the code, or want to use a sensor session already running on the transmitter, choose Use Without Code.", comment: "Instructions on the G6 sensor-code selection screen")
+        return NSLocalizedString("enterSensorCode", tableName: filename, bundle: Bundle.main, value: "Scan the sensor label or choose a photo to read the sensor code.", comment: "Instructions on the G6 sensor-code selection screen")
     }()
 
     static let sensorCodeContinue = NSLocalizedString("sensorCodeContinue", tableName: filename, bundle: .main, value: "Continue", comment: "Common advance action after reviewing a G6 or G7 sensor-code selection")
     static let useWithoutSensorCode = NSLocalizedString("useWithoutSensorCode", tableName: filename, bundle: .main, value: "Use Without Code", comment: "Select the G6 no-code option without advancing")
     static let noSensorCode = NSLocalizedString("noSensorCode", tableName: filename, bundle: .main, value: "No code (0000)", comment: "Selected G6 no-code option before confirmation")
-    static let dexcomG7SelectSensorCodeMessage = NSLocalizedString("dexcomG7SelectSensorCodeMessage", tableName: filename, bundle: .main, value: "Enter the four-digit pairing code manually, scan the current applicator, or choose a photo. Check the selected code, then tap Continue.", comment: "Instructions on the G7 pairing-code selection screen")
+    static let dexcomG7SelectSensorCodeMessage = NSLocalizedString("dexcomG7SelectSensorCodeMessage", tableName: filename, bundle: .main, value: "Scan the current applicator or choose a photo to read the four-digit pairing code. Check the selected code, then tap Continue.", comment: "Instructions on the G7 pairing-code selection screen")
+    static let manualSensorCodeEntryFooter = NSLocalizedString("manualSensorCodeEntryFooter", tableName: filename, bundle: .main, value: "If you can’t scan the label or use a photo, enter the four-digit code manually.", comment: "Footer explaining manual entry as a fallback for G6 and G7 codes")
+    static let useWithoutSensorCodeFooter = NSLocalizedString("useWithoutSensorCodeFooter", tableName: filename, bundle: .main, value: "If you don't have the code, or want to use a sensor session already running on the transmitter, choose Use Without Code.", comment: "Footer explaining the G6 no-code option")
 
     static let scanWithCamera = NSLocalizedString("scanWithCamera", tableName: filename, bundle: .main, value: "Scan with Camera", comment: "button to scan a Dexcom G6 sensor label")
     static let manuallyEnterSensorCode = NSLocalizedString("manuallyEnterSensorCode", tableName: filename, bundle: .main, value: "Manually Enter Code", comment: "label for the manual Dexcom sensor-code entry field")
@@ -924,7 +926,59 @@ enum Texts_HomeView {
     }()
 
     static let postProcessingAdjustment: String = {
-        return NSLocalizedString("postProcessingAdjustment", tableName: filename, bundle: Bundle.main, value: "Adjustment", comment: "post processing section title for adjustment")
+        return NSLocalizedString("postProcessingAdjustment", tableName: filename, bundle: Bundle.main, value: "Glucose Adjustment", comment: "post processing section title for adjustment")
+    }()
+
+    static let postProcessingCurveAdjustment: String = {
+        return NSLocalizedString("postProcessingCurveAdjustment", tableName: filename, bundle: Bundle.main, value: "Curve Adjustment", comment: "section title for curve adjustment settings")
+    }()
+
+    static let postProcessingEnableGlucoseAdjustment: String = {
+        return NSLocalizedString("postProcessingEnableGlucoseAdjustment", tableName: filename, bundle: Bundle.main, value: "Enable Glucose Adjustment?", comment: "confirmation alert title before enabling the glucose offset")
+    }()
+
+    static let postProcessingEnableCurveAdjustment: String = {
+        return NSLocalizedString("postProcessingEnableCurveAdjustment", tableName: filename, bundle: Bundle.main, value: "Enable Curve Adjustment?", comment: "confirmation alert title before enabling scale and emphasis adjustments")
+    }()
+
+    static let postProcessingEnableGlucoseSmoothing: String = {
+        return NSLocalizedString("postProcessingEnableGlucoseSmoothing", tableName: filename, bundle: Bundle.main, value: "Enable Glucose Smoothing?", comment: "confirmation alert title before enabling smoothing")
+    }()
+
+    static let postProcessingGlucoseAdjustmentWarning: String = {
+        return NSLocalizedString("postProcessingGlucoseAdjustmentWarning", tableName: filename, bundle: Bundle.main, value: "Glucose Adjustment adds or subtracts a fixed offset from your sensor readings. Only enable it after confirming a consistent difference against fingerstick readings when glucose is stable. Large or persistent differences may indicate an unreliable sensor.", comment: "warning shown before enabling a fixed glucose offset")
+    }()
+
+    static let postProcessingCurveAdjustmentWarning: String = {
+        return NSLocalizedString("postProcessingCurveAdjustmentWarning", tableName: filename, bundle: Bundle.main, value: "Curve Adjustment is an advanced feature that changes how glucose values are scaled. Only enable it if you understand how Scale and Emphasis affect your readings.", comment: "warning shown before enabling glucose curve adjustments")
+    }()
+
+    static let postProcessingGlucoseSmoothingWarning: String = {
+        return NSLocalizedString("postProcessingGlucoseSmoothingWarning", tableName: filename, bundle: Bundle.main, value: "Glucose Smoothing reduces jumps, noise and fluctuations in sensor readings, but may delay or soften rapid glucose changes. Only enable it if you understand how it affects your readings. Smoothing cannot correct an inaccurate sensor.", comment: "warning shown before enabling glucose smoothing")
+    }()
+
+    static let postProcessingWarningAgreement: String = {
+        return NSLocalizedString("postProcessingWarningAgreement", tableName: filename, bundle: Bundle.main, value: "Tap OK only if you understand and agree to enable this feature.", comment: "explicit agreement required to enable a glucose post-processing feature")
+    }()
+
+    static let postProcessingLargeOffsetWarning: String = {
+        return NSLocalizedString("postProcessingLargeOffsetWarning", tableName: filename, bundle: Bundle.main, value: "Large glucose offset. Confirm against a fingerstick when glucose is stable. Persistent large differences may indicate an unreliable sensor.", comment: "inline warning shown when the absolute offset exceeds 30 mg/dL")
+    }()
+
+    static let postProcessingOffsetLimit: String = {
+        return NSLocalizedString("postProcessingOffsetLimit", tableName: filename, bundle: Bundle.main, value: "Offset exceeds the maximum of ±%@. Reduce the offset to apply this adjustment.", comment: "validation message with the maximum allowed offset and glucose unit")
+    }()
+
+    static let postProcessingOffsetAccessibility: String = {
+        return NSLocalizedString("postProcessingOffsetAccessibility", tableName: filename, bundle: Bundle.main, value: "Glucose offset: %@", comment: "accessibility label for the signed offset and its glucose unit")
+    }()
+
+    static let postProcessingInvalidAdjustment: String = {
+        return NSLocalizedString("postProcessingInvalidAdjustment", tableName: filename, bundle: Bundle.main, value: "The adjustment could not be applied. Check the offset and scale values.", comment: "alert shown when post-processing values fail validation")
+    }()
+
+    static let postProcessingAdjustmentUnavailableNativeCalibration: String = {
+        return NSLocalizedString("postProcessingAdjustmentUnavailableNativeCalibration", tableName: filename, bundle: Bundle.main, value: "Offset and shape adjustment are unavailable because this CGM uses native calibration.", comment: "explanation shown in place of adjustment controls when native CGM calibration disables them")
     }()
 
     static let postProcessingOffset: String = {
@@ -968,7 +1022,7 @@ enum Texts_HomeView {
     }()
 
     static let postProcessingSmoothing: String = {
-        return NSLocalizedString("postProcessingSmoothing", tableName: filename, bundle: Bundle.main, value: "Smoothing", comment: "post processing section title for smoothing")
+        return NSLocalizedString("postProcessingSmoothing", tableName: filename, bundle: Bundle.main, value: "Glucose Smoothing", comment: "post processing section title for smoothing")
     }()
 
     static let postProcessingStrength: String = {

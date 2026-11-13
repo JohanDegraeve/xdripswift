@@ -1,4 +1,5 @@
 import Combine
+import CoreData
 import Foundation
 import os
 import UIKit
@@ -26,6 +27,10 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 ?? legacyResult?.n
         }
     }
+
+    // An overlapping import must repeat its ID lookup if another response inserted treatments
+    // while it was waiting. Keep this revision on main with the treatment mutations.
+    @MainActor private var treatmentImportRevision = 0
 
     /// Plain snapshot used by queued historical BG replacement.
     ///
@@ -1148,6 +1153,11 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             return
         }
 
+        // Keep the source which this response belongs to. Reading it only after the HTTP reply
+        // would allow a previous server's treatments to be imported after a settings change.
+        let sourceURL = UserDefaults.standard.nightscoutUrl
+        let sourcePort = UserDefaults.standard.nightscoutPort
+
         // query for treatments older than maxHoursTreatmentsToDownload
         let queries = [URLQueryItem(name: "find[created_at][$gte]", value: String(Date(timeIntervalSinceNow: TimeInterval(hours: -ConstantsNightscout.maxHoursTreatmentsToDownload)).ISOStringFromDate()))]
         
@@ -1172,63 +1182,68 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             do {
                 // Try to serialize the data
                 if let treatmentNSResponses = try TreatmentNSResponse.arrayFromData(data) {
-                    // Be sure to use the correct thread.
-                    // Running in the completionHandler thread will result in issues.
-                    self.coreDataManager.mainManagedObjectContext.performAndWait {
-                        if treatmentNSResponses.count > 0 {
-                            trace("in getLatestTreatmentsNSResponses, %{public}@ treatments downloaded", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, treatmentNSResponses.count.description)
-                        }
-                        
-                        // newTreatmentsIfRequired will iterate through downloaded treatments and if any in it is not yet known then create an instance of TreatmentEntry for each new one
-                        // amountOfNewTreatments is the amount of new TreatmentEntries, just for tracing
-                        let amountOfNewTreatments = self.newTreatmentsIfRequired(treatmentNSResponses: treatmentNSResponses)
-                        
-                        if amountOfNewTreatments > 0 {
-                            trace("in getLatestTreatmentsNSResponses, %{public}@ new treatmentEntries created", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfNewTreatments.description)
-                        }
-                        
-                        // main goal of the function is not to upload, but to download. However the response from NS will be used to verify if it has any of the treatments that has no id yet in coredata
-                        let amountMarkedAsUploaded = self.checkIfUploaded(forTreatmentEntries: treatmentsToSync, inTreatmentNSResponses: treatmentNSResponses)
-                        
-                        if amountMarkedAsUploaded > 0 {
-                            trace("in getLatestTreatmentsNSResponses, %{public}@ treatmentEntries found in response which were not yet marked as uploaded", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountMarkedAsUploaded.description)
-                        }
-                        
-                        let amountOfUpdatedTreatments = self.checkIfChangedAtNightscout(forTreatmentEntries: treatmentsToSync, inTreatmentNSResponses: treatmentNSResponses)
-                        
-                        if amountOfUpdatedTreatments > 0 {
-                            trace("in getLatestTreatmentsNSResponses, %{public}@ treatmentEntries found that were updated at NS and updated locally", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfUpdatedTreatments.description)
-                        }
-                        
-                        // Bulk results may be truncated. Confirm missing records individually before
-                        // applying remote deletions to local treatments.
-                        let totalActivity = amountOfNewTreatments + amountMarkedAsUploaded + amountOfUpdatedTreatments
-                        if totalActivity > 0 {
-                            trace("in getLatestTreatmentsNSResponses, Nightscout sync summary: new = %{public}@, markedUploaded = %{public}@, updated = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfNewTreatments.description, amountMarkedAsUploaded.description, amountOfUpdatedTreatments.description)
-                        }
-                        
-                        self.coreDataManager.saveChanges()
-                        
-                        let siteURL = UserDefaults.standard.nightscoutUrl
-                        let sitePort = UserDefaults.standard.nightscoutPort
-                        self.reconcileRemoteTreatmentDeletions(treatments: treatmentsToSync, downloaded: treatmentNSResponses, lookup: { remoteID, finished in
-                            let queries = [URLQueryItem(name: "find[_id]", value: remoteID), URLQueryItem(name: "count", value: "1")]
-                            self.performHTTPRequest(path: self.nightscoutTreatmentPath, queries: queries, httpMethod: "GET") { data, result in
-                                // A response from a previous source must not remove current local data.
-                                guard UserDefaults.standard.nightscoutUrl == siteURL,
-                                      UserDefaults.standard.nightscoutPort == sitePort,
-                                      UserDefaults.standard.dataFlowPolicy.importsTreatmentsFromNightscout else {
-                                    finished(nil, false)
-                                    return
-                                }
-                                finished(data, result.successFull())
+                    // Per-treatment existence fetches here blocked main long enough for a scene
+                    // update watchdog termination. Resolve IDs on the private context, then return
+                    // to main for the existing mutation, save and reconciliation steps.
+                    Task { @MainActor in
+                        do {
+                            if treatmentNSResponses.count > 0 {
+                                trace("in getLatestTreatmentsNSResponses, %{public}@ treatments downloaded", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, treatmentNSResponses.count.description)
                             }
-                        }) { deleted in
-                            // Include deletions so the normal sync completion refreshes the list and chart.
-                            completionHandler(.success(amountOfUpdatedTreatments + amountOfNewTreatments + deleted))
+                            let amountOfNewTreatments = try await self.newTreatmentsIfRequired(treatmentNSResponses: treatmentNSResponses, sourceURL: sourceURL, sourcePort: sourcePort)
+
+                            if amountOfNewTreatments > 0 {
+                                trace("in getLatestTreatmentsNSResponses, %{public}@ new treatmentEntries created", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfNewTreatments.description)
+                            }
+                        
+                            // main goal of the function is not to upload, but to download. However the response from NS will be used to verify if it has any of the treatments that has no id yet in coredata
+                            let amountMarkedAsUploaded = self.checkIfUploaded(forTreatmentEntries: treatmentsToSync, inTreatmentNSResponses: treatmentNSResponses)
+                        
+                            if amountMarkedAsUploaded > 0 {
+                                trace("in getLatestTreatmentsNSResponses, %{public}@ treatmentEntries found in response which were not yet marked as uploaded", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountMarkedAsUploaded.description)
+                            }
+                        
+                            let amountOfUpdatedTreatments = self.checkIfChangedAtNightscout(forTreatmentEntries: treatmentsToSync, inTreatmentNSResponses: treatmentNSResponses)
+                        
+                            if amountOfUpdatedTreatments > 0 {
+                                trace("in getLatestTreatmentsNSResponses, %{public}@ treatmentEntries found that were updated at NS and updated locally", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfUpdatedTreatments.description)
+                            }
+                        
+                            // Bulk results may be truncated. Confirm missing records individually before
+                            // applying remote deletions to local treatments.
+                            let totalActivity = amountOfNewTreatments + amountMarkedAsUploaded + amountOfUpdatedTreatments
+                            if totalActivity > 0 {
+                                trace("in getLatestTreatmentsNSResponses, Nightscout sync summary: new = %{public}@, markedUploaded = %{public}@, updated = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfNewTreatments.description, amountMarkedAsUploaded.description, amountOfUpdatedTreatments.description)
+                            }
+                        
+                            self.coreDataManager.saveChanges()
+                        
+                            let siteURL = UserDefaults.standard.nightscoutUrl
+                            let sitePort = UserDefaults.standard.nightscoutPort
+                            self.reconcileRemoteTreatmentDeletions(treatments: treatmentsToSync, downloaded: treatmentNSResponses, lookup: { remoteID, finished in
+                                let queries = [URLQueryItem(name: "find[_id]", value: remoteID), URLQueryItem(name: "count", value: "1")]
+                                self.performHTTPRequest(path: self.nightscoutTreatmentPath, queries: queries, httpMethod: "GET") { data, result in
+                                    // A response from a previous source must not remove current local data.
+                                    guard UserDefaults.standard.nightscoutUrl == siteURL,
+                                          UserDefaults.standard.nightscoutPort == sitePort,
+                                          UserDefaults.standard.dataFlowPolicy.importsTreatmentsFromNightscout else {
+                                        finished(nil, false)
+                                        return
+                                    }
+                                    finished(data, result.successFull())
+                                }
+                            }) { deleted in
+                                // Include deletions so the normal sync completion refreshes the list and chart.
+                                completionHandler(.success(amountOfUpdatedTreatments + amountOfNewTreatments + deleted))
+                            }
+                        } catch {
+                            // A failed ID lookup must not be treated as an empty database, which
+                            // would import existing treatments a second time. Leave this pass failed.
+                            trace("in getLatestTreatmentsNSResponses, treatment import failed: %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+                            completionHandler(.failed)
                         }
                     }
-                    
+
                 } else {
                     if let dataAsString = String(bytes: data, encoding: .utf8) {
                         trace("in getLatestTreatmentsNSResponses, JSON serialization failed. data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, dataAsString)
@@ -2131,29 +2146,79 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         return amountOfNewTreatmentEntries
     }
     
-    /// filters on treatments that are net yet known, and for those creates a TreatMentEntry
-    /// - parameters:
-    ///     - treatmentNSResponses : array of TreatmentNSResponse
-    /// - returns: number of newly created TreatmentEntry's
-    ///
-    /// !! new treatments are stored in coredata after calling this function - no saveChanges to coredata is done here in this function
-    private func newTreatmentsIfRequired(treatmentNSResponses: [TreatmentNSResponse]) -> Int {
-        // returnvalue
+    /// Resolves existing IDs off-main, then creates missing treatments on main without saving.
+    /// The caller retains the existing save, upload acknowledgement and deletion reconciliation order.
+    @MainActor func newTreatmentsIfRequired(
+        treatmentNSResponses: [TreatmentNSResponse],
+        sourceURL: String? = UserDefaults.standard.nightscoutUrl,
+        sourcePort: Int = UserDefaults.standard.nightscoutPort
+    ) async throws -> Int {
+        let mainContext = coreDataManager.mainManagedObjectContext
+        let context = coreDataManager.privateManagedObjectContext
+        let downloadedIDs = treatmentNSResponses.map(\.id)
+        let pendingTreatments = mainContext.insertedObjects.union(mainContext.updatedObjects)
+            .union(mainContext.deletedObjects).compactMap { $0 as? TreatmentEntry }
+
+        // This replaces one main-thread SQL lookup per downloaded treatment with one private
+        // fetch for the response's IDs. Do not use treatmentsToSync as the existence set: it only
+        // contains the latest 50 entries, while a download can contain hundreds of older entries.
+        var existingIDs: [NSManagedObjectID: String]
+        var revision: Int
+        repeat {
+            try Task.checkCancellation()
+            revision = treatmentImportRevision
+            existingIDs = try await context.perform {
+                let request: NSFetchRequest<TreatmentEntry> = TreatmentEntry.fetchRequest()
+                request.predicate = NSPredicate(format: "id IN %@", downloadedIDs)
+                request.returnsObjectsAsFaults = false
+                let treatments = try context.fetch(request)
+                // Return values and object IDs only. Include soft-deleted entries, as the previous
+                // existence check did, and include pending parent changes before its asynchronous save.
+                return Dictionary(uniqueKeysWithValues: treatments.map { ($0.objectID, $0.id) })
+            }
+            // Awaiting the store allows another response to insert and save on main. Its save
+            // can clear insertedObjects before this response resumes, so the pending-object
+            // overlay alone is insufficient. Refresh only a lookup made stale by that insertion.
+        } while revision != treatmentImportRevision
+        try Task.checkCancellation()
+        // The HTTP request and the private lookup both yield. Reject a response from an old
+        // source before creating anything or continuing with acknowledgements and deletions.
+        guard UserDefaults.standard.nightscoutUrl == sourceURL,
+              UserDefaults.standard.nightscoutPort == sourcePort,
+              UserDefaults.standard.dataFlowPolicy.importsTreatmentsFromNightscout else {
+            throw CancellationError()
+        }
+
+        // A local insertion or ID edit may not have reached the parent yet. Overlay main's
+        // pending objects after the fetch, including changes made while that fetch was waiting.
+        let pending = Set(pendingTreatments).union(mainContext.insertedObjects.compactMap { $0 as? TreatmentEntry })
+            .union(mainContext.updatedObjects.compactMap { $0 as? TreatmentEntry })
+            .union(mainContext.deletedObjects.compactMap { $0 as? TreatmentEntry })
+        for treatment in pending {
+            existingIDs.removeValue(forKey: treatment.objectID)
+            if treatment.managedObjectContext != nil, !treatment.isDeleted {
+                existingIDs[treatment.objectID] = treatment.id
+            }
+        }
+        var knownIDs = Set(existingIDs.values)
         var numberOfNewTreatments = 0
-        
         for treatmentNSResponse in treatmentNSResponses {
-            if !treatmentEntryAccessor.existsTreatmentWithId(treatmentNSResponse.id) {
-                if treatmentNSResponse.asNewTreatmentEntry(nsManagedObjectContext: coreDataManager.mainManagedObjectContext) != nil {
-                    numberOfNewTreatments = numberOfNewTreatments + 1
-                    
+            if !knownIDs.contains(treatmentNSResponse.id) {
+                if treatmentNSResponse.asNewTreatmentEntry(nsManagedObjectContext: mainContext) != nil {
+                    // The old fetch saw earlier insertions in this same pass. Preserve that
+                    // behaviour for duplicate response IDs without performing another SQL query.
+                    knownIDs.insert(treatmentNSResponse.id)
+                    numberOfNewTreatments += 1
                     trace("in newTreatmentsIfRequired, new treatmentEntry created with id %{public}@ and date %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, treatmentNSResponse.id, treatmentNSResponse.createdAt.toStringForTrace(timeStyle: .long, dateStyle: .long))
                 }
             }
         }
-        
+        if numberOfNewTreatments > 0 {
+            treatmentImportRevision += 1
+        }
         return numberOfNewTreatments
     }
-    
+
     private func callMessageHandler(withCredentialVerificationResult success: Bool, error: Error?) {
         // define the title text
         var title = TextsNightscout.verificationSuccessfulAlertTitle

@@ -126,7 +126,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "Inserisci manualmente il codice del sensore, scansiona l’etichetta del sensore o scegli una foto.\n\nSe non hai il codice o vuoi usare una sessione del sensore già attiva sul trasmettitore, scegli Usa senza codice.";
+"enterSensorCode" = "Scansiona l’etichetta del sensore o scegli una foto per leggere il codice del sensore.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -296,7 +296,28 @@
 "sensorCodeContinue" = "Continua";
 "useWithoutSensorCode" = "Usa senza codice";
 "noSensorCode" = "Nessun codice (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Inserisci manualmente il codice di abbinamento a quattro cifre, scansiona l’applicatore attuale o scegli una foto. Controlla il codice selezionato, poi tocca Continua.";
+"dexcomG7SelectSensorCodeMessage" = "Scansiona l’applicatore attuale o scegli una foto per leggere il codice di abbinamento a quattro cifre. Controlla il codice selezionato, poi tocca Continua.";
 "noSensorCodeSelectedTitle" = "Continuare senza codice del sensore?";
 "noSensorCodeSelectedMessage" = "Se sul trasmettitore è già attiva una sessione del sensore, l’app userà quella sessione con i suoi requisiti di calibrazione esistenti.\n\nAvviare una nuova sessione senza codice richiede calibrazioni dopo il riscaldamento e periodicamente in seguito. Disattivare il promemoria di calibrazione dell’app non elimina questi requisiti.";
 "showHideGlucoseChartTitle" = "Grafico";
+"manualSensorCodeEntryFooter" = "Se non puoi scansionare l’etichetta o usare una foto, inserisci manualmente il codice a quattro cifre.";
+"useWithoutSensorCodeFooter" = "Se non hai il codice o vuoi usare una sessione del sensore già attiva sul trasmettitore, scegli Usa senza codice.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "Regolazione del glucosio";
+"postProcessingSmoothing" = "Smoothing del glucosio";
+"postProcessingCurveAdjustment" = "Regolazione della curva";
+"postProcessingEnableGlucoseAdjustment" = "Attivare la regolazione del glucosio?";
+"postProcessingEnableCurveAdjustment" = "Attivare la regolazione della curva?";
+"postProcessingEnableGlucoseSmoothing" = "Attivare lo smoothing del glucosio?";
+"postProcessingGlucoseAdjustmentWarning" = "La regolazione del glucosio aggiunge o sottrae un offset fisso alle letture del sensore. Attivala solo dopo aver confermato una differenza costante rispetto alle misurazioni capillari quando il glucosio è stabile. Differenze ampie o persistenti possono indicare un sensore inaffidabile.";
+"postProcessingCurveAdjustmentWarning" = "La regolazione della curva è una funzione avanzata che modifica la scala dei valori di glucosio. Attivala solo se comprendi come Scala ed Enfasi influiscono sulle letture.";
+"postProcessingGlucoseSmoothingWarning" = "Lo smoothing del glucosio riduce salti, rumore e fluttuazioni nelle letture del sensore, ma può ritardare o attenuare i cambiamenti rapidi del glucosio. Attivalo solo se comprendi come influisce sulle letture. Lo smoothing non può correggere un sensore impreciso.";
+"postProcessingLargeOffsetWarning" = "Offset del glucosio elevato. Verifica con una misurazione capillare quando il glucosio è stabile. Differenze ampie e persistenti possono indicare un sensore inaffidabile.";
+"postProcessingOffsetLimit" = "L’offset supera il massimo di ±%@. Riducilo per applicare questa regolazione.";
+"postProcessingOffsetAccessibility" = "Offset del glucosio: %@";
+"postProcessingInvalidAdjustment" = "Impossibile applicare la regolazione. Controlla i valori di offset e scala.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "La regolazione dell'offset e della forma non è disponibile perché questo CGM usa la calibrazione nativa.";
+
+"postProcessingWarningAgreement" = "Tocca OK solo se comprendi questa funzione e accetti di attivarla.";

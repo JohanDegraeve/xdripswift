@@ -104,7 +104,7 @@
 "failedToSendEmail" = "Failed to Send Email";
 
 /// in Settings, to enable debug level in trace file
-"debugLevel" = "Include Debug Level";
+"debugLevel" = "Użyj poziomu debugowania";
 
 /// shown on top of the first settings screen
 "m5stack_settingsviews_settingstitle" = "M5 Stack Settings";
@@ -173,7 +173,7 @@
 "settingsviews_sectiontitleNotifications" = "Notifications";
 
 /// in Settings, row title to send settings
-"sendTraceFile" = "Wyślij raport problemu";
+"sendTraceFile" = "Wyślij e-mailem";
 "settingsviews_issueReportTitle" = "Raport problemu";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
@@ -228,8 +228,6 @@
 /// dexcom share settings, section title
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
 
-/// Text in pop up shown when user wants to send the trace file
-"describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
 
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
 "warningChangeFromMasterToFollower" = "Switching from Master to Follower will stop your current sensor. Do you want to continue?";
@@ -826,3 +824,18 @@
 /* Speak Glucose wording and preview. */
 "speak.introduction" = "Czytaj wprowadzenie";
 "speak.preview" = "Przetestuj odczyt glukozy";
+
+/* Issue Report */
+"settingsviews_includeWatchLogs" = "Dołącz logi Watch";
+"settingsviews_reportWatchFooter" = "Pobierz logi Direct to Watch z połączonego Watch.";
+"settingsviews_reportSendFooter" = "Przygotuj e-mail do programistów xDrip4iOS.";
+"settingsviews_requestingWatchLogs" = "Pobieranie...";
+"settingsviews_watchLogsNotReceived" = "Nie otrzymano logów Watch";
+"settingsviews_watchLogsTimeout" = "Nie otrzymano logów Watch w ciągu 8 sekund. Spróbuj ponownie lub wyślij raport bez nich.";
+"settingsviews_watchLogsFailure" = "Nie udało się odebrać logów Watch. Spróbuj ponownie lub wyślij raport bez nich.";
+"settingsviews_openWatchApp" = "Otwórz aplikację Watch";
+"settingsviews_confirmWatchAppOpen" = "Otwórz %@ na Watch i pozostaw aplikację otwartą do odebrania logów.\n\nCzy jest teraz otwarta?";
+"settingsviews_reportShareFooter" = "Udostępnij pliki dziennika.";
+"settingsviews_shareReport" = "Udostępnij raport";
+"settingsviews_shareIssueReport" = "Udostępnij raport o problemie";
+"settingsviews_reportShareFailed" = "Nie udało się przygotować plików dziennika. Spróbuj ponownie.";

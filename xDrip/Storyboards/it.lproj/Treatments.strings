@@ -37,7 +37,7 @@
 "treatments_basalInjection" = "Basale (iniezione)";
 "treatments_insulinDescription" = "Tipo di insulina";
 "treatments_insulinDescriptionPlaceholder" = "ad es. Tresiba";
-"treatments_invalidBasalInjectionValueMessage" = "Inserisci un numero intero di unità maggiore di zero.";
+"treatments_invalidBasalInjectionValueMessage" = "Inserisci più di 0 e fino a 150 unità, in incrementi di 0,5.";
 
 /* Footer shown when a new basal injection is prefilled from the previous entry. */
 "treatments_basalInjectionCopiedFooter" = "La quantità e il tipo di insulina basale sono stati copiati dalla voce precedente";

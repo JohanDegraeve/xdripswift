@@ -110,7 +110,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "Gib den Sensorcode manuell ein, scanne das Sensoretikett oder wähle ein Foto aus.\n\nWenn du den Code nicht hast oder eine bereits auf dem Transmitter laufende Sensorsitzung verwenden möchtest, wähle Ohne Code verwenden.";
+"enterSensorCode" = "Scanne das Sensoretikett oder wähle ein Foto aus, um den Sensorcode zu lesen.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -279,7 +279,28 @@
 "sensorCodeContinue" = "Weiter";
 "useWithoutSensorCode" = "Ohne Code verwenden";
 "noSensorCode" = "Kein Code (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Gib den vierstelligen Kopplungscode manuell ein, scanne den aktuellen Applikator oder wähle ein Foto aus. Prüfe den ausgewählten Code und tippe auf Weiter.";
+"dexcomG7SelectSensorCodeMessage" = "Scanne den aktuellen Applikator oder wähle ein Foto aus, um den vierstelligen Kopplungscode zu lesen. Prüfe den ausgewählten Code und tippe auf Weiter.";
 "noSensorCodeSelectedTitle" = "Ohne Sensorcode fortfahren?";
 "noSensorCodeSelectedMessage" = "Wenn auf dem Transmitter bereits eine Sensorsitzung läuft, verwendet die App diese Sitzung mit ihren bestehenden Kalibrierungsanforderungen.\n\nEine neue Sitzung ohne Code erfordert Kalibrierungen nach der Aufwärmphase und danach in regelmäßigen Abständen. Das Ausschalten der Kalibrierungserinnerung der App hebt diese Anforderungen nicht auf.";
 "showHideGlucoseChartTitle" = "Diagramm";
+"manualSensorCodeEntryFooter" = "Wenn du das Etikett nicht scannen oder kein Foto verwenden kannst, gib den vierstelligen Code manuell ein.";
+"useWithoutSensorCodeFooter" = "Wenn du den Code nicht hast oder eine bereits auf dem Transmitter laufende Sensorsitzung verwenden möchtest, wähle Ohne Code verwenden.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "Glukoseanpassung";
+"postProcessingSmoothing" = "Glukoseglättung";
+"postProcessingCurveAdjustment" = "Kurvenanpassung";
+"postProcessingEnableGlucoseAdjustment" = "Glukoseanpassung aktivieren?";
+"postProcessingEnableCurveAdjustment" = "Kurvenanpassung aktivieren?";
+"postProcessingEnableGlucoseSmoothing" = "Glukoseglättung aktivieren?";
+"postProcessingGlucoseAdjustmentWarning" = "Die Glukoseanpassung addiert oder subtrahiert einen festen Offset zu den Sensorwerten. Aktiviere sie nur, wenn du bei stabiler Glukose eine gleichbleibende Abweichung zu blutigen Messungen bestätigt hast. Große oder anhaltende Abweichungen können auf einen unzuverlässigen Sensor hinweisen.";
+"postProcessingCurveAdjustmentWarning" = "Die Kurvenanpassung ist eine erweiterte Funktion, die die Skalierung der Glukosewerte verändert. Aktiviere sie nur, wenn du verstehst, wie Skalierung und Gewichtung deine Messwerte beeinflussen.";
+"postProcessingGlucoseSmoothingWarning" = "Die Glukoseglättung reduziert Sprünge, Rauschen und Schwankungen der Sensorwerte, kann jedoch schnelle Glukoseänderungen verzögern oder abschwächen. Aktiviere sie nur, wenn du ihre Auswirkungen auf deine Messwerte verstehst. Eine Glättung kann einen ungenauen Sensor nicht korrigieren.";
+"postProcessingLargeOffsetWarning" = "Großer Glukose-Offset. Prüfe bei stabiler Glukose mit einer blutigen Messung. Anhaltende große Abweichungen können auf einen unzuverlässigen Sensor hinweisen.";
+"postProcessingOffsetLimit" = "Der Offset überschreitet das Maximum von ±%@. Verringere ihn, um diese Anpassung anzuwenden.";
+"postProcessingOffsetAccessibility" = "Glukose-Offset: %@";
+"postProcessingInvalidAdjustment" = "Die Anpassung konnte nicht angewendet werden. Prüfe die Werte für Offset und Skalierung.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "Offset- und Formanpassung sind nicht verfügbar, da dieses CGM eine eigene Kalibrierung verwendet.";
+
+"postProcessingWarningAgreement" = "Tippe nur auf „OK“, wenn du diese Funktion verstehst und ihrer Aktivierung zustimmst.";

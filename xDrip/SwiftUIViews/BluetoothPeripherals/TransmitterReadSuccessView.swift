@@ -70,6 +70,7 @@ struct TransmitterReadSuccessView: View {
         .background(ConstantsUI.listBackGroundColor)
         .navigationTitle(Texts_BluetoothPeripheralView.readSuccess)
         .navigationBarTitleDisplayMode(.large)
+        .onlineHelp(.readSuccess)
         .colorScheme(.dark)
     }
 

@@ -47,7 +47,7 @@
 "stopSensorConfirmation" = "Oletko varma, että haluat pysäyttää sensorin?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "Syötä anturin koodi käsin, skannaa anturin etiketti tai valitse kuva.\n\nJos sinulla ei ole koodia tai haluat käyttää lähettimessä jo käynnissä olevaa anturijaksoa, valitse Käytä ilman koodia.";
+"enterSensorCode" = "Skannaa anturin etiketti tai valitse kuva anturin koodin lukemiseksi.";
 
 /// status info : literally 'Sensor End'
 "sensorend" = "Sensori loppuu";
@@ -193,7 +193,28 @@
 "sensorCodeContinue" = "Jatka";
 "useWithoutSensorCode" = "Käytä ilman koodia";
 "noSensorCode" = "Ei koodia (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Syötä nelinumeroinen pariliitoskoodi käsin, skannaa nykyinen asetin tai valitse kuva. Tarkista valittu koodi ja napauta Jatka.";
+"dexcomG7SelectSensorCodeMessage" = "Skannaa nykyinen asetin tai valitse kuva nelinumeroisen pariliitoskoodin lukemiseksi. Tarkista valittu koodi ja napauta Jatka.";
 "noSensorCodeSelectedTitle" = "Jatketaanko ilman anturin koodia?";
 "noSensorCodeSelectedMessage" = "Jos lähettimessä on jo käynnissä anturijakso, sovellus käyttää sitä sen nykyisten kalibrointivaatimusten mukaisesti.\n\nUuden jakson aloittaminen ilman koodia edellyttää kalibrointeja lämpenemisen jälkeen ja myöhemmin säännöllisesti. Sovelluksen kalibrointimuistutuksen poistaminen käytöstä ei poista näitä vaatimuksia.";
 "showHideGlucoseChartTitle" = "Kaavio";
+"manualSensorCodeEntryFooter" = "Jos et voi skannata etikettiä tai käyttää kuvaa, syötä nelinumeroinen koodi käsin.";
+"useWithoutSensorCodeFooter" = "Jos sinulla ei ole koodia tai haluat käyttää lähettimessä jo käynnissä olevaa anturijaksoa, valitse Käytä ilman koodia.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "Glukoosin säätö";
+"postProcessingSmoothing" = "Glukoosin tasoitus";
+"postProcessingCurveAdjustment" = "Käyrän säätö";
+"postProcessingEnableGlucoseAdjustment" = "Otetaanko glukoosin säätö käyttöön?";
+"postProcessingEnableCurveAdjustment" = "Otetaanko käyrän säätö käyttöön?";
+"postProcessingEnableGlucoseSmoothing" = "Otetaanko glukoosin tasoitus käyttöön?";
+"postProcessingGlucoseAdjustmentWarning" = "Glukoosin säätö lisää sensorilukemiin kiinteän siirtymän tai vähentää sen niistä. Ota se käyttöön vasta, kun olet varmistanut tasaisen eron sormenpäämittauksiin glukoosin ollessa vakaa. Suuret tai jatkuvat erot voivat viitata epäluotettavaan sensoriin.";
+"postProcessingCurveAdjustmentWarning" = "Käyrän säätö on lisätoiminto, joka muuttaa glukoosiarvojen skaalausta. Ota se käyttöön vain, jos ymmärrät, miten skaalaus ja painotus vaikuttavat lukemiisi.";
+"postProcessingGlucoseSmoothingWarning" = "Glukoosin tasoitus vähentää sensorilukemien hyppyjä, kohinaa ja vaihtelua, mutta voi viivästyttää tai vaimentaa nopeita glukoosimuutoksia. Ota se käyttöön vain, jos ymmärrät sen vaikutuksen lukemiisi. Tasoitus ei voi korjata epätarkkaa sensoria.";
+"postProcessingLargeOffsetWarning" = "Suuri glukoosisiirtymä. Tarkista sormenpäämittauksella glukoosin ollessa vakaa. Jatkuvat suuret erot voivat viitata epäluotettavaan sensoriin.";
+"postProcessingOffsetLimit" = "Siirtymä ylittää enimmäisarvon ±%@. Pienennä siirtymää, jotta säätö voidaan ottaa käyttöön.";
+"postProcessingOffsetAccessibility" = "Glukoosisiirtymä: %@";
+"postProcessingInvalidAdjustment" = "Säätöä ei voitu ottaa käyttöön. Tarkista siirtymä ja skaalaus.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "Siirtymän ja muodon säätö ei ole käytettävissä, koska tämä CGM käyttää omaa kalibrointiaan.";
+
+"postProcessingWarningAgreement" = "Napauta OK vain, jos ymmärrät tämän ominaisuuden ja hyväksyt sen käyttöönoton.";

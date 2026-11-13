@@ -44,7 +44,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "Introduza o código do sensor manualmente, leia a etiqueta do sensor com a câmara ou escolha uma fotografia.\n\nSe não tiver o código ou quiser usar uma sessão de sensor já ativa no transmissor, escolha Usar sem código.";
+"enterSensorCode" = "Leia a etiqueta do sensor com a câmara ou escolha uma fotografia para ler o código do sensor.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -213,7 +213,28 @@
 "sensorCodeContinue" = "Continuar";
 "useWithoutSensorCode" = "Usar sem código";
 "noSensorCode" = "Sem código (0000)";
-"dexcomG7SelectSensorCodeMessage" = "Introduza manualmente o código de emparelhamento de quatro dígitos, leia o aplicador atual com a câmara ou escolha uma fotografia. Verifique o código selecionado e toque em Continuar.";
+"dexcomG7SelectSensorCodeMessage" = "Leia o aplicador atual com a câmara ou escolha uma fotografia para ler o código de emparelhamento de quatro dígitos. Verifique o código selecionado e toque em Continuar.";
 "noSensorCodeSelectedTitle" = "Continuar sem código do sensor?";
 "noSensorCodeSelectedMessage" = "Se já existir uma sessão de sensor ativa no transmissor, a app usará essa sessão com os seus requisitos de calibração existentes.\n\nIniciar uma nova sessão sem código exige calibrações após o aquecimento e periodicamente depois disso. Desativar o lembrete de calibração da app não elimina estes requisitos.";
 "showHideGlucoseChartTitle" = "Gráfico";
+"manualSensorCodeEntryFooter" = "Se não conseguir ler a etiqueta com a câmara nem usar uma fotografia, introduza manualmente o código de quatro dígitos.";
+"useWithoutSensorCodeFooter" = "Se não tiver o código ou quiser usar uma sessão de sensor já ativa no transmissor, escolha Usar sem código.";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "Ajuste da glicose";
+"postProcessingSmoothing" = "Suavização da glicose";
+"postProcessingCurveAdjustment" = "Ajuste da curva";
+"postProcessingEnableGlucoseAdjustment" = "Ativar o ajuste da glicose?";
+"postProcessingEnableCurveAdjustment" = "Ativar o ajuste da curva?";
+"postProcessingEnableGlucoseSmoothing" = "Ativar a suavização da glicose?";
+"postProcessingGlucoseAdjustmentWarning" = "O ajuste da glicose soma ou subtrai um desvio fixo às leituras do sensor. Ative-o apenas depois de confirmar uma diferença constante face a medições capilares quando a glicose estiver estável. Diferenças grandes ou persistentes podem indicar um sensor pouco fiável.";
+"postProcessingCurveAdjustmentWarning" = "O ajuste da curva é uma função avançada que altera a escala dos valores de glicose. Ative-o apenas se compreender como a escala e a ênfase afetam as leituras.";
+"postProcessingGlucoseSmoothingWarning" = "A suavização da glicose reduz saltos, ruído e flutuações nas leituras do sensor, mas pode atrasar ou atenuar alterações rápidas da glicose. Ative-a apenas se compreender como afeta as leituras. A suavização não pode corrigir um sensor impreciso.";
+"postProcessingLargeOffsetWarning" = "Desvio de glicose elevado. Confirme com uma medição capilar quando a glicose estiver estável. Diferenças grandes e persistentes podem indicar um sensor pouco fiável.";
+"postProcessingOffsetLimit" = "O desvio ultrapassa o máximo de ±%@. Reduza-o para aplicar este ajuste.";
+"postProcessingOffsetAccessibility" = "Desvio da glicose: %@";
+"postProcessingInvalidAdjustment" = "Não foi possível aplicar o ajuste. Verifique os valores de desvio e escala.";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "O ajuste do desvio e da forma não está disponível porque este CGM usa calibração própria.";
+
+"postProcessingWarningAgreement" = "Toque em OK apenas se compreender esta funcionalidade e concordar em ativá-la.";

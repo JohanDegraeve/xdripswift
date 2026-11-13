@@ -772,7 +772,14 @@ final class WatchStateModel: NSObject, ObservableObject {
         let dictionary = DirectWatchCompatibility.normalized(dictionary)
         processDirectWatchConfiguration(dictionary)
         directWatchCollector.acknowledge(dictionary)
-        if dictionary["directWatchRequestLogs"] as? Bool == true { directWatchCollector.sendLogs() }
+        if dictionary["directWatchRequestLogs"] as? Bool == true {
+            let requestID = dictionary["directWatchLogRequestID"] as? String
+            if !directWatchCollector.sendLogs(requestID: requestID), let requestID,
+               WCSession.default.activationState == .activated, WCSession.default.isReachable {
+                let failure: [String: Any] = ["directWatchLogFailed": true, "directWatchLogRequestID": requestID]
+                WCSession.default.sendMessage(DirectWatchCompatibility.outgoing(failure), replyHandler: nil, errorHandler: nil)
+            }
+        }
         var processedUpdate = false
 
         if let statusDictionary = dictionary["status"] as? [String: Any] {
@@ -1013,6 +1020,21 @@ extension WatchStateModel: WCSessionDelegate {
     }
 
     func session(_: WCSession, didReceiveMessageData _: Data) {}
+
+    func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+        let message = DirectWatchCompatibility.normalized(message)
+        DispatchQueue.main.async {
+            if message["directWatchRequestLogs"] as? Bool == true,
+               let requestID = message[DirectWatchLogReply.requestIDKey] as? String,
+               let offset = message[DirectWatchLogReply.offsetKey] as? Int {
+                let reply = self.directWatchCollector.reportLogReply(requestID: requestID, offset: offset)
+                replyHandler(DirectWatchCompatibility.outgoing(reply))
+            } else {
+                self.processWatchPayloadFromDictionary(dictionary: message)
+                replyHandler([:])
+            }
+        }
+    }
 
     func session(_: WCSession, didReceiveMessage message: [String: Any]) {
         DispatchQueue.main.async {

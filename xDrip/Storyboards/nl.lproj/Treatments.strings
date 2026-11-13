@@ -37,7 +37,7 @@
 "treatments_basalInjection" = "Basaal (injectie)";
 "treatments_insulinDescription" = "Insulinetype";
 "treatments_insulinDescriptionPlaceholder" = "bijv. Tresiba";
-"treatments_invalidBasalInjectionValueMessage" = "Voer een geheel aantal eenheden groter dan nul in.";
+"treatments_invalidBasalInjectionValueMessage" = "Voer meer dan 0 en maximaal 150 eenheden in, in stappen van 0,5.";
 
 /* Footer shown when a new basal injection is prefilled from the previous entry. */
 "treatments_basalInjectionCopiedFooter" = "De hoeveelheid en het type basale insuline zijn overgenomen uit de vorige invoer";

@@ -164,7 +164,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         let screenLockLinkRows = [
             SettingsRow(id: "homeScreen.screenLock", title: Texts_SettingsView.homeScreenScreenLockSectionTitle, accessory: .disclosure, action: .settingsScreen {
-                SettingsScreen(title: Texts_SettingsView.homeScreenScreenLockSectionTitle, onlineHelpTopic: .glucoseDisplay, providers: {
+                SettingsScreen(title: Texts_SettingsView.homeScreenScreenLockSectionTitle, providers: {
                     [SettingsViewHomeScreenSettingsViewModel(rowGroup: .screenLock)]
                 })
             })

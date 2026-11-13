@@ -83,7 +83,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "手动输入传感器代码、扫描传感器标签或选择照片。\n\n如果您没有代码，或想使用发射器上已在运行的传感器会话，请选择“不使用代码”。";
+"enterSensorCode" = "扫描传感器标签或选择照片以读取传感器代码。";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -230,7 +230,28 @@
 "sensorCodeContinue" = "继续";
 "useWithoutSensorCode" = "不使用代码";
 "noSensorCode" = "无代码 (0000)";
-"dexcomG7SelectSensorCodeMessage" = "手动输入四位配对代码、扫描当前的传感器助针器或选择照片。确认所选代码后，轻点“继续”。";
+"dexcomG7SelectSensorCodeMessage" = "扫描当前的传感器助针器或选择照片以读取四位配对代码。确认所选代码后，轻点“继续”。";
 "noSensorCodeSelectedTitle" = "不使用传感器代码继续？";
 "noSensorCodeSelectedMessage" = "如果发射器上已有正在运行的传感器会话，应用将使用该会话并保留其现有校准要求。\n\n不使用代码启动新会话时，需要在预热后进行校准，并在之后定期校准。关闭应用的校准提醒并不会取消这些要求。";
 "showHideGlucoseChartTitle" = "图表";
+"manualSensorCodeEntryFooter" = "如果无法扫描标签或使用照片，请手动输入四位代码。";
+"useWithoutSensorCodeFooter" = "如果您没有代码，或想使用发射器上已在运行的传感器会话，请选择“不使用代码”。";
+
+// Glucose adjustment safety and separate curve controls
+"postProcessingAdjustment" = "葡萄糖调整";
+"postProcessingSmoothing" = "葡萄糖平滑";
+"postProcessingCurveAdjustment" = "曲线调整";
+"postProcessingEnableGlucoseAdjustment" = "启用葡萄糖调整？";
+"postProcessingEnableCurveAdjustment" = "启用曲线调整？";
+"postProcessingEnableGlucoseSmoothing" = "启用葡萄糖平滑？";
+"postProcessingGlucoseAdjustmentWarning" = "葡萄糖调整会在传感器读数上增加或减去固定偏移量。仅在葡萄糖稳定时，通过指尖血测量确认存在一致差异后启用。差异较大或持续存在可能表明传感器不可靠。";
+"postProcessingCurveAdjustmentWarning" = "曲线调整是一项更改葡萄糖数值缩放方式的高级功能。仅在了解缩放和侧重如何影响读数时启用。";
+"postProcessingGlucoseSmoothingWarning" = "葡萄糖平滑可减少传感器读数中的跳变、噪声和波动，但可能延迟或减弱葡萄糖的快速变化。仅在了解其对读数的影响时启用。平滑无法纠正不准确的传感器。";
+"postProcessingLargeOffsetWarning" = "葡萄糖偏移量较大。请在葡萄糖稳定时通过指尖血测量确认。持续存在较大差异可能表明传感器不可靠。";
+"postProcessingOffsetLimit" = "偏移量超过最大值 ±%@。请减小偏移量后再应用此调整。";
+"postProcessingOffsetAccessibility" = "葡萄糖偏移量：%@";
+"postProcessingInvalidAdjustment" = "无法应用调整。请检查偏移量和缩放值。";
+
+"postProcessingAdjustmentUnavailableNativeCalibration" = "此 CGM 使用原生校准，因此无法调整偏移量和曲线形状。";
+
+"postProcessingWarningAgreement" = "仅当您理解此功能并同意启用时，才轻点“好”。";
