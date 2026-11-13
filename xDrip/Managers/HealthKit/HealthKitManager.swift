@@ -4,7 +4,17 @@ import HealthKit
 import os
 import UIKit
 
+extension Notification.Name {
+    /// Posted after BG readings were removed from Core Data at the user's request. `userInfo`
+    /// carries their IDs under `HealthKitManager.deletedBgReadingIDsKey`; the HealthKit copies
+    /// are removed so Apple Health and its readers stop seeing a reading the user deleted.
+    static let bgReadingsDeletedByUser = Notification.Name("bgReadingsDeletedByUser")
+}
+
 public class HealthKitManager: NSObject {
+    /// `userInfo` key of `Notification.Name.bgReadingsDeletedByUser`, holding `[String]` BG reading IDs.
+    static let deletedBgReadingIDsKey = "bgReadingIDs"
+
     // MARK: - public properties
     
     // MARK: - private properties
@@ -64,6 +74,7 @@ public class HealthKitManager: NSObject {
 
         NotificationCenter.default.addObserver(self, selector: #selector(storeBgReadings), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(storeBgReadings), name: UIApplication.didBecomeActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(bgReadingsDeletedByUser(_:)), name: .bgReadingsDeletedByUser, object: nil)
         
         // do first store
         storeBgReadings()
@@ -211,8 +222,8 @@ public class HealthKitManager: NSObject {
         }
     }
 
-    /// Removes readings hidden by an explicit five-minute cadence rebuild without
-    /// touching the samples that remain visible and will be updated separately.
+    /// Removes the HealthKit samples of the given BG readings: readings hidden by an explicit
+    /// five-minute cadence rebuild, and readings the user deleted.
     public func deleteBgReadingsFromHealthKit(bgReadingIDs: [String]) {
         if !Thread.isMainThread {
             DispatchQueue.main.async { [weak self] in
@@ -235,20 +246,27 @@ public class HealthKitManager: NSObject {
             guard let self = self else { return }
 
             if let error = error {
-                trace("failed query suppressed healthkit BG readings, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, error.localizedDescription)
+                trace("failed query healthkit BG readings to delete, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, error.localizedDescription)
                 return
             }
 
             guard let samples = samples, samples.count > 0 else { return }
 
             self.healthStore.delete(samples) { success, deleteError in
-                if !success, let deleteError = deleteError {
-                    trace("failed delete suppressed healthkit BG readings, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, deleteError.localizedDescription)
+                if success {
+                    trace("deleted %{public}d healthkit BG samples for %{public}d BG readings", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .info, samples.count, bgReadingIDs.count)
+                } else if let deleteError = deleteError {
+                    trace("failed delete healthkit BG readings, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, deleteError.localizedDescription)
                 }
             }
         }
 
         healthStore.execute(sampleQuery)
+    }
+
+    @objc private func bgReadingsDeletedByUser(_ notification: Notification) {
+        guard let bgReadingIDs = notification.userInfo?[Self.deletedBgReadingIDsKey] as? [String] else { return }
+        deleteBgReadingsFromHealthKit(bgReadingIDs: bgReadingIDs)
     }
     
     // MARK: - observe function

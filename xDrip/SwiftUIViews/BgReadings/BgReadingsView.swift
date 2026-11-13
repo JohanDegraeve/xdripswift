@@ -242,7 +242,7 @@ struct BgReadingsView: View {
         }
     }
     
-    /// delete a BG reading from the local arrays, coredata and also Nightscout based on the index passed to the function
+    /// delete a BG reading from the local arrays, coredata, Nightscout and Apple Health based on the index passed to the function
     private func deleteBgReading(at offsets: IndexSet) {
         // as we are using a separate filtered bgReading array to populate the List in the view, we need to delete the selected index from both the primary and filtered bgReading arrays to keep them in sync. This means getting the timestamp of the filtered array and matching it to the timestamp in the main array, then deleting them both. Then we can delete it from coredata and also Nightscout
         
@@ -286,14 +286,20 @@ struct BgReadingsView: View {
         // delete the BgReading from Nightscout (if it exists)
         nightscoutSyncManager.deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: timestampOfBgReadingToDelete)
         
+        // delete the BgReading from Apple Health (if it was stored there)
+        NotificationCenter.default.post(name: .bgReadingsDeletedByUser, object: nil, userInfo: [HealthKitManager.deletedBgReadingIDsKey: [bgReadingToDelete.id]])
+
         return
     }
     
-    /// deletes all currently selected BG readings from the filtered list, the main list, Core Data, and Nightscout
+    /// deletes all currently selected BG readings from the filtered list, the main list, Core Data, Nightscout, and Apple Health
     private func deleteSelectedBgReadings() {
         let notificationFeedback = UINotificationFeedbackGenerator()
         
         notificationFeedback.prepare()
+
+        // IDs of the readings removed from Core Data, removed from Apple Health after the loop
+        var deletedBgReadingIDs = [String]()
         
         // make a stable copy to avoid mutating the data set while iterating
         let bgReadingsToDelete = Array(selectedBgReadings)
@@ -336,7 +342,12 @@ struct BgReadingsView: View {
 
             // delete from Nightscout
             nightscoutSyncManager.deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: timestampOfBgReadingToDelete)
+
+            deletedBgReadingIDs.append(bgReadingToDelete.id)
         }
+
+        // delete the readings removed from Core Data from Apple Health as well
+        NotificationCenter.default.post(name: .bgReadingsDeletedByUser, object: nil, userInfo: [HealthKitManager.deletedBgReadingIDsKey: deletedBgReadingIDs])
         
         notificationFeedback.notificationOccurred(readingsThatCouldNotBeDeleted.isEmpty ? .success : .error)
 
