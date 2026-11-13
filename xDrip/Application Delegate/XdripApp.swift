@@ -51,7 +51,7 @@ import SwiftUI
                 )
             }
             .background(ConstantsAppColors.background)
-            .onOpenURL(perform: stateModel.receiveIncomingBackup)
+            .onOpenURL(perform: stateModel.receiveIncomingURL)
         }
     }
 }
