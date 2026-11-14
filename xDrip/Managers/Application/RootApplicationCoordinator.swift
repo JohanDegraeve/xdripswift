@@ -67,6 +67,7 @@ import AppIntents
     // Remember the last widget data and warning so repeated callbacks do not reload the same timeline.
     private var widgetPublication = CompanionPublicationCache<WidgetSharedUserDefaultsModel>()
     private var publishedWidgetKeepAliveMessage: String?
+    private var shouldRenewLiveActivityOnActivation = true
     
     /// CoreDataManager to be used throughout the project
     private var coreDataManager: CoreDataManager?
@@ -585,6 +586,8 @@ import AppIntents
 
         // update the home screen when returning to the foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
+            self.shouldRenewLiveActivityOnActivation = true
+
             // if view is appeared, view did appear will not get called when app moves to the foreground
             // so need to donate here
             IntentDonationManager.shared.donate(intent: GlucoseIntent())
@@ -2815,6 +2818,9 @@ import AppIntents
     }
 
     @objc private func restartLiveActivityWhenActive() {
+        // only renew once per foreground visit, even if the app becomes active again
+        guard shouldRenewLiveActivityOnActivation else { return }
+        shouldRenewLiveActivityOnActivation = false
         updateLiveActivityAndWidgets(forceRestart: true)
     }
 
