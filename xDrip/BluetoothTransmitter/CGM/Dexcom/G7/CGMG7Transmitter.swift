@@ -2,6 +2,7 @@ import CoreBluetooth
 import CoreData
 import Foundation
 import os
+import UIKit
 
 /*
  Manages the complete Bluetooth lifecycle for a Dexcom G7, Dexcom ONE+, or Stelo sensor.
@@ -169,6 +170,18 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
     /// authentication, but is retained here so configuration boundaries can enforce that rule.
     private var pairingCode: String?
     private var watchCollectionObserver: NSObjectProtocol?
+    private var appStateObservers: [NSObjectProtocol] = []
+
+    /// Whether the app is in the foreground. Read from the Core Bluetooth queue, written from main.
+    private let appForegroundLock = NSLock()
+    private var appIsForegroundValue = false
+    private var appIsForeground: Bool {
+        appForegroundLock.lock(); defer { appForegroundLock.unlock() }
+        return appIsForegroundValue
+    }
+
+    /// Peripherals whose advertisement has already been traced, so duplicates do not flood the log.
+    private var tracedAdvertisementIds = Set<UUID>()
     private var phoneWasPaused = false
     private var phoneCollectionIsPaused: Bool { DirectWatchSettings.phoneIsPaused(transmitterId ?? "") }
 
@@ -418,6 +431,18 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
             } else { self.connect() }
         }
 
+        appStateObservers = [
+            NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+                self?.applicationForegroundChanged(true)
+            },
+            NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
+                self?.applicationForegroundChanged(false)
+            },
+        ]
+        DispatchQueue.main.async { [weak self] in
+            self?.applicationForegroundChanged(UIApplication.shared.applicationState == .active)
+        }
+
         if !useOtherApp, !hasValidPairingCode {
             trace("G7 primary mode requires a four-digit pairing code. Falling back to coexistence", log: log, category: ConstantsLog.categoryCGMG7, type: .error)
         }
@@ -425,6 +450,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
 
     deinit {
         if let watchCollectionObserver { NotificationCenter.default.removeObserver(watchCollectionObserver) }
+        appStateObservers.forEach { NotificationCenter.default.removeObserver($0) }
     }
 
     override func prepareForRelease() {
@@ -575,8 +601,16 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
         advertisementData: [String: Any],
         rssi RSSI: NSNumber
     ) {
-        let discoveredName = peripheral.name ?? "nil"
+        let advertisedName = advertisementData[CBAdvertisementDataLocalNameKey] as? String
+        let discoveredName = peripheral.name ?? advertisedName ?? "nil"
+        // An unfiltered foreground scan reports every nearby device. Only DX names are sensors.
+        guard discoveredName.uppercased().hasPrefix("DX") || advertisementAdvertisesG7(advertisementData) else { return }
         trace("Did discover peripheral with name: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, discoveredName)
+        if tracedAdvertisementIds.insert(peripheral.identifier).inserted {
+            let services = (advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID])?.map { $0.uuidString }.joined(separator: ",") ?? "-"
+            let manufacturer = (advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data)?.map { String(format: "%02x", $0) }.joined() ?? "-"
+            trace("G7 advertisement name=%{public}@ services=%{public}@ manufacturer=%{public}@ rssi=%{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, discoveredName, services, manufacturer, RSSI.stringValue)
+        }
 
         if useOtherApp {
             // Scanning is only a wake-up signal in coexistence. We never connect to the advertised
@@ -584,6 +618,11 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
             // Core Bluetooth for the already-connected instance owned by that app.
             if retrieveConnectedPeripheral(withServiceUUIDs: [CBUUID(string: CBUUID_Service_G7)]) {
                 trace("G7 coexistence attached to the Dexcom app connection", log: log, category: ConstantsLog.categoryCGMG7, type: .info)
+            } else {
+                // The advertisement usually arrives BEFORE the Dexcom/Stelo app has connected: the
+                // sensor stops advertising the moment that app connects, so no later discovery ever
+                // coincides with the connection. Keep checking for it for a short window instead.
+                startCoexistenceFollowUpChecks()
             }
             return
         }
@@ -2118,6 +2157,85 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter, DexcomG7AuthSessio
     private func startCoexistenceObservation() {
         if !retrieveConnectedPeripheral(withServiceUUIDs: [CBUUID(string: CBUUID_Service_G7)]) {
             _ = startScanning()
+        }
+    }
+
+    /// Some Stelo sensors are never reported by a scan filtered on the Dexcom FEBC advertisement
+    /// UUID. While a new sensor is being discovered and the app is in the foreground, scan for all
+    /// devices and keep only "DX" names (see didDiscover). iOS ignores unfiltered scans in the
+    /// background, so the filtered scan is restored there; known sensors reconnect by address.
+    override func scanServiceUUIDs() -> [CBUUID]? {
+        if deviceAddress == nil, appIsForeground { return nil }
+        return super.scanServiceUUIDs()
+    }
+
+    private func applicationForegroundChanged(_ foreground: Bool) {
+        appForegroundLock.lock()
+        let changed = appIsForegroundValue != foreground
+        appIsForegroundValue = foreground
+        appForegroundLock.unlock()
+        guard changed else { return }
+        runOnCentralQueue { [weak self] in
+            guard let self, self.deviceAddress == nil, !self.phoneCollectionIsPaused else { return }
+            switch self.getConnectionStatus() {
+            case .connected, .connecting: return
+            default: break
+            }
+            // Restart so the new filter applies; startScanning refuses while already scanning.
+            self.stopScanning()
+            trace("G7 discovery scan restarted for app %{public}@ (%{public}@)", log: self.log, category: ConstantsLog.categoryCGMG7, type: .info, foreground ? "foreground" : "background", foreground ? "all devices, DX names only" : "FEBC filter")
+            _ = self.startScanning()
+        }
+    }
+
+    /// End of the current follow-up window after a coexistence wake-up advertisement, nil if none.
+    private var coexistenceFollowUpDeadline: Date?
+
+    /// How long, and how often, to look for the Dexcom app's connection after an advertisement.
+    /// The app normally connects within a second or two of the sensor waking.
+    private let coexistenceFollowUpWindow: TimeInterval = 20
+    private let coexistenceFollowUpInterval: TimeInterval = 1
+
+    private func advertisementAdvertisesG7(_ advertisementData: [String: Any]) -> Bool {
+        let services = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID] ?? []
+        return services.contains(CBUUID(string: CBUUID_Advertisement_G7))
+    }
+
+    private func startCoexistenceFollowUpChecks() {
+        assertOnCentral()
+        if let deadline = coexistenceFollowUpDeadline, deadline > Date() { return }
+        coexistenceFollowUpDeadline = Date().addingTimeInterval(coexistenceFollowUpWindow)
+        trace("G7 coexistence: advertisement seen before the Dexcom app connected. Checking for its connection for %{public}@ seconds", log: log, category: ConstantsLog.categoryCGMG7, type: .info, String(Int(coexistenceFollowUpWindow)))
+        scheduleCoexistenceFollowUpCheck()
+    }
+
+    private func scheduleCoexistenceFollowUpCheck() {
+        runOnCentralQueue(after: coexistenceFollowUpInterval) { [weak self] in
+            guard let self else { return }
+            guard let deadline = self.coexistenceFollowUpDeadline else { return }
+            // Stop if the mode changed, the sensor became known, or a connection is already underway.
+            guard self.useOtherApp, self.deviceAddress == nil, !self.phoneCollectionIsPaused else {
+                self.coexistenceFollowUpDeadline = nil
+                return
+            }
+            switch self.getConnectionStatus() {
+            case .connected, .connecting:
+                self.coexistenceFollowUpDeadline = nil
+                return
+            default: break
+            }
+            if self.retrieveConnectedPeripheral(withServiceUUIDs: [CBUUID(string: self.CBUUID_Service_G7)]) {
+                self.coexistenceFollowUpDeadline = nil
+                trace("G7 coexistence attached to the Dexcom app connection after a follow-up check", log: self.log, category: ConstantsLog.categoryCGMG7, type: .info)
+                return
+            }
+            if Date() >= deadline {
+                self.coexistenceFollowUpDeadline = nil
+                trace("G7 coexistence: no Dexcom app connection found during the follow-up window. Waiting for the next advertisement", log: self.log, category: ConstantsLog.categoryCGMG7, type: .info)
+                if self.getConnectionStatus() != .connected { _ = self.startScanning() }
+                return
+            }
+            self.scheduleCoexistenceFollowUpCheck()
         }
     }
 
