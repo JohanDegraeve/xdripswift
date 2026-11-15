@@ -324,6 +324,12 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
 
     /// Subclasses can request duplicate advertisements when connection decisions depend on live
     /// system state. Normal transmitters retain CoreBluetooth's default de-duplicated scanning.
+    /// Services the scan filters on. nil scans for all devices, which iOS allows only while the app
+    /// is in the foreground. Subclasses may widen the filter for first-time discovery.
+    func scanServiceUUIDs() -> [CBUUID]? {
+        CBUUID_Advertisement.map { [CBUUID(string: $0)] }
+    }
+
     func scanOptions() -> [String: Any]? {
         nil
     }
@@ -430,10 +436,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             }
             
             /// list of uuid's to scan for, possibly nil, in which case scanning only if app is in foreground and scan for all devices
-            var services:[CBUUID]?
-            if let CBUUID_Advertisement = CBUUID_Advertisement {
-                services = [CBUUID(string: CBUUID_Advertisement)]
-            }
+            let services = scanServiceUUIDs()
             
             // try to start the scanning
             if let centralManager = centralManager {
