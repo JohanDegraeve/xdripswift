@@ -47,6 +47,13 @@ private func parseIgnoredFollowerTypes() -> Set<FollowerDataSourceType> {
     return Set(ints.compactMap { FollowerDataSourceType(rawValue: $0) }).filter { $0 != .nightscout }
 }
 
+/// When a follower source may store an older reading that falls in a gap in stored history.
+enum FollowerHistoricalGapFill: Equatable {
+    case never
+    case always
+    case withoutDownstreamPostProcessing
+}
+
 /// Note: Use FollowerDataSourceType.allEnabledCases to respect disabled sources when presenting choices in the picker list.
 public enum FollowerDataSourceType: Int, CaseIterable {
     
@@ -110,6 +117,24 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return .requiresExplicitConsent
         default:
             return .allowed
+        }
+    }
+    
+    /// When an older reading from this source may fill a gap in stored history.
+    ///
+    /// Shared Calendar payloads carry a history window, and LibreLinkUp's graph carries 15-minute
+    /// history that reaches the server after the current reading has already moved on. LibreLinkUp
+    /// gap fill is limited to followers without downstream post processing: automatic processing
+    /// only rewrites a recent window, so an older gap-filled reading would keep an unprocessed value,
+    /// and inserting one can shift the five-minute cadence without removing what it displaces.
+    var historicalGapFill: FollowerHistoricalGapFill {
+        switch self {
+        case .calendar:
+            return .always
+        case .libreLinkUp, .libreLinkUpRussia:
+            return .withoutDownstreamPostProcessing
+        case .nightscout, .dexcomShare, .medtrumEasyView, .careLink:
+            return .never
         }
     }
     
