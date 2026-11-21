@@ -120,8 +120,11 @@ public class OpenGlückManager: NSObject, OpenGluckSyncClientDelegate {
         let loadLastRecordsSince = Date().addingTimeInterval(-86400)
         let bgRecentRecords = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: loadLastRecordsSince, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false).filter(minimumTimeBetweenTwoReadingsInMinutes: 1, lastConnectionStatusChangeTimeStamp: nil, timeStampLastProcessedBgReading: loadLastRecordsSince)
         let (historics, scans) = splitRecordsByHistoricScan(bgRecentRecords)
-        print("Historic", historics.map {  "\($0.timeStamp) \($0.calculatedValue)"}.joined(separator: "\n"))
-        print("Scans", scans.map { "\($0.timeStamp) \($0.calculatedValue)"}.joined(separator: "\n"))
+        // NOTE: we upload finalValue, not calculatedValue: smoothing is no longer applied when readings are stored but by
+        // post processing, so calculatedValue is now the unsmoothed value. To stay close to the former "smooth Libre values"
+        // behaviour, enable smoothing with the Savitzky-Golay algorithm and the strong strength.
+        print("Historic", historics.map {  "\($0.timeStamp) \($0.finalValue)"}.joined(separator: "\n"))
+        print("Scans", scans.map { "\($0.timeStamp) \($0.finalValue)"}.joined(separator: "\n"))
         // NOTE: when Libre smoothing is enabled, we kind of lose scan records and only have one available; if we don't want this
         // we should store scan readings and re-upload them later -- though not sure this is a feature we'd want
 
@@ -129,9 +132,9 @@ public class OpenGlückManager: NSObject, OpenGluckSyncClientDelegate {
         let uploadHistoricAfter = (UserDefaults.standard.timeStampLatestOpenGlückBgReading ?? Date().addingTimeInterval(-86400)).addingTimeInterval(-historicScanTipoffInterval)
         let glucoseRecordsToUpload: [OpenGluckGlucoseRecord] = (
             historics.map ({
-                OpenGluckGlucoseRecord(timestamp: $0.timeStamp, mgDl: Int(round($0.calculatedValue)), recordType: "historic")
+                OpenGluckGlucoseRecord(timestamp: $0.timeStamp, mgDl: Int(round($0.finalValue)), recordType: "historic")
             }) + scans.map ({
-                OpenGluckGlucoseRecord(timestamp: $0.timeStamp, mgDl: Int(round($0.calculatedValue)), recordType: "scan")
+                OpenGluckGlucoseRecord(timestamp: $0.timeStamp, mgDl: Int(round($0.finalValue)), recordType: "scan")
             })
         ).filter {
             $0.timestamp >= uploadHistoricAfter
@@ -139,7 +142,7 @@ public class OpenGlückManager: NSObject, OpenGluckSyncClientDelegate {
         let modelName = "xdripswift"
         let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? "(unknown-ifv)"
         let instantGlucoseRecords = bgReadingsToStore.map { bgReading in
-            OpenGluckInstantGlucoseRecord(timestamp: bgReading.timeStamp, mgDl: Int(round(bgReading.calculatedValue)), modelName: modelName, deviceId: deviceId)
+            OpenGluckInstantGlucoseRecord(timestamp: bgReading.timeStamp, mgDl: Int(round(bgReading.finalValue)), modelName: modelName, deviceId: deviceId)
         }
         Task {
             if UserDefaults.standard.openGlückUploadEnabled {
