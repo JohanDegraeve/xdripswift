@@ -153,6 +153,10 @@ struct RootHomeSensorLifetimeView: View {
 
     private func startEntranceAnimation() {
         prepareProgressForNextEntrance()
+
+        // with the animation disabled, the reset above already shows the current progress
+        guard UserDefaults.standard.animateProgressBar else { return }
+
         isEntranceAnimationInProgress = true
 
         let targetProgress = presentationProgress(progressState)
@@ -195,12 +199,17 @@ struct RootHomeSensorLifetimeView: View {
     }
 
     /// resets to 0% for elapsed mode or 100% for countdown mode without animation
+    /// if the user disabled the animation, there is no entrance to prepare so show the current progress instead
     private func resetProgressToEndpoint() {
         var resetTransaction = Transaction()
         resetTransaction.disablesAnimations = true
 
         withTransaction(resetTransaction) {
-            displayedProgress = preferSensorCountdown ? 1 : 0
+            if UserDefaults.standard.animateProgressBar {
+                displayedProgress = preferSensorCountdown ? 1 : 0
+            } else {
+                displayedProgress = presentationProgress(progressState)
+            }
         }
     }
 

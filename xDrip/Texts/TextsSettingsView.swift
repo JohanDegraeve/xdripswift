@@ -397,6 +397,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_screenLockDimmingTypeVeryDark", tableName: filename, bundle: Bundle.main, value: "Very Dark", comment: "screen dimming is very dark")
     }()
     
+    static let animateProgressBar: String = {
+        return NSLocalizedString("settingsviews_animateProgressBar", tableName: filename, bundle: Bundle.main, value: "Animate Progress Bar", comment: "home screen settings, should the progress bar be animated")
+    }()
+    
     static let allowScreenRotation: String = {
         return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Chart Rotation", comment: "home screen settings, should the main glucose chart screen be allowed")
     }()

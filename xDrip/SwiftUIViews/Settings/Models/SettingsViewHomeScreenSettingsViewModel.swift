@@ -131,7 +131,8 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
                     guard (0...1).contains(index) else { return }
                     UserDefaults.standard.preferSensorCountdown = index == 1
                 }
-            ))
+            )),
+            SettingsRow(id: "homeScreen.animateProgressBar", title: Texts_SettingsView.animateProgressBar, control: .toggle(isOn: { UserDefaults.standard.animateProgressBar }, setIsOn: { UserDefaults.standard.animateProgressBar = $0 }))
         ]
 
         let mainChartRows = [
