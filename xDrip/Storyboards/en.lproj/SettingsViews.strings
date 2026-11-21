@@ -56,6 +56,7 @@
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Keep-alive.";
 "settingsviews_allowScreenRotation" = "Chart Rotation";
+"settingsviews_animateProgressBar" = "Animate Progress Bar";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Glucose Chart";
 "settingsviews_homeScreenMainChartSectionFooter" = "These options control how glucose data is displayed on the main chart.";
 "settingsviews_mainChartHours" = "Time Range";

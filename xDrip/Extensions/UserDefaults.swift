@@ -170,6 +170,8 @@ extension UserDefaults {
         case miniChartHoursToShow = "miniChartHoursToShow"
         /// should the screen/chart be allowed to rotate?
         case allowScreenRotation = "allowScreenRotation"
+        /// should the sensor progress bar be animated?
+        case animateProgressBar = "animateProgressBar"
         /// number of preceding days used by the landscape AGP comparison
         case landscapeComparisonDays = "landscapeComparisonDays"
         /// should the clock view be shown when the screen is locked?
@@ -1556,6 +1558,17 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.allowScreenRotation.rawValue)
+        }
+    }
+
+    /// should the sensor progress bar be animated?
+    @objc dynamic var animateProgressBar: Bool {
+        // default value for bool in userdefaults is false, as default we want the progress bar to animate
+        get {
+            return !bool(forKey: Key.animateProgressBar.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.animateProgressBar.rawValue)
         }
     }
 
