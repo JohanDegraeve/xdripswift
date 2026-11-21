@@ -80,7 +80,8 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
                     id: "alerts.preferLargeSnoozeScreen",
                     index: Setting.preferLargeSnoozeScreen.rawValue,
                     sectionID: sectionID
-                )
+                ),
+                SettingsRow(id: "alerts.showSlopeInAlarms", title: Texts_SettingsView.showSlopeInAlarms, control: .toggle(isOn: { UserDefaults.standard.showSlopeInAlarms }, setIsOn: { UserDefaults.standard.showSlopeInAlarms = $0 }))
             ]
         case .sensorHealth:
             return [
