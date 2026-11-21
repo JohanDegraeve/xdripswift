@@ -778,6 +778,19 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     }
                 ),
                 SettingsGroupedRow(
+                    id: "sharingServices.openGlück",
+                    title: Texts_SettingsView.sectionTitleOpenGlück,
+                    detail: {
+                        groupedStatusDetail(isEnabled: UserDefaults.standard.openGlückEnabled)
+                    },
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.sectionTitleOpenGlück,
+                            providers: { [SettingsViewOpenGlückSettingsViewModel()] }
+                        )
+                    }
+                ),
+                SettingsGroupedRow(
                     id: "sharingServices.calendarEvents",
                     title: Texts_SettingsView.calendarEventsSectionTitle,
                     isEnabled: {
