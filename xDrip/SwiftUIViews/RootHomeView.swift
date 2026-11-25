@@ -131,6 +131,7 @@ struct RootHomeView: View {
                 .ignoresSafeArea()
 
             rootContent()
+                .avoidingReservedRegions()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .colorScheme(.dark)
@@ -139,7 +140,7 @@ struct RootHomeView: View {
             chartYAxisResetRevision &+= 1
             if state.usesScreenLockNightLayout {
                 applyClockModeState(isEnabled: true)
-            } else if UIDevice.current.userInterfaceIdiom != .pad {
+            } else if !AdaptiveLayout.usesRegularWidth {
                 refreshChartRangeFromStoredSettings()
             }
             requestChartState(forceReset: true)
@@ -273,11 +274,11 @@ struct RootHomeView: View {
                         applyClockModeRange(for: newSize)
                     }
             }
-        } else if UIDevice.current.userInterfaceIdiom == .pad {
+        } else if AdaptiveLayout.usesRegularWidth {
             GeometryReader { geometry in
                 Group {
-                    if IPadLayoutClass.resolve(
-                        isPad: true,
+                    if AdaptiveLayout.resolve(
+                        sizeClass: .regular,
                         width: geometry.size.width,
                         usesAccessibilityText: dynamicTypeSize.isAccessibilitySize
                     ) == .compact {
@@ -302,8 +303,14 @@ struct RootHomeView: View {
     /// equal-width pair of large readouts above the chart.
     @ViewBuilder
     private func nightLockContent(size: CGSize) -> some View {
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            if size.width > size.height {
+        if AdaptiveLayout.usesRegularWidth {
+            // On iOS 27.1 and later an arrangement view handles the pose changes itself: it presents
+            // the readouts side by side when the window is wider than tall, stacks them otherwise and
+            // keeps them clear of the fold when iPhone Duo is partially open. The manual landscape and
+            // portrait compositions stay as the fallback for older systems.
+            if #available(iOS 27.1, *) {
+                arrangementNightLockContent(size: size)
+            } else if size.width > size.height {
                 ipadLandscapeNightLockContent(size: size)
             } else {
                 ipadPortraitNightLockContent(size: size)
@@ -346,6 +353,49 @@ struct RootHomeView: View {
     /// iPad Clock Mode keeps the same readout components as iPhone, but places glucose and time in
     /// balanced columns that remain readable from a distance. The chart receives all remaining
     /// height and therefore continues to adapt to Stage Manager and split-view resizing.
+    /// Clock Mode readouts arranged by the system: side by side in a wide window, above and below in
+    /// a narrow one, and on either side of the fold when iPhone Duo is partially open.
+    @available(iOS 27.1, *)
+    private func arrangementNightLockContent(size: CGSize) -> some View {
+        let contentWidth = max(size.width - 40, 0)
+        let readoutHeight = min(
+            contentWidth * Layout.ipadNightLockReadoutHeightWidthRatio,
+            Layout.ipadNightLockMaximumReadoutHeight
+        )
+
+        return VStack(spacing: Layout.sectionSpacing) {
+            homeHeader
+
+            VStack(spacing: Layout.rowSpacing) {
+                ArrangementView {
+                    RootHomeGlucoseReadingView(
+                        state: glucoseDisplayState,
+                        isScreenLocked: true,
+                        nightLockStatus: nightLockStatus
+                    )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } secondary: {
+                    if state.visibility.showsClock {
+                        RootHomeClockView(text: state.controls.clockText)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                }
+                .arrangementViewStyle(.split)
+                .frame(maxWidth: .infinity)
+                .frame(height: readoutHeight)
+
+                screenLockMainChart
+                    .frame(maxHeight: .infinity)
+                    .layoutPriority(1)
+            }
+            .frame(maxHeight: .infinity, alignment: .top)
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 12)
+        .frame(width: size.width, height: size.height, alignment: .top)
+        .animation(.easeOut(duration: 0.22), value: sensorHealthIssueManager.visibleIssue?.id)
+    }
+
     private func ipadLandscapeNightLockContent(size: CGSize) -> some View {
         let contentWidth = max(size.width - 40, 0)
         let readoutWidth = max(
@@ -1078,7 +1128,7 @@ struct RootHomeView: View {
     private func applyClockModeRange(for size: CGSize) {
         guard size.width > 0, size.height > 0 else { return }
 
-        let range: RootHomeChartRange = UIDevice.current.userInterfaceIdiom == .pad && size.width > size.height
+        let range: RootHomeChartRange = AdaptiveLayout.usesRegularWidth && size.width > size.height
             ? .fiveHours
             : .threeHours
 

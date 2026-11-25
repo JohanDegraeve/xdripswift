@@ -65,10 +65,10 @@ struct StatisticsView: View {
                 .controlSize(.large)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let analytics = viewModel.analytics, analytics.hasData {
-            if UIDevice.current.userInterfaceIdiom == .pad {
+            if AdaptiveLayout.usesRegularWidth {
                 GeometryReader { geometry in
-                    if IPadLayoutClass.resolve(
-                        isPad: true,
+                    if AdaptiveLayout.resolve(
+                        sizeClass: .regular,
                         width: geometry.size.width,
                         usesAccessibilityText: dynamicTypeSize.isAccessibilitySize
                     ) == .compact {
@@ -178,7 +178,7 @@ struct StatisticsView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
                 .padding(.bottom, 8)
-                .frame(maxWidth: UIDevice.current.userInterfaceIdiom == .pad ? 560 : .infinity)
+                .frame(maxWidth: AdaptiveLayout.usesRegularWidth ? 560 : .infinity)
 
             Divider()
                 .overlay(Color(.separator))

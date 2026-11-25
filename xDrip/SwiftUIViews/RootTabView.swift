@@ -17,24 +17,96 @@ private enum RootTabLayout {
     static let contentBottomPadding: CGFloat = 4
 }
 
-/// Window-based layout classes shared by iPad screens. An iPad in Slide Over deliberately receives
-/// the compact composition, and accessibility text avoids dense multi-column arrangements.
-enum IPadLayoutClass: Equatable {
+/// Width based layout classes shared by every tablet-like composition.
+///
+/// The decision must come from the window's size class and from the width of the containing view,
+/// not from the device idiom and not from the interface orientation: iPhone Duo reports a compact
+/// width on its outer display and a regular width on its inner display, so one device needs both
+/// compositions (see Apple's "Preparing your app for iPhone Duo"). An iPad in Slide Over still gets
+/// the compact composition because its size class is compact, and accessibility text avoids dense
+/// multi-column arrangements in every window.
+enum AdaptiveLayout: Equatable {
     case compact
     case regular
     case wide
 
-    static func resolve(isPad: Bool, width: CGFloat, usesAccessibilityText: Bool) -> Self {
-        guard isPad, !usesAccessibilityText else { return .compact }
-        if width >= 980 { return .wide }
-        if width >= 650 { return .regular }
+    static let regularWidthThreshold: CGFloat = 650
+    static let wideWidthThreshold: CGFloat = 980
+
+    static func resolve(sizeClass: UserInterfaceSizeClass?, width: CGFloat, usesAccessibilityText: Bool) -> Self {
+        guard sizeClass == .regular, !usesAccessibilityText else { return .compact }
+        if width >= wideWidthThreshold { return .wide }
+        if width >= regularWidthThreshold { return .regular }
         return .compact
+    }
+
+    /// True when the foreground window reports a regular width — an iPad, or the inner display of an
+    /// iPhone Duo. Replaces the previous `userInterfaceIdiom == .pad` checks so that a foldable phone
+    /// receives the tablet composition and a compact-width iPad does not. Views re-read this value
+    /// when their body is evaluated after a size-class change.
+    static var usesRegularWidth: Bool {
+        guard let scene = activeWindowScene else { return false }
+        return scene.traitCollection.horizontalSizeClass == .regular
+    }
+
+    static var activeWindowScene: UIWindowScene? {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        return scenes.first { $0.activationState == .foregroundActive }
+            ?? scenes.first { $0.activationState == .foregroundInactive }
+            ?? scenes.first
+    }
+}
+
+/// Keeps custom content clear of hardware reserved regions: the fold of a partially open iPhone Duo
+/// (`division`) and the inner front camera, Dynamic Island or window controls (`occlusion`).
+/// Framework containers such as split views and sheets already handle this themselves; this exists
+/// for views that lay out their own content, like the Home screen.
+private struct ReservedRegionAvoider: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 27.1, *) {
+            GeometryReader { proxy in
+                let divisions = proxy.reservedRegions(kind: .division)
+                let occlusions = proxy.reservedRegions(kind: .occlusion)
+                content
+                    .padding(.horizontal, Self.horizontalInset(for: divisions))
+                    .padding(.top, Self.topInset(for: occlusions))
+            }
+        } else {
+            content
+        }
+    }
+
+    @available(iOS 27.1, *)
+    private static func horizontalInset(for regions: [ReservedRegion]) -> CGFloat {
+        let active = regions.filter { $0.isActive }
+        guard !active.isEmpty else { return 0 }
+        // The fold divides the window in two; keep the content of each half clear of the crease.
+        return active.map(\.frame.width).max() ?? 0
+    }
+
+    @available(iOS 27.1, *)
+    private static func topInset(for regions: [ReservedRegion]) -> CGFloat {
+        let active = regions.filter { $0.isActive && $0.frame.minY <= 0 }
+        guard !active.isEmpty else { return 0 }
+        return active.map(\.frame.maxY).max() ?? 0
+    }
+}
+
+extension View {
+    /// Applies reserved-region insets only where they can appear (regular-width windows on iOS 27.1
+    /// and later), leaving the established iPhone and iPad layouts untouched.
+    @ViewBuilder func avoidingReservedRegions() -> some View {
+        if #available(iOS 27.1, *), AdaptiveLayout.usesRegularWidth {
+            modifier(ReservedRegionAvoider())
+        } else {
+            self
+        }
     }
 }
 
 enum RootOrientationPolicy {
-    static func supportedOrientations(isPad: Bool, isHome: Bool, allowsHomeRotation: Bool) -> UIInterfaceOrientationMask {
-        if isPad { return .all }
+    static func supportedOrientations(usesRegularWidth: Bool, isHome: Bool, allowsHomeRotation: Bool) -> UIInterfaceOrientationMask {
+        if usesRegularWidth { return .all }
         return isHome && allowsHomeRotation ? .allButUpsideDown : .portrait
     }
 }
@@ -369,7 +441,7 @@ struct RootTabView: View {
                 if let dependencies = stateModel.dependencies {
                     RootScreenLockOverlay(
                         stateModel: dependencies.rootHomeStateModel,
-                        allowsTapToUnlock: !(isLandscape && UIDevice.current.userInterfaceIdiom != .pad),
+                        allowsTapToUnlock: !(isLandscape && !AdaptiveLayout.usesRegularWidth),
                         unlock: dependencies.cancelScreenLock
                     )
                 }
@@ -480,6 +552,8 @@ struct RootTabView: View {
     /// Uses the modern iPad top-tab presentation, which can expand into a sidebar. The existing
     /// iPhone tab bar remains byte-for-byte the same view hierarchy on every supported iOS release.
     @ViewBuilder private func adaptiveTabView(isLandscape: Bool) -> some View {
+        // `sidebarAdaptable` is the iPad presentation. iPhone Duo receives its vertical tab bar
+        // from the system for a standard TabView, so it stays out of this branch.
         if #available(iOS 18.0, *), UIDevice.current.userInterfaceIdiom == .pad {
             tabs(isLandscape: isLandscape)
                 .tabViewStyle(.sidebarAdaptable)
@@ -596,7 +670,7 @@ struct RootTabView: View {
         let supportedOrientations: UIInterfaceOrientationMask
 
         supportedOrientations = RootOrientationPolicy.supportedOrientations(
-            isPad: UIDevice.current.userInterfaceIdiom == .pad,
+            usesRegularWidth: AdaptiveLayout.usesRegularWidth,
             isHome: tab == .home,
             allowsHomeRotation: UserDefaults.standard.allowScreenRotation
         )
@@ -613,7 +687,7 @@ struct RootTabView: View {
 
         rootController.setNeedsUpdateOfSupportedInterfaceOrientations()
 
-        if UIDevice.current.userInterfaceIdiom != .pad,
+        if !AdaptiveLayout.usesRegularWidth,
            tab != .home,
            windowScene.interfaceOrientation.isLandscape {
             windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
@@ -678,7 +752,7 @@ private struct RootHomeTabView: View {
     var body: some View {
         ZStack {
             if let dependencies {
-                if isLandscape && UIDevice.current.userInterfaceIdiom != .pad {
+                if isLandscape && !AdaptiveLayout.usesRegularWidth {
                     RootHomeLandscapeView(
                         dependencies: dependencies,
                         showSensorManagement: { presentedView = .sensorManagement },
@@ -699,9 +773,9 @@ private struct RootHomeTabView: View {
         }
         .padding(
             .bottom,
-            isLandscape && UIDevice.current.userInterfaceIdiom != .pad ? 0 : RootTabLayout.contentBottomPadding
+            isLandscape && !AdaptiveLayout.usesRegularWidth ? 0 : RootTabLayout.contentBottomPadding
         )
-        .toolbar(isLandscape && UIDevice.current.userInterfaceIdiom != .pad ? .hidden : .automatic, for: .tabBar)
+        .toolbar(isLandscape && !AdaptiveLayout.usesRegularWidth ? .hidden : .automatic, for: .tabBar)
         .onAppear {
             applicationCoordinator.homeDidBecomeVisible()
             updatePresentedViewOrientationLock()
@@ -834,7 +908,7 @@ private struct RootHomeTabView: View {
         let supportedOrientations: UIInterfaceOrientationMask
 
         supportedOrientations = RootOrientationPolicy.supportedOrientations(
-            isPad: UIDevice.current.userInterfaceIdiom == .pad,
+            usesRegularWidth: AdaptiveLayout.usesRegularWidth,
             isHome: presentedView == nil,
             allowsHomeRotation: UserDefaults.standard.allowScreenRotation
         )
@@ -851,7 +925,7 @@ private struct RootHomeTabView: View {
 
         rootController.setNeedsUpdateOfSupportedInterfaceOrientations()
 
-        if UIDevice.current.userInterfaceIdiom != .pad && presentedView != nil {
+        if !AdaptiveLayout.usesRegularWidth && presentedView != nil {
             windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
         }
     }
@@ -997,7 +1071,7 @@ extension View {
     /// completely unmodified. The outer frame still fills the detail area so backgrounds remain
     /// continuous and split-view toolbars align with the window.
     @ViewBuilder func ipadReadableContentWidth(_ maxWidth: CGFloat = 780) -> some View {
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if AdaptiveLayout.usesRegularWidth {
             frame(maxWidth: maxWidth)
                 .frame(maxWidth: .infinity)
         } else {
@@ -1006,7 +1080,7 @@ extension View {
     }
 
     @ViewBuilder func ipadSheetMinimumSize(width: CGFloat, height: CGFloat) -> some View {
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if AdaptiveLayout.usesRegularWidth {
             frame(minWidth: width, minHeight: height)
         } else {
             self
@@ -1014,7 +1088,7 @@ extension View {
     }
 
     @ViewBuilder func ipadLargeSheet(width: CGFloat, height: CGFloat) -> some View {
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if AdaptiveLayout.usesRegularWidth {
             frame(minWidth: width, minHeight: height)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)

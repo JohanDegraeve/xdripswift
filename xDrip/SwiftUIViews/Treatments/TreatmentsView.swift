@@ -71,8 +71,8 @@ struct TreatmentsListView: View {
         ScrollViewReader { scrollProxy in
             ZStack(alignment: .bottomTrailing) {
                 GeometryReader { geometry in
-                    if IPadLayoutClass.resolve(
-                        isPad: UIDevice.current.userInterfaceIdiom == .pad,
+                    if AdaptiveLayout.resolve(
+                        sizeClass: AdaptiveLayout.usesRegularWidth ? .regular : .compact,
                         width: geometry.size.width,
                         usesAccessibilityText: dynamicTypeSize.isAccessibilitySize
                     ) != .compact {

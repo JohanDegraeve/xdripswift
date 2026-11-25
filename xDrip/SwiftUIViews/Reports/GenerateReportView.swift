@@ -49,7 +49,7 @@ struct GenerateReportView: View {
     }
 
     @ViewBuilder private var reportForm: some View {
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if AdaptiveLayout.usesRegularWidth {
             reportFormContent
                 .fullScreenCover(item: $viewModel.generatedReport, content: reportPreview)
         } else {
