@@ -46,7 +46,7 @@ struct BluetoothPeripheralsNavigationView: View {
     }
 
     @ViewBuilder private var navigationContent: some View {
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if AdaptiveLayout.usesRegularWidth {
             NavigationSplitView {
                 BluetoothPeripheralsView(viewModel: viewModel, router: router)
                     .navigationSplitViewColumnWidth(min: 300, ideal: 350, max: 430)

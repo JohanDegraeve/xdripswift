@@ -11,24 +11,28 @@ import XCTest
 
 final class RootHomeInteractionTests: XCTestCase {
 
-    func testIPadLayoutClassRespondsToWindowWidth() {
-        XCTAssertEqual(IPadLayoutClass.resolve(isPad: false, width: 1_366, usesAccessibilityText: false), .compact)
-        XCTAssertEqual(IPadLayoutClass.resolve(isPad: true, width: 500, usesAccessibilityText: false), .compact)
-        XCTAssertEqual(IPadLayoutClass.resolve(isPad: true, width: 744, usesAccessibilityText: false), .regular)
-        XCTAssertEqual(IPadLayoutClass.resolve(isPad: true, width: 1_024, usesAccessibilityText: false), .wide)
+    func testAdaptiveLayoutClassRespondsToWindowWidthAndSizeClass() {
+        // A compact width window keeps the phone composition no matter how wide it is: an iPhone in
+        // landscape and an iPad in Slide Over both land here.
+        XCTAssertEqual(AdaptiveLayout.resolve(sizeClass: .compact, width: 1_366, usesAccessibilityText: false), .compact)
+        XCTAssertEqual(AdaptiveLayout.resolve(sizeClass: .regular, width: 500, usesAccessibilityText: false), .compact)
+        XCTAssertEqual(AdaptiveLayout.resolve(sizeClass: .regular, width: 744, usesAccessibilityText: false), .regular)
+        XCTAssertEqual(AdaptiveLayout.resolve(sizeClass: .regular, width: 1_024, usesAccessibilityText: false), .wide)
+        // iPhone Duo inner display: regular width on an iPad mini sized canvas.
+        XCTAssertEqual(AdaptiveLayout.resolve(sizeClass: .regular, width: 932, usesAccessibilityText: false), .regular)
     }
 
-    func testIPadLayoutClassUsesCompactCompositionForAccessibilityText() {
-        XCTAssertEqual(IPadLayoutClass.resolve(isPad: true, width: 1_366, usesAccessibilityText: true), .compact)
+    func testAdaptiveLayoutClassUsesCompactCompositionForAccessibilityText() {
+        XCTAssertEqual(AdaptiveLayout.resolve(sizeClass: .regular, width: 1_366, usesAccessibilityText: true), .compact)
     }
 
     func testIPadOrientationPolicyAllowsAllTabsToRotate() {
         XCTAssertEqual(
-            RootOrientationPolicy.supportedOrientations(isPad: true, isHome: false, allowsHomeRotation: false),
+            RootOrientationPolicy.supportedOrientations(usesRegularWidth: true, isHome: false, allowsHomeRotation: false),
             .all
         )
         XCTAssertEqual(
-            RootOrientationPolicy.supportedOrientations(isPad: false, isHome: false, allowsHomeRotation: true),
+            RootOrientationPolicy.supportedOrientations(usesRegularWidth: false, isHome: false, allowsHomeRotation: true),
             .portrait
         )
     }

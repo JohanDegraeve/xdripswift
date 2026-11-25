@@ -142,7 +142,7 @@ struct BluetoothPeripheralDetailView: View {
             }
             state.updateSignalStrengthPolling(active: phase == .active)
         }
-        .frame(maxWidth: UIDevice.current.userInterfaceIdiom == .pad ? 780 : .infinity)
+        .frame(maxWidth: AdaptiveLayout.usesRegularWidth ? 780 : .infinity)
         .frame(maxWidth: .infinity)
     }
 

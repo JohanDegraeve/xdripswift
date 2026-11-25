@@ -589,7 +589,7 @@ private final class CameraPreviewView: UIView {
     }
 
     func updateVideoOrientation() {
-        guard UIDevice.current.userInterfaceIdiom == .pad,
+        guard AdaptiveLayout.usesRegularWidth,
               let interfaceOrientation = window?.windowScene?.interfaceOrientation,
               let videoOrientation = AVCaptureVideoOrientation(interfaceOrientation: interfaceOrientation),
               let connection = previewLayer.connection,

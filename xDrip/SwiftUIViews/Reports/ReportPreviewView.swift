@@ -24,7 +24,7 @@ struct GlucoseReportPreviewView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                if UIDevice.current.userInterfaceIdiom == .pad {
+                if AdaptiveLayout.usesRegularWidth {
                     ToolbarItem(placement: .cancellationAction) {
                         Button(Texts_Common.dismiss) {
                             dismiss()

@@ -113,7 +113,7 @@ struct SettingsNavigationView: View {
     }
 
     @ViewBuilder private var navigationContent: some View {
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if AdaptiveLayout.usesRegularWidth {
             NavigationSplitView {
                 SettingsIPadSidebarView(listModel: listModel, presenter: presenter)
                     .navigationSplitViewColumnWidth(min: 300, ideal: 350, max: 430)
