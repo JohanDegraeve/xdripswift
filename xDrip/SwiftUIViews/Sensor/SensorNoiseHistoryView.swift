@@ -131,13 +131,11 @@ struct SensorNoiseHistoryView: View {
         let state = displayState(snapshot: snapshot)
 
         return HStack(spacing: 10) {
-            Circle()
-                .fill(state.displayColor)
-                .frame(width: 11, height: 11)
-                .overlay {
-                    Circle()
-                        .stroke(state.displayColor.opacity(0.35), lineWidth: 5)
-                }
+            SensorNoiseIndicatorView(
+                color: state.displayColor,
+                size: 22
+            )
+            .accessibilityHidden(true)
 
             Text(state.localizedTitle)
                 .font(.body)
@@ -542,13 +540,11 @@ struct SensorNoiseSummaryRow: View {
 
     var body: some View {
         HStack(spacing: 11) {
-            Circle()
-                .fill(state.displayColor)
-                .frame(width: 12, height: 12)
-                .overlay {
-                    Circle()
-                        .stroke(state.displayColor.opacity(0.3), lineWidth: 5)
-                }
+            SensorNoiseIndicatorView(
+                color: state.displayColor,
+                size: 26
+            )
+            .accessibilityHidden(true)
 
             Text(state.localizedTitle)
                 .font(.body)

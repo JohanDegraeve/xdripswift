@@ -335,6 +335,9 @@
 		4E6100012FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100112FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift */; };
 		4E6100022FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100122FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift */; };
 		4E6100032FF3000100000001 /* SensorNoiseHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */; };
+		A21433FB2026112500000002 /* SensorNoiseIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21433FB2026112500000001 /* SensorNoiseIndicatorView.swift */; };
+		A21433FB2026112500000003 /* SensorNoiseIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21433FB2026112500000001 /* SensorNoiseIndicatorView.swift */; };
+		A21433FB2026112500000004 /* SensorNoiseIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21433FB2026112500000001 /* SensorNoiseIndicatorView.swift */; };
 		4F2400013001000100000001 /* NightscoutDeviceStatusEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400113001000100000001 /* NightscoutDeviceStatusEntry+CoreDataClass.swift */; };
 		4F2400023001000100000001 /* NightscoutDeviceStatusEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400123001000100000001 /* NightscoutDeviceStatusEntry+CoreDataProperties.swift */; };
 		4F2400033001000100000001 /* NightscoutProfileEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2400133001000100000001 /* NightscoutProfileEntry+CoreDataClass.swift */; };
@@ -1344,6 +1347,7 @@
 		4E6100112FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensorNoiseSample+CoreDataClass.swift"; sourceTree = "<group>"; };
 		4E6100122FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SensorNoiseSample+CoreDataProperties.swift"; path = "xDrip/Core Data/Extensions/SensorNoiseSample+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorNoiseHistoryView.swift; sourceTree = "<group>"; };
+		A21433FB2026112500000001 /* SensorNoiseIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorNoiseIndicatorView.swift; sourceTree = "<group>"; };
 		4E6100312FF3000100000001 /* xdrip v23.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v23.xcdatamodel"; sourceTree = "<group>"; };
 		4F2400113001000100000001 /* NightscoutDeviceStatusEntry+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NightscoutDeviceStatusEntry+CoreDataClass.swift"; sourceTree = "<group>"; };
 		4F2400123001000100000001 /* NightscoutDeviceStatusEntry+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NightscoutDeviceStatusEntry+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -2603,6 +2607,7 @@
 				4B0C00222F3B000100000001 /* SensorCodeScannerView.swift */,
 				4B0C00012F3B000100000001 /* SensorManagementView.swift */,
 				4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */,
+				A21433FB2026112500000001 /* SensorNoiseIndicatorView.swift */,
 				4B0C00172F3B000100000001 /* SensorStartView.swift */,
 			);
 			path = Sensor;
@@ -4624,6 +4629,7 @@
 				4746067C2B962F8500AC9214 /* SystemMediumView.swift in Sources */,
 				4716A4F62B406C3D00419052 /* XDripWidgetLiveActivity.swift in Sources */,
 				47B65D452E3A756300C3140B /* LiveActivityViewContent.swift in Sources */,
+				A21433FB2026112500000004 /* SensorNoiseIndicatorView.swift in Sources */,
 				4716A4F42B406C3D00419052 /* XDripWidgetBundle.swift in Sources */,
 				474606752B962C4D00AC9214 /* XDripWidget+EntryView.swift in Sources */,
 				4716A4F82B406C3D00419052 /* XDripWidget.swift in Sources */,
@@ -4737,6 +4743,7 @@
 				A1D1EC770000000000000008 /* DirectWatchCollectionGesture.swift in Sources */,
 				47A6ABE22B790CC60047A4BA /* xDripWatchApp.swift in Sources */,
 				47DE41B32B8672F90041DA19 /* MainViewDataSourceView.swift in Sources */,
+				A21433FB2026112500000003 /* SensorNoiseIndicatorView.swift in Sources */,
 				478705932C4D7B90001C3170 /* BigNumberView.swift in Sources */,
 				4787058E2C4D76FE001C3170 /* RootView.swift in Sources */,
 				47F7B1C52C68BBE000609DA7 /* ConstantsCalibrationAlgorithms.swift in Sources */,
@@ -5134,6 +5141,7 @@
 				4B0C00212F3B000100000001 /* DexcomG6SensorLabel.swift in Sources */,
 				4B0C00232F3B000100000001 /* SensorCodeScannerView.swift in Sources */,
 				4E6100032FF3000100000001 /* SensorNoiseHistoryView.swift in Sources */,
+				A21433FB2026112500000002 /* SensorNoiseIndicatorView.swift in Sources */,
 				F8252867243E50FE0067AF77 /* ConstantsLibre.swift in Sources */,
 				F8F9720923A5915900C3F17D /* AESCrypt.m in Sources */,
 				F8CB59D3274D94AF00BA199E /* DexcomSessionStartTxMessage.swift in Sources */,

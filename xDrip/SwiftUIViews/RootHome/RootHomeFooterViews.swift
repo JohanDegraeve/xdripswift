@@ -228,14 +228,11 @@ struct RootHomeDataSourceView: View {
         HStack(spacing: 5) {
             HStack(spacing: 6) {
                 if sensorNoiseState.showsIndicator {
-                    Circle()
-                        .fill(sensorNoiseState.indicatorColor)
-                        .frame(width: 8, height: 8)
-                        .overlay {
-                            Circle()
-                                .stroke(sensorNoiseState.indicatorColor.opacity(0.35), lineWidth: 3)
-                        }
-                        .accessibilityLabel(sensorNoiseState.indicatorAccessibilityLabel)
+                    SensorNoiseIndicatorView(
+                        color: sensorNoiseState.indicatorColor,
+                        size: 18
+                    )
+                    .accessibilityLabel(sensorNoiseState.indicatorAccessibilityLabel)
                 }
 
                 if state.showsConnectionIcon {
