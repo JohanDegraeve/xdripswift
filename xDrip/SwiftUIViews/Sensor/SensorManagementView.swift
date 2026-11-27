@@ -35,6 +35,8 @@ struct SensorManagementView: View {
     @State private var showingSensorDetails = false
     @State private var showingNoSensorCodeConfirmation = false
     @State private var showingCalibrationStatusDetails = false
+    @State private var showingExpiredTransmitterAlert = false
+    @State private var expiredTransmitterIsAnubis = false
     @State private var sensorNoiseSensitivity = UserDefaults.standard.sensorNoiseSensitivity
     @State private var persistentNoise: Double?
     @State private var persistentNoiseSensorID: String?
@@ -260,6 +262,11 @@ struct SensorManagementView: View {
                 Text(calibrationStatusText(transmitterCalibrationStatus))
             }
         }
+        .alert(Texts_HomeView.sensorManagementTransmitterExpiredTitle, isPresented: $showingExpiredTransmitterAlert) {
+            Button(Texts_Common.Ok, role: .cancel) {}
+        } message: {
+            Text(expiredTransmitterMessage)
+        }
         .alert(Texts_Common.warning, isPresented: $showingStopConfirmation) {
             Button(Texts_Common.Cancel, role: .cancel) {}
             Button(Texts_Common.yes, role: .destructive) {
@@ -374,6 +381,12 @@ struct SensorManagementView: View {
     }
 
     private func handleStartTap() {
+        if let isAnubis = expiredDexcomG6TransmitterIsAnubis() {
+            expiredTransmitterIsAnubis = isAnubis
+            showingExpiredTransmitterAlert = true
+            return
+        }
+
         let state = currentState()
 
         if state.needsSensorStartTime {
@@ -384,6 +397,32 @@ struct SensorManagementView: View {
             onStartSensor(SensorStartRequest(startDate: Date()))
             refreshView.toggle()
         }
+    }
+
+    private var expiredTransmitterMessage: String {
+        guard expiredTransmitterIsAnubis else {
+            return Texts_HomeView.sensorManagementTransmitterExpiredMessage
+        }
+
+        return Texts_HomeView.sensorManagementTransmitterExpiredMessage
+            + "\n\n"
+            + Texts_HomeView.sensorManagementAnubisRestartSuggestion
+    }
+
+    /// G5 shares this transmitter class, so its sensor-code requirement identifies the native G6 path.
+    /// Returns whether an expired transmitter is Anubis, or nil when the check does not apply.
+    private func expiredDexcomG6TransmitterIsAnubis() -> Bool? {
+        guard let transmitter = transmitterProvider() as? CGMG5Transmitter,
+              transmitter.needsSensorStartCode(),
+              let transmitterStartDate = transmitter.transmitterStartDate else { return nil }
+
+        let expiryDays = transmitter.isAnubis
+            ? ConstantsMaster.transmitterExpiryDaysDexcomG6Anubis
+            : ConstantsMaster.transmitterExpiryDaysDexcomG5G6
+        let expiryDate = transmitterStartDate.addingTimeInterval(TimeInterval(days: expiryDays))
+        guard Date() >= expiryDate else { return nil }
+
+        return transmitter.isAnubis
     }
 
     private func submitStartSensorCode(_ codeToSubmit: String, sensorLabel: DexcomG6SensorLabel?) {

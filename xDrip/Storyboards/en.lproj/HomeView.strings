@@ -243,6 +243,11 @@
 "sensorExpirationDate" = "Expiry Date";
 "sensorManagementWaitingForSensorStart" = "Waiting for Sensor Start";
 "sensorManagementStatusWarmingUp" = "Warming Up";
+/* Alert shown when a Dexcom G6 transmitter has expired. */
+"sensorManagementTransmitterExpiredTitle" = "Transmitter Expired";
+"sensorManagementTransmitterExpiredMessage" = "This transmitter has expired. A new sensor session cannot be started.";
+/* Shown after a blank line for expired Anubis transmitters. */
+"sensorManagementAnubisRestartSuggestion" = "Restart the Anubis transmitter before trying to start a new sensor session.";
 "sensorCodeContinue" = "Continue";
 "useWithoutSensorCode" = "Use Without Code";
 "noSensorCode" = "No code (0000)";

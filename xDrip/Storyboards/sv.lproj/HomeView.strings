@@ -186,6 +186,9 @@
 "sensorManufactureDate" = "Tillverkningsdatum";
 "sensorExpirationDate" = "Utgångsdatum";
 "sensorManagementWaitingForSensorStart" = "Väntar på sensorstart";
+"sensorManagementTransmitterExpiredTitle" = "Sändaren har gått ut";
+"sensorManagementTransmitterExpiredMessage" = "Den här sändaren har gått ut. En ny sensorsession kan inte startas.";
+"sensorManagementAnubisRestartSuggestion" = "Starta om Anubis-sändaren innan du försöker starta en ny sensorsession.";
 "sensorManagementStatusWarmingUp" = "Värmer upp";
 "sensorCodeContinue" = "Fortsätt";
 "useWithoutSensorCode" = "Använd utan kod";

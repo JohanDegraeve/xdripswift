@@ -173,6 +173,9 @@
 "sensorManufactureDate" = "Дата изготовления";
 "sensorExpirationDate" = "Срок годности";
 "sensorManagementWaitingForSensorStart" = "Ожидание запуска сенсора";
+"sensorManagementTransmitterExpiredTitle" = "Срок службы передатчика истёк";
+"sensorManagementTransmitterExpiredMessage" = "Срок службы этого передатчика истёк. Запустить новый сеанс сенсора нельзя.";
+"sensorManagementAnubisRestartSuggestion" = "Перезапустите передатчик Anubis перед началом нового сеанса сенсора.";
 "sensorManagementStatusWarmingUp" = "Прогрев";
 "sensorCodeContinue" = "Продолжить";
 "useWithoutSensorCode" = "Использовать без кода";

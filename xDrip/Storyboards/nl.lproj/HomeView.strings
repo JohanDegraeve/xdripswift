@@ -211,6 +211,9 @@
 "sensorManufactureDate" = "Productiedatum";
 "sensorExpirationDate" = "Vervaldatum";
 "sensorManagementWaitingForSensorStart" = "Wachten op sensorstart";
+"sensorManagementTransmitterExpiredTitle" = "Zender verlopen";
+"sensorManagementTransmitterExpiredMessage" = "Deze zender is verlopen. Er kan geen nieuwe sensorsessie worden gestart.";
+"sensorManagementAnubisRestartSuggestion" = "Start de Anubis-zender opnieuw voordat je een nieuwe sensorsessie probeert te starten.";
 "sensorManagementStatusWarmingUp" = "Opwarmen";
 "sensorCodeContinue" = "Doorgaan";
 "useWithoutSensorCode" = "Zonder code gebruiken";

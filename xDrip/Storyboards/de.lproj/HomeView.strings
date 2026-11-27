@@ -275,6 +275,9 @@
 "sensorManufactureDate" = "Herstellungsdatum";
 "sensorExpirationDate" = "Verfallsdatum";
 "sensorManagementWaitingForSensorStart" = "Warten auf Sensorstart";
+"sensorManagementTransmitterExpiredTitle" = "Transmitter abgelaufen";
+"sensorManagementTransmitterExpiredMessage" = "Dieser Transmitter ist abgelaufen. Eine neue Sensorsitzung kann nicht gestartet werden.";
+"sensorManagementAnubisRestartSuggestion" = "Starten Sie den Anubis-Transmitter neu, bevor Sie versuchen, eine neue Sensorsitzung zu starten.";
 "sensorManagementStatusWarmingUp" = "Aufwärmphase";
 "sensorCodeContinue" = "Weiter";
 "useWithoutSensorCode" = "Ohne Code verwenden";

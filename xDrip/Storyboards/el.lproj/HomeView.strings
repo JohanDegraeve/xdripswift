@@ -173,6 +173,9 @@
 "sensorManufactureDate" = "Ημερομηνία κατασκευής";
 "sensorExpirationDate" = "Ημερομηνία λήξης";
 "sensorManagementWaitingForSensorStart" = "Αναμονή έναρξης αισθητήρα";
+"sensorManagementTransmitterExpiredTitle" = "Ο πομπός έχει λήξει";
+"sensorManagementTransmitterExpiredMessage" = "Αυτός ο πομπός έχει λήξει. Δεν είναι δυνατή η έναρξη νέας συνεδρίας αισθητήρα.";
+"sensorManagementAnubisRestartSuggestion" = "Επανεκκινήστε τον πομπό Anubis πριν προσπαθήσετε να ξεκινήσετε νέα συνεδρία αισθητήρα.";
 "sensorManagementStatusWarmingUp" = "Προθέρμανση";
 "sensorCodeContinue" = "Συνέχεια";
 "useWithoutSensorCode" = "Χρήση χωρίς κωδικό";

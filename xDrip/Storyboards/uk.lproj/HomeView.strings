@@ -257,6 +257,9 @@
 "sensorManufactureDate" = "Дата виготовлення";
 "sensorExpirationDate" = "Термін придатності";
 "sensorManagementWaitingForSensorStart" = "Очікування запуску сенсора";
+"sensorManagementTransmitterExpiredTitle" = "Термін дії передавача минув";
+"sensorManagementTransmitterExpiredMessage" = "Термін дії цього передавача минув. Розпочати новий сеанс сенсора неможливо.";
+"sensorManagementAnubisRestartSuggestion" = "Перезапустіть передавач Anubis, перш ніж намагатися розпочати новий сеанс сенсора.";
 "sensorManagementStatusWarmingUp" = "Прогрівання";
 "sensorCodeContinue" = "Продовжити";
 "useWithoutSensorCode" = "Використовувати без коду";

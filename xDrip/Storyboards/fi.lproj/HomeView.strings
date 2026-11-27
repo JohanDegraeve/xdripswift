@@ -189,6 +189,9 @@
 "sensorManufactureDate" = "Valmistuspäivä";
 "sensorExpirationDate" = "Viimeinen käyttöpäivä";
 "sensorManagementWaitingForSensorStart" = "Odotetaan sensorin käynnistymistä";
+"sensorManagementTransmitterExpiredTitle" = "Lähetin on vanhentunut";
+"sensorManagementTransmitterExpiredMessage" = "Tämä lähetin on vanhentunut. Uutta sensorijaksoa ei voi aloittaa.";
+"sensorManagementAnubisRestartSuggestion" = "Käynnistä Anubis-lähetin uudelleen ennen kuin yrität aloittaa uuden sensorijakson.";
 "sensorManagementStatusWarmingUp" = "Lämpenee";
 "sensorCodeContinue" = "Jatka";
 "useWithoutSensorCode" = "Käytä ilman koodia";

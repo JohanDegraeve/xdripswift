@@ -175,6 +175,9 @@
 "sensorManufactureDate" = "تاريخ التصنيع";
 "sensorExpirationDate" = "تاريخ انتهاء الصلاحية";
 "sensorManagementWaitingForSensorStart" = "في انتظار بدء تشغيل المستشعر";
+"sensorManagementTransmitterExpiredTitle" = "انتهت صلاحية جهاز الإرسال";
+"sensorManagementTransmitterExpiredMessage" = "انتهت صلاحية جهاز الإرسال هذا. لا يمكن بدء جلسة مستشعر جديدة.";
+"sensorManagementAnubisRestartSuggestion" = "أعد تشغيل جهاز إرسال Anubis قبل محاولة بدء جلسة مستشعر جديدة.";
 "sensorManagementStatusWarmingUp" = "جارٍ الإحماء";
 "sensorCodeContinue" = "متابعة";
 "useWithoutSensorCode" = "استخدام بدون رمز";

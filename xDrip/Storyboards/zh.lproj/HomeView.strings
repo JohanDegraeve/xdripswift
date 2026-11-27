@@ -226,6 +226,9 @@
 "sensorManufactureDate" = "生产日期";
 "sensorExpirationDate" = "有效期至";
 "sensorManagementWaitingForSensorStart" = "正在等待传感器启动";
+"sensorManagementTransmitterExpiredTitle" = "发射器已过期";
+"sensorManagementTransmitterExpiredMessage" = "此发射器已过期，无法启动新的传感器会话。";
+"sensorManagementAnubisRestartSuggestion" = "请重新启动 Anubis 发射器，然后再尝试启动新的传感器会话。";
 "sensorManagementStatusWarmingUp" = "预热中";
 "sensorCodeContinue" = "继续";
 "useWithoutSensorCode" = "不使用代码";

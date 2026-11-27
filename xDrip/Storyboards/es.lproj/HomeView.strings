@@ -183,6 +183,9 @@
 "sensorManufactureDate" = "Fecha de fabricación";
 "sensorExpirationDate" = "Fecha de caducidad";
 "sensorManagementWaitingForSensorStart" = "Esperando el inicio del sensor";
+"sensorManagementTransmitterExpiredTitle" = "Transmisor caducado";
+"sensorManagementTransmitterExpiredMessage" = "Este transmisor ha caducado. No se puede iniciar una nueva sesión del sensor.";
+"sensorManagementAnubisRestartSuggestion" = "Reinicia el transmisor Anubis antes de intentar iniciar una nueva sesión del sensor.";
 "sensorManagementStatusWarmingUp" = "Calentando";
 "sensorCodeContinue" = "Continuar";
 "useWithoutSensorCode" = "Usar sin código";

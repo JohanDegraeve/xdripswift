@@ -269,6 +269,9 @@
 "sensorManufactureDate" = "Datum izdelave";
 "sensorExpirationDate" = "Rok uporabe";
 "sensorManagementWaitingForSensorStart" = "Čakanje na zagon senzorja";
+"sensorManagementTransmitterExpiredTitle" = "Oddajnik je potekel";
+"sensorManagementTransmitterExpiredMessage" = "Temu oddajniku je potekla življenjska doba. Nove seje senzorja ni mogoče začeti.";
+"sensorManagementAnubisRestartSuggestion" = "Znova zaženite oddajnik Anubis, preden poskusite začeti novo sejo senzorja.";
 "sensorManagementStatusWarmingUp" = "Ogrevanje";
 "sensorCodeContinue" = "Nadaljuj";
 "useWithoutSensorCode" = "Uporabi brez kode";

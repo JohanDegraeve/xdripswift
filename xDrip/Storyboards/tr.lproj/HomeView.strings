@@ -173,6 +173,9 @@
 "sensorManufactureDate" = "Üretim Tarihi";
 "sensorExpirationDate" = "Son Kullanma Tarihi";
 "sensorManagementWaitingForSensorStart" = "Sensörün başlaması bekleniyor";
+"sensorManagementTransmitterExpiredTitle" = "Vericinin süresi doldu";
+"sensorManagementTransmitterExpiredMessage" = "Bu vericinin süresi doldu. Yeni bir sensör oturumu başlatılamaz.";
+"sensorManagementAnubisRestartSuggestion" = "Yeni bir sensör oturumu başlatmayı denemeden önce Anubis vericisini yeniden başlatın.";
 "sensorManagementStatusWarmingUp" = "Isınıyor";
 "sensorCodeContinue" = "Devam";
 "useWithoutSensorCode" = "Kodsuz Kullan";

@@ -209,6 +209,9 @@
 "sensorManufactureDate" = "Date de fabrication";
 "sensorExpirationDate" = "Date d’expiration";
 "sensorManagementWaitingForSensorStart" = "En attente du démarrage du capteur";
+"sensorManagementTransmitterExpiredTitle" = "Émetteur expiré";
+"sensorManagementTransmitterExpiredMessage" = "Cet émetteur a expiré. Une nouvelle session de capteur ne peut pas être démarrée.";
+"sensorManagementAnubisRestartSuggestion" = "Redémarrez l’émetteur Anubis avant d’essayer de démarrer une nouvelle session de capteur.";
 "sensorManagementStatusWarmingUp" = "Préchauffage";
 "sensorCodeContinue" = "Continuer";
 "useWithoutSensorCode" = "Utiliser sans code";

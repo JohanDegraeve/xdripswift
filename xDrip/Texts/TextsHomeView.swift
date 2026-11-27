@@ -377,6 +377,10 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorManagementStatusExpired", tableName: filename, bundle: Bundle.main, value: "Expired", comment: "sensor management status label")
     }()
 
+    static let sensorManagementTransmitterExpiredTitle = NSLocalizedString("sensorManagementTransmitterExpiredTitle", tableName: filename, bundle: .main, value: "Transmitter Expired", comment: "alert title when a Dexcom G6 transmitter has expired")
+    static let sensorManagementTransmitterExpiredMessage = NSLocalizedString("sensorManagementTransmitterExpiredMessage", tableName: filename, bundle: .main, value: "This transmitter has expired. A new sensor session cannot be started.", comment: "alert message when a Dexcom G6 transmitter has expired")
+    static let sensorManagementAnubisRestartSuggestion = NSLocalizedString("sensorManagementAnubisRestartSuggestion", tableName: filename, bundle: .main, value: "Restart the Anubis transmitter before trying to start a new sensor session.", comment: "suggestion shown when an Anubis transmitter has expired")
+
     static let sensorManagementStatusNotStarted:String = {
         return NSLocalizedString("sensorManagementStatusNotStarted", tableName: filename, bundle: Bundle.main, value: "Not Started", comment: "sensor management status label")
     }()
