@@ -106,3 +106,13 @@
 "directWatchAlertExplanation" = "De grenzen volgen het alarmschema op de iPhone. Watch-meldingen vereisen actieve verzameling en meer dan 60 seconden zonder iPhone-contact.";
 "directWatchScheduleUnavailable" = "Synchroniseer iPhone-alarmen";
 "directWatchUrgentLowGlucose" = "%@: dringend lage glucose";
+"directWatchEnabled" = "Ingeschakeld";
+"directWatchDisabled" = "Uitgeschakeld";
+"directWatchUploaded" = "Geüpload";
+"directWatchUploadPending" = "In wachtrij";
+"directWatchUploadError" = "Fout";
+"directWatchUploadNotTracked" = "Niet bijgehouden";
+
+/* Direct to Watch cloud upload */
+"directWatchNightscoutUpload" = "Nightscout";
+"directWatchDexcomShareUpload" = "Dexcom Share";

@@ -104,31 +104,11 @@ extension String {
         return nil
     }
     
-    /// used for strings that represent a schedule
-    /// - Example :
-    /// - string = 5-480-660-1080
-    /// - between 00:00  and 00:04, the value is on, between 00:05 and 07:59  on, ...
+    /// Evaluate the saved transitions using the same schedule rules as the Watch.
     func indicatesOn(forWhen when: Date) -> Bool {
-        // minutes since midnight, for when
-        let minutes = Int16(when.minutesSinceMidNightLocalTime())
-        
-        // start with true
-        var isOn = true
-        
-        // split by "-" into array of int
-        let schedule = self.split(separator: "-").map { Int($0) ?? 0 }
-        
-        // loop through ints in the array, each time swap isOn, until entry > current minutes
-        for entry in schedule {
-            if entry > minutes {
-                break
-            }
-            isOn = !isOn
-        }
-        
-        return isOn
+        DirectWatchUploadSchedule.isOn(self, minute: when.minutesSinceMidNightLocalTime())
     }
-    
+
     /// used for strings that represent a schedule
     /// - Example :
     /// - string = 5-480-660-1080

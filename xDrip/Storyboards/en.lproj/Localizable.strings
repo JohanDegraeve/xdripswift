@@ -2,6 +2,7 @@
 
 // Direct to Watch status and pairing guidance
 "directWatchTitle" = "Direct to Watch";
+"directWatchActivationAdvice" = "To receive readings using Direct to Watch collection, the %@ Watch app must be open on your Apple Watch. Even then collection is not guaranteed every cycle. Use with caution.";
 "directWatchNoConnection" = "No Connection Added";
 "directWatchSuspended" = "Collection suspended";
 "directWatchWaiting" = "Waiting for Watch reading";
@@ -36,10 +37,10 @@
 "directWatchMedicalSlot" = "Medical device slot";
 "directWatchWatchSlot" = "Watch slot";
 "directWatchConfirmUnusedSlot" = "Slot unused: add Watch";
-"directWatchSlotMedical" = "Slot 1 · Medical device";
-"directWatchSlotMobile" = "Slot 2 · Mobile app";
-"directWatchSlotWatch" = "Slot 3 · Watch";
-"directWatchSlotAnubis" = "Slot 3 · Anubis extra";
+"directWatchSlotMedical" = "Slot 1 (Medical device)";
+"directWatchSlotMobile" = "Slot 2 (Mobile app)";
+"directWatchSlotWatch" = "Slot 3 (Watch)";
+"directWatchSlotAnubis" = "Slot 3 (Anubis extra)";
 "directWatchUsedWatch" = "Used by this Watch";
 "directWatchUsedPhone" = "Used by this iPhone";
 "directWatchSlotMedicalDetail" = "Only if no pump or receiver uses it";
@@ -49,7 +50,7 @@
 "directWatchAnubisOnly" = "Anubis transmitters only";
 "directWatchWatchStatus" = "Watch status";
 "directWatchTestingDiagnosis" = "Testing and diagnosis";
-"directWatchPausePhone" = "Pause iPhone BLE collection";
+"directWatchPausePhone" = "Disable iPhone Collection";
 "directWatchForTesting" = "For testing Watch collection";
 "directWatchGetLogs" = "Get Watch logs";
 "directWatchShareLogs" = "Share Watch logs";
@@ -80,9 +81,16 @@
 /* Direct to Watch action feedback. */
 "directWatchTryAgain" = "Try again";
 "directWatchRequestQueued" = "Request queued";
-"directWatchLastLogsReceived" = "Last logs received";
+"directWatchLastLogsReceived" = "Last received";
 "directWatchWaitingForLogs" = "Waiting for new logs…";
 "directWatchLogsFailed" = "Could not get logs. Try again.";
 
 /* Watch diagnostic log actions and receipt time. */
-"directWatchLogs" = "Logs";
+"directWatchLogs" = "Watch Logs";
+
+"directWatchPhoneCollectionAdvice" = "Disable iPhone Collection stops Bluetooth readings from this transmitter on the iPhone so you can test Watch-only collection.";
+"directWatchBlockPhoneSync" = "Disable Watch Sync";
+"directWatchUploadReadings" = "Upload Readings";
+"directWatchBlockPhoneSyncAdvice" = "Disable Watch Sync will stop syncing Watch readings back to the iPhone so you can test uploading from the Watch if this feature is enabled.";
+"directWatchCloudUpload" = "Allow cloud upload";
+"directWatchCloudUploadAdvice" = "When enabled, the Watch will attempt to upload readings to each configured cloud service when an internet connection is available.";

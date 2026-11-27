@@ -89,3 +89,4 @@
 
 /* Status label, including Direct to Watch in Advanced Settings. */
 "common_enabled" = "Etkin";
+"common_disabled" = "Devre dışı";

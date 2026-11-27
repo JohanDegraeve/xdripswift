@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import CoreBluetooth
+@preconcurrency import CoreBluetooth
 import Combine
 import UserNotifications
 import WatchConnectivity
@@ -15,7 +15,8 @@ import WatchKit
 
 /// Collects native readings on the Watch and retains them until the phone acknowledges them.
 /// CoreBluetooth callbacks and collector state are handled on the main queue.
-final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeripheralDelegate, DexcomG7AuthSessionTransport {
+@MainActor final class DirectWatchCollector: NSObject, ObservableObject, @preconcurrency CBCentralManagerDelegate, @preconcurrency CBPeripheralDelegate, @preconcurrency DexcomG7AuthSessionTransport {
+    struct CollectionFeedback: Equatable { let id = UUID(); let isPaused: Bool }
     @Published private(set) var status = TextsDirectWatch.collectionOff
     @Published private(set) var readings: [DirectWatchReading] = []
     @Published private(set) var collectionSessions: [DirectWatchCollectionSession] = []
@@ -23,11 +24,13 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
     @Published private(set) var lastConnectedAt: Date?
     @Published private(set) var phoneBLECollectionPaused = false
     @Published private(set) var collectionControl: DirectWatchCollectionControl?
+    @Published private(set) var collectionFeedback: CollectionFeedback?
     // A local Watch choice, independent of phone configuration and collection pause/resume.
     // A missing key defaults to false, including upgrades from the automatic alert.
     @Published private(set) var missedReadingNotificationsEnabled = UserDefaults.standard.bool(forKey: ConstantsDirectWatch.missedReadingNotificationsKey)
     @Published private(set) var urgentLowNotificationsEnabled = UserDefaults.standard.bool(forKey: ConstantsDirectWatch.urgentLowNotificationsKey)
     @Published private(set) var lowNotificationsEnabled = UserDefaults.standard.bool(forKey: ConstantsDirectWatch.lowNotificationsKey)
+    let uploadCoordinator: DirectWatchUploadCoordinator
     private var lastPhoneContactAt = UserDefaults.standard.object(forKey: ConstantsDirectWatch.lastPhoneContactKey) as? Date
     private var lastPublishedControlID: String?
 
@@ -38,6 +41,7 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
     // Configured means a binding exists. Enabled additionally requires an available sensor
     // configuration and an unpaused local choice. Keep those states separate during suspension.
     private var collectionIsEnabled: Bool { isConfigured && configuration != nil && !isPaused }
+    var collectionAllowsCloudUpload: Bool { collectionIsEnabled && !storageFailed }
 
     var latestReadingAt: Date? {
         guard let configuration else { return nil }
@@ -84,7 +88,10 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
     // Separate timers let an Urgent Low alert follow a Low alert immediately.
     private var lastUrgentLowAlert = UserDefaults.standard.object(forKey: ConstantsDirectWatch.lastUrgentLowAlertKey) as? Date
     private var lastLowAlert = UserDefaults.standard.object(forKey: ConstantsDirectWatch.lastLowAlertKey) as? Date
+    private static let maximumJournalLines = 3000
+    private static let journalFlushDelay: UInt64 = 1_000_000_000
     private var journal: [String] = []
+    private var journalFlushTask: Task<Void, Never>?
     private var reportLogSnapshot: (id: String, data: Data, createdAt: TimeInterval)?
     private var pendingIDs: Set<String> = []
     private var configurationRevision: Double = 0
@@ -120,8 +127,20 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
 
     // MARK: - Initialization and stored data
 
-    override init() {
+    init(uploadCoordinator: DirectWatchUploadCoordinator? = nil) {
+        self.uploadCoordinator = uploadCoordinator ?? DirectWatchUploadCoordinator()
         super.init()
+        // Pausing collection holds both queues. A request already sent can still finish.
+        self.uploadCoordinator.nightscoutUploader.collectionAllowsUpload = { [weak self] in
+            self?.collectionAllowsCloudUpload == true && self?.uploadCoordinator.cloudUploadEnabled == true
+        }
+        self.uploadCoordinator.dexcomShareUploader.collectionAllowsUpload = self.uploadCoordinator.nightscoutUploader.collectionAllowsUpload
+        self.uploadCoordinator.nightscoutUploader.onDiagnostic = { [weak self] message in
+            DispatchQueue.main.async { self?.log(message) }
+        }
+        self.uploadCoordinator.dexcomShareUploader.onDiagnostic = { [weak self] message in
+            DispatchQueue.main.async { self?.log("Dexcom Share: \(message)") }
+        }
         if let data = try? Data(contentsOf: storeURL) {
             do {
                 let store = try JSONDecoder().decode(Store.self, from: data)
@@ -132,6 +151,9 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
             }
         }
         if let text = try? String(contentsOf: logURL, encoding: .utf8) { journal = text.components(separatedBy: "\n").filter { !$0.isEmpty } }
+        if !storageFailed {
+            self.uploadCoordinator.reconcileStagedReadings(in: readings)
+        }
         configureG7Authentication()
         if configuration == nil && isConfigured { status = TextsDirectWatch.suspendedCheckPhone }
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "unknown"
@@ -198,7 +220,21 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
 
     private func log(_ message: String) {
         journal.append("\(ISO8601DateFormatter().string(from: Date())) \(message)")
-        journal = Array(journal.suffix(3000))
+        if journal.count > Self.maximumJournalLines {
+            journal.removeFirst(journal.count - Self.maximumJournalLines)
+        }
+        // Keep the journal available for export immediately. Batch disk writes during a burst of BLE or upload events.
+        guard journalFlushTask == nil else { return }
+        journalFlushTask = Task { [weak self] in
+            do { try await Task.sleep(nanoseconds: Self.journalFlushDelay) } catch { return }
+            self?.flushJournal()
+        }
+    }
+
+    private func flushJournal() {
+        guard let journalFlushTask else { return }
+        journalFlushTask.cancel()
+        self.journalFlushTask = nil
         try? (journal.joined(separator: "\n") + "\n").write(to: logURL, atomically: true, encoding: .utf8)
     }
 
@@ -214,8 +250,6 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
                                                     previousRevision: collectionControl?.revision ?? 0)
         if applyCollectionControl(control) {
             publishCollectionControl()
-            // This entry point handles local buttons and triple tap. Remote controls stay silent.
-            WKInterfaceDevice.current().play(paused ? .stop : .start)
         }
     }
 
@@ -229,6 +263,7 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
     /// A failed write leaves the previous choice available for retry, rather than acknowledging it.
     @discardableResult private func applyCollectionControl(_ control: DirectWatchCollectionControl) -> Bool {
         let previous = collectionControl
+        let previouslyPaused = isPaused
         let previousSessions = collectionSessions
         collectionControl = control
         updateCollectionSessions()
@@ -243,7 +278,15 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
         } else { start() }
         updateMissedReadingNotification()
         log("Watch collection paused=\(isPaused), control=\(control.id)")
+        publishCollectionFeedback(previouslyPaused: previouslyPaused)
         return true
+    }
+
+    private func publishCollectionFeedback(previouslyPaused: Bool) {
+        guard isConfigured, let control = collectionControl, control.connection == connectionIdentity,
+              control.isPaused != previouslyPaused else { return }
+        collectionFeedback = CollectionFeedback(isPaused: control.isPaused)
+        WKInterfaceDevice.current().play(control.isPaused ? .stop : .start)
     }
 
     private func updateCollectionSessions() {
@@ -284,6 +327,9 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
             : (payload["directWatchConfiguration"] as? Data).flatMap { try? JSONDecoder().decode(DirectWatchConfiguration.self, from: $0) }
         guard payload["directWatchEnabled"] as? Bool == false || next?.isValid() == true else { return false }
         guard !storageFailed else { return false }
+        if let phoneSyncDisabled = payload["directWatchPhoneSyncDisabled"] as? Bool {
+            UserDefaults.standard.set(phoneSyncDisabled, forKey: DirectWatchUploadSettings.blockPhoneSyncKey)
+        }
         // A configuration transfer is also a background execution opportunity. Previously an
         // unchanged snapshot returned without checking the hours-old restored BLE request.
         // start() respects pause/suspension and connect() bounds recovery by request age.
@@ -309,11 +355,14 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
         }
         guard changed else {
             receiveCollectionControl(payload)
+            uploadCoordinator.receiveConfiguration(payload)
             if isPaused { status = TextsDirectWatch.paused }
             else if let reason = payload["directWatchUnavailableReason"] as? String { status = String(format: TextsDirectWatch.suspendedReasonFormat, reason) }
             return true
         }
         let previousState = storedState
+        let previouslyPaused = isPaused
+        let previousConnection = connectionIdentity
         if restartBluetooth { stop() }
         if pairingCodeChanged { g7AuthSession?.updatePairingCode(next?.pairingCode) }
         // Suspension stops collection but keeps the binding for the same transmitter and slot.
@@ -344,6 +393,7 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
             configureG7Authentication()
             return false
         }
+        uploadCoordinator.receiveConfiguration(payload)
         if controlChanged { lastPublishedControlID = incomingControl?.id }
         log("Configuration received, enabled=\(next != nil), slot=\(next?.slot ?? 0)")
         if isPaused {
@@ -351,6 +401,11 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
             status = TextsDirectWatch.paused
         } else if next != nil && (restartBluetooth || controlChanged) { start() }
         else if let reason = payload["directWatchUnavailableReason"] as? String { status = String(format: TextsDirectWatch.suspendedReasonFormat, reason) }
+        // Only a pause/resume command on the current connection gets feedback. Initial
+        // configuration and a new transmitter binding remain silent.
+        if controlChanged && previousConnection == connectionIdentity {
+            publishCollectionFeedback(previouslyPaused: previouslyPaused)
+        }
         return true
     }
 
@@ -358,6 +413,7 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
 
     func start() {
         guard collectionIsEnabled, configuration?.isValid() == true, !storageFailed else { return }
+        uploadCoordinator.retryPendingUploads()
         requestNotificationAuthorization()
         if central == nil {
             status = TextsDirectWatch.waitingTransmitter
@@ -406,9 +462,11 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
         connectionTimeout = nil
         if discoveryFallbackStartedAt != nil { finishDiscoveryFallback(reason: "Watch app backgrounded") }
         log("App entered background, status=\(status)")
+        flushJournal()
     }
 
     @MainActor func handleBluetoothBackground() async {
+        defer { flushJournal() }
         log("Bluetooth background task started")
         guard collectionIsEnabled else {
             sync()
@@ -416,6 +474,7 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
             return
         }
         connect()
+        uploadCoordinator.retryPendingUploads()
         // Keep the granted task alive briefly for the asynchronous auth/time/glucose exchange.
         // This does not extend watchOS's Bluetooth budget or create additional runtime.
         for _ in 0..<15 {
@@ -423,10 +482,18 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
             do { try await Task.sleep(nanoseconds: 1_000_000_000) } catch { break }
             // G7 has no G6 time-response tuple. Use the common completion flag so a finished
             // G7 exchange does not keep every granted background task alive for all 15 seconds.
-            if cycleCompletedThisConnection && peripheral?.state != .connected { break }
+            if cycleCompletedThisConnection && peripheral?.state != .connected && !uploadCoordinator.isUploading { break }
         }
         sync()
         log("Bluetooth background task completed")
+    }
+
+    // These timers are installed on the collector's main run loop, so the
+    // callback can stay synchronous with the Bluetooth state it inspects.
+    private func scheduleTimer(after interval: TimeInterval, action: @escaping @MainActor @Sendable () -> Void) -> Timer {
+        Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { _ in
+            MainActor.assumeIsolated { action() }
+        }
     }
 
     // MARK: - Connection and recovery
@@ -483,7 +550,7 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
         // Background recovery is checked on an actual wake, never by a suspended Timer.
         guard isForeground, let startedAt = connectionRequestedAt else { return }
         let remaining = max(0.1, DirectWatchCollectionPolicy.pendingConnectionLimit - Date().timeIntervalSince(startedAt))
-        connectionTimeout = Timer.scheduledTimer(withTimeInterval: remaining, repeats: false) { [weak self, weak target] _ in
+        connectionTimeout = scheduleTimer(after: remaining) { [weak self, weak target] in
             guard let self, let target, self.peripheral === target, target.state == .connecting else { return }
             self.connect()
         }
@@ -533,7 +600,7 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
 
     private func awaitPendingCancellation(of target: CBPeripheral, checksRemaining: Int) {
         recoveryCallbackTimeout?.invalidate()
-        recoveryCallbackTimeout = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { [weak self, weak target] _ in
+        recoveryCallbackTimeout = scheduleTimer(after: 3) { [weak self, weak target] in
             guard let self, let target, self.peripheral === target, self.pendingRecovery != nil else { return }
             self.recoveryCallbackTimeout = nil
             if target.state == .disconnected {
@@ -581,7 +648,7 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
         central.scanForPeripherals(withServices: [advertisement])
         log("Foreground discovery fallback started, saved peripheral retained, isScanning=\(central.isScanning)")
         discoveryFallbackTimeout?.invalidate()
-        discoveryFallbackTimeout = Timer.scheduledTimer(withTimeInterval: DirectWatchCollectionPolicy.discoveryFallbackLimit, repeats: false) { [weak self] _ in
+        discoveryFallbackTimeout = scheduleTimer(after: DirectWatchCollectionPolicy.discoveryFallbackLimit) { [weak self] in
             self?.finishDiscoveryFallback(reason: "discovery window elapsed")
         }
     }
@@ -752,7 +819,7 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
         peripheral.discoverServices([service])
         sync()
         timeout?.invalidate()
-        timeout = Timer.scheduledTimer(withTimeInterval: 75, repeats: false) { [weak self] _ in
+        timeout = scheduleTimer(after: 75) { [weak self] in
             guard let self else { return }
             self.log("Connection setup/read timed out")
             self.status = TextsDirectWatch.transmitterTimeout
@@ -1138,8 +1205,14 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
         var reading = incoming
         if reading.collectedAt == nil { reading.collectedAt = Date() }
         guard collectionIsEnabled else { return }
-        reading.collectionSessionID = collectionSessions.last.flatMap { $0.endedAt == nil ? $0.id : nil }
         guard !readings.contains(where: { $0.id == reading.id }) else { return }
+        let phoneReachable = WCSession.default.activationState == .activated && WCSession.default.isReachable
+        let phoneSyncDisabled = UserDefaults.standard.bool(forKey: DirectWatchUploadSettings.blockPhoneSyncKey)
+        reading.collectionSessionID = collectionSessions.last.flatMap { $0.endedAt == nil ? $0.id : nil }
+        let ownership = uploadCoordinator.stageReading(reading, alongside: readings,
+            phoneReachable: phoneReachable, phoneSyncDisabled: phoneSyncDisabled)
+        reading.watchNightscoutOwned = ownership.nightscout
+        reading.watchDexcomShareOwned = ownership.dexcomShare
         let previousReadings = readings
         let previousPending = pendingIDs
         let previousSessions = collectionSessions
@@ -1154,6 +1227,7 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
         pendingIDs.insert(reading.id)
         readings.removeAll { $0.measuredAt < Date().addingTimeInterval(-ConstantsDirectWatch.localReadingRetention) && !pendingIDs.contains($0.id) }
         guard save() else {
+            if ownership.nightscout || ownership.dexcomShare { uploadCoordinator.reconcileStagedReadings(in: []) }
             readings = previousReadings
             pendingIDs = previousPending
             collectionSessions = previousSessions
@@ -1162,6 +1236,13 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
             central?.stopScan()
             return
         }
+        if ownership.nightscout || ownership.dexcomShare {
+            uploadCoordinator.reconcileStagedReadings(in: [reading])
+            uploadCoordinator.retryPendingUploads()
+        }
+        let nightscout = uploadCoordinator.nightscoutUploader
+        let share = uploadCoordinator.dexcomShareUploader
+        log("Cloud upload route: measuredAt=\(reading.measuredAt.ISO8601Format()), iPhoneReachable=\(phoneReachable), phoneSyncDisabled=\(phoneSyncDisabled), enabled=\(uploadCoordinator.cloudUploadEnabled), Nightscout(queued=\(ownership.nightscout), ready=\(nightscout.isReady), scheduleActive=\(nightscout.scheduleIsActive), pending=\(nightscout.pendingCount)), DexcomShare(queued=\(ownership.dexcomShare), ready=\(share.isReady), scheduleActive=\(share.scheduleIsActive), pending=\(share.pendingCount))")
         status = TextsDirectWatch.readingReceived
         log("Stored Watch reading at \(reading.measuredAt), mg/dL=\(reading.mgDl), pending=\(pendingCount)")
         updateMissedReadingNotification()
@@ -1210,7 +1291,7 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
         publishCollectionControl()
         let session = WCSession.default
         if session.activationState == .activated && session.isReachable {
-            session.sendMessage(DirectWatchCompatibility.outgoing(["directWatchStatus": "\(status); pending=\(pendingCount)"].merging(collectionControl?.payload ?? [:], uniquingKeysWith: { _, new in new })
+            session.sendMessage(DirectWatchCompatibility.outgoing(["directWatchStatus": "\(status); pending=\(pendingCount)"].merging(uploadCoordinator.statusPayload, uniquingKeysWith: { _, new in new }).merging(collectionControl?.payload ?? [:], uniquingKeysWith: { _, new in new })
                 .merging(connectionEventPayload, uniquingKeysWith: { _, new in new })), replyHandler: { [weak self] response in
                 DispatchQueue.main.async {
                     self?.recordLivePhoneContact()
@@ -1231,7 +1312,7 @@ final class DirectWatchCollector: NSObject, ObservableObject, CBCentralManagerDe
             liveSyncID = id
             liveSyncStartedAt = .now
             liveSyncTimeout?.invalidate()
-            liveSyncTimeout = Timer.scheduledTimer(withTimeInterval: DirectWatchCollectionPolicy.liveSyncReplyTimeout, repeats: false) { [weak self] _ in
+            liveSyncTimeout = scheduleTimer(after: DirectWatchCollectionPolicy.liveSyncReplyTimeout) { [weak self] in
                 self?.expireLiveSync(id)
             }
             log("Sending live batch, count=\(batch.count)")

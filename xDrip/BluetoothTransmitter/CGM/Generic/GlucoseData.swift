@@ -14,6 +14,8 @@ public class GlucoseData {
     var valueIsFromWatch = false
     var watchReceivedAt: Date?
     var watchCollectedAt: Date?
+    var watchNightscoutOwned = false
+    var watchDexcomShareOwned = false
 
     /// used when needed
     var slopeOrdinal: Int?

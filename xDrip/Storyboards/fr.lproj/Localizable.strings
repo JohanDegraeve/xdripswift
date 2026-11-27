@@ -2,6 +2,7 @@
 
 // Direct to Watch status and pairing guidance
 "directWatchTitle" = "Direct vers la Watch";
+"directWatchActivationAdvice" = "Pour recevoir des mesures avec la collecte Direct vers la Watch, l’app Watch %@ doit être ouverte sur votre Apple Watch. Même dans ce cas, la collecte n’est pas garantie à chaque cycle. À utiliser avec prudence.";
 "directWatchNoConnection" = "Aucune connexion ajoutée";
 "directWatchSuspended" = "Collecte suspendue";
 "directWatchWaiting" = "En attente d’une mesure de la Watch";
@@ -36,10 +37,10 @@
 "directWatchMedicalSlot" = "Canal médical";
 "directWatchWatchSlot" = "Canal du Watch";
 "directWatchConfirmUnusedSlot" = "Canal libre: ajouter le Watch";
-"directWatchSlotMedical" = "Canal 1 · Appareil médical";
-"directWatchSlotMobile" = "Canal 2 · App mobile";
-"directWatchSlotWatch" = "Canal 3 · Watch";
-"directWatchSlotAnubis" = "Canal 3 · Extra Anubis";
+"directWatchSlotMedical" = "Canal 1 (Appareil médical)";
+"directWatchSlotMobile" = "Canal 2 (App mobile)";
+"directWatchSlotWatch" = "Canal 3 (Watch)";
+"directWatchSlotAnubis" = "Canal 3 (Extra Anubis)";
 "directWatchUsedWatch" = "Utilisé par ce Watch";
 "directWatchUsedPhone" = "Utilisé par cet iPhone";
 "directWatchSlotMedicalDetail" = "Si aucune pompe ni récepteur ne l’utilise";
@@ -49,7 +50,7 @@
 "directWatchAnubisOnly" = "Émetteurs Anubis uniquement";
 "directWatchWatchStatus" = "État du Watch";
 "directWatchTestingDiagnosis" = "Tests et diagnostic";
-"directWatchPausePhone" = "Suspendre la collecte BLE iPhone";
+"directWatchPausePhone" = "Désactiver la collecte sur l’iPhone";
 "directWatchForTesting" = "Pour tester la collecte du Watch";
 "directWatchGetLogs" = "Obtenir journaux Watch";
 "directWatchShareLogs" = "Partager journaux Watch";
@@ -80,9 +81,15 @@
 /* Direct to Watch action feedback. */
 "directWatchTryAgain" = "Réessayer";
 "directWatchRequestQueued" = "Demande en attente";
-"directWatchLastLogsReceived" = "Derniers reçus";
+"directWatchLastLogsReceived" = "Dernière réception";
 "directWatchWaitingForLogs" = "En attente de nouveaux journaux…";
 "directWatchLogsFailed" = "Journaux indisponibles. Réessayez.";
 
 /* Watch diagnostic log actions and receipt time. */
-"directWatchLogs" = "Journaux";
+"directWatchLogs" = "Journaux de la Watch";
+"directWatchUploadReadings" = "Envoyer les mesures";
+"directWatchBlockPhoneSync" = "Désactiver la synchronisation Watch";
+"directWatchPhoneCollectionAdvice" = "Désactive la collecte Bluetooth de cet émetteur sur l’iPhone pour tester la collecte uniquement avec la Watch.";
+"directWatchBlockPhoneSyncAdvice" = "Désactiver la synchronisation Watch arrêtera l’envoi des mesures de la Watch vers l’iPhone pour vous permettre de tester l’envoi depuis la Watch si cette fonction est activée.";
+"directWatchCloudUpload" = "Autoriser l’envoi vers le cloud";
+"directWatchCloudUploadAdvice" = "Si cette option est activée, la Watch tente d’envoyer les mesures à chaque service cloud configuré lorsqu’une connexion Internet est disponible.";

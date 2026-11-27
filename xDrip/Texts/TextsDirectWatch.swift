@@ -19,7 +19,18 @@ enum TextsDirectWatch {
         return NSLocalizedString(key, tableName: table, bundle: .main, value: fallback, comment: "Direct to Watch")
     }
 
+    static var uploadReadings: String { text("directWatchUploadReadings", "Upload Readings") }
+    static var cloudUpload: String { text("directWatchCloudUpload", "Allow cloud upload") }
+    static var nightscoutUpload: String { text("directWatchNightscoutUpload", "Nightscout Upload") }
+    static var dexcomShareUpload: String { text("directWatchDexcomShareUpload", "Dexcom Share") }
+    static var cloudUploadAdvice: String { text("directWatchCloudUploadAdvice", "When enabled, the Watch will attempt to upload readings to each configured cloud service when an internet connection is available.") }
+    static var blockPhoneSync: String { text("directWatchBlockPhoneSync", "Disable Watch Sync") }
+    static var blockPhoneSyncAdvice: String { text("directWatchBlockPhoneSyncAdvice", "Disable Watch Sync will stop syncing Watch readings back to the iPhone so you can test uploading from the Watch if this feature is enabled.") }
+
     static var title: String { text("directWatchTitle", "Direct to Watch") }
+    static var activationAdvice: String {
+        String(format: text("directWatchActivationAdvice", "To receive readings using Direct to Watch collection, the %@ Watch app must be open on your Apple Watch. Even then collection is not guaranteed every cycle. Use with caution."), ConstantsHomeView.applicationName)
+    }
     static var noConnection: String { text("directWatchNoConnection", "No Connection Added") }
     static var suspended: String { text("directWatchSuspended", "Collection suspended") }
     static var collectedReadings: String { text("directWatchCollectedReadings", "Collected Readings") }
@@ -31,7 +42,7 @@ enum TextsDirectWatch {
     static var resetStarted: String { text("directWatchResetStarted", "Reset started") }
     static var tryAgain: String { text("directWatchTryAgain", "Try again") }
     static var requestQueued: String { text("directWatchRequestQueued", "Request queued") }
-    static var lastLogsReceived: String { text("directWatchLastLogsReceived", "Last logs received") }
+    static var lastLogsReceived: String { text("directWatchLastLogsReceived", "Last received") }
     static var waitingForLogs: String { text("directWatchWaitingForLogs", "Waiting for new logs…") }
     static var logsFailed: String { text("directWatchLogsFailed", "Could not get logs. Try again.") }
     static var resetConnection: String { text("directWatchResetConnection", "Reset connection") }
@@ -41,12 +52,7 @@ enum TextsDirectWatch {
     }
     static func sessionBoundary(_ session: DirectWatchCollectionSession, ending: Bool) -> String {
         let date = ending ? session.endedAt ?? session.startedAt : session.startedAt
-        let timestamp = date.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute(.twoDigits))
-        let key = ending ? (session.endedByPause ? "directWatchSessionPaused" : "directWatchSessionEnded")
-                         : (session.isResume ? "directWatchSessionResumed" : "directWatchSessionStarted")
-        let fallback = ending ? (session.endedByPause ? "Paused at %@" : "Ended at %@")
-                              : (session.isResume ? "Resumed at %@" : "Started at %@")
-        return String(format: text(key, fallback), timestamp)
+        return date.formatted(date: .numeric, time: .shortened)
     }
     static func readingGap(_ interval: TimeInterval) -> String {
         let seconds = Int(max(0, interval).rounded())
@@ -89,10 +95,10 @@ enum TextsDirectWatch {
     static var medicalSlot: String { text("directWatchMedicalSlot", "Medical device slot") }
     static var watchSlot: String { text("directWatchWatchSlot", "Watch slot") }
     static var confirmUnusedSlot: String { text("directWatchConfirmUnusedSlot", "Slot unused: add Watch") }
-    static var slotMedical: String { text("directWatchSlotMedical", "Slot 1 · Medical device") }
-    static var slotMobile: String { text("directWatchSlotMobile", "Slot 2 · Mobile app") }
-    static var slotWatch: String { text("directWatchSlotWatch", "Slot 3 · Watch") }
-    static var slotAnubis: String { text("directWatchSlotAnubis", "Slot 3 · Anubis extra") }
+    static var slotMedical: String { text("directWatchSlotMedical", "Slot 1 (Medical device)") }
+    static var slotMobile: String { text("directWatchSlotMobile", "Slot 2 (Mobile app)") }
+    static var slotWatch: String { text("directWatchSlotWatch", "Slot 3 (Watch)") }
+    static var slotAnubis: String { text("directWatchSlotAnubis", "Slot 3 (Anubis extra)") }
     static var usedWatch: String { text("directWatchUsedWatch", "Used by this Watch") }
     static var usedPhone: String { text("directWatchUsedPhone", "Used by this iPhone") }
     static var slotMedicalDetail: String { text("directWatchSlotMedicalDetail", "Only if no pump or receiver uses it") }
@@ -102,10 +108,11 @@ enum TextsDirectWatch {
     static var anubisOnly: String { text("directWatchAnubisOnly", "Anubis transmitters only") }
     static var watchStatus: String { text("directWatchWatchStatus", "Watch status") }
     static var testingDiagnosis: String { text("directWatchTestingDiagnosis", "Testing and diagnosis") }
-    static var pausePhone: String { text("directWatchPausePhone", "Pause iPhone BLE collection") }
+    static var pausePhone: String { text("directWatchPausePhone", "Disable iPhone Collection") }
     static var forTesting: String { text("directWatchForTesting", "For testing Watch collection") }
+    static var phoneCollectionAdvice: String { text("directWatchPhoneCollectionAdvice", "Disable iPhone Collection stops Bluetooth readings from this transmitter on the iPhone so you can test Watch-only collection.") }
     static var getLogs: String { text("directWatchGetLogs", "Get Watch logs") }
-    static var logs: String { text("directWatchLogs", "Logs") }
+    static var logs: String { text("directWatchLogs", "Watch Logs") }
     static var shareLogs: String { text("directWatchShareLogs", "Share Watch logs") }
     static var pending: String { text("directWatchPending", "Pending") }
     static var receivedFormat: String { text("directWatchReceivedFormat", "Received %@") }
@@ -132,6 +139,12 @@ enum TextsDirectWatch {
     static var noActiveSensor: String { text("directWatchNoActiveSensor", "No active sensor on the iPhone.") }
     // Watch-only labels and operational states. Protocol details remain in the diagnostic log.
     static var cgm: String { text("directWatchCgm", "CGM") }
+    static var enabled: String { text("directWatchEnabled", "Enabled") }
+    static var disabled: String { text("directWatchDisabled", "Disabled") }
+    static var uploaded: String { text("directWatchUploaded", "Uploaded") }
+    static var uploadPending: String { text("directWatchUploadPending", "Pending") }
+    static var uploadError: String { text("directWatchUploadError", "Error") }
+    static var uploadNotTracked: String { text("directWatchUploadNotTracked", "Not tracked") }
     static var toSync: String { text("directWatchToSync", "To sync") }
     // All current Watch languages have singular/plural forms. Keep the count inside the translated phrase.
     static var oneReadingFormat: String { text("directWatchOneReadingFormat", "%d reading") }

@@ -729,6 +729,12 @@ private struct BluetoothPeripheralListRowView: View {
                             .accessibilityLabel(dexcomModeAccessibilityLabel(mode))
                     }
 
+                    if let watchStatus = row.directWatchStatus {
+                        Image(systemName: ConstantsDirectWatch.watchSymbol(for: watchStatus))
+                            .foregroundStyle(ConstantsDirectWatch.statusColor(for: watchStatus))
+                            .accessibilityLabel(watchStatus.title)
+                    }
+
                     Text(row.typeTitle)
                         .lineLimit(1)
                         .minimumScaleFactor(0.75)

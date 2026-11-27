@@ -19,6 +19,13 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
     /// Returns only identities confirmed in the phone's persistent glucose store.
     var importDirectWatchReadings: (([DirectWatchReading]) -> [String])?
     private var directWatchObservers: [NSObjectProtocol] = []
+    private var lastWatchUploadStatus: [DirectWatchUploadService: DirectWatchUploadServiceStatus] = [:]
+    private static let directWatchUploadSettingsKeys: [UserDefaults.Key] = [
+        .nightscoutUrl, .nightscoutPort, .nightscoutAPIKey, .nightscoutToken, .nightscoutUseSchedule, .nightscoutSchedule,
+        .nightscoutEnabled, .masterUploadDataToNightscout,
+        .uploadReadingstoDexcomShare, .dexcomShareAccountName, .dexcomSharePassword, .dexcomShareUploadSerialNumber,
+        .useUSDexcomShareurl, .dexcomShareUploadUseSchedule, .dexcomShareUploadSchedule, .isMaster
+    ]
     private var directWatchConfigurationSendScheduled = false
     private var directWatchConfigurationHasPublished = false
 
@@ -100,6 +107,9 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
 
         // add observer to sync to the watch once the device status was updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutDeviceStatusWasUpdated.rawValue, options: .new, context: nil)
+        for key in Self.directWatchUploadSettingsKeys {
+            UserDefaults.standard.addObserver(self, forKeyPath: key.rawValue, options: .new, context: nil)
+        }
 
         careLinkStatusObserver = CareLinkAccountState.shared.$snapshot
             .removeDuplicates()
@@ -120,6 +130,10 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
         })
         processWatchUpdate(updateTypes: [.status, .bgReadings], forceComplicationUpdate: false)
         directWatchObservers.append(NotificationCenter.default.addObserver(forName: DirectWatchSettings.changed, object: nil, queue: .main) { [weak self] _ in self?.sendDirectWatchConfiguration() })
+        directWatchObservers.append(NotificationCenter.default.addObserver(forName: DirectWatchUploadSettings.changed, object: nil, queue: .main) { [weak self] _ in
+            DirectWatchSettings.advanceRevision()
+            self?.sendDirectWatchConfiguration()
+        })
         directWatchObservers.append(NotificationCenter.default.addObserver(forName: DirectWatchSettings.requestLogs, object: nil, queue: .main) { [weak self] notification in
             let requestID = notification.userInfo?[DirectWatchSettings.logRequestIDKey] as? String
             guard let self, self.session.activationState == .activated else {
@@ -202,7 +216,7 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
             let selected = BLEPeripheralAccessor(coreDataManager: coreDataManager).getBLEPeripherals().first { $0.shouldconnect && $0.transmitterId == current.transmitterID }
             let g6 = selected?.dexcomG5
             let g7 = selected?.dexcomG7
-            // Suspend collection without deleting the user's setup or testing controls.
+            // Keep the saved setup so collection can resume when its source is available.
             if !UserDefaults.standard.isMaster { unavailableReason = TextsDirectWatch.masterRequired }
             else if current.transmitterFamily == .g6 && g6 == nil { unavailableReason = TextsDirectWatch.g6Mismatch }
             else if current.transmitterFamily == .g7 && g7 == nil { unavailableReason = TextsDirectWatch.g7Mismatch }
@@ -239,19 +253,63 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
             DirectWatchSettings.advanceRevision()
         }
         UserDefaults.standard.set(unavailableReason, forKey: DirectWatchSettings.unavailableReasonKey)
+        DirectWatchSettings.resetTestingOverridesIfCollectionUnavailable()
         var payload: [String: Any] = ["directWatchEnabled": configuration != nil,
                                       "directWatchConfigured": DirectWatchSettings.configuration != nil,
+                                      "directWatchCollectionViewAvailable": configuration != nil,
                                       "directWatchRevision": UserDefaults.standard.double(forKey: DirectWatchSettings.revisionKey),
+                                      "directWatchPhoneSyncDisabled": DirectWatchSettings.readingImportBlocked,
                                       "directWatchPhonePaused": DirectWatchSettings.configuration.map { DirectWatchSettings.phoneIsPaused($0.transmitterID) } ?? false]
         payload.merge(DirectWatchSettings.collectionControl?.payload ?? [:], uniquingKeysWith: { _, new in new })
         if let unavailableReason { payload["directWatchUnavailableReason"] = unavailableReason }
         if let configuration, let data = try? JSONEncoder().encode(configuration) { payload["directWatchConfiguration"] = data }
+        let defaults = UserDefaults.standard
+        let cloudUploadEnabled = DirectWatchSettings.configuration != nil
+            && defaults.bool(forKey: DirectWatchUploadSettings.enabledKey)
+        // Only queue readings collected since both the switch and the service became available.
+        let masterEnabledSince = defaults.object(forKey: DirectWatchUploadSettings.enabledSinceKey) as? Date ?? .distantPast
+        payload[DirectWatchUploadSettings.enabledKey] = cloudUploadEnabled
+
+        let destination = DirectWatchNightscoutConfiguration.normalizedDestination(
+            defaults.nightscoutUrl?.trimmingCharacters(in: .whitespacesAndNewlines), port: defaults.nightscoutPort)
+        let apiKey = defaults.nightscoutAPIKey?.trimmingCharacters(in: .whitespacesAndNewlines).toNilIfLength0()
+        let token = defaults.nightscoutToken?.trimmingCharacters(in: .whitespacesAndNewlines).toNilIfLength0()
+        let nightscoutReady = defaults.dataFlowPolicy.exportsGlucoseToNightscout && destination != nil && (apiKey != nil || token != nil)
+        let nightscoutSince = providerEnabledSince(DirectWatchUploadSettings.nightscoutEnabledSinceKey,
+                                                   eligible: nightscoutReady)
+        let nightscout = DirectWatchNightscoutConfiguration(version: DirectWatchNightscoutConfiguration.version,
+            revision: defaults.double(forKey: DirectWatchSettings.revisionKey), enabled: cloudUploadEnabled && nightscoutReady,
+            destination: destination, schedule: defaults.nightscoutUseSchedule ? defaults.nightscoutSchedule : nil,
+            enabledSince: max(masterEnabledSince, nightscoutSince))
+        if let data = try? JSONEncoder().encode(nightscout) { payload[DirectWatchUploadSettings.nightscoutConfigurationKey] = data }
+        let credentials = DirectWatchNightscoutCredentials(secretHash: apiKey?.sha1(), token: token)
+        if nightscout.enabled, let data = try? JSONEncoder().encode(credentials) { payload[DirectWatchUploadSettings.nightscoutCredentialsKey] = data }
+
+        let username = defaults.dexcomShareAccountName?.trimmingCharacters(in: .whitespacesAndNewlines).toNilIfLength0()
+        let password = defaults.dexcomSharePassword?.toNilIfLength0()
+        let serialNumber = defaults.dexcomShareUploadSerialNumber?.trimmingCharacters(in: .whitespacesAndNewlines).toNilIfLength0()
+        let shareBaseURL = defaults.useUSDexcomShareurl ? ConstantsDexcomShare.usBaseShareUrl : ConstantsDexcomShare.globalBaseShareUrl
+        let shareReady = defaults.uploadReadingstoDexcomShare && defaults.isMaster
+            && username != nil && password != nil && serialNumber != nil
+        let shareSince = providerEnabledSince(DirectWatchUploadSettings.dexcomShareEnabledSinceKey,
+                                              eligible: shareReady)
+        let share = DirectWatchDexcomShareConfiguration(version: DirectWatchDexcomShareConfiguration.version,
+            revision: defaults.double(forKey: DirectWatchSettings.revisionKey), enabled: cloudUploadEnabled && shareReady,
+            baseURL: shareReady ? shareBaseURL : nil, username: username, serialNumber: serialNumber,
+            schedule: defaults.dexcomShareUploadUseSchedule ? defaults.dexcomShareUploadSchedule : nil,
+            enabledSince: max(masterEnabledSince, shareSince))
+        if let data = try? JSONEncoder().encode(share) { payload[DirectWatchUploadSettings.dexcomShareConfigurationKey] = data }
+        if share.enabled, let username, let password,
+           let data = try? JSONEncoder().encode(DirectWatchDexcomShareCredentials(username: username, password: password)) {
+            payload[DirectWatchUploadSettings.dexcomShareCredentialsKey] = data
+        }
         payload = DirectWatchCompatibility.outgoing(payload)
         // Device crash reports show updateApplicationContext blocking inside WCSession's
         // synchronous applicationContext getter until iOS kills the main thread. Use the
         // existing queued-message receiver instead, with revisions still ordering snapshots.
         // Build the payload on main, where its Core Data inputs belong, then send only values.
         configurationSender.enqueue(payload)
+        trace("Watch cloud upload configuration queued: revision=%{public}@, enabled=%{public}@, Nightscout=%{public}@, Dexcom Share=%{public}@", log: log, category: ConstantsLog.categoryWatchManager, type: .debug, nightscout.revision.description, cloudUploadEnabled.description, nightscout.enabled.description, share.enabled.description)
     }
 
     private func receiveDirectWatchPayload(_ payload: [String: Any], reply: (([String: Any]) -> Void)? = nil) {
@@ -270,12 +328,15 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
                 UserDefaults.standard.set(Date(), forKey: DirectWatchSettings.lastStatusDateKey)
                 DirectWatchSettings.recordContact()
             }
+            if let services = payload[DirectWatchUploadSettings.statusKey] as? [String: [String: Any]] {
+                self.traceWatchUploadStatus(services)
+            }
             guard let data = payload["directWatchReadings"] as? Data, data.count <= 100_000,
                   let readings = try? JSONDecoder().decode([DirectWatchReading].self, from: data), readings.count <= ConstantsDirectWatch.maximumSyncBatchReadings else {
                 reply?(DirectWatchCompatibility.outgoing(DirectWatchSettings.collectionControl?.payload ?? [:]))
                 return
             }
-            let acknowledged = self.importDirectWatchReadings?(readings) ?? []
+            let acknowledged = DirectWatchSettings.readingImportBlocked ? [] : (self.importDirectWatchReadings?(readings) ?? [])
             if let latest = readings.filter({ acknowledged.contains($0.id) }).map(\.measuredAt).max() {
                 DirectWatchSettings.recordContact(latestReadingAt: latest)
             }
@@ -304,11 +365,50 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
                         }
                         UserDefaults.standard.nightscoutDeviceStatusWasUpdated = false
                     }
+                case UserDefaults.Key.nightscoutUrl, .nightscoutPort, .nightscoutAPIKey, .nightscoutToken,
+                     .nightscoutUseSchedule, .nightscoutSchedule, .nightscoutEnabled, .masterUploadDataToNightscout, .uploadReadingstoDexcomShare,
+                     .dexcomShareAccountName, .dexcomSharePassword, .dexcomShareUploadSerialNumber,
+                     .useUSDexcomShareurl, .dexcomShareUploadUseSchedule, .dexcomShareUploadSchedule, .isMaster:
+                    DispatchQueue.main.async { [weak self] in
+                        DirectWatchSettings.advanceRevision()
+                        self?.sendDirectWatchConfiguration()
+                    }
                 default:
                     break
                 }
             }
         }
+    }
+
+    /// The Watch sends these summaries with its regular status. Keep only the last logged value per service.
+    private func traceWatchUploadStatus(_ services: [String: [String: Any]]) {
+        for service in DirectWatchUploadService.allCases {
+            guard let summary = services[service.rawValue],
+                  let isReady = summary["enabled"] as? Bool,
+                  let pending = summary["pending"] as? Int, pending >= 0 else { continue }
+            let lastUpload = (summary["lastUpload"] as? Double).flatMap {
+                $0.isFinite ? Date(timeIntervalSince1970: $0) : nil
+            }
+            let status = DirectWatchUploadServiceStatus(service: service, isReady: isReady, pending: pending,
+                hasError: summary["hasError"] as? Bool ?? false, lastUpload: lastUpload)
+            guard status != lastWatchUploadStatus[service] else { continue }
+            lastWatchUploadStatus[service] = status
+            trace("Watch cloud upload status: service=%{public}@, ready=%{public}@, pending=%{public}@, hasError=%{public}@, lastUpload=%{public}@",
+                  log: log, category: ConstantsLog.categoryWatchManager, type: .debug, service.rawValue,
+                  isReady.description, pending.description, status.hasError.description, lastUpload?.ISO8601Format() ?? "none")
+        }
+    }
+
+    private func providerEnabledSince(_ key: String, eligible: Bool) -> Date {
+        guard eligible else {
+            UserDefaults.standard.removeObject(forKey: key)
+            return .distantPast
+        }
+        let defaults = UserDefaults.standard
+        if let saved = defaults.object(forKey: key) as? Date { return saved }
+        let now = Date()
+        defaults.set(now, forKey: key)
+        return now
     }
 
     // MARK: - private functions
@@ -597,6 +697,9 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
 
     deinit {
         directWatchObservers.forEach { NotificationCenter.default.removeObserver($0) }
+        for key in Self.directWatchUploadSettingsKeys {
+            UserDefaults.standard.removeObserver(self, forKeyPath: key.rawValue)
+        }
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutDeviceStatusWasUpdated.rawValue)
     }
 }
@@ -631,6 +734,8 @@ extension WatchManager: WCSessionDelegate {
     // process any received messages from the watch app
     func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         receiveDirectWatchPayload(message)
+        // A standalone upload summary is telemetry. It does not request setup or glucose.
+        if message.count == 1 && message[DirectWatchUploadSettings.statusKey] != nil { return }
         sendDirectWatchConfiguration()
         // check which type of update the Watch is requesting and call the correct sending function as needed
         if let requestWatchUpdate = message["requestWatchUpdate"] as? String {

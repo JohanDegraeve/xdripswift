@@ -30,7 +30,15 @@ struct xDrip_Watch_AppApp: App {
                     .navigationDestination(isPresented: $showsDirectWatchAlerts) {
                         DirectWatchAlertsView(collector: watchState.directWatchCollector)
                     }
-            }.environmentObject(watchState)
+            }
+            .modifier(DirectWatchCollectionFeedback(collector: watchState.directWatchCollector))
+            .environmentObject(watchState)
+            .onChange(of: watchState.watchCollectionViewAvailable) { _, available in
+                if !available {
+                    showsCollectedReadings = false
+                    showsDirectWatchAlerts = false
+                }
+            }
         }
         
         #if os(watchOS)

@@ -12,6 +12,13 @@ import SwiftUI
 struct DirectWatchCollectedReadingsView: View {
     @EnvironmentObject private var watchState: WatchStateModel
     @ObservedObject var collector: DirectWatchCollector
+    @ObservedObject private var uploadCoordinator: DirectWatchUploadCoordinator
+    @ScaledMetric(relativeTo: .body) private var uploadSymbolSize: CGFloat = 14
+
+    init(collector: DirectWatchCollector) {
+        self.collector = collector
+        uploadCoordinator = collector.uploadCoordinator
+    }
 
     // Use the requested 24-hour HH:mm clock in the device's current time zone.
     private static let timestampFormatter: DateFormatter = {
@@ -57,6 +64,7 @@ struct DirectWatchCollectedReadingsView: View {
                                 .padding(.bottom, 8)
                         }
                     }
+                    .padding(.top, session.id == sessions.first?.id ? 12 : 0)
                 }
             }
             // Older app versions did not save sessions. Keep those readings separate
@@ -66,12 +74,14 @@ struct DirectWatchCollectedReadingsView: View {
                     VStack(spacing: 6) {
                         readingRows(ungroupedReadings, session: nil)
                     }
+                    .padding(.top, sessions.isEmpty ? 12 : 0)
                 }
             }
             if readings.isEmpty && sessions.isEmpty {
                 Section {
                     Text(TextsDirectWatch.noCollectedReadings)
                         .foregroundStyle(.secondary)
+                        .padding(.top, 12)
                 }
             }
         }
@@ -80,25 +90,51 @@ struct DirectWatchCollectedReadingsView: View {
 
     private func readingRows(_ readings: [DirectWatchReading], session: DirectWatchCollectionSession?, showsStart: Bool = false) -> some View {
         ForEach(readings) { reading in
-            ScaledDataSourceRow(height: 24) {
-                Text(Self.timestampFormatter.string(from: reading.measuredAt))
-                    .monospacedDigit()
-            } trailing: {
-                Text("\(reading.mgDl.mgDlToMmolAndToString(mgDl: watchState.isMgDl)) \(watchState.bgUnitString())")
-                    .monospacedDigit()
+            // The interval measures the gap to the earlier reading or session start.
+            let hasEarlierReading = reading.id != readings.last?.id
+            let interval = (showsStart || hasEarlierReading) ? session?.intervalBefore(reading, in: collector.readings) : nil
+            VStack(spacing: 2) {
+                ScaledDataSourceRow(height: 24) {
+                    Text(Self.timestampFormatter.string(from: reading.measuredAt))
+                        .monospacedDigit()
+                } trailing: {
+                    Text("\(reading.mgDl.mgDlToMmolAndToString(mgDl: watchState.isMgDl)) \(watchState.bgUnitString())")
+                        .monospacedDigit()
+                }
+                .font(.system(size: 17))
+                .foregroundStyle(.colorPrimary)
+
+                if interval != nil || uploadCoordinator.cloudUploadEnabled {
+                    HStack(spacing: 5) {
+                        if let interval {
+                            let status = DirectWatchReadingStatus(age: interval)
+                            Text(TextsDirectWatch.readingGap(interval))
+                                .font(.system(size: 15))
+                                .foregroundStyle(ConstantsDirectWatch.statusColor(for: status))
+                        }
+                        Spacer(minLength: 4)
+                        if uploadCoordinator.cloudUploadEnabled {
+                            uploadStatusIcon(reading, service: .nightscout)
+                            uploadStatusIcon(reading, service: .dexcomShare)
+                        }
+                    }
+                }
             }
-            .font(.system(size: 17))
-            .foregroundStyle(.colorPrimary)
-            // This interval separates the reading above from its earlier reading or resume below.
-            if (showsStart || reading.id != readings.last?.id),
-               let session, let interval = session.intervalBefore(reading, in: collector.readings) {
-                let status = DirectWatchReadingStatus(age: interval)
-                Text(TextsDirectWatch.readingGap(interval))
-                    .font(.system(size: 15))
-                    .foregroundStyle(ConstantsDirectWatch.statusColor(for: status))
-                    .frame(maxWidth: .infinity, alignment: .center)
+            if hasEarlierReading {
+                Divider()
             }
         }
+    }
+
+    private func uploadStatusIcon(_ reading: DirectWatchReading, service: DirectWatchUploadService) -> some View {
+        let status = uploadCoordinator.readingStatus(for: reading, service: service)
+        let name = service == .nightscout ? TextsDirectWatch.nightscoutUpload : TextsDirectWatch.dexcomShareUpload
+        return Image(systemName: "icloud.and.arrow.up")
+            .font(.system(size: uploadSymbolSize))
+            .symbolRenderingMode(.monochrome)
+            .foregroundStyle(status.color)
+            .accessibilityLabel(Text(name))
+            .accessibilityValue(Text(status.title))
     }
 
     private func sessionBoundary(_ session: DirectWatchCollectionSession, ending: Bool) -> some View {
@@ -110,5 +146,26 @@ struct DirectWatchCollectedReadingsView: View {
         .foregroundStyle(.yellow)
         .lineLimit(1)
         .minimumScaleFactor(0.8)
+    }
+}
+
+private extension DirectWatchServiceReadingStatus {
+    var color: Color {
+        switch self {
+        case .uploaded: return .green
+        case .pending: return .orange
+        case .error: return .red
+        case .disabled, .notTracked: return .gray.opacity(0.5)
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .uploaded: return TextsDirectWatch.uploaded
+        case .pending: return TextsDirectWatch.uploadPending
+        case .error: return TextsDirectWatch.uploadError
+        case .disabled: return TextsDirectWatch.disabled
+        case .notTracked: return TextsDirectWatch.uploadNotTracked
+        }
     }
 }

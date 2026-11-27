@@ -200,3 +200,4 @@
 
 /* Status label, including Direct to Watch in Advanced Settings. */
 "common_enabled" = "Omogočeno";
+"common_disabled" = "Onemogočeno";

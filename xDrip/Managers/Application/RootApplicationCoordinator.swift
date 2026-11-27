@@ -1148,6 +1148,8 @@ import AppIntents
             glucose.valueIsFromWatch = true
             glucose.watchReceivedAt = receivedAt
             glucose.watchCollectedAt = reading.collectedAt
+            glucose.watchNightscoutOwned = reading.watchNightscoutOwned == true
+            glucose.watchDexcomShareOwned = reading.watchDexcomShareOwned == true
             return glucose
         }
         let live = accepted.contains { Date().timeIntervalSince($0.measuredAt) <= ConstantsDirectWatch.readingDelayedAfter }
@@ -1259,6 +1261,9 @@ import AppIntents
                 if duplicateDexcomCycle, glucose.valueIsFromWatch, let receivedAt = glucose.watchReceivedAt {
                     matchingReading?.recordWatchCollection(at: receivedAt, collectedAt: glucose.watchCollectedAt,
                                                            isBackfill: glucose.isHistoricalCollection)
+                    // Keep the stored glucose value and record which cloud services the Watch took responsibility for.
+                    if glucose.watchNightscoutOwned { matchingReading?.watchNightscoutOwned = true }
+                    if glucose.watchDexcomShareOwned { matchingReading?.watchDexcomShareOwned = true }
                 } else if duplicateDexcomCycle, !glucose.valueIsFromWatch,
                           matchingReading?.recordPhoneCollection(isBackfill: glucose.isHistoricalCollection) == true {
                     collectionProvenanceChanged = true
@@ -1290,6 +1295,8 @@ import AppIntents
                         newReading.valueIsFromWatch = glucose.valueIsFromWatch
                         newReading.watchReceivedAt = glucose.watchReceivedAt
                         newReading.watchCollectedAt = glucose.watchCollectedAt
+                        newReading.watchNightscoutOwned = glucose.watchNightscoutOwned
+                        newReading.watchDexcomShareOwned = glucose.watchDexcomShareOwned
                         // Persist live participation separately from eventual recovery. A phone
                         // backfill after a Watch-only run must not change the collection icon.
                         newReading.phoneCollectedLive = NSNumber(value: !glucose.valueIsFromWatch && !glucose.isHistoricalCollection)

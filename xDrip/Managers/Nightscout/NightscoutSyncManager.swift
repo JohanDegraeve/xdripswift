@@ -1524,9 +1524,20 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         // Historical records imported from this same Nightscout site are local read-only copies.
         // Excluding their namespaced IDs prevents a download/upload feedback loop when the normal
         // uploader cursor is older than the newly imported range.
+        var watchOwnedCount = 0
         let uploadCandidates = bgReadingsAccessor
             .getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-            .filter { !NightscoutImportService.isImportedBgReadingID($0.id) }
+            .filter {
+                guard !NightscoutImportService.isImportedBgReadingID($0.id) else { return false }
+                let eligible = DirectWatchUploadRouting.shouldUploadFromPhone(service: .nightscout,
+                    watchNightscoutOwned: $0.watchNightscoutOwned,
+                    watchDexcomShareOwned: $0.watchDexcomShareOwned)
+                if !eligible { watchOwnedCount += 1 }
+                return eligible
+            }
+        if watchOwnedCount > 0 {
+            trace("iPhone Nightscout upload skipped %{public}@ Watch-owned readings", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, watchOwnedCount.description)
+        }
         let filteredBgReadingsToUpload = uploadCandidates.filter(minimumTimeBetweenTwoReadingsInMinutes: minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: timeStamp)
         var bgReadingsToUpload = Array(filteredBgReadingsToUpload.reversed())
         
@@ -1556,7 +1567,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             uploadData(dataToUpload: bgReadingsDictionaryRepresentation, httpMethod: nil, path: nightscoutEntriesPath, completionHandler: {
                 // change timeStampLatestNightscoutUploadedBgReading
                 if let timeStampLastReadingToUpload = timeStampLastReadingToUpload {
-                    trace("in uploadBgReadingsToNightscout, in uploadBgReadingsToNightscout, upload succeeded, timeStampLatestNightscoutUploadedBgReading = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, troubleshooting: .detailed(.integration(name: .nightscout, activity: .succeeded(itemCount: bgReadingsToUpload.count))), timeStampLastReadingToUpload.formatted(date: .abbreviated, time: .standard))
+                    trace("iPhone Nightscout upload accepted: readings=%{public}@, newest=%{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, troubleshooting: .detailed(.integration(name: .nightscout, activity: .succeeded(itemCount: bgReadingsToUpload.count))), bgReadingsToUpload.count.description, timeStampLastReadingToUpload.ISO8601Format())
                     
                     UserDefaults.standard.timeStampLatestNightscoutUploadedBgReading = timeStampLastReadingToUpload
                     
@@ -1635,7 +1646,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             trace("in uploadDataAndGetResponse, size of data to upload : %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, dataToUploadAsJSON.count.description)
             
             // trace data to upload as string in debug  mode
-            if let dataToUploadAsJSONAsString = String(bytes: dataToUploadAsJSON, encoding: .utf8) {
+            if path != nightscoutEntriesPath, let dataToUploadAsJSONAsString = String(bytes: dataToUploadAsJSON, encoding: .utf8) {
                 trace("in uploadDataAndGetResponse, data to upload : %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, dataToUploadAsJSONAsString)
             }
             
@@ -1682,7 +1693,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         // before leaving the function, call completionhandler with result
                         // also trace either debug or error, depending on result
                         defer {
-                            if !nightscoutResult.successFull() {
+                            if path == self.nightscoutEntriesPath {
+                                trace("iPhone Nightscout entries response: HTTP=%{public}@, bytes=%{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, (response as? HTTPURLResponse)?.statusCode.description ?? "none", (data?.count ?? 0).description)
+                            } else if !nightscoutResult.successFull() {
                                 trace("in uploadDataAndGetResponse, data received = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, dataAsString)
                                 
                             } else {
@@ -1695,7 +1708,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         
                         // error cases
                         if let error = error {
-                            trace("in uploadDataAndGetResponse, failed to upload, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, troubleshooting: .detailed(.integration(name: .nightscout, activity: .failed)), error.localizedDescription)
+                            let diagnostic = error as NSError
+                            trace("in uploadDataAndGetResponse, failed to upload, error = %{public}@ code=%{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, troubleshooting: .detailed(.integration(name: .nightscout, activity: .failed)), diagnostic.domain, diagnostic.code.description)
                             
                             nightscoutResult = NightscoutResult.failed
                             

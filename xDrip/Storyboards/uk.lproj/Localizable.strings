@@ -2,6 +2,7 @@
 
 // Direct to Watch status and pairing guidance
 "directWatchTitle" = "Безпосередньо на Watch";
+"directWatchActivationAdvice" = "Щоб отримувати показники через збір даних безпосередньо на Watch, застосунок Watch %@ має бути відкритий на Apple Watch. Навіть тоді збір даних не гарантований у кожному циклі. Використовуйте обережно.";
 "directWatchNoConnection" = "З’єднання не додано";
 "directWatchSuspended" = "Збирання призупинено";
 "directWatchWaiting" = "Очікування показника з Watch";
@@ -36,10 +37,10 @@
 "directWatchMedicalSlot" = "Слот медичного пристрою";
 "directWatchWatchSlot" = "Слот Watch";
 "directWatchConfirmUnusedSlot" = "Слот вільний: підключити Watch";
-"directWatchSlotMedical" = "Слот 1 · Медичний пристрій";
-"directWatchSlotMobile" = "Слот 2 · Мобільний застосунок";
-"directWatchSlotWatch" = "Слот 3 · Watch";
-"directWatchSlotAnubis" = "Слот 3 · Додатковий Anubis";
+"directWatchSlotMedical" = "Слот 1 (Медичний пристрій)";
+"directWatchSlotMobile" = "Слот 2 (Мобільний застосунок)";
+"directWatchSlotWatch" = "Слот 3 (Watch)";
+"directWatchSlotAnubis" = "Слот 3 (Додатковий Anubis)";
 "directWatchUsedWatch" = "Використовує цей Watch";
 "directWatchUsedPhone" = "Використовує цей iPhone";
 "directWatchSlotMedicalDetail" = "Якщо не зайнятий помпою чи приймачем";
@@ -49,7 +50,7 @@
 "directWatchAnubisOnly" = "Лише передавачі Anubis";
 "directWatchWatchStatus" = "Стан Watch";
 "directWatchTestingDiagnosis" = "Тести й діагностика";
-"directWatchPausePhone" = "Пауза збору BLE на iPhone";
+"directWatchPausePhone" = "Вимкнути збір на iPhone";
 "directWatchForTesting" = "Для перевірки збору на Watch";
 "directWatchGetLogs" = "Отримати логи Watch";
 "directWatchShareLogs" = "Поділитися логами Watch";
@@ -80,9 +81,15 @@
 /* Direct to Watch action feedback. */
 "directWatchTryAgain" = "Спробувати знову";
 "directWatchRequestQueued" = "Запит у черзі";
-"directWatchLastLogsReceived" = "Останні логи отримано";
+"directWatchLastLogsReceived" = "Останнє отримання";
 "directWatchWaitingForLogs" = "Очікування нових логів…";
 "directWatchLogsFailed" = "Не вдалося отримати логи. Спробуйте знову.";
 
 /* Watch diagnostic log actions and receipt time. */
-"directWatchLogs" = "Логи";
+"directWatchLogs" = "Журнали Watch";
+"directWatchUploadReadings" = "Надсилання показників";
+"directWatchBlockPhoneSync" = "Вимкнути синхронізацію Watch";
+"directWatchPhoneCollectionAdvice" = "Вимикає отримання показників Bluetooth від цього передавача на iPhone, щоб перевірити збір лише на Watch.";
+"directWatchBlockPhoneSyncAdvice" = "Вимкнути синхронізацію Watch зупинить передавання показників із Watch на iPhone, щоб можна було перевірити надсилання з Watch, якщо цю функцію ввімкнено.";
+"directWatchCloudUpload" = "Дозволити завантаження в хмару";
+"directWatchCloudUploadAdvice" = "Якщо цю опцію ввімкнено, годинник намагатиметься завантажувати показники до кожної налаштованої хмарної служби за наявності підключення до інтернету.";

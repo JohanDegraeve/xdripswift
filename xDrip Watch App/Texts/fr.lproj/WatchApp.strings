@@ -106,3 +106,13 @@
 "directWatchAlertExplanation" = "Les seuils suivent les horaires des alarmes de l’iPhone. Les alertes Watch nécessitent une collecte active et plus de 60 secondes sans échange avec l’iPhone.";
 "directWatchScheduleUnavailable" = "Synchroniser les alarmes de l’iPhone";
 "directWatchUrgentLowGlucose" = "%@: glucose très bas";
+"directWatchEnabled" = "Activé";
+"directWatchDisabled" = "Désactivé";
+"directWatchUploaded" = "Envoyé";
+"directWatchUploadPending" = "En attente";
+"directWatchUploadError" = "Erreur";
+"directWatchUploadNotTracked" = "Non suivi";
+
+/* Direct to Watch cloud upload */
+"directWatchNightscoutUpload" = "Nightscout";
+"directWatchDexcomShareUpload" = "Dexcom Share";

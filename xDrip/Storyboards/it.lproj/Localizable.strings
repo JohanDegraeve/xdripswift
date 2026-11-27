@@ -2,6 +2,7 @@
 
 // Direct to Watch status and pairing guidance
 "directWatchTitle" = "Diretto al Watch";
+"directWatchActivationAdvice" = "Per ricevere letture con la raccolta Diretta su Watch, l’app Watch %@ deve essere aperta sul tuo Apple Watch. Anche così, la raccolta non è garantita a ogni ciclo. Usala con cautela.";
 "directWatchNoConnection" = "Nessuna connessione aggiunta";
 "directWatchSuspended" = "Raccolta sospesa";
 "directWatchWaiting" = "In attesa di una lettura dal Watch";
@@ -36,10 +37,10 @@
 "directWatchMedicalSlot" = "Slot dispositivo medico";
 "directWatchWatchSlot" = "Slot Watch";
 "directWatchConfirmUnusedSlot" = "Slot libero: collega Watch";
-"directWatchSlotMedical" = "Slot 1 · Dispositivo medico";
-"directWatchSlotMobile" = "Slot 2 · App mobile";
-"directWatchSlotWatch" = "Slot 3 · Watch";
-"directWatchSlotAnubis" = "Slot 3 · Extra Anubis";
+"directWatchSlotMedical" = "Slot 1 (Dispositivo medico)";
+"directWatchSlotMobile" = "Slot 2 (App mobile)";
+"directWatchSlotWatch" = "Slot 3 (Watch)";
+"directWatchSlotAnubis" = "Slot 3 (Extra Anubis)";
 "directWatchUsedWatch" = "Usato da questo Watch";
 "directWatchUsedPhone" = "Usato da questo iPhone";
 "directWatchSlotMedicalDetail" = "Solo se libero da pompa o ricevitore";
@@ -49,7 +50,7 @@
 "directWatchAnubisOnly" = "Solo trasmettitori Anubis";
 "directWatchWatchStatus" = "Stato Watch";
 "directWatchTestingDiagnosis" = "Test e diagnosi";
-"directWatchPausePhone" = "Sospendi raccolta BLE iPhone";
+"directWatchPausePhone" = "Disattiva raccolta su iPhone";
 "directWatchForTesting" = "Per testare la raccolta Watch";
 "directWatchGetLogs" = "Richiedi log Watch";
 "directWatchShareLogs" = "Condividi log Watch";
@@ -80,9 +81,15 @@
 /* Direct to Watch action feedback. */
 "directWatchTryAgain" = "Riprova";
 "directWatchRequestQueued" = "Richiesta in coda";
-"directWatchLastLogsReceived" = "Ultimi log ricevuti";
+"directWatchLastLogsReceived" = "Ultima ricezione";
 "directWatchWaitingForLogs" = "In attesa di nuovi log…";
 "directWatchLogsFailed" = "Impossibile ottenere i log. Riprova.";
 
 /* Watch diagnostic log actions and receipt time. */
-"directWatchLogs" = "Log";
+"directWatchLogs" = "Registri del Watch";
+"directWatchUploadReadings" = "Carica letture";
+"directWatchBlockPhoneSync" = "Disattiva sincronizzazione Watch";
+"directWatchPhoneCollectionAdvice" = "Disattiva la raccolta Bluetooth da questo trasmettitore sull’iPhone per provare la raccolta solo con il Watch.";
+"directWatchBlockPhoneSyncAdvice" = "Disattiva sincronizzazione Watch interrompe la sincronizzazione delle letture dal Watch all’iPhone, così puoi provare il caricamento dal Watch se questa funzione è attiva.";
+"directWatchCloudUpload" = "Consenti il caricamento nel cloud";
+"directWatchCloudUploadAdvice" = "Quando questa opzione è attiva, l’Apple Watch tenterà di caricare le letture su ogni servizio cloud configurato quando è disponibile una connessione a Internet.";

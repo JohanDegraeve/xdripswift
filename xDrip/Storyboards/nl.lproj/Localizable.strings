@@ -2,6 +2,7 @@
 
 // Direct to Watch status and pairing guidance
 "directWatchTitle" = "Direct naar Watch";
+"directWatchActivationAdvice" = "Om waarden te ontvangen met Direct naar Watch-verzameling, moet de Watch-app van %@ geopend zijn op je Apple Watch. Ook dan is verzameling niet bij elke cyclus gegarandeerd. Gebruik met voorzichtigheid.";
 "directWatchNoConnection" = "Geen verbinding toegevoegd";
 "directWatchSuspended" = "Verzameling onderbroken";
 "directWatchWaiting" = "Wachten op Watch-meting";
@@ -36,10 +37,10 @@
 "directWatchMedicalSlot" = "Slot medisch apparaat";
 "directWatchWatchSlot" = "Watch-slot";
 "directWatchConfirmUnusedSlot" = "Slot vrij: verbind Watch";
-"directWatchSlotMedical" = "Slot 1 · Medisch apparaat";
-"directWatchSlotMobile" = "Slot 2 · Mobiele app";
-"directWatchSlotWatch" = "Slot 3 · Watch";
-"directWatchSlotAnubis" = "Slot 3 · Anubis extra";
+"directWatchSlotMedical" = "Slot 1 (Medisch apparaat)";
+"directWatchSlotMobile" = "Slot 2 (Mobiele app)";
+"directWatchSlotWatch" = "Slot 3 (Watch)";
+"directWatchSlotAnubis" = "Slot 3 (Anubis extra)";
 "directWatchUsedWatch" = "Gebruikt door deze Watch";
 "directWatchUsedPhone" = "Gebruikt door deze iPhone";
 "directWatchSlotMedicalDetail" = "Alleen zonder pomp of ontvanger";
@@ -49,7 +50,7 @@
 "directWatchAnubisOnly" = "Alleen Anubis-zenders";
 "directWatchWatchStatus" = "Watch-status";
 "directWatchTestingDiagnosis" = "Testen en diagnose";
-"directWatchPausePhone" = "iPhone-BLE-collectie pauzeren";
+"directWatchPausePhone" = "iPhone-verzameling uitschakelen";
 "directWatchForTesting" = "Om Watch-collectie te testen";
 "directWatchGetLogs" = "Watch-logs ophalen";
 "directWatchShareLogs" = "Watch-logs delen";
@@ -80,9 +81,15 @@
 /* Direct to Watch action feedback. */
 "directWatchTryAgain" = "Opnieuw proberen";
 "directWatchRequestQueued" = "Verzoek in wachtrij";
-"directWatchLastLogsReceived" = "Laatste logs ontvangen";
+"directWatchLastLogsReceived" = "Laatst ontvangen";
 "directWatchWaitingForLogs" = "Wachten op nieuwe logs…";
 "directWatchLogsFailed" = "Logs ophalen mislukt. Probeer opnieuw.";
 
 /* Watch diagnostic log actions and receipt time. */
-"directWatchLogs" = "Logs";
+"directWatchLogs" = "Watch-logboeken";
+"directWatchUploadReadings" = "Metingen uploaden";
+"directWatchBlockPhoneSync" = "Watch-synchronisatie uitschakelen";
+"directWatchPhoneCollectionAdvice" = "Schakelt het verzamelen van Bluetooth-metingen van deze zender op de iPhone uit om verzameling met alleen de Watch te testen.";
+"directWatchBlockPhoneSyncAdvice" = "Watch-synchronisatie uitschakelen stopt het synchroniseren van Watch-metingen naar de iPhone, zodat je uploads vanaf de Watch kunt testen als die functie is ingeschakeld.";
+"directWatchCloudUpload" = "Uploaden naar de cloud toestaan";
+"directWatchCloudUploadAdvice" = "Als dit is ingeschakeld, probeert de Watch metingen naar elke ingestelde clouddienst te uploaden zodra er een internetverbinding beschikbaar is.";

@@ -2,6 +2,7 @@
 
 // Direct to Watch status and pairing guidance
 "directWatchTitle" = "Suoraan Watchiin";
+"directWatchActivationAdvice" = "Jotta voit vastaanottaa lukemia Suoraan Watchiin -keräyksellä, %@ Watch -apin on oltava avoinna Apple Watchissasi. Silloinkaan keruuta ei taata jokaisella jaksolla. Käytä varoen.";
 "directWatchNoConnection" = "Yhteyttä ei ole lisätty";
 "directWatchSuspended" = "Keräys keskeytetty";
 "directWatchWaiting" = "Odotetaan Watch-lukemaa";
@@ -36,10 +37,10 @@
 "directWatchMedicalSlot" = "Lääkintälaitteen paikka";
 "directWatchWatchSlot" = "Watch-paikka";
 "directWatchConfirmUnusedSlot" = "Vapaa paikka: yhdistä Watch";
-"directWatchSlotMedical" = "Paikka 1 · Lääkintälaite";
-"directWatchSlotMobile" = "Paikka 2 · Mobiilisovellus";
-"directWatchSlotWatch" = "Paikka 3 · Watch";
-"directWatchSlotAnubis" = "Paikka 3 · Anubis-lisä";
+"directWatchSlotMedical" = "Paikka 1 (Lääkintälaite)";
+"directWatchSlotMobile" = "Paikka 2 (Mobiilisovellus)";
+"directWatchSlotWatch" = "Paikka 3 (Watch)";
+"directWatchSlotAnubis" = "Paikka 3 (Anubis-lisä)";
 "directWatchUsedWatch" = "Tämän Watchin käytössä";
 "directWatchUsedPhone" = "Tämän iPhonen käytössä";
 "directWatchSlotMedicalDetail" = "Vain ilman pumppua tai vastaanotinta";
@@ -49,7 +50,7 @@
 "directWatchAnubisOnly" = "Vain Anubis-lähettimet";
 "directWatchWatchStatus" = "Watchin tila";
 "directWatchTestingDiagnosis" = "Testaus ja vianmääritys";
-"directWatchPausePhone" = "Keskeytä iPhonen BLE-keruu";
+"directWatchPausePhone" = "Poista iPhonen keräys käytöstä";
 "directWatchForTesting" = "Watch-keruun testaamiseen";
 "directWatchGetLogs" = "Hae Watch-lokit";
 "directWatchShareLogs" = "Jaa Watch-lokit";
@@ -80,9 +81,15 @@
 /* Direct to Watch action feedback. */
 "directWatchTryAgain" = "Yritä uudelleen";
 "directWatchRequestQueued" = "Pyyntö jonossa";
-"directWatchLastLogsReceived" = "Viimeksi saadut lokit";
+"directWatchLastLogsReceived" = "Viimeksi vastaanotettu";
 "directWatchWaitingForLogs" = "Odotetaan uusia lokeja…";
 "directWatchLogsFailed" = "Lokeja ei saatu. Yritä uudelleen.";
 
 /* Watch diagnostic log actions and receipt time. */
-"directWatchLogs" = "Lokit";
+"directWatchLogs" = "Watch-lokit";
+"directWatchUploadReadings" = "Lähetä lukemat";
+"directWatchBlockPhoneSync" = "Poista Watch-synkronointi käytöstä";
+"directWatchPhoneCollectionAdvice" = "Poistaa tämän lähettimen Bluetooth-lukemien keräyksen iPhonessa käytöstä, jotta keräystä voi testata pelkällä Watchilla.";
+"directWatchBlockPhoneSyncAdvice" = "Poista Watch-synkronointi käytöstä lopettaa Watchin lukemien synkronoinnin iPhoneen, jotta voit testata lähettämistä Watchista, jos tämä toiminto on käytössä.";
+"directWatchCloudUpload" = "Salli lähetys pilveen";
+"directWatchCloudUploadAdvice" = "Kun toiminto on käytössä, kello yrittää lähettää mittaukset kuhunkin määritettyyn pilvipalveluun, kun internetyhteys on käytettävissä.";

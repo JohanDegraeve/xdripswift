@@ -2,6 +2,7 @@
 
 // Direct to Watch status and pairing guidance
 "directWatchTitle" = "Doğrudan Watch’a";
+"directWatchActivationAdvice" = "Doğrudan Watch’a veri toplama ile ölçüm almak için %@ Watch uygulaması Apple Watch’unuzda açık olmalıdır. Buna rağmen her döngüde veri toplanması garanti değildir. Dikkatli kullanın.";
 "directWatchNoConnection" = "Bağlantı eklenmedi";
 "directWatchSuspended" = "Veri toplama duraklatıldı";
 "directWatchWaiting" = "Watch ölçümü bekleniyor";
@@ -36,10 +37,10 @@
 "directWatchMedicalSlot" = "Tıbbi cihaz yuvası";
 "directWatchWatchSlot" = "Watch yuvası";
 "directWatchConfirmUnusedSlot" = "Yuva boş: Watch bağla";
-"directWatchSlotMedical" = "Yuva 1 · Tıbbi cihaz";
-"directWatchSlotMobile" = "Yuva 2 · Mobil uygulama";
-"directWatchSlotWatch" = "Yuva 3 · Watch";
-"directWatchSlotAnubis" = "Yuva 3 · Anubis ek yuva";
+"directWatchSlotMedical" = "Yuva 1 (Tıbbi cihaz)";
+"directWatchSlotMobile" = "Yuva 2 (Mobil uygulama)";
+"directWatchSlotWatch" = "Yuva 3 (Watch)";
+"directWatchSlotAnubis" = "Yuva 3 (Anubis ek yuva)";
 "directWatchUsedWatch" = "Bu Watch kullanıyor";
 "directWatchUsedPhone" = "Bu iPhone kullanıyor";
 "directWatchSlotMedicalDetail" = "Pompa veya alıcı kullanmıyorsa";
@@ -49,7 +50,7 @@
 "directWatchAnubisOnly" = "Yalnızca Anubis vericiler";
 "directWatchWatchStatus" = "Watch durumu";
 "directWatchTestingDiagnosis" = "Test ve tanılama";
-"directWatchPausePhone" = "iPhone BLE toplamayı duraklat";
+"directWatchPausePhone" = "iPhone toplamayı devre dışı bırak";
 "directWatchForTesting" = "Watch toplamayı test etmek için";
 "directWatchGetLogs" = "Watch günlüklerini al";
 "directWatchShareLogs" = "Watch günlüklerini paylaş";
@@ -80,9 +81,15 @@
 /* Direct to Watch action feedback. */
 "directWatchTryAgain" = "Yeniden dene";
 "directWatchRequestQueued" = "İstek sırada";
-"directWatchLastLogsReceived" = "Son günlük alımı";
+"directWatchLastLogsReceived" = "Son alınan";
 "directWatchWaitingForLogs" = "Yeni günlükler bekleniyor…";
 "directWatchLogsFailed" = "Günlükler alınamadı. Yeniden deneyin.";
 
 /* Watch diagnostic log actions and receipt time. */
-"directWatchLogs" = "Günlükler";
+"directWatchLogs" = "Watch günlükleri";
+"directWatchUploadReadings" = "Ölçümleri yükle";
+"directWatchBlockPhoneSync" = "Watch eşzamanlamasını devre dışı bırak";
+"directWatchPhoneCollectionAdvice" = "Yalnızca Watch ile toplamayı test etmek için iPhone’da bu vericiden Bluetooth ölçümü almayı devre dışı bırakır.";
+"directWatchBlockPhoneSyncAdvice" = "Watch eşzamanlamasını devre dışı bırak, Watch ölçümlerinin iPhone’a eşzamanlanmasını durdurur. Böylece bu özellik etkinse Watch üzerinden yüklemeyi test edebilirsiniz.";
+"directWatchCloudUpload" = "Buluta yüklemeye izin ver";
+"directWatchCloudUploadAdvice" = "Bu seçenek etkinleştirildiğinde Watch, internet bağlantısı varsa ölçümleri yapılandırılmış her bulut hizmetine yüklemeyi dener.";

@@ -89,3 +89,4 @@
 
 /* Status label, including Direct to Watch in Advanced Settings. */
 "common_enabled" = "Включено";
+"common_disabled" = "Отключено";

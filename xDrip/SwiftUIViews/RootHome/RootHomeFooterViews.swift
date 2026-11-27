@@ -254,12 +254,6 @@ struct RootHomeDataSourceView: View {
                         .accessibilityLabel(dexcomModeAccessibilityLabel(mode))
                 }
 
-                Text(state.title)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(ConstantsAppColors.dataSourceText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-
                 if state.showsWatchCollectorIcon {
                     Image(systemName: ConstantsDirectWatch.watchSymbol(for: state.watchCollectorHealth))
                         .font(.system(size: 14))
@@ -267,6 +261,12 @@ struct RootHomeDataSourceView: View {
                         .fixedSize()
                         .accessibilityLabel(state.watchCollectorHealth.title)
                 }
+
+                Text(state.title)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(ConstantsAppColors.dataSourceText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
             .layoutPriority(1)
 
