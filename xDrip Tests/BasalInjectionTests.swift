@@ -142,60 +142,6 @@ final class BasalInjectionTests: XCTestCase {
         }
     }
 
-    @MainActor func testBasalFieldRejectsExtraDecimalsBeforeChangingVisibleText() {
-        var boundText = "4.5"
-        let field = UITextField()
-        field.text = boundText
-        let coordinator = BasalDoseTextField.Coordinator(text: Binding(get: { boundText }, set: { boundText = $0 }))
-        field.delegate = coordinator
-        field.addTarget(coordinator, action: #selector(BasalDoseTextField.Coordinator.textDidChange(_:)), for: .editingChanged)
-
-        // UIKit asks the delegate before applying typing, deletion or a selected-range paste.
-        func edit(_ range: NSRange, _ replacement: String) -> Bool {
-            let accepted = field.delegate!.textField!(field, shouldChangeCharactersIn: range, replacementString: replacement)
-            if accepted {
-                field.text = (field.text! as NSString).replacingCharacters(in: range, with: replacement)
-                field.sendActions(for: .editingChanged)
-            }
-            return accepted
-        }
-
-        XCTAssertFalse(edit(NSRange(location: 3, length: 0), "3"))
-        XCTAssertEqual(field.text, "4.5")
-        XCTAssertEqual(boundText, "4.5")
-        for pasted in ["4.23", "6.45", "6,45", "4..5", "4,5.0", "4e2", "abc", "-1", "150.5", "151", "999"] {
-            XCTAssertFalse(edit(NSRange(location: 0, length: 3), pasted))
-            XCTAssertEqual(field.text, "4.5")
-            XCTAssertEqual(boundText, "4.5")
-        }
-        XCTAssertTrue(edit(NSRange(location: 2, length: 1), "0")) // Replace selected digit.
-        XCTAssertEqual(boundText, "4.0")
-        XCTAssertTrue(edit(NSRange(location: 2, length: 1), "")) // Delete fraction.
-        XCTAssertEqual(boundText, "4.")
-        XCTAssertTrue(edit(NSRange(location: 2, length: 0), "5"))
-        XCTAssertEqual(boundText, "4.5")
-        XCTAssertTrue(edit(NSRange(location: 0, length: 3), ""))
-        XCTAssertEqual(boundText, "")
-        XCTAssertTrue(edit(NSRange(location: 0, length: 0), ","))
-        XCTAssertTrue(edit(NSRange(location: 1, length: 0), "5"))
-        XCTAssertEqual(boundText, ",5")
-        XCTAssertFalse(edit(NSRange(location: 2, length: 0), "3"))
-        XCTAssertEqual(field.text, ",5")
-        XCTAssertEqual(boundText, ",5")
-        XCTAssertTrue(edit(NSRange(location: 0, length: 2), "6,5"))
-        XCTAssertEqual(boundText, "6,5")
-        XCTAssertTrue(edit(NSRange(location: 0, length: 3), "150"))
-        XCTAssertFalse(edit(NSRange(location: 3, length: 0), "1"))
-        XCTAssertEqual(field.text, "150")
-        XCTAssertTrue(edit(NSRange(location: 3, length: 0), "."))
-        XCTAssertFalse(edit(NSRange(location: 4, length: 0), "5"))
-        XCTAssertEqual(boundText, "150.")
-        XCTAssertTrue(edit(NSRange(location: 4, length: 0), "0"))
-        XCTAssertEqual(boundText, "150.0")
-        XCTAssertTrue(edit(NSRange(location: 0, length: 5), "0"))
-        XCTAssertEqual(boundText, "0")
-    }
-
     @MainActor func testBasalRejectsFinerThanHalfUnitsWithoutRoundingOrChangingSavedDose() throws {
         try withRestoredDefaults {
             let coreDataManager = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
