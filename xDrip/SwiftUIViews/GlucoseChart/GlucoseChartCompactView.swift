@@ -218,9 +218,15 @@ struct GlucoseChartCompactView: View {
 
     private func bgColor(bgValueInMgDl: Double) -> Color {
         if chartType != .widgetSystemSmallStandBy || !showHighContrast {
-            if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
+            let bgValueInUserUnit = bgValueInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl)
+            let urgentHighLimitInUserUnit = urgentHighLimitInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl)
+            let urgentLowLimitInUserUnit = urgentLowLimitInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl)
+            let highLimitInUserUnit = highLimitInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl)
+            let lowLimitInUserUnit = lowLimitInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl)
+
+            if bgValueInUserUnit >= urgentHighLimitInUserUnit || bgValueInUserUnit <= urgentLowLimitInUserUnit {
                 return .red
-            } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
+            } else if bgValueInUserUnit >= highLimitInUserUnit || bgValueInUserUnit <= lowLimitInUserUnit {
                 return .yellow
             } else {
                 return .green
