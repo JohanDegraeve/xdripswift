@@ -263,6 +263,12 @@ struct BgReadingsView: View {
             return
         }
 
+        NotificationCenter.default.post(
+            name: .bgReadingsDeletedByUser,
+            object: nil,
+            userInfo: [HealthKitManager.deletedBgReadingIDsKey: [bgReadingToDelete.id]]
+        )
+
         trace(
             "deleted BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata",
             log: log,
@@ -299,6 +305,7 @@ struct BgReadingsView: View {
         let bgReadingsToDelete = Array(selectedBgReadings)
 
         var readingsThatCouldNotBeDeleted = Set<BgReadingSnapshot>()
+        var deletedBgReadingIDs = [String]()
 
         for bgReadingToDelete in bgReadingsToDelete {
             let timestampOfBgReadingToDelete = bgReadingToDelete.timeStamp
@@ -311,6 +318,8 @@ struct BgReadingsView: View {
                 trace("failed to multi-delete BG reading with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .error, timestampOfBgReadingToDelete.description)
                 continue
             }
+
+            deletedBgReadingIDs.append(bgReadingToDelete.id)
 
             trace(
                 "multi-deleted BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata",
@@ -337,6 +346,12 @@ struct BgReadingsView: View {
             // delete from Nightscout
             nightscoutSyncManager.deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: timestampOfBgReadingToDelete)
         }
+
+        NotificationCenter.default.post(
+            name: .bgReadingsDeletedByUser,
+            object: nil,
+            userInfo: [HealthKitManager.deletedBgReadingIDsKey: deletedBgReadingIDs]
+        )
         
         notificationFeedback.notificationOccurred(readingsThatCouldNotBeDeleted.isEmpty ? .success : .error)
 
