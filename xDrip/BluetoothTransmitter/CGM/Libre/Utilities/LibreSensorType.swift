@@ -17,6 +17,8 @@ public enum LibreSensorType: String {
     case libre27F = "7F" // EU Libre 2 Plus (May 2025)
 
     case libre27FNonPlus = "7F30" // EU Libre 2 (May 2025), source: https://github.com/gui-dos/DiaBLE
+
+    case libre284 = "84" // EU Libre 2 Plus (November 2026)
     
     case libreUS = "E5"
     
@@ -48,6 +50,9 @@ public enum LibreSensorType: String {
 
         case .libre27FNonPlus:
             return "Libre 2 EU 7F"
+
+        case .libre284:
+            return "Libre 2 Plus EU 84"
             
         case .libreUS:
             return "Libre US"
@@ -65,7 +70,7 @@ public enum LibreSensorType: String {
     /// True when the sensor's FRAM uses the Libre 2 encryption handled by PreLibre2.
     var requiresLibre2Decryption: Bool {
         switch self {
-        case .libre2, .libre2C5, .libre2C6, .libre27F, .libre27FNonPlus, .libreUS, .libreUSE6:
+        case .libre2, .libre2C5, .libre2C6, .libre27F, .libre27FNonPlus, .libre284, .libreUS, .libreUSE6:
             return true
 
         case .libre1, .libre1A2, .libreProH:
@@ -73,10 +78,10 @@ public enum LibreSensorType: String {
         }
     }
 
-    /// The newer 7F Libre 2 sensors advertise their MAC address instead of ABBOTT plus the serial number.
+    /// These Libre 2 sensors advertise the MAC address returned by NFC as their Bluetooth name.
     var usesMacAddressAsBluetoothName: Bool {
         switch self {
-        case .libre27F, .libre27FNonPlus:
+        case .libre27F, .libre27FNonPlus, .libre284:
             return true
 
         default:
@@ -179,6 +184,9 @@ public enum LibreSensorType: String {
             }
 
             return patchInfoBytes[2] & 0x0F == 0 ? .libre27FNonPlus : .libre27F
+
+        case 0x84:
+            return .libre284
             
         case 0xE5:
             return .libreUS
@@ -210,7 +218,7 @@ public enum LibreSensorType: String {
         case .libre2, .libre2C5, .libre27FNonPlus:
             return 14.5
             
-        case .libre2C6, .libre27F:
+        case .libre2C6, .libre27F, .libre284:
             return 15.5
 
         case .libreUS, .libreUSE6:
