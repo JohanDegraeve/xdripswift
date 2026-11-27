@@ -707,6 +707,9 @@ class LibreLinkUpFollowManager: NSObject {
     private func scheduleNewDownload() {
         guard !UserDefaults.standard.libreLinkUpManuallyLoggedOut,
               UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
+
+        invalidateDownLoadTimerClosure?()
+        invalidateDownLoadTimerClosure = nil
         
         trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
         
