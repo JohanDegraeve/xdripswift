@@ -4,7 +4,13 @@ import HealthKit
 import os
 import UIKit
 
+extension Notification.Name {
+    static let bgReadingsDeletedByUser = Notification.Name("bgReadingsDeletedByUser")
+}
+
 public class HealthKitManager: NSObject {
+    static let deletedBgReadingIDsKey = "bgReadingIDs"
+
     // MARK: - public properties
     
     // MARK: - private properties
@@ -64,6 +70,7 @@ public class HealthKitManager: NSObject {
 
         NotificationCenter.default.addObserver(self, selector: #selector(storeBgReadings), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(storeBgReadings), name: UIApplication.didBecomeActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(bgReadingsDeletedByUser(_:)), name: .bgReadingsDeletedByUser, object: nil)
         
         // do first store
         storeBgReadings()
@@ -154,6 +161,10 @@ public class HealthKitManager: NSObject {
             }
         }
 
+        retryPendingBgReplacements()
+    }
+
+    private func retryPendingBgReplacements() {
         if !pendingHealthKitReplacements.isEmpty, UIApplication.shared.isProtectedDataAvailable {
             // Reload current values, not stale smoothed snapshots saved before a restart.
             // Deleted/suppressed readings must not be resurrected by a delayed retry.
@@ -196,7 +207,7 @@ public class HealthKitManager: NSObject {
 
         var pendingReplacements = pendingHealthKitReplacements
         for bgReading in bgReadings {
-            pendingReplacements[bgReading.id] = bgReading.finalValue
+            pendingReplacements[bgReading.id] = bgReading.historicalValue
         }
         pendingHealthKitReplacements = pendingReplacements
 
@@ -204,15 +215,15 @@ public class HealthKitManager: NSObject {
         // Keep replacements pending until we can safely migrate any legacy samples.
         guard UIApplication.shared.isProtectedDataAvailable else { return }
         
-        for bgReading in bgReadings {
+        let latestStored = UserDefaults.standard.timeStampLatestHealthKitStoreBgReading ?? .distantPast
+        for bgReading in bgReadings where bgReading.timeStamp < latestStored {
             // Reserve the whole query/delete/save operation, not just its final save.
             guard timeStampsOfBgReadingsCurrentlyBeingSaved.insert(bgReading.timeStamp).inserted else { continue }
             deleteExistingBgReadingsFromHealthKit(bgReading: bgReading, bloodGlucoseType: bloodGlucoseType, bloodGlucoseUnit: bloodGlucoseUnit)
         }
     }
 
-    /// Removes readings hidden by an explicit five-minute cadence rebuild without
-    /// touching the samples that remain visible and will be updated separately.
+    /// Removes HealthKit samples for suppressed or user-deleted readings.
     public func deleteBgReadingsFromHealthKit(bgReadingIDs: [String]) {
         if !Thread.isMainThread {
             DispatchQueue.main.async { [weak self] in
@@ -235,7 +246,7 @@ public class HealthKitManager: NSObject {
             guard let self = self else { return }
 
             if let error = error {
-                trace("failed query suppressed healthkit BG readings, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, error.localizedDescription)
+                trace("failed query healthkit BG readings to delete, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, error.localizedDescription)
                 return
             }
 
@@ -243,12 +254,17 @@ public class HealthKitManager: NSObject {
 
             self.healthStore.delete(samples) { success, deleteError in
                 if !success, let deleteError = deleteError {
-                    trace("failed delete suppressed healthkit BG readings, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, deleteError.localizedDescription)
+                    trace("failed delete healthkit BG readings, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, deleteError.localizedDescription)
                 }
             }
         }
 
         healthStore.execute(sampleQuery)
+    }
+
+    @objc private func bgReadingsDeletedByUser(_ notification: Notification) {
+        guard let bgReadingIDs = notification.userInfo?[Self.deletedBgReadingIDsKey] as? [String] else { return }
+        deleteBgReadingsFromHealthKit(bgReadingIDs: bgReadingIDs)
     }
     
     // MARK: - observe function
@@ -334,7 +350,7 @@ public class HealthKitManager: NSObject {
 
         // Use the newest requested value if smoothing ran again during the query.
         // A removed pending entry means the reading was deleted or suppressed meanwhile.
-        guard let valueToStore = shouldUpdateLatestTimeStamp ? bgReading.finalValue : pendingHealthKitReplacements[bgReading.id] else {
+        guard let valueToStore = shouldUpdateLatestTimeStamp ? bgReading.historicalValue : pendingHealthKitReplacements[bgReading.id] else {
             timeStampsOfBgReadingsCurrentlyBeingSaved.remove(bgReading.timeStamp)
             return
         }
@@ -368,6 +384,7 @@ public class HealthKitManager: NSObject {
                             let existingTimeStampLatestHealthKitStoreBgReading = UserDefaults.standard.timeStampLatestHealthKitStoreBgReading ?? Date.distantPast
                             let newTimeStampLatestHealthKitStoreBgReading = max(existingTimeStampLatestHealthKitStoreBgReading, timeStampLastReadingToUpload)
                             UserDefaults.standard.timeStampLatestHealthKitStoreBgReading = newTimeStampLatestHealthKitStoreBgReading
+                            self.retryPendingBgReplacements()
                         }
                         trace("stored reading in HealthKit", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .debug, troubleshooting: .detailed(.integration(name: .healthKit, activity: .succeeded(itemCount: 1))))
                     } else if let error = error {

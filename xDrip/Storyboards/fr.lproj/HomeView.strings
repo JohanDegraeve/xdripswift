@@ -87,6 +87,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "%@ restants";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Un filtre de Hampel atténue d’abord les valeurs aberrantes isolées. Savitzky-Golay lisse ensuite la courbe en préservant la forme générale des pics et des creux.";
 
 "sensorManagementNoiseTitle" = "Bruit du capteur";
 "sensorManagementNoiseShortTerm" = "30 dernières minutes";
@@ -150,7 +151,7 @@
 "sensorHealthPersistentNoiseTitle" = "Bruit du capteur très élevé";
 "sensorHealthPersistentNoiseGuidance" = "Bruit très élevé depuis 12 heures. Envisagez de remplacer le capteur si cela continue.";
 "sensorHealthFlatlineTitle" = "Le signal du capteur est plat";
-"sensorHealthFlatlineGuidance" = "Mesures inchangées depuis 30 minutes. Cela indique généralement que le capteur est défaillant/expiré.";
+"sensorHealthFlatlineGuidance" = "Mesures inchangées depuis 30 min. Capteur possiblement défaillant ou expiré.";
 "sensorHealthTemporaryIssueTitle" = "Problème temporaire du capteur";
 "sensorHealthTemporaryIssueGuidance" = "Problème temporaire du capteur depuis 3 heures. Vérifiez avec un lecteur et suivez les recommandations du fabricant.";
 "sensorHealthSensorFailedTitle" = "Capteur défaillant";
@@ -209,6 +210,9 @@
 "sensorManufactureDate" = "Date de fabrication";
 "sensorExpirationDate" = "Date d’expiration";
 "sensorManagementWaitingForSensorStart" = "En attente du démarrage du capteur";
+"sensorManagementTransmitterExpiredTitle" = "Émetteur expiré";
+"sensorManagementTransmitterExpiredMessage" = "Cet émetteur a expiré. Une nouvelle session de capteur ne peut pas être démarrée.";
+"sensorManagementAnubisRestartSuggestion" = "Redémarrez l’émetteur Anubis avant d’essayer de démarrer une nouvelle session de capteur.";
 "sensorManagementStatusWarmingUp" = "Préchauffage";
 "sensorCodeContinue" = "Continuer";
 "useWithoutSensorCode" = "Utiliser sans code";
@@ -238,3 +242,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Le réglage du décalage et de la forme est indisponible, car ce CGM utilise son propre calibrage.";
 
 "postProcessingWarningAgreement" = "Touchez OK uniquement si vous comprenez cette fonctionnalité et acceptez de l’activer.";
+
+"postProcessingPreviousReadings" = "Lisser les mesures précédentes";
+"postProcessingPreviousReadingsFooter" = "Lisse les mesures précédentes du graphique à mesure que de nouvelles mesures arrivent. La mesure la plus récente reste inchangée.";
+"postProcessingLatestReading" = "Lisser la dernière mesure";
+"postProcessingLatestReadingFooter" = "Atténue les hausses ou les baisses inattendues de la dernière mesure de glucose à partir des mesures des 10 à 20 dernières minutes. Une fois activée, cette option agit uniquement sur la dernière mesure.";
+"postProcessingLatestReadingOff" = "Désactivé";
+"postProcessingLatestReadingDisabled" = "Lissage de la dernière mesure désactivé";
+"postProcessingLatestReadingWarning" = "Le lissage de la dernière mesure peut atténuer ou retarder l’affichage de véritables variations de glucose et modifier le moment où les alertes se déclenchent. D’autres apps peuvent afficher une valeur différente pour la même mesure.";
+
+"postProcessingOffset" = "Décalage";
+"postProcessingCurve" = "Courbe";
+"postProcessingBoth" = "Les deux";
+"postProcessingOffsetAndCurve" = "Décalage et courbe";
+"postProcessingMode" = "Mode";
+"postProcessingUnavailable" = "Indisponible";
+"postProcessingExpanded" = "Développé";
+"postProcessingCollapsed" = "Réduit";
+"postProcessingReferenceGlucose" = "Glycémie de référence";
+"postProcessingEnterReferenceGlucose" = "Saisir la glycémie de référence";
+"postProcessingDecrease" = "Diminuer : %@";
+"postProcessingIncrease" = "Augmenter : %@";
+"postProcessingLight" = "Léger";
+"postProcessingMedium" = "Moyen";
+"postProcessingStrong" = "Fort";
+"postProcessingCurveShape" = "Forme";
+"postProcessingOffsetBgCheckHint" = "Une mesure récente de glycémie recommandée";
+"postProcessingScaleBgCheckHint" = "Deux mesures récentes de glycémie recommandées";

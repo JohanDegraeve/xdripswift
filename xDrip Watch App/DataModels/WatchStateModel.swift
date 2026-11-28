@@ -68,7 +68,7 @@ private struct WatchAGPProfilePoint {
 
 /// holds, the watch state and allows updates and computed properties/variables to be generated for the different views that use it
 /// also used to update the ComplicationSharedUserDefaultsModel in the app group so that the complication can access the data
-final class WatchStateModel: NSObject, ObservableObject {
+@MainActor final class WatchStateModel: NSObject, ObservableObject {
     private let log = Logger(subsystem: "xDrip", category: "WatchStateModel")
 
     /// the Watch Connectivity session
@@ -110,6 +110,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var updatedDate: Date = .now
     @Published var activeSensorDescription: String = ""
     @Published var watchCollectionConfigured = false
+    @Published private(set) var watchCollectionViewAvailable = false
     @Published var phoneBLECollectionPaused = false
     // A successful foreground message or probe reply proves a live phone link. When the app
     // opens after an idle period, show Checking during the first exchange instead of Away.
@@ -154,6 +155,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         super.init()
 
         watchCollectionConfigured = directWatchCollector.isConfigured
+        watchCollectionViewAvailable = directWatchCollector.configuration != nil
         session.delegate = self
         session.activate()
         directWatchSubscription = directWatchCollector.objectWillChange.sink { [weak self] _ in
@@ -761,6 +763,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         guard dictionary["directWatchRevision"] != nil,
               directWatchCollector.receiveConfiguration(dictionary) else { return }
         phoneBLECollectionPaused = directWatchCollector.phoneBLECollectionPaused
+        watchCollectionViewAvailable = directWatchCollector.configuration != nil
         // The collector also understands older payloads without directWatchConfigured.
         // Derive visibility from its accepted state, rather than duplicating wire defaults here.
         let configured = directWatchCollector.isConfigured
@@ -983,7 +986,7 @@ final class WatchStateModel: NSObject, ObservableObject {
 // MARK: - WCSession delegate to handle communications
 
 extension WatchStateModel: WCSessionDelegate {
-    func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error _: Error?) {
+    nonisolated func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error _: Error?) {
         // keep Watch state changes on the main queue because WCSession delivers delegate callbacks on a non-main queue
         DispatchQueue.main.async { [weak self] in
             guard let self = self, activationState == .activated else { return }
@@ -996,7 +999,7 @@ extension WatchStateModel: WCSessionDelegate {
         }
     }
 
-    func sessionReachabilityDidChange(_: WCSession) {
+    nonisolated func sessionReachabilityDidChange(_: WCSession) {
         DispatchQueue.main.async {
             if !self.session.isReachable {
                 self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorInactive
@@ -1009,19 +1012,19 @@ extension WatchStateModel: WCSessionDelegate {
         }
     }
 
-    func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+    nonisolated func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         DispatchQueue.main.async { self.processWatchPayloadFromDictionary(dictionary: applicationContext) }
     }
 
-    func session(_: WCSession, didFinish fileTransfer: WCSessionFileTransfer, error: Error?) {
+    nonisolated func session(_: WCSession, didFinish fileTransfer: WCSessionFileTransfer, error: Error?) {
         if DirectWatchCompatibility.normalized(fileTransfer.file.metadata ?? [:])["directWatchLog"] as? Bool == true, error == nil {
             try? FileManager.default.removeItem(at: fileTransfer.file.fileURL)
         }
     }
 
-    func session(_: WCSession, didReceiveMessageData _: Data) {}
+    nonisolated func session(_: WCSession, didReceiveMessageData _: Data) {}
 
-    func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+    nonisolated func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
         let message = DirectWatchCompatibility.normalized(message)
         DispatchQueue.main.async {
             if message["directWatchRequestLogs"] as? Bool == true,
@@ -1036,7 +1039,7 @@ extension WatchStateModel: WCSessionDelegate {
         }
     }
 
-    func session(_: WCSession, didReceiveMessage message: [String: Any]) {
+    nonisolated func session(_: WCSession, didReceiveMessage message: [String: Any]) {
         DispatchQueue.main.async {
             if !self.phoneLinkIsLive() { self.directWatchCollector.recordPhoneLinkDiagnostic("phone message received, live link restored") }
             self.lastLivePhoneContactAt = .now
@@ -1052,16 +1055,16 @@ extension WatchStateModel: WCSessionDelegate {
         }
     }
 
-    func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+    nonisolated func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
         DispatchQueue.main.async {
             self.processWatchPayloadFromDictionary(dictionary: userInfo)
         }
     }
 
     #if os(iOS)
-    func sessionDidBecomeInactive(_: WCSession) {}
+    nonisolated func sessionDidBecomeInactive(_: WCSession) {}
 
-    func sessionDidDeactivate(_ session: WCSession) {
+    nonisolated func sessionDidDeactivate(_ session: WCSession) {
         session.activate()
     }
     #endif

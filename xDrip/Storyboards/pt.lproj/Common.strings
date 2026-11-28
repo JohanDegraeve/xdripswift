@@ -149,3 +149,4 @@
 
 /* Status label, including Direct to Watch in Advanced Settings. */
 "common_enabled" = "Ativado";
+"common_disabled" = "Desativado";

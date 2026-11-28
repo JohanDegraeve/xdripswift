@@ -76,6 +76,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "متبقي %@";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "يخفف مرشح Hampel أولًا القيم الشاذة المعزولة. ثم ينعّم Savitzky-Golay المنحنى مع الحفاظ على الشكل العام للقمم والانخفاضات.";
 
 "sensorManagementNoiseTitle" = "ضوضاء المستشعر";
 "sensorManagementNoiseShortTerm" = "آخر 30 دقيقة";
@@ -116,7 +117,7 @@
 "sensorHealthPersistentNoiseTitle" = "تشويش المستشعر مرتفع جدًا";
 "sensorHealthPersistentNoiseGuidance" = "تشويش مرتفع جدًا لمدة 12 ساعة. فكّر في استبدال المستشعر إذا استمر.";
 "sensorHealthFlatlineTitle" = "إشارة المستشعر ثابتة";
-"sensorHealthFlatlineGuidance" = "لم تتغير القراءات منذ 30 دقيقة. يشير هذا عادةً إلى تعطل/انتهاء صلاحية المستشعر.";
+"sensorHealthFlatlineGuidance" = "القراءات ثابتة منذ 30 دقيقة. ربما تعطل المستشعر أو انتهت صلاحيته.";
 "sensorHealthTemporaryIssueTitle" = "مشكلة مؤقتة في المستشعر";
 "sensorHealthTemporaryIssueGuidance" = "مشكلة مؤقتة في المستشعر منذ 3 ساعات. تحقق بجهاز قياس السكر واتبع إرشادات الشركة المصنّعة.";
 "sensorHealthSensorFailedTitle" = "فشل المستشعر";
@@ -175,6 +176,9 @@
 "sensorManufactureDate" = "تاريخ التصنيع";
 "sensorExpirationDate" = "تاريخ انتهاء الصلاحية";
 "sensorManagementWaitingForSensorStart" = "في انتظار بدء تشغيل المستشعر";
+"sensorManagementTransmitterExpiredTitle" = "انتهت صلاحية جهاز الإرسال";
+"sensorManagementTransmitterExpiredMessage" = "انتهت صلاحية جهاز الإرسال هذا. لا يمكن بدء جلسة مستشعر جديدة.";
+"sensorManagementAnubisRestartSuggestion" = "أعد تشغيل جهاز إرسال Anubis قبل محاولة بدء جلسة مستشعر جديدة.";
 "sensorManagementStatusWarmingUp" = "جارٍ الإحماء";
 "sensorCodeContinue" = "متابعة";
 "useWithoutSensorCode" = "استخدام بدون رمز";
@@ -204,3 +208,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "يتعذر ضبط الإزاحة والشكل لأن جهاز CGM هذا يستخدم المعايرة الأصلية.";
 
 "postProcessingWarningAgreement" = "اضغط على «موافق» فقط إذا كنت تفهم هذه الميزة وتوافق على تفعيلها.";
+
+"postProcessingPreviousReadings" = "تنعيم القراءات السابقة";
+"postProcessingPreviousReadingsFooter" = "ينعّم القراءات السابقة في المخطط عند وصول قراءات جديدة. لا يؤثر ذلك في أحدث قراءة.";
+"postProcessingLatestReading" = "تنعيم أحدث قراءة";
+"postProcessingLatestReadingFooter" = "يخفف الارتفاعات أو الانخفاضات غير المتوقعة في أحدث قراءة للغلوكوز باستخدام قراءات آخر 10–20 دقيقة. عند تفعيله يؤثر في أحدث قراءة فقط.";
+"postProcessingLatestReadingOff" = "إيقاف";
+"postProcessingLatestReadingDisabled" = "تنعيم أحدث قراءة متوقف";
+"postProcessingLatestReadingWarning" = "قد يؤدي تنعيم أحدث قراءة إلى تخفيف التغيرات الحقيقية في الغلوكوز أو تأخير ظهورها، وقد يؤثر في توقيت تنبيهات الغلوكوز. قد تختلف القيمة المعروضة هنا عن القيمة التي تعرضها التطبيقات الأخرى للقراءة نفسها.";
+
+"postProcessingOffset" = "الإزاحة";
+"postProcessingCurve" = "المنحنى";
+"postProcessingBoth" = "كلاهما";
+"postProcessingOffsetAndCurve" = "الإزاحة والمنحنى";
+"postProcessingMode" = "الوضع";
+"postProcessingUnavailable" = "غير متاح";
+"postProcessingExpanded" = "موسّع";
+"postProcessingCollapsed" = "مطوي";
+"postProcessingReferenceGlucose" = "الغلوكوز المرجعي";
+"postProcessingEnterReferenceGlucose" = "أدخل الغلوكوز المرجعي";
+"postProcessingDecrease" = "خفض %@";
+"postProcessingIncrease" = "زيادة %@";
+"postProcessingLight" = "خفيف";
+"postProcessingMedium" = "متوسط";
+"postProcessingStrong" = "قوي";
+"postProcessingCurveShape" = "الشكل";
+"postProcessingOffsetBgCheckHint" = "يُوصى بقياس حديث لسكر الدم";
+"postProcessingScaleBgCheckHint" = "يُوصى بقياسين حديثين لسكر الدم";

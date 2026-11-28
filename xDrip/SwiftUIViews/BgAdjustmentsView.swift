@@ -24,16 +24,45 @@ struct BgAdjustmentsView: View {
         case offsetValue
     }
 
-    private enum AdjustmentAlert: String, Identifiable {
-        case glucose, curve, smoothing, invalidAdjustment
-        var id: String { rawValue }
+    private enum AdjustmentSection {
+        case offsetAndCurve, previous, latest
+    }
 
-        var troubleshootingFeature: TroubleshootingPostProcessingWarning? {
+    private enum AdjustmentMode: CaseIterable {
+        case off, offset, curve, both
+
+        init(offset: Bool, curve: Bool) {
+            switch (offset, curve) {
+            case (false, false): self = .off
+            case (true, false): self = .offset
+            case (false, true): self = .curve
+            case (true, true): self = .both
+            }
+        }
+
+        var includesOffset: Bool { self == .offset || self == .both }
+        var includesCurve: Bool { self == .curve || self == .both }
+
+        var title: String {
             switch self {
-            case .glucose: return .glucoseAdjustment
-            case .curve: return .curveAdjustment
-            case .smoothing: return .glucoseSmoothing
-            case .invalidAdjustment: return nil
+            case .off: return Texts_HomeView.postProcessingLatestReadingOff
+            case .offset: return Texts_HomeView.postProcessingOffset
+            case .curve: return Texts_HomeView.postProcessingCurve
+            case .both: return Texts_HomeView.postProcessingBoth
+            }
+        }
+    }
+
+    private enum AdjustmentAlert: Identifiable {
+        case adjustment(AdjustmentMode)
+        case latestReadingSmoothing(LatestReadingSmoothing.Mode)
+        case invalidAdjustment
+
+        var id: Int {
+            switch self {
+            case .adjustment: return 0
+            case .latestReadingSmoothing: return 1
+            case .invalidAdjustment: return 2
             }
         }
     }
@@ -54,8 +83,11 @@ struct BgAdjustmentsView: View {
     private let bgPostProcessingManager: BgPostProcessingManager
 
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.colorScheme) private var colorScheme
 
     @State private var bgReadings: [BgReading] = []
+    @State private var previewSourceStartDate = Date.distantPast
 
     @State private var calculatedBgReadingValues: [Double] = []
     @State private var calculatedBgReadingDates: [Date] = []
@@ -66,14 +98,18 @@ struct BgAdjustmentsView: View {
     @State private var previewVisibleFinalBgReadingValues: [Double] = []
     @State private var previewVisibleFinalBgReadingDates: [Date] = []
 
-    @State private var currentBgAdjustment: BgAdjustment?
+    @State private var openedSourceContext: String?
+    @State private var openedShape = ConstantsBgAdjustment.defaultShapeType.rawValue
 
     @State private var enableAdjustment = UserDefaults.standard.enableAdjustment && UserDefaults.standard.enableGlucoseAdjustment
     @State private var enableCurveAdjustment = UserDefaults.standard.enableAdjustment && UserDefaults.standard.enableCurveAdjustment
     @State private var adjustmentAlert: AdjustmentAlert?
     @State private var acknowledgedWarnings = [TroubleshootingPostProcessingWarning]()
     @State private var enableSmoothing = UserDefaults.standard.enableSmoothing
+    @State private var latestReadingSmoothingMode = UserDefaults.standard.latestReadingSmoothingMode
+    @State private var expandedSection: AdjustmentSection?
     @State private var useFiveMinuteReadings = UserDefaults.standard.useFiveMinuteReadings
+    @State private var openingReferenceGlucoseValue: Double?
     @State private var draftAdjustedGlucoseValue = ""
     @State private var slope = "1.00"
     @State private var intercept = "0.0"
@@ -82,8 +118,10 @@ struct BgAdjustmentsView: View {
     @State private var openedInterceptValue = 0.0
     @State private var smoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm
     @State private var smoothingStrength = UserDefaults.standard.bgSmoothingStrength
+    @State private var showingSmoothingAlgorithmInfo = false
     @State private var showingApplyFromConfirmation = false
     @State private var showingUnsavedChangesConfirmation = false
+    @State private var showingDiscardConfirmation = false
     @State private var chartHoursToShow = Double(UserDefaults.standard.postProcessingPreviewChartHoursToShow)
     @State private var showingBasicAdjustmentInputSheet = false
     @State private var viewStateWasLoaded = false
@@ -102,39 +140,43 @@ struct BgAdjustmentsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                ConstantsAppColors.groupedBackground
+                screenBackground
                     .ignoresSafeArea()
 
                 VStack(spacing: 0) {
+                    if dynamicTypeSize.isAccessibilitySize {
+                        Text(Texts_HomeView.postProcessingTitle)
+                            .font(.title2.bold())
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
+                            .accessibilityAddTraits(.isHeader)
+                    }
+
                     chartView()
                         .padding(.top, 8)
                         .padding(.bottom, 10)
 
-                    List {
-                        smoothingSection()
-                        if shouldAllowAdjustmentForCurrentSource() {
-                            adjustmentSection()
-                            curveAdjustmentSection()
-                        } else {
-                            adjustmentUnavailableSection()
-                        }
-                        readingFrequencySection()
-                    }
+                    adjustmentList
                 }
             }
             .ipadReadableContentWidth(980)
-            .navigationTitle(Texts_HomeView.postProcessingTitle)
-            .toolbarBackground(ConstantsAppColors.groupedBackground, for: .navigationBar)
+            .navigationTitle(dynamicTypeSize.isAccessibilitySize ? "" : Texts_HomeView.postProcessingTitle)
+            .navigationBarTitleDisplayMode(dynamicTypeSize.isAccessibilitySize ? .inline : .automatic)
+            .toolbarBackground(screenBackground, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(Texts_Common.Cancel, action: cancelEditing)
-                    .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
+                    .foregroundStyle(Color.primary)
+                    .confirmationDialog(Texts_Common.unsavedChanges, isPresented: $showingDiscardConfirmation, titleVisibility: .visible) {
+                        Button(Texts_Common.discardChanges, role: .destructive) { presentationMode.wrappedValue.dismiss() }
+                        Button(Texts_Common.Cancel, role: .cancel) {}
+                    }
                     .alert(isPresented: $showingUnsavedChangesConfirmation) {
                         Alert(
                             title: Text(Texts_Common.unsavedChanges),
                             primaryButton: .default(Text(Texts_Common.save), action: {
-                                showingApplyFromConfirmation = true
+                                beginApply()
                             }),
                             secondaryButton: .destructive(Text(Texts_Common.discardChanges), action: {
                                 presentationMode.wrappedValue.dismiss()
@@ -147,14 +189,14 @@ struct BgAdjustmentsView: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(Texts_HomeView.postProcessingApply) {
-                        showingApplyFromConfirmation = true
+                        beginApply()
                     }
                     .tint(ConstantsAppColors.toolbarAction)
                     .disabled(!canApplyChanges())
                 }
             }
             .sheet(isPresented: $showingBasicAdjustmentInputSheet) {
-                BasicAdjustmentInputView(currentGlucoseValueInMgDl: bgReadings.last?.calculatedValue, currentGlucoseValueString: displayBgString(for: bgReadings.last?.calculatedValue), glucoseAdjustmentValueString: inputGlucoseAdjustmentValueString(for: draftAdjustedGlucoseValue), unitString: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol, enteredGlucoseValue: $draftAdjustedGlucoseValue, onCancel: {
+                BasicAdjustmentInputView(openingReferenceGlucoseValue: openingReferenceGlucoseValue, currentGlucoseValueInMgDl: latestSourceReading?.calculatedValue, currentGlucoseValueString: displayBgString(for: latestSourceReading?.calculatedValue), glucoseAdjustmentValueString: inputGlucoseAdjustmentValueString(for: draftAdjustedGlucoseValue), unitString: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol, enteredGlucoseValue: $draftAdjustedGlucoseValue, onCancel: {
                     draftAdjustedGlucoseValue = adjustedGlucoseInputValueString()
                     showingBasicAdjustmentInputSheet = false
                 }, onConfirm: {
@@ -163,7 +205,7 @@ struct BgAdjustmentsView: View {
                 })
             }
             .alert(item: $adjustmentAlert) { alert in
-                if alert == .invalidAdjustment {
+                if case .invalidAdjustment = alert {
                     return Alert(title: Text(Texts_Common.warning), message: Text(Texts_HomeView.postProcessingInvalidAdjustment), dismissButton: .default(Text(Texts_Common.Ok)))
                 }
                 return enableConfirmationAlert(for: alert)
@@ -190,6 +232,9 @@ struct BgAdjustmentsView: View {
                 updatePreviewData()
             }
             .onChange(of: enableCurveAdjustment) { _ in
+                updatePreviewData()
+            }
+            .onChange(of: latestReadingSmoothingMode) { _ in
                 updatePreviewData()
             }
             .onChange(of: enableSmoothing) { _ in
@@ -219,11 +264,34 @@ struct BgAdjustmentsView: View {
                 updatePreviewData()
             }
             .onReceive(chartRefreshTimer) { _ in
-                loadBgReadings()
-                updatePreviewData()
+                if openedSourceContext == bgPostProcessingManager.postProcessingEditingSource {
+                    loadBgReadings()
+                    updatePreviewData()
+                }
             }
         }
-        .preferredColorScheme(.dark)
+    }
+
+    private var adjustmentList: some View {
+        List {
+            Section {
+                VStack(alignment: .leading) { offsetAndCurveSection() }
+                    .listRowSeparator(.visible, edges: .bottom)
+                VStack(alignment: .leading) { smoothingSection() }
+                    .listRowSeparator(.visible, edges: .bottom)
+                VStack(alignment: .leading) { latestReadingSmoothingSection() }
+            }
+            readingFrequencySection()
+        }
+        .modifier(AdjustmentListTopMargin())
+    }
+
+    private var screenBackground: Color {
+        colorScheme == .dark ? ConstantsAppColors.groupedBackground : Color(uiColor: .systemGroupedBackground)
+    }
+
+    private var warningColor: Color {
+        colorScheme == .dark ? Color(.systemYellow) : Color(.systemBrown)
     }
 
     private var adjustmentShapeType: BgAdjustmentShapeType {
@@ -238,25 +306,26 @@ struct BgAdjustmentsView: View {
                 .font(.subheadline)
 
             GlucoseChartView(glucoseChartType: .siriGlucoseIntent, bgReadingValues: previewBgReadingValues(), bgReadingDates: previewBgReadingDates(), additionalBgReadingDataSets: chartDataSets(), isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: nil, hoursToShowScalingHours: chartHoursToShow, glucoseCircleDiameterScalingHours: chartHoursToShow, overrideChartHeight: 120, overrideChartWidth: nil, highContrast: nil)
+                .dynamicTypeSize(...DynamicTypeSize.large)
 
-            HStack {
-                Text(Texts_HomeView.postProcessingPreviewHours)
-                    .foregroundStyle(Color(.colorSecondary))
-                    .font(.subheadline)
-                Spacer()
-                Picker(Texts_HomeView.postProcessingPreviewHours, selection: Binding<Int>(
-                    get: { Int(chartHoursToShow) },
-                    set: { selectedChartHoursToShow in
-                        chartHoursToShow = Double(selectedChartHoursToShow)
-                    }
-                )) {
-                    ForEach(ConstantsBgAdjustment.previewChartHoursToShowOptions, id: \.self) { previewChartHoursToShow in
-                        Text("\(previewChartHoursToShow)h")
-                            .tag(previewChartHoursToShow)
-                    }
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(Texts_HomeView.postProcessingPreviewHours)
+                        .foregroundStyle(Color.secondary)
+                        .font(.subheadline)
+                    previewHoursPicker
+                        .pickerStyle(.menu)
                 }
-                .pickerStyle(.segmented)
-                .frame(maxWidth: 240)
+            } else {
+                HStack {
+                    Text(Texts_HomeView.postProcessingPreviewHours)
+                        .foregroundStyle(Color.secondary)
+                        .font(.subheadline)
+                    Spacer()
+                    previewHoursPicker
+                        .pickerStyle(.segmented)
+                        .frame(maxWidth: 240)
+                }
             }
         }
         .padding(.vertical, 8)
@@ -266,104 +335,218 @@ struct BgAdjustmentsView: View {
         .padding(.horizontal)
     }
 
-    private func adjustmentSection() -> some View {
-        Section(header: Text(Texts_HomeView.postProcessingAdjustment)) {
-            VStack(alignment: .leading, spacing: 4) {
-                Toggle(Texts_Common.enable, isOn: confirmedEnableBinding($enableAdjustment, alert: .glucose))
-                    .tint(ConstantsAppColors.normal)
-                    .disabled(!shouldAllowAdjustmentForCurrentSource())
+    private var previewHoursPicker: some View {
+        Picker(Texts_HomeView.postProcessingPreviewHours, selection: $chartHoursToShow) {
+            ForEach(ConstantsBgAdjustment.previewChartHoursToShowOptions, id: \.self) { hours in
+                Text("\(hours)h").tag(Double(hours))
+            }
+        }
+    }
 
-                if effectiveEnableAdjustment(), let previewBgCheckHintText = previewBgCheckHintText() {
-                    Text(previewBgCheckHintText)
-                        .font(.footnote)
-                        .foregroundStyle(Color(.systemRed))
+    private var historicalMode: LatestReadingSmoothing.Mode {
+        guard enableSmoothing else { return .off }
+        switch smoothingStrength {
+        case 0: return .light
+        case 2: return .strong
+        default: return .medium
+        }
+    }
+
+    private var adjustmentMode: AdjustmentMode {
+        AdjustmentMode(offset: effectiveEnableAdjustment(), curve: effectiveEnableCurveAdjustment())
+    }
+
+    private var adjustmentSummary: String {
+        guard shouldAllowAdjustmentForCurrentSource() else { return Texts_HomeView.postProcessingUnavailable }
+        switch adjustmentMode {
+        case .off: return AdjustmentMode.off.title
+        case .offset: return offsetSummary
+        case .curve: return curveSummary
+        case .both: return [offsetSummary, curveSummary].joined(separator: " · ")
+        }
+    }
+
+    private var offsetSummary: String {
+        "\(AdjustmentMode.offset.title) \(displayAdjustmentValueString(for: intercept.toDouble() ?? 0))"
+    }
+
+    private var curveSummary: String {
+        "\(AdjustmentMode.curve.title) \(displaySlopeString(for: slope.toDouble()))"
+    }
+
+    private func disclosureRow(_ section: AdjustmentSection, title: String, summary: String, enabled: Bool, available: Bool = true) -> some View {
+        let expanded = expandedSection == section
+        return Button {
+            expandedSection = expanded ? nil : section
+        } label: {
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 10) {
+                    Text(title)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(Color.primary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Image(systemName: enabled ? "checkmark.circle.fill" : "circle")
+                        .foregroundStyle(available ? (enabled ? Color(.systemGreen) : Color.secondary) : Color(uiColor: .tertiaryLabel))
+                    Image(systemName: expanded ? "chevron.up" : "chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.secondary)
+                }
+                if !expanded {
+                    Text(summary)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.secondary)
                 }
             }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityValue([summary, expanded ? Texts_HomeView.postProcessingExpanded : Texts_HomeView.postProcessingCollapsed].joined(separator: ", "))
+        .accessibilityAddTraits(.isHeader)
+    }
 
-            if effectiveEnableAdjustment() {
-                offsetAdjustmentValueRow()
-                if let warning = offsetWarningMessage(intercept.toDouble()) {
-                    Label(warning, systemImage: "exclamationmark.triangle")
-                        .font(.footnote)
-                        .foregroundStyle(offsetIsValid() ? Color(.systemYellow) : Color(.systemRed))
+    @ViewBuilder private func modeSelector<Mode: Hashable>(_ title: String, options: [Mode], off: Mode, selection: Mode, label: @escaping (Mode) -> String, onSelect: @escaping (Mode) -> Void) -> some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            modeMenu(title, options: options, off: off, selection: selection, label: label, onSelect: onSelect)
+        } else {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 2) {
+                    ForEach(options, id: \.self) { option in
+                        let selected = option == selection
+                        Button {
+                            onSelect(option)
+                        } label: {
+                            Text(label(option))
+                                .font(.subheadline.weight(selected ? .semibold : .regular))
+                                .fixedSize(horizontal: true, vertical: false)
+                                .frame(maxWidth: .infinity)
+                                .foregroundStyle(Color.primary)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.regular)
+                        .tint(option == off ? offModeFill(selected: selected) : (selected ? Color(uiColor: .systemFill) : .clear))
+                        .accessibilityAddTraits(selected ? .isSelected : [])
+                    }
+                }
+                .padding(2)
+                .background(Color(uiColor: .tertiarySystemFill), in: RoundedRectangle(cornerRadius: 10))
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel(title)
+
+                modeMenu(title, options: options, off: off, selection: selection, label: label, onSelect: onSelect)
+            }
+        }
+    }
+
+    private func modeMenu<Mode: Hashable>(_ title: String, options: [Mode], off: Mode, selection: Mode, label: @escaping (Mode) -> String, onSelect: @escaping (Mode) -> Void) -> some View {
+        Menu {
+            ForEach(options, id: \.self) { option in
+                Button {
+                    onSelect(option)
+                } label: {
+                    if option == selection {
+                        Label(label(option), systemImage: "checkmark")
+                    } else {
+                        Text(label(option))
+                    }
                 }
             }
-        }
-    }
-
-    private func curveAdjustmentSection() -> some View {
-        Section(header: Text(Texts_HomeView.postProcessingCurveAdjustment)) {
-            Toggle(Texts_Common.enable, isOn: confirmedEnableBinding($enableCurveAdjustment, alert: .curve))
-                .tint(ConstantsAppColors.normal)
-                .disabled(!shouldAllowAdjustmentForCurrentSource())
-
-            if effectiveEnableCurveAdjustment() {
-                if scaleValueChanged(), bgCheckTreatmentChartPointsValues.count < 2 {
-                    Text(Texts_HomeView.postProcessingScaleBgCheckHint)
-                        .font(.footnote)
-                        .foregroundStyle(Color(.systemRed))
-                }
-                scaleAdjustmentControl()
+        } label: {
+            HStack {
+                Text(Texts_HomeView.postProcessingMode)
+                    .foregroundStyle(Color.primary)
+                Spacer(minLength: 8)
+                Label(label(selection), systemImage: "chevron.up.chevron.down")
+                    .labelStyle(.titleAndIcon)
+                    .foregroundStyle(selection == off ? Color.primary : Color.secondary)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 5)
+                    .background(selection == off ? offModeFill(selected: true) : .clear, in: RoundedRectangle(cornerRadius: 7))
             }
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityValue(label(selection))
+    }
+
+    private func offModeFill(selected: Bool) -> Color {
+        Color(uiColor: .systemRed).opacity(selected ? 0.65 : 0.09)
+    }
+
+    private func selectAdjustmentMode(_ mode: AdjustmentMode) {
+        guard mode != adjustmentMode else { return }
+        if mode != .off && !acknowledgedWarnings.contains(.glucoseAdjustment) {
+            adjustmentAlert = .adjustment(mode)
+        } else {
+            enableAdjustment = mode.includesOffset
+            enableCurveAdjustment = mode.includesCurve
         }
     }
 
-    /// Do not change the draft until the user accepts the warning.
-    private func confirmedEnableBinding(_ value: Binding<Bool>, alert: AdjustmentAlert) -> Binding<Bool> {
-        Binding(get: { value.wrappedValue }, set: { enabled in
-            if enabled {
-                adjustmentAlert = alert
-            } else {
-                value.wrappedValue = false
-            }
-        })
-    }
-
-    private func enableAlertTitle(_ alert: AdjustmentAlert) -> String {
-        switch alert {
-        case .glucose: return Texts_HomeView.postProcessingEnableGlucoseAdjustment
-        case .curve: return Texts_HomeView.postProcessingEnableCurveAdjustment
-        case .smoothing: return Texts_HomeView.postProcessingEnableGlucoseSmoothing
-        case .invalidAdjustment: return Texts_Common.warning
+    private func strengthTitle(_ mode: LatestReadingSmoothing.Mode) -> String {
+        switch mode {
+        case .off: return Texts_HomeView.postProcessingLatestReadingOff
+        case .light: return Texts_HomeView.postProcessingLight
+        case .medium: return Texts_HomeView.postProcessingMedium
+        case .strong: return Texts_HomeView.postProcessingStrong
         }
     }
 
-    private func enableAlertMessage(_ alert: AdjustmentAlert) -> String {
-        let warning: String
-        switch alert {
-        case .glucose: warning = Texts_HomeView.postProcessingGlucoseAdjustmentWarning
-        case .curve: warning = Texts_HomeView.postProcessingCurveAdjustmentWarning
-        case .smoothing: warning = Texts_HomeView.postProcessingGlucoseSmoothingWarning
-        case .invalidAdjustment: warning = Texts_HomeView.postProcessingInvalidAdjustment
+    private func selectHistoricalMode(_ mode: LatestReadingSmoothing.Mode) {
+        enableSmoothing = mode.isEnabled
+        switch mode {
+        case .off: break
+        case .light: smoothingStrength = 0
+        case .medium: smoothingStrength = 1
+        case .strong: smoothingStrength = 2
         }
-        return warning + "\n\n" + Texts_HomeView.postProcessingWarningAgreement
+    }
+
+    private func selectLiveMode(_ mode: LatestReadingSmoothing.Mode) {
+        if mode.isEnabled && !latestReadingSmoothingMode.isEnabled && !acknowledgedWarnings.contains(.latestReadingSmoothing) {
+            adjustmentAlert = .latestReadingSmoothing(mode)
+        } else {
+            latestReadingSmoothingMode = mode
+        }
     }
 
     private func enableConfirmationAlert(for alert: AdjustmentAlert) -> Alert {
-        let cancelButton = Alert.Button.cancel(Text(Texts_Common.Cancel))
-        let enableButton = Alert.Button.default(Text(Texts_Common.Ok)) {
-            confirmEnable(alert)
-        }
-
-        return Alert(
-            title: Text(enableAlertTitle(alert)),
-            message: Text(enableAlertMessage(alert)),
-            primaryButton: cancelButton,
-            secondaryButton: enableButton
-        )
-    }
-
-    private func confirmEnable(_ alert: AdjustmentAlert) {
-        if let feature = alert.troubleshootingFeature {
-            acknowledgedWarnings.append(feature)
-        }
-
+        let title: String
+        let warnings: [(TroubleshootingPostProcessingWarning, String)]
+        let confirm: () -> Void
         switch alert {
-        case .glucose: enableAdjustment = true
-        case .curve: enableCurveAdjustment = true
-        case .smoothing: enableSmoothing = true
-        case .invalidAdjustment: break
+        case .adjustment(let mode):
+            title = Texts_HomeView.postProcessingOffsetAndCurve
+            warnings = [
+                (.glucoseAdjustment, Texts_HomeView.postProcessingGlucoseAdjustmentWarning),
+                (.curveAdjustment, Texts_HomeView.postProcessingCurveAdjustmentWarning)
+            ]
+            confirm = {
+                enableAdjustment = mode.includesOffset
+                enableCurveAdjustment = mode.includesCurve
+            }
+        case .latestReadingSmoothing(let mode):
+            title = Texts_HomeView.postProcessingLatestReading
+            warnings = [(.latestReadingSmoothing, Texts_HomeView.postProcessingLatestReadingWarning)]
+            confirm = { latestReadingSmoothingMode = mode }
+        case .invalidAdjustment:
+            return Alert(title: Text(Texts_Common.warning), message: Text(Texts_HomeView.postProcessingInvalidAdjustment))
         }
+
+        let message = (warnings.map { $0.1 } + [Texts_HomeView.postProcessingWarningAgreement]).joined(separator: "\n\n")
+        return Alert(
+            title: Text(title),
+            message: Text(message),
+            primaryButton: .cancel(Text(Texts_Common.Cancel)),
+            secondaryButton: .default(Text(Texts_Common.Ok)) {
+                for (feature, _) in warnings where !acknowledgedWarnings.contains(feature) {
+                    acknowledgedWarnings.append(feature)
+                }
+                confirm()
+            }
+        )
     }
 
     private func offsetIsValid() -> Bool {
@@ -379,113 +562,178 @@ struct BgAdjustmentsView: View {
         return ConstantsBgAdjustment.offsetNeedsWarning(offset) ? Texts_HomeView.postProcessingLargeOffsetWarning : nil
     }
 
-    private func adjustmentUnavailableSection() -> some View {
-        Section {
-            Label(Texts_HomeView.postProcessingAdjustmentUnavailableNativeCalibration, systemImage: "info.circle")
-                .font(.subheadline)
-                .foregroundStyle(Color(.colorSecondary))
+    @ViewBuilder private func offsetAndCurveSection() -> some View {
+        let title = Texts_HomeView.postProcessingOffsetAndCurve
+        disclosureRow(.offsetAndCurve, title: title, summary: adjustmentSummary, enabled: adjustmentMode != .off, available: shouldAllowAdjustmentForCurrentSource())
+        if expandedSection == .offsetAndCurve {
+            if shouldAllowAdjustmentForCurrentSource() {
+                modeSelector(title, options: AdjustmentMode.allCases, off: .off, selection: adjustmentMode, label: { $0.title }, onSelect: selectAdjustmentMode)
+                    .padding(.top, 4)
+                if effectiveEnableAdjustment() {
+                    offsetAdjustmentValueRow()
+                }
+                if effectiveEnableCurveAdjustment() {
+                    scaleAdjustmentControl()
+                }
+                if effectiveEnableAdjustment(), let warning = offsetWarningMessage(intercept.toDouble()) {
+                    adjustmentHint(warning, color: offsetIsValid() ? warningColor : Color(.systemRed))
+                } else if let hint = previewBgCheckHintText() {
+                    adjustmentHint(hint, color: .secondary)
+                }
+            } else {
+                Label(bgPostProcessingManager.bgAdjustmentDisabledMessageForCurrentSource() ?? Texts_HomeView.postProcessingAdjustmentUnavailableNativeCalibration, systemImage: "info.circle")
+                    .font(.footnote)
+                    .foregroundStyle(Color.secondary)
+                    .padding(.top, 4)
+            }
         }
     }
 
-    private func advancedAdjustmentValueRow(title: String, value: String, valueColor: Color, minusDisabled: Bool = false, plusDisabled: Bool = false, onMinus: @escaping () -> Void, onPlus: @escaping () -> Void) -> some View {
-        HStack {
-            Text(title)
-            Spacer()
-            Button("-") {
-                onMinus()
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-            .disabled(minusDisabled)
+    private func adjustmentHint(_ text: String, color: Color) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 5) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.caption)
+                .accessibilityHidden(true)
+            Text(text)
+        }
+        .font(.footnote)
+        .foregroundStyle(color)
+    }
 
+    private func nudgeControls(title: String, value: String, valueColor: Color, minusDisabled: Bool, plusDisabled: Bool, onMinus: @escaping () -> Void, onPlus: @escaping () -> Void) -> some View {
+        HStack(spacing: 4) {
+            nudgeButton(symbol: "minus", label: String(format: Texts_HomeView.postProcessingDecrease, title), disabled: minusDisabled, action: onMinus)
             Text(value)
+                .monospacedDigit()
                 .foregroundStyle(valueColor)
-                .frame(minWidth: 44, alignment: .center)
-
-            Button("+") {
-                onPlus()
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-            .disabled(plusDisabled)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(minWidth: 44)
+            nudgeButton(symbol: "plus", label: String(format: Texts_HomeView.postProcessingIncrease, title), disabled: plusDisabled, action: onPlus)
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(title)
     }
 
-    @ViewBuilder private func offsetAdjustmentValueRow() -> some View {
-        HStack {
-            Text(Texts_HomeView.postProcessingOffset)
-            Spacer()
-            Button {
-                draftAdjustedGlucoseValue = adjustedGlucoseInputValueString()
-                showingBasicAdjustmentInputSheet = true
-            } label: {
-                Text(displayBgString(for: currentAdjustedGlucoseValueInMgDl()))
-                    .foregroundStyle(offsetAdjustmentInputType == .adjustedGlucoseValue ? Color(.colorPrimary) : Color(.colorTertiary))
-            }
-            .buttonStyle(.plain)
-            .padding(.trailing, 8)
+    private func nudgeButton(symbol: String, label: String, disabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.subheadline.weight(.medium))
+                .frame(width: 34, height: 30)
+                .background(Color(uiColor: .tertiarySystemFill), in: RoundedRectangle(cornerRadius: 8))
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(disabled ? Color.secondary : Color.primary)
+        .disabled(disabled)
+        .accessibilityLabel(label)
+    }
 
-            Button("-") {
-                updateIntercept(by: -interceptNudgeValueInMgDl())
+    private func adjustmentValueRow<Controls: View>(_ title: String, @ViewBuilder controls: () -> Controls) -> some View {
+        let controls = controls()
+        return ViewThatFits(in: .horizontal) {
+            HStack(spacing: 6) {
+                Text(title).fixedSize(horizontal: true, vertical: false)
+                Spacer(minLength: 4)
+                controls
             }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-            .disabled(!canDecreaseOffsetValue())
-
-            Text(displayAdjustmentValueString(for: intercept.toDouble() ?? 0.0, includeUnit: false))
-                .foregroundStyle(offsetValueTextColor())
-                .frame(minWidth: 44, alignment: .center)
-
-            Button("+") {
-                updateIntercept(by: interceptNudgeValueInMgDl())
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                controls
             }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-            .disabled(!canIncreaseOffsetValue())
+        }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var offsetReferenceButton: some View {
+        let value = latestSourceReading == nil ? "-" : displayBgString(for: currentAdjustedGlucoseValueInMgDl())
+        return Button {
+            draftAdjustedGlucoseValue = adjustedGlucoseInputValueString()
+            openingReferenceGlucoseValue = draftAdjustedGlucoseValue.toDouble()
+            showingBasicAdjustmentInputSheet = true
+        } label: {
+            Text(value)
+                .font(.subheadline)
+                .monospacedDigit()
+                .fixedSize()
+                .foregroundStyle(latestSourceReading == nil ? Color.secondary : Color.accentColor)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 6)
+                .background(Color(uiColor: .tertiarySystemFill), in: RoundedRectangle(cornerRadius: 8))
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(latestSourceReading == nil)
+        .accessibilityLabel(Texts_HomeView.postProcessingEnterReferenceGlucose)
+        .accessibilityValue(value)
+    }
+
+    private func offsetAdjustmentValueRow() -> some View {
+        let title = Texts_HomeView.postProcessingOffset
+        let stepper = nudgeControls(title: title, value: displayAdjustmentValueString(for: intercept.toDouble() ?? 0.0, includeUnit: false), valueColor: offsetValueTextColor(), minusDisabled: !canDecreaseOffsetValue(), plusDisabled: !canIncreaseOffsetValue(), onMinus: {
+            updateIntercept(by: -interceptNudgeValueInMgDl())
+        }, onPlus: {
+            updateIntercept(by: interceptNudgeValueInMgDl())
+        })
+        return adjustmentValueRow(title) {
+            HStack(spacing: 4) {
+                offsetReferenceButton
+                stepper
+            }
         }
     }
 
     @ViewBuilder private func scaleAdjustmentControl() -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            advancedAdjustmentValueRow(title: Texts_HomeView.postProcessingScale, value: displaySlopeString(for: slope.toDouble()), valueColor: scaleValueTextColor(), minusDisabled: !canDecreaseScaleValue(), plusDisabled: !canIncreaseScaleValue(), onMinus: {
-                updateSlope(by: -ConstantsBgAdjustment.slopeNudgeValue)
-            }, onPlus: {
-                updateSlope(by: ConstantsBgAdjustment.slopeNudgeValue)
-            })
-
-            Rectangle()
-                .fill(Color(.separator))
-                .frame(height: 0.5)
-
-            HStack {
-                Text(Texts_HomeView.postProcessingShape)
-                Spacer()
-                compactAdjustmentShapeControl()
+            adjustmentValueRow(Texts_HomeView.postProcessingScale) {
+                nudgeControls(title: Texts_HomeView.postProcessingScale, value: displaySlopeString(for: slope.toDouble()), valueColor: scaleValueTextColor(), minusDisabled: !canDecreaseScaleValue(), plusDisabled: !canIncreaseScaleValue(), onMinus: {
+                    updateSlope(by: -ConstantsBgAdjustment.slopeNudgeValue)
+                }, onPlus: {
+                    updateSlope(by: ConstantsBgAdjustment.slopeNudgeValue)
+                })
             }
+
+            Menu {
+                Picker(Texts_HomeView.postProcessingCurveShape, selection: $adjustmentShapeTypeRawValue) {
+                    ForEach([BgAdjustmentShapeType.softerHighs, .neutral, .softerLows], id: \.rawValue) { shape in
+                        Text(shape.description).tag(shape.rawValue)
+                    }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Text(Texts_HomeView.postProcessingCurveShape)
+                        .foregroundStyle(Color.primary)
+                    Spacer(minLength: 8)
+                    Text(adjustmentShapeType.description)
+                        .foregroundStyle(Color.secondary)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.secondary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(shapeControlDisabled())
 
             if shouldShowSelectedAdjustmentShapeDescription() {
                 Text(selectedAdjustmentShapeDescription())
                     .font(.footnote)
-                    .foregroundStyle(Color(.colorSecondary))
+                    .foregroundStyle(Color.secondary)
             }
         }
         .padding(.vertical, 2)
     }
 
-    private func smoothingSection() -> some View {
-        Section(header: Text(Texts_HomeView.postProcessingSmoothing)) {
-            Toggle(Texts_Common.enable, isOn: confirmedEnableBinding($enableSmoothing, alert: .smoothing))
-                .tint(ConstantsAppColors.normal)
-
+    @ViewBuilder private func smoothingSection() -> some View {
+        let title = Texts_HomeView.postProcessingPreviousReadings
+        let strength = strengthTitle(historicalMode)
+        disclosureRow(.previous, title: title, summary: enableSmoothing ? [smoothingAlgorithm.description, strength].joined(separator: " · ") : strength, enabled: enableSmoothing)
+        if expandedSection == .previous {
+            modeSelector(title, options: LatestReadingSmoothing.Mode.allCases, off: .off, selection: historicalMode, label: strengthTitle, onSelect: selectHistoricalMode)
+                .padding(.top, enableSmoothing ? 0 : 4)
             if enableSmoothing {
-                Picker(Texts_HomeView.postProcessingStrength, selection: $smoothingStrength) {
-                    smoothingStrengthPickerItem(title: Texts_HomeView.postProcessingLight, strength: 0)
-                    smoothingStrengthPickerItem(title: Texts_HomeView.postProcessingMedium, strength: 1)
-                    smoothingStrengthPickerItem(title: Texts_HomeView.postProcessingStrong, strength: 2)
-                }
-                .pickerStyle(.segmented)
-
-                VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 4) {
                     Menu {
                         ForEach(BgSmoothingAlgorithm.allCases, id: \.self) { smoothingAlgorithm in
                             Button {
@@ -501,25 +749,56 @@ struct BgAdjustmentsView: View {
                     } label: {
                         HStack(spacing: 8) {
                             Text(Texts_HomeView.postProcessingAlgorithm)
-                                .foregroundStyle(ConstantsAppColors.rowTitleText)
+                                .foregroundStyle(Color.primary)
                             Spacer(minLength: 8)
                             Text(smoothingAlgorithm.description)
-                                .foregroundStyle(ConstantsAppColors.rowDetailText)
+                                .foregroundStyle(Color.secondary)
                             Image(systemName: "chevron.up.chevron.down")
                                 .font(.caption.weight(.semibold))
-                                .foregroundStyle(ConstantsAppColors.rowDetailText)
+                                .foregroundStyle(Color.secondary)
                         }
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
 
-                    Text(smoothingAlgorithm.footerDescription)
-                        .font(.footnote)
-                        .foregroundStyle(Color(.colorSecondary))
+                    Button {
+                        showingSmoothingAlgorithmInfo = true
+                    } label: {
+                        Image(systemName: "info.circle")
+                            .font(.subheadline)
+                            .foregroundStyle(Color.secondary)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Texts_HomeView.info)
+                    .alert(smoothingAlgorithm.description, isPresented: $showingSmoothingAlgorithmInfo) {
+                        Button(Texts_Common.Ok, role: .cancel) {}
+                    } message: {
+                        Text(smoothingAlgorithm.footerDescription)
+                    }
                 }
-                .padding(.vertical, 2)
             }
+            sectionFooter(Texts_HomeView.postProcessingPreviousReadingsFooter)
+                .padding(.top, enableSmoothing ? 0 : 8)
         }
+    }
+
+    @ViewBuilder private func latestReadingSmoothingSection() -> some View {
+        let title = Texts_HomeView.postProcessingLatestReading
+        disclosureRow(.latest, title: title, summary: strengthTitle(latestReadingSmoothingMode), enabled: latestReadingSmoothingMode.isEnabled)
+        if expandedSection == .latest {
+            modeSelector(title, options: LatestReadingSmoothing.Mode.allCases, off: .off, selection: latestReadingSmoothingMode, label: strengthTitle, onSelect: selectLiveMode)
+                .padding(.top, 4)
+            sectionFooter(Texts_HomeView.postProcessingLatestReadingFooter)
+                .padding(.top, 8)
+        }
+    }
+
+    private func sectionFooter(_ text: String) -> some View {
+        Text(text)
+            .font(.footnote)
+            .foregroundStyle(Color.secondary)
     }
 
     @ViewBuilder private func readingFrequencySection() -> some View {
@@ -531,26 +810,27 @@ struct BgAdjustmentsView: View {
         }
     }
 
-    private func smoothingStrengthPickerItem(title: String, strength: Int) -> some View {
-        Text(title)
-            .tag(strength)
-    }
-
     private func chartContextView() -> Text {
+        guard latestReadingSmoothingMode.isEnabled else {
+            return Text(Texts_HomeView.postProcessingLatestReadingDisabled)
+                .foregroundColor(.secondary)
+        }
+
         var chartContextParts = [(title: String, value: Double, isFinalValue: Bool)]()
 
-        if let originalValue = bgReadings.last?.calculatedValue {
-            let finalValueIsOriginal = !effectiveEnableAnyAdjustment() && !enableSmoothing
-            chartContextParts.append((title: Texts_HomeView.postProcessingOriginal, value: originalValue, isFinalValue: finalValueIsOriginal))
+        let latestIndex = livePreviewReadingIndexes(previewReadingIndexes(dates: bgReadings.map(\.timeStamp))).last
+        if let latestIndex {
+            let originalValue = bgReadings[latestIndex].calculatedValue
+            chartContextParts.append((title: Texts_HomeView.postProcessingOriginal, value: originalValue, isFinalValue: false))
         }
 
-        if effectiveEnableAnyAdjustment(), let adjustedValue = latestAdjustedPreviewValue() {
-            let finalValueIsAdjusted = !enableSmoothing
-            chartContextParts.append((title: Texts_HomeView.postProcessingAdjusted, value: adjustedValue, isFinalValue: finalValueIsAdjusted))
+        if effectiveEnableAnyAdjustment(), let latestIndex, let adjustment = currentAdjustmentPreview() {
+            let adjustedValue = adjustment.scaleCenterInMgDl + adjustment.slope * (bgReadings[latestIndex].calculatedValue - adjustment.scaleCenterInMgDl) + adjustment.intercept
+            chartContextParts.append((title: Texts_HomeView.postProcessingAdjusted, value: adjustedValue, isFinalValue: false))
         }
 
-        if enableSmoothing, let smoothedValue = latestSmoothedPreviewValue() {
-            chartContextParts.append((title: Texts_HomeView.postProcessingSmoothed, value: smoothedValue, isFinalValue: true))
+        if let latestIndex, previewAllFinalBgReadingValues.indices.contains(latestIndex) {
+            chartContextParts.append((title: Texts_HomeView.postProcessingSmoothed, value: previewAllFinalBgReadingValues[latestIndex], isFinalValue: true))
         }
 
         guard chartContextParts.count > 0 else {
@@ -572,7 +852,7 @@ struct BgAdjustmentsView: View {
     }
 
     private func chartContextPartText(for title: String, value: Double, isFinalValue: Bool) -> Text {
-        let titleColor: Color = isFinalValue ? .white : .secondary
+        let titleColor: Color = isFinalValue ? .primary : .secondary
         let valueColor: Color = isFinalValue ? glucoseTextColor(for: value) : .secondary
         let titleText = Text(title + ": ").foregroundColor(titleColor)
         let valueText = Text(displayBgValueString(for: value)).foregroundColor(valueColor)
@@ -586,7 +866,7 @@ struct BgAdjustmentsView: View {
     }
 
     private func confirmDraftAdjustedGlucoseValue() {
-        guard let adjustedGlucoseValueInMgDl = enteredGlucoseValueInMgDl(draftAdjustedGlucoseValue), let latestBgReading = bgReadings.last else { return }
+        guard let adjustedGlucoseValueInMgDl = enteredGlucoseValueInMgDl(draftAdjustedGlucoseValue), let latestBgReading = latestSourceReading else { return }
 
         let offset = (adjustedGlucoseValueInMgDl - latestBgReading.calculatedValue).round(toDecimalPlaces: 1)
         guard ConstantsBgAdjustment.isValidOffset(offset) else { return }
@@ -599,8 +879,8 @@ struct BgAdjustmentsView: View {
 
         // Show the original calculated values behind the previewed final values
         // so the user can compare the effect of adjustment and smoothing.
-        if effectiveEnableAnyAdjustment() || enableSmoothing || effectiveUseFiveMinuteReadings() {
-            dataSets.append(GlucoseChartDataSet(bgReadingValues: calculatedBgReadingValues, bgReadingDates: calculatedBgReadingDates, seriesIdentifier: "original", lineColor: nil, pointColor: ConstantsGlucoseChart.glucoseOriginalColor, lineWidth: 0, dash: [], showLine: false, showPoints: true, pointSizeMultiplier: 1.0, pointBorderColor: nil, pointBorderSizeMultiplier: nil))
+        if effectiveEnableAnyAdjustment() || enableSmoothing || latestReadingSmoothingMode.isEnabled || effectiveUseFiveMinuteReadings() {
+            dataSets.append(GlucoseChartDataSet(bgReadingValues: calculatedBgReadingValues, bgReadingDates: calculatedBgReadingDates, seriesIdentifier: "original", lineColor: nil, pointColor: ConstantsGlucoseChart.glucoseOriginalPreviewColor, lineWidth: 0, dash: [], showLine: false, showPoints: true, pointSizeMultiplier: 1.0, pointBorderColor: nil, pointBorderSizeMultiplier: nil))
         }
 
         if bgCheckTreatmentChartPointsValues.count > 0 {
@@ -615,27 +895,22 @@ struct BgAdjustmentsView: View {
         enableAdjustment = UserDefaults.standard.enableAdjustment && UserDefaults.standard.enableGlucoseAdjustment
         enableCurveAdjustment = UserDefaults.standard.enableAdjustment && UserDefaults.standard.enableCurveAdjustment
         enableSmoothing = UserDefaults.standard.enableSmoothing
+        latestReadingSmoothingMode = UserDefaults.standard.latestReadingSmoothingMode
         useFiveMinuteReadings = UserDefaults.standard.useFiveMinuteReadings
         smoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm
         smoothingStrength = UserDefaults.standard.bgSmoothingStrength
         chartHoursToShow = Double(UserDefaults.standard.postProcessingPreviewChartHoursToShow)
-        currentBgAdjustment = bgPostProcessingManager.latestActiveBgAdjustment()
+        openedSourceContext = bgPostProcessingManager.postProcessingEditingSource
+        let currentAdjustment = bgPostProcessingManager.latestActiveBgAdjustment()
+        let saved = bgPostProcessingManager.adjustmentEditingPreferences
+        openedSlopeValue = (enableCurveAdjustment ? currentAdjustment?.slope ?? saved.scale : saved.scale).round(toDecimalPlaces: 2)
+        openedInterceptValue = (enableAdjustment ? currentAdjustment?.intercept ?? saved.offset : saved.offset).round(toDecimalPlaces: 1)
+        openedShape = enableCurveAdjustment ? currentAdjustment?.adjustmentShapeType ?? saved.shape : saved.shape
+        slope = openedSlopeValue.description
+        intercept = openedInterceptValue.stringWithoutTrailingZeroes
+        adjustmentShapeTypeRawValue = openedShape
 
         loadBgReadings()
-
-        if let currentBgAdjustment = currentBgAdjustment {
-            slope = currentBgAdjustment.slope.round(toDecimalPlaces: 2).description
-            intercept = currentBgAdjustment.intercept.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes
-            adjustmentShapeTypeRawValue = currentBgAdjustment.adjustmentShapeType
-            openedSlopeValue = currentBgAdjustment.slope.round(toDecimalPlaces: 2)
-            openedInterceptValue = currentBgAdjustment.intercept.round(toDecimalPlaces: 1)
-        } else {
-            slope = "1.00"
-            intercept = "0.0"
-            adjustmentShapeTypeRawValue = ConstantsBgAdjustment.defaultShapeType.rawValue
-            openedSlopeValue = 1.0
-            openedInterceptValue = 0.0
-        }
 
         if enableAdjustment, let interceptValue = intercept.toDouble(), abs(interceptValue) > 0.0001 {
             offsetAdjustmentInputType = .offsetValue
@@ -651,6 +926,10 @@ struct BgAdjustmentsView: View {
         let chartWindowStartDate = Date(timeIntervalSinceNow: -(chartHoursToShow * 3600))
         let fromDate = previewChartStartDate(chartWindowStartDate: chartWindowStartDate)
         let currentSensor = previewChartSensor()
+        previewSourceStartDate = max(
+            UserDefaults.standard.postProcessingStartTimeStamp ?? .distantPast,
+            bgPostProcessingManager.currentSensorForPostProcessing()?.startDate ?? .distantPast
+        )
 
         bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: fromDate, forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: false, includingSuppressed: true).sorted { $0.timeStamp < $1.timeStamp }
 
@@ -681,8 +960,9 @@ struct BgAdjustmentsView: View {
     }
 
     private func loadBgCheckTreatmentChartPoints(fromDate: Date) {
+        let now = Date()
         let bgCheckTreatments = treatmentEntryAccessor.getLatestTreatments(limit: nil, fromDate: fromDate)
-            .filter { !$0.treatmentdeleted && $0.treatmentType == .BgCheck }
+            .filter { !$0.treatmentdeleted && $0.treatmentType == .BgCheck && $0.date <= now }
             .sorted { $0.date < $1.date }
 
         bgCheckTreatmentChartPointsValues = bgCheckTreatments.map { $0.value }
@@ -698,7 +978,7 @@ struct BgAdjustmentsView: View {
             return
         }
 
-        guard effectiveEnableAnyAdjustment() || enableSmoothing || effectiveUseFiveMinuteReadings() else {
+        guard effectiveEnableAnyAdjustment() || enableSmoothing || latestReadingSmoothingMode.isEnabled || effectiveUseFiveMinuteReadings() else {
             previewAllFinalBgReadingValues = []
             previewAllFinalBgReadingDates = []
             previewVisibleFinalBgReadingValues = []
@@ -717,14 +997,34 @@ struct BgAdjustmentsView: View {
             }
         }
 
+        let dates = bgReadings.map(\.timeStamp)
+        let visibleReadingIndexes = previewReadingIndexes(dates: dates)
+        let baselineValues = finalValues
         if enableSmoothing {
-            finalValues = smoothPreviewValues(previewValues: finalValues)
+            let validIndexes = sourceValues.indices.filter { sourceValues[$0] > 0 }
+            let smoothed = bgPostProcessingManager.smoothedValuesSeparatedByReadingGap(
+                values: validIndexes.map { baselineValues[$0] }, readingDates: validIndexes.map { dates[$0] },
+                smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm
+            )
+            for (index, value) in zip(validIndexes, smoothed) where index != visibleReadingIndexes.last {
+                finalValues[index] = value
+            }
+        }
+
+        if latestReadingSmoothingMode.isEnabled {
+            let liveIndexes = livePreviewReadingIndexes(visibleReadingIndexes)
+            if let latest = liveIndexes.last {
+                finalValues[latest] = LatestReadingSmoothing.value(
+                    for: .init(date: dates[latest], value: baselineValues[latest]),
+                    previous: liveIndexes.dropLast().map { .init(date: dates[$0], value: baselineValues[$0]) },
+                    mode: latestReadingSmoothingMode
+                )
+            }
         }
 
         previewAllFinalBgReadingValues = finalValues
-        previewAllFinalBgReadingDates = bgReadings.map { $0.timeStamp }
+        previewAllFinalBgReadingDates = dates
 
-        let visibleReadingIndexes = bgPostProcessingManager.visibleReadingIndexesAfterApplyingFiveMinuteCadence(readingDates: bgReadings.map { $0.timeStamp }, enableFiveMinuteReadings: enableSmoothing && effectiveUseFiveMinuteReadings())
         previewVisibleFinalBgReadingValues = visibleReadingIndexes.map { finalValues[$0] }
         previewVisibleFinalBgReadingDates = visibleReadingIndexes.map { bgReadings[$0].timeStamp }
     }
@@ -735,30 +1035,8 @@ struct BgAdjustmentsView: View {
         return (effectiveEnableCurveAdjustment() ? slopeAsDouble : 1.0, effectiveEnableAdjustment() ? interceptAsDouble : 0.0, adjustmentShapeType.scaleCenterInMgDl)
     }
 
-    private func latestAdjustedPreviewValue() -> Double? {
-        guard let latestCalculatedValue = bgReadings.last?.calculatedValue else { return nil }
-
-        if let currentAdjustmentPreview = currentAdjustmentPreview() {
-            return currentAdjustmentPreview.scaleCenterInMgDl + currentAdjustmentPreview.slope * (latestCalculatedValue - currentAdjustmentPreview.scaleCenterInMgDl) + currentAdjustmentPreview.intercept
-        }
-
-        return latestCalculatedValue
-    }
-
-    private func latestSmoothedPreviewValue() -> Double? {
-        if let latestPreviewFinalValue = previewAllFinalBgReadingValues.last {
-            return latestPreviewFinalValue
-        }
-
-        if let latestAdjustedPreviewValue = latestAdjustedPreviewValue() {
-            return latestAdjustedPreviewValue
-        }
-
-        return bgReadings.last?.calculatedValue
-    }
-
     private func selectedApplyFromTimeStamp() -> Date {
-        let latestBgReadingTimeStamp = bgReadings.last?.timeStamp ?? Date()
+        let latestBgReadingTimeStamp = latestSourceReading?.timeStamp ?? Date()
 
         if let postProcessingStartTimeStamp = UserDefaults.standard.postProcessingStartTimeStamp {
             return max(latestBgReadingTimeStamp, postProcessingStartTimeStamp)
@@ -770,12 +1048,38 @@ struct BgAdjustmentsView: View {
     /// historical apply is anchored to the latest available reading, not to now,
     /// so gaps in incoming data do not shrink the user-selected rewrite window
     private func historicalApplyFromTimeStamp(for option: ApplyFromOption) -> Date {
-        let latestBgReadingTimeStamp = bgReadings.last?.timeStamp ?? Date()
+        let latestBgReadingTimeStamp = latestSourceReading?.timeStamp ?? Date()
         return latestBgReadingTimeStamp.addingTimeInterval(-option.timeInterval)
     }
 
-    private func smoothPreviewValues(previewValues: [Double]) -> [Double] {
-        return bgPostProcessingManager.smoothedValuesSeparatedByReadingGap(values: previewValues, readingDates: bgReadings.map { $0.timeStamp }, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm)
+    private func previewReadingIndexes(dates: [Date]) -> [Int] {
+        bgPostProcessingManager.visibleReadingIndexesAfterApplyingFiveMinuteCadence(
+            readingDates: dates, enableFiveMinuteReadings: effectiveUseFiveMinuteReadings()
+        ).filter { bgReadings[$0].calculatedValue > 0 }
+    }
+
+    private func livePreviewReadingIndexes(_ visibleIndexes: [Int]) -> [Int] {
+        visibleIndexes.filter { bgReadings[$0].timeStamp >= previewSourceStartDate }
+    }
+
+    private var latestSourceReading: BgReading? {
+        bgReadings.last { $0.timeStamp >= previewSourceStartDate && $0.calculatedValue > 0 }
+    }
+
+    private func beginApply() {
+        guard canApplyChanges() else { return }
+        if historicalSettingsChanged() {
+            showingApplyFromConfirmation = true
+        } else {
+            if bgPostProcessingManager.updateLatestReadingSmoothing(
+                mode: latestReadingSmoothingMode,
+                acknowledgedWarning: acknowledgedWarnings.contains(.latestReadingSmoothing)
+            ) {
+                presentationMode.wrappedValue.dismiss()
+            } else {
+                adjustmentAlert = .invalidAdjustment
+            }
+        }
     }
 
     private func applyChanges(from option: ApplyFromOption) {
@@ -793,7 +1097,7 @@ struct BgAdjustmentsView: View {
             applyFromTimeStamp: applyFromTimeStamp,
             isBasicAdjustment: false,
             enteredBgValue: currentAdjustedGlucoseValueInMgDl(),
-            sourceCalculatedValue: bgReadings.last?.calculatedValue,
+            sourceCalculatedValue: latestSourceReading?.calculatedValue,
             enableSmoothing: enableSmoothing,
             useFiveMinuteReadings: effectiveUseFiveMinuteReadings(),
             smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes,
@@ -801,7 +1105,8 @@ struct BgAdjustmentsView: View {
             smoothingAlgorithm: smoothingAlgorithm,
             processingStartDateOverride: isNow ? nil : applyFromTimeStamp,
             troubleshootingApplyRange: option.troubleshootingRange,
-            acknowledgedWarnings: acknowledgedWarnings
+            acknowledgedWarnings: acknowledgedWarnings,
+            latestReadingSmoothingMode: latestReadingSmoothingMode
         )
 
         if applied {
@@ -812,8 +1117,10 @@ struct BgAdjustmentsView: View {
     }
 
     private func cancelEditing() {
-        if canApplyChanges() {
+        if hasDraftChanges() && canApplyChanges() {
             showingUnsavedChangesConfirmation = true
+        } else if hasDraftChanges() {
+            showingDiscardConfirmation = true
         } else {
             presentationMode.wrappedValue.dismiss()
         }
@@ -832,22 +1139,31 @@ struct BgAdjustmentsView: View {
     }
 
     private func canApplyChanges() -> Bool {
-        guard bgReadings.count > 0, !effectiveEnableAdjustment() || offsetIsValid() else { return false }
+        guard let openedSourceContext, openedSourceContext == bgPostProcessingManager.postProcessingEditingSource,
+              latestSourceReading != nil, !effectiveEnableAdjustment() || offsetIsValid() else { return false }
+        return hasDraftChanges()
+    }
 
-        let glucoseAdjustmentChanged = enableAdjustment != UserDefaults.standard.enableGlucoseAdjustment ||
+    private func hasDraftChanges() -> Bool {
+        historicalSettingsChanged() || latestReadingSmoothingMode != UserDefaults.standard.latestReadingSmoothingMode
+    }
+
+    private func historicalSettingsChanged() -> Bool {
+        let defaults = UserDefaults.standard
+        let glucoseAdjustmentChanged = enableAdjustment != (defaults.enableAdjustment && defaults.enableGlucoseAdjustment) ||
             (effectiveEnableAdjustment() && offsetValueChanged())
-        let curveAdjustmentChanged = enableCurveAdjustment != UserDefaults.standard.enableCurveAdjustment ||
-            (effectiveEnableCurveAdjustment() && (scaleValueChanged() || adjustmentShapeTypeRawValue != currentBgAdjustment?.adjustmentShapeType))
+        let curveAdjustmentChanged = enableCurveAdjustment != (defaults.enableAdjustment && defaults.enableCurveAdjustment) ||
+            (effectiveEnableCurveAdjustment() && (scaleValueChanged() || adjustmentShapeTypeRawValue != openedShape))
 
         return glucoseAdjustmentChanged || curveAdjustmentChanged ||
             enableSmoothing != UserDefaults.standard.enableSmoothing ||
             effectiveUseFiveMinuteReadings() != UserDefaults.standard.useFiveMinuteReadings ||
-            smoothingStrength != UserDefaults.standard.bgSmoothingStrength ||
-            smoothingAlgorithm != UserDefaults.standard.bgSmoothingAlgorithm
+            (enableSmoothing && (smoothingStrength != UserDefaults.standard.bgSmoothingStrength ||
+                smoothingAlgorithm != UserDefaults.standard.bgSmoothingAlgorithm))
     }
 
     private func shouldAllowAdjustmentForCurrentSource() -> Bool {
-        return bgPostProcessingManager.shouldAllowBgAdjustmentForCurrentSource()
+        bgPostProcessingManager.shouldAllowBgAdjustmentForCurrentSource()
     }
 
     private func effectiveEnableAdjustment() -> Bool {
@@ -904,7 +1220,7 @@ struct BgAdjustmentsView: View {
     }
 
     private func availableHistoricalApplyTimeInterval() -> TimeInterval {
-        guard let latestPreviewReadingTimeStamp = bgReadings.last?.timeStamp else { return 0 }
+        guard let latestPreviewReadingTimeStamp = latestSourceReading?.timeStamp else { return 0 }
 
         // Historical apply availability should follow the source history, not the
         // current preview zoom level. Otherwise selecting a shorter preview window
@@ -932,33 +1248,33 @@ struct BgAdjustmentsView: View {
     private func displaySlopeString(for value: Double?) -> String {
         guard let value = value else { return Texts_Common.unknown }
 
-        return String(format: "%.2f", value)
+        return String(format: "%.2f", locale: Locale.current, value)
     }
 
     private func scaleValueTextColor() -> Color {
-        guard let currentSlope = slope.toDouble() else { return Color(.colorTertiary) }
+        guard let currentSlope = slope.toDouble() else { return Color.secondary }
 
-        return abs(currentSlope - 1.0) < 0.0001 ? Color(.colorTertiary) : Color(.colorPrimary)
+        return abs(currentSlope - 1.0) < 0.0001 ? Color.secondary : Color.primary
     }
 
     private func offsetValueTextColor() -> Color {
         if let offset = intercept.toDouble(), ConstantsBgAdjustment.offsetNeedsWarning(offset) {
-            return offsetIsValid() ? Color(.systemYellow) : Color(.systemRed)
+            return offsetIsValid() ? warningColor : Color(.systemRed)
         }
-        guard offsetAdjustmentInputType == .offsetValue else { return Color(.colorTertiary) }
+        guard offsetAdjustmentInputType == .offsetValue else { return Color.secondary }
 
         if offsetValueChanged() || shouldHighlightCurrentOffsetValueOnOpen() {
-            return Color(.colorPrimary)
+            return Color.primary
         }
 
-        return Color(.colorTertiary)
+        return Color.secondary
     }
 
     private func shouldHighlightCurrentOffsetValueOnOpen() -> Bool {
         guard enableAdjustment else { return false }
         guard let interceptValue = intercept.toDouble(), abs(interceptValue) > 0.0001 else { return false }
 
-        return !offsetValueChanged() && currentBgAdjustment != nil
+        return !offsetValueChanged()
     }
 
     private func inputGlucoseString(for valueInMgDl: Double?) -> String {
@@ -1001,31 +1317,6 @@ struct BgAdjustmentsView: View {
         return abs(currentSlope - 1.0) < 0.0001
     }
 
-    @ViewBuilder private func compactAdjustmentShapeControl() -> some View {
-        let bgAdjustmentShapeTypes: [BgAdjustmentShapeType] = [.softerHighs, .neutral, .softerLows]
-
-        HStack(spacing: 4) {
-            ForEach(bgAdjustmentShapeTypes, id: \.rawValue) { bgAdjustmentShapeType in
-                Button {
-                    if !shapeControlDisabled() {
-                        adjustmentShapeTypeRawValue = bgAdjustmentShapeType.rawValue
-                    }
-                } label: {
-                    Text(bgAdjustmentShapeType.description)
-                        .font(.footnote)
-                        .lineLimit(1)
-                        .foregroundStyle(compactAdjustmentShapeControlTextColor(for: bgAdjustmentShapeType))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 6)
-                        .background(compactAdjustmentShapeControlBackgroundColor(for: bgAdjustmentShapeType))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                }
-                .buttonStyle(.plain)
-                .disabled(shapeControlDisabled())
-            }
-        }
-    }
-
     private func applyFromOptionCanBeSelected(_ applyFromOption: ApplyFromOption) -> Bool {
         if applyFromOption.timeInterval == 0 {
             return true
@@ -1051,28 +1342,16 @@ struct BgAdjustmentsView: View {
         }
     }
 
-    private func compactAdjustmentShapeControlBackgroundColor(for bgAdjustmentShapeType: BgAdjustmentShapeType) -> Color {
-        if adjustmentShapeTypeRawValue == bgAdjustmentShapeType.rawValue {
-            return shapeControlDisabled() ? Color(.systemGray3) : Color(.colorPrimary)
-        }
-
-        return shapeControlDisabled() ? Color(.systemGray6) : Color(.systemGray5)
-    }
-
-    private func compactAdjustmentShapeControlTextColor(for bgAdjustmentShapeType: BgAdjustmentShapeType) -> Color {
-        if adjustmentShapeTypeRawValue == bgAdjustmentShapeType.rawValue {
-            return shapeControlDisabled() ? Color(.colorPrimary) : Color(.systemBackground)
-        }
-
-        return shapeControlDisabled() ? Color(.colorSecondary) : Color(.colorPrimary)
-    }
-
     private func shouldShowSelectedAdjustmentShapeDescription() -> Bool {
         return !shapeControlDisabled() && adjustmentShapeType != .neutral
     }
 
     private func previewBgCheckHintText() -> String? {
-        if bgCheckTreatmentChartPointsValues.count < 1 {
+        let count = bgCheckTreatmentChartPointsValues.count
+        if effectiveEnableCurveAdjustment(), scaleValueChanged() {
+            return count < 2 ? Texts_HomeView.postProcessingScaleBgCheckHint : nil
+        }
+        if effectiveEnableAdjustment(), count == 0 {
             return Texts_HomeView.postProcessingOffsetBgCheckHint
         }
 
@@ -1091,7 +1370,7 @@ struct BgAdjustmentsView: View {
     }
 
     private func inputGlucoseAdjustmentValueString(for adjustedGlucoseValueString: String) -> String {
-        guard let adjustedGlucoseValueInMgDl = enteredGlucoseValueInMgDl(adjustedGlucoseValueString), let latestBgReading = bgReadings.last else {
+        guard let adjustedGlucoseValueInMgDl = enteredGlucoseValueInMgDl(adjustedGlucoseValueString), let latestBgReading = latestSourceReading else {
             return displayAdjustmentValueString(for: intercept.toDouble() ?? 0.0)
         }
 
@@ -1148,7 +1427,7 @@ struct BgAdjustmentsView: View {
     }
 
     private func currentAdjustedGlucoseValueInMgDl() -> Double? {
-        guard let latestBgReading = bgReadings.last else { return nil }
+        guard let latestBgReading = latestSourceReading else { return nil }
 
         return latestBgReading.calculatedValue + (intercept.toDouble() ?? 0.0)
     }
@@ -1188,6 +1467,7 @@ private struct BasicAdjustmentInputView: View {
     private let minimumGlucoseValueInMgDl = ConstantsCalibrationAlgorithms.minimumBgReadingCalculatedValue
     private let maximumGlucoseValueInMgDl = ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue
 
+    let openingReferenceGlucoseValue: Double?
     let currentGlucoseValueInMgDl: Double?
     let currentGlucoseValueString: String
     let glucoseAdjustmentValueString: String
@@ -1204,18 +1484,18 @@ private struct BasicAdjustmentInputView: View {
                         Text(Texts_HomeView.postProcessingCurrentValue)
                         Spacer()
                         Text(currentGlucoseValueString)
-                            .foregroundStyle(Color(.colorSecondary))
+                            .foregroundStyle(Color.secondary)
                     }
 
                     HStack {
-                        Text(Texts_HomeView.postProcessingAdjustedGlucose)
-                            .fixedSize(horizontal: true, vertical: false)
+                        Text(Texts_HomeView.postProcessingReferenceGlucose)
+                            .fixedSize(horizontal: false, vertical: true)
                         Spacer()
                         AutoSelectingNumericTextField(placeholder: Texts_HomeView.postProcessingEnterValue, text: $enteredGlucoseValue, shouldBecomeFirstResponder: shouldFocusEnteredGlucoseValue)
                             .multilineTextAlignment(.trailing)
                             .frame(minWidth: 72, maxWidth: 96, alignment: .trailing)
                         Text(unitString)
-                            .foregroundStyle(Color(.colorSecondary))
+                            .foregroundStyle(Color.secondary)
                     }
                 }
 
@@ -1226,26 +1506,25 @@ private struct BasicAdjustmentInputView: View {
                         Text(glucoseAdjustmentValueString)
                             .lineLimit(1)
                             .fixedSize(horizontal: true, vertical: false)
-                            .foregroundStyle(Color(.colorSecondary))
+                            .foregroundStyle(Color.secondary)
                     }
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle(Texts_HomeView.postProcessingEnterGlucose)
+            .navigationTitle(Texts_HomeView.postProcessingReferenceGlucose)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(Texts_Common.Cancel, action: onCancel)
-                        .foregroundStyle(ConstantsAppColors.toolbarNeutralAction)
+                        .foregroundStyle(Color.primary)
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(Texts_Common.Ok, action: onConfirm)
                         .tint(ConstantsAppColors.toolbarAction)
-                        .disabled(!enteredGlucoseValueIsValid())
+                        .disabled(!enteredGlucoseValueIsValid() || enteredGlucoseValue.toDouble() == openingReferenceGlucoseValue)
                 }
             }
         }
-        .colorScheme(.dark)
         .onAppear {
             shouldFocusEnteredGlucoseValue = true
         }
@@ -1336,6 +1615,17 @@ private struct AutoSelectingNumericTextField: UIViewRepresentable {
             DispatchQueue.main.async {
                 textField.selectAll(nil)
             }
+        }
+    }
+}
+
+
+private struct AdjustmentListTopMargin: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 17.0, *) {
+            content.contentMargins(.top, 6, for: .scrollContent)
+        } else {
+            content
         }
     }
 }

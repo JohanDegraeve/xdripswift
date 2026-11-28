@@ -361,8 +361,6 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-/// Settings screen for loop delay
-"Select Time" = "Select Time";
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
 "settingsviews_resetDexcomTransmitterMessage" = "This option will attempt to reset your Anubis transmitter on the next connection.";
@@ -376,8 +374,6 @@
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Aktiv halten is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
-/// Settings screen for loop delay, explanatory text for value
-"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
 
 /// statistics settings, prefer time in tight range
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
@@ -404,8 +400,6 @@
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 
-/// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
-"warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
 
 /// statistics settings, prefer user-defined range
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
@@ -462,11 +456,7 @@
 /// When enabled, then it should be possible to run xDrip4iOS/Libre 2 in parallel with other app(s)
 "suppressUnLockPayLoad" = "Suppress Unlock Payload";
 
-/// Settings screen for loop delay
-"Select Value" = "Select Value";
 
-/// Settings screen for loop delay, explanatory text for time
-"expanatoryTextSelectTime" = "As of what time should the value apply";
 
 /// data source settings, data source region
 "settingsviews_labelFollowerDataSourceRegion" = "Region";
@@ -812,3 +802,10 @@
 "settingsviews_shareReport" = "Bericht teilen";
 "settingsviews_shareIssueReport" = "Problembericht teilen";
 "settingsviews_reportShareFailed" = "Die Protokolldateien konnten nicht vorbereitet werden. Bitte erneut versuchen.";
+
+"settingsviews_loopShareSmoothedLatestReading" = "Geglätteten Wert teilen";
+"settingsviews_loopShareSmoothedLatestReadingConfirmationTitle" = "Geglättete Werte teilen?";
+"settingsviews_loopShareSmoothedLatestReadingAction" = "Teilen";
+"settingsviews_loopShareSmoothedLatestReadingDifferenceMessage" = "Deine AID-App erhält den neuesten Glukosewert ohne Glättung. Dadurch können die beiden Apps unterschiedliche Werte anzeigen.";
+"settingsviews_loopShareSmoothedLatestReadingEnabledMessage" = "Deine AID-App erhält den geglätteten Glukosewert, den %@ anzeigt. Sie verwendet diesen Wert für Entscheidungen zur Insulindosierung.\n\nDer geglättete Wert kann schnelle Anstiege oder Abfälle leicht verzögert abbilden. Die Glättung filtert jedoch plötzliches Signalrauschen und Wertsprünge.";
+"settingsviews_loopShareSmoothedLatestReadingWarning" = "Wenn die Glättung den neuesten Glukosewert verändert, erhält deine AID-App den angepassten Wert und verwendet ihn für Entscheidungen zur Insulindosierung.";

@@ -40,7 +40,7 @@ struct BgReadingsView: View {
     @State private var datePickerReset = UUID()
     
     /// selection set for multi-select delete in the List
-    @State private var selectedBgReadings: Set<BgReadingSnapshot> = []
+    @State private var selectedBgReadings: Set<NSManagedObjectID> = []
     
     /// controls the visibility of the scroll-to-top button
     @State private var showScrollToTopButton = false
@@ -48,8 +48,8 @@ struct BgReadingsView: View {
     /// used to rebuild the list at the top without wrapping it in a ScrollViewReader
     @State private var listReset = UUID()
 
-    /// edit mode binding to enable multi-select in the List
-    @Environment(\.editMode) private var editMode
+    /// Keep selection mode stable across redraws of the presenting Home view.
+    @State private var editMode: EditMode = .inactive
     
     // MARK: - private properties
     
@@ -178,6 +178,7 @@ struct BgReadingsView: View {
 
                 // update the filtered array with the newly selected date
                 filteredBgReadings = bgReadings.filter { Calendar.current.compare($0.timeStamp, to: dateSelected, toGranularity: .day) == .orderedSame}
+                selectedBgReadings.formIntersection(filteredBgReadings.map(\.objectID))
                 
                 updateDayName(date: dateSelected)
                 
@@ -208,6 +209,7 @@ struct BgReadingsView: View {
                 }
             }
         }
+        .environment(\.editMode, $editMode)
         .colorScheme(.dark)
         .onAppear() {
             initializeView()
@@ -223,7 +225,6 @@ struct BgReadingsView: View {
     
     /// this is called when the view appears. It will pull BG readings from coredata
     private func initializeView() {
-        let selectedIDs = Set(selectedBgReadings.map(\.objectID))
         // set the fromDate to be midnight 'numberOfDaysOfBgReadingsToShow' days before the current date
         if let fromDate: Date = Calendar.current.date(byAdding: .day, value: -numberOfDaysOfBgReadingsToShow, to: dateSelected)?.toMidnight() {
             
@@ -232,7 +233,7 @@ struct BgReadingsView: View {
             
             // create a filtered array to only show bg readings for the date selected
             filteredBgReadings = bgReadings.filter { Calendar.current.compare($0.timeStamp, to: dateSelected, toGranularity: .day) == .orderedSame}
-            selectedBgReadings = Set(filteredBgReadings.filter { selectedIDs.contains($0.objectID) })
+            selectedBgReadings.formIntersection(filteredBgReadings.map(\.objectID))
             
             // update the day name in the user language for the newly selected date
             updateDayName(date: dateSelected)
@@ -262,6 +263,12 @@ struct BgReadingsView: View {
             trace("failed to delete BG reading with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .error, timestampOfBgReadingToDelete.description)
             return
         }
+
+        NotificationCenter.default.post(
+            name: .bgReadingsDeletedByUser,
+            object: nil,
+            userInfo: [HealthKitManager.deletedBgReadingIDsKey: [bgReadingToDelete.id]]
+        )
 
         trace(
             "deleted BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata",
@@ -296,9 +303,10 @@ struct BgReadingsView: View {
         notificationFeedback.prepare()
         
         // make a stable copy to avoid mutating the data set while iterating
-        let bgReadingsToDelete = Array(selectedBgReadings)
+        let bgReadingsToDelete = filteredBgReadings.filter { selectedBgReadings.contains($0.objectID) }
 
-        var readingsThatCouldNotBeDeleted = Set<BgReadingSnapshot>()
+        var readingsThatCouldNotBeDeleted = Set<NSManagedObjectID>()
+        var deletedBgReadingIDs = [String]()
 
         for bgReadingToDelete in bgReadingsToDelete {
             let timestampOfBgReadingToDelete = bgReadingToDelete.timeStamp
@@ -307,10 +315,12 @@ struct BgReadingsView: View {
             // the underlying Core Data save succeeds. This keeps the view and Activity Log honest
             // even if persistence fails part-way through a multi-selection.
             guard bgReadingsAccessor.delete(bgReadingObjectID: bgReadingToDelete.objectID) else {
-                readingsThatCouldNotBeDeleted.insert(bgReadingToDelete)
+                readingsThatCouldNotBeDeleted.insert(bgReadingToDelete.objectID)
                 trace("failed to multi-delete BG reading with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .error, timestampOfBgReadingToDelete.description)
                 continue
             }
+
+            deletedBgReadingIDs.append(bgReadingToDelete.id)
 
             trace(
                 "multi-deleted BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata",
@@ -327,16 +337,20 @@ struct BgReadingsView: View {
             )
 
             // remove from filtered array (if present)
-            if let indexInFiltered = filteredBgReadings.firstIndex(where: { $0.timeStamp == timestampOfBgReadingToDelete }) {
-                filteredBgReadings.remove(at: indexInFiltered)
-            }
+            filteredBgReadings.removeAll(where: { $0.objectID == bgReadingToDelete.objectID })
 
             // remove from main array
-            bgReadings.removeAll(where: { $0.timeStamp == timestampOfBgReadingToDelete })
+            bgReadings.removeAll(where: { $0.objectID == bgReadingToDelete.objectID })
 
             // delete from Nightscout
             nightscoutSyncManager.deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: timestampOfBgReadingToDelete)
         }
+
+        NotificationCenter.default.post(
+            name: .bgReadingsDeletedByUser,
+            object: nil,
+            userInfo: [HealthKitManager.deletedBgReadingIDsKey: deletedBgReadingIDs]
+        )
         
         notificationFeedback.notificationOccurred(readingsThatCouldNotBeDeleted.isEmpty ? .success : .error)
 
@@ -344,7 +358,7 @@ struct BgReadingsView: View {
         // retry them. Exit selection mode only when the complete request succeeded.
         selectedBgReadings = readingsThatCouldNotBeDeleted
         if readingsThatCouldNotBeDeleted.isEmpty {
-            editMode?.wrappedValue = .inactive
+            editMode = .inactive
         }
     }
     

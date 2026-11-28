@@ -106,3 +106,14 @@
 "directWatchAlertExplanation" = "Thresholds follow iPhone alarm schedules. Watch alerts require collection to be running and no iPhone communication for over 60 seconds.";
 "directWatchScheduleUnavailable" = "Sync alarm settings from iPhone";
 "directWatchUrgentLowGlucose" = "%@: urgent low glucose";
+
+"directWatchEnabled" = "Enabled";
+"directWatchDisabled" = "Disabled";
+"directWatchUploaded" = "Uploaded";
+"directWatchUploadPending" = "Pending";
+"directWatchUploadError" = "Error";
+"directWatchUploadNotTracked" = "Not tracked";
+
+/* Direct to Watch cloud upload */
+"directWatchNightscoutUpload" = "Nightscout";
+"directWatchDexcomShareUpload" = "Dexcom Share";

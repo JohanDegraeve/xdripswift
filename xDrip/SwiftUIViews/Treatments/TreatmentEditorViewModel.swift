@@ -340,6 +340,12 @@ import OSLog
 
     private func normalizedValue() -> Double? {
         guard let value = enteredValue.toDouble(), value.isFinite else { return nil }
+        if selectedType == .BgCheck {
+            // Validate against the allowable BG range as per app constants.
+            let valueInMgDl = value.mmolToMgdl(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            guard valueInMgDl >= ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl,
+                  valueInMgDl <= ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue else { return nil }
+        }
         // Validate again when saving because entry can also come from defaults or a direct edit.
         if selectedType == .BasalInjection,
            !BasalInjectionPayload.isValidUnits(value) || value > Self.maximumBasalInjectionUnits { return nil }

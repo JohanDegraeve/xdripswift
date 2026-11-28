@@ -82,16 +82,33 @@ struct DexcomShareUploadBatch {
 
     convenience init(bgReadingsAccessor: BgReadingsAccessor, state: DexcomShareUploadState? = nil, messageHandler: ((String, String) -> Void)?) {
         self.init(state: state, messageHandler: messageHandler) { fromDate, lastConnectionChange in
+            var watchOwnedCount = 0
             let readings = bgReadingsAccessor.getLatestBgReadings(
                 limit: nil, fromDate: fromDate, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false
-            ).filter(
+            ).filter {
+                let eligible = DirectWatchUploadRouting.shouldUploadFromPhone(service: .dexcomShare,
+                    watchNightscoutOwned: $0.watchNightscoutOwned,
+                    watchDexcomShareOwned: $0.watchDexcomShareOwned)
+                if !eligible { watchOwnedCount += 1 }
+                return eligible
+            }.filter(
                 minimumTimeBetweenTwoReadingsInMinutes: ConstantsDexcomShare.minimiumTimeBetweenTwoReadingsInMinutes,
                 lastConnectionStatusChangeTimeStamp: lastConnectionChange,
                 timeStampLastProcessedBgReading: fromDate
             )
+            if watchOwnedCount > 0 {
+                let category = ConstantsLog.categoryDexcomShareUploadManager
+                trace("iPhone Dexcom Share upload skipped %{public}@ Watch-owned readings", log: OSLog(subsystem: ConstantsLog.subSystem, category: category), category: category, type: .debug, watchOwnedCount.description)
+            }
             guard let latest = readings.first else { return nil }
             return DexcomShareUploadBatch(
-                readings: readings.map { $0.dictionaryRepresentationForDexcomShareUpload },
+                readings: readings.map { reading in
+                    let trend = bgReadingsAccessor.historicalUploadTrend(for: reading)
+                    return reading.dictionaryRepresentationForDexcomShareUpload(
+                        trend: BgReading.slopeOrdinal(slope: trend.slope, hidden: trend.hidden),
+                        direction: BgReading.slopeName(slope: trend.slope, hidden: trend.hidden)
+                    )
+                },
                 latestReading: latest.timeStamp
             )
         }
@@ -405,6 +422,9 @@ struct DexcomShareUploadBatch {
                 let code = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
                 throw ShareError(code: code?["Code"] as? String ?? "HTTP \(response.statusCode)", httpStatus: response.statusCode)
             }
+            trace("Dexcom Share request finished: %{public}@ HTTP=%{public}@ elapsedMs=%{public}@", log: log,
+                  category: ConstantsLog.categoryDexcomShareUploadManager, type: .debug, path,
+                  response.statusCode.description, Int(Date().timeIntervalSince(requestStartedAt) * 1_000).description)
             return data
         } catch {
             // Settings changes deliberately cancel obsolete requests; those are not service failures.

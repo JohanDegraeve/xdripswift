@@ -122,8 +122,6 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-/// Settings screen for loop delay
-"Select Time" = "Select Time";
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
 "settingsviews_resetDexcomTransmitterMessage" = "This option will attempt to reset your Anubis transmitter on the next connection.";
@@ -137,8 +135,6 @@
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Canlı tut is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
-/// Settings screen for loop delay, explanatory text for value
-"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
 
 /// statistics settings, prefer time in tight range
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
@@ -174,8 +170,6 @@
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 
-/// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
-"warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
 
 /// statistics settings, prefer user-defined range
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
@@ -241,12 +235,8 @@
 /// When enabled, then it should be possible to run xDrip4iOS/Libre 2 in parallel with other app(s)
 "suppressUnLockPayLoad" = "Suppress Unlock Payload";
 
-/// Settings screen for loop delay
-"Select Value" = "Select Value";
 
 
-/// Settings screen for loop delay, explanatory text for time
-"expanatoryTextSelectTime" = "As of what time should the value apply";
 
 /// data source settings, data source region
 "settingsviews_labelFollowerDataSourceRegion" = "Region";
@@ -588,3 +578,10 @@
 "settingsviews_shareReport" = "Raporu Paylaş";
 "settingsviews_shareIssueReport" = "Sorun Raporunu Paylaş";
 "settingsviews_reportShareFailed" = "Günlük dosyaları hazırlanamadı. Lütfen tekrar deneyin.";
+
+"settingsviews_loopShareSmoothedLatestReading" = "Yumuşatılmış değeri paylaş";
+"settingsviews_loopShareSmoothedLatestReadingConfirmationTitle" = "Yumuşatılmış değerler paylaşılsın mı?";
+"settingsviews_loopShareSmoothedLatestReadingAction" = "Paylaş";
+"settingsviews_loopShareSmoothedLatestReadingDifferenceMessage" = "AID uygulamanız en son glikoz ölçümünü yumuşatma uygulanmadan alacaktır. Bu nedenle iki uygulamada farklı değerler görünebilir.";
+"settingsviews_loopShareSmoothedLatestReadingEnabledMessage" = "AID uygulamanız %@ içinde gösterilen yumuşatılmış glikoz değerini alıyor. İnsülin dozuna karar verirken bu değeri kullanacaktır.\n\nHızlı yükselişler veya düşüşler biraz gecikmeli görünebilir, ancak yumuşatma sinyaldeki ani gürültüyü ve sıçramaları azaltır.";
+"settingsviews_loopShareSmoothedLatestReadingWarning" = "Yumuşatma en son glikoz ölçümünü değiştirirse AID uygulamanız düzeltilmiş değeri alacak ve insülin dozuna karar verirken bu değeri kullanacaktır.";

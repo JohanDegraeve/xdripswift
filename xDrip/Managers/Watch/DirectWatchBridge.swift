@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CryptoKit
 
 // MARK: - Transmitter roles and collection policy
 
@@ -34,8 +35,8 @@ enum DirectWatchCollectionPolicy {
         case discoverInForeground
     }
 
-    // Leave a pending CoreBluetooth connection in place across a complete transmitter cycle.
-    static let pendingConnectionLimit: TimeInterval = 6 * 60
+    // Retry a stalled connection before it blocks another reading cycle.
+    static let pendingConnectionLimit: TimeInterval = 2 * 60
     static let discoveryFallbackLimit: TimeInterval = 6 * 60
     static let savedPeripheralRetriesBeforeDiscovery = 2
     static let phoneLinkTimeout: TimeInterval = 60
@@ -70,10 +71,10 @@ enum DirectWatchCollectionPolicy {
         if !isForeground {
             // A restored request can remain connecting for hours without a failure callback.
             // Use an execution opportunity already granted by watchOS to retry the same bond,
-            // but leave several complete transmitter cycles alone first. Issuing the retry
-            // resets startedAt, so repeated phone messages cannot create a cancellation loop.
+            // once it has exceeded the normal connection wait. Issuing the retry resets
+            // startedAt, so repeated phone messages cannot create a cancellation loop.
             // Discovery and central-manager recreation remain foreground-only recovery.
-            return age >= ConstantsDirectWatch.readingOverdueAfter ? .retrySavedPeripheral : .wait
+            return age >= pendingConnectionLimit ? .retrySavedPeripheral : .wait
         }
         guard age >= pendingConnectionLimit else { return .wait }
         return savedRetryCount < savedPeripheralRetriesBeforeDiscovery ? .retrySavedPeripheral : .discoverInForeground
@@ -308,6 +309,9 @@ struct DirectWatchReading: Codable, Equatable, Identifiable {
     var collectedAt: Date? = nil
     // Older readings stay ungrouped. Backfilled values belong to the session that collected them.
     var collectionSessionID: UUID? = nil
+    /// Ownership is recorded per upload service so the phone can continue other destinations.
+    var watchNightscoutOwned: Bool? = nil
+    var watchDexcomShareOwned: Bool? = nil
 
     var id: String { "\(family == .g7 ? "g7:" : "")\(transmitterID):\(sensorStartCounter):\(transmitterSeconds)" }
     var isUsable: Bool { (state == 6 || state == 7) && mgDl.isFinite && (12...400).contains(mgDl) }
@@ -324,6 +328,143 @@ struct DirectWatchReading: Codable, Equatable, Identifiable {
             && measuredAt >= sensorStartDate && measuredAt <= now.addingTimeInterval(60)
             && transmitterSeconds >= sensorStartCounter && sensorStartCounter > 0
     }
+}
+
+/// Configuration sent over the existing setup channel. Credentials are carried separately
+/// and written to the Watch Keychain; neither is stored in the collector's reading archive.
+struct DirectWatchNightscoutConfiguration: Codable, Equatable, Sendable {
+    static let version = 1
+    let version: Int
+    let revision: Double
+    let enabled: Bool
+    let destination: String?
+    let schedule: String?
+    let enabledSince: Date
+
+    func scheduleIsOn(at date: Date, calendar: Calendar = .current) -> Bool {
+        DirectWatchUploadSchedule.isOn(schedule, at: date, calendar: calendar)
+    }
+
+    static func normalizedDestination(_ value: String?, port: Int? = nil) -> String? {
+        guard let value, var parts = URLComponents(string: value),
+              let scheme = parts.scheme?.lowercased(), ["http", "https"].contains(scheme),
+              let host = parts.host, !host.isEmpty, parts.user == nil, parts.password == nil else { return nil }
+        parts.scheme = scheme
+        parts.host = host.lowercased()
+        parts.query = nil
+        parts.fragment = nil
+        if let port, port > 0 { parts.port = port }
+        while parts.path.hasSuffix("/") { parts.path.removeLast() }
+        return parts.string
+    }
+}
+
+struct DirectWatchNightscoutCredentials: Codable, Equatable, Sendable {
+    let secretHash: String?
+    let token: String?
+}
+
+struct DirectWatchDexcomShareConfiguration: Codable, Equatable, Sendable {
+    static let version = 1
+    let version: Int
+    let revision: Double
+    let enabled: Bool
+    let baseURL: String?
+    let username: String?
+    let serialNumber: String?
+    let schedule: String?
+    let enabledSince: Date
+
+    func scheduleIsOn(at date: Date, calendar: Calendar = .current) -> Bool {
+        DirectWatchUploadSchedule.isOn(schedule, at: date, calendar: calendar)
+    }
+}
+
+enum DirectWatchUploadSchedule {
+    static func isOn(_ schedule: String?, at date: Date, calendar: Calendar = .current) -> Bool {
+        guard let schedule else { return true }
+        let components = calendar.dateComponents([.hour, .minute], from: date)
+        return isOn(schedule, minute: (components.hour ?? 0) * 60 + (components.minute ?? 0))
+    }
+
+    // The first interval starts at midnight. Each saved transition flips the state.
+    static func isOn(_ schedule: String, minute: Int) -> Bool {
+        schedule.split(separator: "-").prefix { (Int($0) ?? 0) <= minute }.count.isMultiple(of: 2)
+    }
+}
+
+struct DirectWatchDexcomShareCredentials: Codable, Equatable, Sendable {
+    let username: String
+    let password: String
+}
+
+enum DirectWatchUploadService: String, Codable, CaseIterable {
+    case nightscout
+    case dexcomShare
+}
+
+struct DirectWatchUploadOwnership {
+    var nightscout = false
+    var dexcomShare = false
+}
+
+enum DirectWatchUploadRouting {
+    static func shouldOwnReading(enabled: Bool, configurationReady: Bool, queueHasCapacity: Bool,
+                                 collectedAt: Date, enabledSince: Date) -> Bool {
+        enabled && configurationReady && queueHasCapacity && collectedAt >= enabledSince
+    }
+
+    static func shouldUploadFromPhone(service: DirectWatchUploadService, watchNightscoutOwned: Bool,
+                                      watchDexcomShareOwned: Bool) -> Bool {
+        switch service {
+        case .nightscout: return !watchNightscoutOwned
+        case .dexcomShare: return !watchDexcomShareOwned
+        }
+    }
+}
+
+enum DirectWatchUploadSettings {
+    static let enabledKey = "directWatch.cloudUploadEnabled"
+    static let enabledSinceKey = "directWatch.cloudUploadEnabledSince"
+    static let changed = Notification.Name("DirectWatchCloudUploadSettingsChanged")
+    static let statusKey = "directWatchUploadStatus"
+
+    // Keep the established Nightscout transport keys so an installed Watch can accept a
+    // configuration update from this iPhone without coupling glucose delivery to uploads.
+    static let nightscoutConfigurationKey = "directWatch.nightscoutConfiguration"
+    static let nightscoutCredentialsKey = "directWatch.nightscoutCredentials"
+    static let nightscoutEnabledSinceKey = "directWatch.nightscoutEnabledSince"
+    static let dexcomShareConfigurationKey = "directWatch.dexcomShareConfiguration"
+    static let dexcomShareCredentialsKey = "directWatch.dexcomShareCredentials"
+    static let dexcomShareEnabledSinceKey = "directWatch.dexcomShareEnabledSince"
+    static let blockPhoneSyncKey = "directWatch.blockPhoneImport"
+}
+
+struct DirectWatchUploadServiceStatus: Equatable {
+    let service: DirectWatchUploadService
+    let isReady: Bool
+    let pending: Int
+    let hasError: Bool
+    let lastUpload: Date?
+
+    var payload: [String: Any] {
+        var result: [String: Any] = ["enabled": isReady, "pending": pending, "hasError": hasError]
+        if let lastUpload { result["lastUpload"] = lastUpload.timeIntervalSince1970 }
+        return [service.rawValue: result]
+    }
+}
+
+enum DirectWatchUploadRetry {
+    static let maximumDelay: TimeInterval = 60 * 60
+    static let scheduleCheckInterval: TimeInterval = 5 * 60
+
+    static func delay(afterFailures failures: Int) -> TimeInterval {
+        min(maximumDelay, pow(2, Double(min(failures, 11))) * 15)
+    }
+}
+
+enum DirectWatchServiceReadingStatus: Equatable {
+    case disabled, notTracked, pending, uploaded, error
 }
 
 // MARK: - Phone settings and validated collector telemetry
@@ -351,6 +492,15 @@ enum DirectWatchSettings {
     static let lastStatusDateKey = "directWatch.lastStatusDate"
     static let unavailableReasonKey = "directWatch.unavailableReason"
 
+    static var readingImportBlocked: Bool { UserDefaults.standard.bool(forKey: DirectWatchUploadSettings.blockPhoneSyncKey) }
+    static func blockReadingImport(_ blocked: Bool) {
+        guard !blocked || configuration.map({ watchCollectionIsActive(for: $0.transmitterID) }) == true else { return }
+        UserDefaults.standard.set(blocked, forKey: DirectWatchUploadSettings.blockPhoneSyncKey)
+        advanceRevision()
+        NotificationCenter.default.post(name: changed, object: nil)
+        NotificationCenter.default.post(name: statusChanged, object: nil)
+    }
+
     static var collectionControl: DirectWatchCollectionControl? {
         UserDefaults.standard.data(forKey: collectionControlKey)
             .flatMap { try? JSONDecoder().decode(DirectWatchCollectionControl.self, from: $0) }
@@ -360,6 +510,13 @@ enum DirectWatchSettings {
         guard let configuration, let control = collectionControl,
               control.connection == configuration.connectionIdentity else { return false }
         return control.isPaused
+    }
+
+    static func watchCollectionIsActive(for transmitterID: String,
+                                        family: DirectWatchTransmitterFamily? = nil) -> Bool {
+        guard let configuration, configuration.transmitterID == transmitterID else { return false }
+        if let family, configuration.transmitterFamily != family { return false }
+        return !watchIsPaused && UserDefaults.standard.string(forKey: unavailableReasonKey) == nil
     }
 
     static func pauseWatch(_ paused: Bool) {
@@ -374,9 +531,29 @@ enum DirectWatchSettings {
               let data = try? JSONEncoder().encode(control) else { return false }
         UserDefaults.standard.set(data, forKey: collectionControlKey)
         UserDefaults.standard.set(max(control.revision, UserDefaults.standard.double(forKey: collectionControlClockKey)), forKey: collectionControlClockKey)
+        if control.isPaused { clearTestingOverrides() }
         NotificationCenter.default.post(name: changed, object: nil)
         NotificationCenter.default.post(name: statusChanged, object: nil)
         return true
+    }
+
+    /// Test-only phone overrides must never outlive the Watch collection they control.
+    @discardableResult private static func clearTestingOverrides() -> Bool {
+        let defaults = UserDefaults.standard
+        let hadPhonePause = defaults.string(forKey: pausedKey) != nil
+        let hadBlockedSync = defaults.bool(forKey: DirectWatchUploadSettings.blockPhoneSyncKey)
+        guard hadPhonePause || hadBlockedSync else { return false }
+        defaults.removeObject(forKey: pausedKey)
+        defaults.set(false, forKey: DirectWatchUploadSettings.blockPhoneSyncKey)
+        advanceRevision()
+        return true
+    }
+
+    static func resetTestingOverridesIfCollectionUnavailable() {
+        if let configuration, watchCollectionIsActive(for: configuration.transmitterID) { return }
+        guard clearTestingOverrides() else { return }
+        NotificationCenter.default.post(name: changed, object: nil)
+        NotificationCenter.default.post(name: statusChanged, object: nil)
     }
 
     /// Connection events carry the current control identity. Old queued events cannot reset a
@@ -429,10 +606,11 @@ enum DirectWatchSettings {
         advanceRevision()
         if bindingChanged || sensorChanged { clearTelemetry() }
         if configuration == nil {
-            UserDefaults.standard.removeObject(forKey: pausedKey)
+            _ = clearTestingOverrides()
         } else if bindingChanged {
             // Keep the independent control clock monotonic, but start the new binding enabled.
             // A queued pause from the previous binding must never pause this one.
+            _ = clearTestingOverrides()
             pauseWatch(false)
         }
         NotificationCenter.default.post(name: changed, object: nil)
@@ -457,6 +635,7 @@ enum DirectWatchSettings {
 
     static func pausePhone(_ paused: Bool, transmitterID: String) {
         DirectWatchCompatibility.migrateSettings()
+        guard !paused || watchCollectionIsActive(for: transmitterID) else { return }
         UserDefaults.standard.set(paused ? transmitterID : nil, forKey: pausedKey)
         advanceRevision()
         NotificationCenter.default.post(name: changed, object: nil)

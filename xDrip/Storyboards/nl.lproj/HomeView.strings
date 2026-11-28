@@ -89,6 +89,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "%@ resterend";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Een Hampel-filter dempt eerst afzonderlijke uitschieters. Daarna vlakt Savitzky-Golay de curve af met behoud van de algemene vorm van pieken en dalen.";
 
 "sensorManagementNoiseTitle" = "Sensorruis";
 "sensorManagementNoiseShortTerm" = "Afgelopen 30 minuten";
@@ -152,7 +153,7 @@
 "sensorHealthPersistentNoiseTitle" = "Zeer hoge sensorruis";
 "sensorHealthPersistentNoiseGuidance" = "Zeer hoge ruis gedurende 12 uur. Overweeg de sensor te vervangen als dit aanhoudt.";
 "sensorHealthFlatlineTitle" = "Het sensorsignaal is vlak";
-"sensorHealthFlatlineGuidance" = "Metingen 30 minuten onveranderd. Dit wijst meestal op een defecte/verlopen sensor.";
+"sensorHealthFlatlineGuidance" = "Metingen 30 min. onveranderd. Sensor mogelijk defect of verlopen.";
 "sensorHealthTemporaryIssueTitle" = "Tijdelijk sensorprobleem";
 "sensorHealthTemporaryIssueGuidance" = "Tijdelijk sensorprobleem sinds 3 uur. Controleer met een bloedglucosemeter en volg de aanwijzingen van de fabrikant.";
 "sensorHealthSensorFailedTitle" = "Sensor defect";
@@ -211,6 +212,9 @@
 "sensorManufactureDate" = "Productiedatum";
 "sensorExpirationDate" = "Vervaldatum";
 "sensorManagementWaitingForSensorStart" = "Wachten op sensorstart";
+"sensorManagementTransmitterExpiredTitle" = "Zender verlopen";
+"sensorManagementTransmitterExpiredMessage" = "Deze zender is verlopen. Er kan geen nieuwe sensorsessie worden gestart.";
+"sensorManagementAnubisRestartSuggestion" = "Start de Anubis-zender opnieuw voordat je een nieuwe sensorsessie probeert te starten.";
 "sensorManagementStatusWarmingUp" = "Opwarmen";
 "sensorCodeContinue" = "Doorgaan";
 "useWithoutSensorCode" = "Zonder code gebruiken";
@@ -240,3 +244,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Aanpassing van de offset en vorm is niet beschikbaar omdat deze CGM een eigen kalibratie gebruikt.";
 
 "postProcessingWarningAgreement" = "Tik alleen op OK als je deze functie begrijpt en ermee instemt om deze in te schakelen.";
+
+"postProcessingPreviousReadings" = "Eerdere metingen afvlakken";
+"postProcessingPreviousReadingsFooter" = "Vlakt eerdere metingen op de grafiek af wanneer nieuwe metingen binnenkomen. De meest recente meting blijft ongewijzigd.";
+"postProcessingLatestReading" = "Laatste meting afvlakken";
+"postProcessingLatestReadingFooter" = "Dempt onverwachte stijgingen of dalingen in de laatste glucosemeting op basis van de metingen van de afgelopen 10–20 minuten. Deze optie heeft alleen invloed op de laatste meting.";
+"postProcessingLatestReadingOff" = "Uit";
+"postProcessingLatestReadingDisabled" = "Afvlakking van de laatste meting is uitgeschakeld";
+"postProcessingLatestReadingWarning" = "Het afvlakken van de laatste meting kan werkelijke glucoseveranderingen minder sterk of later tonen en invloed hebben op het moment waarop glucosewaarschuwingen afgaan. Andere apps kunnen voor dezelfde meting een andere waarde tonen.";
+
+"postProcessingOffset" = "Verschuiving";
+"postProcessingCurve" = "Curve";
+"postProcessingBoth" = "Beide";
+"postProcessingOffsetAndCurve" = "Verschuiving en curve";
+"postProcessingMode" = "Modus";
+"postProcessingUnavailable" = "Niet beschikbaar";
+"postProcessingExpanded" = "Uitgeklapt";
+"postProcessingCollapsed" = "Ingeklapt";
+"postProcessingReferenceGlucose" = "Referentieglucose";
+"postProcessingEnterReferenceGlucose" = "Referentieglucose invoeren";
+"postProcessingDecrease" = "Verlaag %@";
+"postProcessingIncrease" = "Verhoog %@";
+"postProcessingLight" = "Licht";
+"postProcessingMedium" = "Gemiddeld";
+"postProcessingStrong" = "Sterk";
+"postProcessingCurveShape" = "Vorm";
+"postProcessingOffsetBgCheckHint" = "Eén recente bloedglucosemeting aanbevolen";
+"postProcessingScaleBgCheckHint" = "Twee recente bloedglucosemetingen aanbevolen";

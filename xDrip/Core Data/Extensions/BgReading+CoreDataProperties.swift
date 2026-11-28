@@ -17,6 +17,8 @@ extension BgReading {
     @NSManaged public var watchReceivedAt: Date?
     /// Actual acquisition on the Watch, independent of delayed delivery to the iPhone.
     @NSManaged public var watchCollectedAt: Date?
+    @NSManaged public var watchNightscoutOwned: Bool
+    @NSManaged public var watchDexcomShareOwned: Bool
     /// Nil identifies older stores whose live collection path was not recorded.
     /// False means only historical collection, or no collection by that device yet.
     @NSManaged public var phoneCollectedLive: NSNumber?

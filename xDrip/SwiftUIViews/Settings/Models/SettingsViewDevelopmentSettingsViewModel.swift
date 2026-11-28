@@ -19,11 +19,6 @@ fileprivate enum Setting:Int, CaseIterable {
     /// should the BG values be written to a shared app group?
     case loopShareType = 4
     
-    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes.
-    ///
-    /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
-    case loopDelay = 5
-    
     /// LibreLinkUp version number that will be used for the LLU follower mode http request headers
     case libreLinkUpVersion = 6
     
@@ -45,8 +40,8 @@ fileprivate enum Setting:Int, CaseIterable {
     /// should the online help be automatically translated?
     case translateOnlineHelp = 12
 
-    /// allow OS-AID sharing to use smoothed/final glucose values
-    case loopShareSmoothedData = 13
+    /// allow OS-AID sharing to use the smoothed latest value
+    case loopShareSmoothedLatestReading = 13
 
     /// allow OS-AID sharing to use Medtrum Nano glucose values
     case loopShareMedtrumNano = 14
@@ -79,6 +74,20 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
     
     // MARK: - Native SwiftUI rows
 
+    func settingsSection(sectionID: Int) -> SettingsSection {
+        let rows = settingsRows(sectionID: sectionID)
+        guard rowGroup == .osAidLoopShare, showLoopShareSmoothedLatestReadingRow else {
+            return SettingsSection(title: sectionTitle(), footer: sectionFooter(), rows: rows)
+        }
+
+        let sharing = UserDefaults.standard.loopShareSmoothedLatestReading
+        return SettingsSection(
+            footer: sharing ? Texts_SettingsView.loopShareSmoothedLatestReadingEnabledMessage : Texts_SettingsView.loopShareSmoothedLatestReadingDifferenceMessage,
+            footerIndicator: SettingsIndicator(color: sharing ? .yellow : .secondary, symbolName: sharing ? "exclamationmark.triangle.fill" : "info.circle"),
+            rows: rows
+        )
+    }
+
     func settingsRows(sectionID: Int) -> [SettingsRow] {
         let developerRowsVisible = UserDefaults.standard.showDeveloperSettings
         let loopShareTypes = LoopShareType.allCases
@@ -92,8 +101,10 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                     }
                 },
                 selectOption: { index in
-                    guard loopShareTypes.indices.contains(index) else { return }
+                    guard loopShareTypes.indices.contains(index),
+                          UserDefaults.standard.loopShareType != loopShareTypes[index] else { return }
                     UserDefaults.standard.loopShareType = loopShareTypes[index]
+                    NotificationCenter.default.post(name: ConstantsNotifications.osAidSharingDidChange, object: nil)
                 }
             )
         }
@@ -134,9 +145,8 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
 
         let osAidLoopShareRows = [
             loopShareTypeRow,
-            nativeSettingsRow(id: "developer.loopDelay", index: Setting.loopDelay.rawValue, sectionID: sectionID, isVisible: UserDefaults.standard.canConfigureOSAidSharing && UserDefaults.standard.loopShareType != .disabled),
             nativeSettingsRow(id: "developer.loopShareMedtrumNano", index: Setting.loopShareMedtrumNano.rawValue, sectionID: sectionID, isVisible: UserDefaults.standard.loopShareMedtrumNanoAvailable),
-            nativeSettingsRow(id: "developer.loopShareSmoothedData", index: Setting.loopShareSmoothedData.rawValue, sectionID: sectionID, isVisible: showLoopShareSmoothedDataRow)
+            nativeSettingsRow(id: "developer.loopShareSmoothedLatestReading", index: Setting.loopShareSmoothedLatestReading.rawValue, sectionID: sectionID, isVisible: showLoopShareSmoothedLatestReadingRow)
         ]
 
         let osAidLoopShareWarningRows = loopShareWarningBanners()
@@ -200,14 +210,12 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         case .loopShareType:
             return Texts_SettingsView.loopShare
 
-        case .loopShareSmoothedData:
-            return Texts_SettingsView.loopShareSmoothedData
+        case .loopShareSmoothedLatestReading:
+            return Texts_SettingsView.loopShareSmoothedLatestReading
 
         case .loopShareMedtrumNano:
             return Texts_SettingsView.loopShareMedtrumNano
             
-        case .loopDelay:
-            return Texts_SettingsView.loopDelaysScreenTitle
             
         case .libreLinkUpVersion:
             return Texts_SettingsView.libreLinkUpVersion
@@ -241,10 +249,10 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp, .loopShareSmoothedData, .loopShareMedtrumNano:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp, .loopShareSmoothedLatestReading, .loopShareMedtrumNano:
             return .none
             
-        case .loopDelay, .libreLinkUpVersion, .careLinkVersion, .CAGEMaxHours:
+        case .libreLinkUpVersion, .careLinkVersion, .CAGEMaxHours:
             return .disclosure
             
         case .loopShareType:
@@ -259,7 +267,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopDelay, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp, .loopShareSmoothedData, .loopShareMedtrumNano:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp, .loopShareSmoothedLatestReading, .loopShareMedtrumNano:
             return nil
 
         case .loopShareType:
@@ -288,14 +296,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 accessibilityLabel: Texts_SettingsView.loopShareMedtrumNanoTitle
             )
 
-        case .loopShareSmoothedData:
-            return SettingsIndicator(
-                color: ConstantsUI.warningBannerIndicatorColor,
-                symbolName: "exclamationmark.triangle.fill",
-                accessibilityLabel: Texts_SettingsView.loopShareSmoothedDataEnabledTitle
-            )
-
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopShareType, .loopDelay, .libreLinkUpVersion, .careLinkVersion, .CAGEMaxHours, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
+        case .loopShareSmoothedLatestReading, .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopShareType, .libreLinkUpVersion, .careLinkVersion, .CAGEMaxHours, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
             return nil
         }
     }
@@ -360,17 +361,20 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 isOn: { UserDefaults.standard.translateOnlineHelp },
                 setIsOn: { UserDefaults.standard.translateOnlineHelp = $0 }
             )
-        case .loopShareSmoothedData:
+        case .loopShareSmoothedLatestReading:
             return SettingsToggleControl(
-                isOn: { UserDefaults.standard.loopShareSmoothedData },
-                setIsOn: { UserDefaults.standard.loopShareSmoothedData = $0 },
+                isOn: { UserDefaults.standard.loopShareSmoothedLatestReading },
+                setIsOn: {
+                    UserDefaults.standard.loopShareSmoothedLatestReading = $0
+                    NotificationCenter.default.post(name: ConstantsNotifications.osAidSharingDidChange, object: nil)
+                },
                 confirmation: { isOn in
                     guard isOn else { return nil }
 
                     return SettingsToggleConfirmationContent(
-                        title: Texts_Common.warning,
-                        message: Texts_SettingsView.loopShareSmoothedDataWarning,
-                        actionTitle: Texts_SettingsView.loopShareSmoothedDataConfirm,
+                        title: Texts_SettingsView.loopShareSmoothedLatestReadingConfirmationTitle,
+                        message: Texts_SettingsView.loopShareSmoothedLatestReadingWarning,
+                        actionTitle: Texts_SettingsView.loopShareSmoothedLatestReadingAction,
                         cancelTitle: Texts_Common.Cancel
                     )
                 }
@@ -380,9 +384,10 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 isOn: { UserDefaults.standard.loopShareMedtrumNano },
                 setIsOn: { isOn in
                     UserDefaults.standard.loopShareMedtrumNano = isOn
-                    if isOn {
-                        UserDefaults.standard.loopShareSmoothedData = false
+                    if !isOn {
+                        UserDefaults.standard.loopShareSmoothedLatestReading = false
                     }
+                    NotificationCenter.default.post(name: ConstantsNotifications.osAidSharingDidChange, object: nil)
                 },
                 confirmation: { isOn in
                     guard isOn else { return nil }
@@ -395,7 +400,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                     )
                 }
             )
-        case .loopShareType, .loopDelay, .libreLinkUpVersion, .careLinkVersion, .CAGEMaxHours:
+        case .loopShareType, .libreLinkUpVersion, .careLinkVersion, .CAGEMaxHours:
             return nil
         }
     }
@@ -411,7 +416,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .translateOnlineHelp, .loopShareSmoothedData, .loopShareMedtrumNano:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .translateOnlineHelp, .loopShareSmoothedLatestReading, .loopShareMedtrumNano:
             return .nothing
             
         case .loopShareType:
@@ -442,13 +447,12 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 if index != selectedRow {
                     
                     UserDefaults.standard.loopShareType = LoopShareType(rawValue: index) ?? .disabled
+                    NotificationCenter.default.post(name: ConstantsNotifications.osAidSharingDidChange, object: nil)
                     
                 }
                 
             }, cancelHandler: nil, didSelectRowHandler: nil)
             
-        case .loopDelay:
-            return .performSegue(withIdentifier: SettingsSegueIdentifier.settingsToLoopDelaySchedule.rawValue, sender: self)
             
         case .libreLinkUpVersion:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.libreLinkUpVersion, message:  Texts_SettingsView.libreLinkUpVersionMessage, keyboardType: .default, text: UserDefaults.standard.libreLinkUpVersion, placeHolder: nil, fieldTitle: Texts_Common.enterValue, actionTitle: nil, cancelTitle: nil, actionHandler: {(libreLinkUpVersion: String) in
@@ -521,34 +525,16 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             ))
         }
 
-        guard showLoopShareSmoothedDataRow else { return rows }
-
-        if UserDefaults.standard.loopShareSmoothedData {
-            rows.append(SettingsRow(
-                id: "developer.loopShareSmoothedDataEnabledWarning",
-                title: Texts_SettingsView.loopShareSmoothedDataEnabledTitle,
-                control: .warningBanner(message: Texts_SettingsView.loopShareSmoothedDataEnabledMessage, severity: .caution)
-            ))
-
-            return rows
-        }
-
-        rows.append(SettingsRow(
-            id: "developer.loopShareSmoothedDataDifferenceWarning",
-            title: Texts_SettingsView.loopShareSmoothedDataDifferenceTitle,
-            control: .warningBanner(message: Texts_SettingsView.loopShareSmoothedDataDifferenceMessage, severity: .normal)
-        ))
-
         return rows
     }
 
-    private var showLoopShareSmoothedDataRow: Bool {
+    private var showLoopShareSmoothedLatestReadingRow: Bool {
         return UserDefaults.standard.canPublishOSAidData
-            && UserDefaults.standard.enableSmoothing
+            && UserDefaults.standard.enableLatestReadingSmoothing
     }
     
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
-        if rowGroup == .osAidLoopShare && (index == Setting.loopShareType.rawValue || index == Setting.loopShareSmoothedData.rawValue || index == Setting.loopShareMedtrumNano.rawValue) {
+        if rowGroup == .osAidLoopShare && (index == Setting.loopShareType.rawValue || index == Setting.loopShareSmoothedLatestReading.rawValue || index == Setting.loopShareMedtrumNano.rawValue) {
             return true
         }
 

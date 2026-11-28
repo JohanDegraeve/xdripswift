@@ -1140,58 +1140,13 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_loopShareMedtrumNanoConfirm", tableName: filename, bundle: Bundle.main, value: "I understand - share Medtrum Nano Pump CGM", comment: "Confirmation button title for enabling Medtrum Nano Pump CGM glucose data sharing with OS-AID apps")
     }()
 
-    static let loopShareSmoothedData: String = {
-        return NSLocalizedString("settingsviews_loopShareSmoothedData", tableName: filename, bundle: Bundle.main, value: "Share Smoothed Data", comment: "Settings row title to allow smoothed glucose data to be shared with OS-AID apps")
-    }()
+    static let loopShareSmoothedLatestReading = NSLocalizedString("settingsviews_loopShareSmoothedLatestReading", tableName: filename, bundle: Bundle.main, value: "Share Smoothed Reading", comment: "OS-AID Share setting")
+    static let loopShareSmoothedLatestReadingConfirmationTitle = NSLocalizedString("settingsviews_loopShareSmoothedLatestReadingConfirmationTitle", tableName: filename, bundle: Bundle.main, value: "Share smoothed readings?", comment: "Confirmation title before enabling the OS-AID option")
+    static let loopShareSmoothedLatestReadingAction = NSLocalizedString("settingsviews_loopShareSmoothedLatestReadingAction", tableName: filename, bundle: Bundle.main, value: "Share", comment: "Button confirming that smoothed readings may be shared with an AID app")
+    static let loopShareSmoothedLatestReadingDifferenceMessage = NSLocalizedString("settingsviews_loopShareSmoothedLatestReadingDifferenceMessage", tableName: filename, bundle: Bundle.main, value: "Your AID app will receive the latest glucose reading without any smoothing applied. This may cause different readings to be shown in both apps.", comment: "OS-AID Share information when latest reading smoothing is not shared")
+    static let loopShareSmoothedLatestReadingEnabledMessage = String(format: NSLocalizedString("settingsviews_loopShareSmoothedLatestReadingEnabledMessage", tableName: filename, bundle: Bundle.main, value: "Your AID app is receiving the smoothed glucose value displayed in %@. It will use this value for insulin dosing decisions.\n\nThe smoothed value may cause fast rises or drops to lag slightly, but will protect against sudden noise and jumps.", comment: "Persistent warning while sharing the smoothed latest reading"), ConstantsHomeView.applicationName)
+    static let loopShareSmoothedLatestReadingWarning = NSLocalizedString("settingsviews_loopShareSmoothedLatestReadingWarning", tableName: filename, bundle: Bundle.main, value: "If smoothing changes the latest glucose reading, your AID app will receive this adjusted value and will use it for insulin dosing decisions.", comment: "Warning before allowing the smoothed latest reading to be shared")
 
-    static let loopShareSmoothedDataDifferenceTitle: String = {
-        return NSLocalizedString("settingsviews_loopShareSmoothedDataDifferenceTitle", tableName: filename, bundle: Bundle.main, value: "Shared values may be different", comment: "Warning banner title shown when Glucose smoothing is enabled but smoothed OS-AID sharing is off")
-    }()
-
-    static let loopShareSmoothedDataDifferenceMessage: String = {
-        return String(format: NSLocalizedString("settingsviews_loopShareSmoothedDataDifferenceMessage", tableName: filename, bundle: Bundle.main, value: "Glucose smoothing is enabled, but OS-AID Share is sending unsmoothed data as preferred by OS-AID apps.\n\nThe glucose values shown in %@ may differ from those received by the OS-AID app.\n\nConsider disabling smoothing in the Adjustments screen when sharing data with OS-AID apps.", comment: "Warning banner text shown when Glucose smoothing is enabled but smoothed OS-AID sharing is off"), ConstantsHomeView.applicationName)
-    }()
-
-    static let loopShareSmoothedDataEnabledTitle: String = {
-        return NSLocalizedString("settingsviews_loopShareSmoothedDataEnabledTitle", tableName: filename, bundle: Bundle.main, value: "Smoothed data is being shared", comment: "Warning banner title shown when smoothed OS-AID sharing is enabled")
-    }()
-
-    static let loopShareSmoothedDataEnabledMessage: String = {
-        return NSLocalizedString("settingsviews_loopShareSmoothedDataEnabledMessage", tableName: filename, bundle: Bundle.main, value: "Sharing smoothed data is not recommended and it may interfere with normal OS-AID operation.\n\nSmoothed data is being shared because you specifically requested it by enabling the above option and accepting the risk.", comment: "Warning banner text shown when smoothed OS-AID sharing is enabled")
-    }()
-
-    static let loopShareSmoothedDataWarning: String = {
-        return String(format: NSLocalizedString("settingsviews_loopShareSmoothedDataWarning", tableName: filename, bundle: Bundle.main, value: "OS-AID apps such as Trio expect unsmoothed glucose data from the shared app group. Sharing smoothed data may change how the AID app interprets CGM data and could interfere with normal operation.\n\nThe recommended setting is Off. Only enable this if you understand the risk and specifically want %@ to share smoothed data.", comment: "Warning shown before allowing smoothed glucose data to be shared with OS-AID apps"), ConstantsHomeView.applicationName)
-    }()
-
-    static let loopShareSmoothedDataConfirm: String = {
-        return NSLocalizedString("settingsviews_loopShareSmoothedDataConfirm", tableName: filename, bundle: Bundle.main, value: "I understand - share smoothed data", comment: "Confirmation button title for enabling smoothed glucose data sharing with OS-AID apps")
-    }()
-    
-    static let selectTime: String = {
-        return NSLocalizedString("Select Time", tableName: filename, bundle: Bundle.main, value: "Select Time", comment: "Settings screen for loop delay")
-    }()
-
-    static let expanatoryTextSelectTime: String = {
-        return NSLocalizedString("expanatoryTextSelectTime", tableName: filename, bundle: Bundle.main, value: "As of what time should the value apply", comment: "Settings screen for loop delay, explanatory text for time")
-    }()
-
-    static let selectValue: String = {
-        return NSLocalizedString("Select Value", tableName: filename, bundle: Bundle.main, value: "Select Value", comment: "Settings screen for loop delay")
-    }()
-
-    static let loopDelaysScreenTitle: String = {
-        return NSLocalizedString("loopDelaysScreenTitle", tableName: filename, bundle: Bundle.main, value: "OS-AID Share Delays", comment: "Title for screen where loop delays are configured.")
-    }()
-
-    static let expanatoryTextSelectValue: String = {
-        return NSLocalizedString("expanatoryTextSelectValue", tableName: filename, bundle: Bundle.main, value: "Delay in minutes, applied to readings shared with OS-AID", comment: "Settings screen for loop delay, explanatory text for value")
-    }()
-
-    static let warningLoopDelayAlreadyExists: String = {
-        return NSLocalizedString("warningLoopDelayAlreadyExists", tableName: filename, bundle: Bundle.main, value: "There is already a loopDelay for this time.", comment: "When user creates new loopdelay, with a timestamp that already exists - this is the warning text")
-    }()
-    
     static let showDeveloperSettings: String = {
         return NSLocalizedString("showDeveloperSettings", tableName: filename, bundle: Bundle.main, value: "Show Advanced", comment: "advanced settings row title that reveals the advanced options")
     }()

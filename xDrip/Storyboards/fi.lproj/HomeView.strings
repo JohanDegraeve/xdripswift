@@ -90,6 +90,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "%@ jäljellä";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Hampel-suodatin vaimentaa ensin yksittäisiä poikkeavia arvoja. Sen jälkeen Savitzky-Golay tasoittaa käyrää ja säilyttää huippujen ja notkelmien yleisen muodon.";
 
 "sensorManagementNoiseTitle" = "Sensorin kohina";
 "sensorManagementNoiseShortTerm" = "Viimeiset 30 minuuttia";
@@ -130,7 +131,7 @@
 "sensorHealthPersistentNoiseTitle" = "Erittäin voimakas anturikohina";
 "sensorHealthPersistentNoiseGuidance" = "Erittäin voimakasta kohinaa 12 tunnin ajan. Harkitse anturin vaihtamista, jos se jatkuu.";
 "sensorHealthFlatlineTitle" = "Anturin signaali on tasainen";
-"sensorHealthFlatlineGuidance" = "Lukemat eivät ole muuttuneet 30 minuuttiin. Tämä tarkoittaa yleensä, että anturi on vioittunut/vanhentunut.";
+"sensorHealthFlatlineGuidance" = "Lukemat ennallaan 30 min. Anturi voi olla viallinen tai vanhentunut.";
 "sensorHealthTemporaryIssueTitle" = "Tilapäinen anturiongelma";
 "sensorHealthTemporaryIssueGuidance" = "Tilapäinen anturiongelma 3 tunnin ajan. Tarkista verensokerimittarilla ja noudata valmistajan ohjeita.";
 "sensorHealthSensorFailedTitle" = "Anturi vioittunut";
@@ -189,6 +190,9 @@
 "sensorManufactureDate" = "Valmistuspäivä";
 "sensorExpirationDate" = "Viimeinen käyttöpäivä";
 "sensorManagementWaitingForSensorStart" = "Odotetaan sensorin käynnistymistä";
+"sensorManagementTransmitterExpiredTitle" = "Lähetin on vanhentunut";
+"sensorManagementTransmitterExpiredMessage" = "Tämä lähetin on vanhentunut. Uutta sensorijaksoa ei voi aloittaa.";
+"sensorManagementAnubisRestartSuggestion" = "Käynnistä Anubis-lähetin uudelleen ennen kuin yrität aloittaa uuden sensorijakson.";
 "sensorManagementStatusWarmingUp" = "Lämpenee";
 "sensorCodeContinue" = "Jatka";
 "useWithoutSensorCode" = "Käytä ilman koodia";
@@ -218,3 +222,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Siirtymän ja muodon säätö ei ole käytettävissä, koska tämä CGM käyttää omaa kalibrointiaan.";
 
 "postProcessingWarningAgreement" = "Napauta OK vain, jos ymmärrät tämän ominaisuuden ja hyväksyt sen käyttöönoton.";
+
+"postProcessingPreviousReadings" = "Tasoita aiemmat lukemat";
+"postProcessingPreviousReadingsFooter" = "Tasoittaa kaavion aiempia lukemia uusien lukemien saapuessa. Tämä ei vaikuta uusimpaan lukemaan.";
+"postProcessingLatestReading" = "Tasoita uusin lukema";
+"postProcessingLatestReadingFooter" = "Vaimenna uusimman glukoosilukeman odottamattomia nousuja tai laskuja edeltävien 10–20 minuutin lukemien perusteella. Käytössä ollessaan toiminto vaikuttaa vain uusimpaan lukemaan.";
+"postProcessingLatestReadingOff" = "Pois";
+"postProcessingLatestReadingDisabled" = "Uusimman lukeman tasoitus on pois käytöstä";
+"postProcessingLatestReadingWarning" = "Uusimman lukeman tasoitus voi vaimentaa tai viivästyttää todellisten glukoosimuutosten näkymistä ja vaikuttaa glukoosihälytysten ajoitukseen. Muut sovellukset voivat näyttää samasta mittauksesta eri arvon.";
+
+"postProcessingOffset" = "Siirtymä";
+"postProcessingCurve" = "Käyrä";
+"postProcessingBoth" = "Molemmat";
+"postProcessingOffsetAndCurve" = "Siirtymä ja käyrä";
+"postProcessingMode" = "Tila";
+"postProcessingUnavailable" = "Ei käytettävissä";
+"postProcessingExpanded" = "Laajennettu";
+"postProcessingCollapsed" = "Tiivistetty";
+"postProcessingReferenceGlucose" = "Vertailuglukoosi";
+"postProcessingEnterReferenceGlucose" = "Syötä vertailuglukoosi";
+"postProcessingDecrease" = "Pienennä: %@";
+"postProcessingIncrease" = "Suurenna: %@";
+"postProcessingLight" = "Kevyt";
+"postProcessingMedium" = "Keskitaso";
+"postProcessingStrong" = "Voimakas";
+"postProcessingCurveShape" = "Muoto";
+"postProcessingOffsetBgCheckHint" = "Suositellaan yhtä tuoretta verensokerimittausta";
+"postProcessingScaleBgCheckHint" = "Suositellaan kahta tuoretta verensokerimittausta";

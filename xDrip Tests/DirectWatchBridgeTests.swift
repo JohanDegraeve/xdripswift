@@ -8,11 +8,237 @@
 
 import XCTest
 import CoreData
+import Security
+import CryptoKit
 #if canImport(xdrip)
 @testable import xdrip
 #endif
 
 final class DirectWatchBridgeTests: XCTestCase {
+
+    func testPerServiceWatchOwnershipRoutesOnlyTheOwnedDestination() {
+        XCTAssertTrue(DirectWatchUploadRouting.shouldOwnReading(enabled: true, configurationReady: true,
+            queueHasCapacity: true, collectedAt: start, enabledSince: start))
+        XCTAssertFalse(DirectWatchUploadRouting.shouldOwnReading(enabled: false, configurationReady: true,
+            queueHasCapacity: true, collectedAt: start, enabledSince: start))
+        XCTAssertFalse(DirectWatchUploadRouting.shouldOwnReading(enabled: true, configurationReady: false,
+            queueHasCapacity: true, collectedAt: start, enabledSince: start))
+        XCTAssertFalse(DirectWatchUploadRouting.shouldOwnReading(enabled: true, configurationReady: true,
+            queueHasCapacity: false, collectedAt: start, enabledSince: start))
+        XCTAssertFalse(DirectWatchUploadRouting.shouldOwnReading(enabled: true, configurationReady: true,
+            queueHasCapacity: true, collectedAt: start.addingTimeInterval(-1), enabledSince: start))
+
+        XCTAssertFalse(DirectWatchUploadRouting.shouldUploadFromPhone(service: .nightscout,
+            watchNightscoutOwned: true, watchDexcomShareOwned: false))
+        XCTAssertTrue(DirectWatchUploadRouting.shouldUploadFromPhone(service: .dexcomShare,
+            watchNightscoutOwned: true, watchDexcomShareOwned: false))
+        XCTAssertTrue(DirectWatchUploadRouting.shouldUploadFromPhone(service: .nightscout,
+            watchNightscoutOwned: false, watchDexcomShareOwned: true))
+        XCTAssertFalse(DirectWatchUploadRouting.shouldUploadFromPhone(service: .dexcomShare,
+            watchNightscoutOwned: false, watchDexcomShareOwned: true))
+        XCTAssertTrue(DirectWatchUploadRouting.shouldUploadFromPhone(service: .nightscout,
+            watchNightscoutOwned: false, watchDexcomShareOwned: false))
+        XCTAssertTrue(DirectWatchUploadRouting.shouldUploadFromPhone(service: .dexcomShare,
+            watchNightscoutOwned: false, watchDexcomShareOwned: false))
+    }
+
+    func testNightscoutConfigurationChangesAndLegacyWatchReadingsDecodeUnowned() throws {
+        let destination = try XCTUnwrap(DirectWatchNightscoutConfiguration.normalizedDestination("HTTPS://Example.COM/nightscout/"))
+        XCTAssertEqual(destination, "https://example.com/nightscout")
+        let first = DirectWatchNightscoutConfiguration(version: 1, revision: 1, enabled: true,
+            destination: destination, schedule: "480", enabledSince: start)
+        let changed = DirectWatchNightscoutConfiguration(version: 1, revision: 2, enabled: true,
+            destination: "https://other.example", schedule: "480", enabledSince: start)
+        XCTAssertNotEqual(first, changed)
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try XCTUnwrap(TimeZone(secondsFromGMT: 0))
+        let morning = try XCTUnwrap(calendar.date(bySettingHour: 7, minute: 59, second: 0, of: start))
+        XCTAssertTrue(first.scheduleIsOn(at: morning, calendar: calendar))
+        XCTAssertFalse(first.scheduleIsOn(at: morning.addingTimeInterval(60), calendar: calendar))
+
+        let reading = DirectWatchReading(transmitterID: "8ABCDE", sensorStartCounter: 1,
+            sensorStartDate: start, transmitterSeconds: 600, measuredAt: start,
+            mgDl: 120, state: 6, family: .g6, collectedAt: start)
+        let encoded = try JSONEncoder().encode(reading)
+        var legacy = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        legacy.removeValue(forKey: "watchNightscoutOwned")
+        let decoded = try JSONDecoder().decode(DirectWatchReading.self, from: JSONSerialization.data(withJSONObject: legacy))
+        XCTAssertNil(decoded.watchNightscoutOwned)
+        XCTAssertTrue(DirectWatchUploadRouting.shouldUploadFromPhone(service: .nightscout, watchNightscoutOwned: decoded.watchNightscoutOwned == true, watchDexcomShareOwned: decoded.watchDexcomShareOwned == true))
+    }
+
+    func testProviderConfigurationAndCredentialsUseSharedUploadPayloadKeys() {
+        XCTAssertEqual(DirectWatchUploadSettings.enabledKey, "directWatch.cloudUploadEnabled")
+        XCTAssertEqual(DirectWatchUploadSettings.nightscoutConfigurationKey, "directWatch.nightscoutConfiguration")
+        XCTAssertEqual(DirectWatchUploadSettings.nightscoutCredentialsKey, "directWatch.nightscoutCredentials")
+        XCTAssertEqual(DirectWatchUploadSettings.dexcomShareConfigurationKey, "directWatch.dexcomShareConfiguration")
+        XCTAssertEqual(DirectWatchUploadSettings.dexcomShareCredentialsKey, "directWatch.dexcomShareCredentials")
+        let configurationData = Data([1])
+        let credentialsData = Data([2])
+        let payload = DirectWatchCompatibility.outgoing([
+            DirectWatchUploadSettings.nightscoutConfigurationKey: configurationData,
+            DirectWatchUploadSettings.nightscoutCredentialsKey: credentialsData
+        ])
+
+        XCTAssertEqual(payload[DirectWatchUploadSettings.nightscoutConfigurationKey] as? Data, configurationData)
+        XCTAssertEqual(payload[DirectWatchUploadSettings.nightscoutCredentialsKey] as? Data, credentialsData)
+    }
+
+    func testCurrentCoreDataModelInfersMigrationFromV38OwnershipDefaults() throws {
+        let bundle = Bundle.main
+        let momd = try XCTUnwrap(bundle.url(forResource: "xdrip", withExtension: "momd"))
+        let oldModelURL = momd.appendingPathComponent("xdrip v38.mom")
+        let oldModel = try XCTUnwrap(NSManagedObjectModel(contentsOf: oldModelURL))
+        let currentModel = try XCTUnwrap(NSManagedObjectModel(contentsOf: momd))
+        let mapping = try NSMappingModel.inferredMappingModel(forSourceModel: oldModel, destinationModel: currentModel)
+        XCTAssertNotNil(mapping, "Expected Core Data to infer the Watch Dexcom Share ownership migration")
+        let entity = try XCTUnwrap(currentModel.entitiesByName["BgReading"])
+        for key in ["watchNightscoutOwned", "watchDexcomShareOwned"] {
+            let ownership = try XCTUnwrap(entity.attributesByName[key])
+            XCTAssertEqual(ownership.attributeType, .booleanAttributeType)
+            XCTAssertEqual(ownership.defaultValue as? Bool, false)
+        }
+
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("migration.sqlite")
+        let oldStore = NSPersistentStoreCoordinator(managedObjectModel: oldModel)
+        let store = try oldStore.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: url, options: nil)
+        let oldContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        oldContext.persistentStoreCoordinator = oldStore
+        try oldContext.performAndWait {
+            let reading = NSEntityDescription.insertNewObject(forEntityName: "BgReading", into: oldContext)
+            reading.setValue("existing-reading", forKey: "id")
+            reading.setValue(start, forKey: "timeStamp")
+            reading.setValue(false, forKey: "calibrationFlag")
+            reading.setValue(false, forKey: "hideSlope")
+            try oldContext.save()
+            oldContext.reset()
+        }
+        try oldStore.remove(store)
+
+        let coordinator = NSPersistentStoreCoordinator(managedObjectModel: currentModel)
+        _ = try coordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: url,
+            options: [NSMigratePersistentStoresAutomaticallyOption: true, NSInferMappingModelAutomaticallyOption: true])
+        let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        context.persistentStoreCoordinator = coordinator
+        try context.performAndWait {
+            let request = NSFetchRequest<BgReading>(entityName: "BgReading")
+            let reading = try XCTUnwrap(context.fetch(request).first)
+            XCTAssertEqual(reading.id, "existing-reading")
+            XCTAssertFalse(reading.watchNightscoutOwned)
+            XCTAssertFalse(reading.watchDexcomShareOwned)
+        }
+    }
+
+    @MainActor func testWatchOutboxRestoresCommittedReadingAndVerifiesBeforeRetry() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let destination = "https://\(UUID().uuidString.lowercased()).example"
+        defer { deleteWatchUploadTestCredentials(destination: destination) }
+        let reading = DirectWatchReading(transmitterID: "8ABCDE", sensorStartCounter: 1,
+            sensorStartDate: start, transmitterSeconds: 600, measuredAt: start, mgDl: 120, state: 6, collectedAt: start)
+        var methods: [String] = []
+        var acceptedEntry: Data?
+        var canReadBack = false
+        let send: @MainActor (URLRequest) async throws -> (Data, URLResponse) = { request in
+            let url = try XCTUnwrap(request.url)
+            let method = try XCTUnwrap(request.httpMethod)
+            methods.append(method)
+            if method == "POST" {
+                let body = try XCTUnwrap(request.httpBody)
+                acceptedEntry = body
+                let entries = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [[String: Any]])
+                XCTAssertNil(entries.first?["filtered"])
+                XCTAssertNil(entries.first?["noise"])
+                throw URLError(.networkConnectionLost)
+            }
+            guard canReadBack else { throw URLError(.notConnectedToInternet) }
+            return (try XCTUnwrap(acceptedEntry), try XCTUnwrap(HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)))
+        }
+        let original = DirectWatchNightscoutUploader(directory: directory, send: send)
+        original.receiveConfiguration(try watchUploadTestConfiguration(destination: destination, revision: 1, enabled: true))
+        XCTAssertTrue(original.shouldOwnNewReading(collectedAt: start, phoneReachable: true, phoneSyncDisabled: true))
+        XCTAssertFalse(original.shouldOwnNewReading(collectedAt: start, phoneReachable: true, phoneSyncDisabled: false))
+        XCTAssertTrue(original.stageReading(reading, alongside: []))
+
+        let restored = DirectWatchNightscoutUploader(directory: directory, send: send)
+        XCTAssertEqual(restored.pendingCount, 0)
+        restored.reconcileStagedReadings(committedIDs: [reading.id])
+        XCTAssertEqual(restored.pendingCount, 1)
+        restored.retryPendingUploads()
+        try await waitForWatchUpload(restored)
+        XCTAssertEqual(methods, ["POST", "GET"])
+        XCTAssertEqual(restored.readingStatus(for: reading), .error)
+
+        restored.receiveConfiguration(try watchUploadTestConfiguration(destination: destination, revision: 2, enabled: false))
+        restored.retryPendingUploads()
+        XCTAssertFalse(restored.isUploading)
+        XCTAssertEqual(restored.pendingCount, 1)
+
+        canReadBack = true
+        restored.receiveConfiguration(try watchUploadTestConfiguration(destination: destination, revision: 3, enabled: true))
+        try await waitForWatchUpload(restored)
+        XCTAssertEqual(methods, ["POST", "GET", "GET"])
+        XCTAssertEqual(restored.readingStatus(for: reading), .uploaded)
+    }
+
+    @MainActor func testWatchUploadAuthenticationFailureKeepsOriginalDestinationAndUnblocksOnCredentialChange() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let first = "https://\(UUID().uuidString.lowercased()).example"
+        let second = "https://\(UUID().uuidString.lowercased()).example"
+        defer {
+            deleteWatchUploadTestCredentials(destination: first)
+            deleteWatchUploadTestCredentials(destination: second)
+        }
+        var requests: [URLRequest] = []
+        let uploader = DirectWatchNightscoutUploader(directory: directory) { request in
+            requests.append(request)
+            let url = try XCTUnwrap(request.url)
+            let fixed = url.query?.contains("token=fixed") == true
+            let code = fixed ? 200 : 401
+            let body = request.httpBody ?? Data("[]".utf8)
+            return (body, try XCTUnwrap(HTTPURLResponse(url: url, statusCode: code, httpVersion: nil, headerFields: nil)))
+        }
+        let reading = DirectWatchReading(transmitterID: "8ABCDE", sensorStartCounter: 1,
+            sensorStartDate: start, transmitterSeconds: 600, measuredAt: start, mgDl: 120, state: 6, collectedAt: start)
+        uploader.receiveConfiguration(try watchUploadTestConfiguration(destination: first, revision: 1, enabled: true))
+        XCTAssertTrue(uploader.stageReading(reading, alongside: []))
+        uploader.reconcileStagedReadings(committedIDs: [reading.id])
+        uploader.retryPendingUploads()
+        try await waitForWatchUpload(uploader)
+        XCTAssertEqual(uploader.readingStatus(for: reading), .error)
+
+        uploader.receiveConfiguration(try watchUploadTestConfiguration(destination: second, revision: 2, enabled: true))
+        XCTAssertFalse(uploader.isUploading)
+        XCTAssertEqual(uploader.pendingCount, 1)
+        uploader.receiveConfiguration(try watchUploadTestConfiguration(destination: first, revision: 3, enabled: true, token: "fixed"))
+        try await waitForWatchUpload(uploader)
+        XCTAssertEqual(requests.map(\.httpMethod), ["POST", "GET", "POST"])
+        XCTAssertEqual(Set(requests.compactMap { $0.url?.host }), [try XCTUnwrap(URL(string: first)?.host)])
+        XCTAssertEqual(uploader.readingStatus(for: reading), .uploaded)
+    }
+
+    private func watchUploadTestConfiguration(destination: String, revision: Double, enabled: Bool, token: String = "test") throws -> [String: Any] {
+        let configuration = DirectWatchNightscoutConfiguration(version: 1, revision: revision, enabled: enabled,
+            destination: destination, schedule: nil, enabledSince: start)
+        return [
+            DirectWatchUploadSettings.nightscoutConfigurationKey: try JSONEncoder().encode(configuration),
+            DirectWatchUploadSettings.nightscoutCredentialsKey: try JSONEncoder().encode(DirectWatchNightscoutCredentials(secretHash: nil, token: token))
+        ]
+    }
+
+    private func deleteWatchUploadTestCredentials(destination: String) {
+        SecItemDelete([kSecClass: kSecClassGenericPassword, kSecAttrService: "xdrip.directWatch.nightscout",
+                       kSecAttrAccount: destination] as CFDictionary)
+    }
+
+    @MainActor private func waitForWatchUpload(_ uploader: DirectWatchNightscoutUploader) async throws {
+        for _ in 0..<100 where uploader.isUploading { try await Task.sleep(nanoseconds: 10_000_000) }
+        XCTAssertFalse(uploader.isUploading)
+    }
 
     func testWatchAlarmSchedulesRoundTripWithoutBreakingLegacyConfiguration() throws {
         var configuration = configuration()
@@ -431,6 +657,139 @@ final class DirectWatchBridgeTests: XCTestCase {
         XCTAssertNil(try JSONDecoder().decode(DirectWatchReading.self, from: JSONSerialization.data(withJSONObject: legacy)).collectionSessionID)
     }
 
+    @MainActor func testDexcomShareOutboxPausesAndResumesWithoutLosingReading() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let username = "test-\(UUID().uuidString)"
+        let keychainAccount = SHA256.hash(data: Data("\(ConstantsDexcomShare.usBaseShareUrl)|\(username)".utf8))
+            .map { String(format: "%02x", $0) }.joined()
+        defer {
+            SecItemDelete([kSecClass: kSecClassGenericPassword,
+                           kSecAttrService: "xdrip.directWatch.dexcomShare",
+                           kSecAttrAccount: keychainAccount] as CFDictionary)
+        }
+        var requestURLs: [URL] = []
+        var postAttempts = 0
+        var uploadedPayload: [String: Any]?
+        let uploader = DirectWatchDexcomShareUploader(directory: directory) { request in
+            let url = try XCTUnwrap(request.url)
+            requestURLs.append(url)
+            if url.path.hasSuffix("AuthenticatePublisherAccount") {
+                return (Data("\"\(UUID().uuidString)\"".utf8), try XCTUnwrap(HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)))
+            }
+            if url.path.hasSuffix("LoginPublisherAccountById") {
+                return (Data("\"\(UUID().uuidString)\"".utf8), try XCTUnwrap(HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)))
+            }
+            postAttempts += 1
+            uploadedPayload = try XCTUnwrap(JSONSerialization.jsonObject(with: request.httpBody ?? Data()) as? [String: Any])
+            if postAttempts == 1 { throw URLError(.networkConnectionLost) }
+            let body = Data(#"{"Code":"DuplicateEgvPosted"}"#.utf8)
+            return (body, try XCTUnwrap(HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)))
+        }
+        let reading = DirectWatchReading(transmitterID: "8ABCDE", sensorStartCounter: 1,
+            sensorStartDate: start, transmitterSeconds: 600, measuredAt: start,
+            mgDl: 120, state: 6, family: .g6, collectedAt: start)
+        uploader.receiveConfiguration(try shareUploadTestConfiguration(username: username, revision: 1, enabled: true))
+        XCTAssertTrue(uploader.shouldOwnNewReading(collectedAt: start, phoneReachable: true, phoneSyncDisabled: true))
+        XCTAssertFalse(uploader.shouldOwnNewReading(collectedAt: start, phoneReachable: true, phoneSyncDisabled: false))
+        XCTAssertTrue(uploader.stageReading(reading, alongside: []))
+        uploader.reconcileStagedReadings(committedIDs: [reading.id])
+        uploader.retryPendingUploads()
+        try await waitForShareUpload(uploader)
+        XCTAssertEqual(uploader.pendingCount, 1)
+
+        uploader.receiveConfiguration(try shareUploadTestConfiguration(username: username, revision: 2, enabled: false))
+        uploader.retryPendingUploads()
+        XCTAssertEqual(requestURLs.count, 3)
+        XCTAssertEqual(uploader.pendingCount, 1)
+
+        uploader.receiveConfiguration(try shareUploadTestConfiguration(username: username, revision: 3, enabled: true))
+        try await waitForShareUpload(uploader)
+        XCTAssertEqual(postAttempts, 2)
+        XCTAssertEqual(uploader.pendingCount, 0)
+        XCTAssertEqual(uploader.readingStatus(for: reading), .uploaded)
+        XCTAssertTrue(requestURLs.allSatisfy { $0.host == URL(string: ConstantsDexcomShare.usBaseShareUrl)?.host })
+        XCTAssertEqual(requestURLs.first?.path, "/ShareWebServices/Services/General/AuthenticatePublisherAccount")
+        let entries = try XCTUnwrap(uploadedPayload?["Egvs"] as? [[String: Any]])
+        XCTAssertEqual(entries.first?["Value"] as? Int, 120)
+        XCTAssertEqual(entries.first?["ST"] as? String, "/Date(1790000000000)/")
+        XCTAssertEqual(uploadedPayload?["SN"] as? String, "SM12345678")
+        let restored = DirectWatchDexcomShareUploader(directory: directory)
+        XCTAssertEqual(restored.readingStatus(for: reading), .uploaded)
+    }
+
+    @MainActor func testShareAccountChangeDuringLoginKeepsQueuedDeliveriesOnTheirOriginalAccounts() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let firstAccount = "test-\(UUID().uuidString)"
+        let secondAccount = "test-\(UUID().uuidString)"
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+            for username in [firstAccount, secondAccount] {
+                let account = SHA256.hash(data: Data("\(ConstantsDexcomShare.usBaseShareUrl)|\(username)".utf8))
+                    .map { String(format: "%02x", $0) }.joined()
+                SecItemDelete([kSecClass: kSecClassGenericPassword, kSecAttrService: "xdrip.directWatch.dexcomShare",
+                               kSecAttrAccount: account] as CFDictionary)
+            }
+        }
+        let firstReading = DirectWatchReading(transmitterID: "8ABCDE", sensorStartCounter: 1,
+            sensorStartDate: start, transmitterSeconds: 600, measuredAt: start, mgDl: 120, state: 6, collectedAt: start)
+        let secondDate = start.addingTimeInterval(300)
+        let secondReading = DirectWatchReading(transmitterID: "8ABCDE", sensorStartCounter: 1,
+            sensorStartDate: start, transmitterSeconds: 900, measuredAt: secondDate, mgDl: 125, state: 6, collectedAt: secondDate)
+        let firstSession = UUID().uuidString
+        let secondSession = UUID().uuidString
+        let nextConfiguration = try shareUploadTestConfiguration(username: secondAccount, revision: 2, enabled: true)
+        weak var receivingUploader: DirectWatchDexcomShareUploader?
+        var authenticationAccounts: [String] = []
+        var postedSessions: [String] = []
+        let uploader = DirectWatchDexcomShareUploader(directory: directory) { request in
+            let url = try XCTUnwrap(request.url)
+            let response = try XCTUnwrap(HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil))
+            if url.path.hasSuffix("AuthenticatePublisherAccount") {
+                let body = try XCTUnwrap(JSONSerialization.jsonObject(with: request.httpBody ?? Data()) as? [String: String])
+                authenticationAccounts.append(try XCTUnwrap(body["accountName"]))
+                if authenticationAccounts.count == 1 {
+                    let receiver = try XCTUnwrap(receivingUploader)
+                    receiver.receiveConfiguration(nextConfiguration)
+                    XCTAssertTrue(receiver.stageReading(secondReading, alongside: [firstReading]))
+                    receiver.reconcileStagedReadings(committedIDs: [secondReading.id])
+                }
+                return (try JSONEncoder().encode(UUID().uuidString), response)
+            }
+            if url.path.hasSuffix("LoginPublisherAccountById") {
+                return (try JSONEncoder().encode(authenticationAccounts.last == firstAccount ? firstSession : secondSession), response)
+            }
+            let session = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?
+                .first { $0.name == "sessionId" }?.value
+            postedSessions.append(try XCTUnwrap(session))
+            return (Data(), response)
+        }
+        receivingUploader = uploader
+        uploader.receiveConfiguration(try shareUploadTestConfiguration(username: firstAccount, revision: 1, enabled: true))
+        XCTAssertTrue(uploader.stageReading(firstReading, alongside: []))
+        uploader.reconcileStagedReadings(committedIDs: [firstReading.id])
+        uploader.retryPendingUploads()
+        try await waitForShareUpload(uploader)
+
+        XCTAssertEqual(authenticationAccounts, [firstAccount, firstAccount, secondAccount])
+        XCTAssertEqual(postedSessions, [firstSession, secondSession])
+        XCTAssertEqual(uploader.pendingCount, 0)
+    }
+
+    private func shareUploadTestConfiguration(username: String, revision: Double, enabled: Bool) throws -> [String: Any] {
+        let configuration = DirectWatchDexcomShareConfiguration(version: 1, revision: revision, enabled: enabled,
+            baseURL: ConstantsDexcomShare.usBaseShareUrl, username: username, serialNumber: "SM12345678",
+            schedule: nil, enabledSince: start)
+        let credentials = DirectWatchDexcomShareCredentials(username: username, password: "test-password")
+        return [DirectWatchUploadSettings.dexcomShareConfigurationKey: try JSONEncoder().encode(configuration),
+                DirectWatchUploadSettings.dexcomShareCredentialsKey: try JSONEncoder().encode(credentials)]
+    }
+
+    @MainActor private func waitForShareUpload(_ uploader: DirectWatchDexcomShareUploader) async throws {
+        for _ in 0..<100 where uploader.isUploading { try await Task.sleep(nanoseconds: 10_000_000) }
+        XCTAssertFalse(uploader.isUploading)
+    }
+
     private let start = Date(timeIntervalSince1970: 1_790_000_000)
     private func configuration(slot: UInt8 = 1, anubis: Bool = false) -> DirectWatchConfiguration {
         DirectWatchConfiguration(transmitterID: "8ABCDE", slot: slot, isAnubis: anubis, sensorStartDate: start, isMgDl: true, low: 70, high: 180)
@@ -551,23 +910,23 @@ final class DirectWatchBridgeTests: XCTestCase {
     func testPendingRecoveryRetriesKnownPeripheralBeforeForegroundDiscovery() {
         let policy = DirectWatchCollectionPolicy.self
         XCTAssertEqual(policy.pendingRecovery(startedAt: nil, now: start, isForeground: true, savedRetryCount: 0), .wait)
-        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: start.addingTimeInterval(5 * 60), isForeground: true, savedRetryCount: 0), .wait)
-        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: start.addingTimeInterval(6 * 60), isForeground: true, savedRetryCount: 0), .retrySavedPeripheral)
-        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: start.addingTimeInterval(12 * 60), isForeground: true, savedRetryCount: 1), .retrySavedPeripheral)
-        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: start.addingTimeInterval(18 * 60), isForeground: true, savedRetryCount: 2), .discoverInForeground)
+        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: start.addingTimeInterval(60), isForeground: true, savedRetryCount: 0), .wait)
+        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: start.addingTimeInterval(2 * 60), isForeground: true, savedRetryCount: 0), .retrySavedPeripheral)
+        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: start.addingTimeInterval(4 * 60), isForeground: true, savedRetryCount: 1), .retrySavedPeripheral)
+        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: start.addingTimeInterval(6 * 60), isForeground: true, savedRetryCount: 2), .discoverInForeground)
         XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: start.addingTimeInterval(8 * 3600), isForeground: false, savedRetryCount: 2), .retrySavedPeripheral)
     }
 
-    func testBackgroundWakeRetriesOnlyOverdueRequestsAndNeverStartsDiscovery() {
+    func testBackgroundWakeRetriesStalledRequestsAndNeverStartsDiscovery() {
         let policy = DirectWatchCollectionPolicy.self
-        let overdue = start.addingTimeInterval(ConstantsDirectWatch.readingOverdueAfter)
-        XCTAssertEqual(policy.pendingRecovery(startedAt: nil, now: overdue, isForeground: false, savedRetryCount: 0), .wait)
-        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: overdue.addingTimeInterval(-1), isForeground: false, savedRetryCount: 0), .wait)
-        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: overdue, isForeground: false, savedRetryCount: 0), .retrySavedPeripheral)
-        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: overdue, isForeground: false, savedRetryCount: 100), .retrySavedPeripheral)
+        let retryAt = start.addingTimeInterval(policy.pendingConnectionLimit)
+        XCTAssertEqual(policy.pendingRecovery(startedAt: nil, now: retryAt, isForeground: false, savedRetryCount: 0), .wait)
+        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: retryAt.addingTimeInterval(-1), isForeground: false, savedRetryCount: 0), .wait)
+        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: retryAt, isForeground: false, savedRetryCount: 0), .retrySavedPeripheral)
+        XCTAssertEqual(policy.pendingRecovery(startedAt: start, now: retryAt, isForeground: false, savedRetryCount: 100), .retrySavedPeripheral)
         // A new request gets a full grace period, even if another phone transfer wakes us immediately.
-        XCTAssertEqual(policy.pendingRecovery(startedAt: overdue, now: overdue.addingTimeInterval(1), isForeground: false, savedRetryCount: 1), .wait)
-        XCTAssertEqual(policy.pendingRecovery(startedAt: overdue, now: start, isForeground: false, savedRetryCount: 1), .wait)
+        XCTAssertEqual(policy.pendingRecovery(startedAt: retryAt, now: retryAt.addingTimeInterval(1), isForeground: false, savedRetryCount: 1), .wait)
+        XCTAssertEqual(policy.pendingRecovery(startedAt: retryAt, now: start, isForeground: false, savedRetryCount: 1), .wait)
     }
 
     func testDisplayAndAlertConfigurationUpdatesKeepBluetoothConnection() {

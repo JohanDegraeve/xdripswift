@@ -170,6 +170,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "Preostalo %@";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Hampelov filter najprej ublaži posamezne odstopajoče vrednosti. Nato Savitzky-Golay zgladi krivuljo in ohrani splošno obliko vrhov in dolin.";
 
 "sensorManagementNoiseTitle" = "Šum senzorja";
 "sensorManagementNoiseShortTerm" = "Zadnjih 30 minut";
@@ -210,7 +211,7 @@
 "sensorHealthPersistentNoiseTitle" = "Zelo visok šum senzorja";
 "sensorHealthPersistentNoiseGuidance" = "Zelo visok šum že 12 ur. Če se nadaljuje, razmislite o zamenjavi senzorja.";
 "sensorHealthFlatlineTitle" = "Signal senzorja je raven";
-"sensorHealthFlatlineGuidance" = "Odčitki se 30 minut niso spremenili. To običajno pomeni, da je senzor odpovedal/potekel.";
+"sensorHealthFlatlineGuidance" = "Odčitki nespremenjeni 30 min. Senzor je morda odpovedal ali potekel.";
 "sensorHealthTemporaryIssueTitle" = "Začasna težava s senzorjem";
 "sensorHealthTemporaryIssueGuidance" = "Začasna težava s senzorjem že 3 ure. Preverite z merilnikom in upoštevajte navodila proizvajalca.";
 "sensorHealthSensorFailedTitle" = "Senzor je odpovedal";
@@ -269,6 +270,9 @@
 "sensorManufactureDate" = "Datum izdelave";
 "sensorExpirationDate" = "Rok uporabe";
 "sensorManagementWaitingForSensorStart" = "Čakanje na zagon senzorja";
+"sensorManagementTransmitterExpiredTitle" = "Oddajnik je potekel";
+"sensorManagementTransmitterExpiredMessage" = "Temu oddajniku je potekla življenjska doba. Nove seje senzorja ni mogoče začeti.";
+"sensorManagementAnubisRestartSuggestion" = "Znova zaženite oddajnik Anubis, preden poskusite začeti novo sejo senzorja.";
 "sensorManagementStatusWarmingUp" = "Ogrevanje";
 "sensorCodeContinue" = "Nadaljuj";
 "useWithoutSensorCode" = "Uporabi brez kode";
@@ -298,3 +302,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Prilagajanje odmika in oblike ni na voljo, ker ta CGM uporablja lastno kalibracijo.";
 
 "postProcessingWarningAgreement" = "Tapnite V redu samo, če razumete to funkcijo in se strinjate, da jo omogočite.";
+
+"postProcessingPreviousReadings" = "Glajenje prejšnjih meritev";
+"postProcessingPreviousReadingsFooter" = "Zgladi prejšnje meritve na grafu, ko prispejo nove. Najnovejša meritev ostane nespremenjena.";
+"postProcessingLatestReading" = "Glajenje najnovejše meritve";
+"postProcessingLatestReadingFooter" = "Ublaži nepričakovane poraste ali padce najnovejše meritve glukoze na podlagi meritev zadnjih 10–20 minut. Ko je možnost vklopljena, vpliva samo na najnovejšo meritev.";
+"postProcessingLatestReadingOff" = "Izklopljeno";
+"postProcessingLatestReadingDisabled" = "Glajenje najnovejše meritve je izklopljeno";
+"postProcessingLatestReadingWarning" = "Glajenje najnovejše meritve lahko ublaži ali zakasni prikaz dejanskih sprememb glukoze ter vpliva na čas sprožitve opozoril. Druge aplikacije lahko za isto meritev pokažejo drugačno vrednost.";
+
+"postProcessingOffset" = "Odmik";
+"postProcessingCurve" = "Krivulja";
+"postProcessingBoth" = "Oboje";
+"postProcessingOffsetAndCurve" = "Odmik in krivulja";
+"postProcessingMode" = "Način";
+"postProcessingUnavailable" = "Ni na voljo";
+"postProcessingExpanded" = "Razširjeno";
+"postProcessingCollapsed" = "Strnjeno";
+"postProcessingReferenceGlucose" = "Referenčna glukoza";
+"postProcessingEnterReferenceGlucose" = "Vnesi referenčno glukozo";
+"postProcessingDecrease" = "Zmanjšaj: %@";
+"postProcessingIncrease" = "Povečaj: %@";
+"postProcessingLight" = "Rahlo";
+"postProcessingMedium" = "Srednje";
+"postProcessingStrong" = "Močno";
+"postProcessingCurveShape" = "Oblika";
+"postProcessingOffsetBgCheckHint" = "Priporočena je ena nedavna meritev krvnega sladkorja";
+"postProcessingScaleBgCheckHint" = "Priporočeni sta dve nedavni meritvi krvnega sladkorja";

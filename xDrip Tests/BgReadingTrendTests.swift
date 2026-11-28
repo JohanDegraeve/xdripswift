@@ -23,6 +23,101 @@ final class BgReadingTrendTests: XCTestCase {
         super.tearDown()
     }
 
+    func testLatestReadingSmoothingReducesIsolatedSpikesAndDrops() {
+        XCTAssertEqual(smoothedReading([100, 102, 104, 130]), 122, accuracy: 0.001)
+        XCTAssertEqual(smoothedReading([100, 98, 96, 70]), 78, accuracy: 0.001)
+        XCTAssertEqual(smoothedReading([100, 102, 104, 130, 108]), 108, accuracy: 0.001)
+    }
+
+    func testLatestReadingSmoothingToleratesFiveMinuteCadenceVariation() {
+        for interval in [299.0, 301.0] {
+            XCTAssertEqual(smoothedReading([98, 100, 102, 104, 130], interval: interval), 122)
+            XCTAssertEqual(smoothedReading([98, 100, 102, 104, 130, 132], interval: interval), 132)
+        }
+    }
+
+    func testLatestReadingSmoothingPassesTrendsAndConfirmedChangesThrough() {
+        XCTAssertEqual(smoothedReading([100, 110, 120, 130]), 130)
+        XCTAssertEqual(smoothedReading([100, 102, 104, 130, 132]), 132)
+        XCTAssertEqual(smoothedReading([100, 98, 96, 70, 68]), 68)
+        XCTAssertEqual(smoothedReading([100, 102, 104, 130], interval: 15 * 60), 130)
+        XCTAssertEqual(smoothedReading(Array(repeating: 100, count: 12) + [130], interval: 60), 122)
+    }
+
+    func testLiveSmoothingPresetsLimitBothDirectionsAndPassSustainedChanges() {
+        let expectations: [(LatestReadingSmoothing.Mode, Double, Double, Double)] = [
+            (.off, 120, 80, 160),
+            (.light, 117, 83, 156),
+            (.medium, 114, 86, 152),
+            (.strong, 112, 88, 152)
+        ]
+        for (mode, rise, drop, cappedRise) in expectations {
+            XCTAssertEqual(smoothedReading([100, 100, 100, 120], mode: mode), rise, accuracy: 0.001)
+            XCTAssertEqual(smoothedReading([100, 100, 100, 80], mode: mode), drop, accuracy: 0.001)
+            XCTAssertEqual(smoothedReading([100, 100, 100, 160], mode: mode), cappedRise, accuracy: 0.001)
+            XCTAssertEqual(smoothedReading([100, 102, 104, 130, 132], mode: mode), 132)
+            XCTAssertEqual(smoothedReading([100, 98, 96, 70, 68], mode: mode), 68)
+            XCTAssertEqual(smoothedReading([100, 102, 104, 130], interval: 900, mode: mode), 130)
+        }
+    }
+
+    func testSmoothingKeepsLiveAndHistoricalValuesSeparate() {
+        let current = reading(value: 130, secondsAgo: 0)
+        let previous = reading(value: 106, secondsAgo: 300)
+        current.adjustedValue = 128
+        current.smoothedValue = 120
+        let oldState = LatestReadingSmoothing.liveState
+        defer { LatestReadingSmoothing.liveState = oldState }
+        LatestReadingSmoothing.liveState = .init(readingID: current.id, smoothedValue: 122,
+                                                 comparisonID: previous.id, comparisonValue: 106)
+        previous.smoothedValue = 111
+
+        XCTAssertEqual(current.calculatedValue, 130)
+        XCTAssertEqual(current.finalValue, 122)
+        XCTAssertEqual(current.historicalValue, 120)
+        XCTAssertEqual(current.baselineValue, 128)
+        XCTAssertEqual(current.previousLiveValue(for: previous), 106)
+        let attributes = current.entity.attributesByName
+        XCTAssertNil(attributes["latestSmoothedValue"])
+        XCTAssertNil(attributes["livePreviousValue"])
+        XCTAssertNotNil(UserDefaults.standard.data(forKey: "latestReadingSmoothingState"))
+    }
+
+    func testGlucoseAlertsEvaluateTheDisplayedReading() {
+        let current = reading(value: 70, secondsAgo: 0)
+        let previous = reading(value: 100, secondsAgo: 300)
+        let context = coreDataManager.mainManagedObjectContext
+        let alertType = AlertType(enabled: true, name: "Smoothing test", overrideMute: false, snooze: false,
+                                  snoozePeriod: 0, vibrate: false, soundName: nil, alertEntries: nil,
+                                  nsManagedObjectContext: context)
+        let low = AlertEntry(isDisabled: false, value: 75, triggerValue: 0, alertKind: .low, start: 0,
+                             alertType: alertType, nsManagedObjectContext: context)
+        let fastDrop = AlertEntry(isDisabled: false, value: 26, triggerValue: 90, alertKind: .fastdrop,
+                                  start: 0, alertType: alertType, nsManagedObjectContext: context)
+
+        let oldState = LatestReadingSmoothing.liveState
+        defer { LatestReadingSmoothing.liveState = oldState }
+        LatestReadingSmoothing.liveState = .init(readingID: current.id, smoothedValue: 78)
+        XCTAssertFalse(AlertKind.low.alertNeeded(currentAlertEntry: low, nextAlertEntry: nil, lastBgReading: current,
+                                                previous, lastCalibration: nil, transmitterBatteryInfo: nil).alertNeeded)
+        XCTAssertFalse(AlertKind.fastdrop.alertNeeded(currentAlertEntry: fastDrop, nextAlertEntry: nil, lastBgReading: current,
+                                                     previous, lastCalibration: nil, transmitterBatteryInfo: nil).alertNeeded)
+
+        LatestReadingSmoothing.liveState = .init(readingID: current.id, smoothedValue: 72)
+        XCTAssertTrue(AlertKind.low.alertNeeded(currentAlertEntry: low, nextAlertEntry: nil, lastBgReading: current,
+                                               previous, lastCalibration: nil, transmitterBatteryInfo: nil).alertNeeded)
+        XCTAssertTrue(AlertKind.fastdrop.alertNeeded(currentAlertEntry: fastDrop, nextAlertEntry: nil, lastBgReading: current,
+                                                    previous, lastCalibration: nil, transmitterBatteryInfo: nil).alertNeeded)
+        XCTAssertEqual(current.calculatedValue, 70)
+    }
+
+    private func smoothedReading(_ values: [Double], interval: TimeInterval = 300, mode: LatestReadingSmoothing.Mode = .medium) -> Double {
+        let samples = values.enumerated().map {
+            LatestReadingSmoothing.Sample(date: now.addingTimeInterval(Double($0.offset) * interval), value: $0.element)
+        }
+        return LatestReadingSmoothing.value(for: samples[samples.count - 1], previous: Array(samples.dropLast()), mode: mode)
+    }
+
     func testVeryRecentReadingUsesOlderTrendReading() {
         let current = reading(value: 101, secondsAgo: 0)
         let outOfTurnReading = reading(value: 98, secondsAgo: 20)

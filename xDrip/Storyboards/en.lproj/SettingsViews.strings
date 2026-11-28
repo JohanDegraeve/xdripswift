@@ -197,11 +197,6 @@
 "settingsviews_housekeeperRetentionPeriod" = "Retention Period";
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 "suppressUnLockPayLoad" = "Suppress Unlock Payload";
-"Select Time" = "Select Time";
-"Select Value" = "Select Value";
-"expanatoryTextSelectTime" = "As of what time should the value apply";
-"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
-"warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
 
 "settingsviews_storeFrequentReadingsInNightscout" = "Frequent Nightscout Uploads";
 "settingsviews_storeFrequentReadingsInHealthKitMessage" = "This option will override the 5-minute upload limits and allow much frequent BG data to be uploaded to Nightscout. Such as for 60-second Libre 2 Direct values.\n\nPlease only enable this option if you really need/want more frequent data. Most users should leave this option disabled.";
@@ -566,3 +561,10 @@
 "settingsviews_shareReport" = "Share Report";
 "settingsviews_shareIssueReport" = "Share Issue Report";
 "settingsviews_reportShareFailed" = "Unable to prepare the log files. Please try again.";
+
+"settingsviews_loopShareSmoothedLatestReading" = "Share Smoothed Reading";
+"settingsviews_loopShareSmoothedLatestReadingConfirmationTitle" = "Share smoothed readings?";
+"settingsviews_loopShareSmoothedLatestReadingAction" = "Share";
+"settingsviews_loopShareSmoothedLatestReadingDifferenceMessage" = "Your AID app will receive the latest glucose reading without any smoothing applied. This may cause different readings to be shown in both apps.";
+"settingsviews_loopShareSmoothedLatestReadingEnabledMessage" = "Your AID app is receiving the smoothed glucose value displayed in %@. It will use this value for insulin dosing decisions.\n\nThe smoothed value may cause fast rises or drops to lag slightly, but will protect against sudden noise and jumps.";
+"settingsviews_loopShareSmoothedLatestReadingWarning" = "If smoothing changes the latest glucose reading, your AID app will receive this adjusted value and will use it for insulin dosing decisions.";

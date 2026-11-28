@@ -1,3 +1,5 @@
+import Foundation
+
 enum ConstantsNotifications {
     
     /// identifiers for alert notifications
@@ -44,6 +46,8 @@ enum ConstantsNotifications {
         static let bgReadingNotificationRequest = "bgReadingNotificationRequest"
     }
     
+    static let osAidSharingDidChange = Notification.Name("osAidSharingDidChange")
+
     enum NotificationIdentifierForBgPostProcessing {
         /// bg post processing update notification
         static let bgPostProcessingDidUpdate = "bgPostProcessingDidUpdate"

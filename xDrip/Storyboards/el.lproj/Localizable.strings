@@ -2,6 +2,7 @@
 
 // Direct to Watch status and pairing guidance
 "directWatchTitle" = "Απευθείας στο Watch";
+"directWatchActivationAdvice" = "Για να λαμβάνετε μετρήσεις μέσω της συλλογής Απευθείας στο Watch, η εφαρμογή Watch %@ πρέπει να είναι ανοιχτή στο Apple Watch σας. Ακόμη κι έτσι, η συλλογή δεν είναι εγγυημένη σε κάθε κύκλο. Χρησιμοποιήστε τη με προσοχή.";
 "directWatchNoConnection" = "Δεν προστέθηκε σύνδεση";
 "directWatchSuspended" = "Η συλλογή ανεστάλη";
 "directWatchWaiting" = "Αναμονή μέτρησης από το Watch";
@@ -36,10 +37,10 @@
 "directWatchMedicalSlot" = "Θέση ιατρικής συσκευής";
 "directWatchWatchSlot" = "Θέση Watch";
 "directWatchConfirmUnusedSlot" = "Κενή θέση: σύνδεση Watch";
-"directWatchSlotMedical" = "Θέση 1 · Ιατρική συσκευή";
-"directWatchSlotMobile" = "Θέση 2 · Εφαρμογή κινητού";
-"directWatchSlotWatch" = "Θέση 3 · Watch";
-"directWatchSlotAnubis" = "Θέση 3 · Πρόσθετη Anubis";
+"directWatchSlotMedical" = "Θέση 1 (Ιατρική συσκευή)";
+"directWatchSlotMobile" = "Θέση 2 (Εφαρμογή κινητού)";
+"directWatchSlotWatch" = "Θέση 3 (Watch)";
+"directWatchSlotAnubis" = "Θέση 3 (Πρόσθετη Anubis)";
 "directWatchUsedWatch" = "Χρήση από αυτό το Watch";
 "directWatchUsedPhone" = "Χρήση από αυτό το iPhone";
 "directWatchSlotMedicalDetail" = "Μόνο χωρίς αντλία ή δέκτη";
@@ -49,7 +50,7 @@
 "directWatchAnubisOnly" = "Μόνο πομποί Anubis";
 "directWatchWatchStatus" = "Κατάσταση Watch";
 "directWatchTestingDiagnosis" = "Δοκιμές και διάγνωση";
-"directWatchPausePhone" = "Παύση συλλογής BLE iPhone";
+"directWatchPausePhone" = "Απενεργοποίηση συλλογής iPhone";
 "directWatchForTesting" = "Για δοκιμή συλλογής Watch";
 "directWatchGetLogs" = "Λήψη αρχείων Watch";
 "directWatchShareLogs" = "Κοινοποίηση αρχείων Watch";
@@ -80,9 +81,15 @@
 /* Direct to Watch action feedback. */
 "directWatchTryAgain" = "Δοκιμή ξανά";
 "directWatchRequestQueued" = "Αίτημα σε αναμονή";
-"directWatchLastLogsReceived" = "Τελευταία λήψη αρχείων";
+"directWatchLastLogsReceived" = "Τελευταία λήψη";
 "directWatchWaitingForLogs" = "Αναμονή νέων αρχείων…";
 "directWatchLogsFailed" = "Αδυναμία λήψης αρχείων. Δοκιμάστε ξανά.";
 
 /* Watch diagnostic log actions and receipt time. */
-"directWatchLogs" = "Καταγραφές";
+"directWatchLogs" = "Αρχεία καταγραφής Watch";
+"directWatchUploadReadings" = "Μεταφόρτωση μετρήσεων";
+"directWatchBlockPhoneSync" = "Απενεργοποίηση συγχρονισμού Watch";
+"directWatchPhoneCollectionAdvice" = "Απενεργοποιεί τη συλλογή μετρήσεων Bluetooth από αυτόν τον πομπό στο iPhone για δοκιμή συλλογής μόνο με το Watch.";
+"directWatchBlockPhoneSyncAdvice" = "Η απενεργοποίηση συγχρονισμού Watch σταματά τον συγχρονισμό μετρήσεων από το Watch στο iPhone, ώστε να δοκιμάσετε τη μεταφόρτωση από το Watch, αν αυτή η λειτουργία είναι ενεργή.";
+"directWatchCloudUpload" = "Να επιτρέπεται η μεταφόρτωση στο cloud";
+"directWatchCloudUploadAdvice" = "Όταν ενεργοποιηθεί, το Apple Watch θα προσπαθεί να ανεβάζει τις μετρήσεις σε κάθε διαμορφωμένη υπηρεσία cloud όταν υπάρχει σύνδεση στο διαδίκτυο.";

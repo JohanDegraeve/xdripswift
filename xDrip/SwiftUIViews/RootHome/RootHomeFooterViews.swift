@@ -31,14 +31,11 @@ struct SensorHealthBannerView: View {
                         Text(issue.title)
                             .font(.headline.weight(.bold))
                             .foregroundStyle(.white)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.85)
                         Text(issue.guidance)
                             .font(.subheadline)
                             .foregroundStyle(.white)
-                            .lineLimit(3)
-                            .minimumScaleFactor(0.9)
                     }
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                     Spacer(minLength: 4)
@@ -231,14 +228,11 @@ struct RootHomeDataSourceView: View {
         HStack(spacing: 5) {
             HStack(spacing: 6) {
                 if sensorNoiseState.showsIndicator {
-                    Circle()
-                        .fill(sensorNoiseState.indicatorColor)
-                        .frame(width: 8, height: 8)
-                        .overlay {
-                            Circle()
-                                .stroke(sensorNoiseState.indicatorColor.opacity(0.35), lineWidth: 3)
-                        }
-                        .accessibilityLabel(sensorNoiseState.indicatorAccessibilityLabel)
+                    SensorNoiseIndicatorView(
+                        color: sensorNoiseState.indicatorColor,
+                        size: 18
+                    )
+                    .accessibilityLabel(sensorNoiseState.indicatorAccessibilityLabel)
                 }
 
                 if state.showsConnectionIcon {
@@ -260,12 +254,6 @@ struct RootHomeDataSourceView: View {
                         .accessibilityLabel(dexcomModeAccessibilityLabel(mode))
                 }
 
-                Text(state.title)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(ConstantsAppColors.dataSourceText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-
                 if state.showsWatchCollectorIcon {
                     Image(systemName: ConstantsDirectWatch.watchSymbol(for: state.watchCollectorHealth))
                         .font(.system(size: 14))
@@ -273,6 +261,12 @@ struct RootHomeDataSourceView: View {
                         .fixedSize()
                         .accessibilityLabel(state.watchCollectorHealth.title)
                 }
+
+                Text(state.title)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(ConstantsAppColors.dataSourceText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
             .layoutPriority(1)
 

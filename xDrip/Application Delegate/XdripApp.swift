@@ -21,6 +21,8 @@ import SwiftUI
     private let tabTitles: RootTabTitles
 
     init() {
+        UserDefaults.standard.migrateLegacySmoothingAlgorithm()
+
         let applicationCoordinator = RootApplicationCoordinator()
         let stateModel = RootTabStateModel()
 

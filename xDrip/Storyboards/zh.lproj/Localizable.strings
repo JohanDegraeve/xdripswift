@@ -2,6 +2,7 @@
 
 // Direct to Watch status and pairing guidance
 "directWatchTitle" = "直连 Watch";
+"directWatchActivationAdvice" = "要通过直连 Watch 采集读数，%@ Watch 应用必须在 Apple Watch 上保持打开。即便如此，也不能保证每个周期都能采集。请谨慎使用。";
 "directWatchNoConnection" = "未添加连接";
 "directWatchSuspended" = "采集已暂停";
 "directWatchWaiting" = "等待 Watch 读数";
@@ -36,10 +37,10 @@
 "directWatchMedicalSlot" = "医疗设备槽位";
 "directWatchWatchSlot" = "Watch 槽位";
 "directWatchConfirmUnusedSlot" = "槽位空闲: 添加 Watch";
-"directWatchSlotMedical" = "槽位 1 · 医疗设备";
-"directWatchSlotMobile" = "槽位 2 · 手机应用";
-"directWatchSlotWatch" = "槽位 3 · Watch";
-"directWatchSlotAnubis" = "槽位 3 · Anubis 扩展";
+"directWatchSlotMedical" = "槽位 1 (医疗设备)";
+"directWatchSlotMobile" = "槽位 2 (手机应用)";
+"directWatchSlotWatch" = "槽位 3 (Watch)";
+"directWatchSlotAnubis" = "槽位 3 (Anubis 扩展)";
 "directWatchUsedWatch" = "此 Watch 使用中";
 "directWatchUsedPhone" = "此 iPhone 使用中";
 "directWatchSlotMedicalDetail" = "仅在无泵或接收器使用时";
@@ -49,7 +50,7 @@
 "directWatchAnubisOnly" = "仅限 Anubis 发射器";
 "directWatchWatchStatus" = "Watch 状态";
 "directWatchTestingDiagnosis" = "测试与诊断";
-"directWatchPausePhone" = "暂停 iPhone BLE 采集";
+"directWatchPausePhone" = "停用 iPhone 采集";
 "directWatchForTesting" = "用于测试 Watch 采集";
 "directWatchGetLogs" = "获取 Watch 日志";
 "directWatchShareLogs" = "分享 Watch 日志";
@@ -80,9 +81,15 @@
 /* Direct to Watch action feedback. */
 "directWatchTryAgain" = "重试";
 "directWatchRequestQueued" = "请求已排队";
-"directWatchLastLogsReceived" = "上次收到日志";
+"directWatchLastLogsReceived" = "上次接收";
 "directWatchWaitingForLogs" = "等待新日志…";
 "directWatchLogsFailed" = "无法获取日志。请重试。";
 
 /* Watch diagnostic log actions and receipt time. */
-"directWatchLogs" = "日志";
+"directWatchLogs" = "Watch 日志";
+"directWatchUploadReadings" = "上传读数";
+"directWatchBlockPhoneSync" = "停用 Watch 同步";
+"directWatchPhoneCollectionAdvice" = "停用 iPhone 从此发射器采集蓝牙读数，以测试仅使用 Watch 采集。";
+"directWatchBlockPhoneSyncAdvice" = "停用 Watch 同步将停止把 Watch 读数同步回 iPhone，以便在启用上传功能时测试从 Watch 上传。";
+"directWatchCloudUpload" = "允许上传到云端";
+"directWatchCloudUploadAdvice" = "启用后，如果有互联网连接，Apple Watch 会尝试将读数上传到每个已配置的云服务。";

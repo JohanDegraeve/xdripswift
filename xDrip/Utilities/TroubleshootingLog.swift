@@ -528,12 +528,14 @@ enum TroubleshootingPostProcessingWarning: String, Codable {
     case glucoseAdjustment
     case curveAdjustment
     case glucoseSmoothing
+    case latestReadingSmoothing
 
     var name: String {
         switch self {
         case .glucoseAdjustment: return "Glucose Adjustment"
         case .curveAdjustment: return "Curve Adjustment"
         case .glucoseSmoothing: return "Glucose Smoothing"
+        case .latestReadingSmoothing: return "Smooth Latest Reading"
         }
     }
 }

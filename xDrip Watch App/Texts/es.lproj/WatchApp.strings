@@ -106,3 +106,13 @@
 "directWatchAlertExplanation" = "Los umbrales siguen los horarios de alarmas del iPhone. El Watch solo avisa si está recogiendo datos y lleva más de 60 segundos sin comunicarse con el iPhone.";
 "directWatchScheduleUnavailable" = "Sincroniza las alarmas del iPhone";
 "directWatchUrgentLowGlucose" = "%@: glucosa baja urgente";
+"directWatchEnabled" = "Activada";
+"directWatchDisabled" = "Desactivada";
+"directWatchUploaded" = "Subido";
+"directWatchUploadPending" = "Pendiente";
+"directWatchUploadError" = "Error";
+"directWatchUploadNotTracked" = "Sin seguimiento";
+
+/* Direct to Watch cloud upload */
+"directWatchNightscoutUpload" = "Nightscout";
+"directWatchDexcomShareUpload" = "Dexcom Share";

@@ -317,8 +317,6 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-/// Settings screen for loop delay
-"Select Time" = "Select Time";
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
 "settingsviews_resetDexcomTransmitterMessage" = "This option will attempt to reset your Anubis transmitter on the next connection.";
@@ -332,8 +330,6 @@
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "保持活动 is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
-/// Settings screen for loop delay, explanatory text for value
-"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
 
 /// statistics settings, prefer time in tight range
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
@@ -360,8 +356,6 @@
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 
-/// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
-"warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
 
 /// statistics settings, prefer user-defined range
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
@@ -418,11 +412,7 @@
 /// When enabled, then it should be possible to run xDrip4iOS/Libre 2 in parallel with other app(s)
 "suppressUnLockPayLoad" = "Suppress Unlock Payload";
 
-/// Settings screen for loop delay
-"Select Value" = "Select Value";
 
-/// Settings screen for loop delay, explanatory text for time
-"expanatoryTextSelectTime" = "As of what time should the value apply";
 
 /// data source settings, data source region
 "settingsviews_labelFollowerDataSourceRegion" = "Region";
@@ -764,3 +754,10 @@
 "settingsviews_shareReport" = "分享报告";
 "settingsviews_shareIssueReport" = "分享问题报告";
 "settingsviews_reportShareFailed" = "无法准备日志文件。请重试。";
+
+"settingsviews_loopShareSmoothedLatestReading" = "共享平滑读数";
+"settingsviews_loopShareSmoothedLatestReadingConfirmationTitle" = "共享平滑读数？";
+"settingsviews_loopShareSmoothedLatestReadingAction" = "共享";
+"settingsviews_loopShareSmoothedLatestReadingDifferenceMessage" = "你的 AID 应用将接收未经平滑处理的最新葡萄糖读数。因此，两个应用显示的读数可能不同。";
+"settingsviews_loopShareSmoothedLatestReadingEnabledMessage" = "你的 AID 应用正在接收 %@ 显示的平滑葡萄糖值，并将用它来决定胰岛素剂量。\n\n平滑后的数值可能会稍有延迟才反映葡萄糖的快速上升或下降，但平滑处理能抑制突发的信号噪声和跳变。";
+"settingsviews_loopShareSmoothedLatestReadingWarning" = "如果平滑处理改变了最新的葡萄糖读数，你的 AID 应用将接收调整后的数值，并用它来决定胰岛素剂量。";

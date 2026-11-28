@@ -205,7 +205,7 @@ extension LiveActivityManager {
                     self.shouldRun = true
                     await self.endActivities()
                     guard self.shouldRun else { return }
-                    await self.startActivity(contentState: self.persistentContentState)
+                    self.startActivity(contentState: self.persistentContentState)
                 }
             } else {
                 trace("in restartFromIntent, cannot restart live activity from Intent because there is no persistentContentState available", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
@@ -244,7 +244,7 @@ extension LiveActivityManager {
         }
         
         // If no activity, start one and return
-        if eventActivity == nil {
+        guard let previousActivity = eventActivity else {
             if !forceRestart && shouldDeferNewStart(contentState: contentState, context: "initial start") {
                 return
             }
@@ -254,7 +254,7 @@ extension LiveActivityManager {
                 await endActivities()
             }
             guard shouldRun else { return }
-            await startActivity(contentState: contentState)
+            startActivity(contentState: contentState)
             trace("in ensureActivity, started new live activity", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
             return
         }
@@ -272,9 +272,12 @@ extension LiveActivityManager {
                     return
                 }
 
-                await endActivities()
-                guard shouldRun else { return }
-                await startActivity(contentState: contentState)
+                // keep the existing activity until the new one starts in case the app goes into the background
+                guard startActivity(contentState: contentState) else {
+                    await updateActivity(to: contentState, force: true)
+                    return
+                }
+                await previousActivity.end(nil, dismissalPolicy: .immediate)
                 let activityAgeString = activityAge < 3600 ? activityAge.minutes.round(toDecimalPlaces: 1).description + " minutes" : activityAge.hours.round(toDecimalPlaces: 1).description + " hours"
                 trace("in ensureActivity, forceRestart triggered (existing Live Activity age: %{public}@)", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, activityAgeString)
                 return
@@ -291,7 +294,7 @@ extension LiveActivityManager {
             }
             await endActivities()
             guard shouldRun else { return }
-            await startActivity(contentState: contentState)
+            startActivity(contentState: contentState)
             trace("in ensureActivity, restarted live activity after dismissal/end", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, troubleshooting: .detailed(.integration(name: .liveActivity, activity: .restarted)))
             return
         }
@@ -308,17 +311,17 @@ extension LiveActivityManager {
     
     /// will start a new live activity event based upon the content state passed to the function
     /// - Parameter contentState: the content state of the new activity
+    @discardableResult
     @MainActor
-    private func startActivity(contentState: XDripWidgetAttributes.ContentState) async {
-        guard shouldRun else { return }
+    private func startActivity(contentState: XDripWidgetAttributes.ContentState) -> Bool {
+        guard shouldRun else { return false }
 
         let now = Date()
-        eventStartDate = now
         lastStartAttemptDate = now
         
         var updatedContentState = contentState
         updatedContentState.warnUserToOpenApp = false
-        updatedContentState.eventStartDate = eventStartDate
+        updatedContentState.eventStartDate = now
         
         let content = ActivityContent(state: updatedContentState, staleDate: nil, relevanceScore: 1.0)
         
@@ -328,6 +331,7 @@ extension LiveActivityManager {
                 content: content,
                 pushType: nil
             )
+            eventStartDate = now
             
             // update the persistent content state with the new/updated content state
             persistentContentState = updatedContentState
@@ -335,10 +339,12 @@ extension LiveActivityManager {
             publishedActivityID = eventActivity?.id
             
             trace("in startActivity, new live activity started: %{public}@", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, troubleshooting: .detailed(.integration(name: .liveActivity, activity: .succeeded(itemCount: nil))), String(describing: eventActivity?.id))
+            return true
         } catch {
-            eventActivity = nil
-            persistentContentState = updatedContentState
-            trace("in startActivity, error: %{public}@", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .error, troubleshooting: .detailed(.integration(name: .liveActivity, activity: .failed)), error.localizedDescription)
+            let state = eventActivity?.activityState
+            let keptExistingActivity = state == .active || state == .stale
+            trace("in startActivity, error: %{public}@ (kept existing activity: %{public}@)", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .error, troubleshooting: keptExistingActivity ? nil : .detailed(.integration(name: .liveActivity, activity: .failed)), error.localizedDescription, keptExistingActivity.description)
+            return false
         }
     }
     
@@ -355,7 +361,7 @@ extension LiveActivityManager {
             }
             await endActivities()
             guard shouldRun else { return }
-            await startActivity(contentState: contentState)
+            startActivity(contentState: contentState)
             return
         }
         
@@ -367,7 +373,7 @@ extension LiveActivityManager {
             }
             await endActivities()
             guard shouldRun else { return }
-            await startActivity(contentState: contentState)
+            startActivity(contentState: contentState)
             trace("in updateActivity, previous live activity was dismissed by the user so it will be ended and will try to start a new one.", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
         } else {
             // update the warnUserToOpenApp flag if needed and then update the activity

@@ -13,7 +13,6 @@ enum BgSmoothingAlgorithm: String, CaseIterable {
     case exponential = "exponential"
     case kalman = "kalman"
     case loess = "loess"
-    case hampelSavitzkyGolay = "hampelSavitzkyGolay"
 
     var description: String {
         switch self {
@@ -25,8 +24,6 @@ enum BgSmoothingAlgorithm: String, CaseIterable {
             return Texts_HomeView.postProcessingAlgorithmKalman
         case .loess:
             return Texts_HomeView.postProcessingAlgorithmLoess
-        case .hampelSavitzkyGolay:
-            return Texts_HomeView.postProcessingAlgorithmHampelSavitzkyGolay
         }
     }
 
@@ -40,23 +37,19 @@ enum BgSmoothingAlgorithm: String, CaseIterable {
             return Texts_HomeView.postProcessingAlgorithmKalmanDescription
         case .loess:
             return Texts_HomeView.postProcessingAlgorithmLoessDescription
-        case .hampelSavitzkyGolay:
-            return Texts_HomeView.postProcessingAlgorithmHampelSavitzkyGolayDescription
         }
     }
 
     var plugin: BgSmoothingAlgorithmPlugin {
         switch self {
         case .savitzkyGolay:
-            return SavitzkyGolayBgSmoothing()
+            return HampelSavitzkyGolayBgSmoothing()
         case .exponential:
             return ExponentialBgSmoothing()
         case .kalman:
             return KalmanBgSmoothing()
         case .loess:
             return LoessBgSmoothing()
-        case .hampelSavitzkyGolay:
-            return HampelSavitzkyGolayBgSmoothing()
         }
     }
 }
@@ -285,5 +278,136 @@ enum ConstantsBgSmoothing {
         default:
             return 3.1
         }
+    }
+}
+
+enum LatestReadingSmoothing {
+    enum Mode: String, CaseIterable {
+        case off, light, medium, strong
+
+        var isEnabled: Bool { self != .off }
+
+        var correction: (fraction: Double, maximum: Double) {
+            switch self {
+            case .off: return (0, 0)
+            case .light: return (0.25, 4)
+            case .medium: return (0.50, 8)
+            case .strong: return (0.75, 8)
+            }
+        }
+    }
+
+    struct LiveState: Codable, Equatable {
+        let readingID: String
+        let smoothedValue: Double?
+        var comparisonID: String? = nil
+        var comparisonValue: Double? = nil
+        var presentedValues: [String: Double] = [:]
+    }
+
+    static let stateKey = "latestReadingSmoothingState"
+    private static let stateLock = NSLock()
+    private static var savedLiveState = UserDefaults.standard.data(forKey: stateKey).flatMap {
+        try? JSONDecoder().decode(LiveState.self, from: $0)
+    }
+
+    /// Keep the current display decision and its short comparison history outside the readings database.
+    static var liveState: LiveState? {
+        get {
+            stateLock.lock()
+            defer { stateLock.unlock() }
+            return savedLiveState
+        }
+        set {
+            stateLock.lock()
+            defer { stateLock.unlock() }
+            guard savedLiveState != newValue else { return }
+
+            savedLiveState = newValue
+            if let newValue, let encoded = try? JSONEncoder().encode(newValue) {
+                UserDefaults.standard.set(encoded, forKey: stateKey)
+            } else {
+                UserDefaults.standard.removeObject(forKey: stateKey)
+            }
+        }
+    }
+
+    struct Sample {
+        let date: Date
+        let value: Double
+    }
+
+    // Allow for small timing variations around the nominal five-minute cadence.
+    private static let timingTolerance: TimeInterval = 60
+    private static let lookback: TimeInterval = 15 * 60 + timingTolerance
+    static let confirmationLookback: TimeInterval = 20 * 60 + timingTolerance
+    private static let minimumHistory: TimeInterval = 10 * 60 - timingTolerance
+    private static let minimumNoiseBand = 8.0
+
+    /// Uses measurements only. A second departure in the same direction confirms a new level.
+    static func value(for current: Sample, previous: [Sample], mode: Mode = .medium) -> Double {
+        guard mode.isEnabled, current.value.isFinite, current.value > 0 else { return current.value }
+
+        var samples = [Sample]()
+        for sample in previous.reversed() {
+            let interval = current.date.timeIntervalSince(sample.date)
+            guard interval <= confirmationLookback else { break }
+            guard interval > 0, sample.value.isFinite, sample.value > 0,
+                  samples.last?.date != sample.date else { continue }
+            samples.append(sample)
+        }
+        samples.reverse()
+
+        if let last = samples.last,
+           let previousDeviation = deviation(for: last, samples: Array(samples.dropLast())),
+           abs(previousDeviation.residual) > previousDeviation.noiseBand,
+           let currentDeviation = deviation(for: current, samples: Array(samples.dropLast()), window: confirmationLookback) {
+            if abs(currentDeviation.residual) > currentDeviation.noiseBand,
+               currentDeviation.residual.sign == previousDeviation.residual.sign {
+                return current.value
+            }
+
+            // A previously isolated outlier should not pull the estimate toward itself.
+            return correctedValue(current.value, deviation: currentDeviation, mode: mode)
+        }
+
+        guard let estimate = deviation(for: current, samples: samples) else { return current.value }
+        return correctedValue(current.value, deviation: estimate, mode: mode)
+    }
+
+    private static func correctedValue(_ value: Double, deviation: (residual: Double, noiseBand: Double), mode: Mode) -> Double {
+        let excess = max(0, abs(deviation.residual) - deviation.noiseBand)
+        let (fraction, maximum) = mode.correction
+        let correction = min(maximum, excess * fraction)
+        return value - (deviation.residual < 0 ? -correction : correction)
+    }
+
+    private static func deviation(for current: Sample, samples: [Sample], window: TimeInterval = lookback) -> (residual: Double, noiseBand: Double)? {
+        let samples = samples.filter { current.date.timeIntervalSince($0.date) <= window }
+        guard samples.count >= 3, let first = samples.first, let last = samples.last,
+              last.date.timeIntervalSince(first.date) >= minimumHistory else { return nil }
+
+        let gaps = zip(samples, samples.dropFirst()).map { $1.date.timeIntervalSince($0.date) }
+        let cadence = median(gaps)
+        guard cadence > 0, current.date.timeIntervalSince(last.date) <= 2 * cadence,
+              gaps.allSatisfy({ $0 <= 2 * cadence }) else { return nil }
+
+        var slopes = [Double]()
+        for (index, sample) in samples.enumerated() {
+            for later in samples.dropFirst(index + 1) {
+                slopes.append((later.value - sample.value) / later.date.timeIntervalSince(sample.date))
+            }
+        }
+
+        let slope = median(slopes)
+        let projections = samples.map { $0.value + slope * current.date.timeIntervalSince($0.date) }
+        let prediction = median(projections)
+        let deviation = median(projections.map { abs($0 - prediction) })
+        return (current.value - prediction, max(minimumNoiseBand, 3 * 1.4826 * deviation))
+    }
+
+    private static func median(_ values: [Double]) -> Double {
+        let sorted = values.sorted()
+        return (sorted[(sorted.count - 1) / 2] + sorted[sorted.count / 2]) / 2
     }
 }

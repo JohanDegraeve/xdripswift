@@ -28,6 +28,8 @@ struct DirectWatchSetupView: View {
     @State private var unavailableReason: String?
     @State private var statusNow = Date()
     @State private var watchPaused = false
+    @State private var cloudUploadEnabled = false
+    @State private var showActivationAdvice = false
     @State private var lastConnectedAt: Date?
     @State private var lastCollectedAt: Date?
 
@@ -68,25 +70,7 @@ struct DirectWatchSetupView: View {
                 }
             }
 
-            Section {
-                ForEach(enabled ? [Int(configuration?.slot ?? UInt8(selectedSlot))] : Array(1...3), id: \.self) { slot in
-                    if enabled {
-                        slotRow(slot)
-                            .accessibilityLabel(String(format: TextsDirectWatch.selectedFormat, slotTitle(slot)))
-                    } else {
-                        Button { selectedSlot = slot } label: { slotRow(slot).contentShape(Rectangle()) }
-                            .buttonStyle(.plain)
-                            .disabled(!slotIsAvailable(slot))
-                            .accessibilityLabel(selectedSlot == slot && slotIsAvailable(slot) ? String(format: TextsDirectWatch.selectedFormat, "\(slotTitle(slot)), \(slotDetail(slot))") : "\(slotTitle(slot)), \(slotDetail(slot))")
-                    }
-                }
-            } header: {
-                Text(TextsDirectWatch.bluetoothSlot)
-            } footer: {
-                if !enabled {
-                    Text(TextsDirectWatch.separateSlots)
-                }
-            }
+            slotSelectionSection
 
             if !enabled {
                 Section {
@@ -112,9 +96,28 @@ struct DirectWatchSetupView: View {
                 }
             }
 
+            if enabled {
+                Section {
+                    Toggle(TextsDirectWatch.cloudUpload, isOn: Binding(get: { cloudUploadEnabled }, set: {
+                        UserDefaults.standard.set($0, forKey: DirectWatchUploadSettings.enabledKey)
+                        if $0 { UserDefaults.standard.set(Date(), forKey: DirectWatchUploadSettings.enabledSinceKey) }
+                        NotificationCenter.default.post(name: DirectWatchUploadSettings.changed, object: nil)
+                        reload()
+                    }))
+                    if cloudUploadEnabled {
+                        cloudUploadStatusRow(Texts_SettingsView.sectionTitleNightscout, isEnabled: nightscoutAvailable)
+                        cloudUploadStatusRow(Texts_SettingsView.sectionTitleDexcomShareUpload, isEnabled: dexcomShareAvailable)
+                    }
+                } header: {
+                    Label(TextsDirectWatch.uploadReadings, systemImage: "icloud.and.arrow.up")
+                } footer: {
+                    Text(TextsDirectWatch.cloudUploadAdvice)
+                }
+            }
+
             Section {
                 NavigationLink(TextsDirectWatch.testingLogs) {
-                    DirectWatchConnectionToolsView(transmitterID: context.transmitterID)
+                    DirectWatchConnectionToolsView(transmitterID: context.transmitterID, family: context.family)
                 }
             }
 
@@ -143,6 +146,11 @@ struct DirectWatchSetupView: View {
         .onReceive(NotificationCenter.default.publisher(for: DirectWatchSettings.statusChanged)) { _ in reload() }
         .onReceive(Timer.publish(every: 5, on: .main, in: .common).autoconnect()) { _ in reload() }
         .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { statusNow = $0 }
+        .alert(TextsDirectWatch.title, isPresented: $showActivationAdvice) {
+            Button(Texts_Common.Ok, role: .cancel) { showPairingGuidance = true }
+        } message: {
+            Text(TextsDirectWatch.activationAdvice)
+        }
         .alert(TextsDirectWatch.added, isPresented: $showPairingGuidance) {
             Button(Texts_Common.Ok, role: .cancel) {}
         } message: {
@@ -161,31 +169,84 @@ struct DirectWatchSetupView: View {
             Text(TextsDirectWatch.watchSlotWarning)
         }
     }
-
-    private func slotIsAvailable(_ slot: Int) -> Bool { availableSlots.contains(slot) }
-
-    private func slotRow(_ slot: Int) -> some View {
-        HStack(spacing: 10) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(slotTitle(slot))
-                    .foregroundStyle(slotIsAvailable(slot) ? Color.primary : .secondary)
-                Text(slotDetail(slot))
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+    private var slotSelectionSection: some View {
+        Section {
+            ForEach(enabled ? [Int(configuration?.slot ?? UInt8(selectedSlot))] : Array(1...3), id: \.self) { slot in
+                slotSelectionRow(slot)
             }
-            Spacer(minLength: 4)
-            if enabled {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-            } else {
-                Image(systemName: slotIsAvailable(slot)
-                      ? (selectedSlot == slot ? "checkmark.circle.fill" : "circle") : "minus")
-                    .foregroundStyle(slotIsAvailable(slot) && selectedSlot == slot ? Color.green : .secondary)
+        } header: {
+            Text(TextsDirectWatch.bluetoothSlot)
+        } footer: {
+            if !enabled {
+                Text(TextsDirectWatch.separateSlots)
             }
         }
-        .frame(minHeight: 36)
     }
 
+    private var nightscoutAvailable: Bool {
+        let defaults = UserDefaults.standard
+        let destination = DirectWatchNightscoutConfiguration.normalizedDestination(
+            defaults.nightscoutUrl?.trimmingCharacters(in: .whitespacesAndNewlines), port: defaults.nightscoutPort)
+        let apiKey = defaults.nightscoutAPIKey?.trimmingCharacters(in: .whitespacesAndNewlines).toNilIfLength0()
+        let token = defaults.nightscoutToken?.trimmingCharacters(in: .whitespacesAndNewlines).toNilIfLength0()
+        return cloudUploadEnabled && defaults.dataFlowPolicy.exportsGlucoseToNightscout
+            && destination != nil && (apiKey != nil || token != nil)
+    }
+
+    private var dexcomShareAvailable: Bool {
+        let defaults = UserDefaults.standard
+        func hasValue(_ value: String?) -> Bool {
+            value?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+        }
+        return cloudUploadEnabled && defaults.uploadReadingstoDexcomShare && defaults.isMaster
+            && hasValue(defaults.dexcomShareAccountName)
+            && defaults.dexcomSharePassword?.isEmpty == false
+            && hasValue(defaults.dexcomShareUploadSerialNumber)
+    }
+
+    private func cloudUploadStatusRow(_ title: String, isEnabled: Bool) -> some View {
+        let active = isEnabled && !watchPaused && unavailableReason == nil
+        let detail = active ? Texts_Common.enabled
+            : isEnabled && watchPaused ? TextsDirectWatch.pausedShort : Texts_Common.disabled
+        return HStack(spacing: 8) {
+            Text(title)
+            Spacer()
+            SettingsIndicatorView(indicator: SettingsIndicator(
+                color: active ? .green : .gray,
+                accessibilityLabel: detail))
+            Text(detail)
+                .foregroundStyle(active ? ConstantsAppColors.rowDetailText : ConstantsAppColors.disabledText)
+        }
+        .accessibilityElement(children: .combine)
+    }
+    private func slotSelectionRow(_ slot: Int) -> DirectWatchSlotSelectionRow {
+        let title = slotTitle(slot)
+        let detail = slotDetail(slot)
+        let isAvailable = slotIsAvailable(slot)
+        let description = title.appending(", ").appending(detail)
+        let selectedLabel = String(format: TextsDirectWatch.selectedFormat, title)
+        let accessibilityLabel: String
+
+        if enabled {
+            accessibilityLabel = selectedLabel
+        } else if selectedSlot == slot && isAvailable {
+            accessibilityLabel = String(format: TextsDirectWatch.selectedFormat, description)
+        } else {
+            accessibilityLabel = description
+        }
+
+        return DirectWatchSlotSelectionRow(
+            title: title,
+            detail: detail,
+            isAvailable: isAvailable,
+            isSelected: selectedSlot == slot,
+            isConfigured: enabled,
+            accessibilityLabel: accessibilityLabel,
+            selectedAccessibilityLabel: selectedLabel,
+            onSelect: { selectedSlot = slot }
+        )
+    }
+    private func slotIsAvailable(_ slot: Int) -> Bool { availableSlots.contains(slot) }
     // The glucose clock controls status, while resume/connection time controls the counter.
     private var statusBanner: DirectWatchStatusBanner {
         let reading = lastCollectedAt.flatMap { date in
@@ -222,6 +283,7 @@ struct DirectWatchSetupView: View {
         lastCollectedAt = UserDefaults.standard.object(forKey: DirectWatchSettings.lastCollectedDateKey) as? Date
         unavailableReason = UserDefaults.standard.string(forKey: DirectWatchSettings.unavailableReasonKey)
         configuration = DirectWatchSettings.configuration
+        cloudUploadEnabled = UserDefaults.standard.bool(forKey: DirectWatchUploadSettings.enabledKey)
         watchPaused = enabled && DirectWatchSettings.watchIsPaused
         if enabled { selectedSlot = Int(configuration?.slot ?? 1) }
     }
@@ -235,84 +297,129 @@ struct DirectWatchSetupView: View {
                                                 deviceName: context.deviceName)
         guard configuration.isValid(phoneSlot: context.phoneSlot) else { return }
         DirectWatchSettings.save(configuration)
-        showPairingGuidance = true
+        showActivationAdvice = true
         reload()
     }
 }
 
+private struct DirectWatchSlotSelectionRow: View {
+    let title: String
+    let detail: String
+    let isAvailable: Bool
+    let isSelected: Bool
+    let isConfigured: Bool
+    let accessibilityLabel: String
+    let selectedAccessibilityLabel: String
+    let onSelect: () -> Void
+
+    @ViewBuilder
+    var body: some View {
+        if isConfigured {
+            row.accessibilityLabel(selectedAccessibilityLabel)
+        } else {
+            Button(action: onSelect) { row }
+                .buttonStyle(.plain)
+                .disabled(!isAvailable)
+                .accessibilityLabel(accessibilityLabel)
+        }
+    }
+
+    private var row: some View {
+        HStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .foregroundStyle(isAvailable ? Color.primary : Color.secondary)
+                if !isConfigured {
+                    Text(detail)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Spacer(minLength: 4)
+            if isConfigured {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+            } else {
+                Image(systemName: isAvailable ? (isSelected ? "checkmark.circle.fill" : "circle") : "minus")
+                    .foregroundStyle(isAvailable && isSelected ? Color.green : Color.secondary)
+            }
+        }
+        .frame(minHeight: 36)
+        .contentShape(Rectangle())
+    }
+}
 private struct DirectWatchConnectionToolsView: View {
     let transmitterID: String
+    let family: DirectWatchTransmitterFamily
     @State private var watchStatus = TextsDirectWatch.openForStatus
     @State private var watchStatusDate: Date?
     @State private var phonePaused = false
+    @State private var readingSyncBlocked = false
     @State private var hasLogs = false
     @State private var lastLogsReceivedAt: Date?
     @State private var waitingForLogs = false
     @State private var logsFailed = false
-    @State private var requestFeedback: Bool?
+    @State private var requestThrottled = false
     @State private var highlightedReceipt: Date?
     @ScaledMetric(relativeTo: .body) private var logActionIconSize: CGFloat = 18
 
+    private var watchCollectionIsActive: Bool {
+        DirectWatchSettings.watchCollectionIsActive(for: transmitterID, family: family)
+    }
+
     var body: some View {
         Form {
-            Section(TextsDirectWatch.watchStatus) {
+            Section {
                 Text(watchStatus)
+            } header: {
+                Text(TextsDirectWatch.watchStatus)
+            } footer: {
                 if let watchStatusDate {
                     Text(String(format: TextsDirectWatch.receivedFormat, watchStatusDate.formatted(date: .abbreviated, time: .shortened)))
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
                 }
-                Text(TextsDirectWatch.checkInstalled)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
             }
-            Section(TextsDirectWatch.testingDiagnosis) {
-                if DirectWatchSettings.configuration?.transmitterID == transmitterID {
-                    Toggle(isOn: Binding(get: { phonePaused }, set: {
-                        DirectWatchSettings.pausePhone($0, transmitterID: transmitterID)
-                        reload()
-                    })) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(TextsDirectWatch.pausePhone)
-                            Text(TextsDirectWatch.forTesting)
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
+            Section {
+                Toggle(TextsDirectWatch.pausePhone, isOn: Binding(get: { phonePaused }, set: {
+                    DirectWatchSettings.pausePhone($0, transmitterID: transmitterID)
+                    reload()
+                }))
+                .disabled(!watchCollectionIsActive)
+            } header: {
+                Text(TextsDirectWatch.testingDiagnosis)
+            } footer: {
+                Text(TextsDirectWatch.phoneCollectionAdvice)
+            }
+            Section {
+                Toggle(TextsDirectWatch.blockPhoneSync, isOn: Binding(get: { readingSyncBlocked }, set: {
+                    DirectWatchSettings.blockReadingImport($0)
+                    reload()
+                }))
+                .disabled(!watchCollectionIsActive)
+            } footer: {
+                Text(TextsDirectWatch.blockPhoneSyncAdvice)
             }
             Section(TextsDirectWatch.logs) {
                 Button {
-                    requestFeedback = true
+                    requestThrottled = true
+                    waitingForLogs = true
+                    logsFailed = false
                     NotificationCenter.default.post(name: DirectWatchSettings.requestLogs, object: nil)
                 } label: {
-                    logActionLabel(
-                        requestFeedback.map { $0 ? TextsDirectWatch.requestQueued : TextsDirectWatch.tryAgain } ?? TextsDirectWatch.getLogs,
-                        symbol: requestFeedback.map { $0 ? "checkmark" : "exclamationmark.circle" } ?? "arrow.down.circle",
-                        iconColor: requestFeedback.map { $0 ? Color.green : .red } ?? ConstantsAppColors.navigationTint)
+                    logActionLabel(TextsDirectWatch.getLogs,
+                        symbol: logsFailed ? "exclamationmark.circle" : "arrow.down.circle",
+                        iconColor: logsFailed ? .red : ConstantsAppColors.navigationTint)
                 }
-                .disabled(requestFeedback != nil)
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Text(TextsDirectWatch.lastLogsReceived)
-                            .foregroundStyle(ConstantsAppColors.rowTitleText)
-                        Spacer(minLength: 8)
+                .disabled(requestThrottled)
+                .accessibilityHint(Text(logsFailed ? TextsDirectWatch.logsFailed : ""))
+                HStack {
+                    Text(TextsDirectWatch.lastLogsReceived)
+                        .foregroundStyle(ConstantsAppColors.rowTitleText)
+                    Spacer(minLength: 8)
+                    HStack(spacing: 6) {
+                        if waitingForLogs { ProgressView().controlSize(.small) }
                         Text(lastLogsReceivedAt?.toStringInUserLocale(timeStyle: .short, dateStyle: .short) ?? "-")
                             .foregroundStyle(highlightedReceipt != nil ? Color.green : ConstantsAppColors.rowDetailText)
                             .multilineTextAlignment(.trailing)
-                    }
-                    if waitingForLogs {
-                        HStack(spacing: 6) {
-                            ProgressView().controlSize(.small)
-                            Text(TextsDirectWatch.waitingForLogs)
-                        }
-                        .font(.footnote)
-                        .foregroundStyle(ConstantsAppColors.rowDetailText)
-                    }
-                    if logsFailed {
-                        Text(TextsDirectWatch.logsFailed)
-                            .font(.footnote)
-                            .foregroundStyle(.red)
                     }
                 }
                 if hasLogs {
@@ -329,6 +436,7 @@ private struct DirectWatchConnectionToolsView: View {
         .colorScheme(.dark)
         .navigationTitle(TextsDirectWatch.testingLogs)
         .onAppear(perform: reload)
+        .onReceive(NotificationCenter.default.publisher(for: DirectWatchSettings.changed)) { _ in reload() }
         .onReceive(NotificationCenter.default.publisher(for: DirectWatchSettings.statusChanged)) { _ in reload() }
         .onReceive(NotificationCenter.default.publisher(for: DirectWatchSettings.logsChanged)) { _ in
             let previous = lastLogsReceivedAt
@@ -338,24 +446,24 @@ private struct DirectWatchConnectionToolsView: View {
             }
         }
         .onReceive(Timer.publish(every: 5, on: .main, in: .common).autoconnect()) { _ in reload() }
-        .task(id: requestFeedback) {
-            guard requestFeedback != nil else { return }
+        .task(id: requestThrottled) {
+            guard requestThrottled else { return }
             do {
                 try await Task.sleep(nanoseconds: 2_000_000_000)
-                requestFeedback = nil
+                requestThrottled = false
             } catch { }
         }
         .task(id: highlightedReceipt) {
             guard highlightedReceipt != nil else { return }
             do {
-                try await Task.sleep(nanoseconds: 2_000_000_000)
+                try await Task.sleep(nanoseconds: 10_000_000_000)
                 highlightedReceipt = nil
             } catch { }
         }
     }
 
     // ShareLink's automatic Label style gives its symbol a different size and text inset.
-    // Both actions, including request feedback, use one scalable icon box and spacing.
+    // Both actions use one scalable icon box and spacing.
     private func logActionLabel(_ title: String, symbol: String, iconColor: Color = ConstantsAppColors.navigationTint) -> some View {
         HStack(spacing: 8) {
             Image(systemName: symbol)
@@ -369,6 +477,7 @@ private struct DirectWatchConnectionToolsView: View {
     }
 
     private func reload() {
+        readingSyncBlocked = DirectWatchSettings.readingImportBlocked
         phonePaused = DirectWatchSettings.phoneIsPaused(transmitterID)
         hasLogs = FileManager.default.fileExists(atPath: DirectWatchSettings.receivedLogURL.path)
         // Existing exports predate receipt tracking. Their file date provides a useful
@@ -377,7 +486,6 @@ private struct DirectWatchConnectionToolsView: View {
             ?? (try? FileManager.default.attributesOfItem(atPath: DirectWatchSettings.receivedLogURL.path)[.modificationDate] as? Date)
         waitingForLogs = UserDefaults.standard.object(forKey: DirectWatchSettings.logsRequestedDateKey) is Date
         logsFailed = UserDefaults.standard.bool(forKey: DirectWatchSettings.logsFailedKey)
-        if logsFailed && requestFeedback != nil { requestFeedback = false }
         if let status = UserDefaults.standard.string(forKey: DirectWatchSettings.lastStatusKey),
            let date = UserDefaults.standard.object(forKey: DirectWatchSettings.lastStatusDateKey) as? Date {
             // The pending delimiter is a wire-format field. Only its visible heading is localized.

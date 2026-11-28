@@ -40,11 +40,18 @@ struct RootView: View {
                 .modifier(DirectWatchCollectionGesture())
                 .tag(WatchAppPage.bigNumber.rawValue)
 
-            DirectWatchCollectionView(collector: watchState.directWatchCollector, onCollectedReadings: onCollectedReadings, onAlerts: onAlerts)
-                .tag(WatchAppPage.directWatch.rawValue)
+            if watchState.watchCollectionViewAvailable {
+                DirectWatchCollectionView(collector: watchState.directWatchCollector, onCollectedReadings: onCollectedReadings, onAlerts: onAlerts)
+                    .tag(WatchAppPage.directWatch.rawValue)
+            }
         }
         .modifier(RootViewTabViewStyleModifier())
         .environmentObject(watchState)
+        .onChange(of: watchState.watchCollectionViewAvailable) { _, available in
+            if !available && selectedPage == WatchAppPage.directWatch.rawValue {
+                selectedPage = WatchAppPage.main.rawValue
+            }
+        }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 watchState.directWatchCollector.foreground()
@@ -67,7 +74,8 @@ struct RootView: View {
                 }
             }
             // if a saved tab value from an older build is invalid, fall back to the normal main page
-            if WatchAppPage(rawValue: selectedPage) == nil {
+            if WatchAppPage(rawValue: selectedPage) == nil
+                || (!watchState.watchCollectionViewAvailable && selectedPage == WatchAppPage.directWatch.rawValue) {
                 selectedPage = WatchAppPage.main.rawValue
             }
         }

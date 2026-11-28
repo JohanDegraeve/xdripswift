@@ -179,7 +179,8 @@ class BgPostProcessingManager {
                 forSensor: nil,
                 ignoreRawData: true,
                 ignoreCalculatedValue: true,
-                includingSuppressed: true
+                includingSuppressed: true,
+                includingStartDate: true
             ).reversed()
         )
 
@@ -192,7 +193,7 @@ class BgPostProcessingManager {
             statesBeforeProcessing[bgReading.objectID] = BgReadingStateBeforeProcessing(
                 adjustedValue: bgReading.adjustedValue,
                 smoothedValue: bgReading.smoothedValue,
-                finalValue: bgReading.finalValue,
+                finalValue: bgReading.historicalValue,
                 isSuppressedByFiveMinuteCadence: bgReading.isSuppressedByFiveMinuteCadence,
                 calculatedValueSlope: bgReading.calculatedValueSlope,
                 hideSlope: bgReading.hideSlope
@@ -203,7 +204,6 @@ class BgPostProcessingManager {
 
         if shouldRecomputePostProcessing, let sourceContextIdentifier = sourceContextIdentifier {
             recomputeAdjustedValues(bgReadings: bgReadings, sourceContextIdentifier: sourceContextIdentifier)
-            recomputeSmoothedValues(bgReadings: bgReadings)
             recomputeFiveMinuteCadenceSuppression(
                 bgReadings: bgReadings,
                 fiveMinuteReadingsStartTimeStampOverride: fiveMinuteReadingsStartTimeStampOverride,
@@ -211,9 +211,14 @@ class BgPostProcessingManager {
             )
         }
 
-        recomputeSlopes(bgReadings: bgReadings)
+        let latestVisibleBgReading = bgReadings.last(where: { !$0.isSuppressedByFiveMinuteCadence && $0.calculatedValue > 0 })
+        if shouldRecomputePostProcessing {
+            recomputeSmoothedValues(bgReadings: bgReadings, latestVisibleReading: latestVisibleBgReading)
+        }
+        let refreshedLatestSlope = refreshLiveReading(latest: latestVisibleBgReading, currentSensor: currentSensor)
+        // The live slope can use readings from before the selected rewrite window.
+        recomputeSlopes(bgReadings: bgReadings, preservingSlopeFor: refreshedLatestSlope ? latestVisibleBgReading : nil)
 
-        let latestVisibleBgReading = bgReadings.last(where: { !$0.isSuppressedByFiveMinuteCadence })
         let shouldProcessDownstream = downstreamGate.shouldProcess(currentVisibleReadingTimeStamp: latestVisibleBgReading?.timeStamp)
         let automaticRewriteStartDate = latestVisibleBgReading?.timeStamp.addingTimeInterval(-ConstantsBgSmoothing.automaticDownstreamRewriteLookbackInterval)
 
@@ -253,7 +258,7 @@ class BgPostProcessingManager {
 
             // include slope-only changes so older downstream entries do not keep a different trend
             let change = BgReadingDownstreamChange(
-                finalValueChanged: stateBeforeProcessing == nil ? true : abs(stateBeforeProcessing!.finalValue - bgReading.finalValue) > 0.001,
+                finalValueChanged: stateBeforeProcessing == nil ? true : abs(stateBeforeProcessing!.finalValue - bgReading.historicalValue) > 0.001,
                 suppressionChanged: stateBeforeProcessing == nil ? true : stateBeforeProcessing!.isSuppressedByFiveMinuteCadence != bgReading.isSuppressedByFiveMinuteCadence,
                 trendChanged: stateBeforeProcessing == nil ? true : abs(stateBeforeProcessing!.calculatedValueSlope - bgReading.calculatedValueSlope) > 0.0000001 || stateBeforeProcessing!.hideSlope != bgReading.hideSlope
             )
@@ -267,12 +272,13 @@ class BgPostProcessingManager {
 
         let bgReadingsToReplaceDownstream: [BgReading]
         if shouldRewriteFullDownstreamWindow {
-            bgReadingsToReplaceDownstream = bgReadings.filter { !$0.isSuppressedByFiveMinuteCadence }
+            bgReadingsToReplaceDownstream = bgReadings.filter { $0.calculatedValue > 0 && !$0.isSuppressedByFiveMinuteCadence && $0.objectID != latestVisibleBgReading?.objectID }
         } else if let latestVisibleBgReading = latestVisibleBgReading, let automaticRewriteStartDate = automaticRewriteStartDate {
             let automaticRewriteCandidates = bgReadings.filter { bgReading in
                 return bgReading.timeStamp >= automaticRewriteStartDate
                     && bgReading.objectID != latestVisibleBgReading.objectID
                     && !bgReading.isSuppressedByFiveMinuteCadence
+                    && bgReading.calculatedValue > 0
             }
 
             if UserDefaults.standard.enableSmoothing {
@@ -371,6 +377,10 @@ class BgPostProcessingManager {
         // Source-specific processing must not leak into a new master sensor session
         // or a different follower stream. Reset the entire editing state so any
         // new source starts from neutral values and disabled post processing.
+        LatestReadingSmoothing.liveState = nil
+        UserDefaults.standard.latestReadingSmoothingMode = .off
+        UserDefaults.standard.removeObject(forKey: UserDefaults.Key.latestReadingSmoothingStrength.rawValue)
+        UserDefaults.standard.removeObject(forKey: UserDefaults.Key.bgAdjustmentEditingPreferences.rawValue)
         UserDefaults.standard.enableAdjustment = false
         updateSmoothingSettings(enableSmoothing: false, useFiveMinuteReadings: ConstantsBgSmoothing.defaultUseFiveMinuteReadings, smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: ConstantsBgSmoothing.defaultSmoothingStrength, smoothingAlgorithm: ConstantsBgSmoothing.defaultSmoothingAlgorithm)
         UserDefaults.standard.fiveMinuteReadingsStartTimeStamp = nil
@@ -390,6 +400,24 @@ class BgPostProcessingManager {
         }
 
         return bgReadingsAccessor.getLatestBgReadings(limit: 1, fromDate: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).first?.timeStamp ?? Date()
+    }
+
+    struct AdjustmentEditingPreferences: Codable {
+        var offset: Double = 0
+        var scale: Double = 1
+        var shape: BgAdjustmentShapeType.RawValue = ConstantsBgAdjustment.defaultShapeType.rawValue
+    }
+
+    var postProcessingEditingSource: String? { currentSourceContextIdentifier() }
+
+    var adjustmentEditingPreferences: AdjustmentEditingPreferences {
+        guard let source = currentSourceContextIdentifier(),
+              source == UserDefaults.standard.postProcessingSourceContextIdentifier,
+              let data = UserDefaults.standard.data(forKey: UserDefaults.Key.bgAdjustmentEditingPreferences.rawValue),
+              let settings = try? JSONDecoder().decode(AdjustmentEditingPreferences.self, from: data) else {
+            return AdjustmentEditingPreferences()
+        }
+        return settings
     }
 
     func latestActiveBgAdjustment() -> BgAdjustment? {
@@ -479,11 +507,13 @@ class BgPostProcessingManager {
     }
 
     @discardableResult
-    func applyPostProcessing(enableGlucoseAdjustment: Bool, enableCurveAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, applyFromTimeStamp: Date, isBasicAdjustment: Bool, enteredBgValue: Double?, sourceCalculatedValue: Double?, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingPeriodInMinutes: Int, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm, processingStartDateOverride: Date? = nil, troubleshootingApplyRange: TroubleshootingPostProcessingApplyRange = .now, acknowledgedWarnings: [TroubleshootingPostProcessingWarning] = []) -> Bool {
+    func applyPostProcessing(enableGlucoseAdjustment: Bool, enableCurveAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, applyFromTimeStamp: Date, isBasicAdjustment: Bool, enteredBgValue: Double?, sourceCalculatedValue: Double?, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingPeriodInMinutes: Int, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm, processingStartDateOverride: Date? = nil, troubleshootingApplyRange: TroubleshootingPostProcessingApplyRange = .now, acknowledgedWarnings: [TroubleshootingPostProcessingWarning] = [], latestReadingSmoothingMode: LatestReadingSmoothing.Mode? = nil) -> Bool {
         let allowsAdjustment = shouldAllowBgAdjustmentForCurrentSource()
         let enableAdjustment = allowsAdjustment && (enableGlucoseAdjustment || enableCurveAdjustment)
         let slope = enableCurveAdjustment ? slope : 1.0
         let intercept = enableGlucoseAdjustment ? intercept : 0.0
+
+        if latestReadingSmoothingMode?.isEnabled == true, currentSourceContextIdentifier() == nil { return false }
 
         // Reject the complete Apply operation before changing settings, history or downstream data.
         if enableAdjustment {
@@ -493,6 +523,24 @@ class BgPostProcessingManager {
                   currentSourceContextIdentifier() != nil else { return false }
         }
         trace("%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, applyPostProcessingDescription(enableAdjustment: enableAdjustment, slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: applyFromTimeStamp, enteredBgValue: enteredBgValue, sourceCalculatedValue: sourceCalculatedValue, enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm, processingStartDateOverride: processingStartDateOverride))
+
+        var editingPreferences = adjustmentEditingPreferences
+        if allowsAdjustment, let previous = latestActiveBgAdjustment() {
+            if UserDefaults.standard.enableGlucoseAdjustment, ConstantsBgAdjustment.isValidOffset(previous.intercept) {
+                editingPreferences.offset = previous.intercept
+            }
+            if UserDefaults.standard.enableCurveAdjustment {
+                editingPreferences.scale = previous.slope
+                editingPreferences.shape = previous.adjustmentShapeType
+            }
+        }
+        if allowsAdjustment && enableGlucoseAdjustment, let intercept {
+            editingPreferences.offset = intercept
+        }
+        if allowsAdjustment && enableCurveAdjustment, let slope {
+            editingPreferences.scale = slope
+            editingPreferences.shape = adjustmentShapeType.rawValue
+        }
 
         if enableAdjustment, let slope = slope, let intercept = intercept {
             createAdjustment(slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: applyFromTimeStamp, isBasicAdjustment: isBasicAdjustment, enteredBgValue: enteredBgValue, sourceCalculatedValue: sourceCalculatedValue)
@@ -517,13 +565,17 @@ class BgPostProcessingManager {
 
         updateSmoothingSettings(enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingPeriodInMinutes: smoothingPeriodInMinutes, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm)
 
+        if let latestReadingSmoothingMode {
+            UserDefaults.standard.latestReadingSmoothingMode = latestReadingSmoothingMode
+        }
+
         for warning in acknowledgedWarnings {
             switch warning {
             case .glucoseAdjustment where allowsAdjustment && enableGlucoseAdjustment:
                 recordPostProcessingWarningAcknowledgement(warning)
             case .curveAdjustment where allowsAdjustment && enableCurveAdjustment:
                 recordPostProcessingWarningAcknowledgement(warning)
-            case .glucoseSmoothing where enableSmoothing:
+            case .latestReadingSmoothing where latestReadingSmoothingMode?.isEnabled == true:
                 recordPostProcessingWarningAcknowledgement(warning)
             default:
                 break
@@ -540,6 +592,11 @@ class BgPostProcessingManager {
 
         _ = processBgReadings(processingStartDateOverride: rewriteStartDate, fiveMinuteReadingsStartTimeStampOverride: rewriteStartDate, allowHistoricalDownstreamRewrite: true)
         replacePostProcessingNote(enableAdjustment: enableAdjustment, slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: applyFromTimeStamp, enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingStrength: smoothingStrength, noteWindowStartDate: rewriteStartDate)
+
+        if allowsAdjustment, currentSourceContextIdentifier() != nil,
+           let data = try? JSONEncoder().encode(editingPreferences) {
+            UserDefaults.standard.set(data, forKey: UserDefaults.Key.bgAdjustmentEditingPreferences.rawValue)
+        }
 
         notifyBgPostProcessingDidUpdate()
         return true
@@ -910,31 +967,102 @@ class BgPostProcessingManager {
         UserDefaults.standard.bgSmoothingAlgorithm = smoothingAlgorithm
     }
 
-    private func recomputeSmoothedValues(bgReadings: [BgReading]) {
-        if !UserDefaults.standard.enableSmoothing {
-            for bgReading in bgReadings {
-                bgReading.smoothedValue = nil
-            }
+    /// Settings that affect the latest reading alone do not change the historical Apply From date.
+    func updateLatestReadingSmoothing(mode: LatestReadingSmoothing.Mode, acknowledgedWarning: Bool = false) -> Bool {
+        guard !mode.isEnabled || currentSourceContextIdentifier() != nil else { return false }
+        UserDefaults.standard.latestReadingSmoothingMode = mode
+        let sensor = UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
+        refreshLiveReading(latest: nil, currentSensor: sensor)
+        coreDataManager.saveChanges()
+        if mode.isEnabled && acknowledgedWarning {
+            recordPostProcessingWarningAcknowledgement(.latestReadingSmoothing)
+        }
+        notifyBgPostProcessingDidUpdate()
+        return true
+    }
 
-            return
+    func refreshLiveReadingForCurrentSource(notify: Bool = true) {
+        refreshSourceContext()
+        let sensor = UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
+        refreshLiveReading(latest: nil, currentSensor: sensor)
+        coreDataManager.saveChanges()
+        if notify { notifyBgPostProcessingDidUpdate() }
+    }
+
+    @discardableResult
+    private func refreshLiveReading(latest: BgReading?, currentSensor: Sensor?) -> Bool {
+        let defaults = UserDefaults.standard
+        if defaults.isMaster && currentSensor == nil {
+            LatestReadingSmoothing.liveState = nil
+            return false
+        }
+        let reading = latest ?? bgReadingsAccessor.getLatestBgReadings(
+            limit: 1, fromDate: startDateClampedToCurrentSensorSession(defaults.postProcessingStartTimeStamp, currentSensor: currentSensor),
+            forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false, includingStartDate: true
+        ).first
+
+        guard let reading else {
+            LatestReadingSmoothing.liveState = nil
+            return false
         }
 
-        // Preview and stored live values can diverge if they use different smoothing windows. Recompute the
-        // full fetched processing segment here so every automatic and historical
-        // pass uses the same smoothing scope.
-        let readingsToSmooth = bgReadings
+        reading.smoothedValue = nil
+        let previousState = LatestReadingSmoothing.liveState
+        let keepsLiveState = defaults.enableLatestReadingSmoothing || defaults.enableSmoothing
+        guard keepsLiveState || previousState != nil else { return false }
 
-        for bgReading in readingsToSmooth {
-            bgReading.smoothedValue = nil
+        let lookbackStart = reading.timeStamp.addingTimeInterval(-LatestReadingSmoothing.confirmationLookback)
+        let historyStart = max(lookbackStart, defaults.postProcessingStartTimeStamp ?? .distantPast)
+        let prior = bgReadingsAccessor.getLatestBgReadings(
+            limit: nil,
+            fromDate: startDateClampedToCurrentSensorSession(historyStart, currentSensor: currentSensor),
+            forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false, includingStartDate: true
+        ).filter { $0.timeStamp < reading.timeStamp && $0.calculatedValue > 0 }
+
+        if !keepsLiveState {
+            LatestReadingSmoothing.liveState = nil
+            (reading.calculatedValueSlope, reading.hideSlope) = reading.calculateSlope(lastBgReadings: prior)
+            return true
         }
 
-        traceAutomaticSmoothingConfigurationIfNeeded(bgReadings: readingsToSmooth)
+        var presentedValues = [String: Double]()
+        for candidate in prior {
+            presentedValues[candidate.id] = previousState?.presentedValues[candidate.id]
+        }
 
-        let inputValues = readingsToSmooth.map { valueToSmooth(bgReading: $0) }
-        let smoothedValues = smoothedValuesSeparatedByReadingGap(values: inputValues, readingDates: readingsToSmooth.map { $0.timeStamp }, smoothingStrength: UserDefaults.standard.bgSmoothingStrength)
+        let minimumTrendInterval = TimeInterval.minutes(Double(ConstantsBGGraphBuilder.minSlopeInMinutes))
+        let comparison = prior.first { reading.timeStamp.timeIntervalSince($0.timeStamp) >= minimumTrendInterval }
+        let comparisonValue = comparison.map { presentedValues[$0.id] ?? $0.baselineValue }
 
-        for readingIndex in 0..<readingsToSmooth.count {
-            readingsToSmooth[readingIndex].smoothedValue = NSNumber(value: smoothedValues[readingIndex])
+        let value = LatestReadingSmoothing.value(
+            for: .init(date: reading.timeStamp, value: reading.baselineValue),
+            previous: prior.reversed().map { .init(date: $0.timeStamp, value: $0.baselineValue) },
+            mode: defaults.latestReadingSmoothingMode
+        )
+
+        presentedValues[reading.id] = value
+        LatestReadingSmoothing.liveState = .init(
+            readingID: reading.id, smoothedValue: value == reading.baselineValue ? nil : value,
+            comparisonID: comparison?.id, comparisonValue: comparisonValue, presentedValues: presentedValues
+        )
+
+        let (slope, hidden) = reading.calculateSlope(lastBgReadings: prior)
+        reading.calculatedValueSlope = slope
+        reading.hideSlope = hidden
+        return true
+    }
+
+    private func recomputeSmoothedValues(bgReadings: [BgReading], latestVisibleReading: BgReading?) {
+        for reading in bgReadings {
+            reading.smoothedValue = nil
+        }
+        guard UserDefaults.standard.enableSmoothing else { return }
+
+        let readings = bgReadings.filter { $0.calculatedValue > 0 }
+        traceAutomaticSmoothingConfigurationIfNeeded(bgReadings: readings)
+        let values = smoothedValuesSeparatedByReadingGap(values: readings.map(\.baselineValue), readingDates: readings.map(\.timeStamp), smoothingStrength: UserDefaults.standard.bgSmoothingStrength)
+        for (reading, value) in zip(readings, values) where reading.objectID != latestVisibleReading?.objectID {
+            reading.smoothedValue = NSNumber(value: value)
         }
     }
 
@@ -1040,11 +1168,11 @@ class BgPostProcessingManager {
         return readingGapsInMinutes
     }
 
-    private func recomputeSlopes(bgReadings: [BgReading]) {
+    private func recomputeSlopes(bgReadings: [BgReading], preservingSlopeFor latestReading: BgReading?) {
         var previousVisibleBgReadings = [BgReading]()
         let maximumTimeInterval = TimeInterval(minutes: Double(ConstantsBGGraphBuilder.maxSlopeInMinutes))
 
-        for bgReading in bgReadings {
+        for bgReading in bgReadings where bgReading.objectID != latestReading?.objectID {
             if bgReading.isSuppressedByFiveMinuteCadence {
                 bgReading.calculatedValueSlope = 0.0
                 bgReading.hideSlope = true
@@ -1257,12 +1385,6 @@ class BgPostProcessingManager {
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: Notification.Name(ConstantsNotifications.NotificationIdentifierForBgPostProcessing.bgPostProcessingDidUpdate), object: nil)
         }
-    }
-
-    /// smoothing always runs after adjustment, so the smoothing input should
-    /// prefer adjusted values when they exist
-    private func valueToSmooth(bgReading: BgReading) -> Double {
-        return bgReading.adjustedValue?.doubleValue ?? bgReading.calculatedValue
     }
 
     private func smoothingSupport() -> BgSmoothingSupport {

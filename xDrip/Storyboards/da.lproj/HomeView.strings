@@ -74,6 +74,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "%@ tilbage";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Et Hampel-filter dæmper først enkeltstående afvigelser. Derefter udjævner Savitzky-Golay kurven og bevarer den overordnede form af toppe og dale.";
 
 "sensorManagementNoiseTitle" = "Sensorstøj";
 "sensorManagementNoiseShortTerm" = "Seneste 30 minutter";
@@ -114,7 +115,7 @@
 "sensorHealthPersistentNoiseTitle" = "Meget høj sensorstøj";
 "sensorHealthPersistentNoiseGuidance" = "Meget høj støj i 12 timer. Overvej at udskifte sensoren, hvis det fortsætter.";
 "sensorHealthFlatlineTitle" = "Sensorsignalet er fladt";
-"sensorHealthFlatlineGuidance" = "Målingerne har været uændrede i 30 minutter. Det betyder normalt, at sensoren er defekt/udløbet.";
+"sensorHealthFlatlineGuidance" = "Uændrede målinger i 30 min. Sensoren kan være defekt eller udløbet.";
 "sensorHealthTemporaryIssueTitle" = "Midlertidigt sensorproblem";
 "sensorHealthTemporaryIssueGuidance" = "Midlertidigt sensorproblem i 3 timer. Kontrollér med et blodsukkerapparat, og følg producentens vejledning.";
 "sensorHealthSensorFailedTitle" = "Sensorfejl";
@@ -173,6 +174,9 @@
 "sensorManufactureDate" = "Fremstillingsdato";
 "sensorExpirationDate" = "Udløbsdato";
 "sensorManagementWaitingForSensorStart" = "Venter på sensorstart";
+"sensorManagementTransmitterExpiredTitle" = "Senderen er udløbet";
+"sensorManagementTransmitterExpiredMessage" = "Denne sender er udløbet. En ny sensorsession kan ikke startes.";
+"sensorManagementAnubisRestartSuggestion" = "Genstart Anubis-senderen, før du prøver at starte en ny sensorsession.";
 "sensorManagementStatusWarmingUp" = "Varmer op";
 "sensorCodeContinue" = "Fortsæt";
 "useWithoutSensorCode" = "Brug uden kode";
@@ -202,3 +206,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Justering af forskydning og form er ikke tilgængelig, fordi denne CGM bruger sin egen kalibrering.";
 
 "postProcessingWarningAgreement" = "Tryk kun på OK, hvis du forstår denne funktion og accepterer at aktivere den.";
+
+"postProcessingPreviousReadings" = "Udjævn tidligere målinger";
+"postProcessingPreviousReadingsFooter" = "Udjævner tidligere målinger i grafen, når der kommer nye målinger. Den seneste måling påvirkes ikke.";
+"postProcessingLatestReading" = "Udjævn seneste måling";
+"postProcessingLatestReadingFooter" = "Dæmper uventede stigninger eller fald i den seneste glukosemåling ud fra de sidste 10–20 minutters målinger. Når funktionen er slået til, påvirker den kun den seneste måling.";
+"postProcessingLatestReadingOff" = "Fra";
+"postProcessingLatestReadingDisabled" = "Udjævning af seneste måling er slået fra";
+"postProcessingLatestReadingWarning" = "Udjævning af den seneste måling kan dæmpe eller forsinke visningen af reelle glukoseændringer og påvirke, hvornår glukosealarmer udløses. Den viste værdi kan afvige fra værdien for samme måling i andre apps.";
+
+"postProcessingOffset" = "Forskydning";
+"postProcessingCurve" = "Kurve";
+"postProcessingBoth" = "Begge";
+"postProcessingOffsetAndCurve" = "Forskydning og kurve";
+"postProcessingMode" = "Tilstand";
+"postProcessingUnavailable" = "Ikke tilgængelig";
+"postProcessingExpanded" = "Udvidet";
+"postProcessingCollapsed" = "Skjult";
+"postProcessingReferenceGlucose" = "Referenceglukose";
+"postProcessingEnterReferenceGlucose" = "Indtast referenceglukose";
+"postProcessingDecrease" = "Sænk %@";
+"postProcessingIncrease" = "Hæv %@";
+"postProcessingLight" = "Let";
+"postProcessingMedium" = "Mellem";
+"postProcessingStrong" = "Kraftig";
+"postProcessingCurveShape" = "Form";
+"postProcessingOffsetBgCheckHint" = "Én nylig blodsukkermåling anbefales";
+"postProcessingScaleBgCheckHint" = "To nylige blodsukkermålinger anbefales";

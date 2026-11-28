@@ -82,6 +82,9 @@ struct BluetoothPeripheralDetailView: View {
                                         }
                                         .accessibilityLabel("\(Texts_Common.enabled), \(watchStatus.title)")
                                     }
+                                } else {
+                                    Text(Texts_Common.disabled)
+                                        .foregroundStyle(ConstantsAppColors.rowDetailText)
                                 }
                             }
                         }

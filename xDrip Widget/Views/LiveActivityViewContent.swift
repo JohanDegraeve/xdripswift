@@ -169,13 +169,10 @@ struct LiveActivityViewContentState: View {
 
                     HStack(alignment: .center, spacing: 8) {
                         if let sensorNoiseIndicatorColor = state.sensorNoiseIndicatorColor() {
-                            Circle()
-                                .fill(sensorNoiseIndicatorColor)
-                                .frame(width: 8, height: 8)
-                                .overlay {
-                                    Circle()
-                                        .stroke(sensorNoiseIndicatorColor.opacity(0.35), lineWidth: 3)
-                                }
+                            SensorNoiseIndicatorView(
+                                color: sensorNoiseIndicatorColor,
+                                size: 18
+                            )
                         }
 
                         // Prefer the follower patient name when one is available.

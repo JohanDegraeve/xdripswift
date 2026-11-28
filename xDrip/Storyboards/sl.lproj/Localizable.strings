@@ -2,6 +2,7 @@
 
 // Direct to Watch status and pairing guidance
 "directWatchTitle" = "Neposredno na Watch";
+"directWatchActivationAdvice" = "Za prejemanje odčitkov z zbiranjem Neposredno na Watch mora biti aplikacija Watch %@ odprta na uri Apple Watch. Tudi takrat zbiranje ni zagotovljeno v vsakem ciklu. Uporabljajte previdno.";
 "directWatchNoConnection" = "Povezava ni dodana";
 "directWatchSuspended" = "Zbiranje začasno ustavljeno";
 "directWatchWaiting" = "Čakanje na odčitek z Watch";
@@ -36,10 +37,10 @@
 "directWatchMedicalSlot" = "Reža medicinske naprave";
 "directWatchWatchSlot" = "Reža Watch";
 "directWatchConfirmUnusedSlot" = "Prosta reža: poveži Watch";
-"directWatchSlotMedical" = "Reža 1 · Medicinska naprava";
-"directWatchSlotMobile" = "Reža 2 · Mobilna aplikacija";
-"directWatchSlotWatch" = "Reža 3 · Watch";
-"directWatchSlotAnubis" = "Reža 3 · Dodatna Anubis";
+"directWatchSlotMedical" = "Reža 1 (Medicinska naprava)";
+"directWatchSlotMobile" = "Reža 2 (Mobilna aplikacija)";
+"directWatchSlotWatch" = "Reža 3 (Watch)";
+"directWatchSlotAnubis" = "Reža 3 (Dodatna Anubis)";
 "directWatchUsedWatch" = "Uporablja ta Watch";
 "directWatchUsedPhone" = "Uporablja ta iPhone";
 "directWatchSlotMedicalDetail" = "Le če je brez črpalke ali sprejemnika";
@@ -49,7 +50,7 @@
 "directWatchAnubisOnly" = "Samo oddajniki Anubis";
 "directWatchWatchStatus" = "Stanje Watch";
 "directWatchTestingDiagnosis" = "Testiranje in diagnostika";
-"directWatchPausePhone" = "Začasno ustavi zbiranje BLE iPhone";
+"directWatchPausePhone" = "Onemogoči zbiranje na iPhonu";
 "directWatchForTesting" = "Za preizkus zbiranja Watch";
 "directWatchGetLogs" = "Pridobi dnevnike Watch";
 "directWatchShareLogs" = "Deli dnevnike Watch";
@@ -80,9 +81,15 @@
 /* Direct to Watch action feedback. */
 "directWatchTryAgain" = "Poskusi znova";
 "directWatchRequestQueued" = "Zahteva v čakalni vrsti";
-"directWatchLastLogsReceived" = "Zadnji prejeti dnevniki";
+"directWatchLastLogsReceived" = "Nazadnje prejeto";
 "directWatchWaitingForLogs" = "Čakanje na nove dnevnike…";
 "directWatchLogsFailed" = "Dnevnikov ni mogoče pridobiti. Poskusite znova.";
 
 /* Watch diagnostic log actions and receipt time. */
-"directWatchLogs" = "Dnevniki";
+"directWatchLogs" = "Dnevniki Watch";
+"directWatchUploadReadings" = "Pošiljanje odčitkov";
+"directWatchBlockPhoneSync" = "Onemogoči sinhronizacijo Watch";
+"directWatchPhoneCollectionAdvice" = "Onemogoči zbiranje odčitkov Bluetooth s tega oddajnika na iPhonu za preizkušanje zbiranja samo z uro Watch.";
+"directWatchBlockPhoneSyncAdvice" = "Onemogoči sinhronizacijo Watch ustavi sinhronizacijo odčitkov z ure Watch na iPhone, da lahko preizkusite pošiljanje z ure Watch, če je ta funkcija omogočena.";
+"directWatchCloudUpload" = "Dovoli nalaganje v oblak";
+"directWatchCloudUploadAdvice" = "Ko je možnost vklopljena, bo ura poskusila naložiti meritve v vsako nastavljeno storitev v oblaku, ko je na voljo internetna povezava.";

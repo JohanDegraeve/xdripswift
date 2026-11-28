@@ -166,3 +166,4 @@
 
 /* Status label, including Direct to Watch in Advanced Settings. */
 "common_enabled" = "已启用";
+"common_disabled" = "已禁用";

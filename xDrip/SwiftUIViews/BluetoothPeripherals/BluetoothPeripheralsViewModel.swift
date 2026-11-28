@@ -207,7 +207,8 @@ struct DexcomManualSensorCodeEntry {
                                     createANewOneIfNecesssary: false
                                 ),
                                 bluetoothPeripheral: bluetoothPeripheral
-                            )
+                            ),
+                            directWatchStatus: BluetoothPeripheralListRow.watchStatus(for: bluetoothPeripheral, at: .now)
                         )
                     )
                 }
@@ -391,6 +392,19 @@ struct BluetoothPeripheralListRow: Identifiable {
     let title: String
     let shouldConnect: Bool
     let connectionStatus: BluetoothPeripheralDisplayStatus
+    let directWatchStatus: DirectWatchReadingStatus?
+
+    // Capture Watch state in each refreshed row so SwiftUI also notices colour-only changes.
+    static func watchStatus(for peripheral: BluetoothPeripheral, at date: Date) -> DirectWatchReadingStatus? {
+        let family: DirectWatchTransmitterFamily
+        if peripheral is DexcomG7 { family = .g7 }
+        else if peripheral is DexcomG5 { family = .g6 }
+        else { return nil }
+        guard let configuration = DirectWatchSettings.configuration,
+              configuration.transmitterID == peripheral.blePeripheral.transmitterId,
+              configuration.transmitterFamily == family else { return nil }
+        return DirectWatchSettings.readingStatus(at: date)
+    }
 
     var id: String {
         bluetoothPeripheral.blePeripheral.address

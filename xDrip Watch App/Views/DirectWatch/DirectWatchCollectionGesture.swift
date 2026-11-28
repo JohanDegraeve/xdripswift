@@ -11,18 +11,49 @@ import SwiftUI
 /// Add triple tap alongside the glucose views' existing double-tap and chart gestures.
 struct DirectWatchCollectionGesture: ViewModifier {
     @EnvironmentObject private var watchState: WatchStateModel
+    func body(content: Content) -> some View {
+        content
+            .contentShape(Rectangle())
+            .simultaneousGesture(
+                TapGesture(count: 3).onEnded {
+                    let collector = watchState.directWatchCollector
+                    guard watchState.watchCollectionViewAvailable else { return }
+                    collector.setPaused(!collector.isPaused)
+                }
+            )
+    }
+}
+
+/// One overlay above the navigation stack covers every collection-control entry point.
+struct DirectWatchCollectionFeedback: ViewModifier {
+    @ObservedObject var collector: DirectWatchCollector
+    @Environment(\.scenePhase) private var scenePhase
     @State private var feedbackSymbol: String?
+    @State private var feedbackIsPaused = false
     @State private var feedbackID = UUID()
     @State private var feedbackScale: CGFloat = 0.7
     @State private var feedbackOpacity: Double = 0
 
     func body(content: Content) -> some View {
         content
-            .contentShape(Rectangle())
-            .simultaneousGesture(
-                TapGesture(count: 3).onEnded { toggleCollection() }
-            )
             .overlay { feedbackOverlay }
+            .onChange(of: collector.collectionFeedback?.id) { _, _ in
+                // Background commands may provide a haptic, but must not queue a pulse
+                // to replay when the user next opens the app.
+                guard scenePhase == .active, let feedback = collector.collectionFeedback else { return }
+                feedbackIsPaused = feedback.isPaused
+                feedbackSymbol = feedback.isPaused ? ConstantsDirectWatch.pauseSymbol : ConstantsDirectWatch.resumeSymbol
+                feedbackScale = 0.7
+                feedbackOpacity = 0
+                feedbackID = UUID()
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase != .active {
+                    feedbackSymbol = nil
+                    feedbackOpacity = 0
+                    feedbackID = UUID()
+                }
+            }
     }
 
     private var feedbackOverlay: some View {
@@ -43,7 +74,7 @@ struct DirectWatchCollectionGesture: ViewModifier {
         }
         .allowsHitTesting(false)
         .accessibilityHidden(feedbackSymbol == nil)
-        .accessibilityLabel(watchState.directWatchCollector.isPaused ? TextsDirectWatch.paused : TextsDirectWatch.resume)
+        .accessibilityLabel(feedbackIsPaused ? TextsDirectWatch.paused : TextsDirectWatch.resume)
         .task(id: feedbackID) { await pulseFeedback() }
     }
 
@@ -65,15 +96,4 @@ struct DirectWatchCollectionGesture: ViewModifier {
         } catch { }
     }
 
-    private func toggleCollection() {
-        let collector = watchState.directWatchCollector
-        guard collector.isConfigured else { return }
-        let paused = !collector.isPaused
-        collector.setPaused(paused)
-        guard collector.isPaused == paused else { return }
-        feedbackSymbol = paused ? ConstantsDirectWatch.pauseSymbol : ConstantsDirectWatch.resumeSymbol
-        feedbackID = UUID()
-        feedbackScale = 0.7
-        feedbackOpacity = 0
-    }
 }

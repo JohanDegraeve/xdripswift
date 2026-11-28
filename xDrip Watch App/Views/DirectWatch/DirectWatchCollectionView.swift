@@ -12,6 +12,7 @@ import WatchKit
 struct DirectWatchCollectionView: View {
     @EnvironmentObject private var watchState: WatchStateModel
     @ObservedObject var collector: DirectWatchCollector
+    @ObservedObject private var uploadCoordinator: DirectWatchUploadCoordinator
     // The app-level NavigationStack owns presentation. This carousel page must not register
     // destinations: lazy page recreation would pop the child or hide its destination.
     let onCollectedReadings: () -> Void
@@ -19,6 +20,13 @@ struct DirectWatchCollectionView: View {
     @State private var showsResetConfirmation = false
     @State private var logFeedback: Bool?
     @State private var resetFeedback: Bool?
+
+    init(collector: DirectWatchCollector, onCollectedReadings: @escaping () -> Void, onAlerts: @escaping () -> Void) {
+        self.collector = collector
+        uploadCoordinator = collector.uploadCoordinator
+        self.onCollectedReadings = onCollectedReadings
+        self.onAlerts = onAlerts
+    }
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 5)) { timeline in
@@ -65,6 +73,13 @@ struct DirectWatchCollectionView: View {
                         statusRow("iphone", "iPhone", phone.text, color: phone.color)
                         statusRow("arrow.up.circle", TextsDirectWatch.toSync, String(format: collector.pendingCount == 1 ? TextsDirectWatch.oneReadingFormat : TextsDirectWatch.readingsFormat, collector.pendingCount))
 
+                        if uploadCoordinator.cloudUploadEnabled {
+                            Divider().padding(.vertical, 9)
+                            uploadStatusRow(TextsDirectWatch.nightscoutUpload, ready: uploadCoordinator.isReady(.nightscout),
+                                            scheduleActive: uploadCoordinator.nightscoutUploader.scheduleIsActive)
+                            uploadStatusRow("Dexcom", ready: uploadCoordinator.isReady(.dexcomShare),
+                                            scheduleActive: uploadCoordinator.dexcomShareUploader.scheduleIsActive)
+                        }
                         Divider().padding(.vertical, 9)
                         connectionDetailRow(TextsDirectWatch.cgmType, deviceName(configuration))
                         connectionDetailRow(TextsDirectWatch.bluetoothSlot, "\(configuration.slot)")
@@ -152,11 +167,11 @@ struct DirectWatchCollectionView: View {
 
     private func actionLabel(_ title: String, feedback: Bool? = nil, confirmation: String = "") -> some View {
         HStack(spacing: 5) {
+            Text(feedback.map { $0 ? confirmation : TextsDirectWatch.tryAgain } ?? title)
             if let feedback {
                 Image(systemName: feedback ? "checkmark" : "exclamationmark.circle")
                     .foregroundStyle(feedback ? Color.green : .red)
             }
-            Text(feedback.map { $0 ? confirmation : TextsDirectWatch.tryAgain } ?? title)
         }
         .font(.system(size: 17))
         .lineLimit(1)
@@ -191,6 +206,13 @@ struct DirectWatchCollectionView: View {
             return watchState.phoneBLECollectionPaused ? (TextsDirectWatch.blePaused, .orange) : (TextsDirectWatch.connected, .green)
         }
         return watchState.phoneLinkIsChecking(at: date) ? (TextsDirectWatch.checking, .orange) : (TextsDirectWatch.away, .red)
+    }
+
+    private func uploadStatusRow(_ title: String, ready: Bool, scheduleActive: Bool) -> some View {
+        let active = ready && collector.collectionAllowsCloudUpload && scheduleActive
+        let paused = ready && (collector.isPaused || (collector.collectionAllowsCloudUpload && !scheduleActive))
+        let detail = active ? TextsDirectWatch.enabled : paused ? TextsDirectWatch.pausedShort : TextsDirectWatch.disabled
+        return statusRow("icloud.and.arrow.up", title, detail, color: active ? .green : .gray)
     }
 
     private func statusRow(_ symbol: String, _ title: String, _ value: String, color: Color = Color("colorSecondary")) -> some View {

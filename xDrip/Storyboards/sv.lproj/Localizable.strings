@@ -2,6 +2,7 @@
 
 // Direct to Watch status and pairing guidance
 "directWatchTitle" = "Direkt till Watch";
+"directWatchActivationAdvice" = "För att ta emot värden med Direkt till Watch-insamling måste %@ Watch-appen vara öppen på din Apple Watch. Även då är insamling inte garanterad i varje cykel. Använd med försiktighet.";
 "directWatchNoConnection" = "Ingen anslutning tillagd";
 "directWatchSuspended" = "Insamling pausad";
 "directWatchWaiting" = "Väntar på Watch-avläsning";
@@ -36,10 +37,10 @@
 "directWatchMedicalSlot" = "Plats för medicinsk enhet";
 "directWatchWatchSlot" = "Watch-plats";
 "directWatchConfirmUnusedSlot" = "Ledig plats: anslut Watch";
-"directWatchSlotMedical" = "Plats 1 · Medicinsk enhet";
-"directWatchSlotMobile" = "Plats 2 · Mobilapp";
-"directWatchSlotWatch" = "Plats 3 · Watch";
-"directWatchSlotAnubis" = "Plats 3 · Extra Anubis";
+"directWatchSlotMedical" = "Plats 1 (Medicinsk enhet)";
+"directWatchSlotMobile" = "Plats 2 (Mobilapp)";
+"directWatchSlotWatch" = "Plats 3 (Watch)";
+"directWatchSlotAnubis" = "Plats 3 (Extra Anubis)";
 "directWatchUsedWatch" = "Används av denna Watch";
 "directWatchUsedPhone" = "Används av denna iPhone";
 "directWatchSlotMedicalDetail" = "Bara utan pump eller mottagare";
@@ -49,7 +50,7 @@
 "directWatchAnubisOnly" = "Endast Anubis-sändare";
 "directWatchWatchStatus" = "Watch-status";
 "directWatchTestingDiagnosis" = "Test och diagnos";
-"directWatchPausePhone" = "Pausa iPhones BLE-insamling";
+"directWatchPausePhone" = "Inaktivera iPhone-insamling";
 "directWatchForTesting" = "För test av Watch-insamling";
 "directWatchGetLogs" = "Hämta Watch-loggar";
 "directWatchShareLogs" = "Dela Watch-loggar";
@@ -80,9 +81,15 @@
 /* Direct to Watch action feedback. */
 "directWatchTryAgain" = "Försök igen";
 "directWatchRequestQueued" = "Begäran köad";
-"directWatchLastLogsReceived" = "Senast mottagna loggar";
+"directWatchLastLogsReceived" = "Senast mottaget";
 "directWatchWaitingForLogs" = "Väntar på nya loggar…";
 "directWatchLogsFailed" = "Kunde inte hämta loggar. Försök igen.";
 
 /* Watch diagnostic log actions and receipt time. */
-"directWatchLogs" = "Loggar";
+"directWatchLogs" = "Watch-loggar";
+"directWatchUploadReadings" = "Ladda upp mätvärden";
+"directWatchBlockPhoneSync" = "Inaktivera Watch-synkronisering";
+"directWatchPhoneCollectionAdvice" = "Inaktiverar Bluetooth-insamling från denna sändare på iPhone så att insamling enbart med Watch kan testas.";
+"directWatchBlockPhoneSyncAdvice" = "Inaktivera Watch-synkronisering stoppar synkronisering av Watch-mätvärden till iPhone så att du kan testa uppladdning från Watch om funktionen är aktiverad.";
+"directWatchCloudUpload" = "Tillåt uppladdning till molnet";
+"directWatchCloudUploadAdvice" = "När funktionen är aktiverad försöker klockan ladda upp mätvärden till varje konfigurerad molntjänst när det finns en internetanslutning.";

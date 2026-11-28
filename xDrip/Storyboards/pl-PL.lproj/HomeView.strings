@@ -170,6 +170,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "Pozostało %@";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Filtr Hampela najpierw ogranicza wpływ pojedynczych wartości odstających. Następnie filtr Savitzky’ego-Golaya wygładza krzywą, zachowując ogólny kształt jej szczytów i dolin.";
 
 "sensorManagementNoiseTitle" = "Szum sensora";
 "sensorManagementNoiseShortTerm" = "Ostatnie 30 minut";
@@ -210,7 +211,7 @@
 "sensorHealthPersistentNoiseTitle" = "Bardzo wysoki szum sensora";
 "sensorHealthPersistentNoiseGuidance" = "Bardzo wysoki szum od 12 godzin. Rozważ wymianę sensora, jeśli problem nie ustąpi.";
 "sensorHealthFlatlineTitle" = "Sygnał sensora jest płaski";
-"sensorHealthFlatlineGuidance" = "Odczyty nie zmieniły się od 30 minut. Zwykle oznacza to awarię/wygaśnięcie sensora.";
+"sensorHealthFlatlineGuidance" = "Brak zmian od 30 min. Możliwa awaria lub wygaśnięcie sensora.";
 "sensorHealthTemporaryIssueTitle" = "Tymczasowy problem z sensorem";
 "sensorHealthTemporaryIssueGuidance" = "Tymczasowy problem z sensorem od 3 godzin. Sprawdź glukometrem i postępuj zgodnie z zaleceniami producenta.";
 "sensorHealthSensorFailedTitle" = "Awaria sensora";
@@ -269,6 +270,9 @@
 "sensorManufactureDate" = "Data produkcji";
 "sensorExpirationDate" = "Data ważności";
 "sensorManagementWaitingForSensorStart" = "Oczekiwanie na uruchomienie sensora";
+"sensorManagementTransmitterExpiredTitle" = "Transmiter wygasł";
+"sensorManagementTransmitterExpiredMessage" = "Ten transmiter wygasł. Nie można rozpocząć nowej sesji sensora.";
+"sensorManagementAnubisRestartSuggestion" = "Uruchom ponownie transmiter Anubis przed próbą rozpoczęcia nowej sesji sensora.";
 "sensorManagementStatusWarmingUp" = "Rozgrzewanie";
 "sensorCodeContinue" = "Kontynuuj";
 "useWithoutSensorCode" = "Użyj bez kodu";
@@ -298,3 +302,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Korekta przesunięcia i kształtu jest niedostępna, ponieważ ten CGM używa własnej kalibracji.";
 
 "postProcessingWarningAgreement" = "Wybierz OK tylko wtedy, gdy rozumiesz tę funkcję i zgadzasz się ją włączyć.";
+
+"postProcessingPreviousReadings" = "Wygładzaj poprzednie odczyty";
+"postProcessingPreviousReadingsFooter" = "Wygładza poprzednie odczyty na wykresie po otrzymaniu nowych. Nie wpływa na najnowszy odczyt.";
+"postProcessingLatestReading" = "Wygładzaj najnowszy odczyt";
+"postProcessingLatestReadingFooter" = "Łagodzi niespodziewane wzrosty lub spadki w najnowszym odczycie glukozy na podstawie odczytów z ostatnich 10–20 minut. Po włączeniu wpływa tylko na najnowszy odczyt.";
+"postProcessingLatestReadingOff" = "Wył.";
+"postProcessingLatestReadingDisabled" = "Wygładzanie najnowszego odczytu wyłączone";
+"postProcessingLatestReadingWarning" = "Wygładzanie najnowszego odczytu może osłabić lub opóźnić wyświetlanie rzeczywistych zmian glukozy i wpłynąć na moment wyzwolenia alertów. Inne aplikacje mogą wyświetlać inną wartość dla tego samego odczytu.";
+
+"postProcessingOffset" = "Przesunięcie";
+"postProcessingCurve" = "Krzywa";
+"postProcessingBoth" = "Oba";
+"postProcessingOffsetAndCurve" = "Przesunięcie i krzywa";
+"postProcessingMode" = "Tryb";
+"postProcessingUnavailable" = "Niedostępne";
+"postProcessingExpanded" = "Rozwinięte";
+"postProcessingCollapsed" = "Zwinięte";
+"postProcessingReferenceGlucose" = "Glukoza referencyjna";
+"postProcessingEnterReferenceGlucose" = "Wprowadź glukozę referencyjną";
+"postProcessingDecrease" = "Zmniejsz: %@";
+"postProcessingIncrease" = "Zwiększ: %@";
+"postProcessingLight" = "Lekkie";
+"postProcessingMedium" = "Średnie";
+"postProcessingStrong" = "Silne";
+"postProcessingCurveShape" = "Kształt";
+"postProcessingOffsetBgCheckHint" = "Zalecany jeden niedawny pomiar glikemii";
+"postProcessingScaleBgCheckHint" = "Zalecane dwa niedawne pomiary glikemii";

@@ -207,16 +207,10 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-/// Settings screen for loop delay
-"Select Time" = "Select Time";
 
-/// Settings screen for loop delay, explanatory text for value
-"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 
-/// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
-"warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
 
 /// data source settings, keep-alive mode is set to use an external heartbeat
 "settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Mantener activo is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
@@ -235,11 +229,7 @@
 /// When enabled, then it should be possible to run xDrip4iOS/Libre 2 in parallel with other app(s)
 "suppressUnLockPayLoad" = "Suppress Unlock Payload";
 
-/// Settings screen for loop delay
-"Select Value" = "Select Value";
 
-/// Settings screen for loop delay, explanatory text for time
-"expanatoryTextSelectTime" = "As of what time should the value apply";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -556,3 +546,10 @@
 "settingsviews_shareReport" = "Compartir informe";
 "settingsviews_shareIssueReport" = "Compartir informe de incidencias";
 "settingsviews_reportShareFailed" = "No se pudieron preparar los archivos de registro. Inténtalo de nuevo.";
+
+"settingsviews_loopShareSmoothedLatestReading" = "Compartir lectura suavizada";
+"settingsviews_loopShareSmoothedLatestReadingConfirmationTitle" = "¿Compartir lecturas suavizadas?";
+"settingsviews_loopShareSmoothedLatestReadingAction" = "Compartir";
+"settingsviews_loopShareSmoothedLatestReadingDifferenceMessage" = "Tu app de AID recibirá la última lectura de glucosa sin suavizar. Por eso, las dos apps pueden mostrar lecturas distintas.";
+"settingsviews_loopShareSmoothedLatestReadingEnabledMessage" = "Tu app de AID está recibiendo el valor de glucosa suavizado que muestra %@. Lo utilizará para decidir la dosis de insulina.\n\nEl valor suavizado puede reflejar con un ligero retraso las subidas o bajadas rápidas, pero filtrará el ruido y los saltos repentinos de la señal.";
+"settingsviews_loopShareSmoothedLatestReadingWarning" = "Si el suavizado modifica la última lectura de glucosa, tu app de AID recibirá ese valor ajustado y lo utilizará para decidir la dosis de insulina.";

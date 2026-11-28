@@ -127,6 +127,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "剩余 %@";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Hampel 滤波器先减弱孤立的异常值。随后，Savitzky-Golay 平滑曲线，同时保留峰值和谷值的大致形状。";
 
 "sensorManagementNoiseTitle" = "传感器噪声";
 "sensorManagementNoiseShortTerm" = "最近 30 分钟";
@@ -167,7 +168,7 @@
 "sensorHealthPersistentNoiseTitle" = "传感器噪声非常高";
 "sensorHealthPersistentNoiseGuidance" = "噪声已持续非常高 12 小时。如果继续，请考虑更换传感器。";
 "sensorHealthFlatlineTitle" = "传感器信号无变化";
-"sensorHealthFlatlineGuidance" = "读数已 30 分钟无变化。这通常表示传感器已失效/到期。";
+"sensorHealthFlatlineGuidance" = "读数 30 分钟无变化。传感器可能已失效或到期。";
 "sensorHealthTemporaryIssueTitle" = "临时传感器问题";
 "sensorHealthTemporaryIssueGuidance" = "临时传感器问题已持续 3 小时。请用血糖仪检查并遵循制造商指导。";
 "sensorHealthSensorFailedTitle" = "传感器失效";
@@ -226,6 +227,9 @@
 "sensorManufactureDate" = "生产日期";
 "sensorExpirationDate" = "有效期至";
 "sensorManagementWaitingForSensorStart" = "正在等待传感器启动";
+"sensorManagementTransmitterExpiredTitle" = "发射器已过期";
+"sensorManagementTransmitterExpiredMessage" = "此发射器已过期，无法启动新的传感器会话。";
+"sensorManagementAnubisRestartSuggestion" = "请重新启动 Anubis 发射器，然后再尝试启动新的传感器会话。";
 "sensorManagementStatusWarmingUp" = "预热中";
 "sensorCodeContinue" = "继续";
 "useWithoutSensorCode" = "不使用代码";
@@ -255,3 +259,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "此 CGM 使用原生校准，因此无法调整偏移量和曲线形状。";
 
 "postProcessingWarningAgreement" = "仅当您理解此功能并同意启用时，才轻点“好”。";
+
+"postProcessingPreviousReadings" = "平滑历史读数";
+"postProcessingPreviousReadingsFooter" = "收到新读数时，平滑图表中的历史读数。最新读数不受影响。";
+"postProcessingLatestReading" = "平滑最新读数";
+"postProcessingLatestReadingFooter" = "根据最近 10–20 分钟的读数，减弱最新血糖读数的异常升降。启用后仅影响最新读数。";
+"postProcessingLatestReadingOff" = "关闭";
+"postProcessingLatestReadingDisabled" = "最新读数平滑已关闭";
+"postProcessingLatestReadingWarning" = "平滑最新读数可能减弱或延迟真实血糖变化的显示，并影响血糖提醒的触发时间。其他应用可能会对同一次测量显示不同的数值。";
+
+"postProcessingOffset" = "偏移";
+"postProcessingCurve" = "曲线";
+"postProcessingBoth" = "两者";
+"postProcessingOffsetAndCurve" = "偏移与曲线";
+"postProcessingMode" = "模式";
+"postProcessingUnavailable" = "不可用";
+"postProcessingExpanded" = "已展开";
+"postProcessingCollapsed" = "已折叠";
+"postProcessingReferenceGlucose" = "参考血糖";
+"postProcessingEnterReferenceGlucose" = "输入参考血糖";
+"postProcessingDecrease" = "减小%@";
+"postProcessingIncrease" = "增大%@";
+"postProcessingLight" = "轻度";
+"postProcessingMedium" = "中度";
+"postProcessingStrong" = "强力";
+"postProcessingCurveShape" = "形状";
+"postProcessingOffsetBgCheckHint" = "建议近期测量一次血糖";
+"postProcessingScaleBgCheckHint" = "建议近期测量两次血糖";

@@ -90,3 +90,4 @@
 
 /* Status label, including Direct to Watch in Advanced Settings. */
 "common_enabled" = "Aktiverat";
+"common_disabled" = "Inaktiverad";

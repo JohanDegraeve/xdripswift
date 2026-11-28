@@ -307,13 +307,21 @@ struct GlucoseChartView: View {
         return view
     }
 
+    /// Issue #802: https://github.com/JohanDegraeve/xdripswift/issues/802
+    /// Match the dot color to the glucose value and thresholds as displayed to the user.
     /// Blood glucose color dependant on the user defined limit values
     /// - Returns: a Color object either red, yellow or green
     func bgColor(bgValueInMgDl: Double) -> Color {
         if chartType != .widgetSystemSmallStandBy || !showHighContrast {
-            if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
+            let bgValueInUserUnit = bgValueInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl)
+            let urgentHighLimitInUserUnit = urgentHighLimitInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl)
+            let urgentLowLimitInUserUnit = urgentLowLimitInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl)
+            let highLimitInUserUnit = highLimitInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl)
+            let lowLimitInUserUnit = lowLimitInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl)
+
+            if bgValueInUserUnit >= urgentHighLimitInUserUnit || bgValueInUserUnit <= urgentLowLimitInUserUnit {
                 return .red
-            } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
+            } else if bgValueInUserUnit >= highLimitInUserUnit || bgValueInUserUnit <= lowLimitInUserUnit {
                 return .yellow
             } else {
                 return .green

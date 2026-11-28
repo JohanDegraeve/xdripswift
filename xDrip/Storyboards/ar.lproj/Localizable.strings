@@ -2,6 +2,7 @@
 
 // Direct to Watch status and pairing guidance
 "directWatchTitle" = "مباشرة إلى Watch";
+"directWatchActivationAdvice" = "لاستقبال القراءات باستخدام تجميع مباشر إلى Watch، يجب أن يكون تطبيق Watch الخاص بـ %@ مفتوحًا على Apple Watch. وحتى حينها، لا يُضمن التجميع في كل دورة. استخدمه بحذر.";
 "directWatchNoConnection" = "لم تتم إضافة اتصال";
 "directWatchSuspended" = "تم تعليق جمع البيانات";
 "directWatchWaiting" = "بانتظار قراءة Watch";
@@ -36,10 +37,10 @@
 "directWatchMedicalSlot" = "منفذ جهاز طبي";
 "directWatchWatchSlot" = "منفذ Watch";
 "directWatchConfirmUnusedSlot" = "المنفذ خالٍ: إضافة Watch";
-"directWatchSlotMedical" = "المنفذ 1 · جهاز طبي";
-"directWatchSlotMobile" = "المنفذ 2 · تطبيق الهاتف";
-"directWatchSlotWatch" = "المنفذ 3 · Watch";
-"directWatchSlotAnubis" = "المنفذ 3 · Anubis إضافي";
+"directWatchSlotMedical" = "المنفذ 1 (جهاز طبي)";
+"directWatchSlotMobile" = "المنفذ 2 (تطبيق الهاتف)";
+"directWatchSlotWatch" = "المنفذ 3 (Watch)";
+"directWatchSlotAnubis" = "المنفذ 3 (Anubis إضافي)";
 "directWatchUsedWatch" = "يستخدمه هذا الـWatch";
 "directWatchUsedPhone" = "يستخدمه هذا الـiPhone";
 "directWatchSlotMedicalDetail" = "فقط إن لم تستخدمه مضخة أو جهاز استقبال";
@@ -49,7 +50,7 @@
 "directWatchAnubisOnly" = "مرسلات Anubis فقط";
 "directWatchWatchStatus" = "حالة Watch";
 "directWatchTestingDiagnosis" = "الاختبار والتشخيص";
-"directWatchPausePhone" = "إيقاف جمع BLE على iPhone مؤقتًا";
+"directWatchPausePhone" = "تعطيل الجمع على iPhone";
 "directWatchForTesting" = "لاختبار الجمع عبر Watch";
 "directWatchGetLogs" = "جلب سجلات Watch";
 "directWatchShareLogs" = "مشاركة سجلات Watch";
@@ -80,9 +81,15 @@
 /* Direct to Watch action feedback. */
 "directWatchTryAgain" = "حاول مجددًا";
 "directWatchRequestQueued" = "الطلب في الانتظار";
-"directWatchLastLogsReceived" = "آخر سجلات مستلمة";
+"directWatchLastLogsReceived" = "آخر استلام";
 "directWatchWaitingForLogs" = "بانتظار سجلات جديدة…";
 "directWatchLogsFailed" = "تعذر جلب السجلات. حاول مجددًا.";
 
 /* Watch diagnostic log actions and receipt time. */
-"directWatchLogs" = "السجلات";
+"directWatchLogs" = "سجلات الساعة";
+"directWatchUploadReadings" = "رفع القراءات";
+"directWatchBlockPhoneSync" = "تعطيل مزامنة الساعة";
+"directWatchPhoneCollectionAdvice" = "يوقف جمع قراءات Bluetooth من جهاز الإرسال هذا على iPhone لاختبار الجمع باستخدام الساعة فقط.";
+"directWatchBlockPhoneSyncAdvice" = "تعطيل مزامنة الساعة سيوقف مزامنة قراءات الساعة مع iPhone لتتمكن من اختبار الرفع من الساعة إذا كانت هذه الميزة ممكّنة.";
+"directWatchCloudUpload" = "السماح بالرفع إلى السحابة";
+"directWatchCloudUploadAdvice" = "عند التمكين، ستحاول الساعة رفع القراءات إلى كل خدمة سحابية تم إعدادها عند توفر اتصال بالإنترنت.";
