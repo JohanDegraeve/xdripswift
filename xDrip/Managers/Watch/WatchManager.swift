@@ -474,7 +474,7 @@ final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
 
         // add delta if available
         if bgReadingSnapshots.count > 1 {
-            previousValueInUserUnit = bgReadingSnapshots[1].finalValue.mgDlToMmol(mgDl: isMgDl)
+            previousValueInUserUnit = (bgReadingSnapshots[0].livePreviousValue ?? bgReadingSnapshots[1].finalValue).mgDlToMmol(mgDl: isMgDl)
             actualValueInUserUnit = bgReadingSnapshots[0].finalValue.mgDlToMmol(mgDl: isMgDl)
 
             // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation

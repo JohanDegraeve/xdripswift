@@ -89,6 +89,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "%@ resterend";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Een Hampel-filter dempt eerst afzonderlijke uitschieters. Daarna vlakt Savitzky-Golay de curve af met behoud van de algemene vorm van pieken en dalen.";
 
 "sensorManagementNoiseTitle" = "Sensorruis";
 "sensorManagementNoiseShortTerm" = "Afgelopen 30 minuten";
@@ -243,3 +244,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Aanpassing van de offset en vorm is niet beschikbaar omdat deze CGM een eigen kalibratie gebruikt.";
 
 "postProcessingWarningAgreement" = "Tik alleen op OK als je deze functie begrijpt en ermee instemt om deze in te schakelen.";
+
+"postProcessingPreviousReadings" = "Eerdere metingen afvlakken";
+"postProcessingPreviousReadingsFooter" = "Vlakt eerdere metingen op de grafiek af wanneer nieuwe metingen binnenkomen. De meest recente meting blijft ongewijzigd.";
+"postProcessingLatestReading" = "Laatste meting afvlakken";
+"postProcessingLatestReadingFooter" = "Dempt onverwachte stijgingen of dalingen in de laatste glucosemeting op basis van de metingen van de afgelopen 10–20 minuten. Deze optie heeft alleen invloed op de laatste meting.";
+"postProcessingLatestReadingOff" = "Uit";
+"postProcessingLatestReadingDisabled" = "Afvlakking van de laatste meting is uitgeschakeld";
+"postProcessingLatestReadingWarning" = "Het afvlakken van de laatste meting kan werkelijke glucoseveranderingen minder sterk of later tonen en invloed hebben op het moment waarop glucosewaarschuwingen afgaan. Andere apps kunnen voor dezelfde meting een andere waarde tonen.";
+
+"postProcessingOffset" = "Verschuiving";
+"postProcessingCurve" = "Curve";
+"postProcessingBoth" = "Beide";
+"postProcessingOffsetAndCurve" = "Verschuiving en curve";
+"postProcessingMode" = "Modus";
+"postProcessingUnavailable" = "Niet beschikbaar";
+"postProcessingExpanded" = "Uitgeklapt";
+"postProcessingCollapsed" = "Ingeklapt";
+"postProcessingReferenceGlucose" = "Referentieglucose";
+"postProcessingEnterReferenceGlucose" = "Referentieglucose invoeren";
+"postProcessingDecrease" = "Verlaag %@";
+"postProcessingIncrease" = "Verhoog %@";
+"postProcessingLight" = "Licht";
+"postProcessingMedium" = "Gemiddeld";
+"postProcessingStrong" = "Sterk";
+"postProcessingCurveShape" = "Vorm";
+"postProcessingOffsetBgCheckHint" = "Eén recente bloedglucosemeting aanbevolen";
+"postProcessingScaleBgCheckHint" = "Twee recente bloedglucosemetingen aanbevolen";

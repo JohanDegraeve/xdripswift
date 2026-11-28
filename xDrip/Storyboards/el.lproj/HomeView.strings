@@ -74,6 +74,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "Απομένουν %@";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Ένα φίλτρο Hampel περιορίζει πρώτα τις μεμονωμένες ακραίες τιμές. Στη συνέχεια, το Savitzky-Golay εξομαλύνει την καμπύλη διατηρώντας το γενικό σχήμα των κορυφών και των κοιλάδων.";
 
 "sensorManagementNoiseTitle" = "Θόρυβος αισθητήρα";
 "sensorManagementNoiseShortTerm" = "Τελευταία 30 λεπτά";
@@ -205,3 +206,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Η προσαρμογή μετατόπισης και σχήματος δεν είναι διαθέσιμη, επειδή αυτό το CGM χρησιμοποιεί εγγενή βαθμονόμηση.";
 
 "postProcessingWarningAgreement" = "Πατήστε «OK» μόνο αν κατανοείτε αυτή τη λειτουργία και συμφωνείτε να την ενεργοποιήσετε.";
+
+"postProcessingPreviousReadings" = "Εξομάλυνση προηγούμενων μετρήσεων";
+"postProcessingPreviousReadingsFooter" = "Εξομαλύνει τις προηγούμενες μετρήσεις στο γράφημα καθώς λαμβάνονται νέες. Η πιο πρόσφατη μέτρηση δεν επηρεάζεται.";
+"postProcessingLatestReading" = "Εξομάλυνση πιο πρόσφατης μέτρησης";
+"postProcessingLatestReadingFooter" = "Μετριάζει απρόσμενες αυξήσεις ή πτώσεις στην πιο πρόσφατη μέτρηση γλυκόζης με βάση τις μετρήσεις των τελευταίων 10–20 λεπτών. Όταν είναι ενεργή, επηρεάζει μόνο την πιο πρόσφατη μέτρηση.";
+"postProcessingLatestReadingOff" = "Ανενεργό";
+"postProcessingLatestReadingDisabled" = "Η εξομάλυνση της πιο πρόσφατης μέτρησης είναι ανενεργή";
+"postProcessingLatestReadingWarning" = "Η εξομάλυνση της πιο πρόσφατης μέτρησης μπορεί να μετριάσει ή να καθυστερήσει την εμφάνιση πραγματικών αλλαγών στη γλυκόζη και να επηρεάσει πότε ενεργοποιούνται οι ειδοποιήσεις γλυκόζης. Άλλες εφαρμογές ενδέχεται να εμφανίζουν διαφορετική τιμή για την ίδια μέτρηση.";
+
+"postProcessingOffset" = "Μετατόπιση";
+"postProcessingCurve" = "Καμπύλη";
+"postProcessingBoth" = "Και τα δύο";
+"postProcessingOffsetAndCurve" = "Μετατόπιση και καμπύλη";
+"postProcessingMode" = "Λειτουργία";
+"postProcessingUnavailable" = "Μη διαθέσιμο";
+"postProcessingExpanded" = "Αναπτυγμένο";
+"postProcessingCollapsed" = "Συμπτυγμένο";
+"postProcessingReferenceGlucose" = "Γλυκόζη αναφοράς";
+"postProcessingEnterReferenceGlucose" = "Εισαγωγή γλυκόζης αναφοράς";
+"postProcessingDecrease" = "Μείωση: %@";
+"postProcessingIncrease" = "Αύξηση: %@";
+"postProcessingLight" = "Ήπια";
+"postProcessingMedium" = "Μέτρια";
+"postProcessingStrong" = "Ισχυρή";
+"postProcessingCurveShape" = "Σχήμα";
+"postProcessingOffsetBgCheckHint" = "Συνιστάται μία πρόσφατη μέτρηση σακχάρου";
+"postProcessingScaleBgCheckHint" = "Συνιστώνται δύο πρόσφατες μετρήσεις σακχάρου";

@@ -29,6 +29,7 @@ enum ConstantsGlucoseChart {
     
     /// glucose colors - for original values when post processing is enabled
     static let glucoseOriginalColor = Color(white: 0.3).opacity(0.3)
+    static let glucoseOriginalPreviewColor = Color(white: 0.75).opacity(0.65)
 
     /// glucose colors - for original values when peek mode is active
     static let glucoseOriginalPeekColor = Color(white: 0.5)

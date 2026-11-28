@@ -61,6 +61,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "%@ restante";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Un filtro de Hampel atenúa primero los valores atípicos aislados. Después, Savitzky-Golay suaviza la curva y conserva la forma general de los picos y los valles.";
 
 "sensorManagementNoiseTitle" = "Ruido del sensor";
 "sensorManagementNoiseShortTerm" = "Últimos 30 minutos";
@@ -215,3 +216,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "El ajuste del desplazamiento y la forma no está disponible porque este MCG usa calibración propia.";
 
 "postProcessingWarningAgreement" = "Pulsa Aceptar solo si entiendes esta función y aceptas activarla.";
+
+"postProcessingPreviousReadings" = "Suavizar lecturas anteriores";
+"postProcessingPreviousReadingsFooter" = "Suaviza las lecturas anteriores del gráfico a medida que llegan nuevas lecturas. La lectura más reciente no se ve afectada.";
+"postProcessingLatestReading" = "Suavizar la lectura más reciente";
+"postProcessingLatestReadingFooter" = "Suaviza las subidas o bajadas inesperadas de la lectura de glucosa más reciente utilizando las lecturas de los últimos 10–20 minutos. Al activarlo, solo se ve afectada la lectura más reciente.";
+"postProcessingLatestReadingOff" = "Desactivado";
+"postProcessingLatestReadingDisabled" = "Suavizado de la lectura más reciente desactivado";
+"postProcessingLatestReadingWarning" = "Suavizar la lectura más reciente puede atenuar o retrasar la visualización de cambios reales de glucosa y afectar al momento en que se activan las alertas de glucosa. Otras apps pueden mostrar un valor distinto para la misma lectura.";
+
+"postProcessingOffset" = "Compensación";
+"postProcessingCurve" = "Curva";
+"postProcessingBoth" = "Ambos";
+"postProcessingOffsetAndCurve" = "Compensación y curva";
+"postProcessingMode" = "Modo";
+"postProcessingUnavailable" = "No disponible";
+"postProcessingExpanded" = "Expandido";
+"postProcessingCollapsed" = "Contraído";
+"postProcessingReferenceGlucose" = "Glucosa de referencia";
+"postProcessingEnterReferenceGlucose" = "Introducir glucosa de referencia";
+"postProcessingDecrease" = "Reducir: %@";
+"postProcessingIncrease" = "Aumentar: %@";
+"postProcessingLight" = "Suave";
+"postProcessingMedium" = "Medio";
+"postProcessingStrong" = "Fuerte";
+"postProcessingCurveShape" = "Forma";
+"postProcessingOffsetBgCheckHint" = "Se recomienda una medición reciente de glucemia";
+"postProcessingScaleBgCheckHint" = "Se recomiendan dos mediciones recientes de glucemia";

@@ -130,9 +130,13 @@ public class BgReading: NSManagedObject {
     }
     
     func slopeOrdinal() -> Int {
-        let slope_by_minute = calculatedValueSlope * 60000
+        Self.slopeOrdinal(slope: calculatedValueSlope, hidden: hideSlope)
+    }
+
+    static func slopeOrdinal(slope: Double, hidden: Bool) -> Int {
+        let slope_by_minute = slope * 60000
         var ordinal = 0
-        if(!hideSlope) {
+        if !hidden {
             if (slope_by_minute <= (-3.5)) {
                 ordinal = 7
             } else if (slope_by_minute <= (-2)) {
@@ -209,7 +213,7 @@ public class BgReading: NSManagedObject {
             return "???"
         }
 
-        var previousValueInUserUnit = previousBgReading.finalValue.mgDlToMmol(mgDl: mgDl)
+        var previousValueInUserUnit = previousLiveValue(for: previousBgReading).mgDlToMmol(mgDl: mgDl)
         var actualValueInUserUnit = finalValue.mgDlToMmol(mgDl: mgDl)
         
         // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation
@@ -308,24 +312,58 @@ public class BgReading: NSManagedObject {
             return (0, true)
         }
         
-        return ((lastBgReading.finalValue - finalValue) / (lastBgReading.timeStamp.toMillisecondsAsDouble() - timeStamp.toMillisecondsAsDouble()), false)
+        return ((previousLiveValue(for: lastBgReading) - finalValue) / (lastBgReading.timeStamp.toMillisecondsAsDouble() - timeStamp.toMillisecondsAsDouble()), false)
     }
 
     var finalValue: Double {
-        if let smoothedValue = smoothedValue?.doubleValue {
-            return smoothedValue
-        }
-        
-        if let adjustedValue = adjustedValue?.doubleValue {
-            return adjustedValue
-        }
-        
-        return calculatedValue
+        latestSmoothedValue ?? historicalValue
     }
+
+    var latestSmoothedValue: Double? {
+        latestSmoothingState?.smoothedValue
+    }
+
+    var livePreviousValue: Double? {
+        latestSmoothingState?.comparisonValue
+    }
+
+    private var latestSmoothingState: LatestReadingSmoothing.LiveState? {
+        guard let state = LatestReadingSmoothing.liveState, state.readingID == id else { return nil }
+        return state
+    }
+
+    var baselineValue: Double {
+        adjustedValue?.doubleValue ?? calculatedValue
+    }
+
+    /// Historical exports exclude smoothing of the current reading.
+    var historicalValue: Double {
+        smoothedValue?.doubleValue ?? baselineValue
+    }
+
+    func previousLiveValue(for previousReading: BgReading) -> Double {
+        guard let state = latestSmoothingState else { return previousReading.finalValue }
+        if state.comparisonID == previousReading.id, let comparison = state.comparisonValue {
+            return comparison
+        }
+        return state.presentedValues[previousReading.id] ?? previousReading.baselineValue
+    }
+
+    static func slope(currentValue: Double, currentDate: Date, previousValue: Double, previousDate: Date) -> (Double, Bool) {
+        let interval = currentDate.timeIntervalSince(previousDate)
+        guard interval >= .minutes(Double(ConstantsBGGraphBuilder.minSlopeInMinutes)),
+              interval <= .minutes(Double(ConstantsBGGraphBuilder.maxSlopeInMinutes)) else { return (0, true) }
+        return ((currentValue - previousValue) / (interval * 1000), false)
+    }
+
     
     /// slopeName for upload to Nightscout
     public var slopeName:String {
-        let slope_by_minute:Double = calculatedValueSlope * 60000
+        Self.slopeName(slope: calculatedValueSlope, hidden: hideSlope)
+    }
+
+    static func slopeName(slope: Double, hidden: Bool) -> String {
+        let slope_by_minute = slope * 60000
         var arrow = "NONE"
         if (slope_by_minute <= (-3.5)) {
             arrow = "DoubleDown" // ↓↓
@@ -343,7 +381,7 @@ public class BgReading: NSManagedObject {
             arrow = "DoubleUp" // ↑↑
         }
         
-        if(hideSlope) {
+        if hidden {
             arrow = "NOT COMPUTABLE"
         }
         return arrow
@@ -360,6 +398,11 @@ public struct BgReadingSnapshot: Sendable, Hashable {
     public let finalValue: Double
     public let adjustedValue: Double?
     public let smoothedValue: Double?
+    var livePreviousValue: Double? = nil
+
+    var historicalValue: Double {
+        smoothedValue ?? adjustedValue ?? calculatedValue
+    }
     public let backfilledAt: Date?
     public let valueIsFromWatch: Bool
     public let watchReceivedAt: Date?

@@ -128,11 +128,6 @@
 "settingsviews_housekeeperRetentionPeriodMessage" = "Сколько дней должны храниться данные? (минимум 90, максимум 365)\n\n(рекомендуется: 90 дней)";
 "suppressUnLockPayLoad" = "Остановить блок. нагрузки";
 "suppressLoopShare" = "Остановить раздачу в Loop";
-"Select Time" = "Выберите время";
-"Select Value" = "Выберите значение";
-"expanatoryTextSelectTime" = "С какого времени должно применяться значение";
-"expanatoryTextSelectValue" = "Задержка в минутах, применяемая к показаниям, переданным в Loop";
-"warningLoopDelayAlreadyExists" = "На это время уже есть задержка Loop";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -560,3 +555,10 @@
 "settingsviews_shareReport" = "Поделиться отчётом";
 "settingsviews_shareIssueReport" = "Поделиться отчётом о проблеме";
 "settingsviews_reportShareFailed" = "Не удалось подготовить файлы журналов. Попробуйте ещё раз.";
+
+"settingsviews_loopShareSmoothedLatestReading" = "Передавать сглаженные значения";
+"settingsviews_loopShareSmoothedLatestReadingConfirmationTitle" = "Передавать сглаженные значения?";
+"settingsviews_loopShareSmoothedLatestReadingAction" = "Передавать";
+"settingsviews_loopShareSmoothedLatestReadingDifferenceMessage" = "Приложение AID получит последнее показание глюкозы без сглаживания. Поэтому два приложения могут показывать разные значения.";
+"settingsviews_loopShareSmoothedLatestReadingEnabledMessage" = "Приложение AID получает сглаженное значение глюкозы, которое показывает %@. Оно будет использовать это значение для принятия решений о дозе инсулина.\n\nБыстрый рост или падение уровня глюкозы могут отображаться с небольшой задержкой, но сглаживание подавляет шум и резкие скачки сигнала.";
+"settingsviews_loopShareSmoothedLatestReadingWarning" = "Если сглаживание изменит последнее показание глюкозы, приложение AID получит скорректированное значение и использует его для принятия решений о дозе инсулина.";

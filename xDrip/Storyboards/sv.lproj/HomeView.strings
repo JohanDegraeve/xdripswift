@@ -87,6 +87,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "%@ kvar";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Ett Hampel-filter dämpar först enstaka avvikande värden. Därefter jämnar Savitzky-Golay ut kurvan och bevarar den övergripande formen på toppar och dalar.";
 
 "sensorManagementNoiseTitle" = "Sensorbrus";
 "sensorManagementNoiseShortTerm" = "Senaste 30 minuterna";
@@ -218,3 +219,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Justering av offset och form är inte tillgänglig eftersom den här CGM:en använder egen kalibrering.";
 
 "postProcessingWarningAgreement" = "Tryck på OK endast om du förstår funktionen och samtycker till att aktivera den.";
+
+"postProcessingPreviousReadings" = "Jämna ut tidigare mätvärden";
+"postProcessingPreviousReadingsFooter" = "Jämnar ut tidigare mätvärden i diagrammet när nya värden kommer in. Det senaste mätvärdet påverkas inte.";
+"postProcessingLatestReading" = "Jämna ut senaste mätvärdet";
+"postProcessingLatestReadingFooter" = "Dämpar oväntade uppgångar eller fall i det senaste glukosvärdet med hjälp av mätvärden från de senaste 10–20 minuterna. När funktionen är på påverkas endast det senaste mätvärdet.";
+"postProcessingLatestReadingOff" = "Av";
+"postProcessingLatestReadingDisabled" = "Utjämning av senaste mätvärdet är av";
+"postProcessingLatestReadingWarning" = "Utjämning av det senaste mätvärdet kan dämpa eller fördröja visningen av verkliga glukosförändringar och påverka när glukoslarm utlöses. Andra appar kan visa ett annat värde för samma mätning.";
+
+"postProcessingOffset" = "Förskjutning";
+"postProcessingCurve" = "Kurva";
+"postProcessingBoth" = "Båda";
+"postProcessingOffsetAndCurve" = "Förskjutning och kurva";
+"postProcessingMode" = "Läge";
+"postProcessingUnavailable" = "Inte tillgängligt";
+"postProcessingExpanded" = "Expanderad";
+"postProcessingCollapsed" = "Hopfälld";
+"postProcessingReferenceGlucose" = "Referensglukos";
+"postProcessingEnterReferenceGlucose" = "Ange referensglukos";
+"postProcessingDecrease" = "Minska %@";
+"postProcessingIncrease" = "Öka %@";
+"postProcessingLight" = "Lätt";
+"postProcessingMedium" = "Medel";
+"postProcessingStrong" = "Kraftig";
+"postProcessingCurveShape" = "Form";
+"postProcessingOffsetBgCheckHint" = "En aktuell blodsockermätning rekommenderas";
+"postProcessingScaleBgCheckHint" = "Två aktuella blodsockermätningar rekommenderas";

@@ -153,6 +153,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "%@ verbleibend";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Ein Hampel-Filter dämpft zunächst einzelne Ausreißer. Anschließend glättet Savitzky-Golay die Kurve und erhält dabei die allgemeine Form der Spitzen und Täler.";
 
 "sensorManagementNoiseTitle" = "Sensorrauschen";
 "sensorManagementNoiseShortTerm" = "Letzte 30 Minuten";
@@ -307,3 +308,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Offset- und Formanpassung sind nicht verfügbar, da dieses CGM eine eigene Kalibrierung verwendet.";
 
 "postProcessingWarningAgreement" = "Tippe nur auf „OK“, wenn du diese Funktion verstehst und ihrer Aktivierung zustimmst.";
+
+"postProcessingPreviousReadings" = "Frühere Messwerte glätten";
+"postProcessingPreviousReadingsFooter" = "Glättet frühere Messwerte im Diagramm, sobald neue Messwerte eintreffen. Der neueste Messwert bleibt unverändert.";
+"postProcessingLatestReading" = "Neuesten Messwert glätten";
+"postProcessingLatestReadingFooter" = "Dämpft unerwartete Anstiege oder Abfälle im neuesten Glukosemesswert anhand der Messwerte der letzten 10–20 Minuten. Ist die Funktion aktiviert, betrifft sie nur den neuesten Messwert.";
+"postProcessingLatestReadingOff" = "Aus";
+"postProcessingLatestReadingDisabled" = "Glättung des neuesten Messwerts ist aus";
+"postProcessingLatestReadingWarning" = "Das Glätten des neuesten Messwerts kann tatsächliche Glukoseänderungen abgeschwächt oder verzögert anzeigen und beeinflussen, wann Glukosealarme ausgelöst werden. Andere Apps können für dieselbe Messung einen anderen Wert anzeigen.";
+
+"postProcessingOffset" = "Versatz";
+"postProcessingCurve" = "Kurve";
+"postProcessingBoth" = "Beides";
+"postProcessingOffsetAndCurve" = "Versatz und Kurve";
+"postProcessingMode" = "Modus";
+"postProcessingUnavailable" = "Nicht verfügbar";
+"postProcessingExpanded" = "Ausgeklappt";
+"postProcessingCollapsed" = "Eingeklappt";
+"postProcessingReferenceGlucose" = "Referenzglukose";
+"postProcessingEnterReferenceGlucose" = "Referenzglukose eingeben";
+"postProcessingDecrease" = "%@ verringern";
+"postProcessingIncrease" = "%@ erhöhen";
+"postProcessingLight" = "Leicht";
+"postProcessingMedium" = "Mittel";
+"postProcessingStrong" = "Stark";
+"postProcessingCurveShape" = "Form";
+"postProcessingOffsetBgCheckHint" = "Eine aktuelle Blutzuckermessung empfohlen";
+"postProcessingScaleBgCheckHint" = "Zwei aktuelle Blutzuckermessungen empfohlen";

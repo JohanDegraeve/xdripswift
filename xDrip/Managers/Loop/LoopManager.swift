@@ -378,14 +378,6 @@ public class LoopManager: NSObject {
     // for trace,
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLoopManager)
 
-    // MARK: - public properties
-
-    /// latest glucose data values - to be used only if using loopDelay
-    /// - first is the youngest
-    ///
-    /// actually there's redundancy in data. Readings are normally read from coredata here in this module, and stored in lastReadings - disadvantage is that BgReadings in coredata only contain readings per 5 minutes + the latest reading (which can be less than 5 minutes later than latest but one reading. But when using loopdelay, we omit the most recent values, and end up with an array of readings, 5 minutes apart from each other, as a result Loop would receive a reading only every 5 minutes. For that reason, this second array glucoseData is introduced (later in the project). This array has readings per minute. Ideally, glucoseData could be used no matter of loopDelay is used or not, but to avoid uncatched coding errors, I kept both
-    public var glucoseData = [GlucoseData]()
-
     // MARK: - initializer
 
     init(
@@ -431,7 +423,6 @@ public class LoopManager: NSObject {
         // Apply the active source policy before reading or writing the shared app group. Direct
         // Medtrum Nano is always blocked. EasyView retains its explicit consent requirement.
         guard Self.osAidSharingPermitted else {
-            glucoseData.removeAll()
             clearBlockedSourceSharedData()
             return
         }
@@ -447,157 +438,66 @@ public class LoopManager: NSObject {
         // this was previously done at the class level, but the scope must now be changed to allow us to change the target app group
         guard let sharedUserDefaults = UserDefaults(suiteName: suiteName) else {return}
 
-        guard let timeStampLatestLoopSharedBgReading = UserDefaults.standard.timeStampLatestLoopSharedBgReading else {
+        trace("    in share, sharing data with selected OS-AID target", log: log, category: ConstantsLog.categoryLoopManager, type: .info, troubleshooting: .detailed(.integration(name: .osAid, activity: .started)))
 
-            // if the last share data hasn't been set previously (could only happen on the first run) then just set it and return until next bg reading is processed. We won't normally ever get to here
-            UserDefaults.standard.timeStampLatestLoopSharedBgReading = Date()
+        // Derive the recovery window from actual measurement times.
+        let sourceStart = UserDefaults.standard.postProcessingStartTimeStamp ?? .distantPast
+        let recoveryStart = Date().addingTimeInterval(-TimeInterval.minutes(30))
+        let lastReadings = bgReadingsAccessor.getLatestBgReadings(
+            limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop,
+            fromDate: max(recoveryStart, sourceStart),
+            forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false
+        ).filter { $0.calculatedValue > 0 && !NightscoutImportService.isImportedBgReadingID($0.id) }
 
-            publishMetadata(sharedUserDefaults: sharedUserDefaults, latestSharedGlucoseAt: nil)
-
-            return
-
-        }
-
-        trace("    in share, sharing data with selected OS-AID target",log: log, category: ConstantsLog.categoryLoopManager, type: .debug, troubleshooting: .detailed(.integration(name: .osAid, activity: .started)))
-
-        // get last readings with calculated value
-        // reduce timeStampLatestLoopSharedBgReading with 30 minutes. Because maybe Loop wasn't running for a while and so missed one or more readings. By adding 30 minutes of readings, we fill up a gap of maximum 30 minutes in Loop
-        let lastReadings = bgReadingsAccessor.getLatestBgReadings(limit: ConstantsShareWithLoop.maxReadingsToShareWithLoop, fromDate: timeStampLatestLoopSharedBgReading.addingTimeInterval(-TimeInterval(minutes: 30)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-
-        // calculate loopDelay, to avoid having to do it multiple times
-        let loopDelay = LoopManager.loopDelay()
-
-        // if needed, remove readings less than loopDelay minutes old from glucoseData
-        if loopDelay > 0 {
-
-            trace("    in share, loopDelay = %{public}@. Deleting %{public}@ minutes of readings from glucoseData.",log: log, category: ConstantsLog.categoryLoopManager, type: .debug, loopDelay.description)
-
-            while glucoseData.count > 0 &&  glucoseData[0].timeStamp.addingTimeInterval(loopDelay) > Date() {
-
-                glucoseData.remove(at: 0)
-
-            }
-
-            // if no readings anymore, then no need to continue
-            if glucoseData.count == 0 {
-                if loopShareType == .trio {
-                    writeEmptyReadingsAndMetadata(sharedUserDefaults: sharedUserDefaults)
-                }
-                return
-            }
-
-        } else if lastReadings.count == 0 {
-            // this is the case where loopdelay = 0 and lastReadings is empty
-            if loopShareType == .trio {
-                publishMetadata(
-                    sharedUserDefaults: sharedUserDefaults,
-                    latestSharedGlucoseAt: latestPreviouslySharedGlucoseAt()
-                )
-            }
-            return
-        }
-
-        //  double check that lastReadings.first exists, because in some cases lastReadings is empty but still lastReadings.count != nil
-        guard lastReadings.first != nil else {return}
-
-        // convert to json Dexcom Share format
-        var dictionary = [Dictionary<String, Any>]()
-
-        if loopDelay > 0 {
-
-            for reading in glucoseData {
-
-                var representation = reading.dictionaryRepresentationForLoopShare
-
-                // Adding "from" field to be able to use multiple BG sources with the same shared group in FreeAPS X
-                representation["from"] = "xDrip"
-                dictionary.append(representation)
-            }
-
-        } else {
-
-            for reading in lastReadings {
-
-                // OS-AID targets should receive adjusted values, or calculated values if no adjustment exists.
-                // Smoothed/final values are only shared when the user explicitly enables the warned override.
-                let date = "/Date(" + Int64(floor(reading.timeStamp.toMillisecondsAsDouble() / 1000) * 1000).description + ")/"
-                var representation: [String : Any] = [
-                    "Trend" : reading.slopeOrdinal(),
-                    "ST" : date,
-                    "DT" : date,
-                    "Value" : round(reading.loopShareValue),
-                    "direction" : reading.slopeName
-                ]
-
-                // Adding "from" field to be able to use multiple BG sources with the same shared group in FreeAPS X
-                representation["from"] = "xDrip"
-                dictionary.append(representation)
-            }
-
-        }
-
-        // now, if needed, increase the timestamp for each reading
-        if loopDelay > 0 {
-
-            // create new dictionary that will have the readings with timestamp increased
-            var newDictionary = [Dictionary<String, Any>]()
-
-            // iterate through dictionary
-            for reading in dictionary {
-
-                var readingTimeStamp: Date?
-                if let rawGlucoseStartDate = reading["DT"] as? String {
-                    do {
-
-                        readingTimeStamp = try self.parseTimestamp(rawGlucoseStartDate)
-
-                    } catch  {
-
-                    }
-                }
-
-                if let readingTimeStamp = readingTimeStamp, let slopeOrdinal = reading["Trend"] as? Int, let value = reading["Value"] as? Double {
-
-                    // create new date : original date + loopDelay
-                    let newReadingTimeStamp = readingTimeStamp.addingTimeInterval(loopDelay)
-
-                    // ignore the reading if newReadingTimeStamp > now
-                    if newReadingTimeStamp < Date() {
-
-                        // this is for the json representation
-                        let dateAsString = "/Date(" + Int64(floor(newReadingTimeStamp.toMillisecondsAsDouble() / 1000) * 1000).description + ")/"
-
-                        // create new reading and append to new dictionary
-                        let newReading: [String : Any] = [
-                            "Trend" : slopeOrdinal,
-                            "ST" : dateAsString,
-                            "DT" : dateAsString,
-                            "Value" : value,
-                            "direction" : slopeOrdinal,
-                            "from" : "xDrip"
-                        ]
-
-                        newDictionary.append(newReading)
-
-                    }
-
-                }
-
-            }
-
-            dictionary = newDictionary
-
-        }
-
-        // If there are no readings to share, clear the shared container to avoid stale entries
-        if dictionary.isEmpty {
+        guard let latest = lastReadings.first else {
             if loopShareType == .trio {
                 writeEmptyReadingsAndMetadata(sharedUserDefaults: sharedUserDefaults)
             } else {
-                sharedUserDefaults.removeObject(forKey: "latestReadings")
-                UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = nil
+                writeLegacyReadings([], sharedUserDefaults: sharedUserDefaults)
             }
+            UserDefaults.standard.removeObject(forKey: UserDefaults.Key.loopShareLiveReadings.rawValue)
             return
+        }
+
+        let defaults = UserDefaults.standard
+        let shareSmoothedLatest = defaults.loopShareSmoothedLatestReading
+        let sharedValuesKey = UserDefaults.Key.loopShareLiveReadings.rawValue
+        let previousLiveValues = shareSmoothedLatest ? defaults.dictionary(forKey: sharedValuesKey) ?? [:] : [:]
+        var liveValues = [String: Double]()
+        let values = lastReadings.map { reading -> Double in
+            // Re-resolve the current reading after Apply. Only older readings keep their published value.
+            if shareSmoothedLatest, reading.objectID == latest.objectID {
+                let value = round(reading.latestSmoothedValue ?? reading.baselineValue)
+                liveValues[reading.id] = value
+                return value
+            }
+            if let published = previousLiveValues[reading.id] as? NSNumber {
+                liveValues[reading.id] = published.doubleValue
+                return published.doubleValue
+            }
+            return round(reading.baselineValue)
+        }
+
+        let dictionary: [[String: Any]] = lastReadings.enumerated().map { index, reading in
+            let previousIndex = lastReadings.indices.dropFirst(index + 1).first {
+                reading.timeStamp.timeIntervalSince(lastReadings[$0].timeStamp) >= .minutes(Double(ConstantsBGGraphBuilder.minSlopeInMinutes))
+            }
+            let trend: (slope: Double, hidden: Bool)
+            if let previousIndex {
+                trend = BgReading.slope(currentValue: values[index], currentDate: reading.timeStamp,
+                                        previousValue: values[previousIndex], previousDate: lastReadings[previousIndex].timeStamp)
+            } else {
+                trend = (0, true)
+            }
+            let date = "/Date(" + Int64(floor(reading.timeStamp.toMillisecondsAsDouble() / 1000) * 1000).description + ")/"
+            return [
+                "Trend": BgReading.slopeOrdinal(slope: trend.slope, hidden: trend.hidden),
+                "ST": date,
+                "DT": date,
+                "Value": values[index],
+                "direction": BgReading.slopeName(slope: trend.slope, hidden: trend.hidden),
+                "from": "xDrip"
+            ]
         }
 
         // Every existing OS-AID consumer expects this key to contain a top-level
@@ -627,34 +527,14 @@ public class LoopManager: NSObject {
         // mirror exactly what we wrote so local deletions are reflected immediately
         UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary
 
-        // initially set timeStampLatestLoopSharedBgReading to timestamp of first reading - may get another value later, in case loopdelay > 0
-        // add 5 seconds to last Readings timestamp, because due to the way timestamp for libre readings is calculated, it may happen that the same reading shifts 1 or 2 seconds in next reading cycle
-        if let first = lastReadings.first {
-            UserDefaults.standard.timeStampLatestLoopSharedBgReading = first.timeStamp.addingTimeInterval(5.0)
+        if shareSmoothedLatest {
+            defaults.set(liveValues, forKey: sharedValuesKey)
         }
-
-        // in case loopdelay is used, then update UserDefaults.standard.timeStampLatestLoopSharedBgReading with value of timestamp of first element in the dictionary
-        if let element = dictionary.first, loopDelay > 0 {
-
-            if let elementDateAsString = element["DT"] as? String {
-
-                do {
-                    if let readingTimeStamp = try self.parseTimestamp(elementDateAsString) {
-                        UserDefaults.standard.timeStampLatestLoopSharedBgReading = readingTimeStamp
-                    }
-                } catch  {
-                    // timeStampLatestLoopSharedBgReading keeps initially set value
-                }
-
-            }
-
-        }
-
     }
 
     /// Clear all glucose data previously shared with Loop / OS-AID from the shared app group container.
     /// Call this when BG readings are deleted to ensure stale values do not remain in the shared container.
-    public func clearSharedLoopReadings() {
+    public func clearSharedLoopReadings(preservingLiveValues: Bool = false) {
         let suiteName = UserDefaults.standard.loopShareType.sharedUserDefaultsSuiteName
         guard suiteName != "" else { return }
 
@@ -664,6 +544,9 @@ public class LoopManager: NSObject {
         }
 
         UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = nil
+        if !preservingLiveValues {
+            UserDefaults.standard.removeObject(forKey: UserDefaults.Key.loopShareLiveReadings.rawValue)
+        }
     }
 
     /// Publishes the current rich CGM snapshot without changing the legacy reading array.
@@ -692,7 +575,6 @@ public class LoopManager: NSObject {
             lastSuccessfulSourceCommunication = max(lastSuccessfulSourceCommunication ?? lastCommunicationAt, lastCommunicationAt)
         }
         guard Self.osAidSharingPermitted else {
-            glucoseData.removeAll()
             clearBlockedSourceSharedData()
             return
         }
@@ -710,60 +592,6 @@ public class LoopManager: NSObject {
         )
     }
 
-    /// calculate loop delay to use dependent on the time of the day, based on UserDefaults loopDelaySchedule and loopDelayValueInMinutes
-    ///
-    /// finds element in loopDelaySchedule with value > actual minutes and uses previous element in loopDelayValueInMinutes as value to use as loopDelay
-    public static func loopDelay() -> TimeInterval {
-
-        // loopDelaySchedule is array of ints, giving minutes starting at 00:00 as of which new value for loopDelay should be used
-        // if nil then user didn't set yet any value
-        guard let loopDelaySchedule = UserDefaults.standard.loopDelaySchedule else {return TimeInterval(0)}
-
-        // split in array of Int
-        let loopDelayScheduleArray = loopDelaySchedule.splitToInt()
-
-        // array size should be > 0
-        guard loopDelaySchedule.count > 0 else {return TimeInterval(0)}
-
-        // loopDelayValueInMinutes is array of ints, giving values to be applied as loopdelay, for matching minutes values in loopDelaySchedule
-        guard let loopDelayValueInMinutes = UserDefaults.standard.loopDelayValueInMinutes else {return TimeInterval(0)}
-
-        // splity in array of int
-        let loopDelayValueInMinutesArray = loopDelayValueInMinutes.splitToInt()
-
-        // array size should be > 0, and size should be equal to size of loopDelayScheduleArray
-        guard loopDelayValueInMinutesArray.count > 0, loopDelayScheduleArray.count == loopDelayValueInMinutesArray.count else {return TimeInterval(0)}
-
-        // minutes since midnight
-        let minutes = Int16(Date().minutesSinceMidNightLocalTime())
-
-        // index in loopDelaySchedule and loopDelayValueInMinutes, start with first value
-        var indexInLoopDelayScheduleArray = 0
-
-        // loop through Ints in loopDelayScheduleArray, until value > current minutes
-        for (index, schedule) in loopDelayScheduleArray.enumerated() {
-
-            if schedule > minutes {
-                break
-            }
-
-            if index < loopDelayScheduleArray.count - 1 {
-                if loopDelayScheduleArray[index + 1] > minutes {
-                    break
-                }
-            } else {
-                indexInLoopDelayScheduleArray = index
-                break
-            }
-            indexInLoopDelayScheduleArray = indexInLoopDelayScheduleArray + 1
-        }
-
-        return TimeInterval(minutes: Double(loopDelayValueInMinutesArray[indexInLoopDelayScheduleArray]))
-
-    }
-
-    /// Encodes the long-standing app-group contract used by Loop, iAPS, and Trio.
-    /// Keeping this pure makes it possible to guard the top-level array shape in tests.
     static func encodeLegacyReadings(_ readings: [[String: Any]]) throws -> Data {
         try JSONSerialization.data(withJSONObject: readings)
     }

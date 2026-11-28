@@ -87,6 +87,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "%@ restantes";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Um filtro de Hampel atenua primeiro os valores atípicos isolados. Em seguida, Savitzky-Golay suaviza a curva, preservando a forma geral dos picos e vales.";
 
 "sensorManagementNoiseTitle" = "Ruído do sensor";
 "sensorManagementNoiseShortTerm" = "Últimos 30 minutos";
@@ -241,3 +242,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "O ajuste do desvio e da forma não está disponível porque este CGM usa calibração própria.";
 
 "postProcessingWarningAgreement" = "Toque em OK apenas se compreender esta funcionalidade e concordar em ativá-la.";
+
+"postProcessingPreviousReadings" = "Suavizar leituras anteriores";
+"postProcessingPreviousReadingsFooter" = "Suaviza as leituras anteriores no gráfico à medida que chegam novas leituras. A leitura mais recente não é afetada.";
+"postProcessingLatestReading" = "Suavizar a leitura mais recente";
+"postProcessingLatestReadingFooter" = "Suaviza subidas ou descidas inesperadas na leitura de glicose mais recente com base nas leituras dos últimos 10–20 minutos. Quando ativada, esta opção afeta apenas a leitura mais recente.";
+"postProcessingLatestReadingOff" = "Desativado";
+"postProcessingLatestReadingDisabled" = "Suavização da leitura mais recente desativada";
+"postProcessingLatestReadingWarning" = "Suavizar a leitura mais recente pode atenuar ou atrasar a apresentação de alterações reais da glicose e afetar o momento em que os alertas são acionados. Outras aplicações podem mostrar um valor diferente para a mesma leitura.";
+
+"postProcessingOffset" = "Desvio";
+"postProcessingCurve" = "Curva";
+"postProcessingBoth" = "Ambos";
+"postProcessingOffsetAndCurve" = "Desvio e curva";
+"postProcessingMode" = "Modo";
+"postProcessingUnavailable" = "Indisponível";
+"postProcessingExpanded" = "Expandido";
+"postProcessingCollapsed" = "Recolhido";
+"postProcessingReferenceGlucose" = "Glicose de referência";
+"postProcessingEnterReferenceGlucose" = "Introduzir glicose de referência";
+"postProcessingDecrease" = "Diminuir: %@";
+"postProcessingIncrease" = "Aumentar: %@";
+"postProcessingLight" = "Leve";
+"postProcessingMedium" = "Médio";
+"postProcessingStrong" = "Forte";
+"postProcessingCurveShape" = "Forma";
+"postProcessingOffsetBgCheckHint" = "Recomenda-se uma medição recente da glicemia";
+"postProcessingScaleBgCheckHint" = "Recomendam-se duas medições recentes da glicemia";

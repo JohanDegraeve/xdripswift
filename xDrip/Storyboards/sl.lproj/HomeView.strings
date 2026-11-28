@@ -170,6 +170,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "Preostalo %@";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Hampelov filter najprej ublaži posamezne odstopajoče vrednosti. Nato Savitzky-Golay zgladi krivuljo in ohrani splošno obliko vrhov in dolin.";
 
 "sensorManagementNoiseTitle" = "Šum senzorja";
 "sensorManagementNoiseShortTerm" = "Zadnjih 30 minut";
@@ -301,3 +302,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Prilagajanje odmika in oblike ni na voljo, ker ta CGM uporablja lastno kalibracijo.";
 
 "postProcessingWarningAgreement" = "Tapnite V redu samo, če razumete to funkcijo in se strinjate, da jo omogočite.";
+
+"postProcessingPreviousReadings" = "Glajenje prejšnjih meritev";
+"postProcessingPreviousReadingsFooter" = "Zgladi prejšnje meritve na grafu, ko prispejo nove. Najnovejša meritev ostane nespremenjena.";
+"postProcessingLatestReading" = "Glajenje najnovejše meritve";
+"postProcessingLatestReadingFooter" = "Ublaži nepričakovane poraste ali padce najnovejše meritve glukoze na podlagi meritev zadnjih 10–20 minut. Ko je možnost vklopljena, vpliva samo na najnovejšo meritev.";
+"postProcessingLatestReadingOff" = "Izklopljeno";
+"postProcessingLatestReadingDisabled" = "Glajenje najnovejše meritve je izklopljeno";
+"postProcessingLatestReadingWarning" = "Glajenje najnovejše meritve lahko ublaži ali zakasni prikaz dejanskih sprememb glukoze ter vpliva na čas sprožitve opozoril. Druge aplikacije lahko za isto meritev pokažejo drugačno vrednost.";
+
+"postProcessingOffset" = "Odmik";
+"postProcessingCurve" = "Krivulja";
+"postProcessingBoth" = "Oboje";
+"postProcessingOffsetAndCurve" = "Odmik in krivulja";
+"postProcessingMode" = "Način";
+"postProcessingUnavailable" = "Ni na voljo";
+"postProcessingExpanded" = "Razširjeno";
+"postProcessingCollapsed" = "Strnjeno";
+"postProcessingReferenceGlucose" = "Referenčna glukoza";
+"postProcessingEnterReferenceGlucose" = "Vnesi referenčno glukozo";
+"postProcessingDecrease" = "Zmanjšaj: %@";
+"postProcessingIncrease" = "Povečaj: %@";
+"postProcessingLight" = "Rahlo";
+"postProcessingMedium" = "Srednje";
+"postProcessingStrong" = "Močno";
+"postProcessingCurveShape" = "Oblika";
+"postProcessingOffsetBgCheckHint" = "Priporočena je ena nedavna meritev krvnega sladkorja";
+"postProcessingScaleBgCheckHint" = "Priporočeni sta dve nedavni meritvi krvnega sladkorja";

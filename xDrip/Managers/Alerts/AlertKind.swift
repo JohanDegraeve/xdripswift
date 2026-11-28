@@ -371,9 +371,9 @@ public enum AlertKind: Int, CaseIterable {
                 // lastbut one reading and last reading shoud be maximum 5 minutes apart (+10 seconds to give some margin!)
                 if (lastBgReading.timeStamp.timeIntervalSince(lastButOneBgReading.timeStamp)) < (5 * 60 + 10) {
                     // first check if calculatedValue > 0.0, never know that it's not been checked by caller
-                    if lastBgReading.finalValue == 0.0 || lastButOneBgReading.finalValue == 0.0 { return (false, nil, nil, nil) }
+                    if lastBgReading.finalValue == 0.0 || lastBgReading.previousLiveValue(for: lastButOneBgReading) == 0.0 { return (false, nil, nil, nil) }
                     // now do the actual check if alert is applicable or not. As this is fast drop, we'll only fire when *under* the trigger value
-                    if (lastButOneBgReading.finalValue.bgValueRounded(mgDl: isMgDl) - lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl)) && (lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) < Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
+                    if (lastBgReading.previousLiveValue(for: lastButOneBgReading).bgValueRounded(mgDl: isMgDl) - lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl)) && (lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) < Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
                             return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
                     } else { return (false, nil, nil, nil) }
                 } else { return (false, nil, nil, nil) }
@@ -387,9 +387,9 @@ public enum AlertKind: Int, CaseIterable {
                 // lastbut one reading and last reading shoud be maximum 5 minutes apart (+10 seconds to give some margin!)
                 if (lastBgReading.timeStamp.timeIntervalSince(lastButOneBgReading.timeStamp)) < (5 * 60 + 10) {
                     // first check if calculatedValue > 0.0, never know that it's not been checked by caller
-                    if lastBgReading.finalValue == 0.0 || lastButOneBgReading.finalValue == 0.0 { return (false, nil, nil, nil) }
+                    if lastBgReading.finalValue == 0.0 || lastBgReading.previousLiveValue(for: lastButOneBgReading) == 0.0 { return (false, nil, nil, nil) }
                     // now do the actual check if alert is applicable or not. As this is fast rise, we'll only fire when *over* the trigger value
-                    if lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) - lastButOneBgReading.finalValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) && (lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
+                    if lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) - lastBgReading.previousLiveValue(for: lastButOneBgReading).bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) && (lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
                             return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
                         } else { return (false, nil, nil, nil) }
                 } else { return (false, nil, nil, nil) }

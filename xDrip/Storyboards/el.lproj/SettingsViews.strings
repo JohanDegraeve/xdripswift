@@ -128,11 +128,6 @@
 "settingsviews_housekeeperRetentionPeriodMessage" = "Για πόσες ημέρες πρέπει να αποθηκεύονται τα δεδομένα; (Ελάχ. 90, μέγ. 365)\n\n(Συνιστάται: 90 ημέρες)";
 "suppressUnLockPayLoad" = "Κατάργηση αποστολής ωφέλιμου φορτίου";
 "suppressLoopShare" = "Κατάργηση Loop Share";
-"Select Time" = "Επιλέξτε ώρα";
-"Select Value" = "Επιλέξτε τιμή";
-"expanatoryTextSelectTime" = "Από πότε να ισχύει η τιμή";
-"expanatoryTextSelectValue" = "Καθυστέρηση σε λεπτά, εφαρμόζεται σε αναγνώσεις που κοινοποιούνται στο Loop";
-"warningLoopDelayAlreadyExists" = "Βρέθηκε ήδη ένα loopDelay για αυτήν τη χρονοσφραγίδα.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -560,3 +555,10 @@
 "settingsviews_shareReport" = "Κοινοποίηση αναφοράς";
 "settingsviews_shareIssueReport" = "Κοινοποίηση αναφοράς προβλήματος";
 "settingsviews_reportShareFailed" = "Δεν ήταν δυνατή η προετοιμασία των αρχείων καταγραφής. Δοκιμάστε ξανά.";
+
+"settingsviews_loopShareSmoothedLatestReading" = "Κοινοποίηση εξομαλυμένης τιμής";
+"settingsviews_loopShareSmoothedLatestReadingConfirmationTitle" = "Κοινοποίηση εξομαλυμένων τιμών;";
+"settingsviews_loopShareSmoothedLatestReadingAction" = "Κοινοποίηση";
+"settingsviews_loopShareSmoothedLatestReadingDifferenceMessage" = "Η εφαρμογή AID θα λαμβάνει την τελευταία μέτρηση γλυκόζης χωρίς εξομάλυνση. Έτσι, οι δύο εφαρμογές ενδέχεται να εμφανίζουν διαφορετικές τιμές.";
+"settingsviews_loopShareSmoothedLatestReadingEnabledMessage" = "Η εφαρμογή AID λαμβάνει την εξομαλυμένη τιμή γλυκόζης που εμφανίζεται στην εφαρμογή %@. Θα τη χρησιμοποιήσει για να καθορίσει τη δόση ινσουλίνης.\n\nΗ τιμή μπορεί να δείχνει τις γρήγορες αυξήσεις ή πτώσεις με μικρή καθυστέρηση, αλλά η εξομάλυνση περιορίζει τον θόρυβο και τα απότομα άλματα του σήματος.";
+"settingsviews_loopShareSmoothedLatestReadingWarning" = "Αν η εξομάλυνση αλλάξει την τελευταία μέτρηση γλυκόζης, η εφαρμογή AID θα λάβει την προσαρμοσμένη τιμή και θα τη χρησιμοποιήσει για να καθορίσει τη δόση ινσουλίνης.";

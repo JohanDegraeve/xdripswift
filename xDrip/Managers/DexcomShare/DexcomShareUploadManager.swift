@@ -102,7 +102,13 @@ struct DexcomShareUploadBatch {
             }
             guard let latest = readings.first else { return nil }
             return DexcomShareUploadBatch(
-                readings: readings.map { $0.dictionaryRepresentationForDexcomShareUpload },
+                readings: readings.map { reading in
+                    let trend = bgReadingsAccessor.historicalUploadTrend(for: reading)
+                    return reading.dictionaryRepresentationForDexcomShareUpload(
+                        trend: BgReading.slopeOrdinal(slope: trend.slope, hidden: trend.hidden),
+                        direction: BgReading.slopeName(slope: trend.slope, hidden: trend.hidden)
+                    )
+                },
                 latestReading: latest.timeStamp
             )
         }

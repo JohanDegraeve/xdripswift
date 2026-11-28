@@ -74,6 +74,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "Осталось %@";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Фильтр Хэмпела сначала ослабляет единичные выбросы. Затем фильтр Савицкого-Голея сглаживает кривую, сохраняя общую форму пиков и провалов.";
 
 "sensorManagementNoiseTitle" = "Шум сенсора";
 "sensorManagementNoiseShortTerm" = "Последние 30 минут";
@@ -205,3 +206,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Настройка смещения и формы недоступна, поскольку этот CGM использует встроенную калибровку.";
 
 "postProcessingWarningAgreement" = "Нажимайте «ОК», только если вы понимаете эту функцию и согласны её включить.";
+
+"postProcessingPreviousReadings" = "Сглаживать предыдущие показания";
+"postProcessingPreviousReadingsFooter" = "Сглаживает предыдущие показания на графике по мере поступления новых. Самое свежее показание не меняется.";
+"postProcessingLatestReading" = "Сглаживать последнее показание";
+"postProcessingLatestReadingFooter" = "Смягчает неожиданный рост или падение в последнем показании глюкозы с учётом измерений за последние 10–20 минут. При включении влияет только на последнее показание.";
+"postProcessingLatestReadingOff" = "Выкл.";
+"postProcessingLatestReadingDisabled" = "Сглаживание последнего показания выключено";
+"postProcessingLatestReadingWarning" = "Сглаживание последнего показания может ослабить или задержать отображение реальных изменений глюкозы и повлиять на время срабатывания предупреждений. Другие приложения могут показывать другое значение для того же измерения.";
+
+"postProcessingOffset" = "Смещение";
+"postProcessingCurve" = "Кривая";
+"postProcessingBoth" = "Оба";
+"postProcessingOffsetAndCurve" = "Смещение и кривая";
+"postProcessingMode" = "Режим";
+"postProcessingUnavailable" = "Недоступно";
+"postProcessingExpanded" = "Развёрнуто";
+"postProcessingCollapsed" = "Свёрнуто";
+"postProcessingReferenceGlucose" = "Референсное значение глюкозы";
+"postProcessingEnterReferenceGlucose" = "Ввести референсное значение глюкозы";
+"postProcessingDecrease" = "Уменьшить: %@";
+"postProcessingIncrease" = "Увеличить: %@";
+"postProcessingLight" = "Слабое";
+"postProcessingMedium" = "Среднее";
+"postProcessingStrong" = "Сильное";
+"postProcessingCurveShape" = "Форма";
+"postProcessingOffsetBgCheckHint" = "Рекомендуется один недавний замер глюкозы крови";
+"postProcessingScaleBgCheckHint" = "Рекомендуются два недавних замера глюкозы крови";

@@ -121,8 +121,8 @@ final class FollowerSettingsTests: XCTestCase {
         defaults.loopShareType = .trio
         defaults.isMaster = true
         defaults.cgmTransmitterTypeAsString = CGMTransmitterType.medtrumTouchCareNano.rawValue
-        defaults.enableSmoothing = true
-        defaults.loopShareSmoothedData = true
+        defaults.enableLatestReadingSmoothing = true
+        defaults.loopShareSmoothedLatestReading = true
 
         XCTAssertEqual(defaults.activeOSAidSharingPolicy, .blocked)
         XCTAssertFalse(defaults.canConfigureOSAidSharing)
@@ -130,21 +130,100 @@ final class FollowerSettingsTests: XCTestCase {
         XCTAssertEqual(defaults.loopShareType, .trio)
     }
 
-    func testEasyViewRequiresConsentAndRetainsSmoothedOverride() {
+    func testEasyViewRequiresConsentAndAllowsLatestReadingSmoothingConsent() {
         defaults.loopShareType = .trio
         defaults.isMaster = false
         defaults.followerDataSourceType = .medtrumEasyView
-        defaults.enableSmoothing = true
+        defaults.enableLatestReadingSmoothing = true
 
         XCTAssertEqual(defaults.activeOSAidSharingPolicy, .requiresExplicitConsent)
         XCTAssertTrue(defaults.canConfigureOSAidSharing)
         XCTAssertFalse(defaults.canPublishOSAidData)
 
         defaults.loopShareMedtrumNano = true
-        defaults.loopShareSmoothedData = true
+        defaults.loopShareSmoothedLatestReading = true
 
         XCTAssertTrue(defaults.canPublishOSAidData)
-        XCTAssertTrue(defaults.loopShareSmoothedData)
+        XCTAssertTrue(defaults.loopShareSmoothedLatestReading)
+    }
+
+    func testLiveSmoothingStrengthPreservesExistingConsentUntilTurnedOff() {
+        defaults.loopShareType = .trio
+        defaults.isMaster = false
+        defaults.followerDataSourceType = .dexcomShare
+        XCTAssertEqual(defaults.latestReadingSmoothingMode, .off)
+
+        defaults.enableLatestReadingSmoothing = true
+        XCTAssertEqual(defaults.latestReadingSmoothingMode, .medium)
+        defaults.loopShareSmoothedLatestReading = true
+        defaults.latestReadingSmoothingMode = .light
+        XCTAssertEqual(defaults.latestReadingSmoothingMode, .light)
+        XCTAssertTrue(defaults.loopShareSmoothedLatestReading)
+        defaults.latestReadingSmoothingMode = .strong
+        XCTAssertEqual(defaults.latestReadingSmoothingMode, .strong)
+        XCTAssertTrue(defaults.loopShareSmoothedLatestReading)
+
+        defaults.latestReadingSmoothingMode = .off
+        XCTAssertFalse(defaults.enableLatestReadingSmoothing)
+        XCTAssertFalse(defaults.loopShareSmoothedLatestReading)
+        defaults.latestReadingSmoothingMode = .light
+        XCTAssertFalse(defaults.loopShareSmoothedLatestReading)
+    }
+
+    func testPreviousReadingSmoothingDoesNotGrantLatestSharingConsent() {
+        defaults.loopShareType = .trio
+        defaults.enableSmoothing = true
+        defaults.set(true, forKey: "loopShareSmoothedData")
+        defaults.loopShareSmoothedLatestReading = true
+        XCTAssertFalse(defaults.loopShareSmoothedLatestReading)
+
+        defaults.enableLatestReadingSmoothing = true
+        XCTAssertFalse(defaults.loopShareSmoothedLatestReading)
+        defaults.loopShareSmoothedLatestReading = true
+        XCTAssertTrue(defaults.loopShareSmoothedLatestReading)
+        defaults.enableLatestReadingSmoothing = false
+        defaults.enableLatestReadingSmoothing = true
+        XCTAssertFalse(defaults.loopShareSmoothedLatestReading)
+
+        defaults.loopShareSmoothedLatestReading = true
+        defaults.loopShareType = .loop
+        XCTAssertFalse(defaults.loopShareSmoothedLatestReading)
+    }
+
+    func testLiveSmoothingStateAndSharingConsentAreExcludedFromBackups() {
+        for key in [UserDefaults.Key.enableLatestReadingSmoothing.rawValue,
+                    UserDefaults.Key.loopShareSmoothedLatestReading.rawValue,
+                    UserDefaults.Key.loopShareLiveReadings.rawValue,
+                    LatestReadingSmoothing.stateKey,
+                    NightscoutSyncManager.historicalBgQueueKey] {
+            XCTAssertFalse(BackupService.isPortableSetting(key), key)
+        }
+    }
+
+    @MainActor
+    func testSmoothedLatestSharingRequiresConfirmationAndShowsWarning() throws {
+        try withTemporaryStandardDefaults { standard in
+            standard.loopShareType = .trio
+            standard.isMaster = true
+            standard.cgmTransmitterTypeAsString = nil
+            standard.enableLatestReadingSmoothing = true
+
+            let model = SettingsViewDevelopmentSettingsViewModel(rowGroup: .osAidLoopShare)
+            let row = try XCTUnwrap(model.settingsRows(sectionID: 0).first { $0.id == "developer.loopShareSmoothedLatestReading" })
+            guard case let .toggle(isOn, setIsOn, confirmation)? = row.control else {
+                return XCTFail("Smoothed latest reading must have a confirmation toggle")
+            }
+            XCTAssertFalse(isOn())
+            XCTAssertNotNil(confirmation?(true))
+            XCTAssertNil(confirmation?(false))
+            XCTAssertFalse(isOn())
+            setIsOn(true)
+            XCTAssertTrue(isOn())
+
+            let section = model.settingsSection(sectionID: 0)
+            XCTAssertEqual(section.footer, Texts_SettingsView.loopShareSmoothedLatestReadingEnabledMessage)
+            XCTAssertEqual(section.footerIndicator?.symbolName, "exclamationmark.triangle.fill")
+        }
     }
 
     func testUnconfiguredDirectAndOtherSourcesRemainAllowed() {
@@ -169,7 +248,7 @@ final class FollowerSettingsTests: XCTestCase {
             standard.loopShareType = .trio
             standard.isMaster = true
             standard.cgmTransmitterTypeAsString = CGMTransmitterType.medtrumTouchCareNano.rawValue
-            standard.enableSmoothing = true
+            standard.enableLatestReadingSmoothing = true
 
             let rows = SettingsViewDevelopmentSettingsViewModel(rowGroup: .osAidLoopShare).settingsRows(sectionID: 0)
             guard let targetRow = rows.first(where: { $0.id == "developer.loopShareType" }) else {
@@ -179,9 +258,9 @@ final class FollowerSettingsTests: XCTestCase {
             XCTAssertEqual(targetRow.detail, Texts_Common.disabled)
             XCTAssertFalse(targetRow.isEnabled)
             XCTAssertNil(targetRow.control)
-            XCTAssertEqual(rows.first { $0.id == "developer.loopDelay" }?.isVisible, false)
+            XCTAssertNil(rows.first { $0.id == "developer.loopDelay" })
             XCTAssertEqual(rows.first { $0.id == "developer.loopShareMedtrumNano" }?.isVisible, false)
-            XCTAssertEqual(rows.first { $0.id == "developer.loopShareSmoothedData" }?.isVisible, false)
+            XCTAssertEqual(rows.first { $0.id == "developer.loopShareSmoothedLatestReading" }?.isVisible, false)
         }
     }
 
@@ -191,7 +270,7 @@ final class FollowerSettingsTests: XCTestCase {
             standard.showDeveloperSettings = true
             standard.careLinkVersion = ConstantsCareLink.carePartnerAppVersionDefault
 
-            let model = SettingsViewDevelopmentSettingsViewModel(rowGroup: .advanced)
+            let model = SettingsViewDevelopmentSettingsViewModel(rowGroup: .advancedOptions)
             let rows = model.settingsRows(sectionID: 0)
             let libreIndex = try XCTUnwrap(rows.firstIndex { $0.id == "developer.libreLinkUpVersion" })
             let careLinkIndex = try XCTUnwrap(rows.firstIndex { $0.id == "developer.careLinkVersion" })
@@ -267,7 +346,82 @@ final class FollowerSettingsTests: XCTestCase {
     }
 
     @MainActor
-    func testBlockedShareClearsPublishedAndDelayedData() throws {
+    func testSharedLatestValueStaysStableAsTheReadingAgesIntoHistory() throws {
+        try withTemporaryStandardDefaults { standard in
+            standard.loopShareType = .trio
+            standard.isMaster = false
+            standard.followerDataSourceType = .dexcomShare
+            standard.postProcessingStartTimeStamp = nil
+            standard.enableLatestReadingSmoothing = true
+            let legacyDelayDefaults = ["loopDelaySchedule", "loopDelayValueInMinutes"]
+            let previousDelay = legacyDelayDefaults.map { ($0, standard.object(forKey: $0)) }
+            standard.set("0", forKey: legacyDelayDefaults[0])
+            standard.set("20", forKey: legacyDelayDefaults[1])
+            defer { for (key, value) in previousDelay { standard.set(value, forKey: key) } }
+            let suite = try XCTUnwrap(UserDefaults(suiteName: standard.loopShareType.sharedUserDefaultsSuiteName))
+            let keys = ["latestReadings", XDripCGMMetadataEnvelope.appGroupKey]
+            let previous = keys.map { ($0, suite.object(forKey: $0)) }
+            defer {
+                for (key, value) in previous { suite.set(value, forKey: key) }
+            }
+
+            let core = CoreDataManager(inMemoryModelName: ConstantsCoreData.modelName)
+            let manager = LoopManager(coreDataManager: core, activeSensorIsAnubisProvider: { false }, metadataContextProvider: {
+                XDripCGMMetadataContext(activeSensor: nil, transmitter: nil, sensorHealthIssue: nil,
+                    hasInitialCalibration: nil, lastCalibrationAt: nil, dexcomAlgorithmState: nil,
+                    libreSensorState: nil)
+            })
+            let now = Date()
+            func reading(_ value: Double, minutesAgo: Double) -> BgReading {
+                let reading = BgReading(timeStamp: now.addingTimeInterval(-TimeInterval.minutes(minutesAgo)), sensor: nil,
+                                        calibration: nil, rawData: value, deviceName: nil,
+                                        nsManagedObjectContext: core.mainManagedObjectContext)
+                reading.calculatedValue = value
+                return reading
+            }
+            func sharedValues() throws -> [Int] {
+                let data = try XCTUnwrap(suite.data(forKey: "latestReadings"))
+                let readings = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [[String: Any]])
+                return try readings.map { try XCTUnwrap($0["Value"] as? Int) }
+            }
+
+            let historical = reading(106, minutesAgo: 11)
+            historical.smoothedValue = 110
+            let latest = reading(130, minutesAgo: 6)
+            let oldState = LatestReadingSmoothing.liveState
+            defer { LatestReadingSmoothing.liveState = oldState }
+            LatestReadingSmoothing.liveState = .init(readingID: latest.id, smoothedValue: 122)
+            XCTAssertTrue(core.saveChangesSynchronously())
+            manager.share()
+            XCTAssertEqual(try sharedValues(), [130, 106])
+            let data = try XCTUnwrap(suite.data(forKey: "latestReadings"))
+            let payload = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [[String: Any]])
+            let latestTimestamp = Int64(floor(latest.timeStamp.timeIntervalSince1970) * 1000)
+            XCTAssertEqual(payload.first?["ST"] as? String, "/Date(\(latestTimestamp))/")
+
+            standard.loopShareSmoothedLatestReading = true
+            manager.share()
+            XCTAssertEqual(try sharedValues(), [122, 106])
+
+            LatestReadingSmoothing.liveState = .init(readingID: latest.id, smoothedValue: 126)
+            manager.share()
+            XCTAssertEqual(try sharedValues(), [126, 106])
+
+            latest.smoothedValue = 119
+            let next = reading(132, minutesAgo: 1)
+            LatestReadingSmoothing.liveState = .init(readingID: next.id, smoothedValue: nil)
+            XCTAssertTrue(core.saveChangesSynchronously())
+            manager.share()
+            XCTAssertEqual(try sharedValues(), [132, 126, 106])
+
+            standard.loopShareSmoothedLatestReading = false
+            manager.share()
+            XCTAssertEqual(try sharedValues(), [132, 130, 106])
+        }
+    }
+
+    @MainActor
+    func testBlockedShareClearsPublishedDataAndRememberedLiveValues() throws {
         try withTemporaryStandardDefaults { standard in
             standard.loopShareType = .trio
             standard.isMaster = true
@@ -316,11 +470,11 @@ final class FollowerSettingsTests: XCTestCase {
                     )
                 }
             )
-            loopManager.glucoseData = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: 123)]
+            standard.set(["test-reading": 123.0], forKey: UserDefaults.Key.loopShareLiveReadings.rawValue)
 
             loopManager.share()
 
-            XCTAssertTrue(loopManager.glucoseData.isEmpty)
+            XCTAssertNil(standard.object(forKey: UserDefaults.Key.loopShareLiveReadings.rawValue))
             XCTAssertNil(standard.readingsStoredInSharedUserDefaultsAsDictionary)
             for key in sharedKeys {
                 XCTAssertNil(sharedDefaults.object(forKey: key), "Expected \(key) to be removed")
@@ -578,9 +732,12 @@ final class FollowerSettingsTests: XCTestCase {
             .followerDataSourceType,
             .transmitterTypeAsString,
             .loopShareType,
-            .loopShareSmoothedData,
+            .loopShareSmoothedLatestReading,
             .loopShareMedtrumNano,
             .enableSmoothing,
+            .enableLatestReadingSmoothing,
+            .loopShareLiveReadings,
+            .postProcessingStartTimeStamp,
             .readingsStoredInSharedUserDefaultsAsDictionary
         ]
         let previousValues = keys.map { ($0.rawValue, standard.object(forKey: $0.rawValue)) }

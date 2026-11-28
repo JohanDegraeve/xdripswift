@@ -532,9 +532,6 @@ extension UserDefaults {
         /// dictionary representation of readings that were shared with Loop (or another OS-AID system using the same method). This is not the json representation, it's an array of dictionary
         case readingsStoredInSharedUserDefaultsAsDictionary = "readingsStoredInSharedUserDefaultsAsDictionary"
 
-        /// timestamp lastest reading shared with Loop/OS-AID
-        case timeStampLatestLoopSharedBgReading = "timeStampLatestLoopSharedBgReading"
-
         // Trace
         /// should debug level logs be added in trace file or not, and also in NSLog
         case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
@@ -573,7 +570,11 @@ extension UserDefaults {
         /// should the BG values be written to a shared app group?
         case loopShareType = "loopShareType"
         /// should smoothed/final values be shared with OS-AID apps instead of adjusted/calculated values?
-        case loopShareSmoothedData = "loopShareSmoothedData"
+        case loopShareSmoothedLatestReading = "loopShareSmoothedLatestReading"
+        case loopShareLiveReadings = "loopShareLiveReadings"
+        case latestReadingSmoothingStrength = "latestReadingSmoothingStrength"
+        case bgAdjustmentEditingPreferences = "bgAdjustmentEditingPreferences"
+        case enableLatestReadingSmoothing = "enableLatestReadingSmoothing"
         /// should Medtrum Nano values be shared with OS-AID apps despite accuracy concerns?
         case loopShareMedtrumNano = "loopShareMedtrumNano"
         /// did user authorize the storage of "frequent" writes to Nightscout or not (i.e. every 60 seconds instead of every 5 minutes)
@@ -586,10 +587,6 @@ extension UserDefaults {
         case dexcomG7PairingCode = "dexcomG7PairingCode"
         /// G7 primary authentication role, stored per transmitter
         case dexcomG7BluetoothSlot = "dexcomG7BluetoothSlot"
-        /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes.
-        /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
-        case loopDelaySchedule = "loopDelaySchedule"
-        case loopDelayValueInMinutes = "loopDelayValueInMinutes"
         /// used for Libre data parsing - only for Libre 1 or Libre 2 read via transmitter, ie full NFC block
         case previousRawLibreValues = "previousRawLibreValues"
         /// used for storing data read with Libre 2 direct
@@ -1123,9 +1120,6 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.enableSmoothing.rawValue)
-            if !newValue {
-                loopShareSmoothedData = false
-            }
         }
     }
 
@@ -1166,6 +1160,12 @@ extension UserDefaults {
         set {
             set(newValue.rawValue, forKey: Key.bgSmoothingAlgorithm.rawValue)
         }
+    }
+
+    /// The Hampel variant now uses the existing Savitzky-Golay selection.
+    func migrateLegacySmoothingAlgorithm() {
+        guard string(forKey: Key.bgSmoothingAlgorithm.rawValue) == "hampelSavitzkyGolay" else { return }
+        bgSmoothingAlgorithm = .savitzkyGolay
     }
 
     /// should faster CGM streams be reduced to visible 5 minute readings?
@@ -2914,16 +2914,6 @@ extension UserDefaults {
         }
     }
 
-    /// timestamp lastest reading shared via the selected Shared App Group
-    var timeStampLatestLoopSharedBgReading:Date? {
-        get {
-            return object(forKey: Key.timeStampLatestLoopSharedBgReading.rawValue) as? Date
-        }
-        set {
-            set(newValue, forKey: Key.timeStampLatestLoopSharedBgReading.rawValue)
-        }
-    }
-
 
     // MARK: - =====  Developer Settings ======
 
@@ -2968,18 +2958,6 @@ extension UserDefaults {
         }
     }
 
-    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes.
-    ///
-    /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
-    @objc dynamic var loopDelaySchedule: String? {
-        get {
-            return string(forKey: Key.loopDelaySchedule.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.loopDelaySchedule.rawValue)
-        }
-    }
-
     /// should the BG values be shared with a specified app group
     var loopShareType: LoopShareType {
         get {
@@ -2988,19 +2966,46 @@ extension UserDefaults {
         }
         set {
             set(newValue.rawValue, forKey: Key.loopShareType.rawValue)
-            loopShareSmoothedData = false
+            loopShareSmoothedLatestReading = false
             loopShareMedtrumNano = false
         }
     }
 
-    /// Share smoothed/final glucose values with OS-AID app groups.
-    /// Default false. Reset to false when OS-AID target or Glucose smoothing is changed.
-    var loopShareSmoothedData: Bool {
+    @objc dynamic var enableLatestReadingSmoothing: Bool {
+        get { bool(forKey: Key.enableLatestReadingSmoothing.rawValue) }
+        set {
+            set(newValue, forKey: Key.enableLatestReadingSmoothing.rawValue)
+            if !newValue {
+                loopShareSmoothedLatestReading = false
+            }
+        }
+    }
+
+    var latestReadingSmoothingMode: LatestReadingSmoothing.Mode {
         get {
-            return bool(forKey: Key.loopShareSmoothedData.rawValue) && loopShareType != .disabled && enableSmoothing
+            guard enableLatestReadingSmoothing else { return .off }
+            let strength = string(forKey: Key.latestReadingSmoothingStrength.rawValue).flatMap(LatestReadingSmoothing.Mode.init(rawValue:))
+            return strength.flatMap { $0.isEnabled ? $0 : nil } ?? .medium
         }
         set {
-            set(newValue && loopShareType != .disabled && enableSmoothing, forKey: Key.loopShareSmoothedData.rawValue)
+            if newValue.isEnabled {
+                set(newValue.rawValue, forKey: Key.latestReadingSmoothingStrength.rawValue)
+            }
+            enableLatestReadingSmoothing = newValue.isEnabled
+        }
+    }
+
+    var loopShareSmoothedLatestReading: Bool {
+        get {
+            bool(forKey: Key.loopShareSmoothedLatestReading.rawValue)
+                && enableLatestReadingSmoothing && canPublishOSAidData
+        }
+        set {
+            let enabled = newValue && enableLatestReadingSmoothing && canPublishOSAidData
+            set(enabled, forKey: Key.loopShareSmoothedLatestReading.rawValue)
+            if !enabled {
+                removeObject(forKey: Key.loopShareLiveReadings.rawValue)
+            }
         }
     }
 
@@ -3049,18 +3054,6 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.suppressUnLockPayLoad.rawValue)
-        }
-    }
-
-    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes.
-    ///
-    /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
-    @objc dynamic var loopDelayValueInMinutes: String? {
-        get {
-            return string(forKey: Key.loopDelayValueInMinutes.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.loopDelayValueInMinutes.rawValue)
         }
     }
 

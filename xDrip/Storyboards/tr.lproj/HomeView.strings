@@ -74,6 +74,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "%@ kaldı";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Hampel filtresi önce tekil aykırı değerleri azaltır. Ardından Savitzky-Golay, tepe ve diplerin genel şeklini koruyarak eğriyi yumuşatır.";
 
 "sensorManagementNoiseTitle" = "Sensör gürültüsü";
 "sensorManagementNoiseShortTerm" = "Son 30 dakika";
@@ -205,3 +206,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Bu CGM kendi kalibrasyonunu kullandığından ofset ve şekil ayarı kullanılamaz.";
 
 "postProcessingWarningAgreement" = "Yalnızca bu özelliği anlıyor ve etkinleştirmeyi kabul ediyorsanız Tamam’a dokunun.";
+
+"postProcessingPreviousReadings" = "Önceki Ölçümleri Yumuşat";
+"postProcessingPreviousReadingsFooter" = "Yeni ölçümler geldikçe grafikteki önceki ölçümleri yumuşatır. En son ölçüm bu işlemden etkilenmez.";
+"postProcessingLatestReading" = "En Son Ölçümü Yumuşat";
+"postProcessingLatestReadingFooter" = "Son 10–20 dakikanın ölçümlerini kullanarak en son glikoz ölçümündeki beklenmedik yükselişleri veya düşüşleri azaltır. Açıldığında yalnızca en son ölçümü etkiler.";
+"postProcessingLatestReadingOff" = "Kapalı";
+"postProcessingLatestReadingDisabled" = "En son ölçümü yumuşatma kapalı";
+"postProcessingLatestReadingWarning" = "En son ölçümü yumuşatmak gerçek glikoz değişimlerinin ekranda daha küçük ya da daha geç görünmesine neden olabilir ve glikoz uyarılarının ne zaman tetiklendiğini etkileyebilir. Diğer uygulamalar aynı ölçüm için farklı bir değer gösterebilir.";
+
+"postProcessingOffset" = "Ofset";
+"postProcessingCurve" = "Eğri";
+"postProcessingBoth" = "Her ikisi";
+"postProcessingOffsetAndCurve" = "Ofset ve eğri";
+"postProcessingMode" = "Mod";
+"postProcessingUnavailable" = "Kullanılamıyor";
+"postProcessingExpanded" = "Genişletildi";
+"postProcessingCollapsed" = "Daraltıldı";
+"postProcessingReferenceGlucose" = "Referans glikoz";
+"postProcessingEnterReferenceGlucose" = "Referans glikozu gir";
+"postProcessingDecrease" = "Azalt: %@";
+"postProcessingIncrease" = "Artır: %@";
+"postProcessingLight" = "Hafif";
+"postProcessingMedium" = "Orta";
+"postProcessingStrong" = "Güçlü";
+"postProcessingCurveShape" = "Şekil";
+"postProcessingOffsetBgCheckHint" = "Yakın zamanda yapılmış bir kan şekeri ölçümü önerilir";
+"postProcessingScaleBgCheckHint" = "Yakın zamanda yapılmış iki kan şekeri ölçümü önerilir";

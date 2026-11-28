@@ -393,8 +393,6 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-/// Settings screen for loop delay
-"Select Time" = "Select Time";
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
 "settingsviews_resetDexcomTransmitterMessage" = "This option will attempt to reset your Anubis transmitter on the next connection.";
@@ -408,8 +406,6 @@
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Mantieni attivo is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
-/// Settings screen for loop delay, explanatory text for value
-"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
 
 /// statistics settings, prefer time in tight range
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
@@ -436,8 +432,6 @@
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 
-/// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
-"warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
 
 /// statistics settings, prefer user-defined range
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
@@ -494,11 +488,7 @@
 /// When enabled, then it should be possible to run xDrip4iOS/Libre 2 in parallel with other app(s)
 "suppressUnLockPayLoad" = "Suppress Unlock Payload";
 
-/// Settings screen for loop delay
-"Select Value" = "Select Value";
 
-/// Settings screen for loop delay, explanatory text for time
-"expanatoryTextSelectTime" = "As of what time should the value apply";
 
 /// data source settings, data source region
 "settingsviews_labelFollowerDataSourceRegion" = "Region";
@@ -840,3 +830,10 @@
 "settingsviews_shareReport" = "Condividi rapporto";
 "settingsviews_shareIssueReport" = "Condividi rapporto sul problema";
 "settingsviews_reportShareFailed" = "Impossibile preparare i file di log. Riprova.";
+
+"settingsviews_loopShareSmoothedLatestReading" = "Condividi lettura filtrata";
+"settingsviews_loopShareSmoothedLatestReadingConfirmationTitle" = "Condividere le letture filtrate?";
+"settingsviews_loopShareSmoothedLatestReadingAction" = "Condividi";
+"settingsviews_loopShareSmoothedLatestReadingDifferenceMessage" = "La tua app AID riceverà l’ultima lettura del glucosio senza alcun filtraggio. Le due app potrebbero quindi mostrare valori diversi.";
+"settingsviews_loopShareSmoothedLatestReadingEnabledMessage" = "La tua app AID riceve il valore del glucosio filtrato mostrato in %@. Lo userà per decidere la dose di insulina.\n\nIl valore filtrato può riflettere con un lieve ritardo aumenti o cali rapidi, ma il filtro attenuerà il rumore e i salti improvvisi del segnale.";
+"settingsviews_loopShareSmoothedLatestReadingWarning" = "Se il filtraggio modifica l’ultima lettura del glucosio, la tua app AID riceverà il valore corretto e lo userà per decidere la dose di insulina.";

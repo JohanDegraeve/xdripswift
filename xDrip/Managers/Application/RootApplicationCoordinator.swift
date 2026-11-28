@@ -516,6 +516,9 @@ import AppIntents
         // if bg post processing changes, update the chart
         NotificationCenter.default.addObserver(self, selector: #selector(handleBgPostProcessingDidUpdate), name: Notification.Name(ConstantsNotifications.NotificationIdentifierForBgPostProcessing.bgPostProcessingDidUpdate), object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshOSAidShare), name: ConstantsNotifications.osAidSharingDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshAfterGlucoseDeletion), name: .bgReadingsDeletedByUser, object: nil)
+
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
         
@@ -800,6 +803,9 @@ import AppIntents
         
         // setup bgPostProcessingManager
         bgPostProcessingManager = BgPostProcessingManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager, healthKitManager: healthKitManager)
+        if UserDefaults.standard.enableSmoothing || UserDefaults.standard.enableLatestReadingSmoothing {
+            bgPostProcessingManager?.refreshLiveReadingForCurrentSource(notify: false)
+        }
 
         // setup sensor noise manager and refresh persisted values for the current algorithm version
         sensorNoiseManager = SensorNoiseManager(
@@ -857,8 +863,8 @@ import AppIntents
                     )
                 }
             )
-            // Reconstruct the additive Trio snapshot from persisted producer state after Core Data startup.
-            loopManager?.shareMetadata()
+            // Publish the active glucose series and reconstruct Trio metadata after Core Data startup.
+            loopManager?.share()
         }
         
         // setup dexcomShareUploadManager
@@ -1211,9 +1217,6 @@ import AppIntents
             let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor)
             let lastCalibrationForActiveSensor = calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: activeSensor)
             
-            /// used if loopdelay > 0, to check if there was a recent calibration. If so then no readings are added in glucoseData array for a period of loopdelay + an amount of minutes
-            let timeStampLastCalibrationForActiveSensor = lastCalibrationForActiveSensor != nil ? lastCalibrationForActiveSensor!.timeStamp : Date(timeIntervalSince1970: 0)
-            
             // was a new reading created or not ?
             var newReadingCreated = false
             var acceptedReadings: [(reading: BgReading, acceptedAt: Date)] = []
@@ -1232,13 +1235,6 @@ import AppIntents
             
             if let oldestIncomingTimeStamp = oldestIncomingTimeStamp, let newestIncomingTimeStamp = newestIncomingTimeStamp {
                 existingBgReadingsInIncomingRange = bgReadingsAccessor.getBgReadings(from: oldestIncomingTimeStamp.addingTimeInterval(-duplicateReadingWindow), to: newestIncomingTimeStamp.addingTimeInterval(duplicateReadingWindow), on: coreDataManager.mainManagedObjectContext, includingSuppressed: true)
-            }
-            
-            /// in case loopdelay > 0, this will be used to share with Loop
-            /// - it will contain the full range off per minute readings (in stead of filtered by 5 minutes
-            /// - reset to empty array
-            if let loopManager = loopManager {
-                loopManager.glucoseData = [GlucoseData]()
             }
             
             // initialize latest3BgReadings
@@ -1340,22 +1336,9 @@ import AppIntents
                         // reset latest3BgReadings
                         latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false, includingSuppressed: true)
                         
-                        if let loopManager = loopManager, LoopManager.osAidSharingPermitted, LoopManager.loopDelay() > 0 && abs(Date().timeIntervalSince(timeStampLastCalibrationForActiveSensor)) > LoopManager.loopDelay() + TimeInterval(minutes: 5.5) {
-                            loopManager.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.loopShareValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
-                        }
                     } else {
                         trace("in processNewGlucoseData, reading skipped, rawValue <= 0, looks like a faulty sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info, troubleshooting: .standard(.sensor(.unusableReading)))
                     }
-                } else if let loopManager = loopManager, LoopManager.osAidSharingPermitted, LoopManager.loopDelay() > 0 && glucose.glucoseLevelRaw > 0 && abs(Date().timeIntervalSince(timeStampLastCalibrationForActiveSensor)) >  LoopManager.loopDelay() + TimeInterval(minutes: 5.5) {
-                    // loopdelay > 0, LoopManager will use loopShareGoucoseData
-                    // create a reading just to be able to fill up loopShareGoucoseData, to have them per minute
-                    
-                    let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                    
-                    loopManager.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.loopShareValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
-                    
-                    // delete the newReading, otherwise it stays in coredata and we would end up with per minute readings
-                    coreDataManager.mainManagedObjectContext.delete(newReading)
                 }
             }
             
@@ -2204,7 +2187,17 @@ import AppIntents
         }
     }
     
+    @objc private func refreshAfterGlucoseDeletion() {
+        loopManager?.clearSharedLoopReadings(preservingLiveValues: true)
+        bgPostProcessingManager?.refreshLiveReadingForCurrentSource()
+    }
+
+    @objc private func refreshOSAidShare() {
+        loopManager?.share()
+    }
+
     @objc private func handleBgPostProcessingDidUpdate() {
+        loopManager?.share()
         updateLabelsAndChart(overrideApplicationState: true, forceReset: true)
         updatePostProcessingStatus()
         watchManager?.updateWatchApp(forceComplicationUpdate: true)
@@ -2883,7 +2876,7 @@ import AppIntents
                 
                 // add delta if available
                 if latestBgReadings.count > 1 {
-                    var previousValueInUserUnit: Double = latestBgReadings[1].finalValue.mgDlToMmol(mgDl: isMgDl)
+                    var previousValueInUserUnit: Double = latestBgReadings[0].previousLiveValue(for: latestBgReadings[1]).mgDlToMmol(mgDl: isMgDl)
                     var actualValueInUserUnit: Double = latestBgReadings[0].finalValue.mgDlToMmol(mgDl: isMgDl)
                     
                     // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation

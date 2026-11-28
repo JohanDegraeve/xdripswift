@@ -170,6 +170,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "%@ rimanenti";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Un filtro di Hampel attenua prima i valori anomali isolati. Poi Savitzky-Golay smussa la curva preservando la forma generale dei picchi e delle valli.";
 
 "sensorManagementNoiseTitle" = "Rumore del sensore";
 "sensorManagementNoiseShortTerm" = "Ultimi 30 minuti";
@@ -324,3 +325,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "La regolazione dell'offset e della forma non è disponibile perché questo CGM usa la calibrazione nativa.";
 
 "postProcessingWarningAgreement" = "Tocca OK solo se comprendi questa funzione e accetti di attivarla.";
+
+"postProcessingPreviousReadings" = "Smussa le letture precedenti";
+"postProcessingPreviousReadingsFooter" = "Smussa le letture precedenti nel grafico man mano che arrivano nuove letture. L’ultima lettura rimane invariata.";
+"postProcessingLatestReading" = "Smussa l’ultima lettura";
+"postProcessingLatestReadingFooter" = "Attenua aumenti o cali imprevisti dell’ultima lettura del glucosio usando le letture degli ultimi 10–20 minuti. Se attiva, l’opzione influisce solo sull’ultima lettura.";
+"postProcessingLatestReadingOff" = "Disattivato";
+"postProcessingLatestReadingDisabled" = "Smussamento dell’ultima lettura disattivato";
+"postProcessingLatestReadingWarning" = "Smussare l’ultima lettura può attenuare o ritardare la visualizzazione delle variazioni reali del glucosio e influire sul momento in cui si attivano gli avvisi. Altre app possono mostrare un valore diverso per la stessa lettura.";
+
+"postProcessingOffset" = "Scostamento";
+"postProcessingCurve" = "Curva";
+"postProcessingBoth" = "Entrambi";
+"postProcessingOffsetAndCurve" = "Scostamento e curva";
+"postProcessingMode" = "Modalità";
+"postProcessingUnavailable" = "Non disponibile";
+"postProcessingExpanded" = "Espanso";
+"postProcessingCollapsed" = "Compresso";
+"postProcessingReferenceGlucose" = "Glicemia di riferimento";
+"postProcessingEnterReferenceGlucose" = "Inserisci glicemia di riferimento";
+"postProcessingDecrease" = "Riduci: %@";
+"postProcessingIncrease" = "Aumenta: %@";
+"postProcessingLight" = "Leggero";
+"postProcessingMedium" = "Medio";
+"postProcessingStrong" = "Forte";
+"postProcessingCurveShape" = "Forma";
+"postProcessingOffsetBgCheckHint" = "Si consiglia una misurazione recente della glicemia";
+"postProcessingScaleBgCheckHint" = "Si consigliano due misurazioni recenti della glicemia";

@@ -258,7 +258,6 @@
 		4A9B10062F0A000100000001 /* BgAdjustmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */; };
 		4A9B10072F0A000100000001 /* ConstantsBgAdjustment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10172F0A000100000001 /* ConstantsBgAdjustment.swift */; };
 		4A9B10082F0A000100000001 /* BgSmoothingAlgorithmPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10182F0A000100000001 /* BgSmoothingAlgorithmPlugin.swift */; };
-		4A9B10092F0A000100000001 /* SavitzkyGolayBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10192F0A000100000001 /* SavitzkyGolayBgSmoothing.swift */; };
 		4A9B100A2F0A000100000001 /* ExponentialBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B101A2F0A000100000001 /* ExponentialBgSmoothing.swift */; };
 		4A9B100B2F0A000100000001 /* KalmanBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B101B2F0A000100000001 /* KalmanBgSmoothing.swift */; };
 		4A9B100C2F0A000100000001 /* LoessBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B101C2F0A000100000001 /* LoessBgSmoothing.swift */; };
@@ -672,7 +671,6 @@
 		F85FF3CD252F9FD7004E6FF1 /* SnoozeParameters+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85FF3CC252F9FD7004E6FF1 /* SnoozeParameters+CoreDataProperties.swift */; };
 		F85FF3D1252F9FF9004E6FF1 /* SnoozeParameters+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85FF3D0252F9FF9004E6FF1 /* SnoozeParameters+CoreDataClass.swift */; };
 		F85FF3D7252FB1C0004E6FF1 /* SnoozeParametersAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85FF3D6252FB1C0004E6FF1 /* SnoozeParametersAccessor.swift */; };
-		F86697502867AA4A00025441 /* LoopDelayScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F866974F2867AA4A00025441 /* LoopDelayScheduleView.swift */; };
 		F867E2612252ADAB000FD265 /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */; };
 		F869188C23A044340065B607 /* TextsM5StackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F869188B23A044340065B607 /* TextsM5StackView.swift */; };
 		F8780DA89B598D0DB76B4DD5 /* Libre3PatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB94A2D461B70758B5A7076D /* Libre3PatchStatus.swift */; };
@@ -720,7 +718,6 @@
 		F8A5EEB2257CEC290085E660 /* LibreNFC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEB1257CEC290085E660 /* LibreNFC.swift */; };
 		F8A5EEB8257CF2940085E660 /* TextsLibreNFC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEB7257CF2940085E660 /* TextsLibreNFC.swift */; };
 		F8A5EEC2257D18DC0085E660 /* LibreNFCDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEC1257D18DC0085E660 /* LibreNFCDelegate.swift */; };
-		F8A8F0022FF4000100000001 /* BgReading+LoopShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A8F0012FF4000100000001 /* BgReading+LoopShare.swift */; };
 		F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425D21ADEBD60078C348 /* AppDelegate.swift */; };
 		F8AC426021ADEBD60078C348 /* RootApplicationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* RootApplicationCoordinator.swift */; };
 		F8AC426521ADEBD60078C348 /* RootTab.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426321ADEBD60078C348 /* RootTab.strings */; };
@@ -812,7 +809,6 @@
 		F8DF766023E38FC100063910 /* BLEPeripheral+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF765F23E38FC100063910 /* BLEPeripheral+CoreDataClass.swift */; };
 		F8DF766223E390D100063910 /* BLEPeripheral+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF766123E390D100063910 /* BLEPeripheral+CoreDataProperties.swift */; };
 		F8DF766423E781C100063910 /* BLEPeripheralAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF766323E781C100063910 /* BLEPeripheralAccessor.swift */; };
-		F8E0475E28CC8E330049D8C9 /* GlucoseData+LoopShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */; };
 		F8E3A2A923D906C200E5E98A /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2A823D906C200E5E98A /* CalendarManager.swift */; };
 		F8E3A2AB23DA520B00E5E98A /* ConstantsCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2AA23DA520B00E5E98A /* ConstantsCalendar.swift */; };
 		F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */; };
@@ -1264,7 +1260,6 @@
 		4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgAdjustmentsView.swift; sourceTree = "<group>"; };
 		4A9B10172F0A000100000001 /* ConstantsBgAdjustment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBgAdjustment.swift; sourceTree = "<group>"; };
 		4A9B10182F0A000100000001 /* BgSmoothingAlgorithmPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgSmoothingAlgorithmPlugin.swift; sourceTree = "<group>"; };
-		4A9B10192F0A000100000001 /* SavitzkyGolayBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavitzkyGolayBgSmoothing.swift; sourceTree = "<group>"; };
 		4A9B101A2F0A000100000001 /* ExponentialBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExponentialBgSmoothing.swift; sourceTree = "<group>"; };
 		4A9B101B2F0A000100000001 /* KalmanBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KalmanBgSmoothing.swift; sourceTree = "<group>"; };
 		4A9B101C2F0A000100000001 /* LoessBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoessBgSmoothing.swift; sourceTree = "<group>"; };
@@ -1861,7 +1856,6 @@
 		F85FF3CC252F9FD7004E6FF1 /* SnoozeParameters+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SnoozeParameters+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85FF3D0252F9FF9004E6FF1 /* SnoozeParameters+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SnoozeParameters+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F85FF3D6252FB1C0004E6FF1 /* SnoozeParametersAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeParametersAccessor.swift; sourceTree = "<group>"; };
-		F866974F2867AA4A00025441 /* LoopDelayScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopDelayScheduleView.swift; sourceTree = "<group>"; };
 		F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Calibration+CoreDataProperties.swift"; path = "xDrip/Core Data/Extensions/Calibration+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		F869188B23A044340065B607 /* TextsM5StackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsM5StackView.swift; sourceTree = "<group>"; };
 		F86A3C6B247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Alerts.strings; sourceTree = "<group>"; };
@@ -1931,7 +1925,6 @@
 		F8A5EEB7257CF2940085E660 /* TextsLibreNFC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsLibreNFC.swift; sourceTree = "<group>"; };
 		F8A5EEC1257D18DC0085E660 /* LibreNFCDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreNFCDelegate.swift; sourceTree = "<group>"; };
 		F8A5EEC5257EDC910085E660 /* xdripDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = xdripDebug.entitlements; sourceTree = "<group>"; };
-		F8A8F0012FF4000100000001 /* BgReading+LoopShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+LoopShare.swift"; sourceTree = "<group>"; };
 		F8AC425A21ADEBD60078C348 /* xdrip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xdrip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8AC425D21ADEBD60078C348 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F8AC425F21ADEBD60078C348 /* RootApplicationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootApplicationCoordinator.swift; sourceTree = "<group>"; };
@@ -2076,7 +2069,6 @@
 		F8DF765F23E38FC100063910 /* BLEPeripheral+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BLEPeripheral+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F8DF766123E390D100063910 /* BLEPeripheral+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BLEPeripheral+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F8DF766323E781C100063910 /* BLEPeripheralAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEPeripheralAccessor.swift; sourceTree = "<group>"; };
-		F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GlucoseData+LoopShare.swift"; sourceTree = "<group>"; };
 		F8E3A2A823D906C200E5E98A /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
 		F8E3A2AA23DA520B00E5E98A /* ConstantsCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsCalendar.swift; sourceTree = "<group>"; };
 		F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringProtocol.swift; sourceTree = "<group>"; };
@@ -2663,7 +2655,6 @@
 				4A9B101D2F0A000100000001 /* HampelSavitzkyGolayBgSmoothing.swift */,
 				4A9B101B2F0A000100000001 /* KalmanBgSmoothing.swift */,
 				4A9B101C2F0A000100000001 /* LoessBgSmoothing.swift */,
-				4A9B10192F0A000100000001 /* SavitzkyGolayBgSmoothing.swift */,
 				F8F7B8EA259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift */,
 			);
 			path = Smoothing;
@@ -3348,7 +3339,6 @@
 				BA0000010000000000000014 /* DataManagementView.swift */,
 				BA000001000000000000001A /* ImportDataView.swift */,
 				4F2700113003000100000001 /* LiveActivitySettingsPreview.swift */,
-				F866974F2867AA4A00025441 /* LoopDelayScheduleView.swift */,
 				BA0000010000000000000019 /* ManageDataView.swift */,
 				BA0000010000000000000018 /* NightscoutImportView.swift */,
 				E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */,
@@ -3692,8 +3682,6 @@
 		F8E51D5B2448D8A3001C9E5A /* Loop */ = {
 			isa = PBXGroup;
 			children = (
-				F8A8F0012FF4000100000001 /* BgReading+LoopShare.swift */,
-				F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */,
 				F855422A2B7182C60058CE09 /* LoopFollowManager.swift */,
 				F8E51D5C2448D8B5001C9E5A /* LoopManager.swift */,
 				473D9ECD2C2DC53A00364060 /* LoopShareType.swift */,
@@ -4907,7 +4895,6 @@
 				F8F71D862B7EC1AD005076E8 /* DexcomG7+BluetoothPeripheral.swift in Sources */,
 				4D7180012FE8000100000001 /* MedtrumTouchCareNano+BluetoothPeripheral.swift in Sources */,
 				47046EA42A6E8BA700A6F736 /* TextsBgReadings.swift in Sources */,
-				F8E0475E28CC8E330049D8C9 /* GlucoseData+LoopShare.swift in Sources */,
 				476698662BE2572C008EB2A9 /* ConstantsSettingsIcons.swift in Sources */,
 				F85542322B7573D20058CE09 /* OmniPodHeartBeat+CoreDataClass.swift in Sources */,
 				F82842322752CBE00097E0C9 /* DexcomSessionStopTxMessage.swift in Sources */,
@@ -5003,7 +4990,6 @@
 				4A9B10052F0A000100000001 /* BgPostProcessingManager.swift in Sources */,
 				4A9B10082F0A000100000001 /* BgSmoothingAlgorithmPlugin.swift in Sources */,
 				4A9B100A2F0A000100000001 /* ExponentialBgSmoothing.swift in Sources */,
-				4A9B10092F0A000100000001 /* SavitzkyGolayBgSmoothing.swift in Sources */,
 				4A9B100B2F0A000100000001 /* KalmanBgSmoothing.swift in Sources */,
 				4A9B100C2F0A000100000001 /* LoessBgSmoothing.swift in Sources */,
 				4A9B100D2F0A000100000001 /* HampelSavitzkyGolayBgSmoothing.swift in Sources */,
@@ -5173,7 +5159,6 @@
 				F8A2BC3925DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMLibre2TransmitterDelegate.swift in Sources */,
 				F8A5EEAE25791F370085E660 /* Libre2BLEUtilities.swift in Sources */,
 				477B2C7E2B432775002F64A4 /* LiveActivityType.swift in Sources */,
-				F86697502867AA4A00025441 /* LoopDelayScheduleView.swift in Sources */,
 				F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */,
 				F8F9720723A5915900C3F17D /* AuthChallengeTxMessage.swift in Sources */,
 				F8B3A78E22622954004BA588 /* AlertType+CoreDataClass.swift in Sources */,
@@ -5299,7 +5284,6 @@
 				4D41C0012FF6000100000001 /* StatisticsView.swift in Sources */,
 				4D41C0022FF6000100000001 /* StatisticsViewModel.swift in Sources */,
 				D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */,
-				F8A8F0022FF4000100000001 /* BgReading+LoopShare.swift in Sources */,
 				F8E51D5D2448D8B5001C9E5A /* LoopManager.swift in Sources */,
 				473D9ECE2C2DC53A00364060 /* LoopShareType.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,

@@ -161,6 +161,10 @@ public class HealthKitManager: NSObject {
             }
         }
 
+        retryPendingBgReplacements()
+    }
+
+    private func retryPendingBgReplacements() {
         if !pendingHealthKitReplacements.isEmpty, UIApplication.shared.isProtectedDataAvailable {
             // Reload current values, not stale smoothed snapshots saved before a restart.
             // Deleted/suppressed readings must not be resurrected by a delayed retry.
@@ -203,7 +207,7 @@ public class HealthKitManager: NSObject {
 
         var pendingReplacements = pendingHealthKitReplacements
         for bgReading in bgReadings {
-            pendingReplacements[bgReading.id] = bgReading.finalValue
+            pendingReplacements[bgReading.id] = bgReading.historicalValue
         }
         pendingHealthKitReplacements = pendingReplacements
 
@@ -211,7 +215,8 @@ public class HealthKitManager: NSObject {
         // Keep replacements pending until we can safely migrate any legacy samples.
         guard UIApplication.shared.isProtectedDataAvailable else { return }
         
-        for bgReading in bgReadings {
+        let latestStored = UserDefaults.standard.timeStampLatestHealthKitStoreBgReading ?? .distantPast
+        for bgReading in bgReadings where bgReading.timeStamp < latestStored {
             // Reserve the whole query/delete/save operation, not just its final save.
             guard timeStampsOfBgReadingsCurrentlyBeingSaved.insert(bgReading.timeStamp).inserted else { continue }
             deleteExistingBgReadingsFromHealthKit(bgReading: bgReading, bloodGlucoseType: bloodGlucoseType, bloodGlucoseUnit: bloodGlucoseUnit)
@@ -345,7 +350,7 @@ public class HealthKitManager: NSObject {
 
         // Use the newest requested value if smoothing ran again during the query.
         // A removed pending entry means the reading was deleted or suppressed meanwhile.
-        guard let valueToStore = shouldUpdateLatestTimeStamp ? bgReading.finalValue : pendingHealthKitReplacements[bgReading.id] else {
+        guard let valueToStore = shouldUpdateLatestTimeStamp ? bgReading.historicalValue : pendingHealthKitReplacements[bgReading.id] else {
             timeStampsOfBgReadingsCurrentlyBeingSaved.remove(bgReading.timeStamp)
             return
         }
@@ -379,6 +384,7 @@ public class HealthKitManager: NSObject {
                             let existingTimeStampLatestHealthKitStoreBgReading = UserDefaults.standard.timeStampLatestHealthKitStoreBgReading ?? Date.distantPast
                             let newTimeStampLatestHealthKitStoreBgReading = max(existingTimeStampLatestHealthKitStoreBgReading, timeStampLastReadingToUpload)
                             UserDefaults.standard.timeStampLatestHealthKitStoreBgReading = newTimeStampLatestHealthKitStoreBgReading
+                            self.retryPendingBgReplacements()
                         }
                         trace("stored reading in HealthKit", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .debug, troubleshooting: .detailed(.integration(name: .healthKit, activity: .succeeded(itemCount: 1))))
                     } else if let error = error {

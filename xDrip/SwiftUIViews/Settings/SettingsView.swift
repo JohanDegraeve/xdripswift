@@ -201,8 +201,6 @@ struct SettingsNavigationView: View {
         case let .timeSchedule(timeSchedule):
             TimeScheduleView(timeSchedule: timeSchedule)
 
-        case .loopDelaySchedule:
-            LoopDelayScheduleView()
 
         case let .dataManagement(flow):
             DataManagementView(coreDataManager: coreDataManager, flow: flow)

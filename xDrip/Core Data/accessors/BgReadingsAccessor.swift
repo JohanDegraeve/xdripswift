@@ -96,7 +96,7 @@ class BgReadingsAccessor: ObservableObject {
     /// - returns: an array with readings, can be empty array.
     ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
 
-    func getLatestBgReadings(limit: Int?, fromDate: Date?, forSensor sensor: Sensor?, ignoreRawData: Bool, ignoreCalculatedValue: Bool, includingSuppressed: Bool = false) -> [BgReading] {
+    func getLatestBgReadings(limit: Int?, fromDate: Date?, forSensor sensor: Sensor?, ignoreRawData: Bool, ignoreCalculatedValue: Bool, includingSuppressed: Bool = false, includingStartDate: Bool = false) -> [BgReading] {
 
         var returnValue: [BgReading] = []
 
@@ -112,7 +112,7 @@ class BgReadingsAccessor: ObservableObject {
             var subPredicates = [NSPredicate]()
 
             if let fromDate = fromDate {
-                subPredicates.append(NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970)))
+                subPredicates.append(NSPredicate(format: includingStartDate ? "timeStamp >= %@" : "timeStamp > %@", fromDate as NSDate))
             }
 
             if !includingSuppressed {
@@ -200,6 +200,7 @@ class BgReadingsAccessor: ObservableObject {
                 let sensorId = sensor?.id
                 let ignoreSensorId = (sensorId == nil)
 
+                var latestReading: BgReading?
                 for bgReading in bgReadings {
                     if !ignoreSensorId {
                         guard let fetchedSensor = bgReading.sensor, fetchedSensor.id == sensorId else { continue }
@@ -217,6 +218,12 @@ class BgReadingsAccessor: ObservableObject {
                         calibrationSnapshot = nil
                     }
 
+                    // The Watch delta uses the same adjacent reading as the phone.
+                    if returnValue.count == 1, let latestReading {
+                        returnValue[0].livePreviousValue = latestReading.previousLiveValue(for: bgReading)
+                    }
+                    if returnValue.isEmpty { latestReading = bgReading }
+
                     returnValue.append(BgReadingSnapshot(timeStamp: bgReading.timeStamp, calculatedValue: bgReading.calculatedValue, rawData: bgReading.rawData, finalValue: bgReading.finalValue, adjustedValue: bgReading.adjustedValue?.doubleValue, smoothedValue: bgReading.smoothedValue?.doubleValue, backfilledAt: bgReading.backfilledAt, valueIsFromWatch: bgReading.valueIsFromWatch, watchReceivedAt: bgReading.watchReceivedAt, wasAlsoCollectedByWatch: bgReading.wasAlsoCollectedByWatch, calculatedValueSlope: bgReading.calculatedValueSlope, hideSlope: bgReading.hideSlope, id: bgReading.id, deviceName: bgReading.deviceName, calibrationSnapshot: calibrationSnapshot, sensorID: bgReading.sensor?.id, objectID: bgReading.objectID))
 
                     if let limit = limit, returnValue.count == limit { break }
@@ -229,6 +236,21 @@ class BgReadingsAccessor: ObservableObject {
         }
 
         return returnValue
+    }
+
+    /// File and service exports use the unfiltered live edge and the stored historical series.
+    func historicalUploadTrend(for reading: BgReading) -> (slope: Double, hidden: Bool) {
+        guard reading.livePreviousValue != nil || reading.latestSmoothedValue != nil else {
+            return (reading.calculatedValueSlope, reading.hideSlope)
+        }
+        let interval = TimeInterval.minutes(Double(ConstantsBGGraphBuilder.maxSlopeInMinutes))
+        let minimum = TimeInterval.minutes(Double(ConstantsBGGraphBuilder.minSlopeInMinutes))
+        let prior = getLatestBgReadings(limit: nil, fromDate: reading.timeStamp.addingTimeInterval(-interval),
+                                       forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+            .first { reading.timeStamp.timeIntervalSince($0.timeStamp) >= minimum }
+        guard let prior else { return (0, true) }
+        return BgReading.slope(currentValue: reading.historicalValue, currentDate: reading.timeStamp,
+                               previousValue: prior.historicalValue, previousDate: prior.timeStamp)
     }
 
     /// Returns plain Date timestamps for readings in the last 24 hours up to endingAt.

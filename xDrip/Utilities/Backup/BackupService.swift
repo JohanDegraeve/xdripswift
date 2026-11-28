@@ -25,6 +25,8 @@ final class BackupService: @unchecked Sendable {
         UserDefaults.Key.careLinkPatientAliases.rawValue,
         UserDefaults.Key.careLinkDeviceOffsets.rawValue,
         "pendingHealthKitReplacements",
+        // Ignore retired OS-AID delay settings stored on older installations.
+        "loopDelaySchedule", "loopDelayValueInMinutes", "timeStampLatestLoopSharedBgReading",
         "healthKitSyncVersion",
         "is15DayDexcomG7",
         // Keep removed credentials out of settings backups from upgraded installations.
@@ -45,6 +47,13 @@ final class BackupService: @unchecked Sendable {
         UserDefaults.Key.snoozeAllAlertsUntilDate.rawValue,
         UserDefaults.Key.enableAdjustment.rawValue,
         UserDefaults.Key.enableSmoothing.rawValue,
+        UserDefaults.Key.enableLatestReadingSmoothing.rawValue,
+        UserDefaults.Key.latestReadingSmoothingStrength.rawValue,
+        UserDefaults.Key.loopShareSmoothedLatestReading.rawValue,
+        UserDefaults.Key.loopShareLiveReadings.rawValue,
+        LatestReadingSmoothing.stateKey,
+        NightscoutSyncManager.historicalBgQueueKey,
+        UserDefaults.Key.bgAdjustmentEditingPreferences.rawValue,
         UserDefaults.Key.bgSmoothingPeriodInMinutes.rawValue,
         UserDefaults.Key.bgSmoothingStrength.rawValue,
         UserDefaults.Key.bgSmoothingAlgorithm.rawValue,
@@ -77,7 +86,6 @@ final class BackupService: @unchecked Sendable {
         UserDefaults.Key.transmitterBatteryInfo.rawValue,
         UserDefaults.Key.timeStampOfLastBatteryReading.rawValue,
         UserDefaults.Key.readingsStoredInSharedUserDefaultsAsDictionary.rawValue,
-        UserDefaults.Key.timeStampLatestLoopSharedBgReading.rawValue,
         UserDefaults.Key.nfcScanFailed.rawValue,
         UserDefaults.Key.nfcScanSuccessful.rawValue,
         UserDefaults.Key.stopActiveSensor.rawValue,
@@ -1082,8 +1090,15 @@ final class BackupService: @unchecked Sendable {
     }
 
     private func restoreStoredValues(_ values: [String: BackupPropertyListValue]) throws -> Int {
+        let defaults = UserDefaults.standard
         for (key, value) in values {
-            try UserDefaults.standard.set(value.decoded(), forKey: key)
+            let decoded = try value.decoded()
+            if key == UserDefaults.Key.loopShareType.rawValue,
+               decoded as? Int != defaults.loopShareType.rawValue {
+                // A restored target needs its own consent to receive smoothed readings.
+                defaults.loopShareSmoothedLatestReading = false
+            }
+            defaults.set(decoded, forKey: key)
         }
         return values.count
     }

@@ -24,7 +24,6 @@ enum SettingsSegueIdentifier: String {
     case settingsToAlertSettings
     case settingsToM5StackSettings
     case settingsToSchedule
-    case settingsToLoopDelaySchedule
 }
 
 final class SettingsRouter: ObservableObject {
@@ -59,7 +58,6 @@ struct SettingsRoute: Hashable {
         case alertEditor(AlertEntryEditorMode, AlertsSettingsViewModel)
         case m5Stack
         case timeSchedule(TimeSchedule)
-        case loopDelaySchedule
         case dataManagement(DataManagementFlow)
         case troubleshootingLog
         case incomingBackup(IncomingBackupRequest)
@@ -240,12 +238,14 @@ struct SettingsSection {
     let title: String?
     let iconSymbolName: String?
     let footer: String?
+    let footerIndicator: SettingsIndicator?
     let rows: [SettingsRow]
 
-    init(title: String? = nil, iconSymbolName: String? = nil, footer: String? = nil, rows: [SettingsRow]) {
+    init(title: String? = nil, iconSymbolName: String? = nil, footer: String? = nil, footerIndicator: SettingsIndicator? = nil, rows: [SettingsRow]) {
         self.title = title
         self.iconSymbolName = iconSymbolName
         self.footer = footer
+        self.footerIndicator = footerIndicator
         self.rows = rows
     }
 }
@@ -795,8 +795,6 @@ final class SettingsActionPresenter: ObservableObject {
             if let timeSchedule = sender as? TimeSchedule {
                 router.show(.timeSchedule(timeSchedule))
             }
-        case SettingsSegueIdentifier.settingsToLoopDelaySchedule.rawValue:
-            router.show(.loopDelaySchedule)
         default:
             break
         }
@@ -1083,9 +1081,16 @@ private struct SettingsNativeSectionView: View {
                 }
             } footer: {
                 if let footer = section.footer {
-                    Text(footer)
-                        .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
-                        .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        if let indicator = section.footerIndicator {
+                            Image(systemName: indicator.symbolName)
+                                .foregroundStyle(indicator.color)
+                                .accessibilityHidden(true)
+                        }
+                        Text(footer)
+                            .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                    }
+                    .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
                 }
             }
         }

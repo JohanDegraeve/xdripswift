@@ -945,20 +945,12 @@ enum Texts_HomeView {
         return NSLocalizedString("postProcessingEnableCurveAdjustment", tableName: filename, bundle: Bundle.main, value: "Enable Curve Adjustment?", comment: "confirmation alert title before enabling scale and emphasis adjustments")
     }()
 
-    static let postProcessingEnableGlucoseSmoothing: String = {
-        return NSLocalizedString("postProcessingEnableGlucoseSmoothing", tableName: filename, bundle: Bundle.main, value: "Enable Glucose Smoothing?", comment: "confirmation alert title before enabling smoothing")
-    }()
-
     static let postProcessingGlucoseAdjustmentWarning: String = {
         return NSLocalizedString("postProcessingGlucoseAdjustmentWarning", tableName: filename, bundle: Bundle.main, value: "Glucose Adjustment adds or subtracts a fixed offset from your sensor readings. Only enable it after confirming a consistent difference against fingerstick readings when glucose is stable. Large or persistent differences may indicate an unreliable sensor.", comment: "warning shown before enabling a fixed glucose offset")
     }()
 
     static let postProcessingCurveAdjustmentWarning: String = {
         return NSLocalizedString("postProcessingCurveAdjustmentWarning", tableName: filename, bundle: Bundle.main, value: "Curve Adjustment is an advanced feature that changes how glucose values are scaled. Only enable it if you understand how Scale and Emphasis affect your readings.", comment: "warning shown before enabling glucose curve adjustments")
-    }()
-
-    static let postProcessingGlucoseSmoothingWarning: String = {
-        return NSLocalizedString("postProcessingGlucoseSmoothingWarning", tableName: filename, bundle: Bundle.main, value: "Glucose Smoothing reduces jumps, noise and fluctuations in sensor readings, but may delay or soften rapid glucose changes. Only enable it if you understand how it affects your readings. Smoothing cannot correct an inaccurate sensor.", comment: "warning shown before enabling glucose smoothing")
     }()
 
     static let postProcessingWarningAgreement: String = {
@@ -1025,9 +1017,25 @@ enum Texts_HomeView {
         return NSLocalizedString("postProcessingSofterLowsDescription", tableName: filename, bundle: Bundle.main, value: "Applies more of the scale effect at lower glucose values and less at higher values.", comment: "post processing explanation for lows emphasis option")
     }()
 
-    static let postProcessingSmoothing: String = {
-        return NSLocalizedString("postProcessingSmoothing", tableName: filename, bundle: Bundle.main, value: "Glucose Smoothing", comment: "post processing section title for smoothing")
-    }()
+    static let postProcessingPreviousReadings = NSLocalizedString("postProcessingPreviousReadings", tableName: filename, bundle: Bundle.main, value: "Smooth Previous Readings", comment: "Section title for historical glucose smoothing")
+    static let postProcessingPreviousReadingsFooter = NSLocalizedString("postProcessingPreviousReadingsFooter", tableName: filename, bundle: Bundle.main, value: "Smooth previous readings on the chart as new readings arrive. This will not affect the latest reading.", comment: "Historical glucose smoothing footer")
+    static let postProcessingLatestReading = NSLocalizedString("postProcessingLatestReading", tableName: filename, bundle: Bundle.main, value: "Smooth Latest Reading", comment: "Section title for smoothing the current glucose reading")
+    static let postProcessingLatestReadingFooter = NSLocalizedString("postProcessingLatestReadingFooter", tableName: filename, bundle: Bundle.main, value: "Soften unexpected rises or drops in the latest glucose reading using the last 10–20 minutes of readings. This affects only the latest reading when enabled.", comment: "Current glucose smoothing footer")
+    static let postProcessingLatestReadingOff = NSLocalizedString("postProcessingLatestReadingOff", tableName: filename, bundle: Bundle.main, value: "Off", comment: "Turns latest reading smoothing off")
+    static let postProcessingCurve = NSLocalizedString("postProcessingCurve", tableName: filename, bundle: Bundle.main, value: "Curve", comment: "Curve-only adjustment mode")
+    static let postProcessingBoth = NSLocalizedString("postProcessingBoth", tableName: filename, bundle: Bundle.main, value: "Both", comment: "Apply both offset and curve adjustments")
+    static let postProcessingOffsetAndCurve = NSLocalizedString("postProcessingOffsetAndCurve", tableName: filename, bundle: Bundle.main, value: "Offset & Curve", comment: "Glucose adjustment section title")
+    static let postProcessingMode = NSLocalizedString("postProcessingMode", tableName: filename, bundle: Bundle.main, value: "Mode", comment: "Label for the glucose adjustment mode picker")
+    static let postProcessingUnavailable = NSLocalizedString("postProcessingUnavailable", tableName: filename, bundle: Bundle.main, value: "Unavailable", comment: "Glucose adjustment is unavailable for this source")
+    static let postProcessingExpanded = NSLocalizedString("postProcessingExpanded", tableName: filename, bundle: Bundle.main, value: "Expanded", comment: "VoiceOver value for an expanded settings section")
+    static let postProcessingCollapsed = NSLocalizedString("postProcessingCollapsed", tableName: filename, bundle: Bundle.main, value: "Collapsed", comment: "VoiceOver value for a collapsed settings section")
+    static let postProcessingReferenceGlucose = NSLocalizedString("postProcessingReferenceGlucose", tableName: filename, bundle: Bundle.main, value: "Reference Glucose", comment: "Reference glucose field in the offset entry sheet")
+    static let postProcessingEnterReferenceGlucose = NSLocalizedString("postProcessingEnterReferenceGlucose", tableName: filename, bundle: Bundle.main, value: "Enter Reference Glucose", comment: "Accessibility label for the reference glucose entry button")
+    static let postProcessingDecrease = NSLocalizedString("postProcessingDecrease", tableName: filename, bundle: Bundle.main, value: "Decrease %@", comment: "VoiceOver label for a minus button. The placeholder is Offset or Scale")
+    static let postProcessingIncrease = NSLocalizedString("postProcessingIncrease", tableName: filename, bundle: Bundle.main, value: "Increase %@", comment: "VoiceOver label for a plus button. The placeholder is Offset or Scale")
+    static let postProcessingCurveShape = NSLocalizedString("postProcessingCurveShape", tableName: filename, bundle: Bundle.main, value: "Shape", comment: "Curve shape picker title")
+    static let postProcessingLatestReadingDisabled = NSLocalizedString("postProcessingLatestReadingDisabled", tableName: filename, bundle: Bundle.main, value: "Live smoothing disabled", comment: "Preview status when latest reading smoothing is off")
+    static let postProcessingLatestReadingWarning = NSLocalizedString("postProcessingLatestReadingWarning", tableName: filename, bundle: Bundle.main, value: "Smoothing the latest reading can soften or delay the display of real glucose changes and affect when glucose alerts trigger. The value shown here may differ from the value shown in other apps for the same reading.", comment: "Confirmation before enabling smoothing of the live glucose reading")
 
     static let postProcessingStrength: String = {
         return NSLocalizedString("postProcessingStrength", tableName: filename, bundle: Bundle.main, value: "Strength", comment: "post processing smoothing strength picker title")
@@ -1042,7 +1050,7 @@ enum Texts_HomeView {
     }()
 
     static let postProcessingAlgorithmSavitzkyGolayDescription: String = {
-        return NSLocalizedString("postProcessingAlgorithmSavitzkyGolayDescription", tableName: filename, bundle: Bundle.main, value: "Savitzky-Golay smooths the glucose curve by fitting short local windows while preserving the general shape of peaks and troughs.", comment: "post processing footer text explaining the selected Savitzky-Golay smoothing algorithm")
+        return NSLocalizedString("postProcessingAlgorithmSavitzkyGolayDescription", tableName: filename, bundle: Bundle.main, value: "A Hampel filter first reduces isolated outliers. Savitzky-Golay then smooths the curve while preserving the general shape of peaks and troughs.", comment: "post processing footer text explaining the selected Savitzky-Golay smoothing algorithm")
     }()
 
     static let postProcessingAlgorithmExponential: String = {
@@ -1067,14 +1075,6 @@ enum Texts_HomeView {
 
     static let postProcessingAlgorithmLoessDescription: String = {
         return NSLocalizedString("postProcessingAlgorithmLoessDescription", tableName: filename, bundle: Bundle.main, value: "LOESS fits a small weighted regression around each reading, usually preserving ramps and bends while looking smoother and less rigid than a simple filter pass.", comment: "post processing footer text explaining the selected LOESS smoothing algorithm")
-    }()
-
-    static let postProcessingAlgorithmHampelSavitzkyGolay: String = {
-        return NSLocalizedString("postProcessingAlgorithmHampelSavitzkyGolay", tableName: filename, bundle: Bundle.main, value: "Hampel + Savitzky-Golay", comment: "post processing Hampel plus Savitzky-Golay smoothing algorithm")
-    }()
-
-    static let postProcessingAlgorithmHampelSavitzkyGolayDescription: String = {
-        return NSLocalizedString("postProcessingAlgorithmHampelSavitzkyGolayDescription", tableName: filename, bundle: Bundle.main, value: "This hybrid first suppresses isolated spike-like outliers with a Hampel pass, then applies Savitzky-Golay smoothing to keep the broader glucose curve natural.", comment: "post processing footer text explaining the selected Hampel plus Savitzky-Golay smoothing algorithm")
     }()
 
     static let postProcessingLight: String = {
@@ -1166,11 +1166,11 @@ enum Texts_HomeView {
     }()
     
     static let postProcessingOffsetBgCheckHint: String = {
-        return NSLocalizedString("postProcessingOffsetBgCheckHint", tableName: filename, bundle: Bundle.main, value: "At least one recent BG check recommended", comment: "post processing hint shown when no BG check is visible in the preview while adjusting offset")
+        return NSLocalizedString("postProcessingOffsetBgCheckHint", tableName: filename, bundle: Bundle.main, value: "One recent BG check recommended", comment: "post processing hint shown when no BG check is visible in the preview while adjusting offset")
     }()
     
     static let postProcessingScaleBgCheckHint: String = {
-        return NSLocalizedString("postProcessingScaleBgCheckHint", tableName: filename, bundle: Bundle.main, value: "At least two recent BG checks recommended", comment: "post processing hint shown when fewer than two BG checks are visible in the preview while adjusting scale or emphasis")
+        return NSLocalizedString("postProcessingScaleBgCheckHint", tableName: filename, bundle: Bundle.main, value: "Two recent BG checks recommended", comment: "post processing hint shown when fewer than two BG checks are visible in the preview while adjusting scale or emphasis")
     }()
     
     static let postProcessingAdjustmentDisabledBecauseSensorIsCalibrated: String = {

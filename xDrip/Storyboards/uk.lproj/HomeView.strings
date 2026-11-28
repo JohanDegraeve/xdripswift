@@ -158,6 +158,7 @@
 "postProcessingAlgorithm" = "Algorithm";
 "sensorLifetimeRemainingFormat" = "Залишилося %@";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Фільтр Гампеля спочатку послаблює поодинокі викиди. Потім фільтр Савицького-Ґолея згладжує криву, зберігаючи загальну форму піків і спадів.";
 
 "sensorManagementNoiseTitle" = "Шум сенсора";
 "sensorManagementNoiseShortTerm" = "Останні 30 хвилин";
@@ -289,3 +290,30 @@
 "postProcessingAdjustmentUnavailableNativeCalibration" = "Налаштування зміщення та форми недоступне, оскільки цей CGM використовує власне калібрування.";
 
 "postProcessingWarningAgreement" = "Натискайте «OK», лише якщо ви розумієте цю функцію та погоджуєтеся її ввімкнути.";
+
+"postProcessingPreviousReadings" = "Згладжувати попередні показники";
+"postProcessingPreviousReadingsFooter" = "Згладжує попередні показники на графіку в міру надходження нових. Найновіший показник не змінюється.";
+"postProcessingLatestReading" = "Згладжувати найновіший показник";
+"postProcessingLatestReadingFooter" = "Пом’якшує несподівані підйоми або падіння в найновішому показнику глюкози за даними останніх 10–20 хвилин. Якщо ввімкнено, впливає лише на найновіший показник.";
+"postProcessingLatestReadingOff" = "Вимкнено";
+"postProcessingLatestReadingDisabled" = "Згладжування найновішого показника вимкнено";
+"postProcessingLatestReadingWarning" = "Згладжування найновішого показника може послабити або затримати відображення справжніх змін глюкози й вплинути на час спрацювання сповіщень. Інші застосунки можуть показувати інше значення для того самого вимірювання.";
+
+"postProcessingOffset" = "Зміщення";
+"postProcessingCurve" = "Крива";
+"postProcessingBoth" = "Обидва";
+"postProcessingOffsetAndCurve" = "Зміщення та крива";
+"postProcessingMode" = "Режим";
+"postProcessingUnavailable" = "Недоступно";
+"postProcessingExpanded" = "Розгорнуто";
+"postProcessingCollapsed" = "Згорнуто";
+"postProcessingReferenceGlucose" = "Референтна глюкоза";
+"postProcessingEnterReferenceGlucose" = "Введіть референтну глюкозу";
+"postProcessingDecrease" = "Зменшити: %@";
+"postProcessingIncrease" = "Збільшити: %@";
+"postProcessingLight" = "Слабке";
+"postProcessingMedium" = "Середнє";
+"postProcessingStrong" = "Сильне";
+"postProcessingCurveShape" = "Форма";
+"postProcessingOffsetBgCheckHint" = "Рекомендовано один нещодавній вимір глюкози крові";
+"postProcessingScaleBgCheckHint" = "Рекомендовано два нещодавні виміри глюкози крові";
